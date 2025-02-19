@@ -1,3 +1,4 @@
+import { Vote } from '@timolegros/snapshot.js';
 import { notifyError } from 'controllers/app/notifications';
 import { ExternalEndpoints, queryClient } from 'state/api/config';
 import {
@@ -91,10 +92,12 @@ class SnapshotLazyLoader {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function castVote(address: string, payload: any, spaceId: string) {
+export async function castVote(
+  address: string,
+  payload: Vote,
+  spaceId: string,
+) {
   const { Web3Provider } = await import('@ethersproject/providers');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
