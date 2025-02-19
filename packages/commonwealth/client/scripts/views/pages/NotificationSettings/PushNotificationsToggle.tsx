@@ -1,11 +1,11 @@
 import React from 'react';
 // eslint-disable-next-line max-len
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
-import { useSubscriptionPreferenceSetting } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
 import {
   SubscriptionPrefType,
-  useSubscriptionPreferenceSettingCallback,
-} from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingCallback';
+  useSubscriptionPreferenceSetting,
+} from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
+import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 
 interface PushNotificationsToggleProps {
   readonly pref: SubscriptionPrefType;
@@ -18,11 +18,7 @@ export const PushNotificationsToggle = (
 
   const checked = useSubscriptionPreferenceSetting(pref);
 
-  const [, activate] = useSubscriptionPreferenceSettingCallback(pref);
+  const toggle = useSubscriptionPreferenceSettingToggle([pref]);
 
-  if (checked == undefined) {
-    return null;
-  }
-
-  return <CWToggle checked={checked} onChange={() => activate(!checked)} />;
+  return <CWToggle checked={checked} onChange={() => toggle(!checked)} />;
 };

@@ -20,6 +20,9 @@ export type SubscriptionPrefType =
   | 'mobile_push_discussion_activity_enabled'
   | 'mobile_push_admin_alerts_enabled';
 
+/**
+ * @deprecated
+ */
 export function useSubscriptionPreferenceSettingCallback(
   pref: SubscriptionPrefType,
 ): UseSubscriptionPreferenceSettingCallbackResult {
