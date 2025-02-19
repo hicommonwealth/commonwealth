@@ -73,6 +73,7 @@ export const QuestActionMeta = (
         allowNull: true,
       },
       action_link: { type: Sequelize.STRING, allowNull: true },
+      content_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

@@ -80,6 +80,7 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
+  content_id?: number, // thread or comment id
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -88,6 +89,12 @@ async function recordXpsForQuest(
 
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
+      if (action_meta.content_id) {
+        const parts = action_meta.content_id.split(':');
+        if (parts.length !== 2) continue;
+        if (parts[1] !== content_id?.toString()) continue;
+      }
+
       // get logged actions for this user and action meta
       const log = await models.XpLog.findAll({
         where: {
@@ -303,6 +310,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           thread!.Address!.address,
+          thread!.id,
         );
       },
       CommentCreated: async ({ payload }) => {
@@ -345,6 +353,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           comment!.Address!.address,
+          comment!.id,
         );
       },
       UserMentioned: async () => {
