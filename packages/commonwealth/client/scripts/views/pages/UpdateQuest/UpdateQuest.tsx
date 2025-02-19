@@ -125,7 +125,8 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 }),
               subForms: (quest.action_metas || [])?.map((action) => ({
                 action: action.event_name as QuestAction,
-                creatorRewardAmount: `${action.creator_reward_weight * 100}`,
+                // pass creator xp value (not fractional percentage)
+                creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
                 actionLink: action.action_link,
               })),
