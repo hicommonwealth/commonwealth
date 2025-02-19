@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      event_signatures: {
+      event_signature: {
         type: Sequelize.STRING,
         primaryKey: true,
       },
