@@ -811,7 +811,7 @@ describe('Thread lifecycle', () => {
         community_id: thread!.community_id,
       });
       const deleted = await command(DeleteComment(), {
-        actor: actors.member,
+        actor: actors.admin,
         payload: { comment_id: tbd!.id! },
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });
