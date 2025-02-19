@@ -35,11 +35,7 @@ const QuestList = () => {
   };
 
   const handleCTAClick = (questId: number, communityId?: string) => {
-    navigate(
-      `${communityId ? `/${communityId}` : ''}/quest/${questId}`,
-      {},
-      null,
-    );
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleLeaderboardClick = () => {
