@@ -1,4 +1,5 @@
 import { Projection } from '@hicommonwealth/core';
+import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
@@ -410,6 +411,29 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
+      },
+      CustomXpChainEvent: async ({ payload }) => {
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
+          where: {
+            eth_chain_id: payload.eth_chain_id,
+          },
+        });
+        if (!chainNode) return;
+        const { tx } = await getTransaction({
+          rpc: chainNode.private_url || chainNode.url,
+          txHash: payload.transaction_hash,
+        });
+        const user_id = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user_id) return;
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
       },
     },
   };

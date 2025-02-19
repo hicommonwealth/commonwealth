@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import {
   communityStakesAbi,
   decodeLog,
@@ -8,45 +9,10 @@ import {
   referralFeeManager,
   singleContestAbi,
 } from '@hicommonwealth/evm-protocols';
-import { EventPair, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
+import { EvmEvent, EvmMapper } from './types';
 
-export type EvmBlockDetails = {
-  number: bigint;
-  hash: string;
-  logsBloom: string;
-  nonce?: string;
-  parentHash: string;
-  timestamp: bigint;
-  miner: string;
-  gasLimit: bigint;
-};
-
-export type Log = {
-  blockNumber: bigint;
-  blockHash: string;
-  transactionIndex: number;
-
-  removed: boolean;
-
-  address: string;
-  data: string;
-
-  topics: Array<string>;
-
-  transactionHash: string;
-  logIndex: number;
-};
-
-export type EvmEvent = {
-  eventSource: {
-    ethChainId: number;
-    eventSignature: string;
-  };
-  rawLog: Log;
-  block: EvmBlockDetails;
-};
-
-type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
+const log = logger(import.meta);
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   event: EvmEvent,
@@ -296,6 +262,27 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   };
 };
 
+const customXpChainEventMapper: EvmMapper<'CustomXpChainEvent'> = (
+  event: EvmEvent,
+) => {
+  if (
+    !('quest_action_meta_id' in event.meta) ||
+    !event.meta.quest_action_meta_id
+  ) {
+    throw new Error('Custom XP chain event is missing quest action meta id');
+  }
+
+  return {
+    event_name: 'CustomXpChainEvent',
+    event_payload: {
+      eth_chain_id: event.eventSource.ethChainId,
+      quest_action_meta_id: event.meta.quest_action_meta_id,
+      transaction_hash: event.rawLog.transactionHash,
+      created_at: new Date(Number(event.block.timestamp)),
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -325,4 +312,7 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // User defined events (no hardcoded event signatures)
+  CustomXpChainEvent: customXpChainEventMapper,
 };

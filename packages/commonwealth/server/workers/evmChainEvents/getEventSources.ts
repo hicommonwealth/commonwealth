@@ -4,9 +4,13 @@ import {
   EventRegistry,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
-import { buildChainNodeUrl, models } from '@hicommonwealth/model';
-import { z } from 'zod';
-import { CeEventSource, ContractSources, EvmSources } from './types';
+import {
+  EvmContractSources,
+  EvmEventSource,
+  EvmSources,
+  buildChainNodeUrl,
+  models,
+} from '@hicommonwealth/model';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
 
@@ -29,7 +33,7 @@ export async function getEventSources(): Promise<EvmSources> {
 
     const entries = Object.entries<ContractSource>(EventRegistry[ethChainId]);
 
-    const registryContractSources: ContractSources = {};
+    const registryContractSources: EvmContractSources = {};
     for (const [address, source] of entries) {
       registryContractSources[address] = source.eventSignatures.map(
         (signature) => ({
@@ -43,7 +47,7 @@ export async function getEventSources(): Promise<EvmSources> {
       );
     }
 
-    const dbContractSources: ContractSources = {};
+    const dbContractSources: EvmContractSources = {};
     for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
@@ -67,7 +71,7 @@ export async function getEventSources(): Promise<EvmSources> {
         contract_address: source.contract_address,
         event_signature: source.event_signature,
       };
-      let buildSource: z.infer<typeof CeEventSource>;
+      let buildSource: EvmEventSource;
       if (source.events_migrated === true) {
         buildSource = {
           ...sharedSource,

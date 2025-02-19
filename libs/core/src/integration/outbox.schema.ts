@@ -48,6 +48,7 @@ export const outboxEvents: Events[] = [
   'LaunchpadTokenCreated',
   'LaunchpadTokenTraded',
   'ReferralFeeDistributed',
+  'CustomXpChainEvent',
 ] as const;
 
 export const Outbox = z.union(
