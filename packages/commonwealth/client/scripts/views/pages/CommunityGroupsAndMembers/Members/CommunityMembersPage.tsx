@@ -477,7 +477,7 @@ const CommunityMembersPage = () => {
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
             extraColumns={extraColumns}
-            refetch={refetchMembers}
+            refetch={() => void refetchMembers()}
           />
         )}
       </section>
