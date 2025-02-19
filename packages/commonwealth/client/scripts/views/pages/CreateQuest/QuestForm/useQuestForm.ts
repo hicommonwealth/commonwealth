@@ -271,7 +271,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             start_date: new Date(values.start_date),
           }),
           image_url: values.image,
-          // community_id: values.community.value || null, TODO: Add support for this
+          community_id: values?.community?.value || undefined,
           action_metas: questActionSubForms.map((subForm) => ({
             event_name: subForm.values.action as QuestAction,
             reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
@@ -297,7 +297,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
         notifySuccess('Quest updated!');
 
-        navigate(`/quest/${questId}`); // redirect to quest details page after update
+        navigate(`/quest/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
       } catch (e) {
         console.error(e);
 
