@@ -171,6 +171,7 @@ const CommunityMembersPage = () => {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
+    refetch: refetchMembers,
   } = useGetMembersQuery({
     order_by: (tableState.orderBy === 'lastActive'
       ? 'last_active'
@@ -476,6 +477,7 @@ const CommunityMembersPage = () => {
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
             extraColumns={extraColumns}
+            refetch={refetchMembers}
           />
         )}
       </section>
