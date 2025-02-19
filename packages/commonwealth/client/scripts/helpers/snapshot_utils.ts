@@ -1,4 +1,12 @@
-import { Vote } from '@timolegros/snapshot.js';
+import {
+  Proposal,
+  Client as SnapshotClient,
+  Vote,
+  VoteClasses,
+  getBlockNumber,
+  getProvider,
+  utils,
+} from '@timolegros/snapshot.js';
 import { notifyError } from 'controllers/app/notifications';
 import { ExternalEndpoints, queryClient } from 'state/api/config';
 import {
@@ -68,29 +76,7 @@ export type SnapshotProposalVote = {
   balance: number;
 };
 
-class SnapshotLazyLoader {
-  private static snapshot;
-  private static client;
-
-  private static async init() {
-    if (!this.snapshot) {
-      const module = await import('@snapshot-labs/snapshot.js');
-      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-      this.client = new module.default.Client712(hub);
-      this.snapshot = module.default;
-    }
-  }
-
-  public static async getSnapshot() {
-    await this.init();
-    return this.snapshot;
-  }
-
-  public static async getClient() {
-    await this.init();
-    return this.client;
-  }
-}
+const client = new SnapshotClient('https://hub.snapshot.org');
 
 export async function castVote(
   address: string,
@@ -99,7 +85,6 @@ export async function castVote(
 ) {
   const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
-  const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
   await queryClient.invalidateQueries({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
@@ -108,17 +93,14 @@ export async function castVote(
 
 export async function createProposal(
   address: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: any,
+  payload: Proposal,
   spaceId: string,
 ) {
   const { Web3Provider } = await import('@ethersproject/providers');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
-  const client = await SnapshotLazyLoader.getClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res = await client.proposal(web3 as any, address, payload);
+  const res = await client.proposal(web3, address, payload);
 
   await queryClient.invalidateQueries({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
@@ -128,16 +110,14 @@ export async function createProposal(
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
-  const snapshot = await SnapshotLazyLoader.getSnapshot();
-  return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
+  return getBlockNumber(getProvider(network));
 }
 
 export async function getScore(
   space: SnapshotSpace,
   address: string,
 ): Promise<Array<{ [index: string]: number }>> {
-  const snapshot = await SnapshotLazyLoader.getSnapshot();
-  return snapshot.utils.getScores(
+  return utils.getScores(
     space?.id,
     space?.strategies,
     space?.network,
@@ -172,8 +152,7 @@ export async function getResults(
       let attempts = 0;
       while (attempts <= 3) {
         try {
-          const snapshot = await SnapshotLazyLoader.getSnapshot();
-          const scores = await snapshot?.utils?.getScores(
+          const scores = await utils.getScores(
             space?.id,
             strategies,
             space?.network,
@@ -206,12 +185,7 @@ export async function getResults(
     }
 
     /* Get results */
-    const snapshot = await SnapshotLazyLoader.getSnapshot();
-    const votingClass = new snapshot.utils.voting[proposal.type](
-      proposal,
-      votes,
-      strategies,
-    );
+    const votingClass = VoteClasses[proposal.type](proposal, votes, strategies);
     const results = {
       resultsByVoteBalance: votingClass.getScores(),
       resultsByStrategyScore: votingClass.getScoresByStrategy(),
@@ -235,21 +209,17 @@ export async function getPower(
   proposal: SnapshotProposal,
   address: string,
 ): Promise<Power> {
-  const snapshot = await SnapshotLazyLoader.getSnapshot();
-  const blockNumber = await snapshot.utils.getBlockNumber(
-    snapshot.utils.getProvider(space.network),
-  );
+  const blockNumber = await getBlockNumber(getProvider(space.network));
   const blockTag =
     +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
-  const scores: Array<{ [who: string]: number }> =
-    await snapshot.utils.getScores(
-      space?.id,
-      proposal?.strategies,
-      space?.network,
-      [address],
-      blockTag,
-      // Snapshot.utils.getProvider(space.network),
-    );
+  const scores: Array<{ [who: string]: number }> = await utils.getScores(
+    space?.id,
+    proposal?.strategies!,
+    space?.network,
+    [address],
+    blockTag,
+    // Snapshot.utils.getProvider(space.network),
+  );
   const summedScores = scores.map((score) =>
     Object.values(score).reduce((a, b) => a + b, 0),
   );
