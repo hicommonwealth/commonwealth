@@ -23,7 +23,8 @@ export function CancelContestManagerMetadata(): Command<
       });
       mustExist('Contest Manager', contestManager);
 
-      if (contestManager.neynar_webhook_id) {
+      // only delete webhooks in prod, otherwise non-prod environments may delete a prod contest webhook
+      if (config.APP_ENV === 'production' && contestManager.neynar_webhook_id) {
         const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
         try {
           await client.deleteWebhook(contestManager.neynar_webhook_id);
