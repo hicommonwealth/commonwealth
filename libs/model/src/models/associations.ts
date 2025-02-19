@@ -43,7 +43,7 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'action_meta_id',
       asOne: 'quest_action_meta',
     })
-    .withMany(db.CustomXpEventSource, {
+    .withMany(db.ChainEventXpSource, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -73,7 +73,7 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.PinnedToken, {
       onDelete: 'CASCADE',
     })
-    .withMany(db.CustomXpEventSource, {
+    .withMany(db.ChainEventXpSource, {
       foreignKey: 'chain_node_id',
       onDelete: 'CASCADE',
     });
