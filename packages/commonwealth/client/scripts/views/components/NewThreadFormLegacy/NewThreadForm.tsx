@@ -235,19 +235,36 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
   const handleNewThreadCreation = async () => {
+    console.log('NewThreadForm: handleNewThreadCreation started');
+    console.log('NewThreadForm: Community context:', {
+      selectedCommunityId,
+      isInsideCommunity,
+      currentLocation: window.location.pathname,
+      hasCommunity: !!community,
+      communityBase: community?.base,
+      hasUserAddress: !!userSelectedAddress,
+    });
+
     const isAIMode = aiCommentsToggleEnabled;
 
     if (!community || !userSelectedAddress || !selectedCommunityId) {
+      console.log('NewThreadForm: Invalid form state:', {
+        hasCommunity: !!community,
+        hasAddress: !!userSelectedAddress,
+        hasCommunityId: !!selectedCommunityId,
+      });
       notifyError('Invalid form state!');
       return;
     }
 
     if (isRestrictedMembership) {
+      console.log('NewThreadForm: Topic is gated');
       notifyError('Topic is gated!');
       return;
     }
 
     if (!isDiscussion && !detectURL(threadUrl)) {
+      console.log('NewThreadForm: Invalid URL for non-discussion thread');
       notifyError('Must provide a valid URL.');
       return;
     }
@@ -264,6 +281,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
       : serializeDelta(threadContentDelta);
 
     if (!isAIMode) {
+      console.log('NewThreadForm: Checking thread errors');
       const deltaString = JSON.stringify(threadContentDelta);
       checkNewThreadErrors(
         { threadKind, threadUrl, threadTitle, threadTopic },
@@ -275,6 +293,21 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     setIsSaving(true);
 
     try {
+      console.log('NewThreadForm: Building thread input with topic:', {
+        topicId: threadTopic?.id,
+        topicName: threadTopic?.name,
+        hasThreadUrl: !!threadUrl,
+        threadKind,
+        effectiveTitle,
+        hasEffectiveBody: !!effectiveBody,
+      });
+
+      if (!threadTopic) {
+        console.error('NewThreadForm: No topic selected');
+        notifyError('Please select a topic');
+        return;
+      }
+
       const input = await buildCreateThreadInput({
         address: userSelectedAddress || '',
         kind: threadKind,
@@ -292,32 +325,65 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
         }),
       });
 
-      const thread = await createThread(input);
+      console.log('NewThreadForm: Thread input built successfully:', {
+        address: userSelectedAddress,
+        communityId: selectedCommunityId,
+        title: effectiveTitle,
+        topicId: threadTopic.id,
+      });
 
+      console.log('NewThreadForm: Creating thread with input:', input);
+      const thread = await createThread(input);
+      console.log('NewThreadForm: Thread created successfully:', {
+        id: thread.id,
+        title: thread.title,
+        community_id: thread.community_id,
+      });
+
+      console.log('NewThreadForm: Clearing form state');
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(
-        `${isInsideCommunity ? '' : `/${selectedCommunityId}`}/discussion/${thread.id}-${thread.title}`,
-      );
+      // Construct the correct navigation path
+      const communityPrefix = isInsideCommunity
+        ? ''
+        : `/${selectedCommunityId}`;
+      const navigationUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+      console.log('NewThreadForm: Navigation details:', {
+        isInsideCommunity,
+        communityPrefix,
+        threadId: thread.id,
+        threadTitle: thread.title,
+        fullUrl: navigationUrl,
+        currentPath: window.location.pathname,
+      });
+
+      console.log('NewThreadForm: Attempting navigation to:', navigationUrl);
+      navigate(navigationUrl);
+      console.log('NewThreadForm: Navigation function called');
     } catch (err) {
+      console.error('NewThreadForm: Error occurred:', err);
       if (err instanceof SessionKeyError) {
+        console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
         return;
       }
 
       if (err?.message?.includes('limit')) {
+        console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
           'Limit of submitted threads in selected contest has been exceeded.',
         );
         return;
       }
 
-      console.error(err?.message);
+      console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
     } finally {
+      console.log('NewThreadForm: Cleanup in finally block');
       setIsSaving(false);
       if (!isInsideCommunity) {
+        console.log('NewThreadForm: Clearing address selector');
         user.setData({
           addressSelectorSelectedAddress: undefined,
         });

@@ -70,25 +70,48 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   const handleThreadCreation = useCallback(
     async (input: string): Promise<number> => {
+      console.log('MobileStickyInput: handleThreadCreation started');
+      console.log('MobileStickyInput: Current communityId:', communityId);
+      console.log(
+        'MobileStickyInput: Current location:',
+        window.location.pathname,
+      );
+
       if (!app.chain?.base) {
+        console.log('MobileStickyInput: No chain base found');
         notifyError('Invalid community configuration');
         throw new Error('Invalid community configuration');
       }
 
       try {
+        console.log('MobileStickyInput: Fetching topics...');
         // Find a default topic (prefer "General" if it exists)
         const { data: topics = [] } = await useFetchTopicsQuery({
           communityId,
           apiEnabled: !!communityId,
         });
+        console.log(
+          'MobileStickyInput: Topics fetched:',
+          topics.map((t) => ({ id: t.id, name: t.name })),
+        );
+
         const defaultTopic =
           topics.find((t) => t.name.toLowerCase() === 'general') || topics[0];
 
         if (!defaultTopic) {
+          console.log('MobileStickyInput: No default topic found');
           notifyError('No topic available for thread creation');
           throw new Error('No topic available');
         }
+        console.log('MobileStickyInput: Selected default topic:', {
+          id: defaultTopic.id,
+          name: defaultTopic.name,
+        });
 
+        console.log(
+          'MobileStickyInput: Building thread input with topic:',
+          defaultTopic,
+        );
         const threadInput = await buildCreateThreadInput({
           address: user.activeAccount?.address || '',
           kind: 'discussion',
@@ -102,24 +125,56 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
           body: input,
         });
 
+        console.log(
+          'MobileStickyInput: Creating thread with input:',
+          threadInput,
+        );
         const thread = await createThread(threadInput);
+
         if (!thread?.id) {
+          console.log('MobileStickyInput: No thread ID returned');
           throw new Error('Failed to create thread - no ID returned');
         }
+        console.log('MobileStickyInput: Thread created successfully:', {
+          id: thread.id,
+          title: thread.title,
+          community_id: thread.community_id,
+        });
 
         // Close the form before navigation
+        console.log('MobileStickyInput: Closing form');
         setFocused(false);
 
         // Clear any content
+        console.log('MobileStickyInput: Clearing content');
         props.setContentDelta(createDeltaFromText(''));
 
-        // Ensure navigation happens after thread is created and cleanup
-        const threadUrl = `/${communityId}/discussion/${thread.id}-${thread.title}`;
-        setTimeout(() => navigate(threadUrl), 0);
+        // Construct the correct navigation path
+        const communityPrefix = communityId ? `/${communityId}` : '';
+        const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+        console.log('MobileStickyInput: Navigation details:', {
+          communityPrefix,
+          threadId: thread.id,
+          threadTitle: thread.title,
+          fullUrl: threadUrl,
+          currentPath: window.location.pathname,
+        });
 
+        console.log('MobileStickyInput: Setting up navigation timeout');
+        setTimeout(() => {
+          console.log('MobileStickyInput: Pre-navigation state:', {
+            focused: focused,
+            currentPath: window.location.pathname,
+            targetUrl: threadUrl,
+          });
+          navigate(threadUrl);
+          console.log('MobileStickyInput: Navigation function called');
+        }, 0);
+
+        console.log('MobileStickyInput: Returning thread ID');
         return thread.id;
       } catch (error) {
-        console.error('Failed to create thread:', error);
+        console.error('MobileStickyInput: Error creating thread:', error);
         notifyError('Failed to create thread');
         throw error;
       }
@@ -132,6 +187,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       user.activeAccount,
       setFocused,
       props.setContentDelta,
+      focused,
     ],
   );
 

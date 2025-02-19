@@ -1,11 +1,11 @@
 import { useFlag } from 'hooks/useFlag';
-import React, { useCallback, useMemo, useState, useContext } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
@@ -13,13 +13,12 @@ import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
 // --- Thread creation imports ---
-import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import { useCreateThreadMutation } from 'state/api/threads';
-import { ThreadKind, ThreadStage } from 'models/types';
-import { getEthChainIdOrBech32Prefix } from 'controllers/server/sessions';
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useCreateThreadMutation } from 'state/api/threads';
+import { buildCreateThreadInput } from 'state/api/threads/createThread';
 
 // NEW: Import topics query to allow searching for a default topic
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -53,7 +52,9 @@ export const MobileInput = (props: MobileInputProps) => {
 
   // --- Thread creation hooks ---
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: createThreadMutation } = useCreateThreadMutation({ communityId });
+  const { mutateAsync: createThreadMutation } = useCreateThreadMutation({
+    communityId,
+  });
   const navigate = useCommonNavigate();
 
   // NEW: Fetch topics for default selection (similar to NewThreadForm)
@@ -62,11 +63,13 @@ export const MobileInput = (props: MobileInputProps) => {
     includeContestData: true,
     apiEnabled: !!communityId,
   });
-  const sortedTopics = [...fetchedTopics].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTopics = [...fetchedTopics].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   // Define default constants (must match NewThreadForm and ViewThreadPage)
-  const DEFAULT_THREAD_TITLE = "Untitled Discussion";
-  const DEFAULT_THREAD_BODY = "No content provided.";
+  const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
+  const DEFAULT_THREAD_BODY = 'No content provided.';
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -90,54 +93,77 @@ export const MobileInput = (props: MobileInputProps) => {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     // When AI mode is enabled or there is some text, allow submission on Enter.
-    if ((aiCommentsToggleEnabled || value.trim() !== '') && event.key === 'Enter') {
+    if (
+      (aiCommentsToggleEnabled || value.trim() !== '') &&
+      event.key === 'Enter'
+    ) {
       void handleSubmit();
     }
   };
 
   const handleSubmit = async () => {
     let submittedText = value.trim();
-    
+
     // For non-thread submissions, apply default text if nothing is provided.
     if (mode !== 'thread' && aiCommentsToggleEnabled && submittedText === '') {
       submittedText = 'New Comment';
     }
-    
+
     if (mode === 'thread') {
-      // --- Quick Thread Creation Logic ---
-      // For mobile thread creation in AI mode, we want to fill in default values so that backend validation passes.
-      // Here we use the entire input value for the body and the first newline for the title.
-      // If AI mode is enabled and no title was provided, default the title.
-      const effectiveTitle = DEFAULT_THREAD_TITLE;
-      // Only fill in the body default if no text was provided.
-      const effectiveBody = aiCommentsToggleEnabled ? (submittedText ? submittedText : DEFAULT_THREAD_BODY) : submittedText;
       try {
-        // Instead of a hard-coded object, search for a topic named "General" in the sorted topics.
+        // Find a default topic (prefer "General" if it exists)
         const defaultTopic =
-          sortedTopics.find(topic => topic.name.toLowerCase() === 'general') ||
-          (sortedTopics.length > 0 ? sortedTopics[0] : { id: 1, name: 'General' });
+          sortedTopics.find(
+            (topic) => topic.name.toLowerCase() === 'general',
+          ) || sortedTopics[0];
+
+        if (!defaultTopic) {
+          notifyError('No topic available for thread creation');
+          throw new Error('No topic available');
+        }
+
+        if (!app.chain?.base) {
+          notifyError('Invalid community configuration');
+          throw new Error('Invalid community configuration');
+        }
+
+        // For mobile thread creation in AI mode, we want to fill in default values
+        const effectiveTitle = aiCommentsToggleEnabled
+          ? DEFAULT_THREAD_TITLE
+          : submittedText.split('\n')[0] || DEFAULT_THREAD_TITLE;
+
+        const effectiveBody = aiCommentsToggleEnabled
+          ? submittedText || DEFAULT_THREAD_BODY
+          : submittedText;
+
         const threadInput = await buildCreateThreadInput({
           address: user.activeAccount?.address || '',
           kind: ThreadKind.Discussion,
           stage: ThreadStage.Discussion,
           communityId,
-          communityBase: app.chain?.base || '',
+          communityBase: app.chain.base,
           title: effectiveTitle,
           topic: defaultTopic,
           body: effectiveBody,
-          url: '', // For quick thread creation, URL is empty.
-          ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
-            base: app.chain?.base || '',
-            bech32_prefix: app.chain?.bech32_prefix || '',
-            eth_chain_id: app.chain?.ChainNode?.eth_chain_id || 0,
-          }),
         });
+
         const thread = await createThreadMutation(threadInput);
-        navigate(`/discussion/${thread.id}-${thread.title}`);
+
+        // Clear the input
         setValue('');
+
+        // Construct the correct navigation path with proper URL encoding
+        const encodedTitle = encodeURIComponent(
+          thread.title.replace(/\s+/g, '-'),
+        );
+        const threadUrl = `/discussion/${thread.id}-${encodedTitle}`;
+
+        // Use the common navigate function which handles prefixes and custom domains
+        // Use replace: true to prevent the redirect loop
+        navigate(threadUrl, { replace: true });
       } catch (error) {
+        console.error('Error creating thread:', error);
         notifyError('Failed to create thread');
-        console.error('Thread creation error:', error);
       }
     } else {
       // --- Traditional Comment Submission Logic ---
@@ -175,7 +201,9 @@ export const MobileInput = (props: MobileInputProps) => {
   };
 
   const avatarURL = useMemo(() => {
-    const filtered = user.accounts.filter((current) => current.profile?.avatarUrl);
+    const filtered = user.accounts.filter(
+      (current) => current.profile?.avatarUrl,
+    );
     return filtered.length > 0 ? filtered[0].profile?.avatarUrl : undefined;
   }, [user]);
 
@@ -183,8 +211,8 @@ export const MobileInput = (props: MobileInputProps) => {
     mode === 'thread'
       ? 'Create a thread...'
       : isReplying
-      ? `Replying to ${replyingToAuthor} ...`
-      : 'Comment on thread...';
+        ? `Replying to ${replyingToAuthor} ...`
+        : 'Comment on thread...';
 
   return (
     <div className="MobileInput">
@@ -219,7 +247,9 @@ export const MobileInput = (props: MobileInputProps) => {
               </div>
             )}
             <div className="RightButton">
-              {isReplying && <CWIconButton iconName="close" onClick={handleClose} />}
+              {isReplying && (
+                <CWIconButton iconName="close" onClick={handleClose} />
+              )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
             </div>
           </div>

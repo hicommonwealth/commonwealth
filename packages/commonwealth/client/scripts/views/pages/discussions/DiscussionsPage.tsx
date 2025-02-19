@@ -22,22 +22,35 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
+  ContentType,
   ZERO_ADDRESS,
   formatDecimalToWei,
   splitAndDecodeURL,
-  ContentType,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
+import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
+import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import useCreateThreadMutation, {
+  buildCreateThreadInput,
+} from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+} from 'views/components/react_quill_editor';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
@@ -50,15 +63,6 @@ import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
-import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
-import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
-import { createDeltaFromText, getTextFromDelta } from 'views/components/react_quill_editor';
-import type { DeltaStatic } from 'quill';
-import useCreateThreadMutation from 'state/api/threads/createThread';
-import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import { notifyError } from 'controllers/app/notifications';
 
 type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
@@ -211,6 +215,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicNameFromURL !== 'overview' &&
       tabStatus !== 'overview'
     ) {
+      // Don't redirect if we're on a discussion page
+      if (location.pathname.includes('/discussion/')) {
+        return;
+      }
+
       const validTopics = topics?.some(
         (topic) => topic?.name === topicNameFromURL,
       );
@@ -257,48 +266,88 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   };
 
   // Add sticky editor state
-  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
+    createDeltaFromText(''),
+  );
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId: communityId,
   });
 
   const handleCreateThread = async (): Promise<number> => {
+    console.log('DiscussionsPage: handleCreateThread started');
+    console.log('DiscussionsPage: Current communityId:', communityId);
+    console.log('DiscussionsPage: Current location:', window.location.pathname);
+
     if (!user.activeAccount) {
+      console.log('DiscussionsPage: No active account found');
       notifyError('You must be logged in to create a thread');
       throw new Error('Not logged in');
     }
 
     if (!topicObj) {
+      console.log('DiscussionsPage: No topic object found');
       notifyError('You must select a topic to create a thread');
       throw new Error('No topic selected');
     }
 
     if (!user.activeAccount.community?.base) {
+      console.log('DiscussionsPage: No community base found');
       notifyError('Invalid community configuration');
       throw new Error('Invalid community configuration');
     }
 
     try {
+      console.log(
+        'DiscussionsPage: Building thread input with topic:',
+        topicObj,
+      );
       const input = await buildCreateThreadInput({
         address: user.activeAccount.address,
         kind: 'discussion',
         stage: 'Discussion',
         communityId: communityId,
         communityBase: user.activeAccount.community.base,
-        title: 'New Thread', // Will be updated by AI if enabled
+        title: 'New Thread',
         topic: topicObj,
         body: getTextFromDelta(threadContentDelta),
       });
 
+      console.log('DiscussionsPage: Creating thread with input:', input);
       const thread = await createThread(input);
+
       if (!thread?.id) {
+        console.log('DiscussionsPage: No thread ID returned');
         throw new Error('Failed to create thread - no ID returned');
       }
-      navigate(`/discussion/${thread.id}-${thread.title}`);
+      console.log('DiscussionsPage: Thread created successfully:', {
+        id: thread.id,
+        title: thread.title,
+        community_id: thread.community_id,
+      });
+
+      // Clear the editor content
+      console.log('DiscussionsPage: Clearing editor content');
+      setThreadContentDelta(createDeltaFromText(''));
+
+      // Construct the correct navigation path
+      const communityPrefix = communityId ? `/${communityId}` : '';
+      const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+      console.log('DiscussionsPage: Navigation details:', {
+        communityPrefix,
+        threadId: thread.id,
+        threadTitle: thread.title,
+        fullUrl: threadUrl,
+        currentPath: window.location.pathname,
+      });
+
+      console.log('DiscussionsPage: Attempting navigation to:', threadUrl);
+      navigate(threadUrl);
+
+      console.log('DiscussionsPage: Navigation function called');
       return thread.id;
     } catch (error) {
-      console.error('Failed to create thread:', error);
+      console.error('DiscussionsPage: Error creating thread:', error);
       notifyError('Failed to create thread');
       throw error;
     }
@@ -310,10 +359,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <StickCommentProvider mode="thread">
-      <CWPageLayout
-        ref={containerRef}
-        className="DiscussionsPageLayout"
-      >
+      <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
         <DiscussionsFeedDiscovery
           orderBy={featuredFilter}
           community={communityId}
