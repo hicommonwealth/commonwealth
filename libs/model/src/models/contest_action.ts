@@ -49,6 +49,10 @@ export default (
         type: Sequelize.DECIMAL(78, 0),
         allowNull: true,
       },
+      fid: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {

@@ -1,14 +1,23 @@
 export function buildFarcasterContentUrl(
   parentCastHash: string,
   replyCashHash: string,
+  fid?: number,
 ) {
-  return `/farcaster/${parentCastHash}/${replyCashHash}`;
+  let url = `/farcaster/${parentCastHash}/${replyCashHash}`;
+  if (fid) {
+    url += `?fid=${fid}`;
+  }
+  return url;
 }
 
 export function parseFarcasterContentUrl(url: string) {
-  const [, , parentCastHash, replyCastHash] = url.split('/');
+  const [path, queryString] = url.split('?');
+  const [, , parentCastHash, replyCastHash] = path.split('/');
+  const params = new URLSearchParams(queryString);
+  const fid = parseInt(params.get('fid') || '0') || null;
   return {
     parentCastHash,
     replyCastHash,
+    fid,
   };
 }

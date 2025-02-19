@@ -150,6 +150,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
           payload.hash,
+          payload.author!.fid,
         );
         await createOnchainContestContent({
           contestManagers,
@@ -160,7 +161,11 @@ export function FarcasterWorker(): Policy<typeof inputs> {
       },
       FarcasterVoteCreated: async ({ payload }) => {
         const { parent_hash, hash } = payload.cast;
-        const content_url = buildFarcasterContentUrl(parent_hash!, hash);
+        const content_url = buildFarcasterContentUrl(
+          parent_hash!,
+          hash,
+          payload.interactor.fid,
+        );
 
         const contestManager = await models.ContestManager.findOne({
           where: {

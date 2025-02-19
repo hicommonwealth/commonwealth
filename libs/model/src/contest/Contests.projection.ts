@@ -19,7 +19,6 @@ import {
   decodeThreadContentUrl,
   getChainNodeUrl,
   getDefaultContestImage,
-  parseFarcasterContentUrl,
   publishCast,
 } from '../utils';
 
@@ -270,9 +269,10 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId, isFarcaster } = decodeThreadContentUrl(
+        const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
+
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -281,11 +281,12 @@ export function Contests(): Projection<typeof inputs> {
           content_url: payload.content_url,
           thread_id: threadId,
           voting_power: '0',
+          fid: farcasterInfo?.fid || null,
           created_at: new Date(),
         });
 
         // post confirmation via FC bot
-        if (isFarcaster) {
+        if (farcasterInfo) {
           const contestManager = await models.ContestManager.findByPk(
             payload.contest_address,
           );
@@ -294,11 +295,8 @@ export function Contests(): Projection<typeof inputs> {
             contestManager!.community_id,
             contestManager!.contest_address,
           );
-          const { replyCastHash } = parseFarcasterContentUrl(
-            payload.content_url,
-          );
           await publishCast(
-            replyCastHash,
+            farcasterInfo.replyCastHash,
             ({ username }) =>
               `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
           );

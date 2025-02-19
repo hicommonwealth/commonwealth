@@ -20,6 +20,9 @@ export const ContestAction = z
       .string()
       .nullish()
       .describe('Calculated  weight of the vote when action was recorded'),
+    fid: PG_INT.nullish().describe(
+      'Farcaster ID of the content or vote author',
+    ),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');
