@@ -1,7 +1,6 @@
+import GeckoTerminalChart from 'client/scripts/views/components/GekoTerminalChart/GekoTerminalChart';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-
-import GeckoTerminalChart from 'client/scripts/views/components/GekoTerminalChart/GekoTerminalChart';
 import useTokenData from '../../hooks/useTokenData';
 import './PriceChartTab.scss';
 
