@@ -5,6 +5,7 @@ import {
   SubscriptionPrefType,
   useSubscriptionPreferenceSetting,
 } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
+// eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 
 interface PushNotificationsToggleProps {
