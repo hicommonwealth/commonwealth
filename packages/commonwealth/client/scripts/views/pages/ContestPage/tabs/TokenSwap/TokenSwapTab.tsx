@@ -10,15 +10,7 @@ const TokenSwapTab = () => {
   const { isPinnedToken, tokenLaunchModalConfig, isLoadingToken, address } =
     useTokenData();
 
-  if (isLoadingToken || !address)
-    return (
-      <div className="TokenSwapTab">
-        <CWText type="h3" fontWeight="semiBold">
-          Token Swap
-        </CWText>
-        <CWText>Token Data Not Found</CWText>
-      </div>
-    );
+  if (isLoadingToken || !address) return <></>;
 
   return (
     <div className="TokenSwapTab">

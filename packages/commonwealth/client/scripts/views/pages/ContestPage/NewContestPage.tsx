@@ -15,6 +15,7 @@ import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 
 import './NewContestPage.scss';
+import useTokenData from './hooks/useTokenData';
 
 interface NewContestPageProps {
   contestAddress: string;
@@ -31,6 +32,8 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
   >();
+
+  const { chain, address } = useTokenData();
 
   const { end_time } = contest?.contests[0] || {};
 
@@ -90,18 +93,22 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             isActive={selectedMobileTab === MobileTabType.Entries}
             onClick={() => setSelectedMobileTab(MobileTabType.Entries)}
           />
-          <CWMobileTab
-            label={MobileTabType.PriceChart}
-            icon="chartLineUp"
-            isActive={selectedMobileTab === MobileTabType.PriceChart}
-            onClick={() => setSelectedMobileTab(MobileTabType.PriceChart)}
-          />
-          <CWMobileTab
-            label={MobileTabType.TokenSwap}
-            icon="arrowClockwise"
-            isActive={selectedMobileTab === MobileTabType.TokenSwap}
-            onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
-          />
+          {chain && address && (
+            <CWMobileTab
+              label={MobileTabType.PriceChart}
+              icon="chartLineUp"
+              isActive={selectedMobileTab === MobileTabType.PriceChart}
+              onClick={() => setSelectedMobileTab(MobileTabType.PriceChart)}
+            />
+          )}
+          {address && (
+            <CWMobileTab
+              label={MobileTabType.TokenSwap}
+              icon="arrowClockwise"
+              isActive={selectedMobileTab === MobileTabType.TokenSwap}
+              onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
+            />
+          )}
         </div>
 
         <div className="mobile-tab-content">
