@@ -2,6 +2,7 @@ export * from './chain.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
 export * from './contest-manager.schemas';
+export * from './custom-xp-event-source.schemas';
 export * from './discordBotConfig.schemas';
 export * from './evm-event-source.schemas';
 export * from './group-permission.schemas';

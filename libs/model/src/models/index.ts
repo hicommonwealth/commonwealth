@@ -49,6 +49,7 @@ export * from './community';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
+export * from './custom_xp_event_sources';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';

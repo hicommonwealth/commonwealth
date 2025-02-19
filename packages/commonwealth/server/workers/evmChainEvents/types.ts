@@ -1,13 +1,23 @@
-import { EvmEventSource } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-const sourceType = EvmEventSource.extend({
-  contract_name: z.string().optional(),
-  parent_contract_address: z.string().optional(),
+export const CeEventSource = z.object({
+  eth_chain_id: z.number(),
+  contract_address: z.string(),
+  event_signature: z.string(),
+  meta: z.union([
+    z.object({
+      events_migrated: z.literal(true),
+      quest_action_meta_id: z.string().optional(),
+    }),
+    z.object({
+      events_migrated: z.literal(false),
+      created_at_block: z.number(),
+    }),
+  ]),
 });
 
 export type ContractSources = {
-  [contractAddress: string]: Array<z.infer<typeof sourceType>>;
+  [contractAddress: string]: Array<z.infer<typeof CeEventSource>>;
 };
 
 export type EvmSource = {

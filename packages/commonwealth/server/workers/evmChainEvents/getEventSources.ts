@@ -5,7 +5,8 @@ import {
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import { buildChainNodeUrl, models } from '@hicommonwealth/model';
-import { ContractSources, EvmSources } from './types';
+import { z } from 'zod';
+import { CeEventSource, ContractSources, EvmSources } from './types';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
 
@@ -35,10 +36,9 @@ export async function getEventSources(): Promise<EvmSources> {
           eth_chain_id: ethChainId,
           contract_address: address,
           event_signature: signature,
-
-          // filler to prevent event migration
-          created_at_block: 1,
-          events_migrated: true,
+          meta: {
+            events_migrated: true,
+          },
         }),
       );
     }
@@ -61,7 +61,31 @@ export async function getEventSources(): Promise<EvmSources> {
       if (!dbContractSources[source.contract_address]) {
         dbContractSources[source.contract_address] = [];
       }
-      dbContractSources[source.contract_address].push(source.toJSON());
+
+      const sharedSource = {
+        eth_chain_id: source.eth_chain_id,
+        contract_address: source.contract_address,
+        event_signature: source.event_signature,
+      };
+      let buildSource: z.infer<typeof CeEventSource>;
+      if (source.events_migrated === true) {
+        buildSource = {
+          ...sharedSource,
+          meta: {
+            events_migrated: source.events_migrated,
+          },
+        };
+      } else {
+        buildSource = {
+          ...sharedSource,
+          meta: {
+            events_migrated: source.events_migrated!,
+            created_at_block: source.created_at_block,
+          },
+        };
+      }
+
+      dbContractSources[source.contract_address].push(buildSource);
     }
 
     evmSources[ethChainId] = {

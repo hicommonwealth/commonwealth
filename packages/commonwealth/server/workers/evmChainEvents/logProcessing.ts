@@ -201,13 +201,13 @@ export async function migrateEvents(
     evmSource.contracts,
   )) {
     for (const source of evmEventSource) {
-      if (source.created_at_block && source.events_migrated === false) {
+      if (!source.meta.events_migrated) {
         if (!contracts[contractAddress]) {
           contracts[contractAddress] = [];
         }
         contracts[contractAddress].push(source);
-        if (!oldestBlock || oldestBlock > source.created_at_block) {
-          oldestBlock = source.created_at_block;
+        if (!oldestBlock || oldestBlock > source.meta.created_at_block) {
+          oldestBlock = source.meta.created_at_block;
         }
       }
     }
