@@ -209,7 +209,7 @@ export async function migrateEvents(
     evmSource.contracts,
   )) {
     for (const source of evmEventSource) {
-      if (!source.meta.events_migrated) {
+      if (!source.meta.events_migrated && source.meta.created_at_block) {
         if (!contracts[contractAddress]) {
           contracts[contractAddress] = [];
         }
