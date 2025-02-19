@@ -21,6 +21,10 @@ export default (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      creator_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       community_id: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -50,6 +54,7 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
       ended: { type: Sequelize.BOOLEAN },
+      ending: { type: Sequelize.BOOLEAN },
       farcaster_frame_url: { type: Sequelize.STRING, allowNull: true },
       farcaster_frame_hashes: {
         type: Sequelize.ARRAY(Sequelize.STRING),

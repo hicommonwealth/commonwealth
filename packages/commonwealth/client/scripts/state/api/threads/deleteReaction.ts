@@ -1,6 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import app from 'state';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
@@ -68,12 +69,13 @@ const useDeleteThreadReactionMutation = ({
           'removeFromExisting',
         );
 
+        const subtraction = BigNumber.from(currentReactionWeightsSum)
+          .sub(BigNumber.from(deletedReaction?.calculated_voting_weight || '0'))
+          .toString();
+
         updateThreadInAllCaches(communityId, threadId, {
           reactionCount: currentReactionCount - 1,
-          reactionWeightsSum: `${
-            parseInt(currentReactionWeightsSum) -
-            parseInt(deletedReaction?.calculated_voting_weight || `0`)
-          }`,
+          reactionWeightsSum: subtraction,
         });
       }
     },

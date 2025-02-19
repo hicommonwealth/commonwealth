@@ -22,7 +22,8 @@ const log = logger(import.meta);
 const Errors = {
   InvalidWebhookUrl:
     'Invalid Webhook url. Must be one of: https://api.telegram.org/*, ' +
-    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
+    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*,' +
+    ' https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
   WebhookExists: 'The provided webhook already exists for this community',
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
   WebhookNotFound: 'The Webhook endpoint was not found (404 Not Found)',

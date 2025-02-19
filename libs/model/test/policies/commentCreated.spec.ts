@@ -5,7 +5,6 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -132,7 +131,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid author is not found', async () => {
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: { address_id: -999999 } as z.infer<
         typeof schemas.events.CommentCreated
       >,
@@ -142,7 +141,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid community is not found', async () => {
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
@@ -158,7 +157,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
@@ -186,7 +185,7 @@ describe('CommentCreated Event Handler', () => {
       thread_id: rootComment.thread_id,
     });
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: { ...rootComment, community_id: community.id },
     });
@@ -233,7 +232,7 @@ describe('CommentCreated Event Handler', () => {
       comment_id: rootComment.id,
     });
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: { ...replyComment, community_id: community.id },
     });
@@ -287,7 +286,7 @@ describe('CommentCreated Event Handler', () => {
 
     await expect(
       notifyCommentCreated({
-        name: EventNames.CommentCreated,
+        name: 'CommentCreated',
         // @ts-expect-error StrictNullChecks
         payload: { ...rootComment, community_id: community.id },
       }),
@@ -309,7 +308,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: {
         ...mentionedComment,

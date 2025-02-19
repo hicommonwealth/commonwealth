@@ -15,9 +15,11 @@ const MarkdownHitHighlighterPage = lazy(
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -122,10 +124,18 @@ const CommunityNotFoundPage = lazy(
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
+
+const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
 const CommonDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
+  communityHomeEnabled,
+  homePageEnable,
+  mobileApp,
 }: RouteFeatureFlags) => [
   <Route
     key="mobile-app-redirect"
@@ -157,10 +167,34 @@ const CommonDomainRoutes = ({
     element={<MarkdownViewerPage />}
   />,
 
+  ...(mobileApp
+    ? [
+        <Route
+          key="/onboarding"
+          path="/onboarding"
+          element={<OnBoardingPage />}
+        />,
+      ]
+    : []),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
-    key="/"
-    path="/"
-    element={withLayout(DashboardPage, { type: 'common' })}
+    key="/home"
+    path="/home"
+    element={withLayout(HomePage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
@@ -173,6 +207,11 @@ const CommonDomainRoutes = ({
           key="/createQuest"
           path="/createQuest"
           element={withLayout(CreateQuestPage, { type: 'common' })}
+        />,
+        <Route
+          key="/quest/:id"
+          path="/quest/:id"
+          element={withLayout(QuestDetailsPage, { type: 'common' })}
         />,
       ]
     : []),
@@ -199,16 +238,36 @@ const CommonDomainRoutes = ({
         />,
       ]
     : []),
-  <Route
-    key="/dashboard"
-    path="/dashboard"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/dashboard/:type"
-    path="/dashboard/:type"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
     key="/explore"
     path="/explore"
@@ -351,6 +410,17 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
+  ...(communityHomeEnabled
+    ? [
+        <Route
+          key="/:scope/community-home"
+          path="/:scope/community-home"
+          element={withLayout(CommunityHomePage, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"
@@ -668,7 +738,6 @@ const CommonDomainRoutes = ({
     path="/discussions"
     element={<Navigate to="/" />}
   />,
-  <Route key="/home" path="/home" element={<Navigate to="/" />} />,
   <Route
     key="/:scope/home"
     path="/:scope/home"

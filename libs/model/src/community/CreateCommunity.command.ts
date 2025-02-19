@@ -179,7 +179,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           models.Outbox,
           [
             {
-              event_name: schemas.EventNames.CommunityCreated,
+              event_name: 'CommunityCreated',
               event_payload: {
                 community_id: id,
                 user_id: user.id!,

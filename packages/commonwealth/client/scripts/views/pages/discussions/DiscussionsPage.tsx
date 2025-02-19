@@ -21,24 +21,29 @@ import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { splitAndDecodeURL, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import {
+  ZERO_ADDRESS,
+  formatDecimalToWei,
+  splitAndDecodeURL,
+} from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import TokenBanner from 'views/components/TokenBanner';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
-import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import OverviewPage from '../overview';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import './DiscussionsPage.scss';
@@ -50,7 +55,7 @@ type DiscussionsPageProps = {
   topicName?: string;
   updateSelectedView?: (tabValue: string) => void;
 };
-type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
+export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
 };
@@ -227,12 +232,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const voteWeight =
     isTopicWeighted && voteBalance
-      ? String(
-          (
-            (topicObj?.vote_weight_multiplier || 1) * Number(voteBalance)
-          ).toFixed(0),
+      ? prettyVoteWeight(
+          formatDecimalToWei(voteBalance),
+          topicObj!.weighted_voting,
         )
       : '';
+
   const updateSelectedView = (activeTab: string) => {
     const params = new URLSearchParams();
     params.set('tab', activeTab);

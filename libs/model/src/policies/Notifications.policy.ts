@@ -1,8 +1,11 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
+import { notifyAddressOwnershipTransferred } from './handlers/notifyAddressOwnershipTransferred';
 import { notifyCommentCreated } from './handlers/notifyCommentCreated';
 import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
+import { notifyCommunityStakeTrades } from './handlers/notifyCommunityStakeTrades';
+import { notifyContestEvent } from './handlers/notifyContestEvent';
+import { notifyQuestStarted } from './handlers/notifyQuestStarted';
 import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
 import { notifyThreadCreated } from './handlers/notifyThreadCreated';
 import { notifyThreadUpvoted } from './handlers/notifyThreadUpvoted';
@@ -10,12 +13,19 @@ import { notifyUserMentioned } from './handlers/notifyUserMentioned';
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
-  ChainEventCreated: events.ChainEventCreated,
+  CommunityStakeTrade: events.CommunityStakeTrade,
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   UserMentioned: events.UserMentioned,
   ThreadUpvoted: events.ThreadUpvoted,
   CommentUpvoted: events.CommentUpvoted,
+  // Contest Events
+  ContestStarted: events.ContestStarted,
+  ContestEnding: events.ContestEnding,
+  ContestEnded: events.ContestEnded,
+  // Quest Events
+  QuestStarted: events.QuestStarted,
+  AddressOwnershipTransferred: events.AddressOwnershipTransferred,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -25,8 +35,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       SnapshotProposalCreated: async (event) => {
         await notifySnapshotProposalCreated(event);
       },
-      ChainEventCreated: async (event) => {
-        await notifyChainEventCreated(event);
+      CommunityStakeTrade: async (event) => {
+        await notifyCommunityStakeTrades(event);
       },
       ThreadCreated: async (event) => {
         await notifyThreadCreated(event);
@@ -42,6 +52,21 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       },
       CommentUpvoted: async (event) => {
         await notifyCommentUpvoted(event);
+      },
+      ContestStarted: async (event) => {
+        await notifyContestEvent(event);
+      },
+      ContestEnding: async (event) => {
+        await notifyContestEvent(event);
+      },
+      ContestEnded: async (event) => {
+        await notifyContestEvent(event);
+      },
+      QuestStarted: async (event) => {
+        await notifyQuestStarted(event);
+      },
+      AddressOwnershipTransferred: async (event) => {
+        await notifyAddressOwnershipTransferred(event);
       },
     },
   };

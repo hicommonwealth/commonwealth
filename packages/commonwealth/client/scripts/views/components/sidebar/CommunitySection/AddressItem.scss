@@ -15,30 +15,46 @@
     .address {
       background-color: $neutral-200;
       border-radius: 6px;
-      font-size: 14px;
       color: $neutral-600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 120px;
+      width: 140px;
+      gap: 4px;
+      padding-left: 2px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .Icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      .CWIdentificationTag {
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
 
     .copy-icon {
-      width: 20px;
-      height: 20px;
+      width: 17px;
+      height: 17px;
       cursor: pointer;
     }
 
     .check-mark-icon {
-      width: 20px;
-      height: 20px;
+      width: 17px;
+      height: 17px;
       cursor: pointer;
       fill: $green-600;
     }
 
     .open-wallet-icon {
-      width: 20px;
-      height: 20px;
+      width: 17px;
+      height: 17px;
       cursor: pointer;
     }
   }

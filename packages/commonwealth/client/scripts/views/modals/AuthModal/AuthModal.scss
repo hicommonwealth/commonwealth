@@ -1,3 +1,7 @@
+@import '../../../styles/shared.scss';
 .AuthModal {
   overflow-y: scroll;
+  @include extraSmall {
+    height: 100vh;
+  }
 }

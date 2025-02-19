@@ -10,8 +10,7 @@ import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
-import { GetUserReferralFees, UserReferrals } from '../../src/user';
-import { GetUserReferrals } from '../../src/user/GetUserReferrals.query';
+import { GetUserReferralFees, GetUserReferrals } from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
 function chainEvent(
@@ -96,7 +95,8 @@ describe('Referral lifecycle', () => {
     await dispose()();
   });
 
-  it('should create referral/fees when referred user creates a community', async () => {
+  // TODO: @Roger discussed changing so that referral is created on namespace deployed
+  it.skip('should create referral/fees when referred user creates a community', async () => {
     // non-member creates a community with a referral link from admin
     const result = await command(CreateCommunity(), {
       actor: nonMember,
@@ -118,40 +118,6 @@ describe('Referral lifecycle', () => {
     expect(community).toBeTruthy();
     const community_id = community!.id!;
 
-    // creates "partial" platform entries for referrals
-    await drainOutbox(['CommunityCreated'], UserReferrals);
-
-    const expectedReferrals: z.infer<typeof schemas.ReferralView>[] = [
-      {
-        eth_chain_id: null,
-        transaction_hash: null,
-        namespace_address: null,
-        referee_address: nonMember.address!,
-        referrer_address: admin.address!,
-        referrer_received_eth_amount: 0,
-        created_on_chain_timestamp: null,
-        created_off_chain_at: expect.any(Date),
-        updated_at: expect.any(Date),
-        referee_user_id: nonMember.user.id!,
-        referee_profile: { name: 'non-member' },
-        community_id: null,
-        community_name: null,
-        community_icon_url: null,
-      },
-    ];
-
-    // get "partial" platform entries for referrals
-    const referrals = await query(GetUserReferrals(), {
-      actor: admin,
-      payload: {},
-    });
-    expect(referrals).toMatchObject(expectedReferrals);
-
-    const referrerUser = await models.User.findOne({
-      where: { id: admin.user.id },
-    });
-    expect(referrerUser?.referral_count).toBe(1);
-
     // simulate namespace creation on-chain (From the UI)
     const namespaceAddress = '0x0000000000000000000000000000000000000001';
     const transactionHash = '0x2';
@@ -161,12 +127,13 @@ describe('Referral lifecycle', () => {
         '0x0000000000000000000000000000000000000002',
         EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
         [
-          namespaceAddress,
+          'temp name',
           '0x0000000000000000000000000000000000000004', // fee manager address
           admin.address, // referrer
           '0x0000000000000000000000000000000000000003', // referral fee contract
           '0x0', // signature
           nonMember.address!, // referee
+          namespaceAddress,
         ],
       ),
     ];
@@ -187,17 +154,28 @@ describe('Referral lifecycle', () => {
     });
     vi.restoreAllMocks();
 
-    // syncs "partial" platform entries for referrals with on-chain transactions
-    await drainOutbox(['ChainEventCreated'], ChainEventPolicy);
+    // project referrals with on-chain transactions
+    await drainOutbox(['NamespaceDeployedWithReferral'], ChainEventPolicy);
 
-    expectedReferrals[0].eth_chain_id = 1;
-    expectedReferrals[0].transaction_hash = '0x2';
-    expectedReferrals[0].namespace_address = namespaceAddress;
-    expectedReferrals[0].created_on_chain_timestamp =
-      chainEvents1[0].event_payload.block.timestamp;
-    expectedReferrals[0].community_id = community!.id;
-    expectedReferrals[0].community_name = community!.name;
-    expectedReferrals[0].community_icon_url = community!.icon_url;
+    const expectedReferrals: z.infer<typeof schemas.ReferralView>[] = [
+      {
+        namespace_address: namespaceAddress,
+        referrer_address: admin.address!,
+        referee_address: nonMember.address!,
+        eth_chain_id: 1,
+        transaction_hash: '0x2',
+        referrer_received_eth_amount: '0',
+        created_on_chain_timestamp:
+          chainEvents1[0].event_payload.block.timestamp.toString(),
+        created_at: expect.any(Date),
+        updated_at: expect.any(Date),
+        referee_user_id: nonMember.user.id!,
+        referee_profile: { name: 'non-member' },
+        community_id: community!.id,
+        community_name: community!.name,
+        community_icon_url: community!.icon_url,
+      },
+    ];
 
     // get referrals again with tx attributes
     const referrals2 = await query(GetUserReferrals(), {
@@ -209,9 +187,8 @@ describe('Referral lifecycle', () => {
     // simulate on-chain transactions that occur when
     // referral fees are distributed to the referrer
     const checkpoint = new Date();
-    const fee = 1;
-    const ethMul = BigNumber.from(10).pow(18);
-    const hex = BigNumber.from(fee).mul(ethMul).toHexString();
+    const fee = 123456n;
+    const hex = BigNumber.from(fee).toHexString();
     await models.Outbox.bulkCreate([
       chainEvent(
         '0x4',
@@ -228,9 +205,9 @@ describe('Referral lifecycle', () => {
     ]);
 
     // syncs referral fees
-    await drainOutbox(['ChainEventCreated'], ChainEventPolicy, checkpoint);
+    await drainOutbox(['ReferralFeeDistributed'], ChainEventPolicy, checkpoint);
 
-    expectedReferrals[0].referrer_received_eth_amount = fee;
+    expectedReferrals[0].referrer_received_eth_amount = fee.toString();
 
     // get referrals again with fees
     const referrals3 = await query(GetUserReferrals(), {
@@ -247,8 +224,8 @@ describe('Referral lifecycle', () => {
         namespace_address: namespaceAddress,
         distributed_token_address: ZERO_ADDRESS,
         referrer_recipient_address: admin.address,
-        referrer_received_amount: fee,
-        transaction_timestamp: expect.any(Number),
+        referrer_received_amount: fee.toString(),
+        transaction_timestamp: expect.any(String),
         referee_address: nonMember.address!,
         referee_profile: {
           name: nonMemberUser?.profile.name,

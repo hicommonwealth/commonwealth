@@ -6,6 +6,7 @@ import {
   NotificationsProviderScheduleRepeats,
   NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
+  WorkflowKeys,
 } from '@hicommonwealth/core';
 import { MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER } from '@hicommonwealth/shared';
 import { Knock, Schedule } from '@knocklabs/node';
@@ -78,6 +79,22 @@ export function KnockProvider(): NotificationsProvider {
       // this is to prevent sending webhooks to real endpoints in all other env
       if (options.key === 'webhooks' && !config.NOTIFICATIONS.WEBHOOKS.SEND) {
         log.warn('Webhooks disabled');
+        return [];
+      }
+
+      // ignore events without a workflow
+      if (
+        [
+          WorkflowKeys.ContestStarted,
+          WorkflowKeys.ContestEnding,
+          WorkflowKeys.ContestEnded,
+          WorkflowKeys.QuestStarted,
+          WorkflowKeys.AddressOwnershipTransferred,
+        ].includes(options.key)
+      ) {
+        log.warn(
+          `Ingoring notification ${options.key} until workflow gets implemented!`,
+        );
         return [];
       }
 

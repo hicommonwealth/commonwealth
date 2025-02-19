@@ -1,0 +1,37 @@
+@import '../../../../../styles/shared';
+
+.CWMobileTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid $neutral-700;
+  padding: 10px 16px;
+  border-radius: 6px;
+
+  .Text {
+    white-space: nowrap;
+  }
+
+  svg {
+    fill: $neutral-700;
+  }
+
+  &.isActive {
+    border-color: $primary-600;
+
+    svg {
+      fill: $primary-600;
+    }
+
+    .Text {
+      color: $primary-600;
+    }
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}

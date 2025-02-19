@@ -23,12 +23,7 @@ export const namespaceFactoryAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
-      },
+      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
       {
         indexed: false,
         internalType: 'address',
@@ -47,6 +42,12 @@ export const namespaceFactoryAbi = [
         name: '_namespaceDeployer',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'nameSpaceAddress',
+        type: 'address',
+      },
     ],
     name: 'DeployedNamespace',
     type: 'event',
@@ -56,9 +57,9 @@ export const namespaceFactoryAbi = [
     inputs: [
       {
         indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
       },
       {
         indexed: true,
@@ -88,6 +89,12 @@ export const namespaceFactoryAbi = [
         indexed: false,
         internalType: 'address',
         name: 'namespaceDeployer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'nameSpaceAddress',
         type: 'address',
       },
     ],
@@ -503,5 +510,29 @@ export const namespaceFactoryAbi = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'string', name: 'name', type: 'string' },
+      { internalType: 'uint256', name: 'length', type: 'uint256' },
+      { internalType: 'uint256[]', name: 'winnerShares', type: 'uint256[]' },
+      { internalType: 'uint256', name: 'voterShare', type: 'uint256' },
+      { internalType: 'address', name: 'exhangeToken', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'newSingleJudgedContest',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+  },
+  {
+    type: 'function',
+    name: 'configureNominationStrategy',
+    inputs: [
+      { name: 'name', type: 'string', internalType: 'string' },
+      { name: 'maxNominations', type: 'uint256', internalType: 'uint256' },
+      { name: 'referralModeEnabled', type: 'bool', internalType: 'bool' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
 ] as const;

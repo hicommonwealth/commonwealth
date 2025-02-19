@@ -5,7 +5,8 @@ import {
 } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { numberGTZeroValidationSchema } from 'helpers/formValidations/common';
-import { calculatePercentageChangeFractional } from 'helpers/number';
+import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useRef, useState } from 'react';
 import {
@@ -15,6 +16,7 @@ import {
 import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
@@ -42,7 +44,11 @@ const useCreateQuestForm = () => {
     maxSubForms: MAX_ACTIONS_LIMIT,
   });
 
-  const minStartDate = new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day date in future
+  const minStartDate = new Date(new Date().getTime() + 1 * 60 * 60 * 1000); // now + 1 hour in future
+  const idealStartDate = new Date(
+    new Date().getTime() + 1 * 24 * 60 * 60 * 1000,
+  ); // now + 1 day in future
+  const minEndDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000); // now + 1 day in future
 
   const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
 
@@ -126,6 +132,30 @@ const useCreateQuestForm = () => {
     },
   });
 
+  const handleQuestCreationConfirmation = async (hours: number) => {
+    return new Promise((resolve, reject) => {
+      openConfirmation({
+        title: 'Confirm Quest Creation',
+        // eslint-disable-next-line max-len
+        description: `Are you sure you want to create a quest ${hours ? `${hours} hour${hours > 1 ? 's' : ''} in advance` : `that starts in a few moments`}? \n\nWe suggest creating quests atleast 24+ hours in advance.\nThis allow users to get plenty of time to prepare, and for you to have plenty of time for any necessary changes.`,
+        buttons: [
+          {
+            label: 'Cancel',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
+            onClick: reject,
+          },
+          {
+            label: 'Confirm',
+            buttonType: 'destructive',
+            buttonHeight: 'sm',
+            onClick: resolve,
+          },
+        ],
+      });
+    });
+  };
+
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const subFormErrors = validateSubForms();
     const repetitionCycleRadioBtnError =
@@ -139,7 +169,7 @@ const useCreateQuestForm = () => {
           description: values.description.trim(),
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
-          // TODO: add image support in api (needs ticketing).
+          image_url: values.image,
         });
 
         if (quest && quest.id) {
@@ -149,10 +179,11 @@ const useCreateQuestForm = () => {
               event_name: subForm.values.action as QuestAction,
               reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
               ...(subForm.values.creatorRewardAmount && {
-                creator_reward_weight: calculatePercentageChangeFractional(
-                  parseInt(`${subForm.values.rewardAmount}`, 10),
-                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-                ),
+                creator_reward_weight:
+                  calculateRemainingPercentageChangeFractional(
+                    parseInt(`${subForm.values.rewardAmount}`, 10),
+                    parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+                  ),
               }),
               participation_limit: values.participation_limit,
               participation_period: repetitionCycleRadioProps
@@ -161,6 +192,9 @@ const useCreateQuestForm = () => {
               participation_times_per_period: parseInt(
                 `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
               ),
+              ...(subForm.values.actionLink && {
+                action_link: subForm.values.actionLink.trim(),
+              }),
             })),
           });
         }
@@ -171,10 +205,25 @@ const useCreateQuestForm = () => {
       } catch (e) {
         console.error(e);
 
-        notifyError('Failed to create quest!');
+        if (e.message.includes('must be at least 0 days in the future')) {
+          notifyError('Start date must be a future date');
+        } else {
+          notifyError('Failed to create quest!');
+        }
       }
     };
-    handleAsync().catch(console.error);
+    const questStartHoursDiffFromNow = moment(values.start_date).diff(
+      moment(),
+      'hours',
+    );
+    // request confirmation from user if quest is being created <=6 hours in advance
+    if (questStartHoursDiffFromNow <= 6) {
+      handleQuestCreationConfirmation(questStartHoursDiffFromNow)
+        .then(() => handleAsync().catch(console.error))
+        .catch(console.error);
+    } else {
+      handleAsync().catch(console.error);
+    }
   };
 
   return {
@@ -191,6 +240,8 @@ const useCreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    idealStartDate,
+    minEndDate,
     // custom radio button props
     repetitionCycleRadio: {
       error: repetitionCycleRadioError,

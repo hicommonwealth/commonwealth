@@ -28,7 +28,6 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
-  REACTION_WEIGHT_OVERRIDE,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -40,6 +39,10 @@ const {
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
+  FARCASTER_MANIFEST_HEADER,
+  FARCASTER_MANIFEST_PAYLOAD,
+  FARCASTER_MANIFEST_SIGNATURE,
+  FARCASTER_MANIFEST_DOMAIN,
   FARCASTER_NGROK_DOMAIN,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
@@ -85,11 +88,6 @@ export const config = configure(
         ? BLACKLISTED_EVENTS.split(',')
         : [],
     },
-    STAKE: {
-      REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
-        ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
-        : null,
-    },
     CONTESTS: {
       MIN_USER_ETH: 0,
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
@@ -104,6 +102,10 @@ export const config = configure(
         NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
+      FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
+      FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
+      FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
+      FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -208,9 +210,6 @@ export const config = configure(
     OUTBOX: z.object({
       BLACKLISTED_EVENTS: z.array(z.string()),
     }),
-    STAKE: z.object({
-      REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
-    }),
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
@@ -257,6 +256,34 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_HEADER: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_PAYLOAD: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_PAYLOAD must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_SIGNATURE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_SIGNATURE must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_DOMAIN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
     }),
     AUTH: z

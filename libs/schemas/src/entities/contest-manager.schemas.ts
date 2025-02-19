@@ -8,6 +8,10 @@ import { Topic } from './topic.schemas';
 export const ContestManager = z
   .object({
     contest_address: z.string().describe('On-Chain contest manager address'),
+    creator_address: z
+      .string()
+      .nullish()
+      .describe('Creator of the contest manager'),
     community_id: z.string(),
     name: z.string(),
     description: z.string().nullish(),
@@ -41,6 +45,7 @@ export const ContestManager = z
       .boolean()
       .nullish()
       .describe('Flags when contest policy is cancelled by admin'),
+    ending: z.boolean().nullish().describe('Flags when contest is ending'),
     ended: z
       .boolean()
       .nullish()

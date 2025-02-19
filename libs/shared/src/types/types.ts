@@ -1,7 +1,7 @@
 import { ThresholdData } from './protocol';
 
 export const Roles = ['admin', 'moderator', 'member'] as const;
-export type Role = typeof Roles[number];
+export type Role = (typeof Roles)[number];
 
 export type AddressRole = {
   address: string;
@@ -70,3 +70,10 @@ export type Link = {
   identifier: string;
   title?: string;
 };
+
+// These are meant to be static and Common focused
+// i.e. these should not change even if the underlying Twitter account changes
+export enum TwitterBotName {
+  MomBot = 'MomBot',
+  ContestBot = 'ContestBot',
+}

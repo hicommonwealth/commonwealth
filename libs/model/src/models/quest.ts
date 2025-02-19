@@ -15,6 +15,7 @@ export const Quest = (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: Sequelize.STRING, allowNull: false },
       description: { type: Sequelize.STRING, allowNull: false },
+      image_url: { type: Sequelize.STRING, allowNull: false },
       start_date: { type: Sequelize.DATE, allowNull: false },
       end_date: { type: Sequelize.DATE, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: true },
@@ -53,6 +54,10 @@ export const QuestActionMeta = (
         allowNull: false,
         defaultValue: 0,
       },
+      amount_multiplier: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
       participation_limit: {
         type: Sequelize.ENUM,
         values: Object.values(schemas.QuestParticipationLimit),
@@ -67,6 +72,7 @@ export const QuestActionMeta = (
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      action_link: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

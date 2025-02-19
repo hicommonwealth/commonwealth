@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowSquareOut,
+  ArrowsClockwise,
   ArrowsInSimple,
   ArrowsOutSimple,
   BellSimple,
@@ -21,6 +22,7 @@ import {
   CaretLeft,
   CaretRight,
   CaretUp,
+  ChartLineUp,
   ChatCenteredDots,
   ChatDots,
   ChatText,
@@ -38,6 +40,7 @@ import {
   Compass,
   Copy,
   CopySimple,
+  DiscordLogo,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -96,6 +99,7 @@ import {
   Users,
   UsersThree,
   Warning,
+  XLogo,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import { CWPara } from './cw_custom_icons';
@@ -129,6 +133,7 @@ export const iconLookup = {
   arrowFatUp: Icons.CWArrowFatUp,
   arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
+  arrowClockwise: withPhosphorIcon(ArrowsClockwise),
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowUpBlue500: Icons.CWArrowUpBlue500,
   arrowUpNeutral400: Icons.CWArrowUpNeutral400,
@@ -177,6 +182,7 @@ export const iconLookup = {
   clock: Icons.CWClock,
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
+  chartLineUp: withPhosphorIcon(ChartLineUp),
   code: withPhosphorIcon(Code),
   coins: withPhosphorIcon(Coins),
   collapse: Icons.CWCollapse,
@@ -307,6 +313,8 @@ export const iconLookup = {
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
   kanban: withPhosphorIcon(Kanban),
+  xTwitter: withPhosphorIcon(XLogo),
+  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export const customIconLookup = {

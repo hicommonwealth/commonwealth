@@ -3,6 +3,9 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+## Workaround here https://github.com/pnpm/pnpm/issues/9029
+RUN corepack prepare pnpm@9.14.2 --activate
+
 FROM base AS build
 ## needed for node-gyp to build
 RUN apt-get update && \

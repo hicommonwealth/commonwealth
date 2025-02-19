@@ -8,9 +8,8 @@ import { MobileStickyInput } from 'views/components/StickEditorContainer/MobileS
 import './StickyEditorContainer.scss';
 
 export const StickyEditorContainer = (props: CommentEditorProps) => {
-  const stickEditor = useFlag('stickyEditor');
-
   const { isWindowExtraSmall } = useBrowserWindow({});
+  const stickEditor = useFlag('stickyEditor');
 
   if (!stickEditor) {
     return <CommentEditor {...props} />;

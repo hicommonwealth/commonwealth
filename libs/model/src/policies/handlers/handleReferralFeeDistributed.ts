@@ -1,54 +1,51 @@
-import { chainEvents, events } from '@hicommonwealth/schemas';
+import { EventHandler } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
-import { z } from 'zod';
+import { Op } from 'sequelize';
+import { ZodUndefined } from 'zod';
 import { models } from '../../database';
 
-export async function handleReferralFeeDistributed(
-  event: z.infer<typeof events.ChainEventCreated>,
-) {
+export const handleReferralFeeDistributed: EventHandler<
+  'ReferralFeeDistributed',
+  ZodUndefined
+> = async ({ payload }) => {
   const {
-    0: namespace_address,
-    1: distributed_token_address,
-    // 2: total_amount_distributed,
-    3: referrer_address,
-    4: fee_amount,
-  } = event.parsedArgs as z.infer<typeof chainEvents.ReferralFeeDistributed>;
+    namespace: namespace_address,
+    token: distributed_token_address,
+    recipient: referrer_address,
+    recipientAmount: fee_amount,
+  } = payload.parsedArgs;
 
   const existingFee = await models.ReferralFee.findOne({
     where: {
-      eth_chain_id: event.eventSource.ethChainId,
-      transaction_hash: event.rawLog.transactionHash,
+      eth_chain_id: payload.eventSource.ethChainId,
+      transaction_hash: payload.rawLog.transactionHash,
     },
   });
   if (existingFee) {
-    event.rawLog.removed && (await existingFee.destroy());
+    payload.rawLog.removed && (await existingFee.destroy());
     return;
   }
 
   // find the referral (already mapped to a namespace)
   const referral = await models.Referral.findOne({
-    where: {
-      referrer_address,
-      namespace_address,
-    },
+    where: { namespace_address, referrer_address },
   });
-  if (!referral) return; // we must guarantee the order of chain events here
+  // enforce chain events in flow are processed in order
+  if (!referral) throw Error('Referral fee received out of order');
 
-  const referrer_received_amount =
-    Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
+  const referrer_received_amount = fee_amount;
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
       {
-        eth_chain_id: event.eventSource.ethChainId,
-        transaction_hash: event.rawLog.transactionHash,
+        eth_chain_id: payload.eventSource.ethChainId,
+        transaction_hash: payload.rawLog.transactionHash,
         namespace_address,
         distributed_token_address,
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
         referee_address: referral.referee_address,
-        transaction_timestamp: Number(event.block.timestamp),
+        transaction_timestamp: payload.block.timestamp,
       },
       { transaction },
     );
@@ -56,19 +53,21 @@ export async function handleReferralFeeDistributed(
     // if native token i.e. ETH
     if (distributed_token_address === ZERO_ADDRESS) {
       const referrer = await models.Address.findOne({
-        where: { address: referrer_address },
+        where: { address: referrer_address, user_id: { [Op.not]: null } },
+        attributes: ['user_id'],
         transaction,
       });
+
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
-          by: referrer_received_amount,
+          by: Number(referrer_received_amount),
           where: { id: referrer.user_id! },
           transaction,
         });
       }
 
       await referral.increment('referrer_received_eth_amount', {
-        by: referrer_received_amount,
+        by: Number(referrer_received_amount),
         transaction,
       });
     }
@@ -76,4 +75,4 @@ export async function handleReferralFeeDistributed(
 
   // TODO: on create address update user.referral_eth_earnings by querying referrals
   //  https://github.com/hicommonwealth/commonwealth/issues/10368
-}
+};
