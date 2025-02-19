@@ -262,7 +262,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   };
 };
 
-const customXpChainEventMapper: EvmMapper<'CustomXpChainEvent'> = (
+const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   event: EvmEvent,
 ) => {
   if (
@@ -273,7 +273,7 @@ const customXpChainEventMapper: EvmMapper<'CustomXpChainEvent'> = (
   }
 
   return {
-    event_name: 'CustomXpChainEvent',
+    event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
       quest_action_meta_id: event.meta.quest_action_meta_id,
@@ -314,5 +314,5 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
     singleContestVoteMapper,
 
   // User defined events (no hardcoded event signatures)
-  CustomXpChainEvent: customXpChainEventMapper,
+  XpChainEventCreated: xpChainEventCreatedMapper,
 };

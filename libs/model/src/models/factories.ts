@@ -3,6 +3,7 @@ import type { Associable } from './types';
 
 import Address from './address';
 import ApiKey from './api_key';
+import CustomXpEventSource from './chain_event_xp_sources';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -15,7 +16,6 @@ import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
-import CustomXpEventSource from './custom_xp_event_sources';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';

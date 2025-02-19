@@ -395,7 +395,7 @@ export const events = {
     }),
   }),
 
-  CustomXpChainEvent: z.object({
+  XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
     quest_action_meta_id: z.number(),
     transaction_hash: z.string(),

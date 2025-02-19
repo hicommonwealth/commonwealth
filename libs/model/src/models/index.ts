@@ -40,6 +40,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
 // TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
 export * from './api_key';
+export * from './chain_event_xp_sources';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';
@@ -49,7 +50,6 @@ export * from './community';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
-export * from './custom_xp_event_sources';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';

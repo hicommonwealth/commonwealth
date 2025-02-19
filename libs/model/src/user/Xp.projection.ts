@@ -412,7 +412,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
-      CustomXpChainEvent: async ({ payload }) => {
+      XpChainEventCreated: async ({ payload }) => {
         const chainNode = await models.ChainNode.scope(
           'withPrivateData',
         ).findOne({

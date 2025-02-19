@@ -1,7 +1,7 @@
 import { EVM_ADDRESS } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export const CustomXpEventSource = z.object({
+export const ChainEventXpSource = z.object({
   chain_node_id: z.number(),
   contract_address: EVM_ADDRESS,
   event_signature: z.string(),
