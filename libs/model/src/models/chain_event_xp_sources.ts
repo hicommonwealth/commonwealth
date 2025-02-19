@@ -36,7 +36,7 @@ export default (
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
-      tableName: 'ChainEventXpSource',
+      tableName: 'ChainEventXpSources',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     },
