@@ -35,3 +35,9 @@ export const DeleteQuest = {
   output: z.boolean(),
   context: AuthContext,
 };
+
+export const CancelQuest = {
+  input: z.object({ quest_id: PG_INT }),
+  output: z.boolean(),
+  context: AuthContext,
+};

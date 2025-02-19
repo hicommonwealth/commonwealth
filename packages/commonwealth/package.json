@@ -288,6 +288,7 @@
     "unleash-proxy-client": "^3.3.1",
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.1",
+    "viem": "^2.23.2",
     "vm-browserify": "^1.1.2",
     "web3": "^4.7.0",
     "web3-core": "^4.3.2",

@@ -1,7 +1,7 @@
 // Ex: oldValue = 100, newValue = 99, result = 0.01
-export const calculatePercentageChangeFractional = (
+export const calculateRemainingPercentageChangeFractional = (
   oldValue: number,
   newValue: number,
 ) => {
-  return Math.abs((newValue - oldValue) / oldValue);
+  return 1 - Math.abs((newValue - oldValue) / oldValue);
 };

@@ -1,9 +1,9 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { notifyAddressOwnershipTransferred } from './handlers/notifyAddressOwnershipTransferred';
-import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
 import { notifyCommentCreated } from './handlers/notifyCommentCreated';
 import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
+import { notifyCommunityStakeTrades } from './handlers/notifyCommunityStakeTrades';
 import { notifyContestEvent } from './handlers/notifyContestEvent';
 import { notifyQuestStarted } from './handlers/notifyQuestStarted';
 import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
@@ -13,7 +13,7 @@ import { notifyUserMentioned } from './handlers/notifyUserMentioned';
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
-  ChainEventCreated: events.ChainEventCreated,
+  CommunityStakeTrade: events.CommunityStakeTrade,
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   UserMentioned: events.UserMentioned,
@@ -35,8 +35,8 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       SnapshotProposalCreated: async (event) => {
         await notifySnapshotProposalCreated(event);
       },
-      ChainEventCreated: async (event) => {
-        await notifyChainEventCreated(event);
+      CommunityStakeTrade: async (event) => {
+        await notifyCommunityStakeTrades(event);
       },
       ThreadCreated: async (event) => {
         await notifyThreadCreated(event);

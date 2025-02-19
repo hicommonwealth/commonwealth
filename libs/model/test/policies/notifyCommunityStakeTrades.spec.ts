@@ -22,7 +22,7 @@ import {
 import z from 'zod';
 import { tester } from '../../src';
 import { models } from '../../src/database';
-import { notifyChainEventCreated } from '../../src/policies/handlers/notifyChainEventCreated';
+import { notifyCommunityStakeTrades } from '../../src/policies/handlers/notifyCommunityStakeTrades';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -75,27 +75,20 @@ describe('chainEventCreated Event Handler', () => {
     await dispose()();
   });
 
-  test('should do nothing if the event signature is unsupported', async () => {
-    await notifyChainEventCreated({
-      name: 'ChainEventCreated',
-      payload: {
-        eventSource: {
-          eventSignature: '0xunsupported',
-        },
-      } as unknown as z.infer<typeof events.ChainEventCreated>,
-    });
-  });
-
   describe('Community Stakes', () => {
     test('should not throw if the community is invalid', async () => {
-      await notifyChainEventCreated({
-        name: 'ChainEventCreated',
+      await notifyCommunityStakeTrades({
+        name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', '0xunsupported', true],
-        } as unknown as z.infer<typeof events.ChainEventCreated>,
+          parsedArgs: {
+            trader: '0x1',
+            namespace: '0xunsupported',
+            isBuy: true,
+          },
+        } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
     });
 
@@ -104,14 +97,18 @@ describe('chainEventCreated Event Handler', () => {
         adapter: SpyNotificationsProvider(),
       });
 
-      await notifyChainEventCreated({
-        name: 'ChainEventCreated',
+      await notifyCommunityStakeTrades({
+        name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', namespaceAddress, true],
-        } as unknown as z.infer<typeof events.ChainEventCreated>,
+          parsedArgs: {
+            trader: '0x1',
+            namespace: namespaceAddress,
+            isBuy: true,
+          },
+        } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
       expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
     });
@@ -127,14 +124,18 @@ describe('chainEventCreated Event Handler', () => {
         user_id: user!.id,
       });
 
-      await notifyChainEventCreated({
-        name: 'ChainEventCreated',
+      await notifyCommunityStakeTrades({
+        name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', namespaceAddress, true],
-        } as unknown as z.infer<typeof events.ChainEventCreated>,
+          parsedArgs: {
+            trader: '0x1',
+            namespace: namespaceAddress,
+            isBuy: true,
+          },
+        } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
       expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
       expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal(
@@ -163,14 +164,18 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await expect(
-        notifyChainEventCreated({
-          name: 'ChainEventCreated',
+        notifyCommunityStakeTrades({
+          name: 'CommunityStakeTrade',
           payload: {
             eventSource: {
               eventSignature: EvmEventSignatures.CommunityStake.Trade,
             },
-            parsedArgs: ['0x1', namespaceAddress, true],
-          } as unknown as z.infer<typeof events.ChainEventCreated>,
+            parsedArgs: {
+              trader: '0x1',
+              namespace: namespaceAddress,
+              isBuy: true,
+            },
+          } as unknown as z.infer<typeof events.CommunityStakeTrade>,
         }),
       ).rejects.toThrow(ProviderError);
     });

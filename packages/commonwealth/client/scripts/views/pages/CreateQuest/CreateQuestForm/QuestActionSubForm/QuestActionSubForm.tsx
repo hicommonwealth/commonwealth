@@ -56,7 +56,7 @@ const QuestActionSubForm = ({
       />
 
       <CWTextInput
-        label="Reward Points"
+        label="Total Reward Points"
         placeholder="Points Earned"
         fullWidth
         {...(defaultValues?.rewardAmount && {
@@ -80,21 +80,22 @@ const QuestActionSubForm = ({
           }
           name="creatorRewardAmount"
           customError={errors?.creatorRewardAmount}
-          instructionalMessage="Number of reward points the action creator would get."
+          // eslint-disable-next-line max-len
+          instructionalMessage="Number of reward points the action creator would get. Deducted from total reward points."
         />
       )}
 
       <CWTextInput
         label="Relevant Quest Link (optional)"
-        name="questLink"
+        name="actionLink"
         placeholder="https://example.com"
         instructionalMessage="Note: Social media task links will appear here (e.g., follow on X, join Discord)"
         fullWidth
-        {...(defaultValues?.questLink && {
-          defaultValue: defaultValues?.questLink,
+        {...(defaultValues?.actionLink && {
+          defaultValue: defaultValues?.actionLink,
         })}
-        onInput={(e) => onChange?.({ questLink: e?.target?.value?.trim() })}
-        customError={errors?.questLink}
+        onInput={(e) => onChange?.({ actionLink: e?.target?.value?.trim() })}
+        customError={errors?.actionLink}
       />
     </div>
   );

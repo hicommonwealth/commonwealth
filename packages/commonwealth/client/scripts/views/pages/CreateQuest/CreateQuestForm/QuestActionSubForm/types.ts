@@ -4,14 +4,14 @@ export type QuestAction = keyof typeof QuestEvents;
 
 export type QuestActionSubFormErrors = {
   action?: string;
-  questLink?: string;
+  actionLink?: string;
   rewardAmount?: string;
   creatorRewardAmount?: string;
 };
 
 export type QuestActionSubFormFields = {
   action?: QuestAction;
-  questLink?: string;
+  actionLink?: string;
   rewardAmount?: string | number;
   creatorRewardAmount?: string | number;
 };

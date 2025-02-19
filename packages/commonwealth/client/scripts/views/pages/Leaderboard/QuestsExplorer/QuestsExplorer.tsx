@@ -48,9 +48,12 @@ const QuestsExplorer = () => {
             />
           </div>
           {quests.map((quest) => {
-            const totalXP =
+            const totalUserXP =
               (quest.action_metas || [])
-                ?.map((action) => action.reward_amount)
+                ?.map(
+                  (action) =>
+                    action.reward_amount - action.creator_reward_weight * 100,
+                )
                 .reduce(
                   (accumulator, currentValue) => accumulator + currentValue,
                   0,
@@ -61,7 +64,7 @@ const QuestsExplorer = () => {
                 key={quest.name}
                 label={quest.name}
                 description={quest.description}
-                xpPoints={totalXP}
+                xpPoints={totalUserXP}
                 featuredImgURL={quest.image_url}
                 onExploreClick={() => handleCTAClick(quest.id)}
               />
