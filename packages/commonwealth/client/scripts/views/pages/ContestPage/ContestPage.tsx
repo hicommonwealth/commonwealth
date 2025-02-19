@@ -50,7 +50,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
 
   const { end_time } = contest?.contests[0] || {};
 
-  if (!newContestPageEnabled) {
+  if (newContestPageEnabled) {
     return <NewContestPage contestAddress={contestAddress} />;
   }
 

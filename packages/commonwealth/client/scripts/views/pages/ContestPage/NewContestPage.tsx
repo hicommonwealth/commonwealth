@@ -1,8 +1,8 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import useFetchFarcasterCastsQuery from 'client/scripts/state/api/contests/getFarcasterCasts';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
@@ -10,12 +10,13 @@ import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayou
 import ContestCard from '../CommunityManagement/Contests/ContestsList/ContestCard';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import { MobileTabType } from './ContestPage';
+import useTokenData from './hooks/useTokenData';
 import EntriesTab from './tabs/Entries';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
+import { SortType } from './types';
 
 import './NewContestPage.scss';
-import useTokenData from './hooks/useTokenData';
 
 interface NewContestPageProps {
   contestAddress: string;
@@ -32,6 +33,15 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
   >();
+
+  const { data: farcasterCasts, isLoading: isFarcasterCastsLoading } =
+    useFetchFarcasterCastsQuery({
+      contest_address: contestAddress,
+      selectedSort: SortType.Upvotes,
+      isEnabled: !!contest?.is_farcaster_contest,
+    });
+
+  console.log('farcasterCasts', farcasterCasts);
 
   const { chain, address } = useTokenData();
 
@@ -112,7 +122,14 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
         </div>
 
         <div className="mobile-tab-content">
-          {selectedMobileTab === MobileTabType.Entries && <EntriesTab />}
+          {selectedMobileTab === MobileTabType.Entries && (
+            <EntriesTab
+              isLoading={isFarcasterCastsLoading}
+              entries={farcasterCasts || []}
+              selectedSort={SortType.Upvotes}
+              onSortChange={() => {}}
+            />
+          )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
         </div>
@@ -120,7 +137,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
         <div className="desktop-view">
           <CWGrid>
             <div>
-              <EntriesTab />
+              <EntriesTab
+                isLoading={false}
+                entries={farcasterCasts || []}
+                selectedSort={SortType.Upvotes}
+                onSortChange={() => {}}
+              />
             </div>
             <div>
               <TokenSwapTab />
