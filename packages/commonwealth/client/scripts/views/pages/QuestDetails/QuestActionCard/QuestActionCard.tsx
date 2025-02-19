@@ -6,8 +6,8 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
-import { QuestAction } from '../../CreateQuest/CreateQuestForm/QuestActionSubForm';
-import { doesActionRequireCreatorReward } from '../../CreateQuest/CreateQuestForm/QuestActionSubForm/helpers';
+import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
+import { doesActionRequireCreatorReward } from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
 import './QuestActionCard.scss';
 
 // TODO: fix types with schemas.Events keys

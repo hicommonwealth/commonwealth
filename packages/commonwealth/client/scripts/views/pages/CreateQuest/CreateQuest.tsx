@@ -23,7 +23,7 @@ const CreateQuest = () => {
             relevant quest items to be grouped into multiple quests.
           </CWText>
         </div>
-        <QuestForm />
+        <QuestForm mode="create" />
       </div>
     </CWPageLayout>
   );

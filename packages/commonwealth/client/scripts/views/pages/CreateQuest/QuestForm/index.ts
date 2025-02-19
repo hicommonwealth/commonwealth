@@ -1,3 +1,3 @@
-import CreateQuestForm from './QuestForm';
+import QuestForm from './QuestForm';
 
-export default CreateQuestForm;
+export default QuestForm;

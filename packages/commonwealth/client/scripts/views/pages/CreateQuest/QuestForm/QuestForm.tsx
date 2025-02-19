@@ -1,4 +1,5 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import { capitalize } from 'lodash';
 import React from 'react';
 import CWCommunityInput from 'views/components/CWCommunityInput';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
@@ -17,10 +18,12 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import './QuestForm.scss';
+import { QuestFormProps } from './types';
 import useQuestForm from './useQuestForm';
 import { questFormValidationSchema } from './validation';
 
-const QuestForm = () => {
+const QuestForm = (props: QuestFormProps) => {
+  const { mode, initialValues } = props;
   const {
     addSubForm,
     questActionSubForms,
@@ -35,7 +38,7 @@ const QuestForm = () => {
     minStartDate,
     repetitionCycleRadio,
     formMethodsRef,
-  } = useQuestForm();
+  } = useQuestForm(props);
 
   return (
     <CWForm
@@ -43,6 +46,16 @@ const QuestForm = () => {
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
+      {...(initialValues && {
+        initialValues: {
+          name: initialValues.name,
+          description: initialValues.description,
+          image: initialValues.image,
+          start_date: initialValues.start_date,
+          end_date: initialValues.end_date,
+          community: initialValues.community,
+        },
+      })}
       className="QuestForm"
     >
       <div className="quest-period-section">
@@ -183,7 +196,7 @@ const QuestForm = () => {
           containerClassName="btn"
         />
         <CWButton
-          label="Create Quest"
+          label={`${capitalize(mode)} Quest`}
           buttonWidth="wide"
           type="submit"
           containerClassName="btn"
