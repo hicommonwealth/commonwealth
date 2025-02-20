@@ -1,29 +1,35 @@
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import useGetCommentByIdQuery from 'state/api/comments/getCommentById';
+import { useFetchCommentsQuery } from 'state/api/comments';
 import { PageLoading } from './loading';
 
 const CommentRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
 
   const commentId = parseInt(identifier.split('-')[0]);
-  const { data: comment, error } = useGetCommentByIdQuery({
+  const { data: comments, error } = useFetchCommentsQuery({
     comment_id: commentId,
-    apiCallEnabled: !!commentId,
+    limit: 1,
+    include_reactions: false,
+    cursor: 1,
+    include_spam_comments: true,
+    order_by: 'newest',
+    apiEnabled: !!commentId,
   });
+  const foundComment = comments?.pages?.[0]?.results?.[0];
 
   useRunOnceOnCondition({
     callback: () => {
-      !comment || error
+      !foundComment || error
         ? navigate('/error')
         : navigate(
-            `/discussion/${comment.thread_id}?comment=${comment.id}`,
+            `/discussion/${foundComment.thread_id}?comment=${foundComment.id}`,
             { replace: true },
-            comment.community_id,
+            foundComment.community_id,
           );
     },
-    shouldRun: !!(comment || error),
+    shouldRun: !!(foundComment || error),
   });
 
   return <PageLoading />;

@@ -4,7 +4,6 @@ import useDeleteCommentMutation from './deleteComment';
 import useEditCommentMutation from './editComment';
 import useFetchCommentsQuery from './fetchComments';
 import { useGenerateCommentText } from './generateCommentText';
-import useGetCommentByIdQuery from './getCommentById';
 import useSearchCommentsQuery from './searchComments';
 import useToggleCommentSpamStatusMutation from './toggleCommentSpamStatus';
 // comment reactions
@@ -19,7 +18,6 @@ export {
   useEditCommentMutation,
   useFetchCommentsQuery,
   useGenerateCommentText,
-  useGetCommentByIdQuery,
   useSearchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 };
