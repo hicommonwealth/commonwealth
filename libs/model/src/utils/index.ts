@@ -1,6 +1,5 @@
 export * from './buildFarcasterWebhookName';
 export * from './decodeContent';
-export * from './defaultAvatar';
 export * from './denormalizedCountUtils';
 export * from './farcasterUtils';
 export * from './generateUnsubscribeLink';

@@ -45,8 +45,8 @@ const QuestList = () => {
     }
   };
 
-  const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleCTAClick = (questId: number, communityId?: string) => {
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleLeaderboardClick = () => {
@@ -75,7 +75,8 @@ const QuestList = () => {
               (quest.action_metas || [])
                 ?.map(
                   (action) =>
-                    action.reward_amount - action.creator_reward_weight * 100,
+                    action.reward_amount -
+                    action.creator_reward_weight * action.reward_amount,
                 )
                 .reduce(
                   (accumulator, currentValue) => accumulator + currentValue,
@@ -88,6 +89,7 @@ const QuestList = () => {
                 key={quest.name}
                 name={quest.name}
                 description={quest.description}
+                communityId={quest.community_id || ''}
                 iconURL={quest.image_url}
                 xpPoints={totalUserXP}
                 tasks={{
@@ -98,7 +100,9 @@ const QuestList = () => {
                 }}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
-                onCTAClick={() => handleCTAClick(quest.id)}
+                onCTAClick={() =>
+                  handleCTAClick(quest.id, quest.community_id || '')
+                }
                 onLeaderboardClick={handleLeaderboardClick}
               />
             );

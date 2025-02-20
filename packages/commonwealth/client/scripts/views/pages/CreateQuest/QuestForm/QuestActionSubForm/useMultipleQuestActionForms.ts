@@ -144,6 +144,7 @@ const useQuestActionMultiFormsState = ({
     addSubForm,
     removeSubFormByIndex,
     updateSubFormByIndex,
+    setQuestActionSubForms,
     validateSubFormByIndex,
     validateSubForms,
   };

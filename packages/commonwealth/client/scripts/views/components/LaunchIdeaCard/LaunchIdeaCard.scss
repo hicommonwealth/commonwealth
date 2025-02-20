@@ -47,10 +47,26 @@
     }
 
     @include extraSmall {
+      .LaunchIdeaCard {
+        .gradiant-container {
+          .buttons {
+            flex-direction: row;
+            gap: 8px;
+
+            button {
+              flex-shrink: 1;
+            }
+          }
+          .responsive-cw-button {
+            font-size: 0.875rem;
+            padding: 4px 8px;
+          }
+        }
+      }
+
+      .cta-elements,
       .buttons {
-        flex-direction: column;
-        align-items: flex-end;
-        width: 100%;
+        gap: 6px !important;
       }
     }
 

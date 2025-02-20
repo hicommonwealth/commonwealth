@@ -1,8 +1,13 @@
+import { getRandomAvatar } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { calculateQuestTimelineLabel } from 'helpers/quest';
 import moment from 'moment';
 import React from 'react';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { Skeleton } from 'views/components/Skeleton';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -12,6 +17,7 @@ import './QuestCard.scss';
 interface QuestCardProps {
   name: string;
   description: string;
+  communityId?: string;
   iconURL: string;
   xpPoints: number;
   startDate: Date;
@@ -32,6 +38,7 @@ const MAX_CHARS_FOR_DESCRIPTIONS = 24;
 const QuestCard = ({
   name,
   description,
+  communityId,
   iconURL,
   xpPoints,
   startDate,
@@ -59,6 +66,12 @@ const QuestCard = ({
   const isStarted = moment().isSameOrAfter(moment(startDate));
   const isEnded = moment().isSameOrAfter(moment(endDate));
 
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId || '',
+      enabled: !!communityId,
+    });
+
   return (
     <div
       role="button"
@@ -66,6 +79,30 @@ const QuestCard = ({
       className={clsx('QuestCard', className)}
       onClick={handleBodyClick}
     >
+      <div className="quest-scope">
+        {communityId ? (
+          <>
+            {isLoadingCommunity || !community ? (
+              <Skeleton />
+            ) : (
+              <CommunityInfo
+                name={community.name}
+                communityId={community.id}
+                iconUrl={community.icon_url || ''}
+              />
+            )}
+          </>
+        ) : (
+          <CommunityInfo
+            name="Global Quest"
+            communityId="global"
+            iconUrl={getRandomAvatar()}
+            linkToCommunity={false}
+          />
+        )}
+        <CWIconButton iconName="gearPhosphor" onClick={() => onCTAClick?.()} />
+      </div>
+      <CWDivider />
       <img src={iconURL} className="image" onClick={handleBodyClick} />
       <div className="content">
         <div className="basic-info" onClick={handleBodyClick}>
@@ -82,6 +119,7 @@ const QuestCard = ({
             isDescriptionTrimmed,
           )}
         </div>
+        <CWDivider />
         {/* time label */}
         {withTooltip(
           <CWText className="time-label" type="b2" fontWeight="semiBold">
