@@ -137,6 +137,7 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     created_at: z.coerce.date(),
+    oauth_provider: z.string().nullish(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -340,7 +341,7 @@ export const events = {
       ethAmount: z.coerce.bigint(),
       protocolEthAmount: z.coerce.bigint(),
       nameSpaceEthAmount: z.coerce.bigint(),
-      supply: z.bigint(),
+      supply: z.coerce.bigint(),
       exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
