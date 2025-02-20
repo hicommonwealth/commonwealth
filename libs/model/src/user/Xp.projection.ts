@@ -420,6 +420,17 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
+      CommonDiscordServerJoined: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          { created_at: payload.joined_date },
+          'CommonDiscordServerJoined',
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.joined_date,
+          action_metas,
+        );
+      },
     },
   };
 }
