@@ -238,9 +238,7 @@ describe('Quest lifecycle', () => {
             action_metas,
           },
         }),
-      ).rejects.toThrowError(
-        `Comment with id "1000" in community "${community_id}" must exist`,
-      );
+      ).rejects.toThrowError(`Comment with id "1000" must exist`);
     });
   });
 
