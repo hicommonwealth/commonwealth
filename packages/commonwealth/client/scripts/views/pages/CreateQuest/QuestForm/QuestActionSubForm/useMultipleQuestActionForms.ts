@@ -2,7 +2,10 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
-import { doesActionRequireCreatorReward } from './helpers';
+import {
+  doesActionRequireContentId,
+  doesActionRequireCreatorReward,
+} from './helpers';
 import {
   QuestAction,
   QuestActionSubFormConfig,
@@ -13,7 +16,9 @@ import {
 } from './types';
 import {
   questSubFormValidationSchema,
+  questSubFormValidationSchemaWithContentLink,
   questSubFormValidationSchemaWithCreatorPoints,
+  questSubFormValidationSchemaWithCreatorPointsWithContentLink,
 } from './validation';
 
 const useQuestActionMultiFormsState = ({
@@ -52,16 +57,57 @@ const useQuestActionMultiFormsState = ({
     ]);
   };
 
+  const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
+    if (config?.requires_comment_id || config?.requires_thread_id) {
+      if (config?.requires_creator_points) {
+        return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
+      }
+
+      return questSubFormValidationSchemaWithContentLink;
+    }
+
+    if (config?.requires_creator_points) {
+      return questSubFormValidationSchemaWithCreatorPoints;
+    }
+
+    return questSubFormValidationSchema;
+  };
+
   const validateFormValues = (
     values: QuestActionSubFormFields,
     config?: QuestActionSubFormConfig,
   ) => {
     let errors: QuestActionSubFormErrors = {};
     try {
-      const schema = config?.requires_creator_points
-        ? questSubFormValidationSchemaWithCreatorPoints
-        : questSubFormValidationSchema;
+      const schema = buildValidationSchema(config);
       schema.parse(values);
+
+      // TODO: thread/comment url validations
+      // validate content link matches a defined pattern
+      // if (values.contentLink) {
+      //   if (config?.requires_thread_id) {
+      //     const isValidlink = THREAD_URL_VALIDATION_REGEX.test(
+      //       values.contentLink,
+      //     );
+      //     if (!isValidlink) {
+      //       errors = {
+      //         ...errors,
+      //         contentLink: 'Invalid thread link',
+      //       };
+      //     }
+      //   }
+      //   if (config?.requires_comment_id) {
+      //     const isValidlink = COMMENT_URL_VALIDATION_REGEX.test(
+      //       values.contentLink,
+      //     );
+      //     if (!isValidlink) {
+      //       errors = {
+      //         ...errors,
+      //         contentLink: 'Invalid comment link',
+      //       };
+      //     }
+      //   }
+      // }
     } catch (e) {
       const zodError = e as ZodError;
       zodError.errors.map((error) => {
@@ -105,14 +151,21 @@ const useQuestActionMultiFormsState = ({
       ...updateBody,
     };
 
-    if (updatedSubForms[index].values.action) {
-      const requiresCreatorPoints = doesActionRequireCreatorReward(
-        updatedSubForms[index].values.action as QuestAction,
-      );
+    const chosenAction = updatedSubForms[index].values.action as QuestAction;
+    if (chosenAction) {
+      const requiresCreatorPoints =
+        doesActionRequireCreatorReward(chosenAction);
+      const requiresContentId = doesActionRequireContentId(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        requires_comment_id:
+          requiresContentId && chosenAction === 'CommentUpvoted',
+        requires_thread_id:
+          requiresContentId &&
+          (chosenAction === 'CommentCreated' ||
+            chosenAction === 'ThreadUpvoted'),
       };
 
       // reset errors/values if action doesn't require creator points
@@ -121,6 +174,15 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           creatorRewardAmount: undefined,
+        };
+      }
+
+      // reset errors/values if action doesn't require content link
+      if (!requiresCreatorPoints) {
+        updatedSubForms[index].values.contentLink = undefined;
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          contentLink: undefined,
         };
       }
     }

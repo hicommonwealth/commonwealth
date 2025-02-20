@@ -19,4 +19,23 @@
     top: 12px;
     right: 12px;
   }
+
+  .grid-row {
+    display: grid;
+
+    &.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    &.cols-2 {
+      @include mediumSmallInclusive {
+        grid-template-columns: 1fr;
+      }
+
+      grid-template-columns: 1fr 1fr;
+    }
+
+    gap: 24px;
+    align-items: flex-start;
+  }
 }
