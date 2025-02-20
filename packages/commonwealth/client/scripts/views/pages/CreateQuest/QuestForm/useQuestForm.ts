@@ -7,6 +7,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useRef, useState } from 'react';
 import {
@@ -16,6 +17,7 @@ import {
 import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
 import { doesActionRequireCreatorReward } from './QuestActionSubForm/helpers';
@@ -99,7 +101,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     shouldRun: !!(initialValues && mode === 'update'),
   });
 
-  const minStartDate = new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day date in future
+  const minStartDate = new Date(new Date().getTime() + 1 * 60 * 60 * 1000); // now + 1 hour in future
+  const idealStartDate = new Date(
+    new Date().getTime() + 1 * 24 * 60 * 60 * 1000,
+  ); // now + 1 day in future
+  const minEndDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000); // now + 1 day in future
 
   const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
 
@@ -183,6 +189,30 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     },
   });
 
+  const handleQuestMutateConfirmation = async (hours: number) => {
+    return new Promise((resolve, reject) => {
+      openConfirmation({
+        title: `Confirm Quest ${mode === 'create' ? 'Creation' : 'Updation'}`,
+        // eslint-disable-next-line max-len
+        description: `Are you sure you want to ${mode} this quest ${hours ? `${hours} hour${hours > 1 ? 's' : ''} in advance` : `that starts in a few moments`}? \n\nWe suggest creating/updating quests atleast 24+ hours in advance.\nThis allow users to get plenty of time to prepare, and for you to have plenty of time for any necessary changes.`,
+        buttons: [
+          {
+            label: 'Cancel',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
+            onClick: reject,
+          },
+          {
+            label: 'Confirm',
+            buttonType: 'destructive',
+            buttonHeight: 'sm',
+            onClick: resolve,
+          },
+        ],
+      });
+    });
+  };
+
   const handleCreateQuest = (
     values: z.infer<typeof questFormValidationSchema>,
   ) => {
@@ -237,14 +267,29 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       } catch (e) {
         console.error(e);
 
+        if (e.message.includes('must be at least 0 days in the future')) {
+          notifyError('Start date must be a future date');
+          return;
+        }
         if (e?.message?.includes?.('must not exist')) {
           notifyError('Quest with provided name already exists!');
-        } else {
-          notifyError('Failed to create quest!');
+          return;
         }
+        notifyError('Failed to create quest!');
       }
     };
-    handleAsync().catch(console.error);
+    const questStartHoursDiffFromNow = moment(values.start_date).diff(
+      moment(),
+      'hours',
+    );
+    // request confirmation from user if quest is being created <=6 hours in advance
+    if (questStartHoursDiffFromNow <= 6) {
+      handleQuestMutateConfirmation(questStartHoursDiffFromNow)
+        .then(() => handleAsync().catch(console.error))
+        .catch(console.error);
+    } else {
+      handleAsync().catch(console.error);
+    }
   };
 
   const handleUpdateQuest = (
@@ -301,14 +346,29 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       } catch (e) {
         console.error(e);
 
+        if (e.message.includes('must be at least 0 days in the future')) {
+          notifyError('Start date must be a future date');
+          return;
+        }
         if (e?.message?.includes?.('must not exist')) {
           notifyError('Quest with provided name already exists!');
-        } else {
-          notifyError('Failed to update quest!');
+          return;
         }
+        notifyError('Failed to update quest!');
       }
     };
-    handleAsync().catch(console.error);
+    const questStartHoursDiffFromNow = moment(values.start_date).diff(
+      moment(),
+      'hours',
+    );
+    // request confirmation from user if quest is being created <=6 hours in advance
+    if (questStartHoursDiffFromNow <= 6) {
+      handleQuestMutateConfirmation(questStartHoursDiffFromNow)
+        .then(() => handleAsync().catch(console.error))
+        .catch(console.error);
+    } else {
+      handleAsync().catch(console.error);
+    }
   };
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
@@ -330,6 +390,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    idealStartDate,
+    minEndDate,
     // custom radio button props
     repetitionCycleRadio: {
       error: repetitionCycleRadioError,

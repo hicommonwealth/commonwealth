@@ -36,6 +36,8 @@ const QuestForm = (props: QuestFormProps) => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    idealStartDate,
+    minEndDate,
     repetitionCycleRadio,
     formMethodsRef,
   } = useQuestForm(props);
@@ -93,14 +95,14 @@ const QuestForm = (props: QuestFormProps) => {
           hookToForm
           name="start_date"
           minDate={minStartDate}
-          selected={minStartDate}
+          selected={idealStartDate}
           showTimeInput
         />
         <CWDateTimeInput
           label="End Date"
           hookToForm
           name="end_date"
-          minDate={minStartDate}
+          minDate={minEndDate}
           selected={null}
           showTimeInput
         />
@@ -142,7 +144,7 @@ const QuestForm = (props: QuestFormProps) => {
           name="community"
           hookToForm
           label="Community (optional)"
-          instructionalMessage="Note: Selecting a community will bound all quest actions to that community."
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
         />
       </div>
 

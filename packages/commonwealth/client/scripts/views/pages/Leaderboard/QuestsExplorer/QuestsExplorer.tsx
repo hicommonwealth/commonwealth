@@ -22,11 +22,7 @@ const QuestsExplorer = () => {
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
   const handleCTAClick = (questId: number, communityId?: string) => {
-    navigate(
-      `${communityId ? `/${communityId}` : ''}/quest/${questId}`,
-      {},
-      null,
-    );
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleSeeAllClick = () => {
