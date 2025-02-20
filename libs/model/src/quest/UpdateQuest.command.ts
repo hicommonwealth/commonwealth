@@ -47,37 +47,41 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         end_date ?? quest.end_date,
       );
 
-      if (community_id && action_metas) {
-        action_metas.forEach(async (action_meta) => {
-          if (action_meta.content_id) {
-            // make sure content_id belong to community
-            const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
-            if (content === 'thread') {
-              const thread = await models.Thread.findOne({
-                where: { id: +id, community_id },
-              });
-              mustExist(
-                `Thread with id "${id}" in community "${community_id}"`,
-                thread,
-              );
-            } else if (content === 'comment') {
-              const comment = await models.Comment.findOne({
-                where: { id: +id },
-                include: [
-                  {
-                    model: models.Thread,
-                    attributes: ['community_id'],
-                    required: true,
-                  },
-                ],
-              });
-              mustExist(
-                `Comment with id "${id}" in community "${community_id}"`,
-                comment,
-              );
+      const c_id = community_id || quest.community_id;
+      if (c_id && action_metas) {
+        await Promise.all(
+          action_metas.map(async (action_meta) => {
+            if (action_meta.content_id) {
+              // make sure content_id belong to community
+              const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
+              if (content === 'thread') {
+                const thread = await models.Thread.findOne({
+                  where: { id: +id, community_id: c_id },
+                });
+                mustExist(
+                  `Thread with id "${id}" in community "${c_id}"`,
+                  thread,
+                );
+              } else if (content === 'comment') {
+                const comment = await models.Comment.findOne({
+                  where: { id: +id },
+                  include: [
+                    {
+                      model: models.Thread,
+                      attributes: ['community_id'],
+                      required: true,
+                      where: { community_id: c_id },
+                    },
+                  ],
+                });
+                mustExist(
+                  `Comment with id "${id}" in community "${c_id}"`,
+                  comment,
+                );
+              }
             }
-          }
-        });
+          }),
+        );
       }
 
       await models.sequelize.transaction(async (transaction) => {
