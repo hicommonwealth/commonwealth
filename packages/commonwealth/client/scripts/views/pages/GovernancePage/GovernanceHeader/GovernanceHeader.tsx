@@ -13,6 +13,7 @@ import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/Unisw
 import React from 'react';
 import { formatAddressShort } from 'shared/utils';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
+import { formatTokenSupply } from '../utils';
 import './GovernanceHeader.scss';
 
 const GovernanceHeader = () => {
@@ -29,6 +30,12 @@ const GovernanceHeader = () => {
     ? isPinnedToken
       ? (communityToken as ExternalToken).contract_address
       : (communityToken as LaunchpadToken).token_address
+    : null;
+
+  const tokenSupply = communityToken
+    ? isPinnedToken
+      ? null
+      : (communityToken as LaunchpadToken).initial_supply
     : null;
 
   const snapShotAvailable =
@@ -68,6 +75,11 @@ const GovernanceHeader = () => {
               )}
             />
           </div>
+        )}
+        {tokenSupply && (
+          <CWText fontWeight="semiBold">
+            {formatTokenSupply(tokenSupply)}
+          </CWText>
         )}
       </div>
     </div>
