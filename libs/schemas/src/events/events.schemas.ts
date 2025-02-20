@@ -340,7 +340,7 @@ export const events = {
       ethAmount: z.coerce.bigint(),
       protocolEthAmount: z.coerce.bigint(),
       nameSpaceEthAmount: z.coerce.bigint(),
-      supply: z.bigint(),
+      supply: z.coerce.bigint(),
       exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
