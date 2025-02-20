@@ -3,7 +3,6 @@ import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { SortType, sortOptions } from '../types';
 
@@ -59,17 +58,6 @@ export const FarcasterEntriesList = ({
       {entries.map((entry) => (
         <div key={entry.hash} className="cast-container">
           <CWUpvote disabled voteCount={entry.calculated_vote_weight || '0'} />
-
-          <div className="upvote-small">
-            <CWUpvoteSmall
-              voteCount={entry.calculated_vote_weight || '0'}
-              disabled
-              selected={false}
-              onClick={() => undefined}
-              popoverContent={<></>}
-              tooltipText="Farcaster Upvotes"
-            />
-          </div>
 
           <FarcasterEmbed
             key={entry.hash}

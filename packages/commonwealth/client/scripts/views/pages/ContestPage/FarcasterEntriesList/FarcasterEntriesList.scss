@@ -11,19 +11,5 @@
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 16px;
-
-    .upvote-small {
-      display: none;
-    }
-
-    @media (max-width: 767px) {
-      .cw-upvote {
-        display: none;
-      }
-
-      .upvote-small {
-        display: block;
-      }
-    }
   }
 }
