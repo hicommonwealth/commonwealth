@@ -46,6 +46,10 @@ export const QuestActionMeta = z
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
     action_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().optional(),
+    content_id: z
+      .string()
+      .regex(/(thread:\d+)|(comment:\d+)/)
+      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
   })

@@ -1,6 +1,7 @@
 import {
   linkValidationSchema,
-  numberGTZeroValidationSchema,
+  numberNonDecimalGTZeroValidationSchema,
+  numberNonDecimalValidationSchema,
   numberValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
@@ -10,14 +11,14 @@ export const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  rewardAmount: numberGTZeroValidationSchema,
+  rewardAmount: numberNonDecimalGTZeroValidationSchema,
   actionLink: linkValidationSchema.optional,
 });
 
 export const questSubFormValidationSchemaWithCreatorPoints =
   questSubFormValidationSchema
     .extend({
-      creatorRewardAmount: numberValidationSchema,
+      creatorRewardAmount: numberNonDecimalValidationSchema,
     })
     .refine(
       (data) => {
@@ -25,9 +26,7 @@ export const questSubFormValidationSchemaWithCreatorPoints =
           const creatorRewardAmount = numberValidationSchema.parse(
             data.creatorRewardAmount,
           );
-          const rewardAmount = numberGTZeroValidationSchema.parse(
-            data.rewardAmount,
-          );
+          const rewardAmount = numberValidationSchema.parse(data.rewardAmount);
           // verify creatorRewardAmount is less or equal to rewardAmount
           return (
             parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)

@@ -48,9 +48,10 @@ const QuestActionSubForm = ({
           newValue && onChange?.({ action: newValue.value })
         }
         {...(defaultValues?.action && {
-          defaultValue: actionOptions.find(
-            (a) => a.value === defaultValues.action,
-          ),
+          value: {
+            value: defaultValues?.action as QuestAction,
+            label: splitCamelOrPascalCase(defaultValues?.action),
+          },
         })}
         customError={errors?.action}
       />
