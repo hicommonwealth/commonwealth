@@ -18,6 +18,8 @@ export type CommentsTreeProps = {
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
+  streamingReplyIds: number[];
+  setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export type UseCommentsTreeProps = Pick<
@@ -37,7 +39,11 @@ export type CommentFiltersProps = Pick<CommentsTreeProps, 'commentsRef'> & {
 
 export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
-  'pageRef' | 'thread' | 'disabledActionsTooltipText'
+  | 'pageRef'
+  | 'thread'
+  | 'disabledActionsTooltipText'
+  | 'streamingReplyIds'
+  | 'setStreamingReplyIds'
 > & {
   parentCommentId?: number;
   isThreadLocked: boolean;

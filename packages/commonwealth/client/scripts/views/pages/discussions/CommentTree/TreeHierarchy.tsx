@@ -1,7 +1,7 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -45,10 +45,11 @@ export const TreeHierarchy = ({
   onCommentReplyEnd,
   commentFilters,
   commentEdits,
+  streamingReplyIds,
+  setStreamingReplyIds,
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
-  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const {
     data: paginatedComments,
@@ -80,7 +81,6 @@ export const TreeHierarchy = ({
 
       const comment = allComments.find((c) => c.id === commentId);
       if (!comment) {
-        console.error('TreeHierarchy - Comment not found:', commentId);
         return Promise.resolve();
       }
 
@@ -120,6 +120,49 @@ export const TreeHierarchy = ({
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;
+  }
+
+  if (streamingReplyIds.includes(thread.id) && !parentCommentId) {
+    const tempRootComment = {
+      id: thread.id,
+      body: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      address: user.activeAccount?.address || '',
+      address_id: user.id,
+      comment_level: 0,
+      thread_id: thread.id,
+      community_id: thread.communityId,
+      marked_as_spam_at: null,
+      reaction_count: 0,
+      reply_count: 0,
+      user_id: user.id,
+      profile_name: user.activeAccount?.address || '',
+    };
+
+    return (
+      <div className="streaming-root-comment" key={`streaming-${thread.id}`}>
+        <CommentCard
+          comment={tempRootComment}
+          isStreamingAIReply={true}
+          isRootComment={true}
+          threadContext={thread.body}
+          onStreamingComplete={() => {
+            setStreamingReplyIds((prev) =>
+              prev.filter((id) => id !== thread.id),
+            );
+          }}
+          canReply={false}
+          canReact={false}
+          canEdit={false}
+          canDelete={false}
+          canToggleSpam={false}
+          shareURL=""
+          maxReplyLimitReached={false}
+          isThreadArchived={false}
+        />
+      </div>
+    );
   }
 
   if (allComments.length === 0) return <></>;
@@ -194,6 +237,7 @@ export const TreeHierarchy = ({
                     comment={comment}
                     shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                     weightType={thread.topic?.weighted_voting}
+                    threadContext={thread.body}
                   />
                 </div>
                 {comment.reply_count > 0 && (
@@ -218,6 +262,8 @@ export const TreeHierarchy = ({
                     canReact={canReact}
                     canReply={canReply}
                     parentCommentId={comment.id}
+                    streamingReplyIds={streamingReplyIds}
+                    setStreamingReplyIds={setStreamingReplyIds}
                   />
                 )}
                 {streamingReplyIds.includes(comment.id) && (
@@ -243,6 +289,7 @@ export const TreeHierarchy = ({
                       }}
                       isStreamingAIReply={true}
                       parentCommentText={comment.body}
+                      threadContext={thread.body}
                       onStreamingComplete={() => {
                         setStreamingReplyIds((prev) =>
                           prev.filter((id) => id !== comment.id),

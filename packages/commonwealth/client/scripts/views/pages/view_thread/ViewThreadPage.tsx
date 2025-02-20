@@ -28,7 +28,6 @@ import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
-import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -180,44 +179,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     currentTopicId: thread?.topic?.id || 0,
   });
 
+  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+
   const handleGenerateAIComment = useCallback(
     async (threadId: number): Promise<void> => {
-      if (!aiCommentsToggleEnabled || !user.activeAccount) return;
-
-      try {
-        const generatedText = await generateComment('', (update) => {
-          // Handle streaming updates
-          console.log('AI comment generation update:', update);
-        });
-
-        if (generatedText) {
-          // Create the AI comment
-          const input = await buildCreateCommentInput({
-            communityId,
-            address: user.activeAccount.address,
-            threadId,
-            threadMsgId: thread?.canvasMsgId ?? null,
-            unescapedText: generatedText,
-            parentCommentId: null,
-            parentCommentMsgId: null,
-            existingNumberOfComments: thread?.numberOfComments || 0,
-          });
-
-          await createComment(input);
-        }
-      } catch (error) {
-        console.error('Failed to generate AI comment:', error);
-        notifyError('Failed to generate AI comment');
+      if (!aiCommentsToggleEnabled || !user.activeAccount) {
+        return;
       }
+
+      // Only generate AI comment if there are no existing comments
+      if (thread?.numberOfComments && thread.numberOfComments > 0) {
+        return;
+      }
+
+      setStreamingReplyIds([threadId]);
     },
-    [
-      aiCommentsToggleEnabled,
-      generateComment,
-      user.activeAccount,
-      communityId,
-      thread,
-      createComment,
-    ],
+    [aiCommentsToggleEnabled, user.activeAccount, thread, streamingReplyIds],
   );
 
   useEffect(() => {
@@ -762,6 +739,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 disabledActionsTooltipText={disabledActionsTooltipText}
                 onThreadCreated={handleGenerateAIComment}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                streamingReplyIds={streamingReplyIds}
+                setStreamingReplyIds={setStreamingReplyIds}
               />
 
               <WithDefaultStickyComment>
