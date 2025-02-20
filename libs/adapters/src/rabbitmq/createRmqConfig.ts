@@ -46,18 +46,15 @@ export function createRmqConfig({
   // TODO: @Roger - add types so that override keys are a partial record of consumer input type
   map: Array<Consumers>;
 }) {
-  let vhost: string, purge: boolean;
-
+  let vhost: string;
   if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
     vhost = '/';
-    purge = !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE;
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
     if (count == 3) {
       // this matches for a production URL
       const res = rabbitMqUri.split('/');
       vhost = res[res.length - 1];
-      purge = false;
     } else {
       throw new Error(
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
@@ -67,7 +64,9 @@ export function createRmqConfig({
 
   const queueConfig = {
     assert: true,
-    purge: purge,
+    purge:
+      ['local', 'CI'].includes(EnvConfig.APP_ENV) &&
+      !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE,
   };
   const deadLetterRoutingKey = 'DeadLetter';
   const exchangeConfig = {
