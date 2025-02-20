@@ -26,7 +26,9 @@ import {
 } from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
+import { buildContentIdFromURL } from './helpers';
 import {
+  QuestActionSubFormValuesWithContentLink,
   QuestActionSubFormValuesWithCreatorPoints,
   QuestFormProps,
 } from './types';
@@ -87,6 +89,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 values: {
                   action: chosenAction,
                   actionLink: subForm.actionLink || '',
+                  contentLink:
+                    (subForm as QuestActionSubFormValuesWithContentLink)
+                      .contentLink || '',
                   rewardAmount: subForm.rewardAmount,
                   ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
                     ?.creatorRewardAmount && {
@@ -202,15 +207,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       selected: repetitionCycleOptions[0],
     },
   });
-
-  const buildContentIdFromURL = (url: string, idType: 'comment' | 'thread') => {
-    if (idType === 'comment') {
-      return `${idType}:${parseInt(url.split('?comment=')[1])}`;
-    }
-    if (idType === 'thread') {
-      return `${idType}:${parseInt(url.split('?')[0].split('discussion/')[1].split('-')[0])}`;
-    }
-  };
 
   const handleQuestMutateConfirmation = async (hours: number) => {
     return new Promise((resolve, reject) => {
