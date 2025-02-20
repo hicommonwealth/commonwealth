@@ -37,6 +37,7 @@ import {
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
+import { buildUpdateThreadInput } from 'state/api/threads/editThread';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
@@ -95,7 +96,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const [streamingTitle, setStreamingTitle] = useState('');
 
+  const { generateComment } = useGenerateCommentText();
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -164,7 +168,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
-  const { generateComment } = useGenerateCommentText();
   const { mutateAsync: createComment } = useCreateCommentMutation({
     communityId,
     threadId: +threadId,
@@ -172,9 +175,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: thread?.communityId || '',
+    communityId,
     threadId: Number(threadId),
-    threadMsgId: thread?.id?.toString() || '',
+    threadMsgId: thread?.canvasMsgId || '',
     currentStage: thread?.stage || ThreadStage.Discussion,
     currentTopicId: thread?.topic?.id || 0,
   });
@@ -295,6 +298,72 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       );
     }
   }, [thread?.versionHistory]);
+
+  // Add title generation logic
+  const generateTitleFromBody = useCallback(async () => {
+    const activeAccount = user.activeAccount;
+    if (!thread?.body || isGeneratingTitle || !activeAccount?.address) {
+      return;
+    }
+
+    setIsGeneratingTitle(true);
+    setStreamingTitle('');
+    let fullTitle = '';
+
+    try {
+      await generateComment(
+        `Based on this thread content, generate a concise 2-6 word title. Content: ${thread.body}`,
+        (chunk) => {
+          const chunkStr =
+            typeof chunk === 'string' ? chunk : String(chunk || '');
+          const cleanChunk = chunkStr
+            .replace(/["']/g, '')
+            .replace(/[.!?]$/, '');
+          fullTitle = (fullTitle + cleanChunk).slice(0, 100);
+          setStreamingTitle(fullTitle);
+        },
+      );
+
+      if (fullTitle.trim()) {
+        if (!thread.id || !thread.canvasMsgId) {
+          return;
+        }
+
+        const input = await buildUpdateThreadInput({
+          address: activeAccount.address,
+          communityId: communityId || '',
+          threadId: thread.id,
+          threadMsgId: thread.canvasMsgId,
+          newTitle: fullTitle.trim(),
+          newBody: thread.body,
+        });
+
+        await editThread(input);
+        setDraftTitle(fullTitle.trim());
+      }
+    } catch (error) {
+      notifyError('Failed to generate title');
+    } finally {
+      setIsGeneratingTitle(false);
+    }
+  }, [
+    thread?.body,
+    thread?.id,
+    thread?.canvasMsgId,
+    communityId,
+    user.activeAccount,
+    generateComment,
+    editThread,
+  ]);
+
+  // Add effect to trigger title generation when thread is loaded without a title
+  useEffect(() => {
+    if (!thread) return;
+    if (isGeneratingTitle || thread.title !== 'Untitled Discussion') return;
+    if (thread.id && thread.canvasMsgId && thread.body) {
+      void generateTitleFromBody();
+    }
+  }, [thread]); // Only run when thread changes
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -572,6 +641,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 }}
                 value={draftTitle}
               />
+            ) : isGeneratingTitle ? (
+              <div className="streaming-title">
+                <CWIcon iconName="sparkle" iconSize="small" />
+                <CWText>{streamingTitle || 'Generating title...'}</CWText>
+              </div>
             ) : (
               thread?.title
             )
