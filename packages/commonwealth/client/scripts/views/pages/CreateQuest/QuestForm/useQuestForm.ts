@@ -257,6 +257,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               ...(subForm.values.actionLink && {
                 action_link: subForm.values.actionLink.trim(),
               }),
+              amount_multiplier: 0,
             })),
           });
         }
