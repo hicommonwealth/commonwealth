@@ -164,6 +164,7 @@ describe('Quest lifecycle', () => {
           actor: superadmin,
           payload: {
             quest_id: quest!.id!,
+            community_id,
             name,
             description: 'updated description',
           },

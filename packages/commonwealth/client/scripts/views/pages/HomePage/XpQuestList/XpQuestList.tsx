@@ -73,7 +73,8 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
                 (quest.action_metas || [])
                   ?.map(
                     (action) =>
-                      action.reward_amount - action.creator_reward_weight * 100,
+                      action.reward_amount -
+                      action.creator_reward_weight * action.reward_amount,
                   )
                   .reduce(
                     (accumulator, currentValue) => accumulator + currentValue,

@@ -19,6 +19,7 @@ const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const UpdateQuestPage = lazy(() => import('views/pages/UpdateQuest'));
 const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
@@ -209,6 +210,11 @@ const CommonDomainRoutes = ({
           element={withLayout(CreateQuestPage, { type: 'common' })}
         />,
         <Route
+          key="/quest/:id/update"
+          path="/quest/:id/update"
+          element={withLayout(UpdateQuestPage, { type: 'common' })}
+        />,
+        <Route
           key="/quest/:id"
           path="/quest/:id"
           element={withLayout(QuestDetailsPage, { type: 'common' })}
@@ -217,6 +223,11 @@ const CommonDomainRoutes = ({
           key="/:scope/quest/:id"
           path="/:scope/quest/:id"
           element={withLayout(QuestDetailsPage, { scoped: true })}
+        />,
+        <Route
+          key="/:scope/quest/:id/update"
+          path="/:scope/quest/:id/update"
+          element={withLayout(UpdateQuestPage, { scoped: true })}
         />,
       ]
     : []),
