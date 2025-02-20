@@ -10,7 +10,7 @@ interface FetchFarcasterCastsProps {
 const useFetchFarcasterCastsQuery = ({
   contest_address,
   selectedSort,
-  isEnabled = true,
+  isEnabled,
 }: FetchFarcasterCastsProps) => {
   return trpc.contest.getFarcasterCasts.useQuery(
     {
@@ -18,7 +18,7 @@ const useFetchFarcasterCastsQuery = ({
       sort_by: selectedSort,
     },
     {
-      enabled: isEnabled,
+      enabled: !!isEnabled,
     },
   );
 };

@@ -2,6 +2,7 @@ import moment from 'moment';
 import React, { useState } from 'react';
 
 import useFetchFarcasterCastsQuery from 'client/scripts/state/api/contests/getFarcasterCasts';
+import useFetchThreadsQuery from 'client/scripts/state/api/threads/fetchThreads';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWGrid from '../../components/component_kit/new_designs/CWGrid';
@@ -9,6 +10,7 @@ import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobile
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import ContestCard from '../CommunityManagement/Contests/ContestsList/ContestCard';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import { RenderThreadCard } from '../discussions/RenderThreadCard';
 import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
 import EntriesTab from './tabs/Entries';
@@ -21,13 +23,12 @@ import './NewContestPage.scss';
 interface NewContestPageProps {
   contestAddress: string;
 }
-
 const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [selectedMobileTab, setSelectedMobileTab] = useState<MobileTabType>(
     MobileTabType.Entries,
   );
 
-  const { getContestByAddress } = useCommunityContests();
+  const { getContestByAddress, contestsData } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
   const [fundDrawerContest, setFundDrawerContest] = useState<
@@ -41,7 +42,14 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
       isEnabled: !!contest?.is_farcaster_contest,
     });
 
-  console.log('farcasterCasts', farcasterCasts);
+  const { data: threads } = useFetchThreadsQuery({
+    communityId: contest?.community_id || '',
+    queryType: 'bulk',
+    page: 1,
+    limit: 30,
+    topicId: contest?.topic_id || undefined,
+    apiEnabled: !!contest && !contest?.is_farcaster_contest,
+  });
 
   const { chain, address } = useTokenData();
 
@@ -123,12 +131,25 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
 
         <div className="mobile-tab-content">
           {selectedMobileTab === MobileTabType.Entries && (
-            <EntriesTab
-              isLoading={isFarcasterCastsLoading}
-              entries={farcasterCasts || []}
-              selectedSort={SortType.Upvotes}
-              onSortChange={() => {}}
-            />
+            <>
+              {contest?.is_farcaster_contest ? (
+                <EntriesTab
+                  isLoading={isFarcasterCastsLoading}
+                  entries={farcasterCasts || []}
+                  selectedSort={SortType.Upvotes}
+                  onSortChange={() => {}}
+                />
+              ) : (
+                threads?.map((thread) => (
+                  <RenderThreadCard
+                    key={thread.id}
+                    thread={thread}
+                    communityId={contest?.community_id || ''}
+                    contestsData={contestsData}
+                  />
+                ))
+              )}
+            </>
           )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
@@ -136,13 +157,24 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
 
         <div className="desktop-view">
           <CWGrid>
-            <div>
-              <EntriesTab
-                isLoading={false}
-                entries={farcasterCasts || []}
-                selectedSort={SortType.Upvotes}
-                onSortChange={() => {}}
-              />
+            <div className="thread-list-container">
+              {contest?.is_farcaster_contest ? (
+                <EntriesTab
+                  isLoading={false}
+                  entries={farcasterCasts || []}
+                  selectedSort={SortType.Upvotes}
+                  onSortChange={() => {}}
+                />
+              ) : (
+                threads?.map((thread) => (
+                  <RenderThreadCard
+                    key={thread.id}
+                    thread={thread}
+                    communityId={contest?.community_id || ''}
+                    contestsData={contestsData}
+                  />
+                ))
+              )}
             </div>
             <div>
               <TokenSwapTab />
