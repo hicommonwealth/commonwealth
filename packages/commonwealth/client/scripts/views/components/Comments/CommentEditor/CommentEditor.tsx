@@ -203,18 +203,18 @@ const CommentEditor = ({
               <span className="label">AI</span>
             </div>
           )}
+          <div className="ml-auto">
+            {effectiveAiStreaming && (
+              <CWThreadAction
+                action="ai-reply"
+                label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
+                disabled={isSubmitDisabled}
+                onClick={handleCommentWithAI}
+              />
+            )}
+          </div>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
-      <div className="ml-auto">
-        {effectiveAiStreaming && (
-          <CWThreadAction
-            action="ai-reply"
-            label={`Generate AI ${!isReplying ? 'Comment' : 'Reply'}`}
-            disabled={isSubmitDisabled}
-            onClick={handleCommentWithAI}
-          />
-        )}
       </div>
       <ReactQuillEditor
         className="editor"

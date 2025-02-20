@@ -45,6 +45,21 @@
       flex-direction: column;
     }
 
+    .thread-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 16px;
+
+      .thread-title-row-left {
+        flex: 1;
+        .TextInput .input-and-icon-container input.large {
+          font-size: 24px;
+        }
+      }
+    }
+
     .new-thread-form-inputs {
       display: flex;
       flex-direction: column;
@@ -89,8 +104,10 @@
 
       .buttons-row {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
         gap: 8px;
-        justify-content: end;
       }
     }
   }
@@ -144,5 +161,11 @@
 
   .help-text-container {
     margin-left: auto;
+  }
+
+  .ai-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 }

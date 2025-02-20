@@ -40,7 +40,6 @@ const App = () => {
                 ) : (
                   <>
                     <OnBoardingWrapperForMobile>
-                      <Mava />
                       <ReactNativeBridgeUser />
                       <ReactNativeLogForwarder />
                       <RouterProvider router={router()} />

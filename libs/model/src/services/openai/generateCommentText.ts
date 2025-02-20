@@ -23,17 +23,29 @@ const generateCommentText = async function* ({
   void,
   unknown
 > {
-  if (!config.OPENAI.API_KEY) {
+  const useOpenRouter = config.OPENAI.USE_OPENROUTER === 'true';
+  const apiKey = useOpenRouter
+    ? config.OPENAI.OPENROUTER_API_KEY
+    : config.OPENAI.API_KEY;
+
+  if (!apiKey) {
     yield { error: CommentErrors.OpenAINotConfigured };
     return;
   }
 
   let openai: OpenAI;
   try {
-    openai = new OpenAI({
-      organization: config.OPENAI.ORGANIZATION,
-      apiKey: config.OPENAI.API_KEY,
-    });
+    const openAIConfig: any = {
+      apiKey,
+    };
+
+    if (useOpenRouter) {
+      openAIConfig.baseURL = 'https://openrouter.ai/api/v1';
+    } else if (config.OPENAI.ORGANIZATION) {
+      openAIConfig.organization = config.OPENAI.ORGANIZATION;
+    }
+
+    openai = new OpenAI(openAIConfig);
   } catch (error) {
     console.error('Failed to initialize OpenAI:', error);
     yield { error: CommentErrors.OpenAIInitFailed };
@@ -41,8 +53,8 @@ const generateCommentText = async function* ({
   }
 
   try {
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4',
+    const createCompletionConfig: any = {
+      model: useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'openai/o3-mini',
       messages: [
         {
           role: 'user',
@@ -50,7 +62,16 @@ const generateCommentText = async function* ({
         },
       ],
       stream: true,
-    });
+    };
+
+    if (useOpenRouter) {
+      createCompletionConfig.extra_headers = {
+        'HTTP-Referer': 'https://common.xyz',
+        'X-Title': 'Common',
+      };
+    }
+
+    const stream = await openai.chat.completions.create(createCompletionConfig);
 
     for await (const chunk of stream) {
       try {
