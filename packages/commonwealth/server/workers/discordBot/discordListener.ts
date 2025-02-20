@@ -55,42 +55,61 @@ async function startDiscordListener() {
 
   // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  client.on('threadDelete', async (thread: ThreadChannel) => {
-    await handleThreadChannel(thread, 'DiscordThreadDeleted');
+  client.on('threadDelete', (thread: ThreadChannel) => {
+    handleThreadChannel(thread, 'DiscordThreadDeleted').catch((e) => {
+      log.error('Failed to handle Discord thread deletion', e, {
+        discord_thread_id: thread.id,
+        title: thread.name,
+        parent_channel_id: thread.parentId,
+      });
+    });
   });
 
   // only used for thread title updates - thread body are handled through the 'messageUpdate' event
   client.on(
     'threadUpdate',
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
-      await handleThreadChannel(
+    (oldThread: ThreadChannel, newThread: ThreadChannel) => {
+      handleThreadChannel(
         newThread,
         'DiscordThreadTitleUpdated',
         oldThread,
-      );
+      ).catch((e) => {
+        log.error('Failed to handle Discord thread title update', e, {
+          discord_thread_id: newThread.id,
+          title: newThread.name,
+          parent_channel_id: newThread.parentId,
+        });
+      });
     },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  client.on('messageDelete', async (message) => {
-    await handleMessage(client, message, 'DiscordThreadCommentDeleted');
+  client.on('messageDelete', (message) => {
+    handleMessage(client, message, 'DiscordThreadCommentDeleted').catch((e) => {
+      log.error('Failed to delete Discord thread comment', e, {
+        channel_id: message.channelId,
+        guild_id: message.guildId,
+        message_id: message.id,
+      });
+    });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  client.on('messageUpdate', async (_, newMessage) => {
-    await handleMessage(
+  client.on('messageUpdate', (_, newMessage) => {
+    handleMessage(
       client,
       newMessage,
       newMessage.nonce
         ? 'DiscordThreadCommentUpdated'
         : 'DiscordThreadBodyUpdated',
-    );
+    ).catch((e) => {
+      log.error('Failed to update Discord thread comment', e, {
+        channel_id: newMessage.channelId,
+        guild_id: newMessage.guildId,
+        message_id: newMessage.id,
+      });
+    });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  client.on('messageCreate', async (message) => {
+  client.on('messageCreate', (message) => {
     // this conditional prevents handling of messages like ChannelNameChanged which
     // are emitted inside a thread but which we do not want to replicate in the CW thread.
     // Thread/channel name changes are handled in threadUpdate since the that event comes
@@ -98,12 +117,22 @@ async function startDiscordListener() {
     // Handling a name change from here would result in a new thread being created rather than updated on CW
     // since the id of the event is not the id of the actual post/thread.
     if (message.type === MessageType.Default) {
-      await handleMessage(
+      handleMessage(
         client,
         message,
         message.nonce ? 'DiscordThreadCommentCreated' : 'DiscordThreadCreated',
-      );
+      ).catch((e) => {
+        log.error('Failed to create Discord thread comment', e, {
+          channel_id: message.channelId,
+          guild_id: message.guildId,
+          message_id: message.id,
+        });
+      });
     }
+  });
+
+  client.on('guildMemberAdd', (member) => {
+    // TODO: Emit CommonDiscordServerJoined event
   });
 
   await client.login(config.DISCORD.BOT_TOKEN);
