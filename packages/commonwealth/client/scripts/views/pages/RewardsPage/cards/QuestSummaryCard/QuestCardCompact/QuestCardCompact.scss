@@ -28,6 +28,15 @@
 
       .caption {
         color: $neutral-600;
+
+        .community-link,
+        .community-link:focus,
+        .community-link:hover,
+        .community-link:active,
+        .community-link:focus-visible,
+        .community-link:focus-within {
+          color: $primary-500;
+        }
       }
 
       .count-down {

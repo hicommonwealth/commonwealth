@@ -1,11 +1,11 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommentsView } from '@hicommonwealth/schemas';
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, getRandomAvatar } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { getRandomAvatar, sanitizeDeletedComment } from '../utils/index';
+import { sanitizeDeletedComment } from '../utils/index';
 
 export function GetComments(): Query<typeof schemas.GetComments> {
   return {
