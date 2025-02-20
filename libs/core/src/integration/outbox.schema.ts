@@ -25,6 +25,7 @@ export const outboxEvents: Events[] = [
   'DiscordThreadCreated',
   'DiscordThreadDeleted',
   'DiscordThreadTitleUpdated',
+  'CommonDiscordServerJoined',
   'FarcasterCastCreated',
   'FarcasterReplyCastCreated',
   'FarcasterVoteCreated',

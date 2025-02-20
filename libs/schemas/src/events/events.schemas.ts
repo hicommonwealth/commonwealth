@@ -208,6 +208,11 @@ export const events = {
     parent_channel_id: true,
   }),
 
+  CommonDiscordServerJoined: z.object({
+    user_id: z.number(),
+    joined_date: z.coerce.date(),
+  }),
+
   // on-chain contest manager events
   RecurringContestManagerDeployed: EventMetadata.extend({
     namespace: z.string().describe('Community namespace'),

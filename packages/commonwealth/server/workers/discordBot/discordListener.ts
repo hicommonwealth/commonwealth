@@ -4,6 +4,7 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
+import { emitEvent, models } from '@hicommonwealth/model';
 import {
   Client,
   IntentsBitField,
@@ -132,7 +133,24 @@ async function startDiscordListener() {
   });
 
   client.on('guildMemberAdd', (member) => {
-    // TODO: Emit CommonDiscordServerJoined event
+    const joinedAt = member.joinedAt || new Date();
+    // TODO: convert discord user_id to common user_id
+    emitEvent(models.Outbox, [
+      {
+        event_name: 'CommonDiscordServerJoined',
+        event_payload: {
+          user_id: 1,
+          joined_date: joinedAt,
+        },
+      },
+    ]).catch((e) => {
+      log.error('Failed to emit CommonDiscordServerJoined event', e, {
+        discord_user_id: member.id,
+        discord_username: member.user.username,
+        discord_server_join_date: joinedAt,
+        common_user_id: 1,
+      });
+    });
   });
 
   await client.login(config.DISCORD.BOT_TOKEN);
