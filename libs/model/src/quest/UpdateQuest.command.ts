@@ -47,6 +47,39 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         end_date ?? quest.end_date,
       );
 
+      if (community_id && action_metas) {
+        action_metas.forEach(async (action_meta) => {
+          if (action_meta.content_id) {
+            // make sure content_id belong to community
+            const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
+            if (content === 'thread') {
+              const thread = await models.Thread.findOne({
+                where: { id: +id, community_id },
+              });
+              mustExist(
+                `Thread with id "${id}" in community "${community_id}"`,
+                thread,
+              );
+            } else if (content === 'comment') {
+              const comment = await models.Comment.findOne({
+                where: { id: +id },
+                include: [
+                  {
+                    model: models.Thread,
+                    attributes: ['community_id'],
+                    required: true,
+                  },
+                ],
+              });
+              mustExist(
+                `Comment with id "${id}" in community "${community_id}"`,
+                comment,
+              );
+            }
+          }
+        });
+      }
+
       await models.sequelize.transaction(async (transaction) => {
         if (action_metas?.length) {
           // clean existing action_metas
