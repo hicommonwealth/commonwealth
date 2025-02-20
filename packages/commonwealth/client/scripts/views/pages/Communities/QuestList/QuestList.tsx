@@ -34,8 +34,8 @@ const QuestList = () => {
     }
   };
 
-  const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleCTAClick = (questId: number, communityId?: string) => {
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleLeaderboardClick = () => {
@@ -76,11 +76,14 @@ const QuestList = () => {
                 key={quest.name}
                 name={quest.name}
                 description={quest.description}
+                communityId={quest.community_id || ''}
                 iconURL={quest.image_url}
                 xpPoints={totalUserXP}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
-                onCTAClick={() => handleCTAClick(quest.id)}
+                onCTAClick={() =>
+                  handleCTAClick(quest.id, quest.community_id || '')
+                }
                 onLeaderboardClick={handleLeaderboardClick}
               />
             );

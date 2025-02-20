@@ -18,9 +18,9 @@ import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCy
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
-import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
+import './QuestForm.scss';
 import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
@@ -32,7 +32,7 @@ const MAX_REPETITION_COUNTS = {
   PER_MONTH: 120,
 };
 
-const useCreateQuestForm = () => {
+const useQuestForm = () => {
   const {
     addSubForm,
     questActionSubForms,
@@ -170,6 +170,9 @@ const useCreateQuestForm = () => {
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
           image_url: values.image,
+          ...(values?.community && {
+            community_id: values.community.value,
+          }),
         });
 
         if (quest && quest.id) {
@@ -259,4 +262,4 @@ const useCreateQuestForm = () => {
   };
 };
 
-export default useCreateQuestForm;
+export default useQuestForm;

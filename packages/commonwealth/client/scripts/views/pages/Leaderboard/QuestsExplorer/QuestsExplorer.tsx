@@ -21,8 +21,8 @@ const QuestsExplorer = () => {
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
-  const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleCTAClick = (questId: number, communityId?: string) => {
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleSeeAllClick = () => {
@@ -64,9 +64,12 @@ const QuestsExplorer = () => {
                 key={quest.name}
                 label={quest.name}
                 description={quest.description}
+                communityId={quest.community_id || ''}
                 xpPoints={totalUserXP}
                 featuredImgURL={quest.image_url}
-                onExploreClick={() => handleCTAClick(quest.id)}
+                onExploreClick={() =>
+                  handleCTAClick(quest.id, quest.community_id || '')
+                }
               />
             );
           })}
