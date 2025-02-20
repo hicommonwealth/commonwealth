@@ -11,6 +11,7 @@ const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
 const UpdateQuestPage = lazy(() => import('views/pages/UpdateQuest'));
 const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
+const QuestsListPage = lazy(() => import('views/pages/QuestsList'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -141,14 +142,14 @@ const CustomDomainRoutes = ({
             element={withLayout(CreateQuestPage, { type: 'common' })}
           />,
           <Route
-            key="/quest/:id/update"
-            path="/quest/:id/update"
-            element={withLayout(UpdateQuestPage, { type: 'common' })}
-          />,
-          <Route
             key="/quest/:id"
             path="/quest/:id"
             element={withLayout(QuestDetailsPage, { type: 'common' })}
+          />,
+          <Route
+            key="/quest/:id/update"
+            path="/quest/:id/update"
+            element={withLayout(UpdateQuestPage, { type: 'common' })}
           />,
           <Route
             key="/:scope/quest/:id"
@@ -159,6 +160,11 @@ const CustomDomainRoutes = ({
             key="/:scope/quest/:id/update"
             path="/:scope/quest/:id/update"
             element={withLayout(UpdateQuestPage, { scoped: true })}
+          />,
+          <Route
+            key="/:scope/quests"
+            path="/:scope/quests"
+            element={withLayout(QuestsListPage, { scoped: true })}
           />,
         ]
       : []),
