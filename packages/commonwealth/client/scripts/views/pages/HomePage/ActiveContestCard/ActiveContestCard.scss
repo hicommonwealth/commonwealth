@@ -38,6 +38,11 @@
     .heading {
       display: flex;
 
+      .image-content {
+        display: flex;
+        align-items: center;
+      }
+
       .basic-info {
         display: flex;
         flex-direction: column;
