@@ -137,6 +137,7 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     created_at: z.coerce.date(),
+    oauth_provider: z.string().nullish(),
   }),
 
   SnapshotProposalCreated: z.object({
