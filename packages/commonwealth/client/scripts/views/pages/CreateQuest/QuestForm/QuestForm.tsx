@@ -1,5 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import React from 'react';
+import CWCommunityInput from 'views/components/CWCommunityInput';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import {
   CWImageInput,
@@ -14,12 +15,12 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import './CreateQuestForm.scss';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
-import useCreateQuestForm from './useCreateQuestForm';
+import './QuestForm.scss';
+import useQuestForm from './useQuestForm';
 import { questFormValidationSchema } from './validation';
 
-const CreateQuestForm = () => {
+const QuestForm = () => {
   const {
     addSubForm,
     questActionSubForms,
@@ -36,7 +37,7 @@ const CreateQuestForm = () => {
     minEndDate,
     repetitionCycleRadio,
     formMethodsRef,
-  } = useCreateQuestForm();
+  } = useQuestForm();
 
   return (
     <CWForm
@@ -44,7 +45,7 @@ const CreateQuestForm = () => {
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
-      className="CreateQuestForm"
+      className="QuestForm"
     >
       <div className="quest-period-section">
         <div className="repeatition-selector">
@@ -120,6 +121,12 @@ const CreateQuestForm = () => {
           imageBehavior={ImageBehavior.Fill}
           withAIImageGeneration
         />
+        <CWCommunityInput
+          name="community"
+          hookToForm
+          label="Community (optional)"
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
+        />
       </div>
 
       <CWDivider />
@@ -189,4 +196,4 @@ const CreateQuestForm = () => {
   );
 };
 
-export default CreateQuestForm;
+export default QuestForm;

@@ -213,6 +213,11 @@ const CommonDomainRoutes = ({
           path="/quest/:id"
           element={withLayout(QuestDetailsPage, { type: 'common' })}
         />,
+        <Route
+          key="/:scope/quest/:id"
+          path="/:scope/quest/:id"
+          element={withLayout(QuestDetailsPage, { scoped: true })}
+        />,
       ]
     : []),
   <Route
