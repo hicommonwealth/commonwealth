@@ -5,8 +5,8 @@ export function useUpdateQuestMutation() {
 
   return trpc.quest.updateQuest.useMutation({
     onSuccess: () => {
-      utils.quest.getQuest.invalidate();
-      utils.quest.getQuests.invalidate();
+      utils.quest.getQuest.invalidate().catch(console.error);
+      utils.quest.getQuests.invalidate().catch(console.error);
     },
   });
 }
