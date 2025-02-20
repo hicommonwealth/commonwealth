@@ -3,8 +3,9 @@ import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
+import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
 import './ProfileCard.scss';
-
 enum ImageBehavior {
   Cover = 'cover',
   Fill = 'fill',
@@ -47,10 +48,28 @@ const ProfileCard = () => {
             alt="Profile"
           />
         </Link>
-
-        <Link to={`/profile/id/${userData.id}`} className="user-info">
-          <h3 className="profile-name">{data?.profile.name}</h3>
-        </Link>
+        <CWTooltip
+          content={
+            data?.profile.name && data?.profile.name.length > 17
+              ? data?.profile.name
+              : null
+          }
+          placement="top"
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <Link
+              onMouseEnter={(e) => {
+                handleMouseEnter({ e, isTooltipOpen, handleInteraction });
+              }}
+              onMouseLeave={(e) => {
+                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+              }}
+              to={`/profile/id/${userData.id}`}
+              className="user-info"
+            >
+              <h3 className="profile-name">{data?.profile.name}</h3>
+            </Link>
+          )}
+        />
       </div>
     </div>
   );
