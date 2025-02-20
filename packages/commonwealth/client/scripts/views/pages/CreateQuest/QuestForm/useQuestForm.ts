@@ -20,7 +20,10 @@ import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
-import { doesActionRequireCreatorReward } from './QuestActionSubForm/helpers';
+import {
+  doesActionRequireContentId,
+  doesActionRequireCreatorReward,
+} from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
 import {
@@ -74,26 +77,37 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
-            ...initialValues.subForms.map((subForm, index) => ({
-              id: index + 1,
-              values: {
-                action: subForm.action as QuestAction,
-                actionLink: subForm.actionLink || '',
-                rewardAmount: subForm.rewardAmount,
-                ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
-                  ?.creatorRewardAmount && {
-                  creatorRewardAmount: (
-                    subForm as QuestActionSubFormValuesWithCreatorPoints
-                  ).creatorRewardAmount,
-                }),
-              },
-              errors: {},
-              config: {
-                requires_creator_points: doesActionRequireCreatorReward(
-                  subForm.action as QuestAction,
-                ),
-              },
-            })),
+            ...initialValues.subForms.map((subForm, index) => {
+              const chosenAction = subForm.action as QuestAction;
+              const requiresContentId =
+                doesActionRequireContentId(chosenAction);
+
+              return {
+                id: index + 1,
+                values: {
+                  action: chosenAction,
+                  actionLink: subForm.actionLink || '',
+                  rewardAmount: subForm.rewardAmount,
+                  ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
+                    ?.creatorRewardAmount && {
+                    creatorRewardAmount: (
+                      subForm as QuestActionSubFormValuesWithCreatorPoints
+                    ).creatorRewardAmount,
+                  }),
+                },
+                errors: {},
+                config: {
+                  requires_creator_points:
+                    doesActionRequireCreatorReward(chosenAction),
+                  requires_thread_id:
+                    requiresContentId &&
+                    (chosenAction === 'CommentCreated' ||
+                      chosenAction === 'ThreadUpvoted'),
+                  requires_comment_id:
+                    requiresContentId && chosenAction === 'CommentUpvoted',
+                },
+              };
+            }),
           ]);
         }
       }
@@ -189,6 +203,15 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     },
   });
 
+  const buildContentIdFromURL = (url: string, idType: 'comment' | 'thread') => {
+    if (idType === 'comment') {
+      return `${idType}:${parseInt(url.split('?comment=')[1])}`;
+    }
+    if (idType === 'thread') {
+      return `${idType}:${parseInt(url.split('?')[0].split('discussion/')[1].split('-')[0])}`;
+    }
+  };
+
   const handleQuestMutateConfirmation = async (hours: number) => {
     return new Promise((resolve, reject) => {
       openConfirmation({
@@ -247,6 +270,14 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     parseInt(`${subForm.values.creatorRewardAmount}`, 10),
                   ),
               }),
+              ...(subForm.values.contentLink &&
+                (subForm.config?.requires_comment_id ||
+                  subForm.config?.requires_thread_id) && {
+                  content_id: buildContentIdFromURL(
+                    subForm.values.contentLink,
+                    subForm.config?.requires_comment_id ? 'comment' : 'thread',
+                  ),
+                }),
               participation_limit: values.participation_limit,
               participation_period: repetitionCycleRadioProps
                 .repetitionCycleSelectListProps.selected
@@ -257,6 +288,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               ...(subForm.values.actionLink && {
                 action_link: subForm.values.actionLink.trim(),
               }),
+              amount_multiplier: 0,
             })),
           });
         }
@@ -327,6 +359,14 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   parseInt(`${subForm.values.creatorRewardAmount}`, 10),
                 ),
             }),
+            ...(subForm.values.contentLink &&
+              (subForm.config?.requires_comment_id ||
+                subForm.config?.requires_thread_id) && {
+                content_id: buildContentIdFromURL(
+                  subForm.values.contentLink,
+                  subForm.config?.requires_comment_id ? 'comment' : 'thread',
+                ),
+              }),
             participation_limit: values.participation_limit,
             participation_period: repetitionCycleRadioProps
               .repetitionCycleSelectListProps.selected
@@ -337,6 +377,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             ...(subForm.values.actionLink && {
               action_link: subForm.values.actionLink.trim(),
             }),
+            amount_multiplier: 0,
           })),
         });
 

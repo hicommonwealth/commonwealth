@@ -77,37 +77,39 @@ const useQuestActionMultiFormsState = ({
     values: QuestActionSubFormFields,
     config?: QuestActionSubFormConfig,
   ) => {
+    console.log('x => ', { values, config });
     let errors: QuestActionSubFormErrors = {};
     try {
       const schema = buildValidationSchema(config);
       schema.parse(values);
-
-      // TODO: thread/comment url validations
-      // validate content link matches a defined pattern
-      // if (values.contentLink) {
-      //   if (config?.requires_thread_id) {
-      //     const isValidlink = THREAD_URL_VALIDATION_REGEX.test(
-      //       values.contentLink,
-      //     );
-      //     if (!isValidlink) {
-      //       errors = {
-      //         ...errors,
-      //         contentLink: 'Invalid thread link',
-      //       };
-      //     }
-      //   }
-      //   if (config?.requires_comment_id) {
-      //     const isValidlink = COMMENT_URL_VALIDATION_REGEX.test(
-      //       values.contentLink,
-      //     );
-      //     if (!isValidlink) {
-      //       errors = {
-      //         ...errors,
-      //         contentLink: 'Invalid comment link',
-      //       };
-      //     }
-      //   }
-      // }
+      {
+        // TODO: thread/comment url validations
+        // validate content link matches a defined pattern
+        // if (values.contentLink) {
+        //   if (config?.requires_thread_id) {
+        //     const isValidlink = THREAD_URL_VALIDATION_REGEX.test(
+        //       values.contentLink,
+        //     );
+        //     if (!isValidlink) {
+        //       errors = {
+        //         ...errors,
+        //         contentLink: 'Invalid thread link',
+        //       };
+        //     }
+        //   }
+        //   if (config?.requires_comment_id) {
+        //     const isValidlink = COMMENT_URL_VALIDATION_REGEX.test(
+        //       values.contentLink,
+        //     );
+        //     if (!isValidlink) {
+        //       errors = {
+        //         ...errors,
+        //         contentLink: 'Invalid comment link',
+        //       };
+        //     }
+        //   }
+        // }
+      }
     } catch (e) {
       const zodError = e as ZodError;
       zodError.errors.map((error) => {
@@ -178,7 +180,7 @@ const useQuestActionMultiFormsState = ({
       }
 
       // reset errors/values if action doesn't require content link
-      if (!requiresCreatorPoints) {
+      if (!requiresContentId) {
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
