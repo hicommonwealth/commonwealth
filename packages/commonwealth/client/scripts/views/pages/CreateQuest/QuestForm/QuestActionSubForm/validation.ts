@@ -7,12 +7,6 @@ import {
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
-// TODO: fix the url regex validation
-// export const THREAD_URL_VALIDATION_REGEX =
-//   /https?:\/\/[a-zA-Z0-9.-]+\/([a-zA-Z0-9]+\/)?discussion\/\d+(-[a-zA-Z0-9-]+)?/;
-// export const COMMENT_URL_VALIDATION_REGEX =
-//   /https?:\/\/[a-zA-Z0-9.-]+\/([a-zA-Z0-9]+\/)?discussion\/\d+(-[a-zA-Z0-9-]+)?/;
-
 export const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
