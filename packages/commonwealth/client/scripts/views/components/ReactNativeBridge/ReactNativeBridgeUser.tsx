@@ -48,7 +48,7 @@ export const ReactNativeBridgeUser = () => {
         darkMode,
       });
     }
-  }, [user.id, user.knockJWT, userInfo?.userId]);
+  }, [darkMode, user.id, user.knockJWT, userInfo?.userId]);
 
   useEffect(() => {
     const message: TypedData<UserInfo | null> = {
