@@ -1,6 +1,5 @@
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
-import { safeTruncateBody } from '../src/utils';
+import { describe, expect, test } from 'vitest';
+import { safeTruncateBody, serializeBigIntObj } from '../src/utils';
 
 describe('utils', () => {
   const spliceUserMentionIndex = 12;
@@ -76,6 +75,102 @@ describe('utils', () => {
     test('should truncate normally on whitespace', () => {
       const res = safeTruncateBody('1234 6789', 5);
       expect(res).to.equal('1234 ');
+    });
+  });
+
+  describe('serializeBigIntObj', () => {
+    test('should serialize BigInts', () => {
+      expect(
+        serializeBigIntObj({
+          a: 1n,
+          b: 2n,
+          c: 3n,
+        }),
+      ).to.deep.equal({
+        a: '1',
+        b: '2',
+        c: '3',
+      });
+    });
+
+    test('should not serialize Dates', () => {
+      const date = new Date('2023-01-01T00:00:00Z');
+      expect(
+        serializeBigIntObj({
+          date,
+        }),
+      ).to.deep.equal({
+        date,
+      });
+    });
+
+    test('should serialize nested objects', () => {
+      const date = new Date();
+      expect(
+        serializeBigIntObj({
+          nested: {
+            a: 1n,
+            b: date,
+          },
+        }),
+      ).to.deep.equal({
+        nested: {
+          a: '1',
+          b: date,
+        },
+      });
+    });
+
+    test('should serialize arrays', () => {
+      const date = new Date();
+      expect(
+        serializeBigIntObj({
+          array: [1n, 2n, 3n, date, 1, '2', true, null],
+        }),
+      ).to.deep.equal({
+        array: ['1', '2', '3', date, 1, '2', true, null],
+      });
+    });
+
+    test('should serialize mixed types', () => {
+      const date = new Date('2023-01-01T00:00:00Z');
+      expect(
+        serializeBigIntObj({
+          a: 1n,
+          b: 'string',
+          c: date,
+          d: null,
+          e: true,
+        }),
+      ).to.deep.equal({
+        a: '1',
+        b: 'string',
+        c: date,
+        d: null,
+        e: true,
+      });
+    });
+
+    test('should handle empty objects', () => {
+      expect(serializeBigIntObj({})).to.deep.equal({});
+    });
+
+    test('should not serialize custom class instances', () => {
+      class CustomClass {
+        constructor(
+          public value: bigint,
+          public name: string,
+        ) {}
+      }
+      const instance = new CustomClass(123n, 'example');
+
+      expect(
+        serializeBigIntObj({
+          customInstance: instance,
+        }),
+      ).to.deep.equal({
+        customInstance: instance,
+      });
     });
   });
 });

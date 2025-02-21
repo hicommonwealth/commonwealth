@@ -20,7 +20,7 @@ import {
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
-import { EventPair } from '@hicommonwealth/schemas';
+import { EventPair, events as eventSchemas } from '@hicommonwealth/schemas';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';
 import {
@@ -456,14 +456,17 @@ describe('EVM Chain Events Devnet Tests', () => {
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
         });
+        eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
         expect(events[1].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
         });
+        eventSchemas.CommunityStakeTrade.parse(events[1].event_payload);
         expect(events[2].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
         });
+        eventSchemas.CommunityStakeTrade.parse(events[2].event_payload);
       },
     );
 
@@ -569,6 +572,7 @@ describe('EVM Chain Events Devnet Tests', () => {
         ethChainId: chainNode.eth_chain_id!,
         eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
       });
+      eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
 
       await evmEventSource.reload();
       expect(evmEventSource.events_migrated).to.be.true;

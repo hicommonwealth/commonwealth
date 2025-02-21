@@ -1,5 +1,7 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import { capitalize } from 'lodash';
 import React from 'react';
+import CWCommunityInput from 'views/components/CWCommunityInput';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import {
   CWImageInput,
@@ -14,12 +16,14 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import './CreateQuestForm.scss';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
-import useCreateQuestForm from './useCreateQuestForm';
+import './QuestForm.scss';
+import { QuestFormProps } from './types';
+import useQuestForm from './useQuestForm';
 import { questFormValidationSchema } from './validation';
 
-const CreateQuestForm = () => {
+const QuestForm = (props: QuestFormProps) => {
+  const { mode, initialValues } = props;
   const {
     addSubForm,
     questActionSubForms,
@@ -36,7 +40,7 @@ const CreateQuestForm = () => {
     minEndDate,
     repetitionCycleRadio,
     formMethodsRef,
-  } = useCreateQuestForm();
+  } = useQuestForm(props);
 
   return (
     <CWForm
@@ -44,7 +48,24 @@ const CreateQuestForm = () => {
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
-      className="CreateQuestForm"
+      {...(initialValues
+        ? {
+            initialValues: {
+              name: initialValues.name,
+              description: initialValues.description,
+              image: initialValues.image,
+              start_date: initialValues.start_date,
+              end_date: initialValues.end_date,
+              community: initialValues.community,
+              participation_limit: initialValues.participation_limit,
+            },
+          }
+        : {
+            initialValues: {
+              participation_limit: QuestParticipationLimit.OncePerQuest,
+            },
+          })}
+      className="QuestForm"
     >
       <div className="quest-period-section">
         <div className="repeatition-selector">
@@ -67,7 +88,6 @@ const CreateQuestForm = () => {
             groupName="participation_limit"
             name="participation_limit"
             hookToForm
-            checked
           />
         </div>
         <CWDateTimeInput
@@ -119,6 +139,12 @@ const CreateQuestForm = () => {
           hookToForm
           imageBehavior={ImageBehavior.Fill}
           withAIImageGeneration
+        />
+        <CWCommunityInput
+          name="community"
+          hookToForm
+          label="Community (optional)"
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
         />
       </div>
 
@@ -178,7 +204,7 @@ const CreateQuestForm = () => {
           containerClassName="btn"
         />
         <CWButton
-          label="Create Quest"
+          label={`${capitalize(mode)} Quest`}
           buttonWidth="wide"
           type="submit"
           containerClassName="btn"
@@ -189,4 +215,4 @@ const CreateQuestForm = () => {
   );
 };
 
-export default CreateQuestForm;
+export default QuestForm;
