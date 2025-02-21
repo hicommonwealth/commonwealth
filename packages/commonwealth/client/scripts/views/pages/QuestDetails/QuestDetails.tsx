@@ -4,6 +4,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -11,8 +12,10 @@ import { useGetQuestByIdQuery } from 'state/api/quest';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -20,7 +23,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { AuthModalType } from 'views/modals/AuthModal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
-import { QuestAction } from '../CreateQuest/CreateQuestForm/QuestActionSubForm';
+import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -63,6 +66,18 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const { setAuthModalType } = useAuthModalStore();
 
+  useRunOnceOnCondition({
+    callback: () => {
+      if (
+        quest?.community_id &&
+        !window.location.pathname.includes(quest.community_id)
+      ) {
+        navigate(`/${quest.community_id}/quest/${quest.id}`);
+      }
+    },
+    shouldRun: !!quest?.community_id,
+  });
+
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
   }
@@ -90,7 +105,9 @@ const QuestDetails = ({ id }: { id: number }) => {
   const totalUserXP =
     (quest.action_metas || [])
       ?.map(
-        (action) => action.reward_amount - action.creator_reward_weight * 100,
+        (action) =>
+          action.reward_amount -
+          action.creator_reward_weight * action.reward_amount,
       )
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
@@ -152,6 +169,8 @@ const QuestDetails = ({ id }: { id: number }) => {
   const questParticipationLimitPerCycle =
     quest.action_metas?.[0]?.participation_times_per_period || 0;
 
+  const isSiteAdmin = Permissions.isSiteAdmin();
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -212,6 +231,24 @@ const QuestDetails = ({ id }: { id: number }) => {
                     }
                   />
                 </CWText>
+              )}
+              {isSiteAdmin && (
+                <>
+                  <CWDivider />
+                  <div className="w-fit">
+                    {withTooltip(
+                      <CWButton
+                        label="Update"
+                        onClick={() => navigate(`/quest/${quest.id}/update`)}
+                        buttonType="primary"
+                        iconLeft="notePencil"
+                        disabled={isStarted || isEnded}
+                      />,
+                      'Updates only allowed in pre-live stage',
+                      isStarted || isEnded,
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>

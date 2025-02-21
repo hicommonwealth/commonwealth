@@ -5,7 +5,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
 import './CreateQuest.scss';
-import CreateQuestForm from './CreateQuestForm';
+import QuestForm from './QuestForm';
 
 const CreateQuest = () => {
   const user = useUserStore();
@@ -23,7 +23,7 @@ const CreateQuest = () => {
             relevant quest items to be grouped into multiple quests.
           </CWText>
         </div>
-        <CreateQuestForm />
+        <QuestForm mode="create" />
       </div>
     </CWPageLayout>
   );

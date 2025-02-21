@@ -20,6 +20,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         quest_id,
         name,
         description,
+        community_id,
         image_url,
         start_date,
         end_date,
@@ -31,11 +32,11 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
 
       if (name) {
         const existingName = await models.Quest.findOne({
-          where: { community_id: quest.community_id, name },
+          where: { community_id, name },
           attributes: ['id'],
         });
         mustNotExist(
-          `Quest named "${name}" in community "${quest.community_id}"`,
+          `Quest named "${name}" in community "${community_id}"`,
           existingName,
         );
       }
@@ -65,6 +66,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         const delta = getDelta(quest, {
           name,
           description,
+          community_id,
           image_url,
           start_date,
           end_date,

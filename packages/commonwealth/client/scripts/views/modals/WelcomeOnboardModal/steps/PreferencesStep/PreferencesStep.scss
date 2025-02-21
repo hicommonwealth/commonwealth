@@ -26,10 +26,10 @@
     width: 80%;
     justify-content: space-between;
     display: flex;
-    position: absolute;
-    bottom: 8px;
-    margin-top: 10px;
+    margin-top: auto; // This pushes the buttons to the bottom
+    padding-top: 24px; // Add some space above the buttons
     gap: 10px;
+
     .primary {
       background-color: $primary-600 !important;
     }
