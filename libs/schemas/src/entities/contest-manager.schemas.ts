@@ -73,6 +73,7 @@ export const ContestManager = z
       .describe('Vote weight multiplier'),
     environment: z
       .enum(['local', 'CI', 'frick', 'frack', 'beta', 'demo', 'production'])
-      .describe('The environment that created the contest manager'),
+      .describe('The environment that created the contest manager')
+      .optional(),
   })
   .describe('On-Chain Contest Manager');
