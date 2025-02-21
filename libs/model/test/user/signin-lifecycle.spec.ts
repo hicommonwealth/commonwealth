@@ -344,12 +344,16 @@ describe('SignIn Lifecycle', async () => {
       const events = await models.Outbox.findAll({});
       expect(events.map((e) => e.event_name)).toEqual([
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'AddressOwnershipTransferred',
         'AddressOwnershipTransferred',
