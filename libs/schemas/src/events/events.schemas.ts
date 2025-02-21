@@ -1,3 +1,4 @@
+import { WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -394,5 +395,17 @@ export const events = {
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
+  }),
+
+  WalletLinked: z.object({
+    user_id: z.number(),
+    wallet_id: z.nativeEnum(WalletId),
+    created_at: z.coerce.date(),
+  }),
+
+  SSOLinked: z.object({
+    user_id: z.number(),
+    oauth_provider: z.string(),
+    created_at: z.coerce.date(),
   }),
 } as const;

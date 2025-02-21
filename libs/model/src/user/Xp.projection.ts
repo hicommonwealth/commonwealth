@@ -420,6 +420,26 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
+      WalletLinked: async ({ payload }) => {
+        const user_id = await getUserByAddressId(payload.user_id);
+        if (!user_id) return;
+
+        const action_metas = await getQuestActionMetas(
+          { created_at: payload.created_at },
+          'WalletLinked',
+        );
+        await recordXpsForQuest(user_id, payload.created_at, action_metas);
+      },
+      SSOLinked: async ({ payload }) => {
+        const user_id = await getUserByAddressId(payload.user_id);
+        if (!user_id) return;
+
+        const action_metas = await getQuestActionMetas(
+          { created_at: payload.created_at },
+          'SSOLinked',
+        );
+        await recordXpsForQuest(user_id, payload.created_at, action_metas);
+      },
     },
   };
 }

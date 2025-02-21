@@ -90,6 +90,14 @@ async function createMagicAddressInstances(
               oauth_provider: oauthProvider,
             },
           },
+          {
+            event_name: 'SSOLinked',
+            event_payload: {
+              user_id: addressInstance.user_id!,
+              oauth_provider: oauthProvider,
+              created_at: addressInstance.created_at!,
+            },
+          },
         ],
         t,
       );
