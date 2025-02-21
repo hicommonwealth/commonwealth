@@ -239,8 +239,8 @@ export class Thread implements IUniqueId {
       address_last_active?: string;
       associatedReactions?: ReactionView[];
       associatedContests?: ContestView[] | null;
-      recentComments?: CommentView[] | null;
-      ContestActions?: ContestActionView[] | null;
+      recentComments?: CommentView[];
+      ContestActions?: ContestActionView[];
     },
   ) {
     this.author = t.Address?.address ?? '';
