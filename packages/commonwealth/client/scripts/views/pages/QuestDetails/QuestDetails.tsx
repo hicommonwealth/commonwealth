@@ -70,14 +70,23 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   useRunOnceOnCondition({
     callback: () => {
+      if (!quest?.id) return;
+
       if (
-        quest?.community_id &&
-        !window.location.pathname.includes(quest.community_id)
+        (quest?.community_id &&
+          !window.location.pathname.includes(quest.community_id)) ||
+        (!quest?.community_id &&
+          window.location.pathname !== `/quests/${quest.id}`)
       ) {
-        navigate(`/${quest.community_id}/quests/${quest.id}`);
+        navigate(
+          `/quests/${questId}`,
+          { replace: true },
+          quest?.community_id || null,
+        );
+        return;
       }
     },
-    shouldRun: !!quest?.community_id,
+    shouldRun: !!quest,
   });
 
   if (!xpEnabled || !questId) {
