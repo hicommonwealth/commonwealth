@@ -130,9 +130,11 @@ async function recordXpsForQuest(
       }
 
       // calculate xp points and log it
-      const reward_amount = Math.round(
-        action_meta.reward_amount * (action_meta.amount_multiplier ?? 1),
-      );
+      const x =
+        (action_meta.amount_multiplier ?? 0) > 0
+          ? action_meta.amount_multiplier!
+          : 1;
+      const reward_amount = Math.round(action_meta.reward_amount * x);
       const creator_xp_points = creator_user_id
         ? Math.round(reward_amount * action_meta.creator_reward_weight)
         : undefined;
