@@ -356,7 +356,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'update') {
           await handleUpdateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate(`/quest/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
+          navigate(`/quests/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
         }
       } catch (e) {
         console.error(e);

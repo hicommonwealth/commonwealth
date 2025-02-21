@@ -142,23 +142,23 @@ const CustomDomainRoutes = ({
             element={withLayout(CreateQuestPage, { type: 'common' })}
           />,
           <Route
-            key="/quest/:id"
-            path="/quest/:id"
+            key="/quests/:id"
+            path="/quests/:id"
             element={withLayout(QuestDetailsPage, { type: 'common' })}
           />,
           <Route
-            key="/quest/:id/update"
-            path="/quest/:id/update"
+            key="/quests/:id/update"
+            path="/quests/:id/update"
             element={withLayout(UpdateQuestPage, { type: 'common' })}
           />,
           <Route
-            key="/:scope/quest/:id"
-            path="/:scope/quest/:id"
+            key="/:scope/quests/:id"
+            path="/:scope/quests/:id"
             element={withLayout(QuestDetailsPage, { scoped: true })}
           />,
           <Route
-            key="/:scope/quest/:id/update"
-            path="/:scope/quest/:id/update"
+            key="/:scope/quests/:id/update"
+            path="/:scope/quests/:id/update"
             element={withLayout(UpdateQuestPage, { scoped: true })}
           />,
           <Route

@@ -74,7 +74,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         quest?.community_id &&
         !window.location.pathname.includes(quest.community_id)
       ) {
-        navigate(`/${quest.community_id}/quest/${quest.id}`);
+        navigate(`/${quest.community_id}/quests/${quest.id}`);
       }
     },
     shouldRun: !!quest?.community_id,
@@ -313,7 +313,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                       {withTooltip(
                         <CWButton
                           label="Update"
-                          onClick={() => navigate(`/quest/${quest.id}/update`)}
+                          onClick={() => navigate(`/quests/${quest.id}/update`)}
                           buttonType="primary"
                           iconLeft="notePencil"
                           disabled={isStarted || isEnded || isPendingAction}

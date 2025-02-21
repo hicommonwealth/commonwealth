@@ -29,7 +29,7 @@ const Quests = ({
 
   const handleQuestCTAClick = (questId: number, communityId?: string) => {
     navigate(
-      `${communityId ? `/${communityId}` : ''}/quest/${questId}`,
+      `${communityId ? `/${communityId}` : ''}/quests/${questId}`,
       {},
       null,
     );

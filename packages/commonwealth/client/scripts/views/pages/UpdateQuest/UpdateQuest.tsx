@@ -51,7 +51,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
         !window.location.pathname.includes(quest.community_id)
       ) {
         navigate(
-          `/${quest.community_id}/quest/${quest.id}/update`,
+          `/${quest.community_id}/quests/${quest.id}/update`,
           { replace: true },
           null,
         );
@@ -61,9 +61,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
       // redirect to global quest update page if on community quest update page
       if (
         !quest?.community_id &&
-        window.location.pathname !== `/quest/${quest.id}/update`
+        window.location.pathname !== `/quests/${quest.id}/update`
       ) {
-        navigate(`/quest/${quest.id}/update`, { replace: true }, null);
+        navigate(`/quests/${quest.id}/update`, { replace: true }, null);
         return;
       }
     },
