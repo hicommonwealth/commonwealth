@@ -119,6 +119,7 @@ async function updateOrCreateWithAlert(
           image_url: getDefaultContestImage(),
           payout_structure: [],
           is_farcaster_contest: false,
+          environment: config.APP_ENV,
         },
         { transaction },
       );
