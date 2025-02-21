@@ -1,4 +1,3 @@
-import { QuestEvents } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { splitCamelOrPascalCase } from 'helpers/string';
@@ -18,7 +17,15 @@ const QuestActionSubForm = ({
   onChange,
   hiddenActions,
 }: QuestActionSubFormProps) => {
-  const actionOptions = Object.keys(QuestEvents)
+  const actionOptions = [
+    'SignUpFlowCompleted',
+    'CommunityCreated',
+    'CommunityJoined',
+    'ThreadCreated',
+    'ThreadUpvoted',
+    'CommentCreated',
+    'CommentUpvoted',
+  ]
     .map((event) => ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
