@@ -7,7 +7,7 @@ import {
 } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
@@ -118,12 +118,6 @@ export const ThreadCard = ({
     useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
-
-  useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
-      document.getElementsByTagName('html')[0].classList.add('invert');
-    }
-  }, []);
 
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({

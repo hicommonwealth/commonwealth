@@ -4,6 +4,7 @@ export enum LocalStorageKeys {
   ReferralCode = 'common-refcode',
   HasSeenOnboarding = 'has-seen-onboarding',
   HasSeenNotifications = 'has-seen-notifications',
+  DarkModeState = 'dark-mode-state',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {
