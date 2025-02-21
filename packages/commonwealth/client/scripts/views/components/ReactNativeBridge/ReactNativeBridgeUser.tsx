@@ -1,6 +1,7 @@
 import useUserStore from 'client/scripts/state/ui/user';
 import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useEffect, useState } from 'react';
+import { useDarkMode } from '../../../state/ui/darkMode/darkMode';
 
 /**
  * Typed message so that the react-native client knows how to handel this message.
@@ -18,7 +19,7 @@ type TypedData<Data> = {
 type UserInfo = {
   userId: number;
   knockJWT: string;
-  // darkMode: 'dark' | 'light';
+  darkMode: boolean;
 };
 
 /**
@@ -34,18 +35,20 @@ type UserInfo = {
  */
 export const ReactNativeBridgeUser = () => {
   const user = useUserStore();
+  const { isDarkMode } = useDarkMode();
   const reactNativeWebView = useReactNativeWebView();
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    if (user.id !== userInfo?.userId) {
+    if (user.id !== userInfo?.userId || isDarkMode !== userInfo?.darkMode) {
       setUserInfo({
         userId: user.id,
         knockJWT: user.knockJWT,
+        darkMode: isDarkMode,
       });
     }
-  }, [user.id, user.knockJWT, userInfo?.userId]);
+  }, [user.id, user.knockJWT, isDarkMode, userInfo]);
 
   useEffect(() => {
     const message: TypedData<UserInfo | null> = {

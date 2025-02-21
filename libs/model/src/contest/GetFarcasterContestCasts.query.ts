@@ -14,6 +14,26 @@ export function GetFarcasterContestCasts(): Query<
     auth: [],
     secure: false,
     body: async ({ payload }) => {
+      console.log('???');
+
+      return [
+        {
+          hash: '0x3e3767652fdd8e66dc0ced717d8843d4d95fa5c2',
+          calculated_vote_weight: 1,
+          author: { username: '0xmullet.eth' },
+        },
+        {
+          hash: '0xd9fa39d21a055f909e031f110678e54fa10332d2',
+          calculated_vote_weight: 2,
+          author: { username: 'yin3l' },
+        },
+      ].sort((a, b) => {
+        if (payload.sort_by === 'upvotes') {
+          return b.calculated_vote_weight - a.calculated_vote_weight;
+        }
+        return 0; // for test data, no timestamp sorting
+      });
+
       const contestManager = await models.ContestManager.findOne({
         where: {
           contest_address: payload.contest_address,
