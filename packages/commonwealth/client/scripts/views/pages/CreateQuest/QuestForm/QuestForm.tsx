@@ -67,6 +67,46 @@ const QuestForm = (props: QuestFormProps) => {
           })}
       className="QuestForm"
     >
+      <div className="basic-information-section">
+        <CWText type="b1" fontWeight="semiBold">
+          Basic information
+        </CWText>
+
+        <CWTextInput
+          label="Quest name"
+          placeholder="Quest name"
+          fullWidth
+          name="name"
+          hookToForm
+        />
+
+        <CWTextArea
+          label="Description"
+          placeholder="Add a description for your Quest"
+          name="description"
+          hookToForm
+        />
+
+        <CWImageInput
+          label="Quest Image (Accepts JPG and PNG files)"
+          onImageProcessingChange={({ isGenerating, isUploading }) => {
+            setIsProcessingQuestImage(isGenerating || isUploading);
+          }}
+          name="image"
+          hookToForm
+          imageBehavior={ImageBehavior.Fill}
+          withAIImageGeneration
+        />
+        <CWCommunityInput
+          name="community"
+          hookToForm
+          label="Community (optional)"
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
+        />
+      </div>
+
+      <CWDivider />
+
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
@@ -105,46 +145,6 @@ const QuestForm = (props: QuestFormProps) => {
           minDate={minEndDate}
           selected={null}
           showTimeInput
-        />
-      </div>
-
-      <CWDivider />
-
-      <div className="basic-information-section">
-        <CWText type="b1" fontWeight="semiBold">
-          Basic information
-        </CWText>
-
-        <CWTextInput
-          label="Quest name"
-          placeholder="Quest name"
-          fullWidth
-          name="name"
-          hookToForm
-        />
-
-        <CWTextArea
-          label="Description"
-          placeholder="Add a description for your Quest"
-          name="description"
-          hookToForm
-        />
-
-        <CWImageInput
-          label="Quest Image (Accepts JPG and PNG files)"
-          onImageProcessingChange={({ isGenerating, isUploading }) => {
-            setIsProcessingQuestImage(isGenerating || isUploading);
-          }}
-          name="image"
-          hookToForm
-          imageBehavior={ImageBehavior.Fill}
-          withAIImageGeneration
-        />
-        <CWCommunityInput
-          name="community"
-          hookToForm
-          label="Community (optional)"
-          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
         />
       </div>
 
