@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
@@ -30,7 +29,6 @@ chai.use(chaiAsPromised);
 
 const { commonProtocol } = evm;
 
-// TODO: re-enable test
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
@@ -348,7 +346,7 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
-              votes: BigNumber.from(s.votes).toString(),
+              votes: BigInt(s.votes).toString(),
             })),
             // actions: [
             //   {

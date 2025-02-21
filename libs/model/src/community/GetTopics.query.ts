@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -102,11 +101,6 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
       });
 
       results.forEach((r) => {
-        r.active_contest_managers?.forEach((cm) => {
-          cm.content.forEach((c) => {
-            c.voting_power = BigNumber.from(c.voting_power).toString();
-          });
-        });
         if (r.chain_node_url) {
           r.chain_node_url = buildChainNodeUrl(r.chain_node_url, 'public');
         }

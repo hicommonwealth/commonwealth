@@ -22,10 +22,9 @@
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/evm-protocols": "workspace:*",
+    "@hicommonwealth/schemas": "workspace:*",
     "dotenv": "^16.0.3",
-    "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
     "node-object-hash": "^3.0.0",

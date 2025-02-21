@@ -5,7 +5,9 @@ import {
   DecodeEventLogReturnType,
   Hex,
   decodeEventLog,
+  getAddress,
 } from 'viem';
+import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
@@ -171,6 +173,10 @@ export const isEvmAddress = (address: string): boolean => {
   return isAddress(address);
 };
 
+export const getEvmAddress = (address: string): string => {
+  return getAddress(address);
+};
+
 export const arbitraryEvmCall = async ({
   evmClient,
   rpc,
@@ -204,3 +210,15 @@ export type DecodedLog<
   abi extends Abi,
   eventName extends ContractEventName<abi>,
 > = DecodeEventLogReturnType<abi, eventName>;
+
+export const createEvmSigner = (
+  mnemonic: string = generateMnemonic(english),
+) => {
+  const account = mnemonicToAccount(mnemonic);
+  return {
+    ...account,
+    getAddress: () => account.address,
+    signMessage: (message: string): Promise<string> =>
+      account.signMessage({ message }),
+  };
+};

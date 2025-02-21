@@ -1,8 +1,8 @@
 import { StdFee } from '@cosmjs/amino';
 import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { Wallet as EthWallet } from '@ethersproject/wallet';
 import { dispose } from '@hicommonwealth/core';
+import { createEvmSigner } from '@hicommonwealth/evm-protocols';
 import { tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
@@ -22,6 +22,7 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import Long from 'long';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import EthSigner from './utils/eth-signer';
 import { waitOneBlock } from './utils/helpers';
@@ -48,7 +49,7 @@ export const setupTestSigner = async (lcdUrl: string) => {
     prefix: 'evmos',
     hdPaths: [hdPath],
   });
-  const ethSigner = EthWallet.fromMnemonic(mnemonic);
+  const ethSigner = createEvmSigner(mnemonic);
   const signer = EthSigner(offlineSigner, ethSigner, 'evmos');
 
   const client = await EthSigningClient(
@@ -126,7 +127,11 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     assert.isAtLeast(activeProposals.length, 1);
     const proposal = activeProposals[activeProposals.length - 1];
 
-    const msg = encodeMsgVote(signerAddr, proposal.proposalId, voteOption);
+    const msg = encodeMsgVote(
+      signerAddr,
+      proposal.proposalId as Long,
+      voteOption,
+    );
     const resp = await sendTx(lcdUrl, msg);
 
     expect(resp.transactionHash).to.not.be.undefined;
