@@ -5,6 +5,7 @@ export type QuestAction = keyof typeof QuestEvents;
 export type QuestActionSubFormErrors = {
   action?: string;
   actionLink?: string;
+  contentLink?: string;
   rewardAmount?: string;
   creatorRewardAmount?: string;
 };
@@ -12,12 +13,15 @@ export type QuestActionSubFormErrors = {
 export type QuestActionSubFormFields = {
   action?: QuestAction;
   actionLink?: string;
+  contentLink?: string;
   rewardAmount?: string | number;
   creatorRewardAmount?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
   requires_creator_points: boolean;
+  requires_thread_id: boolean;
+  requires_comment_id: boolean;
 };
 
 export type QuestActionSubFormProps = {

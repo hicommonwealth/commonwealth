@@ -2,6 +2,7 @@ import {
   QuestActionMeta,
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -9,6 +10,10 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetQuestByIdQuery } from 'state/api/quest';
+import {
+  useCancelQuestMutation,
+  useDeleteQuestMutation,
+} from 'state/api/quests';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -21,9 +26,11 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModalType } from 'views/modals/AuthModal';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
+import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -52,19 +59,14 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const {
-    data: randomResourceIdsForNonJoinedCommunities,
-    isLoading: isLoadingRandomResourceIdsForNonJoinedCommunities,
-  } = useGetRandomResourceIds({
-    limit: 1,
-    cursor: 1,
-    exclude_joined_communities: true,
-    enabled: true,
-  });
-  const randomResourceIdForNonJoinedCommunity =
-    randomResourceIdsForNonJoinedCommunities?.results?.[0];
-
   const { setAuthModalType } = useAuthModalStore();
+
+  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+    useDeleteQuestMutation();
+  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+    useCancelQuestMutation();
+
+  const isPendingAction = isDeletingQuest || isCancelingQuest;
 
   useRunOnceOnCondition({
     callback: () => {
@@ -82,11 +84,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (
-    isLoading ||
-    isLoadingRandomResourceIds ||
-    isLoadingRandomResourceIdsForNonJoinedCommunities
-  ) {
+  if (isLoading || isLoadingRandomResourceIds) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -114,7 +112,10 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isCompleted = gainedXP === totalUserXP;
 
-  const handleActionStart = (actionName: QuestAction) => {
+  const handleActionStart = (
+    actionName: QuestAction,
+    actionContentId?: string,
+  ) => {
     switch (actionName) {
       case 'SignUpFlowCompleted': {
         !user?.isLoggedIn && setAuthModalType(AuthModalType.CreateAccount);
@@ -125,27 +126,45 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
-        navigate(`/${randomResourceId?.community_id}/new/discussion`, {}, null);
+        navigate(
+          `/new/discussion`,
+          {},
+          quest?.community_id || randomResourceId?.community_id,
+        );
         break;
       }
       case 'CommunityJoined': {
         navigate(
-          `/${randomResourceIdForNonJoinedCommunity?.community_id}/discussions`,
+          quest?.community_id ? '' : `/explore`,
           {},
-          null,
+          quest?.community_id,
         );
         break;
       }
       case 'ThreadUpvoted':
       case 'CommentCreated': {
-        navigate(`/discussion/${`${randomResourceId?.thread_id}`}`, {}, null);
+        navigate(
+          actionContentId
+            ? buildURLFromContentId(
+                actionContentId.split(':')[1],
+                'thread',
+              ).split(window.location.origin)[1]
+            : `/discussion/${`${randomResourceId?.thread_id}`}`,
+          {},
+          null,
+        );
         break;
       }
       case 'CommentUpvoted': {
         navigate(
-          `/discussion/${
-            randomResourceId?.thread_id
-          }?comment=${randomResourceId?.comment_id}`,
+          actionContentId
+            ? buildURLFromContentId(
+                actionContentId.split(':')[1],
+                'comment',
+              ).split(window.location.origin)[1]
+            : `/discussion/${
+                randomResourceId?.thread_id
+              }?comment=${randomResourceId?.comment_id}`,
           {},
           null,
         );
@@ -159,8 +178,62 @@ const QuestDetails = ({ id }: { id: number }) => {
         return;
     }
   };
+
+  const handleQuestAbort = () => {
+    const handleAsync = async () => {
+      try {
+        if (isDeletionAllowed) {
+          await deleteQuest({ quest_id: quest.id });
+        } else {
+          await cancelQuest({ quest_id: quest.id });
+        }
+
+        notifySuccess(`Quest ${isDeletionAllowed ? 'deleted' : 'canceled'}!`);
+        navigate('/explore', {}, null);
+      } catch (e) {
+        console.log(e);
+        notifyError(
+          `Failed to ${isDeletionAllowed ? 'delete' : 'cancel'} quest`,
+        );
+      }
+    };
+
+    openConfirmation({
+      title: `Confirm Quest ${isDeletionAllowed ? 'Deletion' : 'Cancelation'}!`,
+      // eslint-disable-next-line max-len
+      description: (
+        <>
+          Are you sure you want to {isDeletionAllowed ? 'delete' : 'cancel'}{' '}
+          this quest. <br />
+          <br />
+          {isDeletionAllowed
+            ? 'Deletion would remove this quest and its sub-tasks entirely for every user.'
+            : // eslint-disable-next-line max-len
+              `With cancelation, users who earned XP for this quest will retain that XP. However new submissions to this quest won't be allowed and won't reward any XP to users.`}
+        </>
+      ),
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+          onClick: () => {},
+        },
+        {
+          label: 'Confirm',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: () => {
+            handleAsync().catch(console.error);
+          },
+        },
+      ],
+    });
+  };
+
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
+  const isDeletionAllowed = !isStarted || isEnded;
 
   const isRepeatableQuest =
     quest.action_metas?.[0]?.participation_limit ===
@@ -235,18 +308,35 @@ const QuestDetails = ({ id }: { id: number }) => {
               {isSiteAdmin && (
                 <>
                   <CWDivider />
-                  <div className="w-fit">
-                    {withTooltip(
-                      <CWButton
-                        label="Update"
-                        onClick={() => navigate(`/quest/${quest.id}/update`)}
-                        buttonType="primary"
-                        iconLeft="notePencil"
-                        disabled={isStarted || isEnded}
-                      />,
-                      'Updates only allowed in pre-live stage',
-                      isStarted || isEnded,
-                    )}
+                  <div className="manage-options">
+                    <div className="w-fit">
+                      {withTooltip(
+                        <CWButton
+                          label="Update"
+                          onClick={() => navigate(`/quest/${quest.id}/update`)}
+                          buttonType="primary"
+                          iconLeft="notePencil"
+                          disabled={isStarted || isEnded || isPendingAction}
+                        />,
+                        'Updates only allowed in pre-live stage',
+                        isStarted || isEnded,
+                      )}
+                    </div>
+                    <div className="w-fit">
+                      {withTooltip(
+                        <CWButton
+                          label={isDeletionAllowed ? 'Delete' : 'Cancel'}
+                          onClick={handleQuestAbort}
+                          buttonType="destructive"
+                          iconLeft="trash"
+                          disabled={isEnded || isPendingAction}
+                        />,
+                        isEnded
+                          ? 'Deletion not allowed for non-active quests'
+                          : '',
+                        isEnded,
+                      )}
+                    </div>
                   </div>
                 </>
               )}

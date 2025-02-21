@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
@@ -68,10 +67,10 @@ export const getTotalContestBalance = async (
 
   const balance =
     balanceResults.length === 2
-      ? BigNumber.from(balanceResults[0]).add(balanceResults[1])
-      : BigNumber.from(balanceResults[0]);
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]);
 
-  return BigNumber.from(balance).toString();
+  return balance.toString();
 };
 
 /**
@@ -194,17 +193,18 @@ export const getContestScore = async (
   });
   const contestBalance = contestData[1];
 
-  let prizePool = BigNumber.from(contestBalance)
-    .mul(oneOff ? 100 : prizePercentage)
-    .div(100);
-  prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
+  let prizePool =
+    (BigInt(contestBalance) *
+      (oneOff ? BigInt(100) : BigInt(prizePercentage))) /
+    BigInt(100);
+  prizePool = (prizePool * BigInt(100 - CONTEST_FEE_PERCENT)) / BigInt(100); // deduct contest fee from prize pool
   return scores.map((s, i) => ({
     content_id: s.winningContent.toString(),
     creator_address: s.winningAddress,
-    votes: BigNumber.from(s.voteCount).toString(),
+    votes: BigInt(s.voteCount).toString(),
     prize:
       i < Number(payoutStructure.length)
-        ? BigNumber.from(prizePool).mul(payoutStructure[i]).div(100).toString()
+        ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
         : '0',
   }));
 };
