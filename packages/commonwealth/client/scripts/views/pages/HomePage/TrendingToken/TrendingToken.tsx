@@ -8,6 +8,7 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import clsx from 'clsx';
 import React from 'react';
+import { smartTrim } from 'shared/utils';
 import './TrendingToken.scss';
 
 interface TrendingTokenCardProps extends TokenCardProps {
@@ -38,30 +39,32 @@ const TreandingToken = ({
       onClick={handleBodyClick}
     >
       <div className="header">
-        <div className="token-details">
+        <div className="token-data">
           <img src={iconURL} className="image" alt={name} />
           <div className="info">
-            <div className="name">{name}</div>
+            <CWText fontWeight="semiBold">{smartTrim(name, 17)}</CWText>
             <div className="detail">
               <CWText className="creator" type="caption">
                 by
               </CWText>
-              <CWText className="link" type="caption">
+              <CWText className="link" type="caption" fontWeight="medium">
                 {symbol}
               </CWText>
             </div>
           </div>
         </div>
-        <CWText className="price-change" type="h5" fontWeight="bold">
-          <PricePercentageChange
-            pricePercentage24HourChange={pricePercentage24HourChange}
-          />
-        </CWText>
+        <PricePercentageChange
+          pricePercentage24HourChange={pricePercentage24HourChange}
+          show24Hour={false}
+          useIcon
+          tokenCard
+        />
       </div>
       <div className="action-buttons">
         <CWButton
           label="Community"
           buttonWidth="full"
+          buttonHeight="sm"
           buttonType="secondary"
           onClick={() =>
             navigateToCommunity({
@@ -74,6 +77,7 @@ const TreandingToken = ({
         <CWButton
           label="Buy"
           buttonWidth="full"
+          buttonHeight="sm"
           buttonType="primary"
           onClick={() => onCTAClick?.(mode)}
         />

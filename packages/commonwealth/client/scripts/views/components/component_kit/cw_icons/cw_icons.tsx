@@ -249,6 +249,71 @@ export const CWArrowFatUpNeutral = (props: IconProps) => {
 };
 
 // eslint-disable-next-line react/no-multi-comp
+export const CWArrowUpHalfGreen = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="12"
+      height="7"
+      fill="none"
+      viewBox="0 0 12 7"
+      {...otherProps}
+    >
+      <path
+        d="M11.8048 6.22169C11.767 6.31306 11.7029 6.39116 11.6207 6.44612C11.5385 6.50108 11.4418 6.53042 11.3429 6.53044H1.34292C1.24398 6.53052 1.14723 6.50124 1.06493 6.4463C0.982635 6.39137 0.918488 6.31325 0.880612 6.22184C0.842736 6.13042 0.832833 6.02983 0.852158 5.93279C0.871484 5.83575 0.919167 5.74662 0.989173 5.67669L5.98917 0.676692C6.03561 0.630204 6.09075 0.593325 6.15145 0.568162C6.21215 0.543 6.27722 0.530049 6.34292 0.530049C6.40863 0.530049 6.47369 0.543 6.53439 0.568162C6.59509 0.593325 6.65024 0.630204 6.69667 0.676692L11.6967 5.67669C11.7666 5.74666 11.8142 5.83578 11.8334 5.93279C11.8527 6.0298 11.8427 6.13034 11.8048 6.22169Z"
+        fill="#9AC54F"
+      />
+    </svg>
+  );
+};
+
+// eslint-disable-next-line react/no-multi-comp
+export const CWArrowDownHalfOrange = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="12"
+      height="7"
+      fill="none"
+      viewBox="0 0 12 7"
+      {...otherProps}
+    >
+      <path
+        transform="rotate(180, 6, 3.5)"
+        d="M11.8048 6.22169C11.767 6.31306 11.7029 6.39116 11.6207 6.44612C11.5385 6.50108 11.4418 6.53042 11.3429 6.53044H1.34292C1.24398 6.53052 1.14723 6.50124 1.06493 6.4463C0.982635 6.39137 0.918488 6.31325 0.880612 6.22184C0.842736 6.13042 0.832833 6.02983 0.852158 5.93279C0.871484 5.83575 0.919167 5.74662 0.989173 5.67669L5.98917 0.676692C6.03561 0.630204 6.09075 0.593325 6.15145 0.568162C6.21215 0.543 6.27722 0.530049 6.34292 0.530049C6.40863 0.530049 6.47369 0.543 6.53439 0.568162C6.59509 0.593325 6.65024 0.630204 6.69667 0.676692L11.6967 5.67669C11.7666 5.74666 11.8142 5.83578 11.8334 5.93279C11.8527 6.0298 11.8427 6.13034 11.8048 6.22169Z"
+        fill="#ff521d"
+      />
+    </svg>
+  );
+};
+
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowFatUpBlue500 = (props: IconProps) => {
   const {
     className,

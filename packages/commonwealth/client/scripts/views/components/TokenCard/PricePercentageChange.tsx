@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import './PricePercentageChange.scss';
 
@@ -7,12 +8,18 @@ interface PricePercentageChangeProps {
   pricePercentage24HourChange: number;
   alignment?: 'left' | 'right';
   className?: string;
+  show24Hour?: boolean;
+  useIcon?: boolean;
+  tokenCard?: boolean;
 }
 
 const PricePercentageChange = ({
   pricePercentage24HourChange,
   alignment = 'right',
   className,
+  show24Hour = true,
+  useIcon = false,
+  tokenCard = false,
 }: PricePercentageChangeProps) => {
   return (
     <CWText
@@ -30,12 +37,24 @@ const PricePercentageChange = ({
           { negative: pricePercentage24HourChange < 0 },
           { positive: pricePercentage24HourChange >= 0 },
         )}
-        type="caption"
+        {...(tokenCard
+          ? { fontWeight: 'semiBold', type: 'h3' }
+          : { type: 'caption' })}
       >
-        {pricePercentage24HourChange >= 0 ? '+' : ''}
-        {pricePercentage24HourChange}%
+        {useIcon ? (
+          pricePercentage24HourChange >= 0 ? (
+            <CWIcon iconName="arrowUpHalfGreen" />
+          ) : (
+            <CWIcon iconName="arrowDownHalfOrange" />
+          )
+        ) : pricePercentage24HourChange >= 0 ? (
+          '+'
+        ) : (
+          ''
+        )}
+        &nbsp;{pricePercentage24HourChange}%
       </CWText>{' '}
-      &nbsp;24hr
+      {show24Hour && <span>&nbsp;24hr</span>}
     </CWText>
   );
 };

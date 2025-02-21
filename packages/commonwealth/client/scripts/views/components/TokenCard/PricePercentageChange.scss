@@ -2,12 +2,14 @@
 
 .PricePercentageChange {
   width: fit-content;
+  display: flex;
+  align-items: center;
 
   &.negative {
     color: $rorange-500;
   }
 
   &.positive {
-    color: $green-600;
+    color: $green-500;
   }
 }
