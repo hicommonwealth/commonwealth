@@ -44,7 +44,7 @@ export const QuestActionMeta = z
     amount_multiplier: z.number().min(0).optional(),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
-    action_link: z.string().url().optional().nullish(),
+    instructions_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().optional(),
     content_id: z
       .string()

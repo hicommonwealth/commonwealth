@@ -89,10 +89,10 @@ const QuestActionCard = ({
           )}
           <div className="points-row">
             <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {questAction.action_link && (
+            {questAction.instructions_link && (
               <a
                 target="_blank"
-                href={questAction.action_link}
+                href={questAction.instructions_link}
                 rel="noreferrer"
                 className="action-link"
               >

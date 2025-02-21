@@ -129,7 +129,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
-                actionLink: action.action_link,
+                instructionsLink: action.instructions_link,
                 contentLink: action.content_id
                   ? buildURLFromContentId(
                       action.content_id.split(':')[1],

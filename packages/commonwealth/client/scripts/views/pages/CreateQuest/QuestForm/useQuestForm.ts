@@ -88,7 +88,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 id: index + 1,
                 values: {
                   action: chosenAction,
-                  actionLink: subForm.actionLink || '',
+                  instructionsLink: subForm.instructionsLink || '',
                   contentLink:
                     (subForm as QuestActionSubFormValuesWithContentLink)
                       .contentLink || '',
@@ -273,8 +273,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           participation_times_per_period: parseInt(
             `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
           ),
-          ...(subForm.values.actionLink && {
-            action_link: subForm.values.actionLink.trim(),
+          ...(subForm.values.instructionsLink && {
+            instructions_link: subForm.values.instructionsLink.trim(),
           }),
           amount_multiplier: 0,
         })),
@@ -325,8 +325,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         participation_times_per_period: parseInt(
           `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
         ),
-        ...(subForm.values.actionLink && {
-          action_link: subForm.values.actionLink.trim(),
+        ...(subForm.values.instructionsLink && {
+          instructions_link: subForm.values.instructionsLink.trim(),
         }),
         amount_multiplier: 0,
       })),

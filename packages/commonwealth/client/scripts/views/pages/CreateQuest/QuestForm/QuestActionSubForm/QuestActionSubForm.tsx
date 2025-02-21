@@ -138,14 +138,16 @@ const QuestActionSubForm = ({
 
         <CWTextInput
           label="Instructions Link (optional)"
-          name="actionLink"
+          name="instructionsLink"
           placeholder="https://example.com"
           fullWidth
-          {...(defaultValues?.actionLink && {
-            defaultValue: defaultValues?.actionLink,
+          {...(defaultValues?.instructionsLink && {
+            defaultValue: defaultValues?.instructionsLink,
           })}
-          onInput={(e) => onChange?.({ actionLink: e?.target?.value?.trim() })}
-          customError={errors?.actionLink}
+          onInput={(e) =>
+            onChange?.({ instructionsLink: e?.target?.value?.trim() })
+          }
+          customError={errors?.instructionsLink}
         />
       </div>
     </div>
