@@ -54,7 +54,11 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
   };
 
   const handleCTAClick = (questId: number, communityId?: string) => {
-    navigate(`/quest/${questId}`, {}, communityId);
+    if (communityId) {
+      navigate(`/${communityId}/quest/${questId}`, {}, '');
+    } else {
+      navigate(`/quest/${questId}`, {}, null);
+    }
   };
 
   const handleLeaderboardClick = () => {
