@@ -26,7 +26,7 @@ export const GetCommentsOrderBy = z.enum(['newest', 'oldest', 'mostLikes']);
 
 export const GetComments = {
   input: PaginationParamsSchema.extend({
-    thread_id: PG_INT,
+    thread_id: PG_INT.optional(),
     comment_id: PG_INT.optional(),
     parent_id: PG_INT.optional(),
     include_reactions: zBoolean.default(false),

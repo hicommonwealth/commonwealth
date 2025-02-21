@@ -49,7 +49,8 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(/(thread:\d+)|(comment:\d+)/)
-      .optional(),
+      .optional()
+      .nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
   })

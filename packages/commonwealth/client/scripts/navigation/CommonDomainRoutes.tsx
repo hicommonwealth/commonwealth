@@ -59,6 +59,7 @@ const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
 );
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect'),
@@ -469,6 +470,13 @@ const CommonDomainRoutes = ({
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
+    key="/discussion/comment/:identifier"
+    path="/discussion/comment/:identifier"
+    element={withLayout(CommentRedirectPage, {
       scoped: false,
     })}
   />,

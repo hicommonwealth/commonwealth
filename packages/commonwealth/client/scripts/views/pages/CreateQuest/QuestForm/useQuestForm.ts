@@ -20,10 +20,15 @@ import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
-import { doesActionRequireCreatorReward } from './QuestActionSubForm/helpers';
+import {
+  doesActionRequireContentId,
+  doesActionRequireCreatorReward,
+} from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
+import { buildContentIdFromURL } from './helpers';
 import {
+  QuestActionSubFormValuesWithContentLink,
   QuestActionSubFormValuesWithCreatorPoints,
   QuestFormProps,
 } from './types';
@@ -74,26 +79,40 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
-            ...initialValues.subForms.map((subForm, index) => ({
-              id: index + 1,
-              values: {
-                action: subForm.action as QuestAction,
-                actionLink: subForm.actionLink || '',
-                rewardAmount: subForm.rewardAmount,
-                ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
-                  ?.creatorRewardAmount && {
-                  creatorRewardAmount: (
-                    subForm as QuestActionSubFormValuesWithCreatorPoints
-                  ).creatorRewardAmount,
-                }),
-              },
-              errors: {},
-              config: {
-                requires_creator_points: doesActionRequireCreatorReward(
-                  subForm.action as QuestAction,
-                ),
-              },
-            })),
+            ...initialValues.subForms.map((subForm, index) => {
+              const chosenAction = subForm.action as QuestAction;
+              const requiresContentId =
+                doesActionRequireContentId(chosenAction);
+
+              return {
+                id: index + 1,
+                values: {
+                  action: chosenAction,
+                  actionLink: subForm.actionLink || '',
+                  contentLink:
+                    (subForm as QuestActionSubFormValuesWithContentLink)
+                      .contentLink || '',
+                  rewardAmount: subForm.rewardAmount,
+                  ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
+                    ?.creatorRewardAmount && {
+                    creatorRewardAmount: (
+                      subForm as QuestActionSubFormValuesWithCreatorPoints
+                    ).creatorRewardAmount,
+                  }),
+                },
+                errors: {},
+                config: {
+                  requires_creator_points:
+                    doesActionRequireCreatorReward(chosenAction),
+                  requires_thread_id:
+                    requiresContentId &&
+                    (chosenAction === 'CommentCreated' ||
+                      chosenAction === 'ThreadUpvoted'),
+                  requires_comment_id:
+                    requiresContentId && chosenAction === 'CommentUpvoted',
+                },
+              };
+            }),
           ]);
         }
       }
@@ -213,168 +232,201 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleCreateQuest = (
+  const handleCreateQuest = async (
     values: z.infer<typeof questFormValidationSchema>,
   ) => {
-    const subFormErrors = validateSubForms();
-    const repetitionCycleRadioBtnError =
-      triggerRepetitionCycleRadioValidation();
-    if (subFormErrors || repetitionCycleRadioBtnError) return;
+    const quest = await createQuest({
+      name: values.name.trim(),
+      description: values.description.trim(),
+      end_date: new Date(values.end_date),
+      start_date: new Date(values.start_date),
+      image_url: values.image,
+      ...(values?.community && {
+        community_id: values.community.value,
+      }),
+    });
 
-    const handleAsync = async () => {
-      try {
-        const quest = await createQuest({
-          name: values.name.trim(),
-          description: values.description.trim(),
-          end_date: new Date(values.end_date),
-          start_date: new Date(values.start_date),
-          image_url: values.image,
-          ...(values?.community && {
-            community_id: values.community.value,
+    if (quest && quest.id) {
+      await updateQuest({
+        quest_id: quest.id,
+        action_metas: questActionSubForms.map((subForm) => ({
+          event_name: subForm.values.action as QuestAction,
+          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+          ...(subForm.values.creatorRewardAmount && {
+            creator_reward_weight: calculateRemainingPercentageChangeFractional(
+              parseInt(`${subForm.values.rewardAmount}`, 10),
+              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+            ),
           }),
-        });
-
-        if (quest && quest.id) {
-          await updateQuest({
-            quest_id: quest.id,
-            action_metas: questActionSubForms.map((subForm) => ({
-              event_name: subForm.values.action as QuestAction,
-              reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-              ...(subForm.values.creatorRewardAmount && {
-                creator_reward_weight:
-                  calculateRemainingPercentageChangeFractional(
-                    parseInt(`${subForm.values.rewardAmount}`, 10),
-                    parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-                  ),
-              }),
-              participation_limit: values.participation_limit,
-              participation_period: repetitionCycleRadioProps
-                .repetitionCycleSelectListProps.selected
-                ?.value as QuestParticipationPeriod,
-              participation_times_per_period: parseInt(
-                `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+          ...(subForm.values.contentLink &&
+            (subForm.config?.requires_comment_id ||
+              subForm.config?.requires_thread_id) && {
+              content_id: buildContentIdFromURL(
+                subForm.values.contentLink,
+                subForm.config?.requires_comment_id ? 'comment' : 'thread',
               ),
-              ...(subForm.values.actionLink && {
-                action_link: subForm.values.actionLink.trim(),
-              }),
-              amount_multiplier: 0,
-            })),
-          });
-        }
-
-        notifySuccess('Quest created!');
-
-        navigate('/explore');
-      } catch (e) {
-        console.error(e);
-
-        if (e.message.includes('must be at least 0 days in the future')) {
-          notifyError('Start date must be a future date');
-          return;
-        }
-        if (e?.message?.includes?.('must not exist')) {
-          notifyError('Quest with provided name already exists!');
-          return;
-        }
-        notifyError('Failed to create quest!');
-      }
-    };
-    const questStartHoursDiffFromNow = moment(values.start_date).diff(
-      moment(),
-      'hours',
-    );
-    // request confirmation from user if quest is being created <=6 hours in advance
-    if (questStartHoursDiffFromNow <= 6) {
-      handleQuestMutateConfirmation(questStartHoursDiffFromNow)
-        .then(() => handleAsync().catch(console.error))
-        .catch(console.error);
-    } else {
-      handleAsync().catch(console.error);
+            }),
+          participation_limit: values.participation_limit,
+          participation_period: repetitionCycleRadioProps
+            .repetitionCycleSelectListProps.selected
+            ?.value as QuestParticipationPeriod,
+          participation_times_per_period: parseInt(
+            `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+          ),
+          ...(subForm.values.actionLink && {
+            action_link: subForm.values.actionLink.trim(),
+          }),
+          amount_multiplier: 0,
+        })),
+      });
     }
   };
 
-  const handleUpdateQuest = (
+  const handleUpdateQuest = async (
     values: z.infer<typeof questFormValidationSchema>,
   ) => {
-    const subFormErrors = validateSubForms();
-    const repetitionCycleRadioBtnError =
-      triggerRepetitionCycleRadioValidation();
+    if (!questId) return;
 
-    if (subFormErrors || repetitionCycleRadioBtnError || !questId) return;
-
-    const handleAsync = async () => {
-      try {
-        await updateQuest({
-          quest_id: questId,
-          description: values.description.trim(),
-          ...(initialValues.name !== values.name.trim() && {
-            name: values.name.trim(),
-          }),
-          ...(initialValues.end_date !== values.end_date && {
-            end_date: new Date(values.end_date),
-          }),
-          ...(initialValues.start_date !== values.start_date && {
-            start_date: new Date(values.start_date),
-          }),
-          image_url: values.image,
-          community_id: values?.community?.value || undefined,
-          action_metas: questActionSubForms.map((subForm) => ({
-            event_name: subForm.values.action as QuestAction,
-            reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-            ...(subForm.values.creatorRewardAmount && {
-              creator_reward_weight:
-                calculateRemainingPercentageChangeFractional(
-                  parseInt(`${subForm.values.rewardAmount}`, 10),
-                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-                ),
-            }),
-            participation_limit: values.participation_limit,
-            participation_period: repetitionCycleRadioProps
-              .repetitionCycleSelectListProps.selected
-              ?.value as QuestParticipationPeriod,
-            participation_times_per_period: parseInt(
-              `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+    await updateQuest({
+      quest_id: questId,
+      description: values.description.trim(),
+      ...(initialValues.name !== values.name.trim() && {
+        name: values.name.trim(),
+      }),
+      ...(initialValues.end_date !== values.end_date && {
+        end_date: new Date(values.end_date),
+      }),
+      ...(initialValues.start_date !== values.start_date && {
+        start_date: new Date(values.start_date),
+      }),
+      image_url: values.image,
+      community_id: values?.community?.value || undefined,
+      action_metas: questActionSubForms.map((subForm) => ({
+        event_name: subForm.values.action as QuestAction,
+        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        ...(subForm.values.creatorRewardAmount && {
+          creator_reward_weight: calculateRemainingPercentageChangeFractional(
+            parseInt(`${subForm.values.rewardAmount}`, 10),
+            parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+          ),
+        }),
+        ...(subForm.values.contentLink &&
+          (subForm.config?.requires_comment_id ||
+            subForm.config?.requires_thread_id) && {
+            content_id: buildContentIdFromURL(
+              subForm.values.contentLink,
+              subForm.config?.requires_comment_id ? 'comment' : 'thread',
             ),
-            ...(subForm.values.actionLink && {
-              action_link: subForm.values.actionLink.trim(),
-            }),
-          })),
-        });
-
-        notifySuccess('Quest updated!');
-
-        navigate(`/quest/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
-      } catch (e) {
-        console.error(e);
-
-        if (e.message.includes('must be at least 0 days in the future')) {
-          notifyError('Start date must be a future date');
-          return;
-        }
-        if (e?.message?.includes?.('must not exist')) {
-          notifyError('Quest with provided name already exists!');
-          return;
-        }
-        notifyError('Failed to update quest!');
-      }
-    };
-    const questStartHoursDiffFromNow = moment(values.start_date).diff(
-      moment(),
-      'hours',
-    );
-    // request confirmation from user if quest is being created <=6 hours in advance
-    if (questStartHoursDiffFromNow <= 6) {
-      handleQuestMutateConfirmation(questStartHoursDiffFromNow)
-        .then(() => handleAsync().catch(console.error))
-        .catch(console.error);
-    } else {
-      handleAsync().catch(console.error);
-    }
+          }),
+        participation_limit: values.participation_limit,
+        participation_period: repetitionCycleRadioProps
+          .repetitionCycleSelectListProps.selected
+          ?.value as QuestParticipationPeriod,
+        participation_times_per_period: parseInt(
+          `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+        ),
+        ...(subForm.values.actionLink && {
+          action_link: subForm.values.actionLink.trim(),
+        }),
+        amount_multiplier: 0,
+      })),
+    });
   };
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
-    if (mode === 'create') handleCreateQuest(values);
-    if (mode === 'update') handleUpdateQuest(values);
+    const subFormErrors = validateSubForms();
+    const repetitionCycleRadioBtnError =
+      triggerRepetitionCycleRadioValidation();
+
+    if (
+      subFormErrors ||
+      repetitionCycleRadioBtnError ||
+      (mode === 'update' ? !questId : false)
+    ) {
+      return;
+    }
+
+    const handleAsync = async () => {
+      try {
+        if (mode === 'create') {
+          await handleCreateQuest(values);
+          notifySuccess(`Quest ${mode}d!`);
+          navigate('/explore');
+        }
+        if (mode === 'update') {
+          await handleUpdateQuest(values);
+          notifySuccess(`Quest ${mode}d!`);
+          navigate(`/quest/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
+        }
+      } catch (e) {
+        console.error(e);
+
+        const error = (e?.message || '').toLowerCase();
+        if (error.includes('must be at least 0 days in the future')) {
+          notifyError('Start date must be a future date');
+          return;
+        }
+        if (error.includes?.('must not exist')) {
+          notifyError('Quest with provided name already exists!');
+          return;
+        }
+        if (error.includes('must exist')) {
+          if (error.includes('comment with id')) {
+            const commentId = error.match(/id "(\d+)"/)[1];
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find(
+              (form) =>
+                form.values.contentLink?.includes(`comment=${commentId}`) ||
+                form.values.contentLink?.includes(`comment/${commentId}`),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentLink: `Invalid comment link.${
+                  values?.community
+                    ? ' Comment must belong to a thread of selected community'
+                    : ''
+                }`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
+          if (error.includes('thread with id')) {
+            const threadId = error.match(/id "(\d+)"/)[1];
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find((form) =>
+              form.values.contentLink?.includes(`discussion/${threadId}`),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentLink: `Invalid thread link.${
+                  values?.community
+                    ? ' Thread must belong to selected community'
+                    : ''
+                }`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
+          notifyError('Failed to update quest! Please fix form errors');
+          return;
+        }
+        notifyError(`Failed to ${mode} quest!`);
+      }
+    };
+    const questStartHoursDiffFromNow = moment(values.start_date).diff(
+      moment(),
+      'hours',
+    );
+    // request confirmation from user if quest is being created <=6 hours in advance
+    if (questStartHoursDiffFromNow <= 6) {
+      handleQuestMutateConfirmation(questStartHoursDiffFromNow)
+        .then(() => handleAsync().catch(console.error))
+        .catch(console.error);
+    } else {
+      handleAsync().catch(console.error);
+    }
   };
 
   return {

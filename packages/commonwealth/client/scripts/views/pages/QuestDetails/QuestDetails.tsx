@@ -24,6 +24,7 @@ import { AuthModalType } from 'views/modals/AuthModal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
+import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -52,18 +53,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const {
-    data: randomResourceIdsForNonJoinedCommunities,
-    isLoading: isLoadingRandomResourceIdsForNonJoinedCommunities,
-  } = useGetRandomResourceIds({
-    limit: 1,
-    cursor: 1,
-    exclude_joined_communities: true,
-    enabled: true,
-  });
-  const randomResourceIdForNonJoinedCommunity =
-    randomResourceIdsForNonJoinedCommunities?.results?.[0];
-
   const { setAuthModalType } = useAuthModalStore();
 
   useRunOnceOnCondition({
@@ -82,11 +71,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (
-    isLoading ||
-    isLoadingRandomResourceIds ||
-    isLoadingRandomResourceIdsForNonJoinedCommunities
-  ) {
+  if (isLoading || isLoadingRandomResourceIds) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -114,7 +99,10 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isCompleted = gainedXP === totalUserXP;
 
-  const handleActionStart = (actionName: QuestAction) => {
+  const handleActionStart = (
+    actionName: QuestAction,
+    actionContentId?: string,
+  ) => {
     switch (actionName) {
       case 'SignUpFlowCompleted': {
         !user?.isLoggedIn && setAuthModalType(AuthModalType.CreateAccount);
@@ -125,27 +113,45 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
-        navigate(`/${randomResourceId?.community_id}/new/discussion`, {}, null);
+        navigate(
+          `/new/discussion`,
+          {},
+          quest?.community_id || randomResourceId?.community_id,
+        );
         break;
       }
       case 'CommunityJoined': {
         navigate(
-          `/${randomResourceIdForNonJoinedCommunity?.community_id}/discussions`,
+          quest?.community_id ? '' : `/explore`,
           {},
-          null,
+          quest?.community_id,
         );
         break;
       }
       case 'ThreadUpvoted':
       case 'CommentCreated': {
-        navigate(`/discussion/${`${randomResourceId?.thread_id}`}`, {}, null);
+        navigate(
+          actionContentId
+            ? buildURLFromContentId(
+                actionContentId.split(':')[1],
+                'thread',
+              ).split(window.location.origin)[1]
+            : `/discussion/${`${randomResourceId?.thread_id}`}`,
+          {},
+          null,
+        );
         break;
       }
       case 'CommentUpvoted': {
         navigate(
-          `/discussion/${
-            randomResourceId?.thread_id
-          }?comment=${randomResourceId?.comment_id}`,
+          actionContentId
+            ? buildURLFromContentId(
+                actionContentId.split(':')[1],
+                'comment',
+              ).split(window.location.origin)[1]
+            : `/discussion/${
+                randomResourceId?.thread_id
+              }?comment=${randomResourceId?.comment_id}`,
           {},
           null,
         );

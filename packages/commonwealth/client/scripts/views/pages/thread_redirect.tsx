@@ -20,7 +20,7 @@ const ThreadRedirect = ({ identifier }: { identifier: string }) => {
         ? navigate('/error')
         : navigate(
             `/discussion/${identifier}${window.location.search}`,
-            {},
+            { replace: true },
             foundThread?.community_id,
           );
     },

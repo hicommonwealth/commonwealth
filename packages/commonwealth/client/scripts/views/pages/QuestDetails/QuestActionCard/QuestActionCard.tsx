@@ -37,7 +37,7 @@ const actionCopies = {
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction) => void;
+  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
   actionNumber: number;
   questAction: z.infer<typeof QuestActionMeta>;
   isActionInEligible?: boolean;
@@ -123,7 +123,12 @@ const QuestActionCard = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               iconRight="arrowRightPhosphor"
-              onClick={() => onActionStart(questAction.event_name)}
+              onClick={() =>
+                onActionStart(
+                  questAction.event_name,
+                  questAction?.content_id || undefined,
+                )
+              }
               disabled={!canStartAction}
             />,
             actionStartBlockedReason || '',
