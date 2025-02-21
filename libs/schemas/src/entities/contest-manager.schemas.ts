@@ -5,6 +5,20 @@ import { Contest } from '../projections';
 import { PG_INT } from '../utils';
 import { Topic } from './topic.schemas';
 
+const ContestManagerEnvironments = [
+  'local',
+  'CI',
+  'frick',
+  'frack',
+  'beta',
+  'demo',
+  'production',
+] as const;
+type ContestManagerEnvironments = (typeof ContestManagerEnvironments)[number];
+export const ContestManagerEnvironmentsSchema = z
+  .enum(ContestManagerEnvironments)
+  .describe('The environment that created the contest manager');
+
 export const ContestManager = z
   .object({
     contest_address: z.string().describe('On-Chain contest manager address'),
@@ -71,9 +85,6 @@ export const ContestManager = z
       .gt(0)
       .nullish()
       .describe('Vote weight multiplier'),
-    environment: z
-      .enum(['local', 'CI', 'frick', 'frack', 'beta', 'demo', 'production'])
-      .describe('The environment that created the contest manager')
-      .optional(),
+    environment: ContestManagerEnvironmentsSchema.optional(),
   })
   .describe('On-Chain Contest Manager');
