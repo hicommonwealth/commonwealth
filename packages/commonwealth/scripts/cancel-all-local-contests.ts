@@ -4,8 +4,10 @@
 
 */
 
-import { logger } from '@hicommonwealth/core';
+import { command, config, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { CancelContestManagerMetadata } from 'node_modules/@hicommonwealth/model/src/contest';
+import { systemActor } from 'node_modules/@hicommonwealth/model/src/middleware';
 import { exit } from 'process';
 import { Op } from 'sequelize';
 
@@ -13,25 +15,29 @@ const log = logger(import.meta);
 
 async function cancelAllLocalContests() {
   const { host } = await models.sequelize.config;
-  if (host !== 'localhost') {
+  if (config.APP_ENV !== 'local' || host !== 'localhost') {
     throw new Error('script can only be run on localhost DB');
   }
-  const [result] = await models.ContestManager.update(
-    {
-      cancelled: true,
-    },
-    {
-      where: {
-        cancelled: {
-          [Op.ne]: true,
-        },
-        ended: {
-          [Op.ne]: true,
-        },
+  const activeContests = await models.ContestManager.findAll({
+    where: {
+      cancelled: {
+        [Op.ne]: true,
+      },
+      ended: {
+        [Op.ne]: true,
       },
     },
-  );
-  log.debug(`cancelled ${result} active contests`);
+  });
+  for (const contest of activeContests) {
+    await command(CancelContestManagerMetadata(), {
+      actor: systemActor({}),
+      payload: {
+        community_id: contest.community_id,
+        contest_address: contest.contest_address,
+      },
+    });
+  }
+  log.debug(`cancelled ${activeContests.length} active contests`);
   exit(0);
 }
 
