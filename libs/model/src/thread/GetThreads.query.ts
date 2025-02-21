@@ -263,8 +263,6 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         numVotingThreadsQuery,
       ]);
 
-      console.log('threads', threads.map);
-
       return {
         limit: replacements.limit,
         page: replacements.page,
