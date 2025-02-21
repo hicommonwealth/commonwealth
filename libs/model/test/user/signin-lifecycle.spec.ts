@@ -17,7 +17,7 @@ import { SignIn } from '../../src/user/SignIn.command';
 import { CommunitySeedOptions, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
-  const [evmSigner, _, cosmosSigner, substrateSigner, solanaSigner] =
+  const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
   const refs = {} as Record<
