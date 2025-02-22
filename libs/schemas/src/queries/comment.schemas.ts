@@ -39,3 +39,11 @@ export const GetComments = {
     results: z.array(CommentsView),
   }),
 };
+
+export const GetCommentById = {
+  input: z.object({
+    comment_id: PG_INT,
+  }),
+  // output: CommentsView,
+  output: z.any(),
+};
