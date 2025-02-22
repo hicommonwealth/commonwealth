@@ -53,18 +53,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const {
-    data: randomResourceIdsForNonJoinedCommunities,
-    isLoading: isLoadingRandomResourceIdsForNonJoinedCommunities,
-  } = useGetRandomResourceIds({
-    limit: 1,
-    cursor: 1,
-    exclude_joined_communities: true,
-    enabled: true,
-  });
-  const randomResourceIdForNonJoinedCommunity =
-    randomResourceIdsForNonJoinedCommunities?.results?.[0];
-
   const { setAuthModalType } = useAuthModalStore();
 
   useRunOnceOnCondition({
@@ -83,11 +71,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (
-    isLoading ||
-    isLoadingRandomResourceIds ||
-    isLoadingRandomResourceIdsForNonJoinedCommunities
-  ) {
+  if (isLoading || isLoadingRandomResourceIds) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -138,10 +122,9 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'CommunityJoined': {
         navigate(
-          `/discussions`,
+          quest?.community_id ? '' : `/explore`,
           {},
-          quest?.community_id ||
-            randomResourceIdForNonJoinedCommunity?.community_id,
+          quest?.community_id,
         );
         break;
       }
