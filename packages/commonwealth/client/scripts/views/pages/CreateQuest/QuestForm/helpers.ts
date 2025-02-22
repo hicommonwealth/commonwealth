@@ -27,4 +27,5 @@ export const buildURLFromContentId = (
   if (idType === 'comment') {
     return `${window.location.origin}/discussion/comment/${id}`;
   }
+  return '';
 };
