@@ -2,10 +2,14 @@ import { splitAndDecodeURL } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from 'client/scripts/models/types';
 import useUserStore from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -18,7 +22,18 @@ import { PageLoading } from '../loading';
 import ThreadCell from './ThreadCell';
 import './index.scss';
 
-const OverviewPage = () => {
+type OverViewPageProps = {
+  topicId?: string | number | undefined;
+  featuredFilter?: ThreadFeaturedFilterTypes;
+  timelineFilter?: ThreadTimelineFilterTypes;
+};
+
+const OverviewPage = ({
+  topicId,
+  featuredFilter,
+  timelineFilter,
+}: OverViewPageProps) => {
+  console.log({ topicId, featuredFilter });
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const topicNameFromURL = splitAndDecodeURL(location.pathname);
@@ -50,6 +65,74 @@ const OverviewPage = () => {
     apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
+  const filterList = useMemo(() => {
+    let newData = recentlyActiveThreads || []; // Start with full data
+
+    if (topicId) {
+      newData = newData.filter((thread) => thread.topic.id === topicId);
+    }
+    if (timelineFilter) {
+      const now = new Date();
+
+      newData = newData.filter((thread) => {
+        const threadDate = new Date(thread.createdAt);
+
+        switch (timelineFilter) {
+          case ThreadTimelineFilterTypes.ThisWeek: {
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            return threadDate >= startOfWeek;
+          }
+
+          case ThreadTimelineFilterTypes.ThisMonth:
+            return (
+              threadDate.getMonth() === now.getMonth() &&
+              threadDate.getFullYear() === now.getFullYear()
+            );
+
+          case ThreadTimelineFilterTypes.AllTime:
+          default:
+            return true;
+        }
+      });
+    }
+    if (featuredFilter) {
+      newData = [...newData].sort((a, b) => {
+        // Spread to avoid mutating original array
+        switch (featuredFilter) {
+          case ThreadFeaturedFilterTypes.Newest:
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+
+          case ThreadFeaturedFilterTypes.Oldest:
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+
+          case ThreadFeaturedFilterTypes.MostLikes:
+            return (b.reactionCount ?? 0) - (a.reactionCount ?? 0);
+
+          case ThreadFeaturedFilterTypes.MostComments:
+            return (b.numberOfComments ?? 0) - (a.numberOfComments ?? 0);
+
+          case ThreadFeaturedFilterTypes.LatestActivity:
+            return (
+              new Date(b.lastActivityAt).getTime() -
+              new Date(a.lastActivityAt).getTime()
+            );
+
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return newData;
+  }, [topicId, featuredFilter, recentlyActiveThreads, timelineFilter]);
+
+  console.log(filterList);
   const columns: CWTableColumnInfo[] = [
     {
       key: 'title',
@@ -89,7 +172,7 @@ const OverviewPage = () => {
   ) : (
     <div className="OverviewPage">
       <CWTable
-        rowData={recentlyActiveThreads.map((thread) => ({
+        rowData={filterList.map((thread) => ({
           ...thread,
           createdAt: {
             sortValue: thread.createdAt,

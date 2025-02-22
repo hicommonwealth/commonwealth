@@ -220,6 +220,7 @@ export const HeaderWithFilters = ({
     }
   };
 
+  const istrue = true;
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
@@ -237,17 +238,14 @@ export const HeaderWithFilters = ({
                   label: 'Row',
                   iconLeft: 'viewAll',
                 },
-                ...(!matchesContestFilterRoute &&
-                !matchesDiscussionsTopicRoute?.[0]?.params?.topic
-                  ? [
-                      {
-                        id: 2,
-                        value: ThreadViewFilterTypes.Overview,
-                        label: 'Overview',
-                        iconLeft: 'viewOverView',
-                      },
-                    ]
-                  : []),
+
+                {
+                  id: 2,
+                  value: ThreadViewFilterTypes.Overview,
+                  label: 'Overview',
+                  iconLeft: 'viewOverView',
+                },
+
                 {
                   id: 3,
                   value: ThreadViewFilterTypes.CardView,
@@ -292,7 +290,7 @@ export const HeaderWithFilters = ({
           )}
         </div>
       </div>
-      {views && views[1].value !== selectedView ? (
+      {istrue ? (
         <>
           {selectedTopic?.description && (
             <MarkdownViewerUsingQuillOrNewEditor
@@ -450,7 +448,9 @@ export const HeaderWithFilters = ({
                     />
                   ) : (
                     stages_enabled &&
-                    !isWindowExtraSmall && (
+                    !isWindowExtraSmall &&
+                    views &&
+                    views[1].value !== selectedView && (
                       <Select
                         selected={selectedStage || 'All Stages'}
                         onSelect={(item) =>
@@ -518,7 +518,7 @@ export const HeaderWithFilters = ({
               </div>
             </div>
           )}
-          {!isWindowExtraSmall && (
+          {!isWindowExtraSmall && views && views[1].value !== selectedView && (
             <div className="checkboxes">
               <CWCheckbox
                 checked={isIncludingSpamThreads}

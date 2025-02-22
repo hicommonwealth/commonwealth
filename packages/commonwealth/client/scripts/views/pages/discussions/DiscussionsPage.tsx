@@ -345,7 +345,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             }}
           />
         ) : selectedView === VIEWS[1].value ? (
-          <OverviewPage />
+          <OverviewPage topicId={topicId} featuredFilter={featuredFilter} />
         ) : (
           <VirtuosoGrid
             data={isInitialLoading ? [] : filteredThreads}
