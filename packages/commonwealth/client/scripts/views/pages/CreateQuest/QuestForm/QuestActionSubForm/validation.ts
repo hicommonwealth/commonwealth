@@ -17,7 +17,7 @@ export const questSubFormValidationSchema = z.object({
 
 export const questSubFormValidationSchemaWithContentLink =
   questSubFormValidationSchema.extend({
-    contentLink: linkValidationSchema.required,
+    contentLink: linkValidationSchema.optional,
   });
 
 const questSubFormValidationSchemaWithCreatorPointsTemp =
@@ -53,6 +53,6 @@ export const questSubFormValidationSchemaWithCreatorPoints =
 export const questSubFormValidationSchemaWithCreatorPointsWithContentLink =
   refineSchemaForCreatorRewardWeightValidation(
     questSubFormValidationSchemaWithCreatorPointsTemp.extend({
-      contentLink: linkValidationSchema.required,
+      contentLink: linkValidationSchema.optional,
     }),
   );

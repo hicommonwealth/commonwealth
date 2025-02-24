@@ -20,8 +20,8 @@ export type QuestActionSubFormFields = {
 
 export type QuestActionSubFormConfig = {
   requires_creator_points: boolean;
-  requires_thread_id: boolean;
-  requires_comment_id: boolean;
+  with_optional_thread_id: boolean;
+  with_optional_comment_id: boolean;
 };
 
 export type QuestActionSubFormProps = {

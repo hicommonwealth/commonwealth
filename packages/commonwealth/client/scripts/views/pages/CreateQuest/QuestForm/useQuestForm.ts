@@ -22,7 +22,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
 import {
-  doesActionRequireContentId,
+  doesActionAllowContentId,
   doesActionRequireCreatorReward,
 } from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
@@ -82,8 +82,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
               const chosenAction = subForm.action as QuestAction;
-              const requiresContentId =
-                doesActionRequireContentId(chosenAction);
+              const allowsContentId = doesActionAllowContentId(chosenAction);
 
               return {
                 id: index + 1,
@@ -105,12 +104,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 config: {
                   requires_creator_points:
                     doesActionRequireCreatorReward(chosenAction),
-                  requires_thread_id:
-                    requiresContentId &&
+                  with_optional_thread_id:
+                    allowsContentId &&
                     (chosenAction === 'CommentCreated' ||
                       chosenAction === 'ThreadUpvoted'),
-                  requires_comment_id:
-                    requiresContentId && chosenAction === 'CommentUpvoted',
+                  with_optional_comment_id:
+                    allowsContentId && chosenAction === 'CommentUpvoted',
                 },
               };
             }),
@@ -260,11 +259,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             ),
           }),
           ...(subForm.values.contentLink &&
-            (subForm.config?.requires_comment_id ||
-              subForm.config?.requires_thread_id) && {
+            (subForm.config?.with_optional_comment_id ||
+              subForm.config?.with_optional_thread_id) && {
               content_id: buildContentIdFromURL(
                 subForm.values.contentLink,
-                subForm.config?.requires_comment_id ? 'comment' : 'thread',
+                subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
               ),
             }),
           participation_limit: values.participation_limit,
@@ -312,11 +311,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           ),
         }),
         ...(subForm.values.contentLink &&
-          (subForm.config?.requires_comment_id ||
-            subForm.config?.requires_thread_id) && {
+          (subForm.config?.with_optional_comment_id ||
+            subForm.config?.with_optional_thread_id) && {
             content_id: buildContentIdFromURL(
               subForm.values.contentLink,
-              subForm.config?.requires_comment_id ? 'comment' : 'thread',
+              subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
             ),
           }),
         participation_limit: values.participation_limit,

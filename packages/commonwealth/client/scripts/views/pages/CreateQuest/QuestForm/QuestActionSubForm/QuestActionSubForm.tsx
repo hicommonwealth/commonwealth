@@ -111,17 +111,18 @@ const QuestActionSubForm = ({
       <div
         className={clsx(
           'grid-row',
-          config?.requires_comment_id || config?.requires_thread_id
+          config?.with_optional_comment_id || config?.with_optional_thread_id
             ? 'cols-2'
             : 'cols-1',
         )}
       >
-        {(config?.requires_comment_id || config?.requires_thread_id) && (
+        {(config?.with_optional_comment_id ||
+          config?.with_optional_thread_id) && (
           <CWTextInput
-            label={`${config?.requires_thread_id ? 'Thread' : 'Comment'} link`}
+            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
             name="contentLink"
             placeholder={
-              config?.requires_thread_id
+              config?.with_optional_thread_id
                 ? placeholders.sampleThreadLink
                 : placeholders.sampleCommentLink
             }
