@@ -261,7 +261,6 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
-      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         const { contest_address, contest_id, start_time, end_time } = payload;
         await models.Contest.findOrCreate({
