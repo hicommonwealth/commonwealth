@@ -2,10 +2,7 @@ import { splitAndDecodeURL } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
-import {
-  ThreadFeaturedFilterTypes,
-  ThreadTimelineFilterTypes,
-} from 'client/scripts/models/types';
+import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
 import useUserStore from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -25,7 +22,10 @@ import './index.scss';
 type OverViewPageProps = {
   topicId?: string | number | undefined;
   featuredFilter?: ThreadFeaturedFilterTypes;
-  timelineFilter?: ThreadTimelineFilterTypes;
+  timelineFilter?: {
+    toDate: string;
+    fromDate: string | null;
+  };
 };
 
 const OverviewPage = ({
@@ -33,7 +33,6 @@ const OverviewPage = ({
   featuredFilter,
   timelineFilter,
 }: OverViewPageProps) => {
-  console.log({ topicId, featuredFilter });
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const topicNameFromURL = splitAndDecodeURL(location.pathname);
@@ -72,30 +71,20 @@ const OverviewPage = ({
       newData = newData.filter((thread) => thread.topic.id === topicId);
     }
     if (timelineFilter) {
-      const now = new Date();
+      if (
+        timelineFilter &&
+        timelineFilter?.fromDate &&
+        timelineFilter?.toDate
+      ) {
+        const { fromDate, toDate } = timelineFilter;
+        const from = new Date(fromDate);
+        const to = new Date(toDate);
 
-      newData = newData.filter((thread) => {
-        const threadDate = new Date(thread.createdAt);
-
-        switch (timelineFilter) {
-          case ThreadTimelineFilterTypes.ThisWeek: {
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - now.getDay());
-            startOfWeek.setHours(0, 0, 0, 0);
-            return threadDate >= startOfWeek;
-          }
-
-          case ThreadTimelineFilterTypes.ThisMonth:
-            return (
-              threadDate.getMonth() === now.getMonth() &&
-              threadDate.getFullYear() === now.getFullYear()
-            );
-
-          case ThreadTimelineFilterTypes.AllTime:
-          default:
-            return true;
-        }
-      });
+        newData = newData.filter((thread) => {
+          const threadDate = new Date(thread.createdAt);
+          return threadDate >= from && threadDate <= to;
+        });
+      }
     }
     if (featuredFilter) {
       newData = [...newData].sort((a, b) => {
@@ -132,7 +121,6 @@ const OverviewPage = ({
     return newData;
   }, [topicId, featuredFilter, recentlyActiveThreads, timelineFilter]);
 
-  console.log(filterList);
   const columns: CWTableColumnInfo[] = [
     {
       key: 'title',
