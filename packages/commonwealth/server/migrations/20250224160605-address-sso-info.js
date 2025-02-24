@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
-        'SsoTokens',
+        'Addresses',
         'oauth_provider',
         {
           type: Sequelize.STRING,
@@ -14,7 +14,7 @@ module.exports = {
         { transaction },
       );
       await queryInterface.addColumn(
-        'SsoTokens',
+        'Addresses',
         'oauth_email',
         {
           type: Sequelize.STRING,
@@ -27,10 +27,10 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn('SsoTokens', 'oauth_provider', {
+      await queryInterface.removeColumn('Addresses', 'oauth_provider', {
         transaction,
       });
-      await queryInterface.removeColumn('SsoTokens', 'oauth_email', {
+      await queryInterface.removeColumn('Addresses', 'oauth_email', {
         transaction,
       });
     });
