@@ -167,22 +167,27 @@ const contestManagerDeployedMapper: EvmMapper<
   });
   const { contest: contest_address, namespace, interval } = decoded.args;
   const event_payload = {
-    contest_address: contest_address as string,
     namespace: namespace as string,
-    length: Number(interval),
+    contest_address: contest_address as string,
     block_number: Number(event.block.number),
   };
 
   if (decoded.args.oneOff) {
     return {
       event_name: 'OneOffContestManagerDeployed',
-      event_payload,
+      event_payload: {
+        ...event_payload,
+        length: Number(interval),
+      },
     };
   }
 
   return {
     event_name: 'RecurringContestManagerDeployed',
-    event_payload,
+    event_payload: {
+      ...event_payload,
+      interval: Number(interval),
+    },
   };
 };
 

@@ -262,19 +262,10 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestStarted: async ({ payload }) => {
-        const { contest_address, contest_id, start_time, end_time } = payload;
-        await models.Contest.findOrCreate({
-          where: {
-            contest_address: payload.contest_address,
-            contest_id,
-          },
-          defaults: {
-            contest_address,
-            contest_id,
-            start_time,
-            end_time,
-          },
-        });
+        // ignore ContestStarted events from OneOff/Single contests
+        if (payload.contest_id !== 0) {
+          await models.Contest.create(payload);
+        }
       },
 
       ContestContentAdded: async ({ payload }) => {
