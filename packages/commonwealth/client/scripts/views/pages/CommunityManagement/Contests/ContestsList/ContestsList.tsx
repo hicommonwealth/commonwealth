@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
+import ContestCard from 'views/components/ContestCard';
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
 import { ContestView } from '../types';
-import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
