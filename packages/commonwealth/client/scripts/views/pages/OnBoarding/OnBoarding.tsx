@@ -1,11 +1,13 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import clsx from 'clsx';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import Lottie from 'lottie-react';
 import React, { useRef, useState } from 'react';
 import 'swiper/css';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
+import { PageNotFound } from 'views/pages/404';
 import animation1 from '../../../../assets/animation/onboarding_1.json';
 import animation2 from '../../../../assets/animation/onboarding_2.json';
 import animation3 from '../../../../assets/animation/onboarding_3.json';
@@ -14,6 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import './OnBoarding.scss';
+
 const slides = [
   {
     id: 1,
@@ -71,6 +74,11 @@ const OnBoarding = () => {
       setIsLastSlide(isLast);
     }
   };
+
+  if (!isMobileApp()) {
+    return <PageNotFound />;
+  }
+
   return (
     <CWPageLayout className="OnBoarding">
       <Swiper
