@@ -81,9 +81,6 @@ async function createMagicAddressInstances(
         is_user_default: false,
         ghost_address: false,
         is_banned: false,
-        oauth_provider: magicUserMetadata.oauthProvider,
-        oauth_email: magicUserMetadata.email,
-        oauth_username: magicUserMetadata.username,
       },
       transaction,
     });
@@ -196,6 +193,9 @@ async function createNewMagicUser({
         address_id: canonicalAddressInstance.id, // always ethereum address
         created_at: new Date(),
         updated_at: new Date(),
+        oauth_provider: magicUserMetadata.oauthProvider,
+        oauth_email: magicUserMetadata.email,
+        oauth_username: magicUserMetadata.username,
       },
       { transaction },
     );
@@ -294,6 +294,9 @@ async function loginExistingMagicUser({
       }
       ssoToken.issued_at = decodedMagicToken.claim.iat;
       ssoToken.updated_at = new Date();
+      ssoToken.oauth_provider = magicUserMetadata.oauthProvider;
+      ssoToken.oauth_email = magicUserMetadata.email;
+      ssoToken.oauth_username = magicUserMetadata.username;
       await ssoToken.save({ transaction });
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
@@ -319,6 +322,9 @@ async function loginExistingMagicUser({
           address_id: canonicalAddressInstance.id, // always ethereum address
           created_at: new Date(),
           updated_at: new Date(),
+          oauth_provider: magicUserMetadata.oauthProvider,
+          oauth_email: magicUserMetadata.email,
+          oauth_username: magicUserMetadata.username,
         },
         { transaction },
       );
@@ -394,6 +400,9 @@ async function addMagicToUser({
     address_id: canonicalAddressInstance.id,
     created_at: new Date(),
     updated_at: new Date(),
+    oauth_provider: magicUserMetadata.oauthProvider,
+    oauth_email: magicUserMetadata.email,
+    oauth_username: magicUserMetadata.username,
   });
   // @ts-expect-error StrictNullChecks
   return loggedInUser;

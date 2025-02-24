@@ -79,9 +79,6 @@ export default (
           },
         },
       },
-      oauth_provider: { type: Sequelize.STRING, allowNull: true },
-      oauth_email: { type: Sequelize.STRING, allowNull: true },
-      oauth_username: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
