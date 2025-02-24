@@ -7,7 +7,6 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
 import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
@@ -55,12 +54,10 @@ async function checkAddressBalance(
     },
     cacheRefresh: true,
   });
-  const minUserEthBigNumber = BigNumber.from(
-    (config.CONTESTS.MIN_USER_ETH * 1e18).toFixed(),
-  );
-  if (BigNumber.from(balances[address]).lt(minUserEthBigNumber))
+  const minUserEthBigInt = BigInt(config.CONTESTS.MIN_USER_ETH * 1e18);
+  if (BigInt(balances[address]) < minUserEthBigInt)
     throw new AppError(
-      `user ETH balance insufficient (${balances[address]} of ${minUserEthBigNumber})`,
+      `user ETH balance insufficient (${balances[address]} of ${minUserEthBigInt})`,
     );
 }
 

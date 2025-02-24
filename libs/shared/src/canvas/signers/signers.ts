@@ -14,11 +14,6 @@ import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
 import * as json from '@ipld/dag-json';
 import { KeypairType } from '@polkadot/util-crypto/types';
-import { Wallet } from 'ethers';
-
-export const getTestSigner = () => {
-  return new SIWESigner({ signer: Wallet.createRandom() });
-};
 
 export const getSessionSigners = () => {
   return [

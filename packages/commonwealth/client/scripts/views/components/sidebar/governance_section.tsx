@@ -5,7 +5,7 @@ import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { handleRedirectClicks } from 'helpers';
 import './index.scss';
 
-import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -58,6 +58,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
 
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const xpEnabled = useFlag('xp');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -146,6 +147,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   );
   const matchesContestsRoute = matchRoutes(
     [{ path: '/contests' }, { path: ':scope/contests' }],
+    location,
+  );
+  const matchesQuestsRoute = matchRoutes(
+    [{ path: '/quests' }, { path: ':scope/quests' }],
     location,
   );
   const matchesGovernanceRoute = matchRoutes(
@@ -282,13 +287,32 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
       });
     },
   };
+
+  const questsData: SectionGroupAttrs = {
+    title: 'Quests',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesQuestsRoute,
+    isVisible: xpEnabled,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/quests`, communityId, () => {
+        setGovernanceToggleTree('children.Quests.toggledState', toggle);
+      });
+    },
+  };
+
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
     proposalsData,
+    questsData,
   ];
 
-  if (!hasProposals) governanceGroupData = [membersData];
+  if (!hasProposals) governanceGroupData = [membersData, questsData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
   }
