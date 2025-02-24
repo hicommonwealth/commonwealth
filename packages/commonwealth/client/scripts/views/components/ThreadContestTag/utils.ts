@@ -27,12 +27,14 @@ export const getWinnersFromAssociatedContests = (
         return null;
       }
 
+      const idx =
+        contest.score?.findIndex(
+          (s) => s.content_id === String(contest.content_id),
+        ) || 0;
+
       return {
         date: moment(contest.end_time).format('DD/MM/YYYY'),
-        prize:
-          contest.score?.findIndex(
-            (s) => s.content_id === String(contest.content_id),
-          ) + 1,
+        prize: idx + 1,
         // show only for recurring
         round:
           (contest.contest_interval ?? 0) > 0 ? contest.contest_id + 1 : null,
