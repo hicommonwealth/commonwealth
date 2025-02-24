@@ -48,7 +48,7 @@ const CommunityHome = () => {
           </div>
         </div>
         <TokenPerformance />
-        <ActiveContestList />
+        <ActiveContestList isCommunityHomePage />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList

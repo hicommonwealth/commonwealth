@@ -10,18 +10,33 @@ type UseCommunityContestsProps =
   | {
       shouldPolling?: boolean;
       fetchAll?: boolean;
+      isCommunityHomePage?: boolean;
     }
   | undefined;
 
 const useCommunityContests = (props?: UseCommunityContestsProps) => {
-  const { shouldPolling = false, fetchAll = false } = props || {};
+  const {
+    shouldPolling = false,
+    fetchAll = false,
+    isCommunityHomePage = false,
+  } = props || {};
   const { stakeEnabled } = useCommunityStake();
 
+  // Query for contests for the current community.
   const { data: contestsData, isLoading: isContestDataLoading } =
     useGetContestsQuery({
       community_id: app.activeChainId() || '',
       shouldPolling,
       fetchAll,
+    });
+
+  // If we're on the community homepage, also fetch global contests (i.e. without filtering by community_id)
+  // NOTE: This query will always run when isCommunityHomepage is true.
+  const { data: globalContestsData, isLoading: isGlobalContestsLoading } =
+    useGetContestsQuery({
+      community_id: '',
+      shouldPolling,
+      fetchAll: true,
     });
 
   const { finishedContests, activeContests } = useMemo(() => {
@@ -93,6 +108,55 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
     };
   }, [contestsData]);
 
+  // Process global contests similarly to return only active contests.
+  const globalActiveContests = useMemo(() => {
+    const active: Contest[] = [];
+    (globalContestsData || []).forEach((contest) => {
+      const tempActiveContests: Pick<Contest, 'contests'>[] = [];
+      (contest?.contests || []).forEach((c) => {
+        const end_time = c.end_time || null;
+        const isActive = end_time
+          ? isContestActive({
+              contest: {
+                cancelled: !!contest.cancelled,
+                contests: [{ end_time: new Date(end_time) }],
+              },
+            })
+          : false;
+        if (isActive) {
+          tempActiveContests.push(c as Pick<Contest, 'contests'>);
+        }
+      });
+
+      // Sort active contests by end time (ascending) and prize amount (descending when times are equal)
+      tempActiveContests.sort((a, b) => {
+        const aEndTime = moment(a.contests?.[0]?.end_time);
+        const bEndTime = moment(b.contests?.[0]?.end_time);
+        if (aEndTime.isSame(bEndTime)) {
+          const aAmount = Number(a.contests?.[0]?.score?.[0]?.prize) || 0;
+          const bAmount = Number(b.contests?.[0]?.score?.[0]?.prize) || 0;
+          return bAmount - aAmount;
+        }
+        return aEndTime.diff(bEndTime);
+      });
+      if (tempActiveContests.length > 0) {
+        active.push({
+          ...contest,
+          contests: tempActiveContests,
+        } as unknown as Contest);
+      }
+    });
+    return active;
+  }, [globalContestsData]);
+
+  // If we're on the community homepage and there are no active contests,
+  // we determine that we should show suggested contests.
+  const isSuggestedMode =
+    isCommunityHomePage &&
+    activeContests.length === 0 &&
+    !!globalContestsData &&
+    !isGlobalContestsLoading;
+
   // @ts-expect-error StrictNullChecks
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
 
@@ -109,9 +173,11 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
       all: contestsData as unknown as Contest[],
       finished: finishedContests,
       active: activeContests,
+      suggested: globalActiveContests,
     },
     isContestDataLoading: isContestDataLoading,
     getContestByAddress,
+    isSuggestedMode,
   };
 };
 
