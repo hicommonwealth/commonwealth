@@ -1,6 +1,5 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance } from '@hicommonwealth/model';
-import { ethers } from 'ethers';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
@@ -118,7 +117,7 @@ async function getEthBalance(
     return {};
   } else {
     return {
-      [address]: ethers.BigNumber.from(data.result).toString(),
+      [address]: BigInt(data.result).toString(),
     };
   }
 }
