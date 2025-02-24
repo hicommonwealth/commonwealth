@@ -46,6 +46,7 @@ async function createMagicAddressInstances(
   models: DB,
   generatedAddresses: Array<{ address: string; community_id: string }>,
   user: UserAttributes,
+  isNewUser: boolean,
   decodedMagicToken: MagicUser,
   oauthProvider: string,
   t?: Transaction,
@@ -94,6 +95,7 @@ async function createMagicAddressInstances(
             event_name: 'SSOLinked',
             event_payload: {
               user_id: addressInstance.user_id!,
+              new_user: isNewUser,
               oauth_provider: oauthProvider,
               community_id,
               created_at: addressInstance.created_at!,
@@ -178,6 +180,7 @@ async function createNewMagicUser({
         models,
         generatedAddresses,
         newUser,
+        true,
         decodedMagicToken,
         magicUserMetadata.oauthProvider!,
         transaction,
@@ -300,6 +303,7 @@ async function loginExistingMagicUser({
         models,
         generatedAddresses,
         existingUserInstance,
+        false,
         decodedMagicToken,
         magicUserMetadata!.oauthProvider!,
         transaction,
@@ -380,6 +384,7 @@ async function addMagicToUser({
     models,
     generatedAddresses,
     loggedInUser!,
+    false,
     decodedMagicToken,
     magicUserMetadata.oauthProvider!,
   );
@@ -618,6 +623,7 @@ async function magicLoginRoute(
       models,
       generatedAddresses,
       loggedInUser,
+      false,
       decodedMagicToken,
       magicUserMetadata.oauthProvider!,
     );
