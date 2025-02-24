@@ -1,3 +1,4 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -5,12 +6,14 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
 import './CreateQuest.scss';
-import CreateQuestForm from './CreateQuestForm';
+import QuestForm from './QuestForm';
 
 const CreateQuest = () => {
+  const xpEnabled = useFlag('xp');
   const user = useUserStore();
 
-  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
+  if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
+    return <PageNotFound />;
 
   return (
     <CWPageLayout>
@@ -23,7 +26,7 @@ const CreateQuest = () => {
             relevant quest items to be grouped into multiple quests.
           </CWText>
         </div>
-        <CreateQuestForm />
+        <QuestForm mode="create" />
       </div>
     </CWPageLayout>
   );

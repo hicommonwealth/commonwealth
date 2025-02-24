@@ -261,11 +261,10 @@ export function Contests(): Projection<typeof inputs> {
 
       // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
-        const contest_id = payload.contest_id!;
-        await models.Contest.create({
-          ...payload,
-          contest_id,
-        });
+        // ignore ContestStarted events from OneOff/Single contests
+        if (payload.contest_id !== 0) {
+          await models.Contest.create(payload);
+        }
       },
 
       ContestContentAdded: async ({ payload }) => {

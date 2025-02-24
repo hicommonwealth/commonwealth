@@ -1,7 +1,6 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventPair, EventSchemas } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
@@ -13,22 +12,25 @@ import { seed } from '../../src/tester';
 import { GetUserReferralFees, GetUserReferrals } from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
-function chainEvent(
+function chainEvent<
+  E extends 'ReferralFeeDistributed' | 'NamespaceDeployedWithReferral',
+  A extends z.infer<EventSchemas[E]>['parsedArgs'],
+>(
+  eventName: E,
   transactionHash: string,
   address: string,
-  eventSignature: string,
-  parsedArgs: unknown[],
-) {
+  parsedArgs: A,
+): EventPair<E> {
   return {
-    event_name: 'ChainEventCreated',
+    event_name: eventName,
     event_payload: {
       eventSource: {
         ethChainId: 1,
-        eventSignature,
       },
-      parsedArgs,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      parsedArgs: parsedArgs as any,
       rawLog: {
-        blockNumber: 1,
+        blockNumber: 1n,
         blockHash: '0x1',
         transactionIndex: 1,
         removed: false,
@@ -39,19 +41,16 @@ function chainEvent(
         logIndex: 1,
       },
       block: {
-        number: 1,
+        number: 1n,
         hash: '0x1',
         logsBloom: '0x1',
         nonce: '0x1',
         parentHash: '0x1',
-        timestamp: new Date().getTime(),
+        timestamp: BigInt(new Date().getTime()),
         miner: '0x1',
-        gasLimit: 1,
-        gasUsed: 1,
+        gasLimit: 1n,
       },
     },
-    created_at: new Date(),
-    updated_at: new Date(),
   };
 }
 
@@ -123,18 +122,18 @@ describe('Referral lifecycle', () => {
     const transactionHash = '0x2';
     const chainEvents1 = [
       chainEvent(
+        'NamespaceDeployedWithReferral',
         transactionHash,
         '0x0000000000000000000000000000000000000002',
-        EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
-        [
-          'temp name',
-          '0x0000000000000000000000000000000000000004', // fee manager address
-          admin.address, // referrer
-          '0x0000000000000000000000000000000000000003', // referral fee contract
-          '0x0', // signature
-          nonMember.address!, // referee
-          namespaceAddress,
-        ],
+        {
+          name: 'temp name',
+          feeManager: '0x0000000000000000000000000000000000000004',
+          referrer: admin.address as `0x${string}`,
+          referralFeeManager: '0x0000000000000000000000000000000000000003',
+          signature: '0x0',
+          namespaceDeployer: nonMember.address! as `0x${string}`,
+          nameSpaceAddress: namespaceAddress,
+        },
       ),
     ];
     await models.Outbox.bulkCreate(chainEvents1);
@@ -188,20 +187,16 @@ describe('Referral lifecycle', () => {
     // referral fees are distributed to the referrer
     const checkpoint = new Date();
     const fee = 123456n;
-    const hex = BigNumber.from(fee).toHexString();
     await models.Outbox.bulkCreate([
-      chainEvent(
-        '0x4',
-        nonMember.address!,
-        EvmEventSignatures.Referrals.FeeDistributed,
-        [
-          namespaceAddress,
-          ZERO_ADDRESS,
-          { hex, type: 'BigNumber' }, // total amount distributed
-          admin.address, // referrer address
-          { hex, type: 'BigNumber' }, // referrer received amount
-        ],
-      ),
+      chainEvent('ReferralFeeDistributed', '0x4', nonMember.address!, {
+        namespace: namespaceAddress,
+        token: ZERO_ADDRESS,
+        amount: fee.toString(),
+        recipient: admin.address,
+        recipientAmount: fee.toString(),
+      } as unknown as z.infer<
+        EventSchemas['ReferralFeeDistributed']
+      >['parsedArgs']),
     ]);
 
     // syncs referral fees

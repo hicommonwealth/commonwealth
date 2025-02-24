@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { getEvmAddress } from '@hicommonwealth/evm-protocols';
 import type { DB } from '@hicommonwealth/model';
 import type { Response } from 'express';
 import { Op } from 'sequelize';
@@ -34,8 +35,7 @@ const updateSiteAdmin = async (
   }
 
   if (address.startsWith('0x')) {
-    const { utils } = await import('ethers');
-    address = utils.getAddress(address);
+    address = getEvmAddress(address);
   }
 
   const userAddress = await models.Address.findOne({

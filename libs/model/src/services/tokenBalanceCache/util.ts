@@ -5,7 +5,6 @@ import {
   encodeParameters,
 } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { ethers } from 'ethers';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
@@ -121,7 +120,7 @@ export async function evmOffChainRpcBatching(
       });
       balances[address] = String(balance);
     } else {
-      balances[address] = ethers.BigNumber.from(data.result).toString();
+      balances[address] = BigInt(data.result).toString();
     }
   }
 

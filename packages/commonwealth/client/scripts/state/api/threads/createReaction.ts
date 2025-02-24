@@ -3,7 +3,6 @@ import { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { signThreadReaction } from 'controllers/server/sessions';
-import { BigNumber } from 'ethers';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
@@ -16,6 +15,7 @@ interface IUseCreateThreadReactionMutation {
   threadMsgId: string;
   communityId: string;
 }
+
 interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
@@ -80,9 +80,10 @@ const useCreateThreadReactionMutation = ({
         'combineAndRemoveDups',
       );
 
-      const addition = BigNumber.from(currentReactionWeightsSum)
-        .add(BigNumber.from(newReaction.calculated_voting_weight || '0'))
-        .toString();
+      const addition = (
+        BigInt(currentReactionWeightsSum) +
+        BigInt(reaction.voting_weight || '0')
+      ).toString();
 
       updateThreadInAllCaches(communityId, threadId, {
         reactionCount: currentReactionCount + 1,
