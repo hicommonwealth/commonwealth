@@ -1,4 +1,4 @@
-import { dispose, handleEvent } from '@hicommonwealth/core';
+import { config, dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -66,7 +66,7 @@ describe('Contest Worker Policy Lifecycle', () => {
               score: [],
             },
           ],
-          environment: 'local',
+          environment: config.APP_ENV,
         },
       ],
     });
