@@ -395,4 +395,11 @@ export const events = {
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
+
+  XpChainEventCreated: z.object({
+    eth_chain_id: z.number(),
+    quest_action_meta_id: z.number(),
+    transaction_hash: z.string(),
+    created_at: z.coerce.date(),
+  }),
 } as const;

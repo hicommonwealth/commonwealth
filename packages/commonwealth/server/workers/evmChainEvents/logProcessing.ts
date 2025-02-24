@@ -1,9 +1,15 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
-import { EvmBlockDetails, Log, chainEventMappers } from '@hicommonwealth/model';
+import {
+  EvmBlockDetails,
+  EvmChainSource,
+  EvmContractSources,
+  EvmEvent,
+  Log,
+  chainEventMappers,
+} from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';
-import { ContractSources, EvmSource } from './types';
 
 const logger = _logger(import.meta);
 
@@ -101,7 +107,7 @@ export async function getLogs({
 }
 
 export async function parseLogs(
-  sources: ContractSources,
+  sources: EvmContractSources,
   logs: Log[],
   blockDetails: Record<number, EvmBlockDetails>,
 ): Promise<Array<EventPairs>> {
@@ -124,7 +130,9 @@ export async function parseLogs(
     );
     if (!evmEventSource) continue;
 
-    const eventMapper = chainEventMappers[evmEventSource.event_signature];
+    const eventMapper = evmEventSource.meta.event_name
+      ? chainEventMappers[evmEventSource.meta.event_name]
+      : chainEventMappers[evmEventSource.event_signature];
     if (!eventMapper) {
       logger.error('Missing event mapper', undefined, {
         eventSignature: evmEventSource.event_signature,
@@ -133,20 +141,20 @@ export async function parseLogs(
       continue;
     }
 
+    const evmEvent: EvmEvent = {
+      eventSource: {
+        ethChainId: evmEventSource.eth_chain_id,
+        eventSignature: evmEventSource.event_signature,
+      },
+      rawLog: log,
+      block: blockDetails[String(log.blockNumber)],
+      meta: evmEventSource.meta,
+    };
     try {
-      events.push(
-        eventMapper({
-          eventSource: {
-            ethChainId: evmEventSource.eth_chain_id,
-            eventSignature: evmEventSource.event_signature,
-          },
-          rawLog: log,
-          block: blockDetails[String(log.blockNumber)],
-        }) as EventPairs,
-      );
+      events.push(eventMapper(evmEvent) as EventPairs);
     } catch (e) {
       const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
-      logger.error(msg, e);
+      logger.error(msg, e, evmEvent);
       continue;
     }
     stats().increment('ce.evm.event', {
@@ -158,7 +166,7 @@ export async function parseLogs(
 }
 
 export async function getEvents(
-  evmSource: EvmSource,
+  evmSource: EvmChainSource,
   startingBlockNum: number,
   endingBlockNum: number,
 ): Promise<{ events: Array<EventPairs>; lastBlockNum: number }> {
@@ -185,29 +193,29 @@ export async function getEvents(
  * create new EvmEventSources derived from the created contract.
  */
 export async function migrateEvents(
-  evmSource: EvmSource,
+  evmSource: EvmChainSource,
   endingBlockNum: number,
 ): Promise<
   | {
       events: Array<EventPairs>;
       lastBlockNum: number;
-      contracts: ContractSources;
+      contracts: EvmContractSources;
     }
-  | { contracts: ContractSources }
+  | { contracts: EvmContractSources }
 > {
   let oldestBlock: number | undefined;
-  const contracts: ContractSources = {};
+  const contracts: EvmContractSources = {};
   for (const [contractAddress, evmEventSource] of Object.entries(
     evmSource.contracts,
   )) {
     for (const source of evmEventSource) {
-      if (source.created_at_block && source.events_migrated === false) {
+      if (source.meta.events_migrated === false) {
         if (!contracts[contractAddress]) {
           contracts[contractAddress] = [];
         }
         contracts[contractAddress].push(source);
-        if (!oldestBlock || oldestBlock > source.created_at_block) {
-          oldestBlock = source.created_at_block;
+        if (!oldestBlock || oldestBlock > source.meta.created_at_block) {
+          oldestBlock = source.meta.created_at_block;
         }
       }
     }

@@ -15,6 +15,7 @@ export const QuestEvents = {
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  XpChainEventCreated: events.XpChainEventCreated,
 } as const;
 
 export enum QuestParticipationLimit {

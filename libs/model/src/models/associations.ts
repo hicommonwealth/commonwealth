@@ -38,10 +38,16 @@ export const buildAssociations = (db: DB) => {
   db.QuestActionMeta.withMany(db.QuestAction, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
-  }).withMany(db.XpLog, {
-    foreignKey: 'action_meta_id',
-    asOne: 'quest_action_meta',
-  });
+  })
+    .withMany(db.XpLog, {
+      foreignKey: 'action_meta_id',
+      asOne: 'quest_action_meta',
+    })
+    .withMany(db.ChainEventXpSource, {
+      foreignKey: 'quest_action_meta_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -65,6 +71,10 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     })
     .withMany(db.PinnedToken, {
+      onDelete: 'CASCADE',
+    })
+    .withMany(db.ChainEventXpSource, {
+      foreignKey: 'chain_node_id',
       onDelete: 'CASCADE',
     });
 

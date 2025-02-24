@@ -1,7 +1,6 @@
-import { models } from '@hicommonwealth/model';
+import { EvmContractSources, models } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
-import { ContractSources } from './types';
 
 export async function updateMigratedEvmEventSources(
   ethChainId: number,
@@ -9,9 +8,9 @@ export async function updateMigratedEvmEventSources(
     | {
         events: Array<EventPairs>;
         lastBlockNum: number;
-        contracts: ContractSources;
+        contracts: EvmContractSources;
       }
-    | { contracts: ContractSources },
+    | { contracts: EvmContractSources },
   transaction: Transaction,
 ) {
   if (Object.keys(migratedData.contracts).length > 0) {
