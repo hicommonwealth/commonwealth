@@ -159,8 +159,8 @@ export const ThreadView = Thread.extend({
   associatedContests: z.array(ContestView).nullish(),
   topic: TopicView.optional(),
   topic_id: PG_INT,
-  ContestActions: z.array(ContestActionView).nullish(),
-  Comments: z.array(CommentView).nullish(),
+  ContestActions: z.array(ContestActionView).optional(),
+  Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
   search: z.union([z.string(), z.record(z.any())]).nullish(),
   total_num_thread_results: z
