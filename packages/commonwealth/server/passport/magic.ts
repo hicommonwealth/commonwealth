@@ -44,11 +44,19 @@ const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
   models: DB,
-  generatedAddresses: Array<{ address: string; community_id: string }>,
-  user: UserAttributes,
-  decodedMagicToken: MagicUser,
-  oauthProvider: string,
-  t?: Transaction,
+  {
+    generatedAddresses,
+    user,
+    decodedMagicToken,
+    magicUserMetadata,
+    transaction,
+  }: {
+    generatedAddresses: Array<{ address: string; community_id: string }>;
+    user: UserAttributes;
+    decodedMagicToken: MagicUser;
+    magicUserMetadata: MagicUserMetadata;
+    transaction?: Transaction;
+  },
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
@@ -73,8 +81,11 @@ async function createMagicAddressInstances(
         is_user_default: false,
         ghost_address: false,
         is_banned: false,
+        oauth_provider: magicUserMetadata.oauthProvider,
+        oauth_email: magicUserMetadata.email,
+        oauth_username: magicUserMetadata.username,
       },
-      transaction: t,
+      transaction,
     });
 
     if (created) {
@@ -87,11 +98,11 @@ async function createMagicAddressInstances(
               community_id,
               user_id: addressInstance.user_id!,
               created_at: addressInstance.created_at!,
-              oauth_provider: oauthProvider,
+              oauth_provider: magicUserMetadata.oauthProvider,
             },
           },
         ],
-        t,
+        transaction,
       );
     }
 
@@ -108,7 +119,7 @@ async function createMagicAddressInstances(
     if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
-      await addressInstance.save({ transaction: t });
+      await addressInstance.save({ transaction });
     }
     addressInstances.push(addressInstance);
   }
@@ -165,14 +176,13 @@ async function createNewMagicUser({
     }
 
     const addressInstances: AddressAttributes[] =
-      await createMagicAddressInstances(
-        models,
+      await createMagicAddressInstances(models, {
         generatedAddresses,
-        newUser,
+        user: newUser,
         decodedMagicToken,
-        magicUserMetadata.oauthProvider!,
+        magicUserMetadata,
         transaction,
-      );
+      });
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(
@@ -287,14 +297,13 @@ async function loginExistingMagicUser({
       await ssoToken.save({ transaction });
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
-      const addressInstances = await createMagicAddressInstances(
-        models,
+      const addressInstances = await createMagicAddressInstances(models, {
         generatedAddresses,
-        existingUserInstance,
+        user: existingUserInstance,
         decodedMagicToken,
-        magicUserMetadata!.oauthProvider!,
+        magicUserMetadata,
         transaction,
-      );
+      });
 
       // once addresses have been created and/or located, we finalize the migration of malformed sso
       // tokens, or create a new one if absent entirely
@@ -367,13 +376,12 @@ async function addMagicToUser({
   magicUserMetadata,
 }: MagicLoginContext): Promise<UserInstance> {
   // create new address on logged-in user
-  const addressInstances = await createMagicAddressInstances(
-    models,
+  const addressInstances = await createMagicAddressInstances(models, {
     generatedAddresses,
-    loggedInUser!,
+    user: loggedInUser!,
     decodedMagicToken,
-    magicUserMetadata.oauthProvider!,
-  );
+    magicUserMetadata,
+  });
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
   const canonicalAddressInstance = addressInstances.find(
@@ -605,13 +613,12 @@ async function magicLoginRoute(
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
     log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
-    await createMagicAddressInstances(
-      models,
+    await createMagicAddressInstances(models, {
       generatedAddresses,
-      loggedInUser,
+      user: loggedInUser,
       decodedMagicToken,
-      magicUserMetadata.oauthProvider!,
-    );
+      magicUserMetadata,
+    });
     return cb(null, existingUserInstance);
   }
 
