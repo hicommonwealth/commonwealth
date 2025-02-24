@@ -9,7 +9,15 @@ type MagicData = {
   email?: string;
   phone_number?: string;
   subject?: string;
-  issuer: string;
+  issuer:
+    | 'EMAIL'
+    | 'APPLE'
+    | 'GITHUB'
+    | 'GOOGLE'
+    | 'TWITTER'
+    | 'DISCORD'
+    | 'SMS'
+    | 'FARCASTER';
   signup_time: Date;
   ETH: string;
   POLKADOT?: string;

@@ -22,6 +22,15 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.addColumn(
+        'Addresses',
+        'oauth_username',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
     });
   },
 
@@ -31,6 +40,9 @@ module.exports = {
         transaction,
       });
       await queryInterface.removeColumn('Addresses', 'oauth_email', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Addresses', 'oauth_username', {
         transaction,
       });
     });
