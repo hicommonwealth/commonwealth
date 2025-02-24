@@ -9,7 +9,6 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { SideBarNotificationIcon } from './SidebarNotificationIcon';
 import { calculateUnreadCount } from './helpers';
 import './sidebar_quick_switcher.scss';
@@ -56,20 +55,11 @@ export const SidebarQuickSwitcher = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && (
-          <CWTooltip
-            content="About Common"
-            placement="bottom"
-            renderTrigger={(handleInteraction) => (
-              <CWIconButton
-                iconButtonTheme="neutral"
-                iconName="infoEmpty"
-                onClick={() =>
-                  window.open('https://landing.common.xyz', '_blank')
-                }
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
+          <CWIconButton
+            iconSize="medium"
+            iconButtonTheme="neutral"
+            iconName="infoEmpty"
+            onClick={() => window.open('https://landing.common.xyz', '_blank')}
           />
         )}
       </div>
