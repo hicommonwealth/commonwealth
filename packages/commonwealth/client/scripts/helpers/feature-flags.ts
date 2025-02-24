@@ -40,6 +40,7 @@ const featureFlags = {
   communityHome: buildFlag(process.env.FLAG_COMMUNITY_HOME),
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
+  governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

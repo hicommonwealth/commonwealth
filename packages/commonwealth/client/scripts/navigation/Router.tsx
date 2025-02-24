@@ -19,6 +19,7 @@ export type RouteFeatureFlags = {
   xpEnabled: boolean;
   communityHomeEnabled: boolean;
   mobileApp: boolean;
+  governancePageEnabled: boolean;
 };
 
 const Router = () => {
@@ -28,6 +29,7 @@ const Router = () => {
   const launchpadEnabled = client.getBooleanValue('launchpad', false);
   const xpEnabled = client.getBooleanValue('xp', false);
   const communityHomeEnabled = client.getBooleanValue('communityHome', false);
+  const governancePageEnabled = client.getBooleanValue('governancePage', false);
   const mobileApp = isMobileApp();
   const flags = {
     homePageEnable,
@@ -35,6 +37,7 @@ const Router = () => {
     xpEnabled,
     communityHomeEnabled,
     mobileApp,
+    governancePageEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
