@@ -400,12 +400,14 @@ export const events = {
   WalletLinked: z.object({
     user_id: z.number(),
     wallet_id: z.nativeEnum(WalletId),
+    community_id: z.string(),
     created_at: z.coerce.date(),
   }),
 
   SSOLinked: z.object({
     user_id: z.number(),
     oauth_provider: z.string(),
+    community_id: z.string(),
     created_at: z.coerce.date(),
   }),
 } as const;

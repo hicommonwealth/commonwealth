@@ -95,6 +95,7 @@ async function createMagicAddressInstances(
             event_payload: {
               user_id: addressInstance.user_id!,
               oauth_provider: oauthProvider,
+              community_id,
               created_at: addressInstance.created_at!,
             },
           },

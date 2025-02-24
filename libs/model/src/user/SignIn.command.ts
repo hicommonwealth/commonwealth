@@ -166,6 +166,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               event_payload: {
                 user_id: addr.user_id!,
                 wallet_id: wallet_id,
+                community_id,
                 created_at: addr.created_at!,
               },
             });
