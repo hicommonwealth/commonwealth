@@ -8,8 +8,11 @@ export const REQUIREMENTS_TO_FULFILL = {
 
 export const TOPIC_PERMISSIONS = {
   [GroupTopicPermissionEnum.UPVOTE]: 'Upvote',
+  [GroupTopicPermissionEnum.POST]: 'Post',
   [GroupTopicPermissionEnum.COMMENT]: 'Comment',
   [GroupTopicPermissionEnum.UPVOTE_AND_COMMENT]: 'Upvote & Comment',
+  [GroupTopicPermissionEnum.UPVOTE_AND_POST]: 'Upvote & Post',
+  [GroupTopicPermissionEnum.POST_AND_COMMENT]: 'Post & Comment',
   [GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST]:
     'Upvote & Comment & Post',
 };
