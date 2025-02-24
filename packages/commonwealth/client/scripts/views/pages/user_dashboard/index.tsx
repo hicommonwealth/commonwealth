@@ -11,6 +11,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import HomePage from 'views/pages/HomePage/HomePage';
 import {
   MixpanelPWAEvent,
   MixpanelPageViewEvent,
@@ -36,6 +37,7 @@ type UserDashboardProps = {
   type?: string;
 };
 const UserDashboard = ({ type }: UserDashboardProps) => {
+  const homePageEnabled = useFlag('homePage');
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
   const location = useLocation();
@@ -90,6 +92,10 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       setActivePage(subpage);
     }
   }, [activePage, subpage]);
+
+  if (homePageEnabled) {
+    return <HomePage />;
+  }
 
   return (
     <CWPageLayout ref={containerRef} className="UserDashboard">
