@@ -112,6 +112,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                       event_payload: {
                         user_id: id,
                         address: actor.address!,
+                        referred_by_address: user.referred_by_address,
                         created_at: updated_user.created_at!,
                       },
                     },
