@@ -12,7 +12,7 @@ import { Op } from 'sequelize';
 const log = logger(import.meta);
 
 async function cancelAllLocalContests() {
-  const { host } = await models.sequelize.config;
+  const { host } = models.sequelize.config;
   if (config.APP_ENV !== 'local' || host !== 'localhost') {
     throw new Error('script can only be run on localhost DB');
   }
