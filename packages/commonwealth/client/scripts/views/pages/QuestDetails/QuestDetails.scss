@@ -86,4 +86,29 @@
       }
     }
   }
+
+  .suggested-quests {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 16px;
+
+    .list {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+
+      @include extraSmall {
+        grid-template-columns: 1fr !important;
+      }
+
+      @include small {
+        grid-template-columns: 1fr !important;
+      }
+
+      @include mediumSmall {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+  }
 }

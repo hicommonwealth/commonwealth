@@ -18,6 +18,7 @@ import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -29,6 +30,7 @@ import { AuthModalType } from 'views/modals/AuthModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
+import QuestCard from '../Communities/QuestList/QuestCard';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
@@ -88,6 +90,8 @@ const QuestDetails = ({ id }: { id: number }) => {
     },
     shouldRun: !!quest,
   });
+
+  const { pendingWeeklyQuests } = useXPProgress();
 
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
@@ -240,6 +244,14 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   };
 
+  const handleQuestCardCTAClick = (_questId: number, communityId?: string) => {
+    navigate(`/quests/${_questId}`, {}, communityId || null);
+  };
+
+  const handleLeaderboardClick = () => {
+    navigate('/leaderboard');
+  };
+
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
   const isDeletionAllowed = !isStarted || isEnded;
@@ -390,6 +402,39 @@ const QuestDetails = ({ id }: { id: number }) => {
             </div>
           </div>
         </div>
+        {pendingWeeklyQuests?.activeWeeklyQuests?.length > 0 && isCompleted && (
+          <div className="suggested-quests">
+            <CWText type="h3">Suggested Quests</CWText>
+            <div className="list">
+              {pendingWeeklyQuests.activeWeeklyQuests.slice(0, 3).map((q) => {
+                const actionMetaIds = (q.action_metas || []).map((a) => a.id);
+
+                return (
+                  <QuestCard
+                    key={q.id}
+                    name={q.name}
+                    description={q.description}
+                    communityId={q.community_id || ''}
+                    iconURL={q.image_url}
+                    xpPoints={totalUserXP}
+                    tasks={{
+                      total: q.action_metas?.length || 0,
+                      completed: xpProgressions.filter((p) =>
+                        actionMetaIds.includes(p.quest_action_meta_id),
+                      ).length,
+                    }}
+                    startDate={new Date(q.start_date)}
+                    endDate={new Date(q.end_date)}
+                    onCTAClick={() =>
+                      handleQuestCardCTAClick(q.id, q.community_id || '')
+                    }
+                    onLeaderboardClick={handleLeaderboardClick}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
     </CWPageLayout>
   );
