@@ -119,6 +119,7 @@ async function updateOrCreateWithAlert(
           image_url: getDefaultContestImage(),
           payout_structure: [],
           is_farcaster_contest: false,
+          environment: config.APP_ENV,
         },
         { transaction },
       );
@@ -260,7 +261,6 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
-      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
         // ignore ContestStarted events from OneOff/Single contests
         if (payload.contest_id !== 0) {
