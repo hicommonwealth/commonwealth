@@ -131,6 +131,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hidePublishDate
       hideTrendingTag
       showOnlyThreadActionIcons
+      communityHomeLayout
     />
   );
 };

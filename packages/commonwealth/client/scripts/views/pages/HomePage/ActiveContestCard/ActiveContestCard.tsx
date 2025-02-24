@@ -86,9 +86,6 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
     });
   };
 
-  console.log({ contest });
-  console.log({ community });
-
   const withOptionalTooltip = (
     children: ReactNode,
     content: string,

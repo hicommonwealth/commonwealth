@@ -61,6 +61,7 @@ export type AuthorAndPublishInfoProps = {
   hidePublishDate?: boolean;
   hideSpamTag?: boolean;
   hideTrendingTag?: boolean;
+  communityHomeLayout?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -91,6 +92,7 @@ export const AuthorAndPublishInfo = ({
   hidePublishDate,
   hideSpamTag,
   hideTrendingTag,
+  communityHomeLayout = false,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -131,7 +133,12 @@ export const AuthorAndPublishInfo = ({
     });
 
   return (
-    <div className="AuthorAndPublishInfo" ref={containerRef}>
+    <div
+      className={`AuthorAndPublishInfo ${
+        communityHomeLayout ? 'community-home-layout' : ''
+      }`}
+      ref={containerRef}
+    >
       {isCommunityFirstLayout && (
         <>
           {isLoadingCommunity ? (
@@ -152,12 +159,14 @@ export const AuthorAndPublishInfo = ({
       {authorAddress && (
         <FullUser
           className={isCommunityFirstLayout ? 'community-user-info' : ''}
-          avatarSize={24}
+          avatarSize={communityHomeLayout ? 32 : 24}
           userAddress={authorAddress}
           userCommunityId={authorCommunityId}
-          shouldShowPopover
+          shouldShowPopover={communityHomeLayout ? false : true}
           shouldLinkProfile
-          shouldHideAvatar={isCommunityFirstLayout}
+          shouldHideAvatar={
+            communityHomeLayout ? false : isCommunityFirstLayout
+          }
           shouldShowAsDeleted={!authorAddress && !authorCommunityId}
           shouldShowAddressWithDisplayName={
             fromDiscordBot || isCommunityFirstLayout
@@ -225,7 +234,7 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
-      {publishDate && (
+      {!communityHomeLayout && publishDate && (
         <>
           {dotIndicator}
           {/*@ts-expect-error <StrictNullChecks>*/}
