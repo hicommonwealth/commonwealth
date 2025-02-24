@@ -66,6 +66,7 @@ describe('Contest Worker Policy Lifecycle', () => {
               score: [],
             },
           ],
+          environment: 'local',
         },
       ],
     });
