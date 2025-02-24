@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import moment from 'moment';
 import React from 'react';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
@@ -11,6 +12,7 @@ import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
@@ -21,12 +23,13 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
-import ContestAlert from '../../../../../components/ContestCard/ContestAlert/ContestAlert';
-import { ContestType } from '../../types';
-import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
+import { ContestType } from '../../pages/CommunityManagement/Contests/types';
+import {
+  copyFarcasterContestFrameUrl,
+  isContestActive,
+} from '../../pages/CommunityManagement/Contests/utils';
+import ContestAlert from './ContestAlert';
 
-import { buildContestPrizes } from '@hicommonwealth/shared';
-import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import './ContestCard.scss';
 
 const noFundsProps = {
