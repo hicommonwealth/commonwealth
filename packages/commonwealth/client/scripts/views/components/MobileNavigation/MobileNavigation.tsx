@@ -67,8 +67,9 @@ const MobileNavigation = () => {
         ]
       : []),
   ];
-  const isNewThreadPage =
-    window.location?.pathname?.includes('/new/discussion');
+  const isNewThreadPage = ['/new/discussion', '/profile'].some((path) =>
+    window.location?.pathname?.includes(path),
+  );
   return (
     <>
       {newMobileNav && !isNewThreadPage && <QuickPostButton />}

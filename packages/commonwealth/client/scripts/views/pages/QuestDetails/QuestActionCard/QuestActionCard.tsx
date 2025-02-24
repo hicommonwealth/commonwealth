@@ -1,4 +1,5 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -36,7 +37,7 @@ const actionCopies = {
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction) => void;
+  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
   actionNumber: number;
   questAction: z.infer<typeof QuestActionMeta>;
   isActionInEligible?: boolean;
@@ -55,7 +56,13 @@ const QuestActionCard = ({
   inEligibilityReason,
   questAction,
 }: QuestActionCardProps) => {
-  const creatorXP = questAction.creator_reward_weight * 100;
+  const creatorXP = {
+    percentage: roundDecimalsOrReturnWhole(
+      questAction.creator_reward_weight * 100,
+      2,
+    ),
+    value: questAction.creator_reward_weight * questAction.reward_amount,
+  };
 
   return (
     <div className="QuestActionCard">
@@ -72,10 +79,12 @@ const QuestActionCard = ({
           {doesActionRequireCreatorReward(questAction.event_name) && (
             <CWText type="caption" className="xp-shares">
               <span className="creator-share">
-                {creatorXP}% ({creatorXP} XP)
+                {creatorXP.percentage}% (
+                {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
               </span>
               &nbsp; shared with {actionCopies.shares[questAction.event_name]}.
-              Your share = {Math.abs(questAction.reward_amount - creatorXP)} XP
+              Your share ={' '}
+              {Math.abs(questAction.reward_amount - creatorXP.value)} XP
             </CWText>
           )}
           <div className="points-row">
@@ -114,7 +123,12 @@ const QuestActionCard = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               iconRight="arrowRightPhosphor"
-              onClick={() => onActionStart(questAction.event_name)}
+              onClick={() =>
+                onActionStart(
+                  questAction.event_name,
+                  questAction?.content_id || undefined,
+                )
+              }
               disabled={!canStartAction}
             />,
             actionStartBlockedReason || '',

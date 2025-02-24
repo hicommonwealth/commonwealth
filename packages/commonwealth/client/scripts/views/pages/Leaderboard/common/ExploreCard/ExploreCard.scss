@@ -8,6 +8,13 @@
   flex-direction: column;
   gap: 8px;
 
+  .quest-scope {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
   .grid {
     display: grid;
     grid-template-columns: 4fr 1fr;

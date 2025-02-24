@@ -4,7 +4,6 @@ import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { BigNumber } from 'ethers';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
@@ -15,7 +14,7 @@ const transactionHash =
 const traderAddress = '0x47d3c3423803eB74eB9Ba0Fa3338DDb881A82081';
 const namespaceAddress = '0x57853A35064A1746133D8635d343901b9d3f3959';
 const isBuy = true;
-const ethAmount = BigNumber.from('242000000000000');
+const ethAmount = BigInt('242000000000000');
 const stakeAmount = 1;
 const stakeId = 2;
 const blockTimestamp = 1712247912;
