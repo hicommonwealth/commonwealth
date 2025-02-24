@@ -94,7 +94,7 @@ const QuestForm = (props: QuestFormProps) => {
         />
 
         <CWImageInput
-          label="Quest Image (Accepts JPG and PNG files)"
+          label="Quest Image - Accepts JPG and PNG files - (optional)"
           onImageProcessingChange={({ isGenerating, isUploading }) => {
             setIsProcessingQuestImage(isGenerating || isUploading);
           }}
