@@ -1,9 +1,13 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { TOPIC_PERMISSIONS } from './constants';
+import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
 
 export enum GroupTopicPermissionEnum {
   UPVOTE = 'UPVOTE',
+  COMMENT = 'COMMENT',
+  POST = 'POST',
+  POST_AND_COMMENT = 'POST_AND_COMMENT',
   UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
+  UPVOTE_AND_POST = 'UPVOTE_AND_POST',
   UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
 }
 
@@ -36,6 +40,29 @@ export type TopicPermissionsSubFormType = {
   onPermissionChange: (permission: string) => void;
 };
 
+export const Permissions = PermissionEnum;
+
+export type Permission = (typeof Permissions)[keyof typeof Permissions];
+
+export type Topic = {
+  id: number;
+  name: string;
+};
+
+export type TopicPermissionToggleGroupSubFormsState = {
+  permission: Permission[];
+  topic: Topic;
+};
+
+export type TopicPermissionFormToggleGroupSubFormProps = {
+  PermissionFormData: TopicPermissionToggleGroupSubFormsState[];
+  onChange: (
+    updatedPermissions: TopicPermissionToggleGroupSubFormsState[],
+  ) => void;
+};
+
+export type PermissionLabelType = (typeof PermissionLabel)[number];
+
 export type LabelType = {
   label: string;
   value: string;
@@ -60,7 +87,7 @@ export type RequirementSubFormType = {
 
 export type GroupFormTopicSubmitValues = {
   id: number;
-  permissions: PermissionEnum[];
+  permissions: Permission[];
 };
 
 export type GroupResponseValuesType = {

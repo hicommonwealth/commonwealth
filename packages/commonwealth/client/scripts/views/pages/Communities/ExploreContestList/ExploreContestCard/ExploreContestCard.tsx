@@ -15,6 +15,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { Contest } from '../../../CommunityManagement/Contests/ContestsList';
 
 import { buildContestPrizes } from '@hicommonwealth/shared';
+import FractionalValue from 'views/components/FractionalValue';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import './ExploreContestCard.scss';
 
@@ -144,7 +145,12 @@ const ExploreContestCard = ({
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
                   <CWText fontWeight="bold">
-                    {prize} {contest.ticker}
+                    <FractionalValue
+                      fontWeight="bold"
+                      value={parseFloat(prize.replace(',', ''))}
+                    />
+                    &nbsp;
+                    {contest.ticker}
                   </CWText>
                 </div>
               ))
