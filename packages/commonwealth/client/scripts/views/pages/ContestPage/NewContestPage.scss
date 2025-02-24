@@ -1,0 +1,87 @@
+@import '../../../styles/shared';
+
+.NewContestPage {
+  .top-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .ContestCard {
+      max-width: 100%;
+    }
+
+    .navigation-buttons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+
+      .previous-btn {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .contest-name {
+        border-radius: 0;
+        .Button {
+          border-radius: 0;
+          max-width: 260px;
+          cursor: default;
+        }
+      }
+
+      .next-btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+
+  .mobile-tabs,
+  .mobile-tab-content {
+    display: none;
+  }
+
+  .mobile-tabs {
+    margin-top: 16px;
+  }
+
+  @include extraSmall {
+    .top-container {
+      .navigation-buttons {
+        width: 100%;
+        order: -1;
+        justify-content: space-between;
+        gap: 8px;
+
+        .previous-btn .button-text {
+          display: none;
+        }
+
+        .next-btn .button-text {
+          display: none;
+        }
+
+        .contest-name .button-text {
+          display: block;
+          max-width: 150px;
+        }
+      }
+    }
+
+    .mobile-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .mobile-tab-content {
+      display: block;
+    }
+
+    .desktop-view {
+      display: none;
+    }
+  }
+}

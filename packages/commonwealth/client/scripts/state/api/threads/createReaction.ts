@@ -15,6 +15,7 @@ interface IUseCreateThreadReactionMutation {
   threadMsgId: string;
   communityId: string;
 }
+
 interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
@@ -78,12 +79,16 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+
+      const addition = (
+        BigInt(currentReactionWeightsSum) +
+        BigInt(reaction.voting_weight || '0')
+      ).toString();
+
       updateThreadInAllCaches(communityId, threadId, {
         reactionCount: currentReactionCount + 1,
-        reactionWeightsSum: `${
-          parseInt(currentReactionWeightsSum) +
-          parseInt(newReaction.calculated_voting_weight || `0`)
-        }`,
+        // I think it is broken here
+        reactionWeightsSum: addition,
       });
 
       const userId = user.addresses?.[0]?.profile?.userId;

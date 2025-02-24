@@ -44,11 +44,20 @@ export const numberValidationSchema = z
     { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );
 
-// number greater than 0
-export const numberGTZeroValidationSchema = numberValidationSchema.refine(
+// non decimal number
+export const numberNonDecimalValidationSchema = numberValidationSchema.refine(
   (value) => {
-    const intVal = parseInt(value, 10);
-    return intVal > 0;
+    return !Number.isInteger(value);
   },
-  { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+  { message: VALIDATION_MESSAGES.MUST_BE_TYPE('integer') },
 );
+
+// non decimal number greater than 0
+export const numberNonDecimalGTZeroValidationSchema =
+  numberNonDecimalValidationSchema.refine(
+    (value) => {
+      const intVal = parseInt(value, 10);
+      return intVal > 0;
+    },
+    { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+  );

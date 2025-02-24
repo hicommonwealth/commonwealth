@@ -2,14 +2,18 @@ import { config as EnvConfig } from '@hicommonwealth/adapters';
 import {
   EventSchemas,
   EventsHandlerMetadata,
+  logger,
   outboxEvents,
 } from '@hicommonwealth/core';
+import { Events } from '@hicommonwealth/schemas';
 import {
   BindingConfig,
   BrokerConfig,
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
+
+const log = logger(import.meta);
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
@@ -42,18 +46,15 @@ export function createRmqConfig({
   // TODO: @Roger - add types so that override keys are a partial record of consumer input type
   map: Array<Consumers>;
 }) {
-  let vhost: string, purge: boolean;
-
+  let vhost: string;
   if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
     vhost = '/';
-    purge = !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE;
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
     if (count == 3) {
       // this matches for a production URL
       const res = rabbitMqUri.split('/');
       vhost = res[res.length - 1];
-      purge = false;
     } else {
       throw new Error(
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
@@ -63,7 +64,9 @@ export function createRmqConfig({
 
   const queueConfig = {
     assert: true,
-    purge: purge,
+    purge:
+      ['local', 'CI'].includes(EnvConfig.APP_ENV) &&
+      !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE,
   };
   const deadLetterRoutingKey = 'DeadLetter';
   const exchangeConfig = {
@@ -114,6 +117,7 @@ export function createRmqConfig({
     },
   };
 
+  const ignoredEvents = new Set<string>();
   for (const item of map) {
     let consumer,
       overrides: Record<string, string | null | undefined> | undefined;
@@ -148,7 +152,8 @@ export function createRmqConfig({
         (acc: string[], val) => {
           // if consumer handler does not have an associated event
           // from the Outbox exclude it automatically
-          if (!Object.keys(outboxEvents).includes(val)) {
+          if (!outboxEvents.includes(<Events>val)) {
+            ignoredEvents.add(val);
             return acc;
           }
 
@@ -171,5 +176,11 @@ export function createRmqConfig({
     };
   }
 
+  if (ignoredEvents.size > 0)
+    log.warn(
+      `The following events are ignored because they are not part of the Outbox: ${Array.from(
+        ignoredEvents,
+      ).join(', ')}`,
+    );
   return config;
 }

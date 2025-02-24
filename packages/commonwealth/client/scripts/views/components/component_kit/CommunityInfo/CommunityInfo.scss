@@ -12,6 +12,10 @@
   gap: 12px;
   cursor: pointer;
 
+  &.unlinked {
+    cursor: default;
+  }
+
   &:focus,
   &:active,
   &:hover,

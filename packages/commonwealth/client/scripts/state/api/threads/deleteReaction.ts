@@ -68,12 +68,14 @@ const useDeleteThreadReactionMutation = ({
           'removeFromExisting',
         );
 
+        const subtraction = String(
+          BigInt(currentReactionWeightsSum) -
+            BigInt(deletedReaction?.calculated_voting_weight || '0'),
+        );
+
         updateThreadInAllCaches(communityId, threadId, {
           reactionCount: currentReactionCount - 1,
-          reactionWeightsSum: `${
-            parseInt(currentReactionWeightsSum) -
-            parseInt(deletedReaction?.calculated_voting_weight || `0`)
-          }`,
+          reactionWeightsSum: subtraction,
         });
       }
     },

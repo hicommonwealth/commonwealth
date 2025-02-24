@@ -49,6 +49,9 @@
     flex-direction: column;
     width: 90vw;
     max-width: 400px;
+    @include heightSmallInclusive {
+      bottom: 0px;
+    }
     @include extraSmall {
       position: absolute;
     }
@@ -70,6 +73,12 @@
     .button-container {
       display: flex;
       gap: 8px;
+    }
+    @include heightSmallInclusive {
+      .Text {
+        font-size: 14px;
+        line-height: 18px;
+      }
     }
   }
 }

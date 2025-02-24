@@ -39,9 +39,13 @@ const useXPProgress = () => {
             (accumulator, currentValue) => accumulator + currentValue,
             0,
           ) || 0;
-      const totalXP =
+      const totalUserXP =
         (quest.action_metas || [])
-          ?.map((action) => action.reward_amount)
+          ?.map(
+            (action) =>
+              action.reward_amount -
+              action.creator_reward_weight * action.reward_amount,
+          )
           .reduce(
             (accumulator, currentValue) => accumulator + currentValue,
             0,
@@ -49,8 +53,8 @@ const useXPProgress = () => {
       return {
         ...quest,
         gainedXP,
-        totalXP,
-        isCompleted: gainedXP === totalXP,
+        totalUserXP,
+        isCompleted: gainedXP === totalUserXP,
       };
     });
   const upcomingWeeklyQuests = allWeeklyQuests.filter((q) =>

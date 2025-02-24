@@ -19,7 +19,9 @@ const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const UpdateQuestPage = lazy(() => import('views/pages/UpdateQuest'));
 const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
+const QuestsListPage = lazy(() => import('views/pages/QuestsList'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -57,6 +59,7 @@ const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
 );
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect'),
@@ -212,6 +215,26 @@ const CommonDomainRoutes = ({
           key="/quest/:id"
           path="/quest/:id"
           element={withLayout(QuestDetailsPage, { type: 'common' })}
+        />,
+        <Route
+          key="/quest/:id/update"
+          path="/quest/:id/update"
+          element={withLayout(UpdateQuestPage, { type: 'common' })}
+        />,
+        <Route
+          key="/:scope/quest/:id"
+          path="/:scope/quest/:id"
+          element={withLayout(QuestDetailsPage, { scoped: true })}
+        />,
+        <Route
+          key="/:scope/quest/:id/update"
+          path="/:scope/quest/:id/update"
+          element={withLayout(UpdateQuestPage, { scoped: true })}
+        />,
+        <Route
+          key="/:scope/quests"
+          path="/:scope/quests"
+          element={withLayout(QuestsListPage, { scoped: true })}
         />,
       ]
     : []),
@@ -447,6 +470,13 @@ const CommonDomainRoutes = ({
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
+    key="/discussion/comment/:identifier"
+    path="/discussion/comment/:identifier"
+    element={withLayout(CommentRedirectPage, {
       scoped: false,
     })}
   />,

@@ -21,12 +21,14 @@ type CustomCWSelectListProps = {
     successNotification?: boolean,
   ) => Promise<void>;
   showCopyIcon?: boolean;
+  instructionalMessage?: string;
 };
 
 type OptionProps = {
   value: string;
   label: string;
 };
+
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
@@ -48,18 +50,16 @@ export const CWSelectList = <
     isMulti,
     showCopyIcon,
     saveToClipboard,
+    instructionalMessage,
   } = props;
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
+  const isHookedToForm = hookToForm && name;
+  const formFieldContext = isHookedToForm ? formContext.register(name) : null;
   const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+    isHookedToForm &&
+    (formContext?.formState?.errors?.[name]?.message as string);
   const [defaultFormContextValue, setDefaultFormContextValue] = useState(
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm ? formContext?.getValues?.(props?.name) : null,
+    isHookedToForm ? formContext?.getValues?.(name) : null,
   );
 
   useEffect(() => {
@@ -79,12 +79,8 @@ export const CWSelectList = <
   }, [hookToForm, name, defaultValue, formContext]);
 
   useEffect(() => {
-    hookToForm &&
-      formContext &&
-      name &&
-      value &&
-      formContext.setValue(name, value);
-  }, [hookToForm, name, value, formContext]);
+    isHookedToForm && formContext && value && formContext.setValue(name, value);
+  }, [isHookedToForm, name, value, formContext]);
 
   const isDisabled = props?.isDisabled || formFieldContext?.disabled;
 
@@ -110,8 +106,7 @@ export const CWSelectList = <
         }}
         onChange={(newValue: any, actionMeta) => {
           props?.onChange?.(newValue, actionMeta);
-          if (hookToForm) {
-            // @ts-expect-error <StrictNullChecks/>
+          if (isHookedToForm) {
             formContext.setValue(name, newValue);
             (newValue?.length ||
               (typeof newValue === 'object' &&
@@ -166,6 +161,9 @@ export const CWSelectList = <
         )}
         classNamePrefix={classNamePrefix || 'cwsl'}
       />
+      {instructionalMessage && (
+        <MessageRow instructionalMessage={instructionalMessage} />
+      )}
       {(formFieldErrorMessage || customError) && (
         <MessageRow
           hasFeedback={!!formFieldErrorMessage || !!customError}

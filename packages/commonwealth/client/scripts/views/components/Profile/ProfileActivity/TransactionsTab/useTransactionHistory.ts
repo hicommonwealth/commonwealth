@@ -1,4 +1,4 @@
-import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
+import { WEI_PER_ETHER } from '@hicommonwealth/shared';
 import { trpc } from 'utils/trpcClient';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
 import { formatFractionalValue } from '../../../FractionalValue/helpers';

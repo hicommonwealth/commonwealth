@@ -13,7 +13,6 @@ import useUserStore from 'state/ui/user';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
-import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { ArchiveMsg } from './ArchiveMsg';
@@ -28,6 +27,8 @@ type CreateCommentProps = {
   isReplying?: boolean;
   replyingToAuthor?: string;
   onCancel?: (event: React.MouseEvent) => void;
+  onCommentCreated?: (commentId: number, hasAI: boolean) => void;
+  aiCommentsToggleEnabled?: boolean;
 };
 
 export const CreateComment = ({
@@ -40,6 +41,8 @@ export const CreateComment = ({
   isReplying,
   replyingToAuthor,
   onCancel,
+  onCommentCreated,
+  aiCommentsToggleEnabled = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -86,55 +89,63 @@ export const CreateComment = ({
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
-  const handleSubmitComment = () => {
-    if (!user.activeAccount) return;
+  const handleSubmitComment = async () => {
+    if (!user.activeAccount) {
+      throw new Error('No active account');
+    }
 
     setErrorMsg(null);
     setSendingComment(true);
 
-    const communityId = app.activeChainId() || '';
-    const asyncHandle = async () => {
-      try {
-        const input = await buildCreateCommentInput({
-          communityId,
-          address: user.activeAccount!.address,
-          threadId: rootThread.id,
-          threadMsgId: rootThread.canvasMsgId ?? null,
-          unescapedText: serializeDelta(contentDelta),
-          parentCommentId: parentCommentId ?? null,
-          parentCommentMsgId: parentCommentMsgId ?? null,
-          existingNumberOfComments: rootThread.numberOfComments || 0,
-        });
-        const newComment = await createComment(input);
+    try {
+      const communityId = app.activeChainId() || '';
+      const input = await buildCreateCommentInput({
+        communityId,
+        address: user.activeAccount!.address,
+        threadId: rootThread.id,
+        threadMsgId: rootThread.canvasMsgId ?? null,
+        unescapedText: serializeDelta(contentDelta),
+        parentCommentId: parentCommentId ?? null,
+        parentCommentMsgId: parentCommentMsgId ?? null,
+        existingNumberOfComments: rootThread.numberOfComments || 0,
+      });
 
-        setErrorMsg(null);
-        setContentDelta(createDeltaFromText(''));
-        clearDraft();
+      const newComment = await createComment(input);
 
-        setTimeout(() => {
-          // Wait for dom to be updated before scrolling to comment
-          jumpHighlightComment(newComment?.id as number);
-        }, 100);
-      } catch (err) {
-        if (err instanceof SessionKeyError) {
-          checkForSessionKeyRevalidationErrors(err);
-          return;
-        }
-        const errMsg = err?.responseJSON?.error || err?.message;
-        console.error(errMsg);
-
-        notifyError('Failed to create comment');
-        setErrorMsg(errMsg);
-      } finally {
-        setSendingComment(false);
-
-        if (handleIsReplying) {
-          handleIsReplying(false);
-        }
+      if (!newComment?.id) {
+        throw new Error('No comment ID returned');
       }
-    };
 
-    asyncHandle().then().catch(console.error);
+      // Store the ID before any state changes
+      const commentId = newComment.id;
+
+      // Now update state
+      setErrorMsg(null);
+      setContentDelta(createDeltaFromText(''));
+      clearDraft();
+
+      if (handleIsReplying) {
+        handleIsReplying(false);
+      }
+
+      // Notify parent about the new comment and its AI status
+      onCommentCreated?.(commentId, aiCommentsToggleEnabled);
+
+      return commentId;
+    } catch (err) {
+      if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
+        throw err;
+      }
+      const errMsg = err?.responseJSON?.error || err?.message;
+      console.error('CreateComment - Error:', errMsg);
+
+      notifyError('Failed to create comment');
+      setErrorMsg(errMsg);
+      throw err;
+    } finally {
+      setSendingComment(false);
+    }
   };
 
   const disabled = editorValue.length === 0 || sendingComment;

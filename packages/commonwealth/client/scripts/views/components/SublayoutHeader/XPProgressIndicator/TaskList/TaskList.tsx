@@ -41,10 +41,11 @@ const TaskList = ({ className }: TaskListProps) => {
               endDate: new Date(quest.end_date),
               startDate: new Date(quest.start_date),
               id: quest.id,
+              communityId: quest.community_id || '',
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
+              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
             }))}
           />
           <Quests
@@ -54,10 +55,11 @@ const TaskList = ({ className }: TaskListProps) => {
               endDate: new Date(quest.end_date),
               startDate: new Date(quest.start_date),
               id: quest.id,
+              communityId: quest.community_id || '',
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
+              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
             }))}
           />
         </>
