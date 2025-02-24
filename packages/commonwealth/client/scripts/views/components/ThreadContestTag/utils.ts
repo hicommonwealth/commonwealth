@@ -35,7 +35,7 @@ export const getWinnersFromAssociatedContests = (
 
       return {
         date: moment(contest.end_time).format('DD/MM/YYYY'),
-        prize: Math.min(0, prize),
+        prize: Math.max(0, prize),
         // show only for recurring
         round:
           (contest.contest_interval ?? 0) > 0 ? contest.contest_id + 1 : null,
