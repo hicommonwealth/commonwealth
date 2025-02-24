@@ -8,7 +8,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
-import ContestCard from '../CommunityManagement/Contests/ContestsList/ContestCard';
+import ContestCard from '../../components/ContestCard';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import { MobileTabType } from './ContestPage';
 import EntriesTab from './tabs/Entries';
@@ -16,8 +16,8 @@ import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 import { getCurrentContestIndex, getSortedContests } from './utils';
 
-import './NewContestPage.scss';
 import useTokenData from './hooks/useTokenData';
+import './NewContestPage.scss';
 
 interface NewContestPageProps {
   contestAddress: string;

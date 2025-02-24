@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import 'react-farcaster-embed/dist/styles.css';
 import useFetchFarcasterCastsQuery from 'state/api/contests/getFarcasterCasts';
+import ContestCard from 'views/components/ContestCard';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -11,7 +12,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { PageNotFound } from 'views/pages/404';
-import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
