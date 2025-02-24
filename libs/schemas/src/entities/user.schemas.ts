@@ -84,6 +84,9 @@ export const Address = z.object({
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
+  oauth_provider: z.string().max(255).nullish(),
+  oauth_email: z.string().max(255).nullish(),
+  oauth_username: z.string().max(255).nullish(),
 
   User: User.optional().nullish(),
 
