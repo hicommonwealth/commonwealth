@@ -15,6 +15,7 @@ export const QuestEvents = {
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
 } as const;
 
 export enum QuestParticipationLimit {
