@@ -2,6 +2,7 @@ import {
   communityStakesAbi,
   decodeLog,
   EvmEventSignatures,
+  getEvmAddress,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
   recurringContestAbi,
@@ -204,7 +205,7 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
   return {
     event_name: 'ContestStarted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: Number(decoded.args.contestId),
       start_time: new Date(Number(decoded.args.startTime) * 1000),
       end_time: new Date(Number(decoded.args.endTime) * 1000),
@@ -226,7 +227,7 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
   return {
     event_name: 'ContestStarted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: 0,
       start_time: new Date(Number(decoded.args.startTime) * 1000),
       end_time: new Date(Number(decoded.args.endTime) * 1000),
@@ -246,7 +247,7 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
   return {
     event_name: 'ContestContentAdded',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       content_id: Number(decoded.args.contentId),
       creator_address: decoded.args.creator,
       content_url: decoded.args.url,
@@ -271,7 +272,7 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   return {
     event_name: 'ContestContentUpvoted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: Number(contestId),
       content_id: Number(contentId),
       voter_address,
@@ -292,7 +293,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   return {
     event_name: 'ContestContentUpvoted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: 0,
       content_id: Number(contentId),
       voter_address,
