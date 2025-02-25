@@ -65,6 +65,7 @@ type CardProps = AdminActionsProps & {
   maxChars?: number;
   cutoffLines?: number;
   showOnlyThreadActionIcons?: boolean;
+  communityHomeLayout?: boolean;
 };
 
 export const ThreadCard = ({
@@ -109,6 +110,7 @@ export const ThreadCard = ({
   maxChars,
   cutoffLines,
   showOnlyThreadActionIcons = false,
+  communityHomeLayout = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -203,6 +205,7 @@ export const ThreadCard = ({
               hidePublishDate={hidePublishDate}
               hideSpamTag={hideSpamTag}
               hideTrendingTag={hideTrendingTag}
+              communityHomeLayout={communityHomeLayout}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

@@ -1,11 +1,11 @@
 import moment from 'moment';
 import React, { ReactNode } from 'react';
 
+import { capDecimals } from 'client/scripts/views/modals/ManageCommunityStakeModal/utils';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import { formatAddressShort, smartTrim } from 'shared/utils';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
-
-import FractionalValue from 'views/components/FractionalValue';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -120,29 +120,42 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
 
       <div className="contest-content">
         <div className="heading">
-          <CWCommunityAvatar
-            onClick={() => {
-              navigateToCommunity({
-                navigate,
-                path: '',
-                chain: contest.community_id || '',
-              });
-            }}
-            community={{
-              name: community.name,
-              iconUrl: community.iconUrl,
-            }}
-          />
+          <div className="image-content">
+            <CWCommunityAvatar
+              onClick={() => {
+                navigateToCommunity({
+                  navigate,
+                  path: '',
+                  chain: contest.community_id || '',
+                });
+              }}
+              community={{
+                name: community.name,
+                iconUrl: community.iconUrl,
+              }}
+              size="xl"
+            />
+          </div>
           <div className="basic-info" onClick={() => {}}>
             {withOptionalTooltip(
-              <CWText className="text-dark" type="h4" fontWeight="regular">
+              <CWText className="text-dark" type="h4" fontWeight="semiBold">
                 {trimmedName}
               </CWText>,
               name,
               isNameTrimmed,
             )}
+
+            <CWText fontWeight="regular" type="caption">
+              by {smartTrim(community?.name, 15)} {' \u2022 '}
+              {contest?.contest_address &&
+                formatAddressShort(contest.contest_address)}
+            </CWText>
           </div>
-          <CWCountDownTimer finishTime={finishDate} isActive />
+          <CWCountDownTimer
+            finishTime={finishDate}
+            isActive
+            className="critical"
+          />
         </div>
 
         <CWDivider />
@@ -165,8 +178,7 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
                   <CWText fontWeight="medium">
-                    <FractionalValue fontWeight="medium" value={prize} />
-                    &nbsp;{contest.ticker}
+                    {capDecimals(String(prize))} {contest.ticker}
                   </CWText>
                 </div>
               ))

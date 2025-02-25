@@ -131,6 +131,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hidePublishDate
       hideTrendingTag
       showOnlyThreadActionIcons
+      communityHomeLayout
     />
   );
 };
@@ -243,7 +244,24 @@ const TrendingThreadList = ({
   }
 
   if (!allThreads?.length) {
-    return <></>;
+    return (
+      <div className="TrendingThreadList">
+        <div className="heading-container">
+          <CWText type="h2">Trending Threads</CWText>
+          <Link to="/explore">
+            <div className="link-right">
+              <CWText className="link">See all threads</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
+          </Link>
+        </div>
+        <>
+          <CWText type="h2" className="empty-thread">
+            No threads found
+          </CWText>
+        </>
+      </div>
+    );
   }
 
   return (
