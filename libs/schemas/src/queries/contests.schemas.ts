@@ -54,6 +54,15 @@ export const GetActiveContestManagers = {
       max_contest_id: z.number(),
       end_time: z.coerce.date(),
       actions: z.array(ContestAction),
+      environment: z.enum([
+        'local',
+        'CI',
+        'frick',
+        'frack',
+        'beta',
+        'demo',
+        'production',
+      ]),
     }),
   ),
 };

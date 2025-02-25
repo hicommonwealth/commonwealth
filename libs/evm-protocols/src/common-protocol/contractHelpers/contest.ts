@@ -171,7 +171,7 @@ export const getContestScore = async (
 
   if (winnerIds.length == 0) {
     console.warn(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
+      `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
     return [];
   }
