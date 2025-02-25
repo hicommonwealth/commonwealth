@@ -9,7 +9,10 @@ import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
-import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import type {
+  CommentEditorProps,
+  StreamingReplyData,
+} from 'views/components/Comments/CommentEditor/CommentEditor';
 import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import {
@@ -17,6 +20,7 @@ import {
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
+import { ChipsAndModelBar, ModelOption } from './ChipsAndModelBar';
 import './DesktopStickyInput.scss';
 import { useStickComment } from './context/StickCommentProvider';
 
@@ -26,7 +30,9 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
-  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [streamingReplyIds, setStreamingReplyIds] = useState<
+    StreamingReplyData[]
+  >([]);
   const { generateComment } = useGenerateCommentText();
   const navigate = useCommonNavigate();
   const communityId = app.activeChainId() || '';
@@ -34,6 +40,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     communityId,
   });
   const user = useUserStore();
+  const [selectedModels, setSelectedModels] = useState<ModelOption[]>([]);
 
   const handleFocused = useCallback(() => {
     setIsExpanded(true);
@@ -53,28 +60,109 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleAiReply = useCallback(
-    (commentId: number) => {
-      if (streamingReplyIds.includes(commentId)) {
-        return;
+    (commentId: number, modelIds?: string[]) => {
+      // If modelIds parameter is provided, use it
+      // Otherwise, use the component's selectedModels state
+      const modelsToUse =
+        modelIds ||
+        (selectedModels.length > 0
+          ? selectedModels.map((model) => model.value)
+          : ['anthropic/claude-3.5-sonnet']);
+
+      console.log(
+        'DesktopStickyInput - handleAiReply with models:',
+        modelsToUse,
+      );
+      console.log(
+        'DesktopStickyInput - Selected models state:',
+        selectedModels.map((m) => `${m.label} (${m.value})`),
+      );
+
+      if (modelsToUse.length === 0) {
+        // If no models are selected, continue with default behavior
+        console.log(
+          'DesktopStickyInput - No models selected, using default model',
+        );
+        const defaultModel = 'anthropic/claude-3.5-sonnet';
+
+        // Check if we're already streaming this model for this comment
+        if (
+          streamingReplyIds.some(
+            (reply) =>
+              reply.commentId === commentId && reply.modelId === defaultModel,
+          )
+        ) {
+          console.log(
+            `DesktopStickyInput - Already streaming default model for comment ${commentId}`,
+          );
+          return;
+        }
+
+        setStreamingReplyIds((prev) => [
+          ...prev,
+          { commentId, modelId: defaultModel },
+        ]);
+        console.log(
+          `DesktopStickyInput - Calling onAiReply with comment ${commentId} and default model`,
+        );
+        props.onAiReply?.(commentId, [defaultModel]);
+      } else {
+        // For each selected model, create a streaming reply
+        const newStreamingReplies = modelsToUse.map((modelId) => ({
+          commentId,
+          modelId,
+        }));
+
+        // Filter out any models that are already streaming for this comment
+        const filteredNewReplies = newStreamingReplies.filter(
+          (newReply) =>
+            !streamingReplyIds.some(
+              (existing) =>
+                existing.commentId === newReply.commentId &&
+                existing.modelId === newReply.modelId,
+            ),
+        );
+
+        if (filteredNewReplies.length > 0) {
+          console.log(
+            'DesktopStickyInput - Adding streaming replies for models:',
+            filteredNewReplies.map((reply) => reply.modelId),
+          );
+          setStreamingReplyIds((prev) => [...prev, ...filteredNewReplies]);
+          // Pass the selected model IDs to onAiReply
+          console.log(
+            `DesktopStickyInput - Calling onAiReply with comment ${commentId} and models:`,
+            modelsToUse,
+          );
+          props.onAiReply?.(commentId, modelsToUse);
+        } else {
+          console.log(
+            'DesktopStickyInput - All selected models are already streaming',
+          );
+        }
       }
-      setStreamingReplyIds((prev) => [...prev, commentId]);
     },
-    [streamingReplyIds],
+    [props.onAiReply, streamingReplyIds, selectedModels],
   );
 
   const handleAiGenerate = useCallback(
     async (text: string) => {
       try {
-        const generatedText = await generateComment(text, (update) => {
-          console.log('AI generation update:', update);
-        });
-        return generatedText;
+        const responses = await generateComment(
+          text,
+          (update, modelId) => {
+            console.log(`AI generation update for ${modelId}:`, update);
+          },
+          selectedModels.map((m) => m.value),
+        );
+        // Combine all responses into a single string
+        return Object.values(responses).join('\n\n---\n\n');
       } catch (error) {
         console.error('Failed to generate AI text:', error);
         return '';
       }
     },
-    [generateComment],
+    [generateComment, selectedModels],
   );
 
   const handleThreadCreation = useCallback(
@@ -213,6 +301,19 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
         <div className="DesktopStickyInputCollapsed">
+          {aiCommentsToggleEnabled && (
+            <ChipsAndModelBar
+              onChipAction={(action) => {
+                if (action === 'summary') {
+                  handleAiGenerate('Please summarize the discussion');
+                } else if (action === 'question') {
+                  handleAiGenerate('Please generate a relevant question');
+                }
+              }}
+              onModelsChange={setSelectedModels}
+              selectedModels={selectedModels}
+            />
+          )}
           <div className="container">
             <input
               type="text"
@@ -243,6 +344,19 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
         </div>
       ) : (
         <div className="DesktopStickyInputExpanded">
+          {aiCommentsToggleEnabled && (
+            <ChipsAndModelBar
+              onChipAction={(action) => {
+                if (action === 'summary') {
+                  handleAiGenerate('Please summarize the discussion');
+                } else if (action === 'question') {
+                  handleAiGenerate('Please generate a relevant question');
+                }
+              }}
+              onModelsChange={setSelectedModels}
+              selectedModels={selectedModels}
+            />
+          )}
           {mode === 'thread' ? (
             <NewThreadForm
               onCancel={handleCancel}

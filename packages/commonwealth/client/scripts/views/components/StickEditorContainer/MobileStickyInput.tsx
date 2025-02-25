@@ -18,6 +18,8 @@ import {
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { StreamingReplyData } from '../Comments/CommentEditor/CommentEditor';
+import { ChipsAndModelBar, ModelOption } from './ChipsAndModelBar';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
 import { StickCommentContext } from './context/StickCommentProvider';
@@ -28,7 +30,9 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { mode } = useContext(StickCommentContext);
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
-  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [streamingReplyIds, setStreamingReplyIds] = useState<
+    StreamingReplyData[]
+  >([]);
   const menuVisible = useSidebarStore((state) => state.menuVisible);
   const { generateComment } = useGenerateCommentText();
   const navigate = useCommonNavigate();
@@ -37,6 +41,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     communityId,
   });
   const user = useUserStore();
+  const [selectedModels, setSelectedModels] = useState<ModelOption[]>([]);
 
   const handleCancel = useCallback(() => {
     console.log('MobileStickyInput: handleCancel triggered');
@@ -44,28 +49,99 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   }, []);
 
   const handleAiReply = useCallback(
-    (commentId: number) => {
-      if (streamingReplyIds.includes(commentId)) {
-        return;
+    (commentId: number, modelIds?: string[]) => {
+      // If modelIds parameter is provided, use it
+      // Otherwise, use the component's selectedModels state
+      const modelsToUse =
+        modelIds ||
+        (selectedModels.length > 0
+          ? selectedModels.map((model) => model.value)
+          : ['anthropic/claude-3.5-sonnet']);
+
+      console.log(
+        'MobileStickyInput - handleAiReply with models:',
+        modelsToUse,
+      );
+      console.log(
+        'MobileStickyInput - Selected models state:',
+        selectedModels.map((m) => `${m.label} (${m.value})`),
+      );
+
+      if (modelsToUse.length === 0) {
+        // If no models are selected, continue with default behavior
+        console.log(
+          'MobileStickyInput - No models selected, using default model',
+        );
+        const defaultModel = 'anthropic/claude-3.5-sonnet';
+        setStreamingReplyIds((prev) => [
+          ...prev,
+          { commentId, modelId: defaultModel },
+        ]);
+        console.log(
+          `MobileStickyInput - Calling onAiReply with comment ${commentId} and default model`,
+        );
+        props.onAiReply?.(commentId, [defaultModel]);
+      } else {
+        // For each selected model, create a streaming reply
+        const newStreamingReplies = modelsToUse.map((modelId) => ({
+          commentId,
+          modelId,
+        }));
+
+        // Filter out any models that are already streaming for this comment
+        const filteredNewReplies = newStreamingReplies.filter(
+          (newReply) =>
+            !streamingReplyIds.some(
+              (existing) =>
+                existing.commentId === newReply.commentId &&
+                existing.modelId === newReply.modelId,
+            ),
+        );
+
+        if (filteredNewReplies.length > 0) {
+          console.log(
+            'MobileStickyInput - Adding streaming replies for models:',
+            filteredNewReplies.map((reply) => reply.modelId),
+          );
+          setStreamingReplyIds((prev) => [...prev, ...filteredNewReplies]);
+          // Pass the selected model IDs to onAiReply
+          console.log(
+            `MobileStickyInput - Calling onAiReply with comment ${commentId} and models:`,
+            modelsToUse,
+          );
+          props.onAiReply?.(commentId, modelsToUse);
+        } else {
+          console.log(
+            'MobileStickyInput - All selected models are already streaming',
+          );
+        }
       }
-      setStreamingReplyIds((prev) => [...prev, commentId]);
     },
-    [streamingReplyIds],
+    [props.onAiReply, streamingReplyIds, selectedModels],
   );
 
   const handleAiGenerate = useCallback(
     async (text: string) => {
+      console.log(
+        'MobileStickyInput - handleAiGenerate with models:',
+        selectedModels.map((m) => m.value),
+      );
       try {
-        const generatedText = await generateComment(text, (update) => {
-          console.log('AI generation update:', update);
-        });
-        return generatedText;
+        const responses = await generateComment(
+          text,
+          (update, modelId) => {
+            console.log(`AI generation update for ${modelId}:`, update);
+          },
+          selectedModels.map((m) => m.value),
+        );
+        // Combine all responses into a single string
+        return Object.values(responses).join('\n\n---\n\n');
       } catch (error) {
         console.error('Failed to generate AI text:', error);
         return '';
       }
     },
-    [generateComment],
+    [generateComment, selectedModels],
   );
 
   const handleThreadCreation = useCallback(
@@ -252,6 +328,20 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
             </div>
           </div>
 
+          {aiCommentsToggleEnabled && (
+            <ChipsAndModelBar
+              onChipAction={(action) => {
+                if (action === 'summary') {
+                  handleAiGenerate('Please summarize the discussion');
+                } else if (action === 'question') {
+                  handleAiGenerate('Please generate a relevant question');
+                }
+              }}
+              onModelsChange={setSelectedModels}
+              selectedModels={selectedModels}
+            />
+          )}
+
           {mode === 'thread' ? (
             <NewThreadForm
               onCancel={handleCancel}
@@ -278,6 +368,19 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   return createPortal(
     <div className="MobileStickyInput">
+      {aiCommentsToggleEnabled && (
+        <ChipsAndModelBar
+          onChipAction={(action) => {
+            if (action === 'summary') {
+              handleAiGenerate('Please summarize the discussion');
+            } else if (action === 'question') {
+              handleAiGenerate('Please generate a relevant question');
+            }
+          }}
+          onModelsChange={setSelectedModels}
+          selectedModels={selectedModels}
+        />
+      )}
       <MobileInput
         {...props}
         onFocus={handleFocused}

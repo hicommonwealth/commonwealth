@@ -1,0 +1,251 @@
+@import '../../../../../styles/shared';
+
+.UpwardMultiSelectList {
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+
+  // Override CWSelectList styles only when inside UpwardMultiSelectList
+  .CWSelectList {
+    .SelectList {
+      min-height: 26px !important;
+      max-height: 26px !important;
+      padding: 0 !important;
+
+      &.isMulti {
+        max-height: initial !important;
+      }
+    }
+  }
+
+  .umsl__control {
+    background-color: #f9fafb;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    min-height: 26px;
+    width: 100%;
+    padding: 0 !important;
+
+    &:hover {
+      border-color: #d1d5db;
+    }
+
+    &--is-focused {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 1px #dbeafe;
+    }
+  }
+
+  .umsl__menu {
+    margin-top: 0;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 100%;
+
+    // Force menu to appear above the input
+    &-list {
+      max-height: 250px;
+    }
+  }
+
+  .umsl__option {
+    cursor: pointer;
+
+    &--is-focused {
+      background-color: #f3f4f6;
+    }
+
+    &--is-selected {
+      background-color: #eff6ff;
+      color: #111827;
+    }
+
+    // Style for the divider option
+    &--is-disabled {
+      cursor: default;
+      color: #9ca3af;
+      text-align: center;
+      padding: 4px 0;
+      margin: 4px 0;
+      background-color: transparent !important;
+
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
+  }
+
+  .upward-option-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+
+    .CWIcon {
+      margin-left: 4px;
+      flex-shrink: 0;
+      color: #3b82f6;
+    }
+  }
+
+  .upward-option-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-width: calc(100% - 20px); // Reserve space for checkmark
+  }
+
+  .upward-option-label {
+    font-weight: 500;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .upward-option-description {
+    font-size: 11px;
+    color: #4b5563;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    line-height: 1.2;
+    max-height: 2.4em; /* 2 lines * line-height */
+  }
+
+  .upward-more-container {
+    background-color: transparent !important;
+    margin-left: 2px;
+    padding: 0 !important;
+  }
+
+  .upward-more-label {
+    font-size: 11px;
+    color: #4b5563;
+    padding: 1px 3px;
+    background-color: #f3f4f6;
+    border-radius: 2px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    height: 16px;
+    margin: 0 !important;
+  }
+
+  // Multi-value styles
+  .umsl__multi-value {
+    background-color: #eff6ff;
+    border-radius: 2px;
+    margin-right: 2px;
+    margin-left: 0;
+    max-width: calc(100% - 4px);
+    height: 18px;
+
+    &__label {
+      color: #1d4ed8;
+      font-size: 11px;
+      padding: 1px 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px; // Prevent very long model names from taking too much space
+      line-height: 1.2;
+    }
+
+    &__remove {
+      color: #3b82f6;
+      cursor: pointer;
+      padding: 0 2px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  // Value container styles
+  .umsl__value-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    gap: 2px;
+    padding: 0 2px !important;
+    min-height: 24px;
+    align-items: center;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  // Makes the indicator more visible
+  .umsl__dropdown-indicator {
+    color: #6b7280;
+    padding: 0 !important;
+
+    &:hover {
+      color: #374151;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  // Customize the clear indicator to be smaller
+  .umsl__clear-indicator {
+    padding: 0 !important;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  // Specifically target inner containers that might have padding
+  .umsl__indicators {
+    padding: 0 !important;
+  }
+
+  // Remove padding from single value container too
+  .umsl__single-value {
+    margin: 0;
+    padding: 0;
+  }
+
+  // Improve selected item visibility
+  [data-selected='0'] {
+    .umsl__placeholder {
+      opacity: 1;
+    }
+  }
+
+  [data-selected='1'] {
+    .umsl__placeholder {
+      opacity: 0;
+    }
+  }
+
+  // Add a subtle background to the selected section
+  .umsl__menu-list {
+    // Add subtle blue background to the top section (selected items)
+    background: linear-gradient(
+      180deg,
+      rgba(239, 246, 255, 0.5) 0%,
+      rgba(239, 246, 255, 0.5) var(--selected-height, 0px),
+      transparent var(--selected-height, 0px)
+    );
+  }
+}

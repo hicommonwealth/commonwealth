@@ -22,7 +22,14 @@
 
   .DesktopStickyInputCollapsed {
     width: 100%;
-    margin-bottom: 0;
+    border-radius: 4px;
+    background: var(--background-color);
+
+    .ChipsAndModelBar {
+      border-bottom: 1px solid var(--border-color);
+      background: var(--background-color-light);
+      padding: 8px 12px;
+    }
 
     .container {
       display: flex;
