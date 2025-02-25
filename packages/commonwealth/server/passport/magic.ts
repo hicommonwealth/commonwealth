@@ -120,10 +120,32 @@ async function createMagicAddressInstances(
     if (!created) {
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
-      addressInstance.oauth_provider = magicUserMetadata.oauthProvider;
-      addressInstance.oauth_email = magicUserMetadata.email;
-      addressInstance.oauth_username = magicUserMetadata.username;
-      addressInstance.oauth_phone_number = magicUserMetadata.phoneNumber;
+
+      if (
+        magicUserMetadata.oauthProvider &&
+        addressInstance.oauth_provider !== magicUserMetadata.oauthProvider
+      ) {
+        addressInstance.oauth_provider = magicUserMetadata.oauthProvider;
+      }
+
+      if (
+        magicUserMetadata.email &&
+        addressInstance.oauth_email !== magicUserMetadata.email
+      ) {
+        addressInstance.oauth_email = magicUserMetadata.email;
+      }
+      if (
+        magicUserMetadata.username &&
+        addressInstance.oauth_username !== magicUserMetadata.username
+      ) {
+        addressInstance.oauth_username = magicUserMetadata.username;
+      }
+      if (
+        magicUserMetadata.phoneNumber &&
+        addressInstance.oauth_phone_number !== magicUserMetadata.phoneNumber
+      ) {
+        addressInstance.oauth_phone_number = magicUserMetadata.phoneNumber;
+      }
       await addressInstance.save({ transaction });
     }
     addressInstances.push(addressInstance);
