@@ -18,13 +18,14 @@ const QuestActionSubForm = ({
   hiddenActions,
 }: QuestActionSubFormProps) => {
   const actionOptions = [
-    'SignUpFlowCompleted',
     'CommunityCreated',
     'CommunityJoined',
     'ThreadCreated',
     'ThreadUpvoted',
     'CommentCreated',
     'CommentUpvoted',
+    'WalletLinked',
+    'SSOLinked',
   ]
     .map((event) => ({
       value: event as QuestAction,
