@@ -1,8 +1,8 @@
 import {
-  namespaceAbi,
-  namespaceFactoryAbi,
-  reservationHookAbi,
-} from '@hicommonwealth/evm-protocols';
+  INamespace as namespaceAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+  INamespaceResHook as reservationHookAbi,
+} from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -411,6 +411,7 @@ class NamespaceFactory extends ContractBase {
       return String(balance / (10 ^ (decimals ?? 18)));
     }
   }
+
   /**
    * mints namespace tokens to assignee on id with desired balance
    * @param namespace the namespace name
