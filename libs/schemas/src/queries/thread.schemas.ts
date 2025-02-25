@@ -87,6 +87,11 @@ export const AddressView = Address.extend({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+}).omit({
+  oauth_email: true,
+  oauth_provider: true,
+  oauth_phone_number: true,
+  oauth_username: true,
 });
 
 export const ReactionView = z.object({
