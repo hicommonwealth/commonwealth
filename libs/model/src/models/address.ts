@@ -82,6 +82,7 @@ export default (
       oauth_provider: { type: Sequelize.STRING, allowNull: true },
       oauth_email: { type: Sequelize.STRING, allowNull: true },
       oauth_username: { type: Sequelize.STRING, allowNull: true },
+      oauth_phone_number: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -101,6 +102,10 @@ export default (
             'block_info',
             'created_at',
             'updated_at',
+            'oauth_provider',
+            'oauth_email',
+            'oauth_username',
+            'oauth_phone_number',
           ],
         },
       },

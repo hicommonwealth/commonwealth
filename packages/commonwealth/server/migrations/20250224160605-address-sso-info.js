@@ -31,6 +31,15 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.addColumn(
+        'Addresses',
+        'oauth_phone_number',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
     });
   },
 
