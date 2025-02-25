@@ -40,6 +40,10 @@ module.exports = {
         },
         { transaction },
       );
+
+      await queryInterface.removeIndex('Users', ['email'], {
+        transaction,
+      });
     });
   },
 
@@ -52,6 +56,13 @@ module.exports = {
         transaction,
       });
       await queryInterface.removeColumn('Addresses', 'oauth_username', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Addresses', 'oauth_phone_number', {
+        transaction,
+      });
+      await queryInterface.addIndex('Users', ['email'], {
+        unique: true,
         transaction,
       });
     });
