@@ -38,7 +38,7 @@ function getWalletType(address: string): WalletType {
 }
 
 async function loadMagicData(
-  filepath: string = './2025-02-24T15_16_02.493Z.csv',
+  filepath: string,
 ): Promise<Record<string, MagicData>> {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const fileContent = await fs.readFile(path.join(__dirname, filepath));
@@ -71,7 +71,18 @@ async function loadMagicData(
 }
 
 async function main() {
-  const data = await loadMagicData();
+  if (config.APP_ENV === 'production') {
+    if (!config.MAGIC_API_KEY) {
+      throw new Error('MAGIC_API_KEY is required in production');
+    }
+    if (!process.argv[2]) {
+      throw new Error('Must provide a filepath to the user dump (csv)');
+    }
+  }
+
+  const data = await loadMagicData(
+    process.argv[2] || './2025-02-24T15_16_02.493Z.csv',
+  );
 
   const addressToBackfillCount = await models.Address.count({
     where: {
