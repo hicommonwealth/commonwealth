@@ -62,10 +62,10 @@
         display: flex;
         align-items: self-start;
         gap: 8px;
-      }
 
-      & > .Text {
-        word-break: break-word;
+        & > .Text {
+          line-height: 1.2;
+        }
       }
 
       .contest-icon-container {
@@ -125,7 +125,7 @@
         gap: 8px;
         background-color: $neutral-50;
         border: 1px solid $neutral-100;
-        padding: 8px;
+        padding: 8px 8px 4px;
         border-radius: 6px;
 
         .label {
