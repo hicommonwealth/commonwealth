@@ -4,6 +4,7 @@ import {
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
+import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import {
@@ -23,51 +24,58 @@ type ManageOnchainModalProps = {
   onClose: () => void;
   Addresses: AddressInfo[] | undefined;
   refetch?: () => void;
+  namespace: string;
+  chainRpc: string;
+  ethChainId: number;
+  chainId: string;
 };
 
 export const ManageOnchainModal = ({
   onClose,
   Addresses,
   refetch,
+  namespace,
+  chainRpc,
+  ethChainId,
+  chainId,
 }: ManageOnchainModalProps) => {
   const [userRole, setUserRole] = useState(Addresses);
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   const userData = useUserStore();
+  const mintAdminTokenMutation = useMintAdminTokenMutation();
 
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
       (prevData || []).map((user) => {
-        const updatedUser = user.id === id ? { ...user, role: newRole } : user;
-        setHasChanges((prev) => prev || user.role !== newRole);
-        return updatedUser;
+        if (user.id === id && user.role !== newRole) {
+          setHasChanges(true);
+          return { ...user, role: newRole };
+        }
+        return user;
       }),
     );
   };
 
-  const updateRoles = async () => {
+  const updateRolesOnServer = async () => {
     if (!hasChanges) return;
     try {
       setLoading(true);
       if (!userRole || !Addresses) return;
-      const updates = userRole
-        .filter((user, index) => user.role !== Addresses[index]?.role)
-        .map(({ id, role }) => ({ id, newRole: role }));
+      const updates = userRole.filter(
+        (user, index) => user.role !== Addresses[index]?.role,
+      );
       if (updates.length === 0) return;
-      const updatePromises = updates.map(({ id, newRole }) => {
-        const user = userRole.find((u) => u.id === id);
-        if (!user)
-          return Promise.reject(new Error(`User with ID ${id} not found`));
-
-        return axios.post(`${SERVER_URL}/upgradeMember`, {
-          new_role: newRole,
-          address: user.address,
+      const axiosPromises = updates.map(({ role, address }) =>
+        axios.post(`${SERVER_URL}/upgradeMember`, {
+          new_role: role,
+          address: address,
           community_id: app.activeChainId(),
           jwt: userData.jwt,
-        });
-      });
-      const responses = await Promise.all(updatePromises);
+        }),
+      );
+      const responses = await Promise.all(axiosPromises);
       responses.forEach((response) => {
         if (response.data.status === 'Success') {
           notifySuccess('Role Updated');
@@ -76,13 +84,43 @@ export const ManageOnchainModal = ({
         }
       });
       if (refetch) refetch();
-      onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error upgrading members:', error);
-      notifyError(`${error?.response?.data?.error}`);
+      notifyError(error?.response?.data?.error || error.message);
     } finally {
       setLoading(false);
-      onClose();
+    }
+  };
+
+  const updateAndMint = async () => {
+    try {
+      await updateRolesOnServer();
+
+      const adminUpdates = (userRole || []).filter(
+        (user, index) =>
+          user.role !== Addresses?.[index]?.role && user.role === 'admin',
+      );
+
+      if (adminUpdates.length > 0) {
+        await Promise.all(
+          adminUpdates.map(async (update) => {
+            await mintAdminTokenMutation.mutateAsync({
+              namespace,
+              walletAddress: userData.activeAccount?.address!,
+              adminAddress: update.address,
+              chainRpc,
+              ethChainId,
+              chainId,
+            });
+            notifySuccess(
+              `Admin token minted for ${formatAddressShort(update.address)}`,
+            );
+          }),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      notifyError('An error occurred while updating roles and minting tokens.');
     }
   };
 
@@ -133,13 +171,13 @@ export const ManageOnchainModal = ({
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          label="Confirm"
+          label="Confirm & Mint"
           buttonType="secondary"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={() => updateRoles()}
+          onClick={updateAndMint}
           buttonHeight="sm"
           disabled={loading || !hasChanges}
         />
+        <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
       </CWModalFooter>
     </div>
   );

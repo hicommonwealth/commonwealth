@@ -1,5 +1,7 @@
 import { Role } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
@@ -64,6 +66,18 @@ const MembersSection = ({
   refetch,
   extraColumns,
 }: MembersSectionProps) => {
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+  });
+
+  const chainRpc =
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
+  const ethChainId =
+    community?.chain_node_id || app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const namespace = community?.namespace || '';
+  const chainId = community?.id || app.activeChainId() || '';
+
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   const [selectedUserAddresses, setSelectedUserAddresses] = useState<
@@ -188,6 +202,10 @@ const MembersSection = ({
             }}
             Addresses={selectedUserAddresses}
             refetch={refetch}
+            namespace={namespace}
+            chainRpc={chainRpc}
+            ethChainId={ethChainId}
+            chainId={chainId}
           />
         }
         onClose={() => {
