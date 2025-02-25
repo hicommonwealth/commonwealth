@@ -20,11 +20,20 @@ export const notifyReferrerSignedUp: EventHandler<
   });
   if (!referrer?.user_id) return;
 
+  const referee = await models.User.findOne({
+    where: { id: user_id },
+    attributes: ['profile'],
+  });
+
   const provider = notificationsProvider();
   const res = await provider.triggerWorkflow({
     key: WorkflowKeys.ReferrerSignedUp,
     users: [{ id: referrer.user_id.toString() }],
-    data: { referee_user_id: user_id },
+    data: {
+      referee_user_id: user_id,
+      referee_profile_name: referee?.profile?.name || '',
+      referee_profile_avatar_url: referee?.profile?.avatar_url || '',
+    },
   });
   return !res.some((r) => r.status === 'rejected');
 };
