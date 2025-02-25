@@ -408,7 +408,7 @@ export const events = {
   SSOLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    oauth_provider: z.string(),
+    oauth_provider: z.string().nullish(),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),
