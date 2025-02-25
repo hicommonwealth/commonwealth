@@ -289,11 +289,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           where: { id: payload.thread_id },
           include: [
             {
-              model: models.Thread,
-              attributes: ['community_id'],
-              required: true,
-            },
-            {
               model: models.Address,
               as: 'Address',
               attributes: ['address'],
