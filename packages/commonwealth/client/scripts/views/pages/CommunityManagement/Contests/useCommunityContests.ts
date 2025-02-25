@@ -22,7 +22,6 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
   } = props || {};
   const { stakeEnabled } = useCommunityStake();
 
-  // Query for contests for the current community.
   const { data: contestsData, isLoading: isContestDataLoading } =
     useGetContestsQuery({
       community_id: app.activeChainId() || '',
