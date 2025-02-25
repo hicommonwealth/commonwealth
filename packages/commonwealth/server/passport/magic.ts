@@ -47,12 +47,14 @@ async function createMagicAddressInstances(
   {
     generatedAddresses,
     user,
+    isNewUser,
     decodedMagicToken,
     magicUserMetadata,
     transaction,
   }: {
     generatedAddresses: Array<{ address: string; community_id: string }>;
     user: UserAttributes;
+    isNewUser: boolean;
     decodedMagicToken: MagicUser;
     magicUserMetadata: MagicUserMetadata;
     transaction?: Transaction;
@@ -100,6 +102,16 @@ async function createMagicAddressInstances(
               user_id: addressInstance.user_id!,
               created_at: addressInstance.created_at!,
               oauth_provider: magicUserMetadata.oauthProvider,
+            },
+          },
+          {
+            event_name: 'SSOLinked',
+            event_payload: {
+              user_id: addressInstance.user_id!,
+              new_user: isNewUser,
+              oauth_provider: magicUserMetadata.oauthProvider,
+              community_id,
+              created_at: addressInstance.created_at!,
             },
           },
         ],
@@ -206,6 +218,7 @@ async function createNewMagicUser({
       await createMagicAddressInstances(models, {
         generatedAddresses,
         user: newUser,
+        isNewUser: true,
         decodedMagicToken,
         magicUserMetadata,
         transaction,
@@ -327,6 +340,7 @@ async function loginExistingMagicUser({
       const addressInstances = await createMagicAddressInstances(models, {
         generatedAddresses,
         user: existingUserInstance,
+        isNewUser: false,
         decodedMagicToken,
         magicUserMetadata,
         transaction,
@@ -406,6 +420,7 @@ async function addMagicToUser({
   const addressInstances = await createMagicAddressInstances(models, {
     generatedAddresses,
     user: loggedInUser!,
+    isNewUser: false,
     decodedMagicToken,
     magicUserMetadata,
   });
@@ -643,6 +658,7 @@ async function magicLoginRoute(
     await createMagicAddressInstances(models, {
       generatedAddresses,
       user: loggedInUser,
+      isNewUser: false,
       decodedMagicToken,
       magicUserMetadata,
     });
