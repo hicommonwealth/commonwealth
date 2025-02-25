@@ -39,6 +39,13 @@
           font-size: 14px;
           color: $neutral-700;
         }
+
+        .manage-options {
+          display: flex;
+          gap: 4;
+          align-items: center;
+          justify-content: flex-start;
+        }
       }
     }
 

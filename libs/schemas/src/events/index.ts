@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import * as chainEvents from './chain-event.schemas';
 import { events } from './events.schemas';
 
 export type EventSchemas = typeof events;
@@ -12,4 +11,4 @@ export type EventPairs = {
   [K in Events]: EventPair<K>;
 }[Events];
 
-export { chainEvents, events };
+export { events };

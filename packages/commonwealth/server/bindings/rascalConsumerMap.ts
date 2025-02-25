@@ -14,7 +14,6 @@ export const rascalConsumerMap = [
   ChainEventPolicy,
   DiscordBotPolicy,
   Contest.Contests,
-  User.UserReferrals,
   FarcasterWorker,
   NotificationsSettingsPolicy,
   {

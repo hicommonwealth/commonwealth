@@ -53,6 +53,7 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
   isOneOff: boolean,
+  blockNumber: number,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -118,6 +119,7 @@ async function updateOrCreateWithAlert(
           image_url: getDefaultContestImage(),
           payout_structure: [],
           is_farcaster_contest: false,
+          environment: config.APP_ENV,
         },
         { transaction },
       );
@@ -157,7 +159,7 @@ async function updateOrCreateWithAlert(
           event_signature: eventSignature,
           contract_name: childContractName,
           parent_contract_address: cp.factoryContracts[ethChainId].factory,
-          // TODO: add created_at_block so EVM CE runs the migrateEvents func
+          created_at_block: blockNumber,
         };
       },
     );
@@ -244,6 +246,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           payload.interval,
           false,
+          payload.block_number,
         );
       },
 
@@ -254,16 +257,15 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           0,
           true,
+          payload.block_number,
         );
       },
 
-      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
-        const contest_id = payload.contest_id!;
-        await models.Contest.create({
-          ...payload,
-          contest_id,
-        });
+        // ignore ContestStarted events from OneOff/Single contests
+        if (payload.contest_id !== 0) {
+          await models.Contest.create(payload);
+        }
       },
 
       ContestContentAdded: async ({ payload }) => {
@@ -333,7 +335,7 @@ export function Contests(): Projection<typeof inputs> {
           BigInt(payload.voting_power || 0) > BigInt(0) &&
           add_action?.ContestManager?.vote_weight_multiplier
         ) {
-          const { eth_chain_id, url, private_url } =
+          const { eth_chain_id } =
             add_action!.ContestManager!.Community!.ChainNode!;
           const { funding_token_address, vote_weight_multiplier } =
             add_action!.ContestManager!;
@@ -341,7 +343,6 @@ export function Contests(): Projection<typeof inputs> {
             payload.voter_address,
             funding_token_address!,
             eth_chain_id!,
-            getChainNodeUrl({ url, private_url }),
             vote_weight_multiplier!,
           );
           calculated_voting_weight = numTokens.toString();

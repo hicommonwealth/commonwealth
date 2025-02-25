@@ -4,7 +4,7 @@ import { ExternalEndpoints } from 'state/api/config';
 
 const TOKEN_USD_RATE_STALE_TIME = 10 * 60 * 1_000; // 10 min
 
-type CoinbaseResponseType = {
+export type CoinbaseResponseType = {
   data: {
     data: {
       amount: string;
@@ -14,7 +14,7 @@ type CoinbaseResponseType = {
   };
 };
 
-const fetchTokenUsdRate = async (tokenSymbol: string) => {
+export const fetchTokenUsdRate = async (tokenSymbol: string) => {
   return await axios.get(
     ExternalEndpoints.coinbase.tokenToUsdRate(tokenSymbol),
   );

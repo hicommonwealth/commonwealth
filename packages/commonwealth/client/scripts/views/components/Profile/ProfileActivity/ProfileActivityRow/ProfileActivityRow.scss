@@ -11,7 +11,13 @@
   border-bottom: 1px solid #dddddd;
   padding: 16px 60px 16px 60px;
   @include extraSmall {
-    padding: 0px 30px 0px 30px;
+    padding: 10px 30px 0px 30px;
+  }
+  .AuthorAndPublishInfo {
+    flex-wrap: nowrap;
+    .community-user-info a {
+      color: $black;
+    }
   }
 
   &:hover {
@@ -31,14 +37,14 @@
     align-items: center;
 
     @include extraSmall {
-      flex-wrap: wrap;
       margin-bottom: 2px;
+      flex-wrap: wrap;
     }
 
     .created_at {
-      color: $neutral-700 !important;
       margin-bottom: 10px;
       min-width: fit-content;
+      color: $neutral-500;
       @include extraSmall {
         margin-bottom: 0px;
         font-size: 12px !important;
@@ -176,20 +182,30 @@
     overflow: auto;
     align-items: center;
     justify-content: space-between;
-
+    height: fit-content;
+    max-height: 80px;
+    @include extraSmall {
+      overflow: hidden;
+    }
     .MarkdownFormattedText {
+      @include extraSmall {
+        padding-top: 0px !important;
+      }
+
       div {
-        max-height: 80px !important;
-        min-height: 30px !important;
         overflow: hidden;
         @include extraSmall {
-          max-height: 108px !important;
+          display: flex;
           overflow: hidden;
         }
       }
 
       width: 90%;
       height: 100%;
+      @include extraSmall {
+        height: auto;
+        width: auto;
+      }
       padding-top: 10px;
       margin-right: 16px;
       margin-right: 16px;
@@ -199,6 +215,11 @@
         font-size: 21px !important;
         line-height: 21px !important;
         font-family: $font-family-neue-haas-unica;
+
+        @include extraSmall {
+          font-size: 14px !important;
+          line-height: 20px !important;
+        }
       }
 
       p {
@@ -218,5 +239,10 @@
   .footer {
     display: flex;
     gap: 10px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 8px;
+    padding-bottom: 0px;
   }
 }

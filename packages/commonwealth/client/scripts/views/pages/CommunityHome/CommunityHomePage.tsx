@@ -5,6 +5,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -14,6 +15,7 @@ import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
 import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
+import TokenPerformance from './TokenPerformance/TokenPerformance';
 
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,6 +29,10 @@ const CommunityHome = () => {
   } = useManageCommunityStakeModalStore();
 
   const [selectedCommunityId] = useState<string>();
+
+  if (!communityHomeEnabled) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
@@ -46,6 +52,7 @@ const CommunityHome = () => {
             />
           </div>
         </div>
+        <TokenPerformance />
         <ActiveContestList />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}

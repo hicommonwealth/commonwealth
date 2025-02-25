@@ -1,20 +1,13 @@
-import {
-  logger,
-  parseEvmEventToContestEvent,
-  stats,
-} from '@hicommonwealth/core';
-import {
-  ChainEventSigs,
-  EvmEventSignatures,
-} from '@hicommonwealth/evm-protocols';
+import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
-import { events as coreEvents } from '@hicommonwealth/schemas';
-import { ethers } from 'ethers';
-import { z } from 'zod';
+import { EventPairs } from '@hicommonwealth/schemas';
+import { serializeBigIntObj } from '@hicommonwealth/shared';
+import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
 import { getEventSources } from './getEventSources';
-import { getEvents, getProvider, migrateEvents } from './logProcessing';
-import { EvmEvent, EvmSource } from './types';
+import { getEvents, migrateEvents } from './logProcessing';
+import { EvmSource } from './types';
+import { updateMigratedEvmEventSources } from './utils';
 
 const log = logger(import.meta);
 
@@ -54,8 +47,10 @@ export async function processChainNode(
       },
     });
 
-    const provider = getProvider(evmSource.rpc);
-    const currentBlock = await provider.getBlockNumber();
+    const client = createPublicClient({
+      transport: http(evmSource.rpc),
+    });
+    const currentBlock = Number(await client.getBlockNumber());
 
     let startBlockNum: number;
     if (!lastProcessedBlock) {
@@ -74,9 +69,9 @@ export async function processChainNode(
       return;
     }
 
-    const allEvents: EvmEvent[] = [];
-    const migratedData = await migrateEvents(evmSource, startBlockNum);
-    if (migratedData && migratedData?.events?.length > 0)
+    const allEvents: Array<EventPairs> = [];
+    const migratedData = await migrateEvents(evmSource, startBlockNum - 1);
+    if ('events' in migratedData && migratedData.events?.length > 0)
       allEvents.push(...migratedData.events);
 
     const { events, lastBlockNum } = await getEvents(
@@ -101,73 +96,19 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        // log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
         return;
       }
 
-      const records = allEvents.map((event) => {
-        const contractAddress = ethers.utils.getAddress(event.rawLog.address);
-
-        const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
-          parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
-
-        switch (event.eventSource.eventSignature) {
-          case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
-            return parseContestEvent('NewContest') as
-              | {
-                  event_name: 'RecurringContestManagerDeployed';
-                  event_payload: z.infer<
-                    typeof coreEvents.RecurringContestManagerDeployed
-                  >;
-                }
-              | {
-                  event_name: 'OneOffContestManagerDeployed';
-                  event_payload: z.infer<
-                    typeof coreEvents.OneOffContestManagerDeployed
-                  >;
-                };
-          case EvmEventSignatures.Contests.RecurringContestStarted:
-            return parseContestEvent('NewRecurringContestStarted') as {
-              event_name: 'ContestStarted';
-              event_payload: z.infer<typeof coreEvents.ContestStarted>;
-            };
-          case EvmEventSignatures.Contests.SingleContestStarted:
-            return parseContestEvent('NewSingleContestStarted') as {
-              event_name: 'ContestStarted';
-              event_payload: z.infer<typeof coreEvents.ContestStarted>;
-            };
-          case EvmEventSignatures.Contests.ContentAdded:
-            return parseContestEvent('ContentAdded') as {
-              event_name: 'ContestContentAdded';
-              event_payload: z.infer<typeof coreEvents.ContestContentAdded>;
-            };
-          case EvmEventSignatures.Contests.RecurringContestVoterVoted:
-            return parseContestEvent('VoterVotedRecurring') as {
-              event_name: 'ContestContentUpvoted';
-              event_payload: z.infer<typeof coreEvents.ContestContentUpvoted>;
-            };
-          case EvmEventSignatures.Contests.SingleContestVoterVoted:
-            return parseContestEvent('VoterVotedOneOff') as {
-              event_name: 'ContestContentUpvoted';
-              event_payload: z.infer<typeof coreEvents.ContestContentUpvoted>;
-            };
-        }
-
-        // fallback to generic chain event
-        return {
-          event_name: 'ChainEventCreated',
-          event_payload: event as z.infer<typeof coreEvents.ChainEventCreated>,
-        } as {
-          event_name: 'ChainEventCreated';
-          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-        };
-      });
-
-      if (records.length) {
+      if (allEvents.length) {
         log.info(
           `>>> ethChainId ${ethChainId}: ${JSON.stringify(
             Object.fromEntries(
-              records.reduce(
+              allEvents.reduce(
                 (map, { event_name }) =>
                   map.set(event_name, (map.get(event_name) ?? 0) + 1),
                 new Map(),
@@ -175,7 +116,16 @@ export async function processChainNode(
             ),
           )}`,
         );
-        await emitEvent(models.Outbox, records, transaction);
+        await emitEvent(
+          models.Outbox,
+          allEvents.map((e) => serializeBigIntObj(e)) as Array<EventPairs>,
+          transaction,
+        );
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
       }
     });
   } catch (e) {

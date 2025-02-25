@@ -114,7 +114,7 @@ const FundContestForm = ({
           containerClassName="eth-amount"
           fullWidth
           min={0}
-          step={0.0001}
+          step={0.001}
         />
 
         <div className="amount-helper-row">

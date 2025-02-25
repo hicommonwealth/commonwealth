@@ -43,9 +43,11 @@ interface SignTransactionsStepProps {
   isFarcasterContest: boolean;
 }
 
-const ONE_HOUR_IN_SECONDS =
-  process.env.NODE_ENV === 'development' ? 180 : 60 * 60;
-console.log({ ONE_HOUR_IN_SECONDS });
+const ONE_HOUR_IN_SECONDS = 60 * 60;
+
+const CUSTOM_CONTEST_DURATION_IN_SECONDS =
+  Number(process.env.CONTEST_DURATION_IN_SEC) || ONE_HOUR_IN_SECONDS;
+console.log({ CUSTOM_CONTEST_DURATION_IN_SECONDS });
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -87,7 +89,7 @@ const SignTransactionsStep = ({
     const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
-      ? ONE_HOUR_IN_SECONDS
+      ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
 
     const stakeId = stakeData?.stake_id;
@@ -95,7 +97,7 @@ const SignTransactionsStep = ({
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
-      ? ONE_HOUR_IN_SECONDS
+      ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = user.activeAccount?.address;
@@ -103,6 +105,9 @@ const SignTransactionsStep = ({
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
+    const voteToken = contestFormData?.isFarcasterContest
+      ? exchangeToken
+      : contestFormData?.contestTopic?.tokenAddress;
 
     const singleERC20 = {
       ethChainId,
@@ -110,7 +115,7 @@ const SignTransactionsStep = ({
       namespaceName,
       contestInterval: contestLength,
       winnerShares,
-      voteToken: exchangeToken,
+      voteToken,
       voterShare,
       walletAddress,
       exchangeToken,

@@ -9,6 +9,11 @@
 
   .react-datepicker-wrapper {
     width: 100% !important;
+    min-width: 250px;
+
+    @include extraSmall {
+      min-width: 100%;
+    }
   }
 
   .react-datepicker__input-container {
@@ -20,6 +25,43 @@
 
       &.darkMode {
         @include darkModeInputStyles;
+      }
+    }
+  }
+
+  .react-datepicker__input-time-container {
+    margin: 0;
+    width: 100%;
+    padding: 8px;
+
+    .react-datepicker-time__caption {
+      color: $neutral-500;
+      font-size: 12px;
+      padding-bottom: 2px;
+      padding-left: 2px;
+    }
+
+    .react-datepicker-time__input-container {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    .react-datepicker-time__input {
+      margin-left: 0;
+      width: 100% !important;
+    }
+
+    input {
+      border: 1px solid $neutral-300;
+      border-radius: 6px;
+      padding: 4px;
+      cursor: pointer;
+
+      &:focus,
+      &:focus-within,
+      &:focus-visible {
+        border: 1px solid $primary-300;
+        outline: none;
       }
     }
   }

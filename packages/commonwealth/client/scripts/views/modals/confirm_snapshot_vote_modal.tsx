@@ -2,7 +2,6 @@ import React from 'react';
 
 import { formatBigNumberShort } from 'adapters/currency';
 import { MixpanelSnapshotEvents } from 'analytics/types';
-import { BigNumber } from 'ethers';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserStore from 'state/ui/user';
@@ -98,9 +97,10 @@ export const ConfirmSnapshotVoteModal = (
           <div className="vote-info-row">
             <CWText>Your voting power</CWText>
             <CWText>
-              {`${formatBigNumberShort(BigNumber.from(totalScore))} ${space.symbol
-                .slice(0, 6)
-                .trim()}...`}
+              {`${formatBigNumberShort(
+                totalScore,
+                8,
+              )} ${space.symbol.slice(0, 6).trim()}...`}
             </CWText>
           </div>
         </div>

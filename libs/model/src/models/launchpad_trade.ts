@@ -12,7 +12,7 @@ export type LaunchpadTradeModelStatic =
 
 export default (sequelize: Sequelize.Sequelize): LaunchpadTradeModelStatic =>
   <LaunchpadTradeModelStatic>sequelize.define<LaunchpadTradeInstance>(
-    'LaunchpadTrade',
+    'LaunchpadTokenTraded',
     {
       eth_chain_id: {
         type: Sequelize.INTEGER,

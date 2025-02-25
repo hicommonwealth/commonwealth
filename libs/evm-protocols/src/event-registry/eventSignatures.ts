@@ -47,8 +47,6 @@ export const EvmEventSignatures = {
       '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',
   },
   Referrals: {
-    ReferralSet:
-      '0xdf63218877cb126f6c003f2b7f77327674cd6a0b53ad51deac392548ec12b0ed',
     FeeDistributed:
       '0xadecf9f6e10f953395058158f0e6e399835cf1d045bbed7ecfa82947ecc0a368',
   },

@@ -30,6 +30,7 @@ export * from './commands';
 export * from './context';
 export * from './entities';
 export * from './events';
+export * from './integrations';
 export * from './projections';
 export * from './queries';
 export * from './utils';

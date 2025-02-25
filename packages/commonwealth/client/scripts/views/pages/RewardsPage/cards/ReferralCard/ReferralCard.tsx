@@ -50,6 +50,7 @@ const ReferralCard = ({
               label={tab}
               isSelected={currentTab === tab}
               onClick={() => setCurrentTab(tab)}
+              isDisabled={tab === ReferralTabs.XP}
             />
           ))}
         </CWTabsRow>
@@ -57,7 +58,7 @@ const ReferralCard = ({
           {currentTab === ReferralTabs.Total && (
             <div className="total-body">
               <CWText fontWeight="bold" type="h4">
-                ETH {totalEarnings.toLocaleString()}
+                ETH {totalEarnings}
               </CWText>
               {!isLoading && (trendValue || trendValue === 0) && (
                 <Trend value={trendValue} />

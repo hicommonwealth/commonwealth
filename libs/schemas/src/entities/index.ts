@@ -19,6 +19,7 @@ export * from './stake.schemas';
 export * from './tag.schemas';
 export * from './thread.schemas';
 export * from './topic.schemas';
+export * from './twitter-cursors.schemas';
 export * from './user.schemas';
 export * from './wallets.schemas';
 export * from './webhook.schemas';

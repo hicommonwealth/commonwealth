@@ -6,7 +6,6 @@ import {
   // TEST_BLOCK_INFO_STRING,
   WalletId,
   getSessionSigners,
-  getTestSigner,
   serializeCanvas,
 } from '@hicommonwealth/shared';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -14,9 +13,10 @@ import { tester } from '../../src';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import { SignIn } from '../../src/user/SignIn.command';
-import { CommunitySeedOptions, seedCommunity } from '../utils';
+import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [evmSigner, _, cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 

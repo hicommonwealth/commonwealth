@@ -87,14 +87,6 @@ export async function bootstrapBindings(
   const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
   checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
 
-  const userReferralsProjectionSubRes = await brokerInstance.subscribe(
-    User.UserReferrals,
-  );
-  checkSubscriptionResponse(
-    userReferralsProjectionSubRes,
-    User.UserReferrals.name,
-  );
-
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
     FarcasterWorker,
     buildRetryStrategy(undefined, 20_000),

@@ -21,8 +21,8 @@ const QuestsExplorer = () => {
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
-  const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleCTAClick = (questId: number, communityId?: string) => {
+    navigate(`/quest/${questId}`, {}, communityId);
   };
 
   const handleSeeAllClick = () => {
@@ -48,9 +48,13 @@ const QuestsExplorer = () => {
             />
           </div>
           {quests.map((quest) => {
-            const totalXP =
+            const totalUserXP =
               (quest.action_metas || [])
-                ?.map((action) => action.reward_amount)
+                ?.map(
+                  (action) =>
+                    action.reward_amount -
+                    action.creator_reward_weight * action.reward_amount,
+                )
                 .reduce(
                   (accumulator, currentValue) => accumulator + currentValue,
                   0,
@@ -61,9 +65,12 @@ const QuestsExplorer = () => {
                 key={quest.name}
                 label={quest.name}
                 description={quest.description}
-                xpPoints={totalXP}
+                communityId={quest.community_id || ''}
+                xpPoints={totalUserXP}
                 featuredImgURL={quest.image_url}
-                onExploreClick={() => handleCTAClick(quest.id)}
+                onExploreClick={() =>
+                  handleCTAClick(quest.id, quest.community_id || '')
+                }
               />
             );
           })}

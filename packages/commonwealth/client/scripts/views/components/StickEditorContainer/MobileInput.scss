@@ -1,4 +1,46 @@
 .MobileInput {
+  .conatiner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+
+    .input-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid #e5e5e5;
+
+      .input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .ai-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .ai-toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .label {
+          font-size: 12px;
+          color: #757575;
+        }
+      }
+    }
+  }
+
   flex-grow: 1;
   display: flex;
 

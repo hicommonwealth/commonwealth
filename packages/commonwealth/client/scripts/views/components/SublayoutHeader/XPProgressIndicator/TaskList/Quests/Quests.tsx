@@ -27,8 +27,12 @@ const Quests = ({
     navigate('/explore', {}, null);
   };
 
-  const handleQuestCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleQuestCTAClick = (questId: number, communityId?: string) => {
+    navigate(
+      `${communityId ? `/${communityId}` : ''}/quest/${questId}`,
+      {},
+      null,
+    );
   };
 
   return (
@@ -58,7 +62,9 @@ const Quests = ({
             <QuestTask
               key={quest.id}
               quest={quest}
-              onClick={() => handleQuestCTAClick(quest.id)}
+              onClick={() =>
+                handleQuestCTAClick(quest.id, quest.communityId || '')
+              }
             />
           ))}
         </div>

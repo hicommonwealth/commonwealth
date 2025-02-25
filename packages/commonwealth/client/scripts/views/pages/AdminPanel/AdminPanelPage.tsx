@@ -9,6 +9,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import './AdminPanel.scss';
 import Analytics from './Analytics';
+import ChangeResourceTimestamps from './ChangeResourceTimestamps';
 import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
@@ -54,6 +55,7 @@ const AdminPanelPage = () => {
         <TopUsers />
         <TriggerNotificationsWorkflow />
         <EnableDigestEmail />
+        <ChangeResourceTimestamps />
       </div>
     </CWPageLayout>
   );

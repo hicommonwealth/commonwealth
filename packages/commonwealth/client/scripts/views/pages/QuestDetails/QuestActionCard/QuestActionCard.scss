@@ -50,9 +50,26 @@
         color: $neutral-700;
       }
 
-      .points {
+      .points-row {
         display: flex;
         gap: 12px;
+      }
+
+      .action-link {
+        color: $primary-500;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        gap: 4px;
+
+        &:hover,
+        &:focus,
+        :focus-within,
+        :focus-within,
+        :active {
+          color: $primary-500;
+        }
       }
 
       .xp-shares {

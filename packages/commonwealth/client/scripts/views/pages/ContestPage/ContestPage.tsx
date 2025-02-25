@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
@@ -14,6 +15,7 @@ import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/C
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import NewContestPage from './NewContestPage';
 
 import './ContestPage.scss';
 
@@ -33,11 +35,18 @@ const sortOptions = [
   },
 ];
 
+export enum MobileTabType {
+  Entries = 'Entries',
+  PriceChart = 'Price Chart',
+  TokenSwap = 'Token Swap',
+}
+
 interface ContestPageProps {
   contestAddress: string;
 }
 
 const ContestPage = ({ contestAddress }: ContestPageProps) => {
+  const newContestPageEnabled = useFlag('newContestPage');
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
@@ -59,6 +68,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   }
 
   const { end_time } = contest?.contests[0] || {};
+
+  if (newContestPageEnabled) {
+    return <NewContestPage contestAddress={contestAddress} />;
+  }
 
   return (
     <CWPageLayout>

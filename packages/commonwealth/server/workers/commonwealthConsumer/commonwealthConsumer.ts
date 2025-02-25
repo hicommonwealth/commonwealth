@@ -40,6 +40,7 @@ async function main() {
     isServiceHealthy = true;
     bootstrapContestRolloverLoop();
   } catch (error) {
+    isServiceHealthy = false;
     log.fatal('Consumer setup failed', error);
   }
 }

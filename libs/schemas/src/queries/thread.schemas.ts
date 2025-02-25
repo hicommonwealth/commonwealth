@@ -26,14 +26,16 @@ export const ContestView = z.object({
   contest_address: z.string(),
   start_time: z.date().or(z.string()),
   end_time: z.date().or(z.string()),
-  score: z.array(
-    z.object({
-      prize: z.string(),
-      votes: z.string(),
-      content_id: z.string(),
-      creator_address: z.string(),
-    }),
-  ),
+  score: z
+    .array(
+      z.object({
+        prize: z.string(),
+        votes: z.string(),
+        content_id: z.string(),
+        creator_address: z.string(),
+      }),
+    )
+    .nullish(),
   contest_name: z.string().nullish(),
   contest_interval: z.number().nullish(),
   content_id: z.number().nullish(),

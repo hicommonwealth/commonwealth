@@ -26,16 +26,19 @@
     width: 80%;
     justify-content: space-between;
     display: flex;
-    position: absolute;
-    bottom: 2px;
-    margin-top: 10px;
+    margin-top: auto; // This pushes the buttons to the bottom
+    padding-top: 24px; // Add some space above the buttons
+    gap: 10px;
+
     .primary {
       background-color: $primary-600 !important;
     }
     @include extraSmall {
       bottom: 80px;
-      grid-template-columns: 1fr 1fr;
       gap: 16px;
+    }
+    @include heightSmallInclusive {
+      bottom: 4px;
     }
   }
 }
