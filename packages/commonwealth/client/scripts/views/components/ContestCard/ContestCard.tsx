@@ -67,6 +67,8 @@ interface ContestCardProps {
     name: string;
     iconUrl: string;
     id: string;
+    ethChainId: number;
+    chainNodeUrl: string;
   };
 }
 
@@ -109,9 +111,8 @@ const ContestCard = ({
   const { data: contestBalance, isLoading: isLoadingContestBalance } =
     useGetContestBalanceQuery({
       contestAddress: address,
-      // this oes not work in explore page or home page
-      chainRpc: app.chain.meta?.ChainNode?.url || '',
-      ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
+      chainRpc: community?.chainNodeUrl || '',
+      ethChainId: community?.ethChainId || 0,
       isOneOff: !isRecurring,
     });
 

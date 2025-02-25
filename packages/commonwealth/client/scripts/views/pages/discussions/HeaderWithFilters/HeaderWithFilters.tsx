@@ -566,6 +566,13 @@ export const HeaderWithFilters = ({
                 isHorizontal
                 showShareButton={false}
                 payoutStructure={contest.payout_structure}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                  ethChainId: community?.ChainNode?.eth_chain_id || 0,
+                  chainNodeUrl: community?.ChainNode?.url || '',
+                }}
               />
             );
           })}

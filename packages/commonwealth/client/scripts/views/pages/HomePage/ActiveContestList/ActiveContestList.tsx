@@ -42,6 +42,7 @@ const ActiveContestList = () => {
         iconUrl: communityData?.icon_url || '',
         chainNodeUrl: communityData?.ChainNode?.url,
         ethChainId: communityData?.ChainNode?.eth_chain_id,
+        id: communityData?.id,
       },
     };
   }, {});
@@ -83,7 +84,6 @@ const ActiveContestList = () => {
               return (
                 <ContestCard
                   key={contest.contest_address}
-                  community={community[contest.community_id as string]}
                   isAdmin={false}
                   address={contest.contest_address || ''}
                   name={contest.name || ''}
@@ -99,6 +99,7 @@ const ActiveContestList = () => {
                   isFarcaster={
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
+                  community={community[contest.community_id as string]}
                 />
               );
             })}

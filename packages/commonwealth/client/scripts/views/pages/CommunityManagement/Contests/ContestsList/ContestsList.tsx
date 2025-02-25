@@ -52,6 +52,8 @@ interface ContestsListProps {
     id: string;
     name: string;
     iconUrl: string;
+    ethChainId: number;
+    chainNodeUrl: string;
   };
 }
 
