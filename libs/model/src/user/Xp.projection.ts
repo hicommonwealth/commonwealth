@@ -219,28 +219,28 @@ async function recordXpsForEvent(
   });
 }
 
+// automatic xp rewards: @dillchen should we softcode these in .env or db?
+const SignUpFlowCompletedReward = 20;
+const SignUpFlowCompletedReferrerRewardWeight = 0.2;
+const WalletLinkedReward = 10;
+const SSOLinkedReward = 10;
+
 export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
     inputs: schemas.QuestEvents,
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
-        // TODO: softcode reward amount and reward weight in some way similar to quests
-        const reward_amount = 20;
-        const creator_reward_weight = 0.2;
-
         const referee_address = await models.User.findOne({
           where: { id: payload.user_id },
         });
-        referee_address &&
-          referee_address.referred_by_address &&
-          (await recordXpsForEvent(
-            payload.user_id,
-            'SignUpFlowCompleted',
-            payload.created_at!,
-            reward_amount,
-            referee_address.referred_by_address,
-            creator_reward_weight,
-          ));
+        await recordXpsForEvent(
+          payload.user_id,
+          'SignUpFlowCompleted',
+          payload.created_at!,
+          SignUpFlowCompletedReward,
+          referee_address?.referred_by_address || undefined,
+          SignUpFlowCompletedReferrerRewardWeight,
+        );
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -288,11 +288,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const thread = await models.Thread.findOne({
           where: { id: payload.thread_id },
           include: [
-            {
-              model: models.Thread,
-              attributes: ['community_id'],
-              required: true,
-            },
             {
               model: models.Address,
               as: 'Address',
@@ -419,6 +414,43 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
+      },
+      WalletLinked: async ({ payload }) => {
+        if (payload.new_user) {
+          await recordXpsForEvent(
+            payload.user_id,
+            'WalletLinked',
+            payload.created_at,
+            WalletLinkedReward,
+          );
+        } else {
+          const action_metas = await getQuestActionMetas(
+            payload,
+            'WalletLinked',
+          );
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.created_at,
+            action_metas,
+          );
+        }
+      },
+      SSOLinked: async ({ payload }) => {
+        if (payload.new_user) {
+          await recordXpsForEvent(
+            payload.user_id,
+            'SSOLinked',
+            payload.created_at,
+            SSOLinkedReward,
+          );
+        } else {
+          const action_metas = await getQuestActionMetas(payload, 'SSOLinked');
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.created_at,
+            action_metas,
+          );
+        }
       },
     },
   };
