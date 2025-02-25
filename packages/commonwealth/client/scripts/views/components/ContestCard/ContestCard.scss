@@ -15,6 +15,10 @@
       max-height: 240px;
       max-width: 522px;
     }
+
+    .contest-icon-container {
+      display: none;
+    }
   }
 
   .active-contest-tag {
@@ -42,6 +46,10 @@
   .contest-body {
     width: 100%;
     padding: 12px;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    position: relative;
 
     .header-row {
       display: flex;
@@ -52,12 +60,31 @@
 
       .header-row-left {
         display: flex;
-        align-items: center;
+        align-items: self-start;
         gap: 8px;
       }
 
       & > .Text {
         word-break: break-word;
+      }
+
+      .contest-icon-container {
+        position: absolute;
+        background: $white;
+        border-radius: 50%;
+        right: 20px;
+        top: -30px;
+        width: 30px;
+        height: 30px;
+
+        .contest-icon {
+          width: 100%;
+          height: 100%;
+
+          &.common-icon {
+            padding: 2px;
+          }
+        }
       }
 
       .CWCountDownTimer {
@@ -90,6 +117,7 @@
       display: flex;
       gap: 8px;
       flex-direction: column;
+      margin-bottom: 8px;
 
       .prize-row {
         display: flex;
@@ -131,7 +159,7 @@
     .actions {
       display: flex;
       gap: 16px;
-      margin-top: 8px;
+      margin-top: auto;
 
       @include extraSmall {
         justify-content: space-between;

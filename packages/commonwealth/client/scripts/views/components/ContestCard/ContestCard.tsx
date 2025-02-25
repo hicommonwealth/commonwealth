@@ -3,6 +3,7 @@ import moment from 'moment';
 import React from 'react';
 
 import { buildContestPrizes } from '@hicommonwealth/shared';
+import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
@@ -236,6 +237,12 @@ const ContestCard = ({
           ) : isActive ? (
             <Skeleton width="70px" />
           ) : null}
+          <div className="contest-icon-container">
+            <img
+              className={clsx('contest-icon', !isFarcaster && 'common-icon')}
+              src={isFarcaster ? farcasterUrl : commonLogo}
+            />
+          </div>
         </div>
         {!isFarcaster && topics?.length > 0 && (
           <CWText className="topics">

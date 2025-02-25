@@ -34,6 +34,19 @@
       flex-direction: column;
       flex-wrap: nowrap;
     }
+
+    .ContestCard {
+      max-width: 335px;
+
+      .header-row {
+        flex-direction: column;
+        align-items: start;
+
+        .CWCountDownTimer {
+          margin-left: 0;
+        }
+      }
+    }
   }
 
   .empty-contests {
