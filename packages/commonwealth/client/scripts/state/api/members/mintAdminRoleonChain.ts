@@ -42,9 +42,7 @@ export const mintAdminToken = async ({
   );
 };
 
-interface UseMintAdminTokenMutationProps {}
-
-const useMintAdminTokenMutation = ({}: UseMintAdminTokenMutationProps = {}) => {
+const useMintAdminTokenMutation = () => {
   return useMutation({
     mutationFn: mintAdminToken,
   });
