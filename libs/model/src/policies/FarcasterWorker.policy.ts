@@ -64,19 +64,12 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             return;
           }
 
-          // each environment has 1 programmatic webhook
-          const environment =
-            config.APP_ENV === 'local'
-              ? config.CONTESTS.FARCASTER_NGROK_DOMAIN?.replace('https://', '')
-              : config.APP_ENV;
-          const webhookName = `fc-${environment}-replies`;
-
           // find webhook by name, otherwise create it
           const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-          const { webhooks } = await client.fetchWebhooks();
-          const existingCastWebhook = webhooks.find(
-            (w) => w.title === webhookName,
+          const { webhook: existingCastWebhook } = await client.lookupWebhook(
+            config.CONTESTS.NEYNAR_CAST_WEBHOOK_ID!,
           );
+          mustExist('Neynar Webhook', existingCastWebhook);
 
           // merge all old and new parent hashes
           const parent_hashes = _.uniq([
@@ -89,34 +82,29 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           ]);
 
           const subscription = {
+            ...(existingCastWebhook.subscription?.filters || {}),
             // reply cast created on parent
             'cast.created': {
+              ...(existingCastWebhook.subscription?.filters['cast.created'] ||
+                {}),
               parent_hashes,
             },
             // reply cast deleted on parent
             'cast.deleted': {
+              ...(existingCastWebhook.subscription?.filters['cast.deleted'] ||
+                {}),
               parent_hashes,
             },
           };
 
-          if (!existingCastWebhook) {
-            await client.publishWebhook(
-              webhookName,
-              `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}/api/integration/farcaster/CastEvent`,
-              {
-                subscription,
-              },
-            );
-          } else {
-            await client.updateWebhook(
-              existingCastWebhook.webhook_id,
-              existingCastWebhook.title,
-              existingCastWebhook.target_url,
-              {
-                subscription,
-              },
-            );
-          }
+          await client.updateWebhook(
+            existingCastWebhook.webhook_id,
+            existingCastWebhook.title,
+            existingCastWebhook.target_url,
+            {
+              subscription,
+            },
+          );
 
           // update contest manager frame hashes
           contestManager.farcaster_frame_hashes = parent_hashes;

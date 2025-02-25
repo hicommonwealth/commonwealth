@@ -97,6 +97,7 @@ export const config = configure(
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+      NEYNAR_CAST_WEBHOOK_ID: NEYNAR_CAST_WEBHOOK_ID,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
       FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
       FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
@@ -231,6 +232,13 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_CAST_WEBHOOK_ID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CAST_WEBHOOK_ID must be set to a non-default value in production.',
         ),
       FARCASTER_ACTION_URL: z
         .string()
