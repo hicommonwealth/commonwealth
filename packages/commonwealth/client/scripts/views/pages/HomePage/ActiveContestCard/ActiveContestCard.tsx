@@ -1,18 +1,17 @@
 import moment from 'moment';
 import React, { ReactNode } from 'react';
 
+import { capDecimals } from 'client/scripts/views/modals/ManageCommunityStakeModal/utils';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import { formatAddressShort, smartTrim } from 'shared/utils';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
-
-import { formatAddressShort, smartTrim } from 'shared/utils';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { Contest } from '../../CommunityManagement/Contests/ContestsList';
 import './ActiveContestCard.scss';
 

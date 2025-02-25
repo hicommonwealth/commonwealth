@@ -1,5 +1,5 @@
+import { WEI_PER_ETHER } from '@hicommonwealth/shared';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';

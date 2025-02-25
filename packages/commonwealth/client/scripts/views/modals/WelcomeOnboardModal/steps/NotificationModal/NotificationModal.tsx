@@ -3,18 +3,29 @@ import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/c
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 // eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSettingCallback } from 'client/scripts/views/pages/NotificationSettings/useSubscriptionPreferenceSettingCallback';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+// eslint-disable-next-line max-len
+import { useSubscriptionPreferenceSetting } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
+// eslint-disable-next-line max-len
+import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 import './NotificationModal.scss';
+
 type NotificationModalProps = {
   onComplete: () => void;
 };
 
 const NotificationModal = ({ onComplete }: NotificationModalProps) => {
-  const [checked, activate] = useSubscriptionPreferenceSettingCallback(
+  const checked = useSubscriptionPreferenceSetting(
     'mobile_push_notifications_enabled',
   );
+
+  const activate = useSubscriptionPreferenceSettingToggle([
+    'mobile_push_notifications_enabled',
+    'mobile_push_discussion_activity_enabled',
+    'mobile_push_admin_alerts_enabled',
+  ]);
+
   const [enableNotifications, setEnableNotification] = useState(checked);
 
   useEffect(() => {

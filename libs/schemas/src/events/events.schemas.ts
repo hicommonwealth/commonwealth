@@ -1,3 +1,4 @@
+import { WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -137,6 +138,7 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     created_at: z.coerce.date(),
+    oauth_provider: z.string().nullish(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -340,7 +342,7 @@ export const events = {
       ethAmount: z.coerce.bigint(),
       protocolEthAmount: z.coerce.bigint(),
       nameSpaceEthAmount: z.coerce.bigint(),
-      supply: z.bigint(),
+      supply: z.coerce.bigint(),
       exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
@@ -393,5 +395,21 @@ export const events = {
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
+  }),
+
+  WalletLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    wallet_id: z.nativeEnum(WalletId),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  SSOLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    oauth_provider: z.string(),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
   }),
 } as const;

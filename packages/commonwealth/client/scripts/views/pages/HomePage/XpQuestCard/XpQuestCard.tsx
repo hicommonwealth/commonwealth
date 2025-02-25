@@ -109,7 +109,7 @@ const QuestCard = ({
             buttonHeight="sm"
           />
           <CWButton
-            label="Go to Quests"
+            label="Go to Quest"
             buttonWidth="full"
             buttonType="primary"
             buttonHeight="sm"
