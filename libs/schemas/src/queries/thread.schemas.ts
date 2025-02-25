@@ -140,6 +140,8 @@ export const CommentView = Comment.extend({
   CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
 
+export type CommentViewType = z.infer<typeof CommentView>;
+
 export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
   id: PG_INT,
   timestamp: z.date().or(z.string()),

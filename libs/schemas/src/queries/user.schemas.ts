@@ -6,7 +6,12 @@ import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
-import { AddressView, CommentView, ThreadView } from './thread.schemas';
+import {
+  AddressView,
+  CommentView,
+  CommentViewType,
+  ThreadView,
+} from './thread.schemas';
 
 export const UserProfileAddressView = AddressView.extend({
   Community: z.object({
@@ -29,7 +34,7 @@ export const UserProfileView = z.object({
     UserProfileAddressView[]
   >,
   threads: z.array(ThreadView),
-  comments: z.array(CommentView),
+  comments: z.array(CommentView) as ZodType<CommentViewType[]>,
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
@@ -39,11 +44,13 @@ export const UserProfileView = z.object({
   xp_points: PG_INT.default(0),
 });
 
+type UserProfileView = z.infer<typeof UserProfileView>;
+
 export const GetUserProfile = {
   input: z.object({
     userId: PG_INT.optional(),
   }),
-  output: UserProfileView,
+  output: UserProfileView as ZodType<UserProfileView>,
 };
 
 export const GetUser = {
