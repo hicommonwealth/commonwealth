@@ -94,6 +94,9 @@ export const ManageOnchainModal = ({
 
   const updateAndMint = async () => {
     try {
+      const walletAddress = userData.activeAccount?.address;
+      if (!walletAddress) throw Error('Wallet Address Not Found');
+
       await updateRolesOnServer();
 
       const adminUpdates = (userRole || []).filter(
@@ -106,7 +109,7 @@ export const ManageOnchainModal = ({
           adminUpdates.map(async (update) => {
             await mintAdminTokenMutation.mutateAsync({
               namespace,
-              walletAddress: userData.activeAccount?.address!,
+              walletAddress,
               adminAddress: update.address,
               chainRpc,
               ethChainId,
