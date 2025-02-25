@@ -160,12 +160,12 @@ export const ChipsAndModelBar = ({
       {/* Action buttons below */}
       <div className="action-chips">
         <CWButton
-          label="Summarize Thread"
+          label="Summarize Thread & Comments"
           buttonType="secondary"
           buttonHeight="sm"
           iconLeft="bookOpenText"
           onClick={() => {
-            console.log('Action: Summarize Thread');
+            console.log('Action: Summarize Thread and Comments');
             onChipAction('summary');
           }}
         />

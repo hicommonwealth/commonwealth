@@ -27,6 +27,11 @@ import { ChipsAndModelBar, ChipsContext } from './ChipsAndModelBar';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
 import { StickCommentContext } from './context/StickCommentProvider';
+import {
+  buildThreadContext,
+  createDraftPrompt,
+  createSummaryPrompt,
+} from './helpers/commentFetcher';
 import { ExtendedCommentEditorProps } from './types';
 
 export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
@@ -219,52 +224,74 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
 
       switch (action) {
         case 'summary': {
-          const summary = await handleAiGenerate(
-            'Please summarize the discussion',
-          );
-          if (summary) {
-            props.setContentDelta(createDeltaFromText(summary));
+          try {
+            // Build context using the helper function
+            const contextInfo = await buildThreadContext(
+              threadId,
+              fetchedThread?.title,
+              fetchedThread?.body,
+              2, // Nesting depth of 2
+              communityId, // Pass the communityId
+            );
+
+            console.log('Generating summary with context:', {
+              threadId,
+              communityId,
+              hasThreadTitle: !!fetchedThread?.title,
+              hasThreadBody: !!fetchedThread?.body,
+              contextLength: contextInfo.length,
+              includesNestedComments: true,
+              nestingDepth: 2,
+            });
+
+            // Create the final prompt with context
+            const prompt = createSummaryPrompt(contextInfo);
+
+            const summary = await handleAiGenerate(prompt);
+            if (summary) {
+              props.setContentDelta(createDeltaFromText(summary));
+            }
+          } catch (error) {
+            console.error('Failed to generate summary:', error);
           }
           break;
         }
         case 'draft': {
-          // Build a context-aware prompt that includes thread and parent comment content
-          let contextInfo = '';
-          let replyingToAuthor = '';
+          try {
+            // Build a context-aware prompt that includes thread and parent comment content
+            let contextInfo = '';
 
-          // Add parent comment text to context if available
-          if (props.parentCommentId) {
-            const parentComment = parentCommentData?.pages?.[0]?.results?.[0];
-            if (parentComment) {
-              // Get author name or use a default
-              replyingToAuthor = 'the comment author';
-              contextInfo += `Replying to a comment: "${parentComment.body}"\n\n`;
+            // Add parent comment text to context if available
+            if (props.parentCommentId) {
+              const parentComment = parentCommentData?.pages?.[0]?.results?.[0];
+              if (parentComment) {
+                contextInfo += `Replying to a comment: "${parentComment.body}"\n\n`;
+              }
             }
-          }
 
-          // Add thread title and body to context
-          if (fetchedThread) {
-            if (fetchedThread.title) {
-              contextInfo += `Thread title: "${fetchedThread.title}"\n\n`;
+            // Add thread title and body to context
+            if (fetchedThread) {
+              if (fetchedThread.title) {
+                contextInfo += `Thread title: "${fetchedThread.title}"\n\n`;
+              }
+              if (fetchedThread.body) {
+                contextInfo += `Thread content: "${fetchedThread.body}"\n\n`;
+              }
             }
-            if (fetchedThread.body) {
-              contextInfo += `Thread content: "${fetchedThread.body}"\n\n`;
-            }
-          }
 
-          // Create the final prompt with context
-          if (isReplying && replyingToAuthor) {
-            const prompt = `${contextInfo}Please draft a thoughtful reply to ${replyingToAuthor} based on the context provided.`;
+            // Create the final prompt with context
+            const prompt = createDraftPrompt(
+              contextInfo,
+              !!isReplying,
+              replyingToAuthor || 'the comment author',
+            );
+
             const draft = await handleAiGenerate(prompt);
             if (draft) {
               props.setContentDelta(createDeltaFromText(draft));
             }
-          } else {
-            const prompt = `${contextInfo}Please draft a thoughtful response based on the context provided.`;
-            const draft = await handleAiGenerate(prompt);
-            if (draft) {
-              props.setContentDelta(createDeltaFromText(draft));
-            }
+          } catch (error) {
+            console.error('Failed to generate draft:', error);
           }
           break;
         }
@@ -296,6 +323,7 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
       props.setContentDelta,
       setFocused,
       parentCommentData,
+      communityId,
     ],
   );
 
