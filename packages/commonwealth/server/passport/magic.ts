@@ -84,6 +84,7 @@ async function createMagicAddressInstances(
         oauth_provider: magicUserMetadata.oauthProvider,
         oauth_email: magicUserMetadata.email,
         oauth_username: magicUserMetadata.username,
+        oauth_phone_number: magicUserMetadata.phoneNumber,
       },
       transaction,
     });
