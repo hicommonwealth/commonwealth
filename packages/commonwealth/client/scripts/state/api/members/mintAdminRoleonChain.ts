@@ -1,7 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import NamespaceFactory from 'client/scripts/helpers/ContractHelpers/NamespaceFactory';
-import { queryClient } from 'state/api/config';
 
 export interface MintAdminTokenProps {
   namespace: string;
@@ -48,15 +47,6 @@ interface UseMintAdminTokenMutationProps {}
 const useMintAdminTokenMutation = ({}: UseMintAdminTokenMutationProps = {}) => {
   return useMutation({
     mutationFn: mintAdminToken,
-    onSuccess: async (_, variables: MintAdminTokenProps) => {
-      await queryClient.invalidateQueries({
-        queryKey: [
-          'namespaceTokens',
-          variables.namespace,
-          variables.adminAddress,
-        ],
-      });
-    },
   });
 };
 
