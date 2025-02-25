@@ -413,6 +413,8 @@ export async function handleSocialLoginCallback({
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
 
+  let magicOauthRes;
+
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
@@ -433,21 +435,23 @@ export async function handleSocialLoginCallback({
       magicAddress = getEvmAddress(metadata.publicAddress);
     }
   } else {
-    const result = isCustomDomain
+    magicOauthRes = isCustomDomain
       ? await magic.oauth.getRedirectResult()
       : await magic.oauth2.getRedirectResult();
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');
-      bearer = result.magic.idToken;
-      console.log('Magic redirect result:', result);
+      bearer = magicOauthRes.magic.idToken;
+      console.log('Magic redirect result:', magicOauthRes);
     }
     // Get magic metadata
-    profileMetadata = getProfileMetadata(result.oauth);
+    profileMetadata = getProfileMetadata(magicOauthRes.oauth);
     if (isCosmos) {
-      magicAddress = result.magic.userMetadata.publicAddress;
+      magicAddress = magicOauthRes.magic.userMetadata.publicAddress;
     } else {
-      magicAddress = getEvmAddress(result.magic.userMetadata.publicAddress);
+      magicAddress = getEvmAddress(
+        magicOauthRes.magic.userMetadata.publicAddress,
+      );
     }
   }
 
@@ -511,6 +515,7 @@ export async function handleSocialLoginCallback({
       {
         data: {
           community_id: desiredChain?.id,
+          accessToken: magicOauthRes?.oauth?.accessToken,
           jwt: userStore.getState().jwt,
           username: profileMetadata?.username,
           avatarUrl: profileMetadata?.avatarUrl,

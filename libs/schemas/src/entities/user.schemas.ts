@@ -86,6 +86,7 @@ export const Address = z.object({
   hex: z.string().max(64).nullish(),
   oauth_provider: z.string().max(255).nullish(),
   oauth_email: z.string().max(255).nullish(),
+  oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
 

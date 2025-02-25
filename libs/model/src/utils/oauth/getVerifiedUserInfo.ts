@@ -6,9 +6,9 @@ import {
 } from '@hicommonwealth/schemas';
 import { MagicUserMetadata } from '@magic-sdk/admin';
 import fetch from 'node-fetch';
-import { SsoProviders, VerifiedUserInfo } from './types';
+import { VerifiedUserInfo } from './types';
 
-export async function get(token: string, url: string) {
+async function get(token: string, url: string) {
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -23,7 +23,7 @@ export async function get(token: string, url: string) {
   return await response.json();
 }
 
-export async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
+async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://api.twitter.com/2/users/me');
   const userData = TwitterUser.parse(res);
   return {
@@ -32,7 +32,7 @@ export async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
   };
 }
 
-export async function getDiscordUser(token: string): Promise<VerifiedUserInfo> {
+async function getDiscordUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://discord.com/api/users/@me');
   const userData = DiscordUser.parse(res);
   return {
@@ -43,7 +43,7 @@ export async function getDiscordUser(token: string): Promise<VerifiedUserInfo> {
   };
 }
 
-export async function getGithubUser(token: string): Promise<VerifiedUserInfo> {
+async function getGithubUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://api.github.com/user');
   const userData = GitHubUser.parse(res);
   return {
@@ -52,7 +52,7 @@ export async function getGithubUser(token: string): Promise<VerifiedUserInfo> {
   };
 }
 
-export async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
+async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://www.googleapis.com/oauth2/v3/userinfo');
   const userData = GoogleUser.parse(res);
   return {
@@ -64,7 +64,7 @@ export async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
 
 // Assume email returned by magic is unverified
 // Apple doesn't have an endpoint from which we can fetch user info to check email
-export function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   if (!magicData.email) {
     throw new Error('No email found in magic metadata');
   }
@@ -76,7 +76,7 @@ export function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   };
 }
 
-export function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   if (!magicData.phoneNumber) {
     throw new Error('No phone number found in magic metadata');
   }
@@ -86,13 +86,13 @@ export function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   };
 }
 
-export function getFarcasterUser(): VerifiedUserInfo {
+function getFarcasterUser(): VerifiedUserInfo {
   return {
     provider: 'farcaster',
   };
 }
 
-export function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   if (!magicData.email) {
     throw new Error('No email found in magic metadata');
   }
@@ -105,19 +105,30 @@ export function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
 }
 
 export async function getVerifiedUserInfo(
-  ssoProvider: SsoProviders,
-  token: string,
   magicMetadata: MagicUserMetadata,
+  token?: string,
 ): Promise<VerifiedUserInfo> {
-  switch (ssoProvider) {
+  if (!magicMetadata.oauthProvider) {
+    throw new Error('No oauth provider found in magic metadata');
+  }
+
+  if (
+    !token &&
+    ['twitter', 'discord', 'github', 'google'].includes(
+      magicMetadata.oauthProvider.toLowerCase(),
+    )
+  )
+    throw new Error('Email verification requires a token to be passed in');
+
+  switch (magicMetadata.oauthProvider) {
     case 'twitter':
-      return getTwitterUser(token);
+      return getTwitterUser(token!);
     case 'discord':
-      return getDiscordUser(token);
+      return getDiscordUser(token!);
     case 'github':
-      return getGithubUser(token);
+      return getGithubUser(token!);
     case 'google':
-      return getGoogleUser(token);
+      return getGoogleUser(token!);
     case 'apple':
       return Promise.resolve(getAppleUser(magicMetadata));
     case 'sms':
@@ -127,6 +138,8 @@ export async function getVerifiedUserInfo(
     case 'email':
       return Promise.resolve(getEmailUser(magicMetadata));
     default:
-      throw new Error(`Unsupported SSO provider: ${ssoProvider}`);
+      throw new Error(
+        `Unsupported SSO provider: ${magicMetadata.oauthProvider}`,
+      );
   }
 }

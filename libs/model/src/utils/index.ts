@@ -6,6 +6,7 @@ export * from './generateUnsubscribeLink';
 export * from './getDefaultContestImage';
 export * from './getDelta';
 export * from './makeGetBalancesOptions';
+export * from './oauth/getVerifiedUserInfo';
 export * from './parseUserMentions';
 export * from './sanitizeDeletedComment';
 export * from './sanitizeQuillText';

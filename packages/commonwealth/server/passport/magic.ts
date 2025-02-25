@@ -9,6 +9,7 @@ import {
   UserAttributes,
   UserInstance,
   emitEvent,
+  getVerifiedUserInfo,
   sequelize,
 } from '@hicommonwealth/model';
 import {
@@ -34,6 +35,7 @@ type MagicLoginContext = {
   decodedMagicToken: MagicUser;
   magicUserMetadata: MagicUserMetadata;
   generatedAddresses: Array<{ address: string; community_id: string }>;
+  accessToken?: string;
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
   profileMetadata?: { username?: string; avatarUrl?: string };
@@ -51,17 +53,31 @@ async function createMagicAddressInstances(
     decodedMagicToken,
     magicUserMetadata,
     transaction,
+    accessToken,
   }: {
     generatedAddresses: Array<{ address: string; community_id: string }>;
     user: UserAttributes;
     isNewUser: boolean;
     decodedMagicToken: MagicUser;
     magicUserMetadata: MagicUserMetadata;
+    accessToken?: string;
     transaction?: Transaction;
   },
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
+
+  const verifiedUserInfo = await getVerifiedUserInfo(
+    magicUserMetadata,
+    accessToken,
+  );
+  const oauth_provider = verifiedUserInfo.provider || null;
+  const oauth_email = verifiedUserInfo.email || null;
+  const oauth_email_verified = verifiedUserInfo.email
+    ? !!verifiedUserInfo.emailVerified
+    : null;
+  const oauth_username = verifiedUserInfo.username || null;
+  const oauth_phone_number = verifiedUserInfo.phoneNumber || null;
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -83,10 +99,11 @@ async function createMagicAddressInstances(
         is_user_default: false,
         ghost_address: false,
         is_banned: false,
-        oauth_provider: magicUserMetadata.oauthProvider,
-        oauth_email: magicUserMetadata.email,
-        oauth_username: magicUserMetadata.username,
-        oauth_phone_number: magicUserMetadata.phoneNumber,
+        oauth_provider,
+        oauth_email,
+        oauth_username,
+        oauth_phone_number,
+        oauth_email_verified,
       },
       transaction,
     });
@@ -133,30 +150,27 @@ async function createMagicAddressInstances(
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
 
-      if (
-        magicUserMetadata.oauthProvider &&
-        addressInstance.oauth_provider !== magicUserMetadata.oauthProvider
-      ) {
-        addressInstance.oauth_provider = magicUserMetadata.oauthProvider;
+      if (oauth_provider && addressInstance.oauth_provider !== oauth_provider) {
+        addressInstance.oauth_provider = oauth_provider;
       }
 
-      if (
-        magicUserMetadata.email &&
-        addressInstance.oauth_email !== magicUserMetadata.email
-      ) {
-        addressInstance.oauth_email = magicUserMetadata.email;
+      if (oauth_email && addressInstance.oauth_email !== oauth_email) {
+        addressInstance.oauth_email = oauth_email;
+      }
+      if (oauth_username && addressInstance.oauth_username !== oauth_username) {
+        addressInstance.oauth_username = oauth_username;
       }
       if (
-        magicUserMetadata.username &&
-        addressInstance.oauth_username !== magicUserMetadata.username
+        oauth_phone_number &&
+        addressInstance.oauth_phone_number !== oauth_phone_number
       ) {
-        addressInstance.oauth_username = magicUserMetadata.username;
+        addressInstance.oauth_phone_number = oauth_phone_number;
       }
       if (
-        magicUserMetadata.phoneNumber &&
-        addressInstance.oauth_phone_number !== magicUserMetadata.phoneNumber
+        oauth_email_verified !== null &&
+        addressInstance.oauth_email_verified !== oauth_email_verified
       ) {
-        addressInstance.oauth_phone_number = magicUserMetadata.phoneNumber;
+        addressInstance.oauth_email_verified = oauth_email_verified;
       }
       await addressInstance.save({ transaction });
     }
@@ -436,6 +450,7 @@ async function magicLoginRoute(
   models: DB,
   req: TypedRequestBody<{
     community_id?: string;
+    accessToken: string;
     jwt?: string;
     username?: string;
     avatarUrl?: string;
