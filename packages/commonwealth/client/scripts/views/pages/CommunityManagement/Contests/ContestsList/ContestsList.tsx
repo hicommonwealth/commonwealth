@@ -48,6 +48,11 @@ interface ContestsListProps {
   isContestAvailable: boolean;
   onSetContestView?: (type: ContestView) => void;
   displayAllRecurringContests?: boolean;
+  community?: {
+    id: string;
+    name: string;
+    iconUrl: string;
+  };
 }
 
 const ContestsList = ({
@@ -57,6 +62,7 @@ const ContestsList = ({
   isContestAvailable,
   onSetContestView,
   displayAllRecurringContests = false,
+  community,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
   const farcasterContestEnabled = useFlag('farcasterContest');
@@ -109,6 +115,7 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={score || []}
+                  community={community}
                 />
               );
             } else {
@@ -136,6 +143,7 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={sc?.score || []}
+                  community={community}
                 />
               ));
             }

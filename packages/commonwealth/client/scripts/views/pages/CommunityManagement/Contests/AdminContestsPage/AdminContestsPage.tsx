@@ -148,6 +148,11 @@ const AdminContestsPage = () => {
                 isLoading={isContestDataLoading}
                 isContestAvailable={isContestAvailable}
                 onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                }}
               />
             )}
 
@@ -165,6 +170,11 @@ const AdminContestsPage = () => {
                 isContestAvailable={isContestAvailable}
                 displayAllRecurringContests
                 onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                }}
               />
             )}
           </>
