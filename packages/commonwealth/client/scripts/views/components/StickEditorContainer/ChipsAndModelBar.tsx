@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
-import { CWTag } from '../component_kit/new_designs/CWTag';
+import { CWButton } from '../component_kit/new_designs/CWButton';
 import {
   MultiSelectOption,
   UpwardMultiSelectList,
@@ -9,10 +9,22 @@ import './ChipsAndModelBar.scss';
 
 export type ModelOption = MultiSelectOption;
 
+export type ChipsContext = {
+  isReplyingToComment: boolean;
+  commentId?: number;
+  threadId?: number;
+  authorName?: string;
+  threadBody?: string;
+  threadTitle?: string;
+};
+
 type ChipsAndModelBarProps = {
-  onChipAction: (action: 'summary' | 'question') => void;
+  onChipAction: (
+    action: 'summary' | 'question' | 'draft' | 'generate-replies',
+  ) => void;
   onModelsChange?: (models: ModelOption[]) => void;
   selectedModels?: ModelOption[];
+  context: ChipsContext;
 };
 
 // Truncate model descriptions to keep them reasonable
@@ -29,9 +41,20 @@ export const ChipsAndModelBar = ({
   onChipAction,
   onModelsChange,
   selectedModels: externalSelectedModels,
+  context,
 }: ChipsAndModelBarProps) => {
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Ensure context has default values to prevent undefined errors
+  const safeContext = {
+    isReplyingToComment: context?.isReplyingToComment || false,
+    commentId: context?.commentId,
+    threadId: context?.threadId,
+    authorName: context?.authorName || '',
+    threadBody: context?.threadBody || '',
+    threadTitle: context?.threadTitle || '',
+  };
 
   // Use the persisted models from the store
   const { selectedModels: storedModels, setSelectedModels } =
@@ -111,21 +134,13 @@ export const ChipsAndModelBar = ({
     void fetchModels();
   }, []);
 
+  // Determine what chips to show based on context
+  const { isReplyingToComment, authorName } = safeContext;
+  const replyingToText = authorName ? ` to ${authorName}` : '';
+
   return (
     <div className="ChipsAndModelBar">
-      <div className="action-chips">
-        <CWTag
-          label="Draft Summary"
-          onClick={() => onChipAction('summary')}
-          type="stage"
-        />
-        <CWTag
-          label="Ask Question"
-          onClick={() => onChipAction('question')}
-          type="stage"
-        />
-      </div>
-
+      {/* Model selector on top */}
       <div className="model-selector">
         <UpwardMultiSelectList
           options={modelOptions}
@@ -140,6 +155,68 @@ export const ChipsAndModelBar = ({
           value={selectedModels}
           menuPlacement="top"
         />
+      </div>
+
+      {/* Action buttons below */}
+      <div className="action-chips">
+        <CWButton
+          label="Summarize Thread"
+          buttonType="secondary"
+          buttonHeight="sm"
+          iconLeft="bookOpenText"
+          onClick={() => {
+            console.log('Action: Summarize Thread');
+            onChipAction('summary');
+          }}
+        />
+
+        {isReplyingToComment ? (
+          <>
+            <CWButton
+              label={`Draft Reply${replyingToText}`}
+              buttonType="secondary"
+              buttonHeight="sm"
+              iconLeft="notePencil"
+              onClick={() => {
+                console.log('Action: Draft Reply');
+                onChipAction('draft');
+              }}
+            />
+            <CWButton
+              label={`Generate Replies${replyingToText}`}
+              buttonType="secondary"
+              buttonHeight="sm"
+              iconLeft="sparkle"
+              onClick={() => {
+                console.log('Action: Generate Replies');
+                onChipAction('generate-replies');
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <CWButton
+              label="Draft Response"
+              buttonType="secondary"
+              buttonHeight="sm"
+              iconLeft="notePencil"
+              onClick={() => {
+                console.log('Action: Draft Response');
+                onChipAction('draft');
+              }}
+            />
+            <CWButton
+              label="Generate Thread Replies"
+              buttonType="secondary"
+              buttonHeight="sm"
+              iconLeft="sparkle"
+              onClick={() => {
+                console.log('Action: Generate Thread Replies');
+                onChipAction('generate-replies');
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   );

@@ -13,7 +13,6 @@ import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helper
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
-import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
@@ -79,19 +78,6 @@ const CommentEditor = ({
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const { generateComment } = useGenerateCommentText();
-
-  const handleCommentWithAI = () => {
-    setIsSubmitDisabled(true);
-    let text = '';
-    setContentDelta(text);
-    generateComment('userText', (x) => {
-      text += `${x}`;
-      text = text.trim();
-      setContentDelta(text);
-    })
-      .catch(console.error)
-      .finally(() => setIsSubmitDisabled(false));
-  };
 
   const handleEnhancedSubmit = async () => {
     // Immediately close the editor before any operations
@@ -208,16 +194,6 @@ const CommentEditor = ({
               <span className="label">AI</span>
             </div>
           )}
-          <div className="ml-auto">
-            {effectiveAiStreaming && (
-              <CWThreadAction
-                action="ai-reply"
-                label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
-                disabled={isSubmitDisabled}
-                onClick={handleCommentWithAI}
-              />
-            )}
-          </div>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>

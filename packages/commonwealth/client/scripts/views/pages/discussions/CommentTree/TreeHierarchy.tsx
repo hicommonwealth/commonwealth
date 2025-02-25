@@ -106,7 +106,7 @@ export const TreeHierarchy = ({
 
       return Promise.resolve();
     },
-    [allComments, streamingReplyIds, selectedModels],
+    [allComments, streamingReplyIds, selectedModels, setStreamingReplyIds],
   );
 
   useEffect(() => {
