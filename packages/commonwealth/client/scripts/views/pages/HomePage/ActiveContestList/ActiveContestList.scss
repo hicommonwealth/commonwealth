@@ -36,7 +36,11 @@
     }
 
     .ContestCard {
-      max-width: 335px;
+      width: 335px;
+
+      .contest-image {
+        max-height: 160px;
+      }
 
       .header-row {
         flex-direction: column;

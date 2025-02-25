@@ -70,6 +70,7 @@ interface ContestCardProps {
     ethChainId: number;
     chainNodeUrl: string;
   };
+  hideWhenNoPrizes?: boolean;
 }
 
 const ContestCard = ({
@@ -91,6 +92,7 @@ const ContestCard = ({
   payoutStructure,
   score = [],
   community,
+  hideWhenNoPrizes = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -192,6 +194,10 @@ const ContestCard = ({
     isLessThan24HoursLeft &&
     (contestBalance || 0) > 0 &&
     (!hasVotes || hasLessVotesThanPrizes);
+
+  if (hideWhenNoPrizes && prizes && prizes.length === 0) {
+    return null;
+  }
 
   return (
     <CWCard
