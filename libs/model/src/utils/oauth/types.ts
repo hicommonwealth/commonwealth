@@ -1,4 +1,12 @@
-export type SsoProviders = 'google' | 'github' | 'twitter' | 'discord';
+export type SsoProviders =
+  | 'google'
+  | 'github'
+  | 'twitter'
+  | 'discord'
+  | 'apple'
+  | 'sms'
+  | 'email'
+  | 'farcaster';
 
 export type VerifiedUserInfo =
   | {
@@ -19,4 +27,21 @@ export type VerifiedUserInfo =
       provider: 'google';
       email: string;
       emailVerified: boolean;
+    }
+  | {
+      provider: 'apple';
+      email: string;
+      emailVerified: false;
+    }
+  | {
+      provider: 'sms';
+      phoneNumber: string;
+    }
+  | {
+      provider: 'email';
+      email: string;
+      emailVerified: true;
+    }
+  | {
+      provider: 'farcaster';
     };

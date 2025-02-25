@@ -4,6 +4,7 @@ import {
   GoogleUser,
   TwitterUser,
 } from '@hicommonwealth/schemas';
+import { MagicUserMetadata } from '@magic-sdk/admin';
 import fetch from 'node-fetch';
 import { SsoProviders, VerifiedUserInfo } from './types';
 
@@ -61,9 +62,52 @@ export async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
   };
 }
 
+// Assume email returned by magic is unverified
+// Apple doesn't have an endpoint from which we can fetch user info to check email
+export function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+  if (!magicData.email) {
+    throw new Error('No email found in magic metadata');
+  }
+
+  return {
+    provider: 'apple',
+    email: magicData.email,
+    emailVerified: false,
+  };
+}
+
+export function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+  if (!magicData.phoneNumber) {
+    throw new Error('No phone number found in magic metadata');
+  }
+  return {
+    provider: 'sms',
+    phoneNumber: magicData.phoneNumber,
+  };
+}
+
+export function getFarcasterUser(): VerifiedUserInfo {
+  return {
+    provider: 'farcaster',
+  };
+}
+
+export function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
+  if (!magicData.email) {
+    throw new Error('No email found in magic metadata');
+  }
+
+  return {
+    provider: 'email',
+    email: magicData.email,
+    emailVerified: true,
+  };
+}
+
 export async function getVerifiedUserInfo(
   ssoProvider: SsoProviders,
   token: string,
+  magicMetadata: MagicUserMetadata,
 ): Promise<VerifiedUserInfo> {
   switch (ssoProvider) {
     case 'twitter':
@@ -74,5 +118,15 @@ export async function getVerifiedUserInfo(
       return getGithubUser(token);
     case 'google':
       return getGoogleUser(token);
+    case 'apple':
+      return Promise.resolve(getAppleUser(magicMetadata));
+    case 'sms':
+      return Promise.resolve(getSmsUser(magicMetadata));
+    case 'farcaster':
+      return Promise.resolve(getFarcasterUser());
+    case 'email':
+      return Promise.resolve(getEmailUser(magicMetadata));
+    default:
+      throw new Error(`Unsupported SSO provider: ${ssoProvider}`);
   }
 }
