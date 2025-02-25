@@ -164,8 +164,12 @@ const ContestCard = ({
 
   const handleLeaderboardClick = () => {
     isFarcaster
-      ? navigate(`/contests/${address}`)
-      : navigate(`/discussions?featured=mostLikes&contest=${address}`);
+      ? navigate(`/contests/${address}`, {}, community?.id)
+      : navigate(
+          `/discussions?featured=mostLikes&contest=${address}`,
+          {},
+          community?.id,
+        );
   };
 
   const handleFundClick = () => {
@@ -317,7 +321,7 @@ const ContestCard = ({
 
           {showShareButton && (
             <SharePopoverOld
-              customUrl="/contests"
+              customUrl={`${community?.id}/contests`}
               renderTrigger={(handleInteraction) => (
                 <CWThreadAction
                   action="share"
