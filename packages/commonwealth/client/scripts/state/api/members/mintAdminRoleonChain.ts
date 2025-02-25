@@ -35,8 +35,8 @@ export const mintAdminToken = async ({
 
   return await namespaceFactory.mintNamespaceTokens(
     namespace,
-    0, // token ID for admin
-    1, // desired balance (grant admin privileges)
+    0,
+    1,
     adminAddress,
     chainId,
     walletAddress,

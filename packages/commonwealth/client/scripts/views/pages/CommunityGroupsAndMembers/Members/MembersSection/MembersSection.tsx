@@ -73,8 +73,7 @@ const MembersSection = ({
 
   const chainRpc =
     community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
-  const ethChainId =
-    community?.chain_node_id || app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const namespace = community?.namespace || '';
   const chainId = community?.id || app.activeChainId() || '';
 
