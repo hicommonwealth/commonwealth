@@ -6,6 +6,7 @@ import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
 import { notifyCommunityStakeTrades } from './handlers/notifyCommunityStakeTrades';
 import { notifyContestEvent } from './handlers/notifyContestEvent';
 import { notifyQuestStarted } from './handlers/notifyQuestStarted';
+import { notifyReferrerCommunityJoined } from './handlers/notifyReferrerCommunityJoined';
 import { notifyReferrerSignedUp } from './handlers/notifyReferrerSignedUp';
 import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
 import { notifyThreadCreated } from './handlers/notifyThreadCreated';
@@ -29,6 +30,7 @@ const notificationInputs = {
   AddressOwnershipTransferred: events.AddressOwnershipTransferred,
   // Referral Events
   SignUpFlowCompleted: events.SignUpFlowCompleted,
+  CommunityJoined: events.CommunityJoined,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -74,6 +76,10 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       SignUpFlowCompleted: async (event) => {
         if (event.payload.referred_by_address)
           await notifyReferrerSignedUp(event);
+      },
+      CommunityJoined: async (event) => {
+        if (event.payload.referrer_address)
+          await notifyReferrerCommunityJoined(event);
       },
     },
   };
