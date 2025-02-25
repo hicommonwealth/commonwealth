@@ -1,13 +1,14 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
-import { useFetchQuestsQuery } from 'client/scripts/state/api/quest';
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useFetchQuestsQuery } from 'state/api/quest';
 import { Skeleton } from 'views/components/Skeleton';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 
+import app from 'state';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';
 
@@ -32,12 +33,12 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     quests = quests.filter((quest) => quest.community_id === communityIdFilter);
   }
 
-  const handleCTAClick = () => {
-    // TODO: navigate to quest details in #10732
+  const handleCTAClick = (questId: number) => {
+    navigate(`/quests/${questId}`);
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   if (!xpEnabled) return <></>;
@@ -46,7 +47,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     <div className="XpQuestList">
       <div className="heading-container">
         <CWText type="h2">XP Quests</CWText>
-        <Link to="/explore">
+        <Link to={`/${app.activeChainId()}/quests`}>
           <div className="link-right">
             <CWText className="link">See all quests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
@@ -91,7 +92,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
                   xpPoints={totalUserXP}
                   startDate={new Date(quest.start_date)}
                   endDate={new Date(quest.end_date)}
-                  onCTAClick={handleCTAClick}
+                  onCTAClick={() => handleCTAClick(quest.id)}
                   onLeaderboardClick={handleLeaderboardClick}
                 />
               );

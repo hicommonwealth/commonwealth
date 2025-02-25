@@ -9,7 +9,7 @@ export const doesActionRequireCreatorReward = (action: QuestAction) => {
   );
 };
 
-export const doesActionRequireContentId = (action: QuestAction) => {
+export const doesActionAllowContentId = (action: QuestAction) => {
   // These are inferred from libs/model/src/user/Xp.projection.ts
   return (
     action === 'CommentCreated' ||
