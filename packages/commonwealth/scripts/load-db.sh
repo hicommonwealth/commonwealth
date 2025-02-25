@@ -19,3 +19,4 @@ if [ "$1" ]; then
 fi
 
 psql -h localhost -d commonwealth -U commonwealth -f "$DUMP_NAME";
+pnpm cancel-all-local-contests

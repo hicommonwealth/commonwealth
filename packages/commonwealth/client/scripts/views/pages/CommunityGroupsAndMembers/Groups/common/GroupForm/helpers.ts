@@ -29,31 +29,46 @@ export const convertAccumulatedPermissionsToGranularPermissions = (
 export const convertGranularPermissionsToAccumulatedPermissions = (
   permissions: PermissionEnum[],
 ): TopicPermissions => {
-  if (
-    permissions.includes(PermissionEnum.CREATE_COMMENT) &&
-    permissions.includes(PermissionEnum.CREATE_COMMENT_REACTION) &&
-    permissions.includes(PermissionEnum.CREATE_THREAD_REACTION) &&
-    permissions.includes(PermissionEnum.CREATE_THREAD)
-  ) {
+  const hasThread = permissions.includes(PermissionEnum.CREATE_THREAD);
+  const hasComment = permissions.includes(PermissionEnum.CREATE_COMMENT);
+  const hasThreadReaction = permissions.includes(
+    PermissionEnum.CREATE_THREAD_REACTION,
+  );
+  const hasCommentReaction = permissions.includes(
+    PermissionEnum.CREATE_COMMENT_REACTION,
+  );
+
+  const hasUpvote = hasThreadReaction || hasCommentReaction;
+
+  if (hasUpvote && hasThread && hasComment) {
     return TOPIC_PERMISSIONS[
       GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST
     ];
-  }
-
-  if (
-    permissions.includes(PermissionEnum.CREATE_COMMENT) &&
-    permissions.includes(PermissionEnum.CREATE_COMMENT_REACTION) &&
-    permissions.includes(PermissionEnum.CREATE_THREAD_REACTION)
-  ) {
+  } else if (hasUpvote && hasThread) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE_AND_POST];
+  } else if (hasUpvote && hasComment) {
     return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE_AND_COMMENT];
-  }
-
-  if (
-    permissions.includes(PermissionEnum.CREATE_COMMENT_REACTION) &&
-    permissions.includes(PermissionEnum.CREATE_THREAD_REACTION)
-  ) {
+  } else if (hasThread && hasComment) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.POST_AND_COMMENT];
+  } else if (hasThread) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.POST];
+  } else if (hasComment) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.COMMENT];
+  } else if (hasUpvote) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE];
+  } else {
     return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE];
   }
+};
 
-  return TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST;
+export const isPermissionGuard = (
+  value: PermissionEnum,
+): value is PermissionEnum => {
+  return [
+    PermissionEnum.CREATE_COMMENT_REACTION,
+    PermissionEnum.CREATE_THREAD_REACTION,
+    PermissionEnum.CREATE_COMMENT,
+    PermissionEnum.CREATE_THREAD,
+    PermissionEnum.UPDATE_POLL,
+  ].includes(value);
 };

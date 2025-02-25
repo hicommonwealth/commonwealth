@@ -25,6 +25,7 @@ export function GetActiveContestManagers(): Query<
         end_time: string;
         max_contest_id: number;
         actions: Array<z.infer<typeof schemas.ContestAction>>;
+        environment: z.infer<typeof schemas.ContestManagerEnvironmentsSchema>;
       }>(
         `
             SELECT cn.eth_chain_id,
@@ -35,7 +36,8 @@ export function GetActiveContestManagers(): Query<
                    COALESCE(cm.ending, false) as ending,
                    co.max_contest_id,
                    co.end_time,
-                   COALESCE(JSON_AGG(ca) FILTER (WHERE ca.action IS NOT NULL), '[]'::json) as actions
+                   COALESCE(JSON_AGG(ca) FILTER (WHERE ca.action IS NOT NULL), '[]'::json) as actions,
+                   cm.environment
             FROM "Communities" c
                      JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                      JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -80,6 +82,7 @@ export function GetActiveContestManagers(): Query<
         end_time: new Date(r.end_time),
         max_contest_id: r.max_contest_id,
         actions: r.actions,
+        environment: r.environment,
       }));
     },
   };

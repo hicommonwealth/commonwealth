@@ -3,7 +3,6 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
-import { RouteFeatureFlags } from './Router';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -133,13 +132,7 @@ const CommunityHomePage = lazy(
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
-const CommonDomainRoutes = ({
-  launchpadEnabled,
-  xpEnabled,
-  communityHomeEnabled,
-  homePageEnable,
-  mobileApp,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = () => [
   <Route
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
@@ -169,31 +162,12 @@ const CommonDomainRoutes = ({
     path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
-
-  ...(mobileApp
-    ? [
-        <Route
-          key="/onboarding"
-          path="/onboarding"
-          element={<OnBoardingPage />}
-        />,
-      ]
-    : []),
-  ...(homePageEnable
-    ? [
-        <Route
-          key="/"
-          path="/"
-          element={withLayout(HomePage, { type: 'common' })}
-        />,
-      ]
-    : [
-        <Route
-          key="/"
-          path="/"
-          element={withLayout(DashboardPage, { type: 'common' })}
-        />,
-      ]),
+  <Route key="/onboarding" path="/onboarding" element={<OnBoardingPage />} />,
+  <Route
+    key="/"
+    path="/"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
   <Route
     key="/home"
     path="/home"
@@ -204,93 +178,61 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(xpEnabled
-    ? [
-        <Route
-          key="/createQuest"
-          path="/createQuest"
-          element={withLayout(CreateQuestPage, { type: 'common' })}
-        />,
-        <Route
-          key="/quests/:id"
-          path="/quests/:id"
-          element={withLayout(QuestDetailsPage, { type: 'common' })}
-        />,
-        <Route
-          key="/quests/:id/update"
-          path="/quests/:id/update"
-          element={withLayout(UpdateQuestPage, { type: 'common' })}
-        />,
-        <Route
-          key="/:scope/quests/:id"
-          path="/:scope/quests/:id"
-          element={withLayout(QuestDetailsPage, { scoped: true })}
-        />,
-        <Route
-          key="/:scope/quests/:id/update"
-          path="/:scope/quests/:id/update"
-          element={withLayout(UpdateQuestPage, { scoped: true })}
-        />,
-        <Route
-          key="/:scope/quests"
-          path="/:scope/quests"
-          element={withLayout(QuestsListPage, { scoped: true })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/createQuest"
+    path="/createQuest"
+    element={withLayout(CreateQuestPage, { type: 'common' })}
+  />,
+  <Route
+    key="/quests/:id"
+    path="/quests/:id"
+    element={withLayout(QuestDetailsPage, { type: 'common' })}
+  />,
+  <Route
+    key="/quests/:id/update"
+    path="/quests/:id/update"
+    element={withLayout(UpdateQuestPage, { type: 'common' })}
+  />,
+  <Route
+    key="/:scope/quests/:id"
+    path="/:scope/quests/:id"
+    element={withLayout(QuestDetailsPage, { scoped: true })}
+  />,
+  <Route
+    key="/:scope/quests/:id/update"
+    path="/:scope/quests/:id/update"
+    element={withLayout(UpdateQuestPage, { scoped: true })}
+  />,
+  <Route
+    key="/:scope/quests"
+    path="/:scope/quests"
+    element={withLayout(QuestsListPage, { scoped: true })}
+  />,
   <Route
     key="/unSubscribe/:userId"
     path="/unSubscribe/:userId"
     element={withLayout(UnSubscribePage, { type: 'common' })}
   />,
-  ...(launchpadEnabled
-    ? [
-        <Route
-          key="/createTokenCommunity"
-          path="/createTokenCommunity"
-          element={withLayout(LaunchToken, { type: 'common' })}
-        />,
-      ]
-    : []),
-  ...(xpEnabled
-    ? [
-        <Route
-          key="/leaderboard"
-          path="/leaderboard"
-          element={withLayout(LeaderboardPage, { type: 'common' })}
-        />,
-      ]
-    : []),
-  ...(homePageEnable
-    ? [
-        <Route
-          key="/dashboard"
-          path="/dashboard"
-          element={withLayout(HomePage, { type: 'common' })}
-        />,
-      ]
-    : [
-        <Route
-          key="/dashboard"
-          path="/dashboard"
-          element={withLayout(DashboardPage, { type: 'common' })}
-        />,
-      ]),
-  ...(homePageEnable
-    ? [
-        <Route
-          key="/dashboard/:type"
-          path="/dashboard/:type"
-          element={withLayout(HomePage, { type: 'common' })}
-        />,
-      ]
-    : [
-        <Route
-          key="/dashboard/:type"
-          path="/dashboard/:type"
-          element={withLayout(DashboardPage, { type: 'common' })}
-        />,
-      ]),
+  <Route
+    key="/createTokenCommunity"
+    path="/createTokenCommunity"
+    element={withLayout(LaunchToken, { type: 'common' })}
+  />,
+  <Route
+    key="/leaderboard"
+    path="/leaderboard"
+    element={withLayout(LeaderboardPage, { type: 'common' })}
+  />,
+  <Route
+    key="/dashboard"
+    path="/dashboard"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
+  <Route
+    key="/dashboard/:type"
+    path="/dashboard/:type"
+    element={withLayout(DashboardPage, { type: 'common' })}
+  />,
   <Route
     key="/explore"
     path="/explore"
@@ -433,17 +375,13 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
-  ...(communityHomeEnabled
-    ? [
-        <Route
-          key="/:scope/community-home"
-          path="/:scope/community-home"
-          element={withLayout(CommunityHomePage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/community-home"
+    path="/:scope/community-home"
+    element={withLayout(CommunityHomePage, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"

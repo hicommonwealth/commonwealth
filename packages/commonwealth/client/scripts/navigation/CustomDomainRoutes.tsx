@@ -2,7 +2,6 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
-import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
@@ -114,12 +113,7 @@ const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
 
-const CustomDomainRoutes = ({
-  launchpadEnabled,
-  xpEnabled,
-  communityHomeEnabled,
-  homePageEnable,
-}: RouteFeatureFlags) => {
+const CustomDomainRoutes = () => {
   return [
     <Route
       key="/"
@@ -134,72 +128,56 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
-    ...(xpEnabled
-      ? [
-          <Route
-            key="/createQuest"
-            path="/createQuest"
-            element={withLayout(CreateQuestPage, { type: 'common' })}
-          />,
-          <Route
-            key="/quests/:id"
-            path="/quests/:id"
-            element={withLayout(QuestDetailsPage, { type: 'common' })}
-          />,
-          <Route
-            key="/quests/:id/update"
-            path="/quests/:id/update"
-            element={withLayout(UpdateQuestPage, { type: 'common' })}
-          />,
-          <Route
-            key="/:scope/quests/:id"
-            path="/:scope/quests/:id"
-            element={withLayout(QuestDetailsPage, { scoped: true })}
-          />,
-          <Route
-            key="/:scope/quests/:id/update"
-            path="/:scope/quests/:id/update"
-            element={withLayout(UpdateQuestPage, { scoped: true })}
-          />,
-          <Route
-            key="/:scope/quests"
-            path="/:scope/quests"
-            element={withLayout(QuestsListPage, { scoped: true })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/createQuest"
+      path="/createQuest"
+      element={withLayout(CreateQuestPage, { type: 'common' })}
+    />,
+    <Route
+      key="/quests/:id"
+      path="/quests/:id"
+      element={withLayout(QuestDetailsPage, { type: 'common' })}
+    />,
+    <Route
+      key="/quests/:id/update"
+      path="/quests/:id/update"
+      element={withLayout(UpdateQuestPage, { type: 'common' })}
+    />,
+    <Route
+      key="/:scope/quests/:id"
+      path="/:scope/quests/:id"
+      element={withLayout(QuestDetailsPage, { scoped: true })}
+    />,
+    <Route
+      key="/:scope/quests/:id/update"
+      path="/:scope/quests/:id/update"
+      element={withLayout(UpdateQuestPage, { scoped: true })}
+    />,
+    <Route
+      key="/:scope/quests"
+      path="/:scope/quests"
+      element={withLayout(QuestsListPage, { scoped: true })}
+    />,
     <Route
       key="/unSubscribe/:userId"
       path="/unSubscribe/:userId"
       element={withLayout(UnSubscribePage, { type: 'common' })}
     />,
-    ...(launchpadEnabled
-      ? [
-          <Route
-            key="/createTokenCommunity"
-            path="/createTokenCommunity"
-            element={withLayout(LaunchTokenPage, { type: 'common' })}
-          />,
-        ]
-      : []),
-    ...(xpEnabled
-      ? [
-          <Route
-            key="/leaderboard"
-            path="/leaderboard"
-            element={withLayout(LeaderboardPage, { type: 'common' })}
-          />,
-        ]
-      : []),
-    ...(homePageEnable
-      ? [
-          <Route
-            key="/home"
-            path="/home"
-            element={withLayout(HomePage, { type: 'common' })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/createTokenCommunity"
+      path="/createTokenCommunity"
+      element={withLayout(LaunchTokenPage, { type: 'common' })}
+    />,
+    <Route
+      key="/leaderboard"
+      path="/leaderboard"
+      element={withLayout(LeaderboardPage, { type: 'common' })}
+    />,
+    <Route
+      key="/home"
+      path="/home"
+      element={withLayout(HomePage, { type: 'common' })}
+    />,
     <Route
       key="/search"
       path="/search"
@@ -310,17 +288,13 @@ const CustomDomainRoutes = ({
     // GOVERNANCE END
 
     // DISCUSSIONS
-    ...(communityHomeEnabled
-      ? [
-          <Route
-            key="/community-home"
-            path="/community-home"
-            element={withLayout(CommunityHomePage, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/community-home"
+      path="/community-home"
+      element={withLayout(CommunityHomePage, {
+        scoped: true,
+      })}
+    />,
     <Route
       key="/discussions"
       path="/discussions"

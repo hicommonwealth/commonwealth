@@ -70,7 +70,8 @@ const UpdateQuest = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
+  if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
+    return <PageNotFound />;
 
   if (isLoadingQuest || (quest?.community_id && isLoadingCommunity))
     return <CWCircleMultiplySpinner />;

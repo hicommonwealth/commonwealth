@@ -1,5 +1,5 @@
 import type { Command } from '@hicommonwealth/core';
-import { InvalidState } from '@hicommonwealth/core';
+import { config, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   buildFarcasterContestFrameUrl,
@@ -58,6 +58,7 @@ export function CreateContestManagerMetadata(): Command<
               topic_id: topic?.id || null,
               is_farcaster_contest: !!is_farcaster_contest,
               image_url: rest.image_url || getDefaultContestImage(),
+              environment: config.APP_ENV,
             },
             { transaction },
           );
