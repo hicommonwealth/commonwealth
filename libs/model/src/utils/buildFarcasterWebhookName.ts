@@ -1,3 +1,3 @@
 export function buildFarcasterWebhookName(contestAddress: string) {
-  return `farcaster-contest-webhook-${contestAddress}`;
+  return `fc-${contestAddress.slice(0, 6)}`;
 }

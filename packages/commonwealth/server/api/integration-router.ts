@@ -36,31 +36,13 @@ function build() {
 
     // Farcaster webhooks/actions
     router.post(
-      '/farcaster/CastCreated',
+      '/farcaster/CastEvent',
       (req, _, next) => {
         validateNeynarWebhook(
           config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
         )(req, _, next).catch(next);
       },
-      express.command(Contest.FarcasterCastCreatedWebhook()),
-    );
-
-    router.post(
-      '/farcaster/ReplyCastCreated',
-      (req, _, next) => {
-        validateNeynarWebhook(null)(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
-    );
-
-    router.post(
-      '/farcaster/ContestBotMentioned',
-      (req, _, next) => {
-        validateNeynarWebhook(
-          config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-        )(req, _, next).catch(next);
-      },
-      express.command(Contest.RelayFarcasterContestBotMentioned()),
+      express.command(Contest.FarcasterCastWebhook()),
     );
 
     router.get(

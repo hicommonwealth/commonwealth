@@ -23,6 +23,7 @@ export const ContestAction = z
     fid: PG_INT.nullish().describe(
       'Farcaster ID of the content or vote author',
     ),
+    deleted_at: z.coerce.date().describe('Date-time when content was deleted'),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');

@@ -139,7 +139,7 @@ export const FarcasterCast = z.object({
   event_timestamp: z.string(),
 });
 
-export const FarcasterCastCreatedWebhook = {
+export const FarcasterCastWebhook = {
   input: z.object({
     created_at: z.number(),
     type: z.string(),

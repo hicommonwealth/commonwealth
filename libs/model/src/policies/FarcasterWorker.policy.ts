@@ -26,6 +26,7 @@ const log = logger(import.meta);
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
   FarcasterReplyCastCreated: events.FarcasterReplyCastCreated,
+  FarcasterReplyCastDeleted: events.FarcasterReplyCastDeleted,
   FarcasterVoteCreated: events.FarcasterVoteCreated,
   FarcasterContestBotMentioned: events.FarcasterContestBotMentioned,
 };
@@ -80,24 +81,44 @@ export function FarcasterWorker(): Policy<typeof inputs> {
                     payload.hash,
                   ],
                 },
-              },
-            },
-          );
-        } else {
-          const neynarWebhook = await client.publishWebhook(
-            webhookName,
-            config.CONTESTS.NEYNAR_REPLY_WEBHOOK_URL!,
-            {
-              subscription: {
-                'cast.created': {
-                  parent_hashes: [payload.hash],
+                'cast.deleted': {
+                  parent_hashes: [
+                    ...(contestManager.farcaster_frame_hashes || []),
+                    payload.hash,
+                  ],
                 },
               },
             },
           );
-          contestManager.neynar_webhook_id = neynarWebhook.webhook!.webhook_id;
-          contestManager.neynar_webhook_secret =
-            neynarWebhook.webhook?.secrets.at(0)?.value;
+        } else {
+          try {
+            const neynarWebhook = await client.publishWebhook(
+              webhookName,
+              config.CONTESTS.NEYNAR_REPLY_WEBHOOK_URL!,
+              {
+                subscription: {
+                  // reply cast created on parent
+                  'cast.created': {
+                    parent_hashes: [payload.hash],
+                  },
+                  // reply cast deleted on parent
+                  'cast.deleted': {
+                    parent_hashes: [payload.hash],
+                  },
+                },
+              },
+            );
+            contestManager.neynar_webhook_id =
+              neynarWebhook.webhook!.webhook_id;
+            contestManager.neynar_webhook_secret =
+              neynarWebhook.webhook?.secrets.at(0)?.value;
+          } catch (error) {
+            console.error(
+              'Axios error response:',
+              (error as any).response?.data,
+            );
+            throw error;
+          }
         }
 
         // append frame hash to Contest Manager
@@ -138,6 +159,13 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
+        const content_url = buildFarcasterContentUrl(
+          payload.parent_hash!,
+          payload.hash,
+          payload.author!.fid,
+        );
+
+        // create onchain content from reply cast
         const contestManagers = [
           {
             url: community.ChainNode!.private_url! || community.ChainNode!.url!,
@@ -145,19 +173,62 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             actions: [],
           },
         ];
-
-        // create onchain content from reply cast
-        const content_url = buildFarcasterContentUrl(
-          payload.parent_hash!,
-          payload.hash,
-          payload.author!.fid,
-        );
         await createOnchainContestContent({
           contestManagers,
           bypass_quota: true,
           author_address: payload.verified_address,
           content_url,
         });
+      },
+      FarcasterReplyCastDeleted: async ({ payload }) => {
+        // find associated contest manager by parent cast hash
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            cancelled: {
+              [Op.not]: true,
+            },
+            ended: {
+              [Op.not]: true,
+            },
+            farcaster_frame_hashes: {
+              [Op.contains]: [payload.parent_hash!],
+            },
+          },
+        });
+        mustExist('Contest Manager', contestManager);
+
+        const community = await models.Community.findByPk(
+          contestManager.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode.scope('withPrivateData'),
+                required: false,
+              },
+            ],
+          },
+        );
+        mustExist('Community with Chain Node', community?.ChainNode);
+
+        const content_url = buildFarcasterContentUrl(
+          payload.parent_hash!,
+          payload.hash,
+          payload.author!.fid,
+        );
+
+        // mark the contest action as deleted, but keep the record
+        // because the onchain content is immutable
+        await models.ContestAction.update(
+          {
+            deleted_at: new Date(),
+          },
+          {
+            where: {
+              contest_address: contestManager.contest_address,
+              content_url,
+            },
+          },
+        );
       },
       FarcasterVoteCreated: async ({ payload }) => {
         const { parent_hash, hash } = payload.cast;
