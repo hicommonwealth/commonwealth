@@ -39,7 +39,7 @@ function build() {
       '/farcaster/CastEvent',
       (req, _, next) => {
         validateNeynarWebhook(
-          config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+          config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET!,
         )(req, _, next).catch(next);
       },
       express.command(Contest.FarcasterCastWebhook()),

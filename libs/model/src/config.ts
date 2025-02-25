@@ -35,8 +35,7 @@ const {
   NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
-  NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-  NEYNAR_REPLY_WEBHOOK_URL,
+  NEYNAR_CAST_WEBHOOK_ID,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
   FARCASTER_MANIFEST_HEADER,
@@ -98,9 +97,6 @@ export const config = configure(
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
-      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET:
-        NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-      NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
       FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
       FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
@@ -235,20 +231,6 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
-        ),
-      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET must be set to a non-default value in production.',
-        ),
-      NEYNAR_REPLY_WEBHOOK_URL: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
         ),
       FARCASTER_ACTION_URL: z
         .string()

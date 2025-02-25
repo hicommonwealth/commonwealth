@@ -4,31 +4,11 @@ import {
   rollOverContest,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
 import { models } from '../database';
 import { emitEvent, getChainNodeUrl } from '../utils/utils';
 
 const log = logger(import.meta);
-
-async function cleanNeynarWebhook(
-  contest_address: string,
-  neynar_webhook_id: string,
-) {
-  try {
-    const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-    await client.deleteWebhook(neynar_webhook_id);
-    await models.ContestManager.update(
-      {
-        neynar_webhook_id: null,
-        neynar_webhook_secret: null,
-      },
-      { where: { contest_address } },
-    );
-  } catch (err) {
-    log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
-  }
-}
 
 export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
   return {
@@ -43,7 +23,6 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         payout_structure,
         chain_url,
         chain_private_url,
-        neynar_webhook_id,
       } = payload;
 
       const rpc = getChainNodeUrl({
@@ -102,10 +81,6 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
           transaction,
         );
       });
-
-      // clean up neynar webhooks when farcaster contest ends (fire and forget)
-      if (neynar_webhook_id)
-        void cleanNeynarWebhook(contest_address, neynar_webhook_id);
 
       return {};
     },

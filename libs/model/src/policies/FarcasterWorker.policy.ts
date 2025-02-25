@@ -5,17 +5,15 @@ import {
   getBaseUrl,
 } from '@hicommonwealth/shared';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
+import { Mutex } from 'async-mutex';
+import _ from 'lodash';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { CreateBotContest } from '../bot/CreateBotContest.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
-import {
-  buildFarcasterContentUrl,
-  buildFarcasterWebhookName,
-  publishCast,
-} from '../utils';
+import { buildFarcasterContentUrl, publishCast } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -25,109 +23,108 @@ const log = logger(import.meta);
 
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
+  FarcasterCastDeleted: events.FarcasterCastDeleted,
   FarcasterReplyCastCreated: events.FarcasterReplyCastCreated,
   FarcasterReplyCastDeleted: events.FarcasterReplyCastDeleted,
   FarcasterVoteCreated: events.FarcasterVoteCreated,
   FarcasterContestBotMentioned: events.FarcasterContestBotMentioned,
 };
 
+const neynarMutex = new Mutex();
+
 export function FarcasterWorker(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
       FarcasterCastCreated: async ({ payload }) => {
-        const frame_url = new URL(payload.embeds[0].url).pathname;
-        const contest_address = frame_url
-          .split('/')
-          .find((str) => str.startsWith('0x'));
+        // avoid concurrency because shared webhook mutations will occur
+        await neynarMutex.runExclusive(async () => {
+          const frame_url = new URL(payload.embeds[0].url).pathname;
+          const contest_address = frame_url
+            .split('/')
+            .find((str) => str.startsWith('0x'));
 
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            cancelled: {
-              [Op.not]: true,
-            },
-            ended: {
-              [Op.not]: true,
-            },
-            contest_address,
-          },
-        });
-        mustExist('Contest Manager', contestManager);
-
-        if (contestManager.farcaster_frame_hashes?.includes(payload.hash)) {
-          log.warn(
-            `farcaster frame hash already added to contest manager: ${payload.hash}`,
-          );
-          return;
-        }
-
-        // create/update webhook to listen for replies on this cast
-        const webhookName = buildFarcasterWebhookName(
-          contestManager.contest_address,
-        );
-
-        // if webhook exists, update target hashes, otherwise create new webhook
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-        if (contestManager.neynar_webhook_id) {
-          await client.updateWebhook(
-            contestManager.neynar_webhook_id,
-            webhookName,
-            config.CONTESTS.NEYNAR_REPLY_WEBHOOK_URL!,
-            {
-              subscription: {
-                'cast.created': {
-                  parent_hashes: [
-                    ...(contestManager.farcaster_frame_hashes || []),
-                    payload.hash,
-                  ],
-                },
-                'cast.deleted': {
-                  parent_hashes: [
-                    ...(contestManager.farcaster_frame_hashes || []),
-                    payload.hash,
-                  ],
-                },
+          const contestManager = await models.ContestManager.findOne({
+            where: {
+              cancelled: {
+                [Op.not]: true,
               },
-            },
-          );
-        } else {
-          try {
-            const neynarWebhook = await client.publishWebhook(
-              webhookName,
-              config.CONTESTS.NEYNAR_REPLY_WEBHOOK_URL!,
-              {
-                subscription: {
-                  // reply cast created on parent
-                  'cast.created': {
-                    parent_hashes: [payload.hash],
-                  },
-                  // reply cast deleted on parent
-                  'cast.deleted': {
-                    parent_hashes: [payload.hash],
-                  },
-                },
+              ended: {
+                [Op.not]: true,
               },
+              contest_address,
+            },
+          });
+          mustExist('Contest Manager', contestManager);
+
+          if (contestManager.farcaster_frame_hashes?.includes(payload.hash)) {
+            log.warn(
+              `farcaster frame hash already added to contest manager: ${payload.hash}`,
             );
-            contestManager.neynar_webhook_id =
-              neynarWebhook.webhook!.webhook_id;
-            contestManager.neynar_webhook_secret =
-              neynarWebhook.webhook?.secrets.at(0)?.value;
-          } catch (error) {
-            console.error(
-              'Axios error response:',
-              (error as any).response?.data,
-            );
-            throw error;
+            return;
           }
-        }
 
-        // append frame hash to Contest Manager
-        contestManager.farcaster_frame_hashes = [
-          ...(contestManager.farcaster_frame_hashes || []),
-          payload.hash,
-        ];
+          // each environment has 1 programmatic webhook
+          const environment =
+            config.APP_ENV === 'local'
+              ? config.CONTESTS.FARCASTER_NGROK_DOMAIN?.replace('https://', '')
+              : config.APP_ENV;
+          const webhookName = `fc-${environment}-replies`;
 
-        await contestManager.save();
+          // find webhook by name, otherwise create it
+          const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+          const { webhooks } = await client.fetchWebhooks();
+          const existingCastWebhook = webhooks.find(
+            (w) => w.title === webhookName,
+          );
+
+          // merge all old and new parent hashes
+          const parent_hashes = _.uniq([
+            ...(existingCastWebhook?.subscription?.filters['cast.created']
+              ?.parent_hashes || []),
+            ...(existingCastWebhook?.subscription?.filters['cast.deleted']
+              ?.parent_hashes || []),
+            ...(contestManager.farcaster_frame_hashes || []),
+            payload.hash,
+          ]);
+
+          const subscription = {
+            // reply cast created on parent
+            'cast.created': {
+              parent_hashes,
+            },
+            // reply cast deleted on parent
+            'cast.deleted': {
+              parent_hashes,
+            },
+          };
+
+          if (!existingCastWebhook) {
+            await client.publishWebhook(
+              webhookName,
+              `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}/api/integration/farcaster/CastEvent`,
+              {
+                subscription,
+              },
+            );
+          } else {
+            await client.updateWebhook(
+              existingCastWebhook.webhook_id,
+              existingCastWebhook.title,
+              existingCastWebhook.target_url,
+              {
+                subscription,
+              },
+            );
+          }
+
+          // update contest manager frame hashes
+          contestManager.farcaster_frame_hashes = parent_hashes;
+          await contestManager.save();
+        });
+      },
+      FarcasterCastDeleted: async ({ payload }) => {
+        // not implemented
       },
       FarcasterReplyCastCreated: async ({ payload }) => {
         // find associated contest manager by parent cast hash
@@ -196,19 +193,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         });
         mustExist('Contest Manager', contestManager);
-
-        const community = await models.Community.findByPk(
-          contestManager.community_id,
-          {
-            include: [
-              {
-                model: models.ChainNode.scope('withPrivateData'),
-                required: false,
-              },
-            ],
-          },
-        );
-        mustExist('Community with Chain Node', community?.ChainNode);
 
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
