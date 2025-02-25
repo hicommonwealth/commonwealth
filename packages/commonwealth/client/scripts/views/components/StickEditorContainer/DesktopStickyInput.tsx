@@ -7,7 +7,8 @@ import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type {
   CommentEditorProps,
@@ -20,7 +21,7 @@ import {
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
-import { ChipsAndModelBar, ModelOption } from './ChipsAndModelBar';
+import { ChipsAndModelBar } from './ChipsAndModelBar';
 import './DesktopStickyInput.scss';
 import { useStickComment } from './context/StickCommentProvider';
 
@@ -28,8 +29,12 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const { mode, isExpanded, setIsExpanded } = useStickComment();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    selectedModels,
+    setSelectedModels,
+  } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<
     StreamingReplyData[]
   >([]);
@@ -40,7 +45,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     communityId,
   });
   const user = useUserStore();
-  const [selectedModels, setSelectedModels] = useState<ModelOption[]>([]);
 
   const handleFocused = useCallback(() => {
     setIsExpanded(true);
@@ -62,7 +66,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const handleAiReply = useCallback(
     (commentId: number, modelIds?: string[]) => {
       // If modelIds parameter is provided, use it
-      // Otherwise, use the component's selectedModels state
+      // Otherwise, use the persisted selectedModels state
       const modelsToUse =
         modelIds ||
         (selectedModels.length > 0
@@ -310,7 +314,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                   handleAiGenerate('Please generate a relevant question');
                 }
               }}
-              onModelsChange={setSelectedModels}
               selectedModels={selectedModels}
             />
           )}
@@ -353,7 +356,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                   handleAiGenerate('Please generate a relevant question');
                 }
               }}
-              onModelsChange={setSelectedModels}
               selectedModels={selectedModels}
             />
           )}

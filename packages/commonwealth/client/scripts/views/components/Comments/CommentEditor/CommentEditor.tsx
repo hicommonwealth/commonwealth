@@ -34,10 +34,15 @@ export type CommentEditorProps = {
   isReplying?: boolean;
   aiCommentsToggleEnabled?: boolean;
   setAICommentsToggleEnabled?: (value: boolean) => void;
-  onAiReply?: (commentId: number) => void;
+  onAiReply?: (commentId: number, modelIds?: string[]) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   replyingToAuthor?: string;
-  streamingReplyIds?: number[];
+  streamingReplyIds?: number[] | StreamingReplyData[];
+};
+
+export type StreamingReplyData = {
+  commentId: number;
+  modelId: string;
 };
 
 const CommentEditor = ({

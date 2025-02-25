@@ -8,8 +8,12 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useSidebarStore from 'state/ui/sidebar/sidebar';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
-import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
+import type {
+  CommentEditorProps,
+  StreamingReplyData,
+} from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -18,8 +22,7 @@ import {
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
-import { StreamingReplyData } from '../Comments/CommentEditor/CommentEditor';
-import { ChipsAndModelBar, ModelOption } from './ChipsAndModelBar';
+import { ChipsAndModelBar } from './ChipsAndModelBar';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
 import { StickCommentContext } from './context/StickCommentProvider';
@@ -28,8 +31,12 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
   const { mode } = useContext(StickCommentContext);
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    selectedModels,
+    setSelectedModels,
+  } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<
     StreamingReplyData[]
   >([]);
@@ -41,7 +48,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     communityId,
   });
   const user = useUserStore();
-  const [selectedModels, setSelectedModels] = useState<ModelOption[]>([]);
 
   const handleCancel = useCallback(() => {
     console.log('MobileStickyInput: handleCancel triggered');
@@ -51,7 +57,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const handleAiReply = useCallback(
     (commentId: number, modelIds?: string[]) => {
       // If modelIds parameter is provided, use it
-      // Otherwise, use the component's selectedModels state
+      // Otherwise, use the persisted selectedModels state
       const modelsToUse =
         modelIds ||
         (selectedModels.length > 0
@@ -337,7 +343,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
                   handleAiGenerate('Please generate a relevant question');
                 }
               }}
-              onModelsChange={setSelectedModels}
               selectedModels={selectedModels}
             />
           )}
@@ -377,7 +382,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
               handleAiGenerate('Please generate a relevant question');
             }
           }}
-          onModelsChange={setSelectedModels}
           selectedModels={selectedModels}
         />
       )}

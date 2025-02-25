@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import {
   MultiSelectOption,
@@ -10,8 +11,8 @@ export type ModelOption = MultiSelectOption;
 
 type ChipsAndModelBarProps = {
   onChipAction: (action: 'summary' | 'question') => void;
-  onModelsChange: (models: ModelOption[]) => void;
-  selectedModels: ModelOption[];
+  onModelsChange?: (models: ModelOption[]) => void;
+  selectedModels?: ModelOption[];
 };
 
 // Truncate model descriptions to keep them reasonable
@@ -27,10 +28,25 @@ const truncateDescription = (
 export const ChipsAndModelBar = ({
   onChipAction,
   onModelsChange,
-  selectedModels,
+  selectedModels: externalSelectedModels,
 }: ChipsAndModelBarProps) => {
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Use the persisted models from the store
+  const { selectedModels: storedModels, setSelectedModels } =
+    useLocalAISettingsStore();
+
+  // Determine which models to use - external props or stored models
+  const selectedModels = externalSelectedModels || storedModels;
+
+  // Handle model changes
+  const handleModelsChange = (models: ModelOption[]) => {
+    // Update the store
+    setSelectedModels(models);
+    // Also call the external handler if provided
+    onModelsChange?.(models);
+  };
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -57,7 +73,7 @@ export const ChipsAndModelBar = ({
           (m) => m.value === 'anthropic/claude-3.5-sonnet',
         );
         if (claude && selectedModels.length === 0) {
-          onModelsChange([claude]);
+          handleModelsChange([claude]);
         }
       } catch (error) {
         console.error('Failed to fetch models:', error);
@@ -85,7 +101,7 @@ export const ChipsAndModelBar = ({
         setModelOptions(fallbackModels);
 
         if (selectedModels.length === 0) {
-          onModelsChange([fallbackModels[0]]);
+          handleModelsChange([fallbackModels[0]]);
         }
       } finally {
         setIsLoading(false);
@@ -93,7 +109,7 @@ export const ChipsAndModelBar = ({
     };
 
     void fetchModels();
-  }, [selectedModels.length, onModelsChange]);
+  }, []);
 
   return (
     <div className="ChipsAndModelBar">
@@ -120,7 +136,7 @@ export const ChipsAndModelBar = ({
               : 'Select AI Models...'
           }
           isDisabled={isLoading}
-          onChange={onModelsChange}
+          onChange={handleModelsChange}
           value={selectedModels}
           menuPlacement="top"
         />
