@@ -31,7 +31,9 @@ import {
 } from '../../pages/CommunityManagement/Contests/utils';
 import ContestAlert from './ContestAlert';
 
+import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -299,7 +301,11 @@ const ContestCard = ({
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {prize} {ticker}
+                        <FractionalValue
+                          fontWeight="bold"
+                          value={parseFloat(prize.replace(',', ''))}
+                        />
+                        &nbsp;{ticker}
                       </CWText>
                     </div>
                   ))

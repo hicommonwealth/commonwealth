@@ -170,9 +170,10 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new Error(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
+    console.warn(
+      `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
+    return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
