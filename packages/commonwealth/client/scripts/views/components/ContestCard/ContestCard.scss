@@ -83,6 +83,8 @@
     .prizes-header {
       font-size: 18px;
       margin-block: 8px;
+      font-family: $font-family-silka;
+      font-weight: 600;
     }
 
     .prizes {
@@ -94,14 +96,36 @@
         display: flex;
         justify-content: space-between;
         gap: 8px;
+        background-color: $neutral-50;
+        border: 1px solid $neutral-100;
+        padding: 8px;
+        border-radius: 6px;
 
         .label {
           color: $neutral-600;
+          font-family: $font-family-silka;
+          font-weight: 600;
         }
 
         .bold {
           word-break: break-word;
+          font-family: $font-family-monospace;
         }
+      }
+
+      .prize-row:nth-child(1) {
+        background-color: $yellow-300;
+        border: 1px solid $yellow-400;
+      }
+
+      .prize-row:nth-child(2) {
+        background-color: $neutral-200;
+        border: 1px solid $neutral-300;
+      }
+
+      .prize-row:nth-child(3) {
+        background-color: $rorange-200;
+        border: 1px solid $rorange-300;
       }
     }
 

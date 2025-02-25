@@ -173,7 +173,10 @@ const ContestCard = ({
   };
 
   const showNoFundsInfo =
-    isActive && !isLoadingContestBalance && (contestBalance || 0) <= 0;
+    isAdmin &&
+    isActive &&
+    !isLoadingContestBalance &&
+    (contestBalance || 0) <= 0;
 
   const isLessThan24HoursLeft =
     moment(finishDate).diff(moment(), 'hours') <= 24;
@@ -271,7 +274,7 @@ const ContestCard = ({
                 Current Prizes
               </CWText>
               <div className="prizes">
-                {prizes ? (
+                {prizes && prizes.length > 0 ? (
                   prizes?.map((prize, index) => (
                     <div className="prize-row" key={index}>
                       <CWText className="label">
