@@ -18,6 +18,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
+import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import './UpdateQuest.scss';
 
 const UpdateQuest = ({ id }: { id: number }) => {
@@ -50,7 +51,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
         !window.location.pathname.includes(quest.community_id)
       ) {
         navigate(
-          `/${quest.community_id}/quest/${quest.id}/update`,
+          `/${quest.community_id}/quests/${quest.id}/update`,
           { replace: true },
           null,
         );
@@ -60,16 +61,17 @@ const UpdateQuest = ({ id }: { id: number }) => {
       // redirect to global quest update page if on community quest update page
       if (
         !quest?.community_id &&
-        window.location.pathname !== `/quest/${quest.id}/update`
+        window.location.pathname !== `/quests/${quest.id}/update`
       ) {
-        navigate(`/quest/${quest.id}/update`, { replace: true }, null);
+        navigate(`/quests/${quest.id}/update`, { replace: true }, null);
         return;
       }
     },
     shouldRun: !!quest,
   });
 
-  if (!user.isLoggedIn || !Permissions.isSiteAdmin()) return <PageNotFound />;
+  if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
+    return <PageNotFound />;
 
   if (isLoadingQuest || (quest?.community_id && isLoadingCommunity))
     return <CWCircleMultiplySpinner />;
@@ -128,7 +130,13 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
-                actionLink: action.action_link,
+                instructionsLink: action.instructions_link,
+                contentLink: action.content_id
+                  ? buildURLFromContentId(
+                      action.content_id.split(':')[1],
+                      action.content_id.split(':')[0] as 'thread' | 'comment',
+                    )
+                  : action.content_id,
               })),
             }}
           />

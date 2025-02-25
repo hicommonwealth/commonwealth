@@ -49,7 +49,7 @@ const QuestSummaryCard = () => {
   };
 
   const handleCTAClick = (questId: number, communityId?: string) => {
-    navigate(`/quest/${questId}`, {}, communityId);
+    navigate(`/quests/${questId}`, {}, communityId);
   };
 
   const isLoading =

@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   ChainBase,
@@ -6,7 +7,6 @@ import {
 } from '@hicommonwealth/shared';
 import { Theme } from '@uniswap/widgets';
 import WebWalletController from 'controllers/app/web_wallets';
-import { ethers } from 'ethers';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useState } from 'react';
@@ -97,8 +97,7 @@ const uniswapWidgetTheme: Theme = {
 
 const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
-  const [uniswapProvider, setUniswapProvider] =
-    useState<ethers.providers.Web3Provider>();
+  const [uniswapProvider, setUniswapProvider] = useState<Web3Provider>();
   const [uniswapTokensList, setUniswapTokensList] = useState<UniswapToken[]>();
 
   // base chain node info
@@ -136,7 +135,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
           );
           const selectedWallet = wallet[0];
           await selectedWallet.enable(`${baseNode.ethChainId}`);
-          const tempProvider = new ethers.providers.Web3Provider(
+          const tempProvider = new Web3Provider(
             selectedWallet.api.givenProvider,
           );
           setUniswapProvider(tempProvider);

@@ -37,7 +37,7 @@ const actionCopies = {
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction) => void;
+  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
   actionNumber: number;
   questAction: z.infer<typeof QuestActionMeta>;
   isActionInEligible?: boolean;
@@ -76,23 +76,24 @@ const QuestActionCard = ({
           <CWText type="b1" fontWeight="semiBold">
             {actionCopies.title[questAction.event_name]}
           </CWText>
-          {doesActionRequireCreatorReward(questAction.event_name) && (
-            <CWText type="caption" className="xp-shares">
-              <span className="creator-share">
-                {creatorXP.percentage}% (
-                {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
-              </span>
-              &nbsp; shared with {actionCopies.shares[questAction.event_name]}.
-              Your share ={' '}
-              {Math.abs(questAction.reward_amount - creatorXP.value)} XP
-            </CWText>
-          )}
+          {doesActionRequireCreatorReward(questAction.event_name) &&
+            creatorXP.percentage > 0 && (
+              <CWText type="caption" className="xp-shares">
+                <span className="creator-share">
+                  {creatorXP.percentage}% (
+                  {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
+                </span>
+                &nbsp; shared with {actionCopies.shares[questAction.event_name]}
+                . Your share ={' '}
+                {Math.abs(questAction.reward_amount - creatorXP.value)} XP
+              </CWText>
+            )}
           <div className="points-row">
             <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {questAction.action_link && (
+            {questAction.instructions_link && (
               <a
                 target="_blank"
-                href={questAction.action_link}
+                href={questAction.instructions_link}
                 rel="noreferrer"
                 className="action-link"
               >
@@ -123,7 +124,12 @@ const QuestActionCard = ({
               buttonHeight="sm"
               buttonWidth="narrow"
               iconRight="arrowRightPhosphor"
-              onClick={() => onActionStart(questAction.event_name)}
+              onClick={() =>
+                onActionStart(
+                  questAction.event_name,
+                  questAction?.content_id || undefined,
+                )
+              }
               disabled={!canStartAction}
             />,
             actionStartBlockedReason || '',

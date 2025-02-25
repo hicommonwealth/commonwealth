@@ -26,6 +26,7 @@ import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 
 import { buildContestPrizes } from '@hicommonwealth/shared';
+import FractionalValue from 'views/components/FractionalValue';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import './ContestCard.scss';
 
@@ -248,7 +249,11 @@ const ContestCard = ({
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {prize} {ticker}
+                        <FractionalValue
+                          fontWeight="bold"
+                          value={parseFloat(prize.replace(',', ''))}
+                        />
+                        &nbsp;{ticker}
                       </CWText>
                     </div>
                   ))
