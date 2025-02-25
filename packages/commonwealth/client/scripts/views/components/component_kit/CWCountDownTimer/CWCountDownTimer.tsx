@@ -13,6 +13,7 @@ interface CWCountDownTimerProps {
   isActive: boolean;
   className?: string;
   labelPostfix?: string;
+  showTag?: boolean;
 }
 
 const CWCountDownTimer = ({
@@ -20,11 +21,16 @@ const CWCountDownTimer = ({
   isActive,
   className,
   labelPostfix,
+  showTag,
 }: CWCountDownTimerProps) => {
   const { label, status } = calculateTimeLeft(finishTime, isActive);
 
   return (
-    <div className={clsx('CWCountDownTimer', status, className)}>
+    <div
+      className={clsx('CWCountDownTimer', status, className, {
+        'show-tag': showTag,
+      })}
+    >
       <CWIcon iconName="timer" iconSize="small" weight="bold" />
       <CWText fontWeight="medium">
         {label}

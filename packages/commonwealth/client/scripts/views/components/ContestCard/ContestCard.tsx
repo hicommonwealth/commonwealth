@@ -6,7 +6,7 @@ import { buildContestPrizes } from '@hicommonwealth/shared';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
@@ -30,6 +30,7 @@ import {
 } from '../../pages/CommunityManagement/Contests/utils';
 import ContestAlert from './ContestAlert';
 
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -61,6 +62,11 @@ interface ContestCardProps {
     prize?: string;
     tickerPrize?: number;
   }[];
+  community?: {
+    name: string;
+    iconUrl: string;
+    id: string;
+  };
 }
 
 const ContestCard = ({
@@ -81,6 +87,7 @@ const ContestCard = ({
   isFarcaster = false,
   payoutStructure,
   score = [],
+  community,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -101,6 +108,7 @@ const ContestCard = ({
   const { data: contestBalance, isLoading: isLoadingContestBalance } =
     useGetContestBalanceQuery({
       contestAddress: address,
+      // this oes not work in explore page or home page
       chainRpc: app.chain.meta?.ChainNode?.url || '',
       ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
       isOneOff: !isRecurring,
@@ -187,7 +195,7 @@ const ContestCard = ({
       })}
     >
       {imageUrl && (
-        <>
+        <div className="contest-image-container">
           {isHorizontal && isActive && (
             <CWTag
               label="Active Contest"
@@ -196,18 +204,37 @@ const ContestCard = ({
             />
           )}
           <img src={imageUrl} alt="contest-image" className="contest-image" />
-        </>
+        </div>
       )}
       <div className="contest-body">
         <div className="header-row">
-          <CWText type="h3">{name}</CWText>
+          <div className="header-row-left">
+            <CWCommunityAvatar
+              onClick={() => {
+                navigateToCommunity({
+                  navigate,
+                  path: '',
+                  chain: community?.id || '',
+                });
+              }}
+              community={{
+                name: community?.name || '',
+                iconUrl: community?.iconUrl || '',
+              }}
+            />
+            <CWText type="h3">{name}</CWText>
+          </div>
           {finishDate ? (
-            <CWCountDownTimer finishTime={finishDate} isActive={isActive} />
+            <CWCountDownTimer
+              finishTime={finishDate}
+              isActive={isActive}
+              showTag
+            />
           ) : isActive ? (
             <Skeleton width="70px" />
           ) : null}
         </div>
-        {!isFarcaster && (
+        {!isFarcaster && topics?.length > 0 && (
           <CWText className="topics">
             Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
           </CWText>

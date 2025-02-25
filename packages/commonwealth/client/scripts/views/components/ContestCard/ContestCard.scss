@@ -23,35 +23,56 @@
     left: 10px;
   }
 
-  .contest-image {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  .contest-image-container {
     width: 100%;
-    max-height: 275px;
-    object-fit: cover;
+    padding: 12px;
+    padding-bottom: 0;
 
-    @include extraSmall {
-      min-height: 195px;
+    .contest-image {
+      border-radius: 6px;
+      width: 100%;
+      max-height: 275px;
+      object-fit: cover;
+
+      @include extraSmall {
+        min-height: 195px;
+      }
     }
   }
 
   .contest-body {
     width: 100%;
-    padding: 16px;
+    padding: 12px;
 
     .header-row {
       display: flex;
-      justify-content: space-between;
-      align-items: start;
-      gap: 32px;
+      justify-content: start;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+
+      .header-row-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
       & > .Text {
         word-break: break-word;
       }
 
+      .CWCountDownTimer {
+        margin-left: auto;
+      }
+
       @include extraSmall {
         flex-direction: column;
-        gap: 4px;
+        align-items: start;
+        gap: 8px;
+
+        .CWCountDownTimer {
+          margin-left: 0;
+        }
       }
     }
 
@@ -60,7 +81,8 @@
     }
 
     .prizes-header {
-      margin-top: 8px;
+      font-size: 18px;
+      margin-block: 8px;
     }
 
     .prizes {
