@@ -39,7 +39,10 @@ import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
 
-export type CommentViewParams = z.infer<typeof CommentsView>;
+export type CommentViewParams = z.infer<typeof CommentsView> & {
+  modelName?: string;
+  streamingModelId?: string;
+};
 
 type CommentCardProps = {
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
@@ -80,6 +83,7 @@ type CommentCardProps = {
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
+  streamingModelId?: string;
   // Add props for root-level comment generation
   isRootComment?: boolean;
   threadContext?: string;
@@ -123,6 +127,7 @@ export const CommentCard = ({
   isStreamingAIReply,
   parentCommentText,
   onStreamingComplete,
+  streamingModelId,
   isRootComment,
   threadContext,
 }: CommentCardProps) => {
@@ -244,14 +249,22 @@ export const CommentCard = ({
           .filter(Boolean)
           .join('\n\n');
 
-        await generateCommentRef.current(contextText || '', (text) => {
-          if (mounted) {
-            // Append incoming chunks so the full comment is built up
-            accumulatedText += text;
-            setStreamingText(accumulatedText);
-            finalText = accumulatedText;
-          }
-        });
+        // The model ID is explicitly provided through streamingModelId props
+        // or we use the default model
+        const modelToUse = streamingModelId || 'anthropic/claude-3.5-sonnet';
+
+        await generateCommentRef.current(
+          contextText || '',
+          (text) => {
+            if (mounted) {
+              // Append incoming chunks so the full comment is built up
+              accumulatedText += text;
+              setStreamingText(accumulatedText);
+              finalText = accumulatedText;
+            }
+          },
+          [modelToUse],
+        ); // Pass the model ID to use
 
         if (mounted && finalText) {
           if (!activeUserAddress) {
@@ -291,6 +304,8 @@ export const CommentCard = ({
     comment.id,
     comment.thread_id,
     comment.community_id,
+    comment.user_id,
+    streamingModelId,
     activeUserAddress,
   ]);
 
@@ -373,7 +388,10 @@ export const CommentCard = ({
           {isStreamingAIReply && (
             <div className="streaming-indicator">
               <CWIcon iconName="sparkle" iconSize="small" />
-              <CWText type="caption">AI Assistant</CWText>
+              <CWText type="caption">
+                AI Assistant
+                {comment.modelName && ` (${comment.modelName})`}
+              </CWText>
             </div>
           )}
         </div>

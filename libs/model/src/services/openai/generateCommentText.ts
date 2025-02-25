@@ -16,8 +16,10 @@ const CommentErrors = {
 
 const generateCommentText = async function* ({
   userText,
+  modelId,
 }: {
   userText?: string;
+  modelId?: string;
 }): AsyncGenerator<
   string | { error: (typeof CommentErrors)[keyof typeof CommentErrors] },
   void,
@@ -53,8 +55,13 @@ const generateCommentText = async function* ({
   }
 
   try {
+    // Use provided modelId or fallback to default models
+    const model =
+      modelId ||
+      (useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'openai/o3-mini');
+
     const createCompletionConfig: any = {
-      model: useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'openai/o3-mini',
+      model,
       messages: [
         {
           role: 'user',
@@ -71,17 +78,25 @@ const generateCommentText = async function* ({
       };
     }
 
-    const stream = await openai.chat.completions.create(createCompletionConfig);
+    try {
+      const response = await openai.chat.completions.create(
+        createCompletionConfig,
+      );
 
-    for await (const chunk of stream) {
-      try {
-        const content = chunk.choices[0]?.delta?.content || '';
-        if (content) {
-          yield content;
+      // @ts-ignore - OpenAI SDK types might not properly reflect the stream capability
+      for await (const chunk of response) {
+        try {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            yield content;
+          }
+        } catch (chunkError) {
+          console.error('Error processing chunk:', chunkError);
         }
-      } catch (chunkError) {
-        console.error('Error processing chunk:', chunkError);
       }
+    } catch (streamError) {
+      console.error('Error in streaming response:', streamError);
+      yield { error: CommentErrors.RequestFailed };
     }
   } catch (e) {
     console.error('Error in OpenAI stream:', e);

@@ -502,7 +502,13 @@ function setupRouter(
       res.setHeader('Transfer-Encoding', 'chunked');
       const userText =
         typeof req.body?.userText === 'string' ? req.body.userText : undefined;
-      const commentGenerator = generateCommentText({ userText });
+      const modelId =
+        typeof req.body?.modelId === 'string' ? req.body.modelId : undefined;
+
+      const commentGenerator = generateCommentText({
+        userText,
+        modelId,
+      });
 
       for await (const chunk of commentGenerator) {
         if ((chunk as { error?: string }).error) {

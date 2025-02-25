@@ -2,6 +2,7 @@ import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
+import { StreamingReplyData } from 'views/components/Comments/CommentEditor/CommentEditor';
 import Thread from '../../../../models/Thread';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
@@ -18,8 +19,10 @@ export type CommentsTreeProps = {
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
-  streamingReplyIds: number[];
-  setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
+  streamingReplyIds: Array<number | StreamingReplyData>;
+  setStreamingReplyIds: React.Dispatch<
+    React.SetStateAction<Array<number | StreamingReplyData>>
+  >;
 };
 
 export type UseCommentsTreeProps = Pick<
