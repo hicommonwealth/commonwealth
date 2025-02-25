@@ -161,6 +161,11 @@ async function main() {
       address.oauth_provider = fetchedData.oauthProvider;
       address.oauth_email = fetchedData.email;
       address.oauth_phone_number = fetchedData.phoneNumber;
+
+      if (fetchedData.email) {
+        // WARNING: for backfilling only assume all emails are verified (all new emails will be checked first)
+        address.oauth_email_verified = true;
+      }
       await address.save();
     }
     processedAddresses++;

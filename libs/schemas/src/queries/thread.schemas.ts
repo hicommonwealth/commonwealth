@@ -92,6 +92,7 @@ export const AddressView = Address.extend({
   oauth_provider: true,
   oauth_phone_number: true,
   oauth_username: true,
+  oauth_email_verified: true,
 });
 
 export const ReactionView = z.object({
