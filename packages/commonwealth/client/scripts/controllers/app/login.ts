@@ -397,7 +397,7 @@ export async function handleSocialLoginCallback({
 }: {
   bearer?: string | null;
   chain?: string;
-  walletSsoSource?: WalletSsoSource;
+  walletSsoSource: WalletSsoSource;
   isCustomDomain?: boolean;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from

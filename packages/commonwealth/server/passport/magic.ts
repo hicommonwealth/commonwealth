@@ -18,6 +18,7 @@ import {
   CANVAS_TOPIC,
   ChainBase,
   WalletId,
+  WalletSsoSource,
   deserializeCanvas,
   getSessionSignerForDid,
 } from '@hicommonwealth/shared';
@@ -38,10 +39,11 @@ type MagicLoginContext = {
   decodedMagicToken: MagicUser;
   magicUserMetadata: MagicUserMetadata;
   generatedAddresses: Array<{ address: string; community_id: string }>;
+  walletSsoSource: WalletSsoSource;
   accessToken?: string; // SSO access token returned by OAuth process
   existingUserInstance?: UserInstance | null;
   loggedInUser?: UserInstance | null;
-  profileMetadata?: { username?: string; avatarUrl?: string };
+  profileMetadata?: { username?: string | null; avatarUrl?: string | null };
 };
 
 const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
@@ -56,14 +58,16 @@ type OauthInfo = {
 
 async function getVerifiedInfo(
   magicUserMetadata: MagicUserMetadata,
+  walletSsoSource: WalletSsoSource,
   accessToken?: string,
 ): Promise<OauthInfo> {
   let verifiedUserInfo: VerifiedUserInfo;
   try {
-    verifiedUserInfo = await getVerifiedUserInfo(
-      magicUserMetadata,
-      accessToken,
-    );
+    verifiedUserInfo = await getVerifiedUserInfo({
+      magicMetadata: magicUserMetadata,
+      token: accessToken,
+      walletSsoSource,
+    });
   } catch (e) {
     log.error('Failed to fetch verified SSO user info', e, {
       magicUserMetadata,
@@ -131,6 +135,7 @@ async function createMagicAddressInstances(
     isNewUser,
     decodedMagicToken,
     magicUserMetadata,
+    walletSsoSource,
     transaction,
     accessToken,
   }: {
@@ -139,6 +144,7 @@ async function createMagicAddressInstances(
     isNewUser: boolean;
     decodedMagicToken: MagicUser;
     magicUserMetadata: MagicUserMetadata;
+    walletSsoSource: WalletSsoSource;
     accessToken?: string;
     transaction?: Transaction;
   },
@@ -146,7 +152,11 @@ async function createMagicAddressInstances(
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
 
-  const verifiedInfo = await getVerifiedInfo(magicUserMetadata, accessToken);
+  const verifiedInfo = await getVerifiedInfo(
+    magicUserMetadata,
+    walletSsoSource,
+    accessToken,
+  );
   const {
     oauth_provider,
     oauth_email,
@@ -247,6 +257,7 @@ async function createNewMagicUser({
   generatedAddresses,
   profileMetadata,
   accessToken,
+  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
@@ -285,6 +296,7 @@ async function createNewMagicUser({
         isNewUser: true,
         decodedMagicToken,
         magicUserMetadata,
+        walletSsoSource,
         accessToken,
         transaction,
       });
@@ -372,6 +384,7 @@ async function loginExistingMagicUser({
   decodedMagicToken,
   generatedAddresses,
   magicUserMetadata,
+  walletSsoSource,
   accessToken,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
@@ -407,6 +420,7 @@ async function loginExistingMagicUser({
 
       const verifiedInfo = await getVerifiedInfo(
         magicUserMetadata,
+        walletSsoSource,
         accessToken,
       );
       await updateAddressesOauth(
@@ -424,6 +438,7 @@ async function loginExistingMagicUser({
         isNewUser: false,
         decodedMagicToken,
         magicUserMetadata,
+        walletSsoSource,
         accessToken,
         transaction,
       });
@@ -502,6 +517,7 @@ async function addMagicToUser({
   loggedInUser,
   decodedMagicToken,
   magicUserMetadata,
+  walletSsoSource,
   accessToken,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!loggedInUser) {
@@ -514,6 +530,7 @@ async function addMagicToUser({
     user: loggedInUser,
     isNewUser: false,
     decodedMagicToken,
+    walletSsoSource,
     accessToken,
     magicUserMetadata,
   });
@@ -743,6 +760,7 @@ async function magicLoginRoute(
       user: loggedInUser,
       isNewUser: false,
       decodedMagicToken,
+      walletSsoSource: body.walletSsoSource,
       accessToken: body.access_token,
       magicUserMetadata,
     });
@@ -757,6 +775,7 @@ async function magicLoginRoute(
     generatedAddresses,
     existingUserInstance,
     loggedInUser,
+    walletSsoSource: body.walletSsoSource,
     accessToken: body.access_token,
     profileMetadata: {
       username: body.username,

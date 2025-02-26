@@ -4,6 +4,7 @@ import {
   GoogleUser,
   TwitterUser,
 } from '@hicommonwealth/schemas';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { MagicUserMetadata } from '@magic-sdk/admin';
 import fetch from 'node-fetch';
 import { VerifiedUserInfo } from './types';
@@ -27,7 +28,7 @@ async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://api.twitter.com/2/users/me');
   const userData = TwitterUser.parse(res);
   return {
-    provider: 'twitter',
+    provider: WalletSsoSource.Twitter,
     username: userData.data.username,
   };
 }
@@ -36,7 +37,7 @@ async function getDiscordUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://discord.com/api/users/@me');
   const userData = DiscordUser.parse(res);
   return {
-    provider: 'discord',
+    provider: WalletSsoSource.Discord,
     email: userData.email,
     emailVerified: userData.verified,
     username: userData.username,
@@ -47,7 +48,7 @@ async function getGithubUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://api.github.com/user');
   const userData = GitHubUser.parse(res);
   return {
-    provider: 'github',
+    provider: WalletSsoSource.Github,
     username: userData.login,
   };
 }
@@ -56,7 +57,7 @@ async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://www.googleapis.com/oauth2/v3/userinfo');
   const userData = GoogleUser.parse(res);
   return {
-    provider: 'google',
+    provider: WalletSsoSource.Google,
     email: userData.email,
     emailVerified: userData.email_verified,
   };
@@ -70,7 +71,7 @@ function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   }
 
   return {
-    provider: 'apple',
+    provider: WalletSsoSource.Apple,
     email: magicData.email,
     emailVerified: false,
   };
@@ -81,14 +82,14 @@ function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
     throw new Error('No phone number found in magic metadata');
   }
   return {
-    provider: 'sms',
+    provider: WalletSsoSource.SMS,
     phoneNumber: magicData.phoneNumber,
   };
 }
 
 function getFarcasterUser(): VerifiedUserInfo {
   return {
-    provider: 'farcaster',
+    provider: WalletSsoSource.Farcaster,
   };
 }
 
@@ -98,46 +99,52 @@ function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
   }
 
   return {
-    provider: 'email',
+    provider: WalletSsoSource.Email,
     email: magicData.email,
     emailVerified: true,
   };
 }
 
-export async function getVerifiedUserInfo(
-  magicMetadata: MagicUserMetadata,
-  token?: string,
-): Promise<VerifiedUserInfo> {
-  if (!magicMetadata.oauthProvider) {
-    throw new Error('No oauth provider found in magic metadata');
-  }
+export async function getVerifiedUserInfo({
+  magicMetadata,
+  token,
+  walletSsoSource,
+}: {
+  magicMetadata: MagicUserMetadata;
+  // magicMetadata.oauthProvider is not set for email and some others
+  walletSsoSource: WalletSsoSource;
+  token?: string;
+}): Promise<VerifiedUserInfo> {
+  const provider: WalletSsoSource =
+    (magicMetadata.oauthProvider?.toLowerCase() as WalletSsoSource) ||
+    walletSsoSource;
 
   if (
-    !token &&
-    ['twitter', 'discord', 'github', 'google'].includes(
-      magicMetadata.oauthProvider.toLowerCase(),
-    )
-  )
-    throw new Error(
-      `${magicMetadata.oauthProvider.toLowerCase()} verification requires a token to be passed in`,
-    );
+    magicMetadata.oauthProvider &&
+    magicMetadata.oauthProvider?.toLowerCase() !== walletSsoSource
+  ) {
+    throw new Error('Invalid oauth provider');
+  }
 
-  switch (magicMetadata.oauthProvider) {
-    case 'twitter':
+  if (!token && ['twitter', 'discord', 'github', 'google'].includes(provider))
+    throw new Error(`${provider} verification requires a bearer token`);
+
+  switch (provider) {
+    case WalletSsoSource.Twitter:
       return getTwitterUser(token!);
-    case 'discord':
+    case WalletSsoSource.Discord:
       return getDiscordUser(token!);
-    case 'github':
+    case WalletSsoSource.Github:
       return getGithubUser(token!);
-    case 'google':
+    case WalletSsoSource.Google:
       return getGoogleUser(token!);
-    case 'apple':
+    case WalletSsoSource.Apple:
       return Promise.resolve(getAppleUser(magicMetadata));
-    case 'sms':
+    case WalletSsoSource.SMS:
       return Promise.resolve(getSmsUser(magicMetadata));
-    case 'farcaster':
+    case WalletSsoSource.Farcaster:
       return Promise.resolve(getFarcasterUser());
-    case 'email':
+    case WalletSsoSource.Email:
       return Promise.resolve(getEmailUser(magicMetadata));
     default:
       throw new Error(

@@ -1,15 +1,7 @@
-export type SsoProviders =
-  | 'google'
-  | 'github'
-  | 'twitter'
-  | 'discord'
-  | 'apple'
-  | 'sms'
-  | 'email'
-  | 'farcaster';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 
 export type VerifiedUserInfo = {
-  provider: SsoProviders;
+  provider: WalletSsoSource;
   email?: string;
   emailVerified?: boolean;
   phoneNumber?: string;
