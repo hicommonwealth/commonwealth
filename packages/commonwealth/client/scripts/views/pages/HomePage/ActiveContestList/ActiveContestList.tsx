@@ -11,17 +11,29 @@ import useCommunityContests from '../../CommunityManagement/Contests/useCommunit
 
 import './ActiveContestList.scss';
 
-const ActiveContestList = () => {
+interface ActiveContestListProps {
+  isCommunityHomePage?: boolean;
+}
+
+const ActiveContestList = ({
+  isCommunityHomePage = false,
+}: ActiveContestListProps) => {
   const {
-    contestsData: { active: activeContests },
+    contestsData: { active: activeContests, suggested: suggestedContest },
     isContestDataLoading,
+    isSuggestedMode,
   } = useCommunityContests({
     fetchAll: true,
+    isCommunityHomePage,
   });
 
   const farcasterContestEnabled = useFlag('farcasterContest');
 
-  const activeContestsLimited = activeContests.slice(0, 3);
+  const activeContestsLimited = isCommunityHomePage
+    ? activeContests.length > 0
+      ? activeContests.slice(0, 3)
+      : suggestedContest.slice(0, 3) || []
+    : activeContests.slice(0, 3);
 
   const communityIds = [
     ...new Set(activeContestsLimited.map((contest) => contest.community_id)),
@@ -58,6 +70,7 @@ const ActiveContestList = () => {
           </div>
         </Link>
       </div>
+      {isSuggestedMode && <CWText type="h5">Suggested</CWText>}
       <>
         {!isContestDataLoading && activeContestsLimited.length === 0 && (
           <CWText type="h2" className="empty-contests">
