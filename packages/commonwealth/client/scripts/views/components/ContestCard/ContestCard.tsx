@@ -2,15 +2,18 @@ import clsx from 'clsx';
 import moment from 'moment';
 import React from 'react';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
+import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
@@ -21,13 +24,16 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
-import { ContestType } from '../../types';
-import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
-import ContestAlert from '../ContestAlert';
+import { ContestType } from '../../pages/CommunityManagement/Contests/types';
+import {
+  copyFarcasterContestFrameUrl,
+  isContestActive,
+} from '../../pages/CommunityManagement/Contests/utils';
+import ContestAlert from './ContestAlert';
 
-import { buildContestPrizes } from '@hicommonwealth/shared';
 import FractionalValue from 'views/components/FractionalValue';
-import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -59,6 +65,14 @@ interface ContestCardProps {
     prize?: string;
     tickerPrize?: number;
   }[];
+  community?: {
+    name: string;
+    iconUrl: string;
+    id: string;
+    ethChainId: number;
+    chainNodeUrl: string;
+  };
+  hideWhenNoPrizes?: boolean;
 }
 
 const ContestCard = ({
@@ -79,6 +93,8 @@ const ContestCard = ({
   isFarcaster = false,
   payoutStructure,
   score = [],
+  community,
+  hideWhenNoPrizes = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -99,8 +115,8 @@ const ContestCard = ({
   const { data: contestBalance, isLoading: isLoadingContestBalance } =
     useGetContestBalanceQuery({
       contestAddress: address,
-      chainRpc: app.chain.meta?.ChainNode?.url || '',
-      ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
+      chainRpc: community?.chainNodeUrl || '',
+      ethChainId: community?.ethChainId || 0,
       isOneOff: !isRecurring,
     });
 
@@ -150,8 +166,12 @@ const ContestCard = ({
 
   const handleLeaderboardClick = () => {
     isFarcaster
-      ? navigate(`/contests/${address}`)
-      : navigate(`/discussions?featured=mostLikes&contest=${address}`);
+      ? navigate(`/contests/${address}`, {}, community?.id)
+      : navigate(
+          `/discussions?featured=mostLikes&contest=${address}`,
+          {},
+          community?.id,
+        );
   };
 
   const handleFundClick = () => {
@@ -163,7 +183,10 @@ const ContestCard = ({
   };
 
   const showNoFundsInfo =
-    isActive && !isLoadingContestBalance && (contestBalance || 0) <= 0;
+    isAdmin &&
+    isActive &&
+    !isLoadingContestBalance &&
+    (contestBalance || 0) <= 0;
 
   const isLessThan24HoursLeft =
     moment(finishDate).diff(moment(), 'hours') <= 24;
@@ -178,6 +201,10 @@ const ContestCard = ({
     (contestBalance || 0) > 0 &&
     (!hasVotes || hasLessVotesThanPrizes);
 
+  if (hideWhenNoPrizes && prizes && prizes.length === 0) {
+    return null;
+  }
+
   return (
     <CWCard
       className={clsx('ContestCard', {
@@ -185,7 +212,7 @@ const ContestCard = ({
       })}
     >
       {imageUrl && (
-        <>
+        <div className="contest-image-container">
           {isHorizontal && isActive && (
             <CWTag
               label="Active Contest"
@@ -194,18 +221,43 @@ const ContestCard = ({
             />
           )}
           <img src={imageUrl} alt="contest-image" className="contest-image" />
-        </>
+        </div>
       )}
       <div className="contest-body">
         <div className="header-row">
-          <CWText type="h3">{name}</CWText>
+          <div className="header-row-left">
+            <CWCommunityAvatar
+              onClick={() => {
+                navigateToCommunity({
+                  navigate,
+                  path: '',
+                  chain: community?.id || '',
+                });
+              }}
+              community={{
+                name: community?.name || '',
+                iconUrl: community?.iconUrl || '',
+              }}
+            />
+            <CWText type="h3">{name}</CWText>
+          </div>
           {finishDate ? (
-            <CWCountDownTimer finishTime={finishDate} isActive={isActive} />
+            <CWCountDownTimer
+              finishTime={finishDate}
+              isActive={isActive}
+              showTag
+            />
           ) : isActive ? (
             <Skeleton width="70px" />
           ) : null}
+          <div className="contest-icon-container">
+            <img
+              className={clsx('contest-icon', !isFarcaster && 'common-icon')}
+              src={isFarcaster ? farcasterUrl : commonLogo}
+            />
+          </div>
         </div>
-        {!isFarcaster && (
+        {!isFarcaster && topics?.length > 0 && (
           <CWText className="topics">
             Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
           </CWText>
@@ -242,7 +294,7 @@ const ContestCard = ({
                 Current Prizes
               </CWText>
               <div className="prizes">
-                {prizes ? (
+                {prizes && prizes.length > 0 ? (
                   prizes?.map((prize, index) => (
                     <div className="prize-row" key={index}>
                       <CWText className="label">
@@ -275,7 +327,7 @@ const ContestCard = ({
 
           {showShareButton && (
             <SharePopoverOld
-              customUrl="/contests"
+              customUrl={`${community?.id}/contests`}
               renderTrigger={(handleInteraction) => (
                 <CWThreadAction
                   action="share"

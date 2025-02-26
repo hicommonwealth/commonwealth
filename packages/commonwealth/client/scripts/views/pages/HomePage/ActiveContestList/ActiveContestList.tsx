@@ -1,14 +1,14 @@
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { useFlag } from 'hooks/useFlag';
+import moment from 'moment';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { trpc } from 'utils/trpcClient';
+import ContestCard from 'views/components/ContestCard';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { Link } from 'react-router-dom';
-import ActiveContestCard, {
-  ActiveContest,
-} from '../ActiveContestCard/ActiveContestCard';
 import './ActiveContestList.scss';
 
 interface ActiveContestListProps {
@@ -26,6 +26,8 @@ const ActiveContestList = ({
     fetchAll: true,
     isCommunityHomePage,
   });
+
+  const farcasterContestEnabled = useFlag('farcasterContest');
 
   const activeContestsLimited = isCommunityHomePage
     ? activeContests.length > 0
@@ -52,6 +54,7 @@ const ActiveContestList = ({
         iconUrl: communityData?.icon_url || '',
         chainNodeUrl: communityData?.ChainNode?.url,
         ethChainId: communityData?.ChainNode?.eth_chain_id,
+        id: communityData?.id,
       },
     };
   }, {});
@@ -83,13 +86,36 @@ const ActiveContestList = ({
           </div>
         ) : (
           <div className="content">
-            {activeContestsLimited.map((contest) => (
-              <ActiveContestCard
-                key={contest.contest_address}
-                contest={contest as ActiveContest}
-                community={community[contest.community_id as string]}
-              />
-            ))}
+            {activeContestsLimited.map((contest) => {
+              const sortedContests = (contest?.contests || []).toSorted(
+                (a, b) => (moment(a.end_time).isBefore(b.end_time) ? -1 : 1),
+              );
+
+              const { end_time, score } =
+                sortedContests[sortedContests.length - 1] || {};
+
+              return (
+                <ContestCard
+                  key={contest.contest_address}
+                  isAdmin={false}
+                  address={contest.contest_address || ''}
+                  name={contest.name || ''}
+                  imageUrl={contest.image_url || ''}
+                  topics={contest.topics || []}
+                  decimals={contest.decimals}
+                  ticker={contest.ticker}
+                  finishDate={end_time ? moment(end_time).toISOString() : ''}
+                  isCancelled={contest.cancelled}
+                  isRecurring={!contest.funding_token_address}
+                  payoutStructure={contest.payout_structure}
+                  score={score || []}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
+                  community={community[contest.community_id as string]}
+                />
+              );
+            })}
           </div>
         )}
       </>
