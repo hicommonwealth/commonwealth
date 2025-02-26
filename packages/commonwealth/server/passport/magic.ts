@@ -74,6 +74,9 @@ async function createMagicAddressInstances(
       accessToken,
     );
   } catch (e) {
+    log.error('Failed to fetch verified SSO user info', e, {
+      magicUserMetadata,
+    });
     throw new ServerError('Could not verify user');
   }
 
