@@ -92,7 +92,6 @@ export function GetFarcasterContestCasts(): Query<
         (hash) => hash.split('?')[0],
       );
       const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-      console.log({ frameHashesToFetch });
       const castsResponse = await client.fetchBulkCasts(frameHashesToFetch);
 
       const { casts } = castsResponse.result;
@@ -108,8 +107,6 @@ export function GetFarcasterContestCasts(): Query<
         },
         {} as Record<string, number>,
       );
-
-      console.log(replyVoteSums);
 
       return casts
         .map((cast) => ({

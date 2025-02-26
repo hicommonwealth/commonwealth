@@ -27,7 +27,7 @@ export function FarcasterUpvoteAction(): Command<
         return;
       }
       const { parent_hash, hash } = payload.cast;
-      const content_url = buildFarcasterContentUrl(parent_hash!, hash);
+      const contentUrlWithoutFid = buildFarcasterContentUrl(parent_hash!, hash);
 
       // find content from farcaster hash
       const addAction = await models.ContestAction.findOne({
@@ -35,7 +35,7 @@ export function FarcasterUpvoteAction(): Command<
           action: 'added',
           content_url: {
             // check prefix because fid may be attached as query param
-            [Op.like]: `${content_url}%`,
+            [Op.like]: `${contentUrlWithoutFid}%`,
           },
         },
         include: [
@@ -57,14 +57,15 @@ export function FarcasterUpvoteAction(): Command<
           },
         ],
       });
-      mustExist(`Contest Action (${content_url})`, addAction);
+      mustExist(`Contest Action (${contentUrlWithoutFid})`, addAction);
 
       // ensure that the fid did not vote on this content before
       const voteAction = await models.ContestAction.findOne({
         where: {
           action: 'upvoted',
-          content_url,
-          fid: payload.interactor.fid,
+          content_url: {
+            [Op.like]: `${contentUrlWithoutFid}%fid=${payload.interactor.fid}`,
+          },
         },
       });
       mustNotExist(
