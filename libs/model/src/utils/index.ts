@@ -7,6 +7,7 @@ export * from './getDefaultContestImage';
 export * from './getDelta';
 export * from './makeGetBalancesOptions';
 export * from './oauth/getVerifiedUserInfo';
+export * from './oauth/types';
 export * from './parseUserMentions';
 export * from './sanitizeDeletedComment';
 export * from './sanitizeQuillText';

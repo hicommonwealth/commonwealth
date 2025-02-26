@@ -5,14 +5,14 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 
 import { getEvmAddress } from '@hicommonwealth/evm-protocols';
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { ExtendedCommunity, MagicLogin } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
+  WalletSsoSource,
   chainBaseToCanvasChainId,
   getSessionSigners,
   serializeCanvas,
-  WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { FarcasterExtension } from '@magic-ext/farcaster';
@@ -397,7 +397,7 @@ export async function handleSocialLoginCallback({
 }: {
   bearer?: string | null;
   chain?: string;
-  walletSsoSource?: string;
+  walletSsoSource?: WalletSsoSource;
   isCustomDomain?: boolean;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
@@ -510,28 +510,24 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   let response;
+  const data: z.infer<typeof MagicLogin> = {
+    community_id: desiredChain?.id,
+    access_token: magicOauthRes?.oauth?.accessToken,
+    jwt: userStore.getState().jwt,
+    username: profileMetadata?.username,
+    avatarUrl: profileMetadata?.avatarUrl,
+    magicAddress,
+    session: session && serializeCanvas(session),
+    walletSsoSource,
+  };
+
   try {
-    response = await axios.post(
-      `${SERVER_URL}/auth/magic`,
-      {
-        data: {
-          community_id: desiredChain?.id,
-          accessToken: magicOauthRes?.oauth?.accessToken,
-          jwt: userStore.getState().jwt,
-          username: profileMetadata?.username,
-          avatarUrl: profileMetadata?.avatarUrl,
-          magicAddress,
-          session: session && serializeCanvas(session),
-          walletSsoSource,
-        },
+    response = await axios.post(`${SERVER_URL}/auth/magic`, data, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${bearer}`,
       },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${bearer}`,
-        },
-      },
-    );
+    });
   } catch (e) {
     notifyError(e.response.data.error);
   }

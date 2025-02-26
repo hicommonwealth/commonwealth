@@ -104,6 +104,8 @@ export const SsoToken = z.object({
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  Address: Address.nullish(),
 });
 
 export const CommunityMember = z.object({
