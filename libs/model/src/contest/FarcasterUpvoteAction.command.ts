@@ -64,7 +64,7 @@ export function FarcasterUpvoteAction(): Command<
         where: {
           action: 'upvoted',
           content_url: {
-            [Op.like]: `${contentUrlWithoutFid}%fid=${payload.interactor.fid}`,
+            [Op.like]: `${contentUrlWithoutFid}?fid=${payload.interactor.fid}`,
           },
         },
       });
