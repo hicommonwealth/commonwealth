@@ -46,7 +46,7 @@ export function UpdateContestManagerFrameHashes(): Command<
             ?.parent_hashes || []),
         ])
           .filter((hash) => {
-            return (payload.frames_to_remove || []).includes(hash);
+            return !(payload.frames_to_remove || []).includes(hash);
           })
           .concat(payload.frames_to_add || []);
 
