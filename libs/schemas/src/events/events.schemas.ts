@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -394,7 +394,7 @@ export const events = {
   SSOLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    oauth_provider: z.string().nullish(),
+    oauth_provider: z.nativeEnum(WalletSsoSource),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),

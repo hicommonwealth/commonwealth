@@ -49,7 +49,7 @@ type MagicLoginContext = {
 const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
 
 type OauthInfo = {
-  oauth_provider: string | null;
+  oauth_provider: WalletSsoSource;
   oauth_email: string | null;
   oauth_email_verified: boolean | null;
   oauth_username: string | null;
@@ -76,7 +76,7 @@ async function getVerifiedInfo(
   }
 
   return {
-    oauth_provider: verifiedUserInfo.provider || null,
+    oauth_provider: verifiedUserInfo.provider,
     oauth_email: verifiedUserInfo.email || null,
     oauth_email_verified: verifiedUserInfo.email
       ? !!verifiedUserInfo.emailVerified
@@ -204,7 +204,7 @@ async function createMagicAddressInstances(
               community_id,
               user_id: addressInstance.user_id!,
               created_at: addressInstance.created_at!,
-              oauth_provider: magicUserMetadata.oauthProvider,
+              oauth_provider,
             },
           },
           {
@@ -212,7 +212,7 @@ async function createMagicAddressInstances(
             event_payload: {
               user_id: addressInstance.user_id!,
               new_user: isNewUser,
-              oauth_provider: magicUserMetadata.oauthProvider,
+              oauth_provider,
               community_id,
               created_at: addressInstance.created_at!,
             },

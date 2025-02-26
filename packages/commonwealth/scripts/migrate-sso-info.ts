@@ -1,5 +1,6 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { AddressInstance, models } from '@hicommonwealth/model';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import csvParser from 'csv-parser';
 import fs from 'fs/promises';
@@ -120,7 +121,16 @@ async function main() {
         log.warn(`No data for address ${address.address}`);
         continue;
       }
-      address.oauth_provider = lowerCase(data[address.address].issuer);
+
+      const provider = lowerCase(data[address.address].issuer);
+      if (
+        !provider ||
+        !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
+      ) {
+        log.warn(`Invalid provider ${provider} for address ${address.address}`);
+        continue;
+      }
+      address.oauth_provider = provider;
       address.oauth_email = data[address.address].email;
       address.oauth_phone_number = data[address.address].phone_number;
 
@@ -164,7 +174,15 @@ async function main() {
     }
 
     if (fetchedData.oauthProvider) {
-      address.oauth_provider = lowerCase(fetchedData.oauthProvider);
+      const provider = lowerCase(fetchedData.oauthProvider);
+
+      if (
+        !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
+      ) {
+        log.warn(`Invalid provider ${provider} for address ${address.address}`);
+        continue;
+      }
+      address.oauth_provider = provider;
       address.oauth_email = fetchedData.email;
       address.oauth_phone_number = fetchedData.phoneNumber;
 
