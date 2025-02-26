@@ -112,7 +112,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
       },
       FarcasterCastDeleted: async ({ payload }) => {
-        // not implemented
+        // not implemented, let's figure out how we should handle this
       },
       FarcasterReplyCastCreated: async ({ payload }) => {
         // find associated contest manager by parent cast hash
