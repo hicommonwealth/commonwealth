@@ -31,8 +31,8 @@ type ContractAddresses = {
           : never
         : never)
     | (key extends keyof typeof factoryContracts
-        ? 'ReferralFeeManagerAbi' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['ReferralFeeManagerAbi']
+        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['referralFeeManager']
           : never
         : never);
 };
