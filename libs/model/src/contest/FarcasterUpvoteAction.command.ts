@@ -63,9 +63,7 @@ export function FarcasterUpvoteAction(): Command<
       const voteAction = await models.ContestAction.findOne({
         where: {
           action: 'upvoted',
-          content_url: {
-            [Op.like]: `${contentUrlWithoutFid}?fid=${payload.interactor.fid}`,
-          },
+          content_url: `${contentUrlWithoutFid}?fid=${payload.interactor.fid}`,
         },
       });
       mustNotExist(
