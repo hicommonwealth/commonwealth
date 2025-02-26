@@ -2,15 +2,43 @@ import { z } from 'zod';
 import { VALIDATION_MESSAGES } from './messages';
 
 export const linkValidationSchema = {
-  required: z.string().url({
-    message: VALIDATION_MESSAGES.INVALID_INPUT,
-  }),
+  required: z
+    .string()
+    .url({
+      message: VALIDATION_MESSAGES.INVALID_INPUT,
+    })
+    .refine(
+      (url) => {
+        if (url.includes('github.com')) {
+          const parts = url.split('/').filter(Boolean);
+          return parts.length === 3;
+        }
+        return true;
+      },
+      {
+        message: VALIDATION_MESSAGES.GITHUB_FORMAT,
+      },
+    ),
   optional: z
     .union([
       z.literal(''),
-      z.string().url({
-        message: VALIDATION_MESSAGES.INVALID_INPUT,
-      }),
+      z
+        .string()
+        .url({
+          message: VALIDATION_MESSAGES.INVALID_INPUT,
+        })
+        .refine(
+          (url) => {
+            if (url.includes('github.com')) {
+              const parts = url.split('/').filter(Boolean);
+              return parts.length === 3;
+            }
+            return true;
+          },
+          {
+            message: VALIDATION_MESSAGES.GITHUB_FORMAT,
+          },
+        ),
     ])
     .nullish(),
 };

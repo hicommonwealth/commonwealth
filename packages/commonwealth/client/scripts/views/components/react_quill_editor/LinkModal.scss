@@ -1,0 +1,14 @@
+.LinkModal {
+  .error-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .error-icon {
+    color: red;
+  }
+  .error-text {
+    color: red;
+    font-size: 12px;
+  }
+}
