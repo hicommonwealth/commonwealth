@@ -1,8 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { formatAddressShort } from 'client/scripts/helpers';
 import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
-import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
@@ -10,10 +8,10 @@ import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_i
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
-import { useTokenTradeWidget } from 'client/scripts/views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import React from 'react';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { z } from 'zod';
 import SocialLinks from './SocialLinks/SocialLinks';
 import './TokenDetails.scss';
@@ -29,13 +27,6 @@ const TokenDetails = ({
   communityThreadCount,
   communityDescription,
 }: TokenDetailsProbs) => {
-  const { data: community, isLoading } = useGetCommunityByIdQuery({
-    id: app.activeChainId() || '',
-    enabled: !!app.activeChainId(),
-  });
-
-  if (!app.chain || !community) return;
-
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 

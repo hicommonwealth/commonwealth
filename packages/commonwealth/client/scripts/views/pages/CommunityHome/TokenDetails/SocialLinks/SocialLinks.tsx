@@ -6,7 +6,7 @@ import React from 'react';
 import './SocialLinks.scss';
 
 const SocialLinks = () => {
-  const { data: community, isLoading } = useGetCommunityByIdQuery({
+  const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
   });
