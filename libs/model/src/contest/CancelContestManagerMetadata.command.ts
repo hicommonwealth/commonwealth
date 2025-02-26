@@ -1,11 +1,9 @@
-import { command, logger, type Command } from '@hicommonwealth/core';
+import { command, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { authRoles, systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
-
-const log = logger(import.meta);
 
 export function CancelContestManagerMetadata(): Command<
   typeof schemas.CancelContestManagerMetadata
