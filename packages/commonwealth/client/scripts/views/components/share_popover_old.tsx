@@ -73,7 +73,7 @@ export const SharePopoverOld = ({
                 }
               }
             } else if (customUrl) {
-              urlToCopy = `${domain}/${app.activeChainId()}${customUrl}`;
+              urlToCopy = `${domain}/${customUrl}`;
             }
 
             navigator.clipboard

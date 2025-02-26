@@ -29,6 +29,23 @@
     justify-content: start;
     margin: 10px 0;
     overflow-x: auto;
+
+    .ContestCard {
+      width: 335px;
+
+      .contest-image {
+        max-height: 160px;
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: start;
+
+        .CWCountDownTimer {
+          margin-left: 0;
+        }
+      }
+    }
   }
 
   .empty-contests {
