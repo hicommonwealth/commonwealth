@@ -1,4 +1,4 @@
-import { Command, logger } from '@hicommonwealth/core';
+import { command, Command, logger } from '@hicommonwealth/core';
 import {
   getContestScore,
   rollOverContest,
@@ -6,7 +6,10 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { config } from '../config';
 import { models } from '../database';
+import { systemActor } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import { emitEvent, getChainNodeUrl } from '../utils/utils';
+import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
 
 const log = logger(import.meta);
 
@@ -46,6 +49,31 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         contest_id,
         is_one_off,
       );
+
+      const contestManager = await models.ContestManager.findByPk(
+        contest_address,
+        {
+          attributes: ['farcaster_frame_hashes'],
+        },
+      );
+      mustExist('Contest Manager', contestManager);
+
+      if (contestManager.farcaster_frame_hashes?.length) {
+        try {
+          await command(UpdateContestManagerFrameHashes(), {
+            actor: systemActor({}),
+            payload: {
+              contest_address,
+              frames_to_remove: contestManager.farcaster_frame_hashes,
+            },
+          });
+        } catch (err) {
+          log.error(
+            'Failed to update contest manager frame hashes',
+            err as Error,
+          );
+        }
+      }
 
       await models.sequelize.transaction(async (transaction) => {
         // update final score

@@ -4,12 +4,11 @@ import {
   buildFarcasterContestFrameUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Mutex } from 'async-mutex';
-import _ from 'lodash';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { CreateBotContest } from '../bot/CreateBotContest.command';
+import { UpdateContestManagerFrameHashes } from '../contest/UpdateContestManagerFrameHashes.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
@@ -37,82 +36,38 @@ export function FarcasterWorker(): Policy<typeof inputs> {
     inputs,
     body: {
       FarcasterCastCreated: async ({ payload }) => {
-        // avoid concurrency because shared webhook mutations will occur
         await neynarMutex.runExclusive(async () => {
           const frame_url = new URL(payload.embeds[0].url).pathname;
           const contest_address = frame_url
             .split('/')
             .find((str) => str.startsWith('0x'));
+          mustExist('Contest Address', contest_address);
 
-          const contestManager = await models.ContestManager.findOne({
-            where: {
-              cancelled: {
-                [Op.not]: true,
-              },
-              ended: {
-                [Op.not]: true,
-              },
+          await command(UpdateContestManagerFrameHashes(), {
+            actor: systemActor({}),
+            payload: {
               contest_address,
+              frames_to_add: [payload.hash],
             },
           });
-          mustExist('Contest Manager', contestManager);
-
-          if (contestManager.farcaster_frame_hashes?.includes(payload.hash)) {
-            log.warn(
-              `farcaster frame hash already added to contest manager: ${payload.hash}`,
-            );
-            return;
-          }
-
-          // find webhook by name, otherwise create it
-          const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-          const { webhook: existingCastWebhook } = await client.lookupWebhook(
-            config.CONTESTS.NEYNAR_CAST_WEBHOOK_ID!,
-          );
-          mustExist('Neynar Webhook', existingCastWebhook);
-
-          // merge all old and new parent hashes
-          const parent_hashes = _.uniq([
-            ...(existingCastWebhook?.subscription?.filters['cast.created']
-              ?.parent_hashes || []),
-            ...(existingCastWebhook?.subscription?.filters['cast.deleted']
-              ?.parent_hashes || []),
-            ...(contestManager.farcaster_frame_hashes || []),
-            payload.hash,
-          ]);
-
-          const subscription = {
-            ...(existingCastWebhook.subscription?.filters || {}),
-            // reply cast created on parent
-            'cast.created': {
-              ...(existingCastWebhook.subscription?.filters['cast.created'] ||
-                {}),
-              parent_hashes,
-            },
-            // reply cast deleted on parent
-            'cast.deleted': {
-              ...(existingCastWebhook.subscription?.filters['cast.deleted'] ||
-                {}),
-              parent_hashes,
-            },
-          };
-
-          await client.updateWebhook(
-            existingCastWebhook.webhook_id,
-            existingCastWebhook.title,
-            existingCastWebhook.target_url,
-            {
-              subscription,
-            },
-          );
-
-          // update contest manager frame hashes
-          contestManager.farcaster_frame_hashes = parent_hashes;
-          await contestManager.save();
         });
       },
       FarcasterCastDeleted: async ({ payload }) => {
-        // not implemented, let's figure out how we should handle this
+        await neynarMutex.runExclusive(async () => {
+          const frame_url = new URL(payload.embeds[0].url).pathname;
+          const contest_address = frame_url
+            .split('/')
+            .find((str) => str.startsWith('0x'));
+          mustExist('Contest Address', contest_address);
+
+          await command(UpdateContestManagerFrameHashes(), {
+            actor: systemActor({}),
+            payload: {
+              contest_address,
+              frames_to_remove: [payload.hash],
+            },
+          });
+        });
       },
       FarcasterReplyCastCreated: async ({ payload }) => {
         // find associated contest manager by parent cast hash

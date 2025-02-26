@@ -1,8 +1,9 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import { command, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { authRoles } from '../middleware';
+import { authRoles, systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
 
 const log = logger(import.meta);
 
@@ -21,7 +22,15 @@ export function CancelContestManagerMetadata(): Command<
       });
       mustExist('Contest Manager', contestManager);
 
-      // TODO: remove contest manager frames from shared webhook
+      if (contestManager.farcaster_frame_hashes?.length) {
+        await command(UpdateContestManagerFrameHashes(), {
+          actor: systemActor({}),
+          payload: {
+            contest_address: contestManager.contest_address,
+            frames_to_remove: contestManager.farcaster_frame_hashes,
+          },
+        });
+      }
 
       contestManager.cancelled = true;
       await contestManager.save();
