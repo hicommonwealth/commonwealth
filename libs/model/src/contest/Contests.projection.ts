@@ -279,7 +279,6 @@ export function Contests(): Projection<typeof inputs> {
           content_url: payload.content_url,
           thread_id: threadId,
           voting_power: '0',
-          fid: farcasterInfo?.fid || null,
           created_at: new Date(),
         });
 

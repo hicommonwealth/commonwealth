@@ -20,9 +20,6 @@ export const ContestAction = z
       .string()
       .nullish()
       .describe('Calculated  weight of the vote when action was recorded'),
-    fid: PG_INT.nullish().describe(
-      'Farcaster ID of the content or vote author',
-    ),
     deleted_at: z.coerce
       .date()
       .nullish()
