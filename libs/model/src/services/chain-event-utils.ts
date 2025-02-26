@@ -7,8 +7,8 @@ import {
   ContestGovernorSingle as singleContestAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
-  decodeLog,
   EvmEventSignatures,
+  decodeLog,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { EventPair, Events } from '@hicommonwealth/schemas';
@@ -132,11 +132,11 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
       block_timestamp: event.block.timestamp,
       transaction_hash: event.rawLog.transactionHash,
       trader_address: decoded.args.trader,
-      token_address: decoded.args.namespace,
+      token_address: decoded.args.tokenAddress,
       is_buy: decoded.args.isBuy,
       eth_chain_id: event.eventSource.ethChainId,
       eth_amount: decoded.args.ethAmount,
-      community_token_amount: decoded.args.communityTokenAmount,
+      community_token_amount: decoded.args.tokenAmount,
       floating_supply: decoded.args.floatingSupply,
     },
   };
