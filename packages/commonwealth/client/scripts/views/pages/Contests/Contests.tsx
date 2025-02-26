@@ -17,6 +17,9 @@ const Contests = () => {
   const { contestsData, isContestAvailable, isContestDataLoading } =
     useCommunityContests();
 
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const chainNodeUrl = app?.chain?.meta?.ChainNode?.url || '';
+
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
@@ -52,6 +55,8 @@ const Contests = () => {
               id: community?.id || '',
               name: community?.name || '',
               iconUrl: community?.icon_url || '',
+              ethChainId,
+              chainNodeUrl,
             }}
           />
         )}
@@ -73,6 +78,8 @@ const Contests = () => {
               id: community?.id || '',
               name: community?.name || '',
               iconUrl: community?.icon_url || '',
+              ethChainId,
+              chainNodeUrl,
             }}
           />
         )}
