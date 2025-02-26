@@ -6,6 +6,7 @@ export const handleTokenLocked: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenLocked', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenLockDurationIncreased: EventHandler<
@@ -13,6 +14,7 @@ export const handleTokenLockDurationIncreased: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenLockDurationIncreased', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenUnlocked: EventHandler<
@@ -20,6 +22,7 @@ export const handleTokenUnlocked: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenUnlocked', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenPermanentConverted: EventHandler<
@@ -27,6 +30,7 @@ export const handleTokenPermanentConverted: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenPermanentConverted', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenDelegated: EventHandler<
@@ -34,6 +38,7 @@ export const handleTokenDelegated: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenDelegated', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenUndelegated: EventHandler<
@@ -41,6 +46,7 @@ export const handleTokenUndelegated: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenUndelegated', payload);
+  await Promise.resolve();
 };
 
 export const handleTokenMerged: EventHandler<
@@ -48,4 +54,5 @@ export const handleTokenMerged: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   console.log('handleTokenMerged', payload);
+  await Promise.resolve();
 };
