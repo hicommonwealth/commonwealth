@@ -7,4 +7,5 @@ export const trpcRouter = trpc.router({
   getQuest: trpc.query(Quest.GetQuest, trpc.Tag.Quest),
   updateQuest: trpc.command(Quest.UpdateQuest, trpc.Tag.Quest),
   cancelQuest: trpc.command(Quest.CancelQuest, trpc.Tag.Quest),
+  deleteQuest: trpc.command(Quest.DeleteQuest, trpc.Tag.Quest),
 });
