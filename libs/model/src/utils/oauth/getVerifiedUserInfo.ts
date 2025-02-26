@@ -118,7 +118,9 @@ export async function getVerifiedUserInfo(
       magicMetadata.oauthProvider.toLowerCase(),
     )
   )
-    throw new Error('Email verification requires a token to be passed in');
+    throw new Error(
+      `${magicMetadata.oauthProvider.toLowerCase()} verification requires a token to be passed in`,
+    );
 
   switch (magicMetadata.oauthProvider) {
     case 'twitter':

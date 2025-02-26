@@ -35,7 +35,7 @@ type MagicLoginContext = {
   decodedMagicToken: MagicUser;
   magicUserMetadata: MagicUserMetadata;
   generatedAddresses: Array<{ address: string; community_id: string }>;
-  accessToken?: string;
+  accessToken?: string; // SSO access token returned by OAuth process
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
   profileMetadata?: { username?: string; avatarUrl?: string };
@@ -67,10 +67,16 @@ async function createMagicAddressInstances(
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
 
-  const verifiedUserInfo = await getVerifiedUserInfo(
-    magicUserMetadata,
-    accessToken,
-  );
+  let verifiedUserInfo: Awaited<ReturnType<typeof getVerifiedUserInfo>>;
+  try {
+    verifiedUserInfo = await getVerifiedUserInfo(
+      magicUserMetadata,
+      accessToken,
+    );
+  } catch (e) {
+    throw new ServerError('Could not verify user');
+  }
+
   const oauth_provider = verifiedUserInfo.provider || null;
   const oauth_email = verifiedUserInfo.email || null;
   const oauth_email_verified = verifiedUserInfo.email
@@ -307,6 +313,7 @@ async function loginExistingMagicUser({
   decodedMagicToken,
   generatedAddresses,
   magicUserMetadata,
+  accessToken,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
     throw new Error('No user provided to sign in');
@@ -346,6 +353,7 @@ async function loginExistingMagicUser({
         isNewUser: false,
         decodedMagicToken,
         magicUserMetadata,
+        accessToken,
         transaction,
       });
 
@@ -418,6 +426,7 @@ async function addMagicToUser({
   loggedInUser,
   decodedMagicToken,
   magicUserMetadata,
+  accessToken,
 }: MagicLoginContext): Promise<UserInstance> {
   // create new address on logged-in user
   const addressInstances = await createMagicAddressInstances(models, {
@@ -425,6 +434,7 @@ async function addMagicToUser({
     user: loggedInUser!,
     isNewUser: false,
     decodedMagicToken,
+    accessToken,
     magicUserMetadata,
   });
 
@@ -664,6 +674,7 @@ async function magicLoginRoute(
       user: loggedInUser,
       isNewUser: false,
       decodedMagicToken,
+      accessToken: req.body.accessToken,
       magicUserMetadata,
     });
     return cb(null, existingUserInstance);
@@ -679,6 +690,7 @@ async function magicLoginRoute(
     existingUserInstance,
     // @ts-expect-error StrictNullChecks
     loggedInUser,
+    accessToken: req.body.accessToken,
     profileMetadata: {
       username: req.body.username,
       avatarUrl: req.body.avatarUrl,
