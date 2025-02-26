@@ -29,41 +29,39 @@ function build() {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
-  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
-    // Farcaster frames
-    // WARNING: do not change this because cloudflare may route to it
-    router.use('/farcaster/contests', farcasterRouter);
+  // Farcaster frames
+  // WARNING: do not change this because cloudflare may route to it
+  router.use('/farcaster/contests', farcasterRouter);
 
-    // Farcaster webhooks/actions
-    router.post(
-      '/farcaster/CastEvent',
-      (req, _, next) => {
-        validateNeynarWebhook(
-          config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET!,
-        )(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterCastWebhook()),
-    );
+  // Farcaster webhooks/actions
+  router.post(
+    '/farcaster/CastEvent',
+    (req, _, next) => {
+      validateNeynarWebhook(
+        config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET!,
+      )(req, _, next).catch(next);
+    },
+    express.command(Contest.FarcasterCastWebhook()),
+  );
 
-    router.get(
-      '/farcaster/CastUpvoteAction',
-      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
-    );
+  router.get(
+    '/farcaster/CastUpvoteAction',
+    express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+  );
 
-    router.post(
-      '/farcaster/CastUpvoteAction',
-      (req, _, next) => {
-        validateFarcasterAction()(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterUpvoteAction()),
-    );
+  router.post(
+    '/farcaster/CastUpvoteAction',
+    (req, _, next) => {
+      validateFarcasterAction()(req, _, next).catch(next);
+    },
+    express.command(Contest.FarcasterUpvoteAction()),
+  );
 
-    router.post(
-      '/farcaster/NotificationsWebhook',
-      // TODO: add validation middleware
-      express.command(Contest.FarcasterNotificationsWebhook()),
-    );
-  }
+  router.post(
+    '/farcaster/NotificationsWebhook',
+    // TODO: add validation middleware
+    express.command(Contest.FarcasterNotificationsWebhook()),
+  );
 
   router.post(
     '/snapshot/webhook',
