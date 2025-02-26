@@ -33,6 +33,7 @@ type TrendingThreadListProps = {
   query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
   defaultCount?: number;
   customScrollParent?: HTMLElement;
+  communityIdFilter?: string;
 };
 
 type FeedThreadProps = {
@@ -130,6 +131,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hidePublishDate
       hideTrendingTag
       showOnlyThreadActionIcons
+      communityHomeLayout
     />
   );
 };
@@ -211,6 +213,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
 const TrendingThreadList = ({
   query,
   customScrollParent,
+  communityIdFilter,
 }: TrendingThreadListProps) => {
   const { data: feed, isLoading, isError } = query({ limit: 3 });
 
@@ -230,16 +233,33 @@ const TrendingThreadList = ({
   if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
-  const allThreads = feed?.pages
+  let allThreads = feed?.pages
     ? feed.pages.flatMap((page) => page.results || [])
     : [];
 
+  if (communityIdFilter) {
+    allThreads = allThreads.filter(
+      (thread) => thread.community_id === communityIdFilter,
+    );
+  }
+
   if (!allThreads?.length) {
     return (
-      <div className="Feed">
-        <div className="no-feed-message">
-          Join some communities to see Activity!
+      <div className="TrendingThreadList">
+        <div className="heading-container">
+          <CWText type="h2">Trending Threads</CWText>
+          <Link to="/explore">
+            <div className="link-right">
+              <CWText className="link">See all threads</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
+          </Link>
         </div>
+        <>
+          <CWText type="h2" className="empty-thread">
+            No threads found
+          </CWText>
+        </>
       </div>
     );
   }

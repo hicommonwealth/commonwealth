@@ -1,0 +1,89 @@
+@import '../../../../styles/shared.scss';
+
+.token-details {
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .token-info {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+
+    .token-description {
+      margin: 5px;
+    }
+  }
+}
+
+.token-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.token-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.copy-icon {
+  cursor: pointer;
+}
+
+.token-description {
+  margin-top: 12px;
+}
+
+.token-stats {
+  width: 400px;
+  margin-top: 16px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.price-change.positive {
+  color: green;
+}
+
+.price-change.negative {
+  color: red;
+}
+
+.token-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: start;
+
+  .dot {
+    font-size: 18px;
+    margin-left: 6px;
+    margin-right: 6px;
+    color: $neutral-500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .footer-icon {
+    margin-right: 6px;
+  }
+}
+
+.token-footer > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -21,6 +21,7 @@ export const UpdateQuest = {
     quest_id: PG_INT,
     name: z.string().optional(),
     description: z.string().optional(),
+    community_id: z.string().optional(),
     image_url: z.string().optional(),
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
@@ -31,6 +32,12 @@ export const UpdateQuest = {
 };
 
 export const DeleteQuest = {
+  input: z.object({ quest_id: PG_INT }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const CancelQuest = {
   input: z.object({ quest_id: PG_INT }),
   output: z.boolean(),
   context: AuthContext,

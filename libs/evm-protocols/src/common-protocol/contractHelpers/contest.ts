@@ -1,5 +1,4 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
@@ -68,10 +67,10 @@ export const getTotalContestBalance = async (
 
   const balance =
     balanceResults.length === 2
-      ? BigNumber.from(balanceResults[0]).add(balanceResults[1])
-      : BigNumber.from(balanceResults[0]);
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]);
 
-  return BigNumber.from(balance).toString();
+  return balance.toString();
 };
 
 /**
@@ -140,24 +139,21 @@ export const getContestBalance = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
+ * @param prizePercentage the prize percentage of the contest
+ * @param payoutStructure the payout structure of the contest
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
+ * @returns ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
+  prizePercentage: number,
+  payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-): Promise<{
-  scores: {
-    winningContent: string;
-    winningAddress: string;
-    voteCount: string;
-  }[];
-  contestBalance: string;
-}> => {
+) => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     oneOff ? singleContestAbi : recurringContestAbi,
@@ -174,9 +170,10 @@ export const getContestScore = async (
   const winnerIds: string[] = contestData[0] as string[];
 
   if (winnerIds.length == 0) {
-    throw new Error(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
+    console.warn(
+      `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
+    return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,16 +184,29 @@ export const getContestScore = async (
 
   const contentMeta = await Promise.all(votePromises);
 
-  return {
-    scores: winnerIds.map((v, i) => {
-      return {
-        winningContent: v,
-        winningAddress: contentMeta[i]['creator'],
-        voteCount: contentMeta[i]['cumulativeVotes'],
-      };
-    }),
-    contestBalance: contestData[1],
-  };
+  const scores = winnerIds.map((v, i) => {
+    return {
+      winningContent: v,
+      winningAddress: contentMeta[i]['creator'],
+      voteCount: contentMeta[i]['cumulativeVotes'],
+    };
+  });
+  const contestBalance = contestData[1];
+
+  let prizePool =
+    (BigInt(contestBalance) *
+      (oneOff ? BigInt(100) : BigInt(prizePercentage))) /
+    BigInt(100);
+  prizePool = (prizePool * BigInt(100 - CONTEST_FEE_PERCENT)) / BigInt(100); // deduct contest fee from prize pool
+  return scores.map((s, i) => ({
+    content_id: s.winningContent.toString(),
+    creator_address: s.winningAddress,
+    votes: BigInt(s.voteCount).toString(),
+    prize:
+      i < Number(payoutStructure.length)
+        ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
+        : '0',
+  }));
 };
 
 export type AddContentResponse = {
@@ -399,9 +409,24 @@ export const rollOverContest = async ({
       contest,
     );
 
+    if (oneOff) {
+      const contestEnded = await contestInstance.methods.contestEnded().call();
+      if (contestEnded) {
+        return false;
+      } else {
+        const endTime = await contestInstance.methods.endTime().call();
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (Number(endTime) > currentTime) {
+          return false;
+        }
+      }
+    }
     const contractCall = oneOff
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();
+
+    // TODO: @ianrowan or @rbennettcw - we should check if the contest is already ended before calling endContest again
+    // to avoid transaction failures and unnecessary gas costs
 
     let gasResult = BigInt(300000);
     try {

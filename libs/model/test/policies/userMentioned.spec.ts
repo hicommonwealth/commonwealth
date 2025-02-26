@@ -5,7 +5,6 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -89,7 +88,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
-      name: EventNames.UserMentioned,
+      name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',
       } as z.infer<typeof schemas.events.UserMentioned>,
@@ -103,7 +102,7 @@ describe('userMentioned Event Handler', () => {
     });
 
     const res = await notifyUserMentioned({
-      name: EventNames.UserMentioned,
+      name: 'UserMentioned',
       payload: {
         // @ts-expect-error StrictNullChecks
         authorAddressId: community!.Addresses[0].id,
@@ -152,7 +151,7 @@ describe('userMentioned Event Handler', () => {
 
     await expect(
       notifyUserMentioned({
-        name: EventNames.UserMentioned,
+        name: 'UserMentioned',
         payload: {
           // @ts-expect-error StrictNullChecks
           authorAddressId: community!.Addresses[0].id,

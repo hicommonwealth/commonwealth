@@ -10,7 +10,6 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -114,7 +113,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         email_notifications_enabled: false,
@@ -155,7 +154,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: true,
@@ -209,7 +208,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: true,
@@ -248,7 +247,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: false,
@@ -288,7 +287,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: false,

@@ -1,7 +1,6 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import { Contests } from 'model/src/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -93,7 +92,7 @@ describe.skip('Check Contests', () => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ThreadCreated,
+        event_name: 'ThreadCreated',
         event_payload: {
           id: threadId,
           community_id: communityId,
@@ -128,7 +127,7 @@ describe.skip('Check Contests', () => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ContestContentAdded,
+        event_name: 'ContestContentAdded',
         event_payload: {
           content_id: 0,
           content_url: '/ethhh/discussion/888',
@@ -158,7 +157,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
 
@@ -179,7 +178,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
 

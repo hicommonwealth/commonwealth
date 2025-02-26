@@ -4,7 +4,6 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { EventNames } from '@hicommonwealth/schemas';
 import {
   Client,
   IntentsBitField,
@@ -58,7 +57,7 @@ async function startDiscordListener() {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('threadDelete', async (thread: ThreadChannel) => {
-    await handleThreadChannel(thread, EventNames.DiscordThreadDeleted);
+    await handleThreadChannel(thread, 'DiscordThreadDeleted');
   });
 
   // only used for thread title updates - thread body are handled through the 'messageUpdate' event
@@ -68,7 +67,7 @@ async function startDiscordListener() {
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
       await handleThreadChannel(
         newThread,
-        EventNames.DiscordThreadTitleUpdated,
+        'DiscordThreadTitleUpdated',
         oldThread,
       );
     },
@@ -76,11 +75,7 @@ async function startDiscordListener() {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   client.on('messageDelete', async (message) => {
-    await handleMessage(
-      client,
-      message,
-      EventNames.DiscordThreadCommentDeleted,
-    );
+    await handleMessage(client, message, 'DiscordThreadCommentDeleted');
   });
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -89,8 +84,8 @@ async function startDiscordListener() {
       client,
       newMessage,
       newMessage.nonce
-        ? EventNames.DiscordThreadCommentUpdated
-        : EventNames.DiscordThreadBodyUpdated,
+        ? 'DiscordThreadCommentUpdated'
+        : 'DiscordThreadBodyUpdated',
     );
   });
 
@@ -106,9 +101,7 @@ async function startDiscordListener() {
       await handleMessage(
         client,
         message,
-        message.nonce
-          ? EventNames.DiscordThreadCommentCreated
-          : EventNames.DiscordThreadCreated,
+        message.nonce ? 'DiscordThreadCommentCreated' : 'DiscordThreadCreated',
       );
     }
   });

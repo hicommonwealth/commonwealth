@@ -1,7 +1,7 @@
 import { generateBlobImageFromAlphabet } from 'helpers/image';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
 import {
@@ -42,38 +42,46 @@ export const useTokenTradeWidget = () => {
       apiEnabled:
         !!(communityPinnedToken?.contract_address || '') && uniswapTradeEnabled,
     });
-  const communityPinnedTokenWithMetadata =
-    communityPinnedToken && tokenMetadata
-      ? {
-          ...communityPinnedToken,
-          ...tokenMetadata,
-        }
+  const communityPinnedTokenWithMetadata = useMemo(() => {
+    return communityPinnedToken && tokenMetadata
+      ? { ...communityPinnedToken, ...tokenMetadata }
       : null;
-
+  }, [communityPinnedToken, tokenMetadata]);
   const isLoadingToken =
     (launchpadEnabled && isLoadingLaunchpadToken) ||
     (uniswapTradeEnabled &&
       ((isLoadingPinnedToken && !communityLaunchpadToken) ||
         (isLoadingTokenMetadata && communityPinnedToken)));
 
-  const communityToken: LaunchpadToken | ExternalToken | undefined =
-    communityLaunchpadToken
-      ? ({
-          ...communityLaunchpadToken,
-          community_id: communityId,
-        } as LaunchpadToken)
-      : communityPinnedTokenWithMetadata
-        ? ({
-            ...communityPinnedTokenWithMetadata,
-            logo:
-              communityPinnedTokenWithMetadata.logo ||
-              generatedFallbackImageForPinnedToken ||
-              // this url points to common logo, adding this here as a fallback in
-              // case token metadata from alchemy doesn't include a token icon and we
-              // failed to generate one from `generateBlobImageFromAlphabet` util
-              'https://assets.commonwealth.im/b531c73a-eb29-4348-96af-db1114346f90.jpeg',
-          } as ExternalToken)
-        : undefined;
+  const communityToken = useMemo(():
+    | LaunchpadToken
+    | ExternalToken
+    | undefined => {
+    if (communityLaunchpadToken) {
+      return {
+        ...communityLaunchpadToken,
+        community_id: communityId,
+      } as LaunchpadToken;
+    } else if (communityPinnedTokenWithMetadata) {
+      return {
+        ...communityPinnedTokenWithMetadata,
+        logo:
+          communityPinnedTokenWithMetadata.logo ||
+          generatedFallbackImageForPinnedToken ||
+          // this url points to common logo, adding this here as a fallback in
+          // case token metadata from alchemy doesn't include a token icon and we
+          // failed to generate one from `generateBlobImageFromAlphabet` util
+          'https://assets.commonwealth.im/b531c73a-eb29-4348-96af-db1114346f90.jpeg',
+      } as ExternalToken;
+    } else {
+      return undefined;
+    }
+  }, [
+    communityLaunchpadToken,
+    communityPinnedTokenWithMetadata,
+    generatedFallbackImageForPinnedToken,
+    communityId,
+  ]);
 
   useRunOnceOnCondition({
     callback: () => {

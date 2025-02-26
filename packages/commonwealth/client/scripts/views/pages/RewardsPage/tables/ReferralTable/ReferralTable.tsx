@@ -1,6 +1,6 @@
-import { smallNumberFormatter } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { fromWei } from 'web3-utils';
 
 import { APIOrderDirection } from 'helpers/constants';
 import { Avatar } from 'views/components/Avatar';
@@ -9,7 +9,6 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { Referral } from '../../types';
-
 import { columns } from './columns';
 
 import './ReferralTable.scss';
@@ -69,14 +68,12 @@ export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
                 ),
               },
               earnings: {
-                sortValue: parseFloat(
-                  String(item.referrer_received_eth_amount),
-                ),
+                sortValue: Number(item.referrer_received_eth_amount),
                 customElement: (
                   <div className="table-cell text-right">
                     ETH{' '}
-                    {smallNumberFormatter.format(
-                      item.referrer_received_eth_amount,
+                    {Number(
+                      fromWei(item.referrer_received_eth_amount, 'ether'),
                     )}
                   </div>
                 ),

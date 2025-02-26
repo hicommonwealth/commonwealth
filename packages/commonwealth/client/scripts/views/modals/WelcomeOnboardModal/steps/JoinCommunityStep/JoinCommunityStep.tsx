@@ -98,12 +98,14 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
           })}
         </div>
       )}
-      <CWButton
-        label="Let's go!"
-        buttonWidth="full"
-        type="submit"
-        onClick={onComplete}
-      />
+      <div className="footer-container">
+        <CWButton
+          label="Let's go!"
+          buttonWidth="full"
+          type="submit"
+          onClick={onComplete}
+        />
+      </div>
     </section>
   );
 };

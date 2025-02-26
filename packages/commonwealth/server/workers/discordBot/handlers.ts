@@ -1,6 +1,5 @@
 import { logger } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import {
   Client,
   Message,
@@ -26,11 +25,11 @@ export async function handleMessage(
     | Message<boolean>
     | PartialMessage,
   action:
-    | EventNames.DiscordThreadCreated
-    | EventNames.DiscordThreadBodyUpdated
-    | EventNames.DiscordThreadCommentCreated
-    | EventNames.DiscordThreadCommentUpdated
-    | EventNames.DiscordThreadCommentDeleted,
+    | 'DiscordThreadCreated'
+    | 'DiscordThreadBodyUpdated'
+    | 'DiscordThreadCommentCreated'
+    | 'DiscordThreadCommentUpdated'
+    | 'DiscordThreadCommentDeleted',
 ) {
   log.info(
     `Discord message received from channel ID: ${message.channelId} with action: ${action}`,
@@ -76,8 +75,8 @@ export async function handleMessage(
     };
 
     if (
-      EventNames.DiscordThreadCreated === action ||
-      EventNames.DiscordThreadBodyUpdated === action
+      'DiscordThreadCreated' === action ||
+      'DiscordThreadBodyUpdated' === action
     ) {
       await emitEvent(models.Outbox, [
         {
@@ -104,9 +103,7 @@ export async function handleMessage(
 
 export async function handleThreadChannel(
   thread: ThreadChannel,
-  action:
-    | EventNames.DiscordThreadDeleted
-    | EventNames.DiscordThreadTitleUpdated,
+  action: 'DiscordThreadDeleted' | 'DiscordThreadTitleUpdated',
   oldThread?: ThreadChannel,
 ) {
   log.info(
@@ -121,10 +118,10 @@ export async function handleThreadChannel(
     const topicId = await getForumLinkedTopic(thread.parentId!);
     if (!topicId) return;
 
-    if (action === EventNames.DiscordThreadDeleted) {
+    if (action === 'DiscordThreadDeleted') {
       await emitEvent(models.Outbox, [
         {
-          event_name: EventNames.DiscordThreadDeleted,
+          event_name: 'DiscordThreadDeleted',
           event_payload: {
             message_id: thread.id,
             parent_channel_id: thread.parentId!,
@@ -151,7 +148,7 @@ export async function handleThreadChannel(
 
         await emitEvent(models.Outbox, [
           {
-            event_name: EventNames.DiscordThreadTitleUpdated,
+            event_name: 'DiscordThreadTitleUpdated',
             event_payload: {
               user: {
                 id: owner?.user?.id,

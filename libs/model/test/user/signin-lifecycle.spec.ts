@@ -6,7 +6,6 @@ import {
   // TEST_BLOCK_INFO_STRING,
   WalletId,
   getSessionSigners,
-  getTestSigner,
   serializeCanvas,
 } from '@hicommonwealth/shared';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -14,10 +13,10 @@ import { tester } from '../../src';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import { SignIn } from '../../src/user/SignIn.command';
-import { CommunitySeedOptions, seedCommunity } from '../utils';
+import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
-  const [evmSigner, cosmosSigner, substrateSigner, solanaSigner] =
+  const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
   const refs = {} as Record<
@@ -90,7 +89,7 @@ describe('SignIn Lifecycle', async () => {
           'getWalletAddress' in signer &&
           typeof signer.getWalletAddress === 'function'
             ? await signer.getWalletAddress()
-            : payload.did.split(':')[4];
+            : signer.getAddressFromDid(payload.did);
 
         const ref = (refs[seed.chain_base!] = {
           community_id: community!.id,
@@ -344,12 +343,16 @@ describe('SignIn Lifecycle', async () => {
       const events = await models.Outbox.findAll({});
       expect(events.map((e) => e.event_name)).toEqual([
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'AddressOwnershipTransferred',
         'AddressOwnershipTransferred',

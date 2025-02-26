@@ -43,31 +43,37 @@
       }
     }
   }
-  .container {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    flex-direction: row;
-    border-bottom: 1px solid $neutral-200;
-    align-items: flex-start;
-
-    .avatar {
+  .CustomNotificationCell {
+    text-decoration: none;
+    color: unset !important;
+    cursor: pointer;
+    .container {
       display: flex;
       gap: 10px;
-      padding-top: 4px;
-      height: 100%;
-    }
-    .content {
-      gap: 10px;
-      display: flex;
-      flex-direction: column;
+      padding: 10px;
+      flex-direction: row;
+      border-bottom: 1px solid $neutral-200;
+      align-items: flex-start;
+      cursor: pointer;
+      .avatar {
+        display: flex;
+        gap: 10px;
+        padding-top: 4px;
+        height: 100%;
+      }
+      .content {
+        gap: 10px;
+        display: flex;
+        flex-direction: column;
 
-      .Text {
-        font-size: 12px;
-        color: #656167;
+        .Text {
+          font-size: 12px;
+          color: #656167;
+        }
       }
     }
   }
+
   .rnf-notification-feed__type {
     display: none;
   }

@@ -97,6 +97,8 @@ export const GetUserAddresses = {
 };
 
 export const ReferralView = Referral.extend({
+  created_on_chain_timestamp: z.string(),
+  referrer_received_eth_amount: z.string(),
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
   community_id: z.string().nullish(),
@@ -110,6 +112,8 @@ export const GetUserReferrals = {
 };
 
 export const ReferralFeesView = ReferralFees.extend({
+  referrer_received_amount: z.string(),
+  transaction_timestamp: z.string(),
   referee_profile: UserProfile.nullish(),
   community_id: z.string().nullish(),
   community_name: z.string().nullish(),
@@ -117,7 +121,10 @@ export const ReferralFeesView = ReferralFees.extend({
 });
 
 export const GetUserReferralFees = {
-  input: z.object({}),
+  input: z.object({
+    distributed_token_address: z.string().optional(),
+    user_id: PG_INT.optional(),
+  }),
   output: z.array(ReferralFeesView),
 };
 

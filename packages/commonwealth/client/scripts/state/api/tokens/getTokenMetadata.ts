@@ -15,7 +15,7 @@ export type GetTokenMetadataResponse = {
   symbol: string;
 };
 
-const getTokenMetadata = async ({
+export const getTokenMetadata = async ({
   tokenId,
   nodeEthChainId,
 }: UseTokenMetadataQueryProps): Promise<GetTokenMetadataResponse> => {

@@ -20,4 +20,13 @@
       rgba(255, 16, 0, 1) 100%
     );
   }
+
+  @include extraSmall {
+    padding: 8px !important;
+    .Button {
+      font-size: 0.875rem !important;
+      padding: 4px 18px !important;
+      width: auto !important;
+    }
+  }
 }

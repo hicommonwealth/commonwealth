@@ -190,6 +190,8 @@ const Discord = () => {
             You can merge content from Discord directly into your community by
             connecting the Commonbot.{' '}
             <a
+              target="_blank"
+              rel="noopener noreferrer"
               href={`https://${DOCS_SUBDOMAIN}/commonwealth/bridged-discord-forum-bot`}
             >
               Learn more

@@ -13,23 +13,22 @@
       display: flex;
       gap: 4px;
 
-      &:hover {
-        filter: brightness(1.2);
+      .link {
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
       }
     }
   }
 
   .content {
     display: flex;
-    flex-wrap: wrap;
     gap: 15px;
     justify-content: start;
     margin: 10px 0;
-
-    @include extraSmall {
-      flex-direction: column;
-      flex-wrap: nowrap;
-    }
+    overflow-y: auto;
   }
 
   .empty-quests {

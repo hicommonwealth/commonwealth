@@ -41,7 +41,7 @@ export function FarcasterReplyCastCreatedWebhook(): Command<
         models.Outbox,
         [
           {
-            event_name: schemas.EventNames.FarcasterReplyCastCreated,
+            event_name: 'FarcasterReplyCastCreated',
             event_payload: {
               ...payload.data,
               verified_address,

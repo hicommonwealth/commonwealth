@@ -28,6 +28,8 @@ export async function createContestEventSources(
       parent_contract_address:
         commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
           .factory,
+      created_at_block: 1,
+      events_migrated: true,
     },
     {
       eth_chain_id: ethChainId,
@@ -37,6 +39,8 @@ export async function createContestEventSources(
       parent_contract_address:
         commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
           .factory,
+      created_at_block: 1,
+      events_migrated: true,
     },
   ]);
 

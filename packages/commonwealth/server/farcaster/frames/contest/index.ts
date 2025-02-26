@@ -1,4 +1,4 @@
 import { contestCard } from './contestCard';
-import { contestPrizes } from './contestPrizes';
+import { votingRules } from './votingRules';
 
-export { contestCard, contestPrizes };
+export { contestCard, votingRules };

@@ -4,6 +4,7 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 
+import { getEvmAddress } from '@hicommonwealth/evm-protocols';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
@@ -426,11 +427,10 @@ export async function handleSocialLoginCallback({
     if (isCosmos) {
       magicAddress = metadata.publicAddress;
     } else {
-      const { utils } = await import('ethers');
       if (metadata.publicAddress === null) {
         throw new Error('Expected magic to return publicAddress');
       }
-      magicAddress = utils.getAddress(metadata.publicAddress);
+      magicAddress = getEvmAddress(metadata.publicAddress);
     }
   } else {
     const result = isCustomDomain
@@ -447,8 +447,7 @@ export async function handleSocialLoginCallback({
     if (isCosmos) {
       magicAddress = result.magic.userMetadata.publicAddress;
     } else {
-      const { utils } = await import('ethers');
-      magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+      magicAddress = getEvmAddress(result.magic.userMetadata.publicAddress);
     }
   }
 
@@ -480,11 +479,10 @@ export async function handleSocialLoginCallback({
       );
     } else {
       const { Web3Provider } = await import('@ethersproject/providers');
-      const { utils } = await import('ethers');
 
       const provider = new Web3Provider(magic.rpcProvider);
       const signer = provider.getSigner();
-      const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
+      const checksumAddress = getEvmAddress(magicAddress); // get checksum-capitalized eth address
 
       const sessionSigner = new SIWESigner({
         signer,

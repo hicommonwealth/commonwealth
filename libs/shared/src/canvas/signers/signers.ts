@@ -1,5 +1,5 @@
 import { CosmosSigner } from '@canvas-js/chain-cosmos';
-import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SIWESigner, SIWFSigner } from '@canvas-js/chain-ethereum';
 import { SolanaSigner } from '@canvas-js/chain-solana';
 import { SubstrateSigner } from '@canvas-js/chain-substrate';
 import {
@@ -14,19 +14,23 @@ import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
 import * as json from '@ipld/dag-json';
 import { KeypairType } from '@polkadot/util-crypto/types';
-import { Wallet } from 'ethers';
-
-export const getTestSigner = () => {
-  return new SIWESigner({ signer: Wallet.createRandom() });
-};
 
 export const getSessionSigners = () => {
   return [
     new SIWESigner(),
+    new SIWFSigner(),
     new CosmosSignerCW(),
     new SubstrateSignerCW(),
     new SolanaSigner(),
   ];
+};
+
+export const getAddressFromDid = (did: string) => {
+  if (did.startsWith('did:pkh:farcaster:')) {
+    return did.split(':')[3];
+  } else {
+    return did.split(':')[4];
+  }
 };
 
 export const getSessionSignerForDid = (address: string) => {

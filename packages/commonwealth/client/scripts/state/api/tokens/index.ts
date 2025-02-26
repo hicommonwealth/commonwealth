@@ -5,6 +5,7 @@ import useGetERC20BalanceQuery from './getERC20Balance';
 import useTokenBalanceQuery from './getTokenBalance';
 import useGetTokenByCommunityId from './getTokenByCommunityId';
 import useTokenMetadataQuery from './getTokenMetadata';
+import useTokensMetadataQuery from './getTokensMetadata';
 
 export {
   useCreateTokenMutation,
@@ -14,4 +15,5 @@ export {
   useGetTokenByCommunityId,
   useTokenBalanceQuery,
   useTokenMetadataQuery,
+  useTokensMetadataQuery,
 };

@@ -138,6 +138,16 @@ export const UpvoteNotification = z.union([
   CommentUpvoteNotification,
 ]);
 
+export const AddressOwnershipTransferredNotification = z.object({
+  community_id: z.string(),
+  community_name: z.string(),
+  address: z.string(),
+  user_id: z.number(),
+  old_user_id: z.number(),
+  old_user_email: z.string(),
+  created_at: z.string(),
+});
+
 export const WebhookNotification = z.object({
   sender_username: z.literal('Common'),
   sender_avatar_url: z
@@ -161,4 +171,36 @@ export const WebhookNotification = z.object({
   content_type: z.union([z.literal('thread'), z.literal('comment')]),
   thread_id: z.number().describe('The id of the thread'),
   comment_id: z.number().optional().describe('The id of the comment'),
+});
+
+export const ContestNotification = z.object({
+  contest_id: z.number(),
+  start_time: z.date(),
+  end_time: z.date(),
+  contest_name: z.string(),
+  image_url: z.string(),
+  community_id: z.string(),
+  community_name: z.string(),
+});
+
+export const ContestEndedNotification = ContestNotification.extend({
+  winners: z
+    .object({
+      address: z.string(),
+      content: z.string(),
+      name: z.string(),
+      votes: z.string(),
+      prize: z.string(),
+    })
+    .array(),
+});
+
+export const QuestStartedNotification = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  image_url: z.string(),
+  start_date: z.date(),
+  end_date: z.date(),
+  community_id: z.string().nullish(),
 });

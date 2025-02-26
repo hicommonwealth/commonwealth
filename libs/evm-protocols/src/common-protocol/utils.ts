@@ -1,3 +1,13 @@
+import {
+  Abi,
+  ContractEventName,
+  DecodeEventLogParameters,
+  DecodeEventLogReturnType,
+  Hex,
+  decodeEventLog,
+  getAddress,
+} from 'viem';
+import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
@@ -7,7 +17,7 @@ export type EvmClientType = Web3Type;
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
-  precision: number = 10 ** 18, // precision factor for multiplying
+  precision: number = 10 ** 16, // precision factor for multiplying
 ): bigint | null => {
   if (!balance || voteWeight <= 0) return null;
   // solution to multiply BigInt with fractional vote weight
@@ -48,6 +58,17 @@ export const getBlock = async ({
     block: await web3.eth.getBlock(blockHash),
     evmClient: web3,
   };
+};
+
+export const getBlockNumber = async ({
+  evmClient,
+  rpc,
+}: {
+  evmClient?: EvmClientType;
+  rpc: string;
+}): Promise<number> => {
+  const web3 = evmClient || new Web3(rpc);
+  return Number(await web3.eth.getBlockNumber());
 };
 
 export const getTransactionReceipt = async ({
@@ -152,6 +173,10 @@ export const isEvmAddress = (address: string): boolean => {
   return isAddress(address);
 };
 
+export const getEvmAddress = (address: string): string => {
+  return getAddress(address);
+};
+
 export const arbitraryEvmCall = async ({
   evmClient,
   rpc,
@@ -168,4 +193,32 @@ export const arbitraryEvmCall = async ({
     to,
     data,
   });
+};
+
+export function decodeLog<
+  abi extends Abi,
+  eventName extends ContractEventName<abi>,
+>({ abi, data, topics }: { abi: abi; data: string; topics: string[] }) {
+  return decodeEventLog<abi, eventName, Hex[], Hex>({
+    abi,
+    data: data as Hex,
+    topics: topics as DecodeEventLogParameters['topics'],
+  });
+}
+
+export type DecodedLog<
+  abi extends Abi,
+  eventName extends ContractEventName<abi>,
+> = DecodeEventLogReturnType<abi, eventName>;
+
+export const createEvmSigner = (
+  mnemonic: string = generateMnemonic(english),
+) => {
+  const account = mnemonicToAccount(mnemonic);
+  return {
+    ...account,
+    getAddress: () => account.address,
+    signMessage: (message: string): Promise<string> =>
+      account.signMessage({ message }),
+  };
 };

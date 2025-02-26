@@ -1,4 +1,4 @@
-import { ChainType } from '@hicommonwealth/shared';
+import { ChainType, DefaultPage } from '@hicommonwealth/shared';
 import { initAppState } from 'state';
 import { trpc } from 'utils/trpcClient';
 import useUserStore, { userStore } from '../../ui/user';
@@ -24,6 +24,7 @@ interface UpdateCommunityProps {
   defaultOverview?: boolean;
   chainNodeId?: string;
   type?: ChainType;
+  defaultPage?: DefaultPage;
 }
 
 export const buildUpdateCommunityInput = ({
@@ -46,6 +47,7 @@ export const buildUpdateCommunityInput = ({
   defaultOverview,
   chainNodeId,
   type,
+  defaultPage,
 }: UpdateCommunityProps) => {
   return {
     jwt: userStore.getState().jwt,
@@ -84,6 +86,9 @@ export const buildUpdateCommunityInput = ({
     }),
     ...(typeof chainNodeId !== 'undefined' && { chain_node_id: +chainNodeId }),
     ...(typeof type !== 'undefined' && { type: type }),
+    ...(typeof defaultPage !== 'undefined' && {
+      default_page: defaultPage,
+    }),
   };
 };
 

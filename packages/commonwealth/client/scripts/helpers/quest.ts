@@ -32,7 +32,7 @@ export const calculateQuestTimelineLabel = ({
   // else it yet to start
   return `Starts in ${
     startHoursRemaining <= 24
-      ? `${startHoursRemaining} hours`
+      ? `${startHoursRemaining} hour${startHoursRemaining > 1 ? 's' : ''}`
       : `${startDaysRemaining} day${startDaysRemaining > 1 ? 's' : ''}`
   }`;
 };

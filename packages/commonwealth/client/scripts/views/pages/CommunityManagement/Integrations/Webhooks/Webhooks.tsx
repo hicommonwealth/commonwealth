@@ -160,6 +160,8 @@ const Webhooks = () => {
               supported. For more information and examples for setting these up,
               please view our{' '}
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href={`https://${DOCS_SUBDOMAIN}/commonwealth/for-admins-and-mods/capabilities/webhooks`}
               >
                 documentation

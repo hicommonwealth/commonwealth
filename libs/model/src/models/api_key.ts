@@ -16,6 +16,7 @@ export default (sequelize: Sequelize.Sequelize): ApiKeyModelStatic =>
       user_id: { type: Sequelize.INTEGER, primaryKey: true },
       hashed_api_key: { type: Sequelize.STRING, allowNull: false },
       salt: { type: Sequelize.STRING, allowNull: false },
+      premium_tier: { type: Sequelize.BOOLEAN, defaultValue: false },
     },
     {
       timestamps: true,

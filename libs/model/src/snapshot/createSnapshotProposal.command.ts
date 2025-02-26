@@ -103,7 +103,7 @@ export function CreateSnapshotProposal(): Command<
 
       await emitEvent(models.Outbox, [
         {
-          event_name: schemas.EventNames.SnapshotProposalCreated,
+          event_name: 'SnapshotProposalCreated',
           event_payload: {
             id: parsedId,
             event: payload.event,

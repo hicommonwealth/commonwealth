@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowSquareOut,
+  ArrowsClockwise,
   ArrowsInSimple,
   ArrowsOutSimple,
   BellSimple,
@@ -21,6 +22,7 @@ import {
   CaretLeft,
   CaretRight,
   CaretUp,
+  ChartLineUp,
   ChatCenteredDots,
   ChatDots,
   ChatText,
@@ -38,6 +40,7 @@ import {
   Compass,
   Copy,
   CopySimple,
+  DiscordLogo,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -45,6 +48,7 @@ import {
   Eye,
   Flag,
   FunnelSimple,
+  Gear,
   Heart,
   House,
   Image,
@@ -96,6 +100,7 @@ import {
   Users,
   UsersThree,
   Warning,
+  XLogo,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import { CWPara } from './cw_custom_icons';
@@ -128,7 +133,10 @@ export const iconLookup = {
   arrowDownBlue500: Icons.CWArrowDownBlue500,
   arrowFatUp: Icons.CWArrowFatUp,
   arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
+  arrowUpHalfGreen: Icons.CWArrowUpHalfGreen,
+  arrowDownHalfOrange: Icons.CWArrowDownHalfOrange,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
+  arrowClockwise: withPhosphorIcon(ArrowsClockwise),
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowUpBlue500: Icons.CWArrowUpBlue500,
   arrowUpNeutral400: Icons.CWArrowUpNeutral400,
@@ -177,6 +185,7 @@ export const iconLookup = {
   clock: Icons.CWClock,
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
+  chartLineUp: withPhosphorIcon(ChartLineUp),
   code: withPhosphorIcon(Code),
   coins: withPhosphorIcon(Coins),
   collapse: Icons.CWCollapse,
@@ -215,6 +224,7 @@ export const iconLookup = {
   funnelSimple: withPhosphorIcon(FunnelSimple),
   flame: Icons.CWFlame,
   gear: Icons.CWGear,
+  gearPhosphor: withPhosphorIcon(Gear),
   github: Icons.CWGithub,
   octocat: Icons.CWOctocat,
   google: Icons.CWGoogle,
@@ -307,6 +317,8 @@ export const iconLookup = {
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
   kanban: withPhosphorIcon(Kanban),
+  xTwitter: withPhosphorIcon(XLogo),
+  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export const customIconLookup = {

@@ -338,7 +338,7 @@ export class Thread implements IUniqueId {
               profile: {
                 name: rc?.profile_name ?? rc.Address?.User?.profile?.name,
                 avatar_url:
-                  rc?.profile_avatar ?? rc.Address?.User?.profile?.avatar_url,
+                  rc?.avatar_url ?? rc.Address?.User?.profile?.avatar_url,
               },
             },
           },

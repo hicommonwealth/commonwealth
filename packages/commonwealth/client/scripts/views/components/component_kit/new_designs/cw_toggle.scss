@@ -3,9 +3,11 @@
 .Toggle {
   background-color: $neutral-200;
   border-radius: $border-radius-rounded-corners;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   cursor: pointer;
+  gap: 8px;
 
   &.large {
     height: 24px;
@@ -42,22 +44,22 @@
   .slider {
     background-color: $white;
     border-radius: $border-radius-round;
-    left: 2px;
     position: absolute;
-    top: 2px;
     transition: all ease-in-out 0.1s;
     box-shadow:
       0px 1px 3px rgba(40, 39, 41, 0.1),
       0px 1px 2px rgba(40, 39, 41, 0.06);
 
-    &.large {
-      height: 20px;
-      width: 20px;
-    }
-
-    &.small {
-      height: 16px;
-      width: 16px;
+    .icon-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
     }
 
     &.disabled {
@@ -100,6 +102,18 @@
 
     .slider {
       background-color: $neutral-100;
+    }
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $neutral-800;
+  }
+
+  .icon-container {
+    .icon-gray-500 {
+      color: #757575;
     }
   }
 }

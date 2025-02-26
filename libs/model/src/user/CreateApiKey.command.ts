@@ -17,6 +17,7 @@ export function CreateApiKey(): Command<typeof schemas.CreateApiKey> {
       await models.ApiKey.create({
         user_id: actor.user.id,
         hashed_api_key: hash,
+        premium_tier: false,
         salt,
       });
 

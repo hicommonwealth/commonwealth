@@ -4,14 +4,15 @@ import React, { useEffect, useMemo } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { CreateContentSidebar } from '../../menus/CreateContentMenu';
-import { SidebarHeader } from '../component_kit/CWSidebarHeader';
 import { KnockFeedWrapper } from '../KnockNotifications/KnockFeedWrapper';
+import { SidebarHeader } from '../component_kit/CWSidebarHeader';
 import { CommunitySection } from './CommunitySection';
 
+import useSidebarSwipe from 'client/scripts/hooks/useSidebarSwipe';
+import { SidebarProfileSection } from './SidebarProfileSection';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import './index.scss';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { SidebarProfileSection } from './SidebarProfileSection';
 
 export type SidebarMenuName =
   | 'default'
@@ -33,6 +34,7 @@ export const Sidebar = ({
   } = useSidebarStore();
 
   const user = useUserStore();
+  const left = useSidebarSwipe();
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(false);
@@ -47,7 +49,7 @@ export const Sidebar = ({
   }, [menuVisible, onMobile, recentlyUpdatedVisibility]);
 
   return (
-    <div className={sidebarClass}>
+    <div className={sidebarClass} style={{ left }}>
       {isInsideCommunity ? (
         <div className="sidebar-header-wrapper">
           <SidebarHeader

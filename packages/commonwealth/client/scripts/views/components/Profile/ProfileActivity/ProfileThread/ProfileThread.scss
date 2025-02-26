@@ -1,0 +1,11 @@
+@import '../../../../../styles/shared.scss';
+.ProfileThread {
+  padding: 0px 60px 0px 60px;
+  border-bottom: 1px solid $neutral-200;
+  @include extraSmall {
+    padding: 0px 30px 0px 30px;
+  }
+  .Divider {
+    display: none;
+  }
+}

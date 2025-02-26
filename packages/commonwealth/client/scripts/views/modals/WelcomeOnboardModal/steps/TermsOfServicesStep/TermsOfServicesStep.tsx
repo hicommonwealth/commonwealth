@@ -51,20 +51,22 @@ const TermsOfServicesStep = ({ onComplete }: TermsOfServicesStepProps) => {
               />
             </div>
 
-            <CWButton
-              label="Next"
-              buttonWidth="full"
-              type="submit"
-              disabled={!isTermsChecked}
-            />
+            <div className="footerContainer">
+              <CWButton
+                label="Next"
+                buttonWidth="full"
+                type="submit"
+                disabled={!isTermsChecked}
+              />
 
-            <CWText isCentered className="footer">
-              We will never share your contact information with third-party
-              services.
-              <br />
-              For questions, please review our&nbsp;
-              <Link to="/privacy">Privacy Policy</Link>
-            </CWText>
+              <CWText isCentered className="footer">
+                We will never share your contact information with third-party
+                services.
+                <br />
+                For questions, please review our&nbsp;
+                <Link to="/privacy">Privacy Policy</Link>
+              </CWText>
+            </div>
           </>
         );
       }}

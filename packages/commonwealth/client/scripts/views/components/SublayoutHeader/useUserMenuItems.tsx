@@ -6,6 +6,7 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -59,6 +60,8 @@ export const handleLogout = async () => {
     }
     notifySuccess('Signed out');
     setDarkMode(false);
+    localStorage.setItem(LocalStorageKeys.HasSeenNotifications, 'true');
+    localStorage.setItem(LocalStorageKeys.HasSeenOnboarding, 'true');
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();

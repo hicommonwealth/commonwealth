@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
 import {
   AddressAttributes,
   AddressInstance,
   CommunityInstance,
+  DB,
   UserAttributes,
   UserInstance,
+  emitEvent,
   sequelize,
 } from '@hicommonwealth/model';
 import {
@@ -45,7 +46,9 @@ async function createMagicAddressInstances(
   models: DB,
   generatedAddresses: Array<{ address: string; community_id: string }>,
   user: UserAttributes,
+  isNewUser: boolean,
   decodedMagicToken: MagicUser,
+  oauthProvider: string,
   t?: Transaction,
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
@@ -74,6 +77,34 @@ async function createMagicAddressInstances(
       },
       transaction: t,
     });
+
+    if (created) {
+      await emitEvent(
+        models.Outbox,
+        [
+          {
+            event_name: 'CommunityJoined',
+            event_payload: {
+              community_id,
+              user_id: addressInstance.user_id!,
+              created_at: addressInstance.created_at!,
+              oauth_provider: oauthProvider,
+            },
+          },
+          {
+            event_name: 'SSOLinked',
+            event_payload: {
+              user_id: addressInstance.user_id!,
+              new_user: isNewUser,
+              oauth_provider: oauthProvider,
+              community_id,
+              created_at: addressInstance.created_at!,
+            },
+          },
+        ],
+        t,
+      );
+    }
 
     // case should not happen, but if somehow a to-be-created address is owned
     // by another user than the one logging in, we should throw an error, because that is an
@@ -149,7 +180,9 @@ async function createNewMagicUser({
         models,
         generatedAddresses,
         newUser,
+        true,
         decodedMagicToken,
+        magicUserMetadata.oauthProvider!,
         transaction,
       );
 
@@ -232,6 +265,7 @@ async function loginExistingMagicUser({
   existingUserInstance,
   decodedMagicToken,
   generatedAddresses,
+  magicUserMetadata,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
     throw new Error('No user provided to sign in');
@@ -269,7 +303,9 @@ async function loginExistingMagicUser({
         models,
         generatedAddresses,
         existingUserInstance,
+        false,
         decodedMagicToken,
+        magicUserMetadata!.oauthProvider!,
         transaction,
       );
 
@@ -341,13 +377,16 @@ async function addMagicToUser({
   generatedAddresses,
   loggedInUser,
   decodedMagicToken,
+  magicUserMetadata,
 }: MagicLoginContext): Promise<UserInstance> {
   // create new address on logged-in user
   const addressInstances = await createMagicAddressInstances(
     models,
     generatedAddresses,
     loggedInUser!,
+    false,
     decodedMagicToken,
+    magicUserMetadata.oauthProvider!,
   );
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
@@ -584,7 +623,9 @@ async function magicLoginRoute(
       models,
       generatedAddresses,
       loggedInUser,
+      false,
       decodedMagicToken,
+      magicUserMetadata.oauthProvider!,
     );
     return cb(null, existingUserInstance);
   }

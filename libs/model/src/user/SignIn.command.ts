@@ -132,7 +132,12 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             },
             transaction,
           });
+
+          let wallet_found = undefined;
           if (!new_address) {
+            wallet_found = await models.Address.findOne({
+              where: { user_id, wallet_id },
+            });
             addr.user_id = user_id;
             addr.wallet_id = wallet_id;
             addr.verification_token = verification_token;
@@ -145,19 +150,30 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
           const transferredUser = await transferOwnership(addr, transaction);
 
-          const events: schemas.EventPairs[] = [];
+          const events = [] as Array<schemas.EventPairs>;
           new_address &&
             events.push({
-              event_name: schemas.EventNames.CommunityJoined,
+              event_name: 'CommunityJoined',
               event_payload: {
                 community_id,
                 user_id: addr.user_id!,
                 created_at: addr.created_at!,
               },
             });
+          (new_address || !wallet_found) &&
+            events.push({
+              event_name: 'WalletLinked',
+              event_payload: {
+                user_id: addr.user_id!,
+                new_user,
+                wallet_id: wallet_id,
+                community_id,
+                created_at: addr.created_at!,
+              },
+            });
           new_user &&
             events.push({
-              event_name: schemas.EventNames.UserCreated,
+              event_name: 'UserCreated',
               event_payload: {
                 community_id,
                 address: addr.address,
@@ -168,7 +184,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
           transferredUser &&
             events.push({
-              event_name: schemas.EventNames.AddressOwnershipTransferred,
+              event_name: 'AddressOwnershipTransferred',
               event_payload: {
                 community_id,
                 address: addr.address,

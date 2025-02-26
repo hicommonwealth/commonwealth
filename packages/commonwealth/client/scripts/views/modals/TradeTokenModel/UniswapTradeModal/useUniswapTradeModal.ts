@@ -1,8 +1,12 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  UNISWAP_CONVENIENCE_FEE_PERCENT,
+  UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+} from '@hicommonwealth/shared';
 import { Theme } from '@uniswap/widgets';
 import WebWalletController from 'controllers/app/web_wallets';
-import { ethers } from 'ethers';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useState } from 'react';
@@ -93,8 +97,7 @@ const uniswapWidgetTheme: Theme = {
 
 const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
-  const [uniswapProvider, setUniswapProvider] =
-    useState<ethers.providers.Web3Provider>();
+  const [uniswapProvider, setUniswapProvider] = useState<Web3Provider>();
   const [uniswapTokensList, setUniswapTokensList] = useState<UniswapToken[]>();
 
   // base chain node info
@@ -132,7 +135,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
           );
           const selectedWallet = wallet[0];
           await selectedWallet.enable(`${baseNode.ethChainId}`);
-          const tempProvider = new ethers.providers.Web3Provider(
+          const tempProvider = new Web3Provider(
             selectedWallet.api.givenProvider,
           );
           setUniswapProvider(tempProvider);
@@ -154,6 +157,13 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       defaultTokenAddress: {
         input: 'NATIVE', // special address for native token of default chain
         output: tradeConfig.token.contract_address,
+      },
+      convenienceFee: {
+        percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,
+        recipient: {
+          // chainId to address map, for all receipts of convenience fee
+          [baseNode.ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+        },
       },
       routerURLs: uniswapRouterURLs,
     },

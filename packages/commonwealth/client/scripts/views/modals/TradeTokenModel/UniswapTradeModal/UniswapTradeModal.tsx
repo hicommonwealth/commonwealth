@@ -57,6 +57,10 @@ const UniswapTradeModal = ({
                   defaultOutputTokenAddress={
                     uniswapWidget.defaultTokenAddress.output
                   }
+                  convenienceFee={uniswapWidget.convenienceFee.percentage}
+                  convenienceFeeRecipient={
+                    uniswapWidget.convenienceFee.recipient
+                  }
                   hideConnectionUI={true}
                   {...(uniswapWidget.provider && {
                     provider: uniswapWidget.provider,

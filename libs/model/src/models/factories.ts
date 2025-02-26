@@ -41,6 +41,7 @@ import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
 import Topic from './topic';
+import TwitterCursor from './twitter_cursor';
 import User from './user';
 import Vote from './vote';
 import Wallets from './wallets';
@@ -89,6 +90,7 @@ export const Factories = {
   ThreadVersionHistory,
   ThreadSubscription,
   Topic,
+  TwitterCursor,
   User,
   Vote,
   Webhook,

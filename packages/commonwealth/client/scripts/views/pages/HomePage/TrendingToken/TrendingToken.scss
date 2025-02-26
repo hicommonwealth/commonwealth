@@ -5,11 +5,10 @@
   padding: 8px 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   background-color: $white;
   width: 330px;
-  height: 130px;
+  height: 115px;
   border: 1px solid $neutral-300;
   cursor: pointer;
 
@@ -18,8 +17,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    height: 50px;
 
-    .token-details {
+    .token-data {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,12 +36,6 @@
       display: flex;
       flex-direction: column;
 
-      .name {
-        font-weight: 600;
-        color: $neutral-600;
-        font-size: 14px;
-      }
-
       .detail {
         display: flex;
         gap: 4px;
@@ -50,10 +44,6 @@
       .creator {
         color: $neutral-500;
       }
-    }
-
-    .price-change {
-      color: $primary-500;
     }
   }
 

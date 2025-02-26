@@ -30,12 +30,11 @@ describe('relay', () => {
   });
 
   test('Should relay multiple events in order', async () => {
-    const publishedEvents = [];
+    const publishedEvents: string[] = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
-      publish: async (topic: string, event: any) => {
-        // @ts-expect-error StrictNullChecks
+      // eslint-disable-next-line @typescript-eslint/require-await
+      publish: async (event: { name: string }) => {
         publishedEvents.push(event.name);
         return true;
       },
@@ -55,13 +54,12 @@ describe('relay', () => {
   });
 
   test('should stop relaying if publish fails in order to preserve order', async () => {
-    const publishedEvents = [];
+    const publishedEvents: string[] = [];
     const spyBroker: Broker = {
       ...successfulInMemoryBroker,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/require-await
-      publish: async (topic: string, event: any) => {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      publish: async (event: { name: string }) => {
         if (publishedEvents.length === 1) return false;
-        // @ts-expect-error StrictNullChecks
         publishedEvents.push(event.name);
         return true;
       },

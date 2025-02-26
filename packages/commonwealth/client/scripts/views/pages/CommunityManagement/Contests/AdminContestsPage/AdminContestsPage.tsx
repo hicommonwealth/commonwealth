@@ -24,6 +24,7 @@ import { PageNotFound } from 'views/pages/404';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
 import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStakeStep';
 
+import { CWDivider } from '../../../../components/component_kit/cw_divider';
 import ContestsList from '../ContestsList';
 import { ContestType, ContestView } from '../types';
 import useCommunityContests from '../useCommunityContests';
@@ -42,6 +43,7 @@ const AdminContestsPage = () => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const chainNodeUrl = app?.chain?.meta?.ChainNode?.url || '';
 
   const communityId = app.activeChainId() || '';
 
@@ -135,14 +137,51 @@ const AdminContestsPage = () => {
                 isLoading={isFeeManagerBalanceLoading}
               />
             )}
+            <CWText type="h3" className="mb-12">
+              Active Contests
+            </CWText>
+            {!isContestAvailable && !contestsData.active.length ? (
+              <CWText>No active contests available</CWText>
+            ) : (
+              <ContestsList
+                contests={contestsData.active}
+                isAdmin={isAdmin}
+                isLoading={isContestDataLoading}
+                isContestAvailable={isContestAvailable}
+                onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                  ethChainId,
+                  chainNodeUrl,
+                }}
+              />
+            )}
 
-            <ContestsList
-              contests={contestsData.all}
-              isLoading={isContestDataLoading}
-              isAdmin={isAdmin}
-              isContestAvailable={isContestAvailable}
-              onSetContestView={setContestView}
-            />
+            <CWDivider className="ended" />
+            <CWText type="h3" className="mb-12">
+              Previous Contests
+            </CWText>
+            {isContestAvailable && contestsData.finished.length === 0 ? (
+              <CWText>No previous contests available</CWText>
+            ) : (
+              <ContestsList
+                contests={contestsData.finished}
+                isAdmin={isAdmin}
+                isLoading={isContestDataLoading}
+                isContestAvailable={isContestAvailable}
+                displayAllRecurringContests
+                onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                  ethChainId,
+                  chainNodeUrl,
+                }}
+              />
+            )}
           </>
         ) : contestView === ContestView.TypeSelection ? (
           <div className="type-selection-list">

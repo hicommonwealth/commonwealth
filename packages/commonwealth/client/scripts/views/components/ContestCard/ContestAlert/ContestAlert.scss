@@ -1,0 +1,26 @@
+@import '../../../../styles/shared';
+
+.ContestAlert {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: $yellow-100;
+  margin-block: 8px;
+  gap: 16px;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+    background-color: $yellow-400;
+    fill: $yellow-800;
+    border-radius: 6px;
+  }
+
+  .right-side {
+    .Text {
+      color: $yellow-800;
+    }
+  }
+}
