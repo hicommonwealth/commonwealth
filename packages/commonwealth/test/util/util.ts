@@ -1,9 +1,11 @@
 import {
+  CommunityStake as communityStakesAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
+import {
   ChildContractNames,
   EvmEventSignatures,
   commonProtocol,
-  communityStakesAbi,
-  namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import {
   EvmEventSourceInstance,

@@ -3,11 +3,11 @@ import {
   Launchpad as launchpadFactoryAbi,
   LPBondingCurve as lpBondingCurveAbi,
   NamespaceFactory as namespaceFactoryAbi,
+  ContestGovernor as recurringContestAbi,
+  ReferralFeeManager as referralFeeManager,
   ContestGovernorSingle as singleContestAbi,
   TokenCommunityManager as tokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
-import { recurringContestAbi } from '../abis/recurringContestAbi';
-import { referralFeeManager } from '../abis/referralFeeManager';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 

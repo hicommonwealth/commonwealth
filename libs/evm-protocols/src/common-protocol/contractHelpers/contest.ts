@@ -1,11 +1,13 @@
+import {
+  FeeManager as feeManagerAbi,
+  INamespace as namespaceAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+  ContestGovernor as recurringContestAbi,
+  ContestGovernorSingle as singleContestAbi,
+} from '@commonxyz/common-protocol-abis';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
-import { feeManagerAbi } from '../../abis/feeManagerAbi';
-import { namespaceAbi } from '../../abis/namespaceAbi';
-import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
-import { recurringContestAbi } from '../../abis/recurringContestAbi';
-import { singleContestAbi } from '../../abis/singleContestAbi';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
   createPrivateEvmClient,

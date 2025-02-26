@@ -1,3 +1,4 @@
+import { LPBondingCurve as lpBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
   createPrivateEvmClient,
@@ -5,7 +6,6 @@ import {
   EvmEventSignatures,
   getBlock,
   getTransactionReceipt,
-  lpBondingCurveAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 

@@ -1,13 +1,15 @@
 import {
-  communityStakesAbi,
+  CommunityStake as communityStakesAbi,
+  LPBondingCurve as lpBondingCurveAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+  ContestGovernor as recurringContestAbi,
+  ReferralFeeManager as referralFeeManager,
+  ContestGovernorSingle as singleContestAbi,
+} from '@commonxyz/common-protocol-abis';
+import {
   decodeLog,
   EvmEventSignatures,
   getEvmAddress,
-  lpBondingCurveAbi,
-  namespaceFactoryAbi,
-  recurringContestAbi,
-  referralFeeManager,
-  singleContestAbi,
 } from '@hicommonwealth/evm-protocols';
 import { EventPair, Events } from '@hicommonwealth/schemas';
 

@@ -1,8 +1,8 @@
+import { ContestGovernorSingle as singleContestAbi } from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { erc20Abi } from '../../abis/erc20Abi';
-import { singleContestAbi } from '../../abis/singleContestAbi';
 import { Denominations, WeiDecimals } from '../utils';
 
 /**

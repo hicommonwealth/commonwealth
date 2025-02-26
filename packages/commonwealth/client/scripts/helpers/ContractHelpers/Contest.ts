@@ -1,8 +1,6 @@
-import {
-  commonProtocol,
-  contestAbi,
-  erc20Abi,
-} from '@hicommonwealth/evm-protocols';
+import { ContestGovernor as contestAbi } from '@commonxyz/common-protocol-abis';
+import { commonProtocol, erc20Abi } from '@hicommonwealth/evm-protocols';
+
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';

@@ -1,7 +1,7 @@
 import {
-  communityStakesAbi,
-  namespaceFactoryAbi,
-} from '@hicommonwealth/evm-protocols';
+  CommunityStake as communityStakesAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import dex_abi from './abi/dex';
