@@ -41,11 +41,15 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
   const location = useLocation();
-
+  const [containerReady, setContainerReady] = React.useState(false);
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
   );
-
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerReady(true);
+    }
+  }, []);
   const { isAddedToHomeScreen } = useAppStatus();
 
   const launchpadEnabled = useFlag('launchpad');
@@ -130,7 +134,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 />
               </CWTabsRow>
             </div>
-            {activePage === DashboardViews.Global ? (
+            {containerReady && activePage === DashboardViews.Global ? (
               <Feed
                 query={useFetchGlobalActivityQuery}
                 // @ts-expect-error <StrictNullChecks/>
