@@ -138,7 +138,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         // because the onchain content is immutable
         await models.ContestAction.update(
           {
-            deleted_at: new Date(),
+            cast_deleted_at: new Date(),
           },
           {
             where: {

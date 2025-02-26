@@ -49,7 +49,7 @@ export default (
         type: Sequelize.DECIMAL(78, 0),
         allowNull: true,
       },
-      deleted_at: {
+      cast_deleted_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },

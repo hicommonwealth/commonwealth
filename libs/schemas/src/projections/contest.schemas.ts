@@ -20,7 +20,7 @@ export const ContestAction = z
       .string()
       .nullish()
       .describe('Calculated  weight of the vote when action was recorded'),
-    deleted_at: z.coerce
+    cast_deleted_at: z.coerce
       .date()
       .nullish()
       .describe('Date-time when content was deleted'),
