@@ -4,7 +4,6 @@ import {
   buildFarcasterContestFrameUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { Mutex } from 'async-mutex';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { CreateBotContest } from '../bot/CreateBotContest.command';
@@ -27,44 +26,38 @@ const inputs = {
   FarcasterContestBotMentioned: events.FarcasterContestBotMentioned,
 };
 
-const neynarMutex = new Mutex();
-
 export function FarcasterWorker(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
       FarcasterCastCreated: async ({ payload }) => {
-        await neynarMutex.runExclusive(async () => {
-          const frame_url = new URL(payload.embeds[0].url).pathname;
-          const contest_address = frame_url
-            .split('/')
-            .find((str) => str.startsWith('0x'));
-          mustExist('Contest Address', contest_address);
+        const frame_url = new URL(payload.embeds[0].url).pathname;
+        const contest_address = frame_url
+          .split('/')
+          .find((str) => str.startsWith('0x'));
+        mustExist('Contest Address', contest_address);
 
-          await command(UpdateContestManagerFrameHashes(), {
-            actor: systemActor({}),
-            payload: {
-              contest_address,
-              frames_to_add: [payload.hash],
-            },
-          });
+        await command(UpdateContestManagerFrameHashes(), {
+          actor: systemActor({}),
+          payload: {
+            contest_address,
+            frames_to_add: [payload.hash],
+          },
         });
       },
       FarcasterCastDeleted: async ({ payload }) => {
-        await neynarMutex.runExclusive(async () => {
-          const frame_url = new URL(payload.embeds[0].url).pathname;
-          const contest_address = frame_url
-            .split('/')
-            .find((str) => str.startsWith('0x'));
-          mustExist('Contest Address', contest_address);
+        const frame_url = new URL(payload.embeds[0].url).pathname;
+        const contest_address = frame_url
+          .split('/')
+          .find((str) => str.startsWith('0x'));
+        mustExist('Contest Address', contest_address);
 
-          await command(UpdateContestManagerFrameHashes(), {
-            actor: systemActor({}),
-            payload: {
-              contest_address,
-              frames_to_remove: [payload.hash],
-            },
-          });
+        await command(UpdateContestManagerFrameHashes(), {
+          actor: systemActor({}),
+          payload: {
+            contest_address,
+            frames_to_remove: [payload.hash],
+          },
         });
       },
       FarcasterReplyCastCreated: async ({ payload }) => {
