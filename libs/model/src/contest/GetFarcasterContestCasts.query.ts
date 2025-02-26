@@ -55,6 +55,7 @@ export function GetFarcasterContestCasts(): Query<
             ca1.action = 'added'
             AND ca1.contest_address = :contest_address
             AND ca1.contest_id = :contest_id
+            AND ca1.cast_deleted_at IS NULL
         GROUP BY
             ca1.contest_address,
             ca1.contest_id,
