@@ -222,22 +222,18 @@ const TrendingThreadList = ({
     data: feed,
     isLoading: feedIsLoading,
     isError: feedIsError,
-  } = communityIdFilter
-    ? { data: null, isLoading: false, isError: false }
-    : query({ limit: 3 });
+  } = query({ limit: 3 });
 
   const {
     data: communityThreads,
     loading: communitythreadsLoading,
     isError: threadsError,
-  } = communityIdFilter
-    ? useFetchThreadsQuery({
-        queryType: 'active',
-        communityId,
-        limit: 3,
-        apiEnabled: !!communityId,
-      })
-    : { data: null, loading: false, isError: false };
+  } = useFetchThreadsQuery({
+    queryType: 'active',
+    communityId,
+    limit: 3,
+    apiEnabled: !!communityId,
+  });
 
   const isLoading = communityIdFilter ? communitythreadsLoading : feedIsLoading;
   const isError = communityIdFilter ? threadsError : feedIsError;
