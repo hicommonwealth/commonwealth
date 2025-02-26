@@ -441,6 +441,7 @@ export async function handleSocialLoginCallback({
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');
+      // eslint-disable-next-line no-param-reassign
       bearer = magicOauthRes.magic.idToken;
       console.log('Magic redirect result:', magicOauthRes);
     }
