@@ -13,6 +13,9 @@ importers:
 
   .:
     dependencies:
+      '@commonxyz/common-protocol-abis':
+        specifier: 1.4.3
+        version: 1.4.3
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -24,9 +27,6 @@ importers:
         specifier: ^0.15.12
         version: 0.15.18
     devDependencies:
-      '@commonxyz/common-protocol-abis':
-        specifier: 1.4.1
-        version: 1.4.1
       '@cosmjs/encoding':
         specifier: 0.32.3
         version: 0.32.3
@@ -507,9 +507,6 @@ importers:
       '@alchemy/aa-core':
         specifier: ^3.16.0
         version: 3.19.0(typescript@5.4.5)(viem@2.23.2(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.24.1))
-      '@commonxyz/common-protocol-abis':
-        specifier: ^1.4.0
-        version: 1.4.1
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
@@ -537,9 +534,6 @@ importers:
 
   libs/evm-testing:
     dependencies:
-      '@commonxyz/common-protocol-abis':
-        specifier: ^1.4.0
-        version: 1.4.1
       '@hicommonwealth/model':
         specifier: workspace:*
         version: link:../model
@@ -604,9 +598,6 @@ importers:
       '@canvas-js/signatures':
         specifier: ^0.12.1
         version: 0.12.1
-      '@commonxyz/common-protocol-abis':
-        specifier: ^1.4.0
-        version: 1.4.1
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0.31.3
         version: 0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -824,9 +815,6 @@ importers:
       '@canvas-js/signatures':
         specifier: ^0.13.14
         version: 0.13.14
-      '@commonxyz/common-protocol-abis':
-        specifier: ^1.4.0
-        version: 1.4.1
       '@cosmjs/amino':
         specifier: ^0.31.3
         version: 0.31.3
@@ -3102,8 +3090,8 @@ packages:
   '@coinbase/wallet-sdk@4.0.4':
     resolution: {integrity: sha512-74c040CRnGhfRjr3ArnkAgud86erIqdkPHNt5HR1k9u97uTIZCJww9eGYT67Qf7gHPpGS/xW8Be1D4dvRm63FA==}
 
-  '@commonxyz/common-protocol-abis@1.4.1':
-    resolution: {integrity: sha512-DnHv2dg9HviQxUcJDJXY+nN8mAO6ysmO1z1GP2x2TmoixU10PXEYndqtzvgnOL9BcizQnEYVv7/rnzUGc4TSFQ==}
+  '@commonxyz/common-protocol-abis@1.4.3':
+    resolution: {integrity: sha512-/LPVUeVgolhQgKu5XKmlfQ8u8hr04JprcCa7CBoDQ8B32Ie7q2Rv/q00V5bmJEiJZof+cVEClcIN2dBqb7eeXw==}
 
   '@confio/ics23@0.6.8':
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
@@ -22516,7 +22504,7 @@ snapshots:
       preact: 10.23.2
       sha.js: 2.4.11
 
-  '@commonxyz/common-protocol-abis@1.4.1': {}
+  '@commonxyz/common-protocol-abis@1.4.3': {}
 
   '@confio/ics23@0.6.8':
     dependencies:
