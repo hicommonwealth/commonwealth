@@ -1,8 +1,8 @@
 import {
-  commonProtocol as cp,
-  launchpadFactoryAbi,
-  lpBondingCurveAbi,
-} from '@hicommonwealth/evm-protocols';
+  Launchpad as launchpadFactoryAbi,
+  LPBondingCurve as lpBondingCurveAbi,
+} from '@commonxyz/common-protocol-abis';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { describe, expect, test, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';

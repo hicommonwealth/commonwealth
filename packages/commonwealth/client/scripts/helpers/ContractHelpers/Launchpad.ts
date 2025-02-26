@@ -1,9 +1,8 @@
 import {
-  commonProtocol as cp,
-  erc20Abi,
-  launchpadFactoryAbi,
-  lpBondingCurveAbi,
-} from '@hicommonwealth/evm-protocols';
+  Launchpad as launchpadFactoryAbi,
+  LPBondingCurve as lpBondingCurveAbi,
+} from '@commonxyz/common-protocol-abis';
+import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';

@@ -1,11 +1,11 @@
 import {
-  communityStakesAbi,
-  launchpadFactoryAbi,
-  lpBondingCurveAbi,
-  namespaceFactoryAbi,
-  singleContestAbi,
-  tokenCommunityManagerAbi,
-} from '../abis';
+  CommunityStake as communityStakesAbi,
+  Launchpad as launchpadFactoryAbi,
+  LPBondingCurve as lpBondingCurveAbi,
+  NamespaceFactory as namespaceFactoryAbi,
+  ContestGovernorSingle as singleContestAbi,
+  TokenCommunityManager as tokenCommunityManagerAbi,
+} from '@commonxyz/common-protocol-abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
 import { referralFeeManager } from '../abis/referralFeeManager';
 import { ValidChains, factoryContracts } from '../common-protocol';

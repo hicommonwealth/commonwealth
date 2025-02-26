@@ -1,3 +1,4 @@
+import { Launchpad as launchpadFactoryAbi } from '@commonxyz/common-protocol-abis';
 import {
   AppError,
   InvalidState,
@@ -9,7 +10,6 @@ import {
   commonProtocol as cp,
   getErc20TokenInfo,
   getLaunchpadTokenCreatedTransaction,
-  launchpadFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';

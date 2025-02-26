@@ -411,7 +411,6 @@ class NamespaceFactory extends ContractBase {
       return String(balance / (10 ^ (decimals ?? 18)));
     }
   }
-
   /**
    * mints namespace tokens to assignee on id with desired balance
    * @param namespace the namespace name
