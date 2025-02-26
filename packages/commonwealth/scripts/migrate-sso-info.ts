@@ -3,6 +3,7 @@ import { AddressInstance, models } from '@hicommonwealth/model';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import csvParser from 'csv-parser';
 import fs from 'fs/promises';
+import { lowerCase } from 'lodash';
 import path from 'path';
 import { Op } from 'sequelize';
 import { Readable } from 'stream';
@@ -119,9 +120,14 @@ async function main() {
         log.warn(`No data for address ${address.address}`);
         continue;
       }
-      address.oauth_provider = data[address.address].issuer;
+      address.oauth_provider = lowerCase(data[address.address].issuer);
       address.oauth_email = data[address.address].email;
       address.oauth_phone_number = data[address.address].phone_number;
+
+      if (address.oauth_provider === 'email' && address.oauth_email) {
+        address.oauth_email_verified = true;
+      }
+
       await address.save();
       numBackfilled++;
       log.info(
@@ -158,12 +164,12 @@ async function main() {
     }
 
     if (fetchedData.oauthProvider) {
-      address.oauth_provider = fetchedData.oauthProvider;
+      address.oauth_provider = lowerCase(fetchedData.oauthProvider);
       address.oauth_email = fetchedData.email;
       address.oauth_phone_number = fetchedData.phoneNumber;
 
-      if (fetchedData.email) {
-        // WARNING: for backfilling only assume all emails are verified (all new emails will be checked first)
+      // only Email oauth is considered verified email for backfilling purposes
+      if (address.oauth_provider === 'email' && fetchedData.email) {
         address.oauth_email_verified = true;
       }
       await address.save();
