@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { Op } from 'sequelize';
 import { mustExist } from '../middleware/guards';
 
-// NOTE: this is NOT concurrency safe
 const neynarMutex = new Mutex();
 
 export function UpdateContestManagerFrameHashes(): Command<
