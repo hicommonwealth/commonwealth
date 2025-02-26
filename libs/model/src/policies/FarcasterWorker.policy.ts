@@ -188,7 +188,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           payload.author!.fid,
         );
 
-        // mark the contest action as deleted, but keep the record
+        // mark the content as deleted, but keep the record
         // because the onchain content is immutable
         await models.ContestAction.update(
           {
@@ -196,6 +196,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
           {
             where: {
+              action: 'added',
               contest_address: contestManager.contest_address,
               content_url,
             },
