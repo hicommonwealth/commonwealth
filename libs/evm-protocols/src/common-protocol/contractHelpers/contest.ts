@@ -1,9 +1,9 @@
 import {
-  FeeManager as feeManagerAbi,
-  INamespace as namespaceAbi,
-  NamespaceFactory as namespaceFactoryAbi,
-  ContestGovernor as recurringContestAbi,
-  ContestGovernorSingle as singleContestAbi,
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+  FeeManagerAbi,
+  INamespaceAbi,
+  NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
@@ -19,7 +19,8 @@ import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
   contestContract: Contract<
-    Readonly<typeof singleContestAbi> | Readonly<typeof recurringContestAbi>
+    | Readonly<typeof ContestGovernorSingleAbi>
+    | Readonly<typeof ContestGovernorAbi>
   >,
   contestAddress: string,
   web3: Web3,
@@ -36,7 +37,7 @@ export const getTotalContestBalance = async (
   const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
-    const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
+    const feeManager = new web3.eth.Contract(FeeManagerAbi, String(results[1]));
     balancePromises.push(
       feeManager.methods
         .getBeneficiaryBalance(contestAddress, results[0])
@@ -94,7 +95,7 @@ export const getContestStatus = async (
 }> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -130,7 +131,7 @@ export const getContestBalance = async (
   const web3 = new Web3(rpcNodeUrl);
 
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -158,7 +159,7 @@ export const getContestScore = async (
 ) => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -232,7 +233,10 @@ export const addContent = async (
   web3: Web3,
   nonce?: number,
 ): Promise<AddContentResponse> => {
-  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+  const contestInstance = new web3.eth.Contract(
+    ContestGovernorSingleAbi,
+    contest,
+  );
 
   const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt: TransactionReceipt;
@@ -286,7 +290,10 @@ export const voteContent = async (
   web3: Web3,
   nonce?: number,
 ): Promise<TransactionReceipt> => {
-  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+  const contestInstance = new web3.eth.Contract(
+    ContestGovernorSingleAbi,
+    contest,
+  );
 
   const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
@@ -407,7 +414,7 @@ export const rollOverContest = async ({
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
     const contestInstance = new web3.eth.Contract(
-      oneOff ? singleContestAbi : recurringContestAbi,
+      oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
       contest,
     );
 
@@ -481,7 +488,7 @@ export const deployERC20Contest = async ({
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
     const contract = new web3.eth.Contract(
-      namespaceFactoryAbi,
+      NamespaceFactoryAbi,
       namespaceFactory,
     );
     const maxFeePerGasEst = await estimateGas(web3);
@@ -533,7 +540,7 @@ export const deployNamespace = async (
   if (namespaceCheck === ZERO_ADDRESS) {
     throw new Error('Namespace already reserved');
   }
-  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+  const contract = new web3.eth.Contract(NamespaceFactoryAbi, namespaceFactory);
 
   const maxFeePerGasEst = await estimateGas(web3);
 
@@ -554,7 +561,7 @@ export const deployNamespace = async (
     namespaceFactory,
   );
   const namespaceContract = new web3.eth.Contract(
-    namespaceAbi,
+    INamespaceAbi,
     namespaceAddress,
   );
 

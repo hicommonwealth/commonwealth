@@ -1,4 +1,4 @@
-import { LPBondingCurve as lpBondingCurveAbi } from '@commonxyz/common-protocol-abis';
+import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
   createPrivateEvmClient,
@@ -308,7 +308,7 @@ export async function getLaunchpadToken({
 }> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
-    lpBondingCurveAbi,
+    LPBondingCurveAbi,
     lpBondingCurveAddress,
   );
   return await contract.methods.tokens(tokenAddress).call();
@@ -327,7 +327,7 @@ export async function transferLaunchpadLiquidityToUniswap({
 }) {
   const web3 = createPrivateEvmClient({ rpc, privateKey });
   const contract = new web3.eth.Contract(
-    lpBondingCurveAbi,
+    LPBondingCurveAbi,
     lpBondingCurveAddress,
   );
   await commonProtocol.transferLiquidity(

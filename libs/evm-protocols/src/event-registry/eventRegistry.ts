@@ -1,12 +1,12 @@
 import {
-  CommunityStake as communityStakesAbi,
-  Launchpad as launchpadFactoryAbi,
-  LPBondingCurve as lpBondingCurveAbi,
-  NamespaceFactory as namespaceFactoryAbi,
-  ContestGovernor as recurringContestAbi,
-  ReferralFeeManager as referralFeeManager,
-  ContestGovernorSingle as singleContestAbi,
-  TokenCommunityManager as tokenCommunityManagerAbi,
+  CommunityStakeAbi,
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+  LPBondingCurveAbi,
+  LaunchpadAbi,
+  NamespaceFactoryAbi,
+  ReferralFeeManagerAbi,
+  TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
@@ -31,8 +31,8 @@ type ContractAddresses = {
           : never
         : never)
     | (key extends keyof typeof factoryContracts
-        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['referralFeeManager']
+        ? 'ReferralFeeManagerAbi' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['ReferralFeeManagerAbi']
           : never
         : never);
 };
@@ -64,7 +64,7 @@ export type EventRegistryType = {
 };
 
 const namespaceFactorySource = {
-  abi: namespaceFactoryAbi,
+  abi: NamespaceFactoryAbi,
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
@@ -72,7 +72,7 @@ const namespaceFactorySource = {
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
-      abi: recurringContestAbi,
+      abi: ContestGovernorAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.RecurringContestStarted,
@@ -80,7 +80,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.SingleContest]: {
-      abi: singleContestAbi,
+      abi: ContestGovernorSingleAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.SingleContestStarted,
@@ -91,27 +91,27 @@ const namespaceFactorySource = {
 } satisfies ContractSource;
 
 const communityStakesSource = {
-  abi: communityStakesAbi,
+  abi: CommunityStakeAbi,
   eventSignatures: [EvmEventSignatures.CommunityStake.Trade],
 } satisfies ContractSource;
 
 const launchpadSource: ContractSource = {
-  abi: launchpadFactoryAbi,
+  abi: LaunchpadAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.TokenLaunched],
 } satisfies ContractSource;
 
 const lpBondingCurveSource: ContractSource = {
-  abi: lpBondingCurveAbi,
+  abi: LPBondingCurveAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.Trade],
 } satisfies ContractSource;
 
 const tokenCommunityManagerSource: ContractSource = {
-  abi: tokenCommunityManagerAbi,
+  abi: TokenCommunityManagerAbi,
   eventSignatures: [],
 } satisfies ContractSource;
 
 const referralFeeManagerSource: ContractSource = {
-  abi: referralFeeManager,
+  abi: ReferralFeeManagerAbi,
   eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 

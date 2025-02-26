@@ -1,4 +1,4 @@
-import { Launchpad as launchpadFactoryAbi } from '@commonxyz/common-protocol-abis';
+import { LaunchpadAbi } from '@commonxyz/common-protocol-abis';
 import {
   AppError,
   InvalidState,
@@ -57,7 +57,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       });
       const launchpadContract = new web3.eth.Contract(
-        launchpadFactoryAbi,
+        LaunchpadAbi,
         cp.factoryContracts[
           eth_chain_id as cp.ValidChains.SepoliaBase
         ].launchpad,

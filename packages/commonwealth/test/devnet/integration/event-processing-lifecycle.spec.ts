@@ -1,6 +1,6 @@
 import {
-  Launchpad as launchpadFactoryAbi,
-  LPBondingCurve as lpBondingCurveAbi,
+  LaunchpadAbi,
+  LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
@@ -15,7 +15,7 @@ describe('End to end event tests', () => {
         await setupCommonwealthE2E();
 
       const launchpadFactory = new web3.eth.Contract(
-        launchpadFactoryAbi,
+        LaunchpadAbi,
         contractAddresses.launchpad,
       );
 
@@ -50,7 +50,7 @@ describe('End to end event tests', () => {
       );
 
       const lpBondingCurveFactory = new web3.eth.Contract(
-        lpBondingCurveAbi,
+        LPBondingCurveAbi,
         contractAddresses.lpBondingCurve,
       );
 
