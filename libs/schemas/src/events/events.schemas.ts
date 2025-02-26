@@ -7,7 +7,7 @@ import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Tweet } from '../integrations';
-import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_ETH, PG_INT } from '../utils';
+import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
 
 const DiscordEventBase = z.object({
@@ -416,53 +416,53 @@ export const events = {
   // TokenStaking - TODO: review mapping rules with @timolegros
   TokenLocked: ChainEventBase.extend({
     parsedArgs: z.object({
-      userAddress: EVM_ADDRESS_STRICT.describe('User address'),
-      lockedAmount: PG_ETH.describe('Locked amount'),
-      tokenId: PG_ETH.describe('Token id'),
-      durationInSecs: PG_ETH.describe('Duration (in seconds)'),
-      isPermantent: z.boolean().describe('Is permanent'),
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      amount: z.coerce.bigint().describe('Locked amount'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      duration: z.coerce.bigint().describe('Duration (in seconds)'),
+      isPermanent: z.boolean().describe('Is permanent'),
     }),
   }),
   TokenLockDurationIncreased: ChainEventBase.extend({
     parsedArgs: z.object({
-      tokenId: PG_ETH.describe('Token id'),
-      durationInSecs: PG_ETH.describe('New duration (in seconds)'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      newDuration: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
   TokenUnlocked: ChainEventBase.extend({
     parsedArgs: z.object({
-      userAddress: EVM_ADDRESS_STRICT.describe('User address'),
-      tokenId: PG_ETH.describe('Token id'),
-      lockedAmount: PG_ETH.describe('Locked amount'),
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      amount: z.coerce.bigint().describe('Locked amount'),
     }),
   }),
   TokenPermanentConverted: ChainEventBase.extend({
     parsedArgs: z.object({
-      userAddress: EVM_ADDRESS_STRICT.describe('User address'),
-      tokenId: PG_ETH.describe('Token id'),
-      lockedAmount: PG_ETH.describe('Locked amount'),
-      durationInSecs: PG_ETH.describe('Duration (in seconds)'),
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      amount: z.coerce.bigint().describe('Locked amount'),
+      duration: z.coerce.bigint().describe('Duration (in seconds)'),
     }),
   }),
   TokenDelegated: ChainEventBase.extend({
     parsedArgs: z.object({
-      fromUserAddress: EVM_ADDRESS_STRICT.describe('From user address'),
-      toUserAddress: EVM_ADDRESS_STRICT.describe('To user address'),
-      tokenId: PG_ETH.describe('Token id'),
+      fromuser: EVM_ADDRESS_STRICT.describe('From user address'),
+      touser: EVM_ADDRESS_STRICT.describe('To user address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
     }),
   }),
   TokenUndelegated: ChainEventBase.extend({
     parsedArgs: z.object({
-      tokenId: PG_ETH.describe('Token id'),
+      tokenId: z.coerce.bigint().describe('Token id'),
     }),
   }),
   TokenMerged: ChainEventBase.extend({
     parsedArgs: z.object({
-      userAddress: EVM_ADDRESS_STRICT.describe('User address'),
-      fromTokenId: PG_ETH.describe('From token id'),
-      toTokenId: PG_ETH.describe('To token id'),
-      amount: PG_ETH.describe('New amount'),
-      durationInSecs: PG_ETH.describe('New duration (in seconds)'),
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      fromTokenId: z.coerce.bigint().describe('From token id'),
+      toTokenId: z.coerce.bigint().describe('To token id'),
+      newAmount: z.coerce.bigint().describe('New amount'),
+      newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
 } as const;
