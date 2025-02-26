@@ -1,6 +1,7 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import { models } from '../database';
 import { mustExist, mustNotExist } from '../middleware/guards';
 import { GetBalancesOptions, tokenBalanceCache } from '../services';
@@ -32,7 +33,10 @@ export function FarcasterUpvoteAction(): Command<
       const addAction = await models.ContestAction.findOne({
         where: {
           action: 'added',
-          content_url,
+          content_url: {
+            // check prefix because fid may be attached as query param
+            [Op.like]: `${content_url}%`,
+          },
         },
         include: [
           {
