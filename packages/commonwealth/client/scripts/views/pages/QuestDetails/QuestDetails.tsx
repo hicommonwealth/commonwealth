@@ -223,7 +223,9 @@ const QuestDetails = ({ id }: { id: number }) => {
           label: 'Confirm',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: () => handleAsync().catch(console.error),
+          onClick: () => {
+            handleAsync().catch(console.error);
+          },
         },
       ],
     });
