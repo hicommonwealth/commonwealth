@@ -120,7 +120,10 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
   }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleAiReply = useCallback(
-    (commentId: number, modelIds?: string[]) => {
+    async (commentId: number, modelIds?: string[]): Promise<void> => {
+      // Always close the editor when generating AI replies
+      setIsExpanded(false);
+
       // If modelIds parameter is provided, use it
       // Otherwise, use only the first selected model to prevent multi-streaming
       const modelsToUse =
@@ -169,26 +172,26 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
         props.onAiReply?.(commentId, [modelId]);
       }
     },
-    [props.onAiReply, streamingReplyIds, selectedModels],
+    [props.onAiReply, streamingReplyIds, selectedModels, setIsExpanded],
   );
 
   const handleAiGenerate = useCallback(
     async (text: string) => {
       try {
         // Log only the final prompt context
-        console.log('AI Generate Prompt:', {
-          promptText: text,
-          threadContext: {
-            threadId: rootThread?.id || threadId,
-            hasThreadTitle: !!(rootThread?.title || fetchedThread?.title),
-            hasThreadBody: !!(rootThread?.body || fetchedThread?.body),
-            isReplying: !!props.parentCommentId,
-            modelToUse:
-              selectedModels.length > 0
-                ? selectedModels[0].value
-                : 'anthropic/claude-3.5-sonnet',
-          },
-        });
+        // console.log('AI Generate Prompt:', {
+        //   promptText: text,
+        //   threadContext: {
+        //     threadId: rootThread?.id || threadId,
+        //     hasThreadTitle: !!(rootThread?.title || fetchedThread?.title),
+        //     hasThreadBody: !!(rootThread?.body || fetchedThread?.body),
+        //     isReplying: !!props.parentCommentId,
+        //     modelToUse:
+        //       selectedModels.length > 0
+        //         ? selectedModels[0].value
+        //         : 'anthropic/claude-3.5-sonnet',
+        //   },
+        // });
 
         // Clear the editor first
         props.setContentDelta(createDeltaFromText(''));
@@ -233,8 +236,10 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
     async (action: 'summary' | 'question' | 'draft' | 'generate-replies') => {
       if (!aiCommentsToggleEnabled) return;
 
-      // Always expand the editor when any action is triggered
-      setIsExpanded(true);
+      // Only expand the editor for actions other than generate-replies
+      if (action !== 'generate-replies') {
+        setIsExpanded(true);
+      }
 
       switch (action) {
         case 'summary': {
@@ -310,6 +315,9 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
           break;
         }
         case 'generate-replies': {
+          // First set isExpanded to false to close the editor
+          setIsExpanded(false);
+
           // If we're replying to a comment, generate replies for that comment
           if (isReplying && props.parentCommentId) {
             handleAiReply(props.parentCommentId);
@@ -318,6 +326,16 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
           else if (threadId) {
             handleAiReply(threadId);
           }
+
+          // Also call onCancel to properly close the editor if it exists
+          if (props.onCancel) {
+            props.onCancel(
+              new MouseEvent('click', {
+                bubbles: true,
+              }) as unknown as React.MouseEvent,
+            );
+          }
+
           break;
         }
         default:
@@ -338,6 +356,7 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
       setIsExpanded,
       parentCommentData,
       communityId,
+      props.onCancel,
     ],
   );
 
@@ -482,6 +501,10 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
               onChipAction={handleChipAction}
               selectedModels={selectedModels}
               context={chipsContext}
+              onDirectAIReply={handleAiReply}
+              onMinimize={() => {
+                setIsExpanded(false);
+              }}
             />
           )}
           <div className="container">
@@ -519,6 +542,10 @@ export const DesktopStickyInput = (props: ExtendedCommentEditorProps) => {
               onChipAction={handleChipAction}
               selectedModels={selectedModels}
               context={chipsContext}
+              onDirectAIReply={handleAiReply}
+              onMinimize={() => {
+                setIsExpanded(false);
+              }}
             />
           )}
           {mode === 'thread' ? (

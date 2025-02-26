@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
+import { triggerAIReply } from 'views/pages/discussions/CommentTree/helpers';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import {
   MultiSelectOption,
@@ -25,6 +26,10 @@ type ChipsAndModelBarProps = {
   onModelsChange?: (models: ModelOption[]) => void;
   selectedModels?: ModelOption[];
   context: ChipsContext;
+  // New prop for direct AI reply without going through sticky inputs
+  onDirectAIReply?: (commentId: number) => Promise<void>;
+  // New prop for minimizing the editor when generating replies
+  onMinimize?: () => void;
 };
 
 // Truncate model descriptions to keep them reasonable
@@ -42,6 +47,8 @@ export const ChipsAndModelBar = ({
   onModelsChange,
   selectedModels: externalSelectedModels,
   context,
+  onDirectAIReply,
+  onMinimize,
 }: ChipsAndModelBarProps) => {
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,6 +145,40 @@ export const ChipsAndModelBar = ({
   const { isReplyingToComment, authorName } = safeContext;
   const replyingToText = authorName ? ` to ${authorName}` : '';
 
+  // Handle generate replies action
+  const handleGenerateReplies = () => {
+    const commentId = isReplyingToComment
+      ? safeContext.commentId
+      : safeContext.threadId;
+
+    // Always minimize the editor before generating replies
+    if (onMinimize) {
+      onMinimize();
+    }
+
+    onChipAction('generate-replies');
+
+    // Only use ONE method to trigger AI replies to prevent duplicate streaming replies
+    // Use triggerAIReply as the primary method since it's the most reliable
+    try {
+      if (commentId) {
+        triggerAIReply(commentId);
+      }
+    } catch (error) {
+      // Only if triggerAIReply fails, try onDirectAIReply as a fallback
+      if (onDirectAIReply && commentId) {
+        try {
+          void onDirectAIReply(commentId);
+        } catch (fallbackError) {
+          console.error(
+            'ChipsAndModelBar: Error in fallback method:',
+            fallbackError,
+          );
+        }
+      }
+    }
+  };
+
   return (
     <div className="ChipsAndModelBar">
       {/* Model selector on top */}
@@ -165,7 +206,7 @@ export const ChipsAndModelBar = ({
           buttonHeight="sm"
           iconLeft="bookOpenText"
           onClick={() => {
-            console.log('Action: Summarize Thread and Comments');
+            // console.log('Action: Summarize Thread and Comments');
             onChipAction('summary');
           }}
         />
@@ -178,7 +219,7 @@ export const ChipsAndModelBar = ({
               buttonHeight="sm"
               iconLeft="notePencil"
               onClick={() => {
-                console.log('Action: Draft Reply');
+                // console.log('Action: Draft Reply');
                 onChipAction('draft');
               }}
             />
@@ -187,10 +228,7 @@ export const ChipsAndModelBar = ({
               buttonType="secondary"
               buttonHeight="sm"
               iconLeft="sparkle"
-              onClick={() => {
-                console.log('Action: Generate Replies');
-                onChipAction('generate-replies');
-              }}
+              onClick={handleGenerateReplies}
             />
           </>
         ) : (
@@ -201,7 +239,7 @@ export const ChipsAndModelBar = ({
               buttonHeight="sm"
               iconLeft="notePencil"
               onClick={() => {
-                console.log('Action: Draft Response');
+                // console.log('Action: Draft Response');
                 onChipAction('draft');
               }}
             />
@@ -210,10 +248,7 @@ export const ChipsAndModelBar = ({
               buttonType="secondary"
               buttonHeight="sm"
               iconLeft="sparkle"
-              onClick={() => {
-                console.log('Action: Generate Thread Replies');
-                onChipAction('generate-replies');
-              }}
+              onClick={handleGenerateReplies}
             />
           </>
         )}

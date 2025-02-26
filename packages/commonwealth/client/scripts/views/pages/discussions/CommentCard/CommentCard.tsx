@@ -491,26 +491,6 @@ export const CommentCard = ({
                         void onReply?.();
                       }}
                     />
-                    {aiCommentsFeatureEnabled && (
-                      <CWThreadAction
-                        action="ai-reply"
-                        label="AI Reply"
-                        disabled={maxReplyLimitReached || !canReply}
-                        tooltipText={
-                          (typeof disabledActionsTooltipText === 'function'
-                            ? disabledActionsTooltipText?.('reply')
-                            : disabledActionsTooltipText) ||
-                          (canReply && maxReplyLimitReached
-                            ? 'Further replies not allowed'
-                            : '')
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          void onAIReply?.();
-                        }}
-                      />
-                    )}
                   </>
                 )}
 

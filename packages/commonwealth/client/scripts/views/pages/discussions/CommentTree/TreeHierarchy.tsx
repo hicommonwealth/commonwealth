@@ -88,10 +88,9 @@ export const TreeHierarchy = ({
         return Promise.resolve();
       }
 
+      // Check if this is a comment or the thread itself
       const comment = allComments.find((c) => c.id === commentId);
-      if (!comment) {
-        return Promise.resolve();
-      }
+      const isThreadId = commentId === thread.id;
 
       // Use models from the store, or default to Claude if none selected
       const modelsToUse =
@@ -99,20 +98,53 @@ export const TreeHierarchy = ({
           ? selectedModels.map((model) => model.value)
           : ['anthropic/claude-3.5-sonnet'];
 
-      // Create a streaming reply entry for each selected model
+      // Only create one streaming reply entry per model to prevent duplicates
+      // First, clear any existing streaming replies for this comment
+      setStreamingReplyIds((prev) =>
+        prev.filter((reply) =>
+          typeof reply === 'number'
+            ? reply !== commentId
+            : reply.commentId !== commentId,
+        ),
+      );
+
+      // Then add one entry for each selected model
       modelsToUse.forEach((modelId) => {
-        setStreamingReplyIds((prev) => [...prev, { commentId, modelId }]);
+        setStreamingReplyIds((prev) => {
+          // Check if this model is already in the array for this comment
+          const alreadyExists = prev.some(
+            (reply) =>
+              typeof reply !== 'number' &&
+              reply.commentId === commentId &&
+              reply.modelId === modelId,
+          );
+
+          // Only add if it doesn't already exist
+          if (!alreadyExists) {
+            return [...prev, { commentId, modelId }];
+          }
+          return prev;
+        });
       });
 
       return Promise.resolve();
     },
-    [allComments, streamingReplyIds, selectedModels, setStreamingReplyIds],
+    [
+      allComments,
+      streamingReplyIds,
+      selectedModels,
+      setStreamingReplyIds,
+      thread.id,
+    ],
   );
 
   useEffect(() => {
-    const unregister = registerAIStreamingCallback((commentId) => {
+    // Define the callback function
+    const aiStreamingCallback = (commentId: number) => {
+      // console.log('AI streaming callback triggered for comment ID:', commentId);
       void handleGenerateAIReply(commentId);
-    });
+    }; // Register the callback
+    const unregister = registerAIStreamingCallback(aiStreamingCallback);
 
     return () => {
       unregister();

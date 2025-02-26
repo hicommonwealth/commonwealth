@@ -106,7 +106,10 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
   }, []);
 
   const handleAiReply = useCallback(
-    (commentId: number, modelIds?: string[]) => {
+    async (commentId: number, modelIds?: string[]): Promise<void> => {
+      // Always close the editor when generating AI replies
+      setFocused(false);
+
       // If modelIds parameter is provided, use it
       // Otherwise, use only the first selected model to prevent multi-streaming
       const modelsToUse =
@@ -155,26 +158,26 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
         props.onAiReply?.(commentId, [modelId]);
       }
     },
-    [props.onAiReply, streamingReplyIds, selectedModels],
+    [props.onAiReply, streamingReplyIds, selectedModels, setFocused],
   );
 
   const handleAiGenerate = useCallback(
     async (text: string) => {
       try {
         // Log only the final prompt context
-        console.log('AI Generate Prompt:', {
-          promptText: text,
-          threadContext: {
-            threadId: rootThread?.id || threadId,
-            hasThreadTitle: !!(rootThread?.title || fetchedThread?.title),
-            hasThreadBody: !!(rootThread?.body || fetchedThread?.body),
-            isReplying: !!props.parentCommentId,
-            modelToUse:
-              selectedModels.length > 0
-                ? selectedModels[0].value
-                : 'anthropic/claude-3.5-sonnet',
-          },
-        });
+        // console.log('AI Generate Prompt:', {
+        //   promptText: text,
+        //   threadContext: {
+        //     threadId: rootThread?.id || threadId,
+        //     hasThreadTitle: !!(rootThread?.title || fetchedThread?.title),
+        //     hasThreadBody: !!(rootThread?.body || fetchedThread?.body),
+        //     isReplying: !!props.parentCommentId,
+        //     modelToUse:
+        //       selectedModels.length > 0
+        //         ? selectedModels[0].value
+        //         : 'anthropic/claude-3.5-sonnet',
+        //   },
+        // });
 
         // Clear the editor first
         props.setContentDelta(createDeltaFromText(''));
@@ -219,8 +222,10 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
     async (action: 'summary' | 'question' | 'draft' | 'generate-replies') => {
       if (!aiCommentsToggleEnabled) return;
 
-      // Always focus the editor when any action is triggered
-      setFocused(true);
+      // Only expand the editor for actions other than generate-replies
+      if (action !== 'generate-replies') {
+        setFocused(true);
+      }
 
       switch (action) {
         case 'summary': {
@@ -234,15 +239,15 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
               communityId, // Pass the communityId
             );
 
-            console.log('Generating summary with context:', {
-              threadId,
-              communityId,
-              hasThreadTitle: !!fetchedThread?.title,
-              hasThreadBody: !!fetchedThread?.body,
-              contextLength: contextInfo.length,
-              includesNestedComments: true,
-              nestingDepth: 2,
-            });
+            // console.log('Generating summary with context:', {
+            //   threadId,
+            //   communityId,
+            //   hasThreadTitle: !!fetchedThread?.title,
+            //   hasThreadBody: !!fetchedThread?.body,
+            //   contextLength: contextInfo.length,
+            //   includesNestedComments: true,
+            //   nestingDepth: 2,
+            // });
 
             // Create the final prompt with context
             const prompt = createSummaryPrompt(contextInfo);
@@ -296,6 +301,8 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
           break;
         }
         case 'generate-replies': {
+          // For generate-replies, we want to minimize the editor
+          setFocused(false);
           // If we're replying to a comment, generate replies for that comment
           if (isReplying && props.parentCommentId) {
             handleAiReply(props.parentCommentId);
@@ -440,7 +447,7 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
   const parent = document.getElementById('MobileNavigationHead');
 
   if (!parent) {
-    console.warn('No parent container for MobileStickyInput');
+    // console.warn('No parent container for MobileStickyInput');
     return null;
   }
 
@@ -465,6 +472,10 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
               onChipAction={handleChipAction}
               selectedModels={selectedModels}
               context={chipsContext}
+              onDirectAIReply={handleAiReply}
+              onMinimize={() => {
+                setFocused(false);
+              }}
             />
           )}
 
@@ -499,6 +510,10 @@ export const MobileStickyInput = (props: ExtendedCommentEditorProps) => {
           onChipAction={handleChipAction}
           selectedModels={selectedModels}
           context={chipsContext}
+          onDirectAIReply={handleAiReply}
+          onMinimize={() => {
+            setFocused(false);
+          }}
         />
       )}
       <MobileInput
