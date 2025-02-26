@@ -28,7 +28,14 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      padding: 4px;
+      background: var(--primary-50);
+      border-radius: 4px;
       margin-bottom: 8px;
+
+      svg {
+        color: var(--primary-500);
+      }
     }
 
     .streaming-text {
@@ -52,6 +59,15 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+
+      .comment-text {
+        min-height: 40px;
+      }
+
+      .streaming-text {
+        opacity: 0.9;
+        position: relative;
+      }
     }
 
     .comment-header {
@@ -86,6 +102,27 @@
       align-items: center;
       gap: 1px;
       flex-wrap: wrap;
+
+      button[data-action='ai-reply'] {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' width='24' height='24'%3E%3Cpath d='M15.75 0a8.25 8.25 0 00-8.1 6.746 8.268 8.268 0 00-3.224-.662 3.764 3.764 0 00-3.025 1.305 4.467 4.467 0 00-1.163 3.284 4.818 4.818 0 001.4 3.221 4.33 4.33 0 002.962 1.356h.332v6.483c.002.341.133.665.367.9.234.234.558.364.9.367A1.31 1.31 0 007.5 21.75c.002-.341.133-.665.367-.9.234-.234.558-.364.9-.367h1.566c.341.002.665.133.9.367.234.234.364.558.367.9a1.31 1.31 0 001.275 1.35 1.31 1.31 0 001.35-1.275c.002-.341.133-.665.367-.9.234-.234.558-.364.9-.367h1.566c.341.002.665.133.9.367.234.234.364.558.367.9A1.31 1.31 0 0019.5 23.25a1.31 1.31 0 001.35-1.275v-10.5A11.5 11.5 0 0015.75 0zm6 10.96A9.516 9.516 0 0115.75 2a6.25 6.25 0 00-6.114 5.011c.212.013.423.039.631.078a8.24 8.24 0 014.561 2.685 8.216 8.216 0 012.076 5.042v3.111c0 .106-.003.212-.009.317h.857c.341.002.665.133.9.367.234.234.364.558.367.9.001.34.137.665.379.901.222.228.52.363.839.38v-5.354A12.85 12.85 0 0121.75 10.96zM9.55 13.5a1 1 0 11-1-1 1 1 0 011 1zm3 0a1 1 0 11-1-1 1 1 0 011 1zm3 0a1 1 0 11-1-1 1 1 0 011 1z'/%3E%3C/svg%3E");
+          background-size: contain;
+          background-repeat: no-repeat;
+          opacity: 0.8;
+        }
+
+        &:hover::before {
+          opacity: 1;
+        }
+      }
     }
   }
 }

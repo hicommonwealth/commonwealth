@@ -3,7 +3,6 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
-import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -22,12 +21,14 @@ import { buildCreateThreadInput } from 'state/api/threads/createThread';
 
 // NEW: Import topics query to allow searching for a default topic
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { ExtendedCommentEditorProps } from './types';
 
-export type MobileInputProps = CommentEditorProps & {
+// Update the type definition
+export type MobileInputProps = ExtendedCommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
-  aiCommentsToggleEnabled: boolean;
-  setAICommentsToggleEnabled: (value: boolean) => void;
+  aiCommentsToggleEnabled?: boolean;
+  setAICommentsToggleEnabled?: (value: boolean) => void;
 };
 
 export const MobileInput = (props: MobileInputProps) => {

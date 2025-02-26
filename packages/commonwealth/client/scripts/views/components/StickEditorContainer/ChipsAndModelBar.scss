@@ -1,0 +1,84 @@
+.ChipsAndModelBar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--neutral-50);
+  border-radius: 8px;
+
+  // Model selector comes first now
+  .model-selector {
+    width: 100%;
+    margin-bottom: 4px;
+
+    // Style the select component
+    :global(.css-1s2u09g-control) {
+      background-color: var(--neutral-50);
+      border-radius: 4px;
+      border-color: var(--neutral-200);
+      min-height: 36px;
+    }
+
+    :global(.css-1hb7zxy-IndicatorsContainer) {
+      color: var(--neutral-600);
+    }
+
+    :global(.css-6j8wv5-Input) {
+      margin: 0;
+      padding: 0;
+    }
+
+    :global(.css-1p3m7a8-multiValue) {
+      background-color: var(--primary-50);
+      border-radius: 4px;
+
+      :global(.css-12a83d4-MultiValueRemove:hover) {
+        background-color: var(--primary-100);
+        color: var(--primary-700);
+      }
+    }
+  }
+
+  // Action buttons below
+  .action-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .CWButton {
+      // Make button text smaller to fit more buttons
+      .button-text {
+        font-size: 0.8rem;
+      }
+
+      // Remove the border margin to save space
+      &.btn-border {
+        margin: 0;
+      }
+
+      // Add hover effect
+      &:hover {
+        transform: translateY(-1px);
+        transition: transform 0.2s ease;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    gap: 8px;
+
+    .action-chips {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+
+      .CWButton {
+        // Make buttons even smaller on mobile
+        .button-text {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+}

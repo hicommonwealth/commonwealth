@@ -15,6 +15,23 @@ export const registerAIStreamingCallback = (callback: AIStreamingCallback) => {
   };
 };
 
+// Direct function to trigger AI replies without relying on DOM events
+export const triggerAIReply = (commentId: number): void => {
+  // Only use the first available callback to prevent duplicate streaming
+  let callbackExecuted = false;
+
+  // Try local callbacks first - but only use the first one
+  if (aiStreamingCallbacks.length > 0) {
+    try {
+      aiStreamingCallbacks[0](commentId);
+      console.log('Successfully triggered AI reply using local callback');
+      callbackExecuted = true;
+    } catch (error) {
+      console.error('Error in AI streaming callback:', error);
+    }
+  }
+};
+
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (
   commentId: number,
@@ -22,7 +39,7 @@ export const jumpHighlightComment = (
 ) => {
   const element = document.querySelector(`.comment-${commentId}`);
   if (!element) {
-    console.warn(`No element found for comment ID: ${commentId}`);
+    // console.warn(`No element found for comment ID: ${commentId}`);
     return;
   }
 
@@ -69,9 +86,9 @@ export const listenForComment = (
       } else if (attempts < maxAttempts) {
         setTimeout(checkElement, 100); // Try again after 100ms
       } else {
-        console.warn(
-          `Failed to find comment element after ${maxAttempts} attempts`,
-        );
+        // console.warn(
+        //   `Failed to find comment element after ${maxAttempts} attempts`,
+        // );
         reject(new Error('Comment element not found'));
       }
     };

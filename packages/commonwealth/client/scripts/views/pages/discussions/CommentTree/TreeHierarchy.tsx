@@ -6,6 +6,7 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -50,6 +51,7 @@ export const TreeHierarchy = ({
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
+  const { selectedModels } = useLocalAISettingsStore();
 
   const {
     data: paginatedComments,
@@ -75,25 +77,74 @@ export const TreeHierarchy = ({
 
   const handleGenerateAIReply = useCallback(
     (commentId: number): Promise<void> => {
-      if (streamingReplyIds.includes(commentId)) {
+      // Check if we're already streaming a reply for this comment
+      const isAlreadyStreaming = streamingReplyIds.some((reply) =>
+        typeof reply === 'number'
+          ? reply === commentId
+          : reply.commentId === commentId,
+      );
+
+      if (isAlreadyStreaming) {
         return Promise.resolve();
       }
 
+      // Check if this is a comment or the thread itself
       const comment = allComments.find((c) => c.id === commentId);
-      if (!comment) {
-        return Promise.resolve();
-      }
+      const isThreadId = commentId === thread.id;
 
-      setStreamingReplyIds((prev) => [...prev, commentId]);
+      // Use models from the store, or default to Claude if none selected
+      const modelsToUse =
+        selectedModels.length > 0
+          ? selectedModels.map((model) => model.value)
+          : ['anthropic/claude-3.5-sonnet'];
+
+      // Only create one streaming reply entry per model to prevent duplicates
+      // First, clear any existing streaming replies for this comment
+      setStreamingReplyIds((prev) =>
+        prev.filter((reply) =>
+          typeof reply === 'number'
+            ? reply !== commentId
+            : reply.commentId !== commentId,
+        ),
+      );
+
+      // Then add one entry for each selected model
+      modelsToUse.forEach((modelId) => {
+        setStreamingReplyIds((prev) => {
+          // Check if this model is already in the array for this comment
+          const alreadyExists = prev.some(
+            (reply) =>
+              typeof reply !== 'number' &&
+              reply.commentId === commentId &&
+              reply.modelId === modelId,
+          );
+
+          // Only add if it doesn't already exist
+          if (!alreadyExists) {
+            return [...prev, { commentId, modelId }];
+          }
+          return prev;
+        });
+      });
+
       return Promise.resolve();
     },
-    [allComments, streamingReplyIds],
+    [
+      allComments,
+      streamingReplyIds,
+      selectedModels,
+      setStreamingReplyIds,
+      thread.id,
+    ],
   );
 
   useEffect(() => {
-    const unregister = registerAIStreamingCallback((commentId) => {
+    // Define the callback function
+    const aiStreamingCallback = (commentId: number) => {
+      // console.log('AI streaming callback triggered for comment ID:', commentId);
       void handleGenerateAIReply(commentId);
-    });
+    }; // Register the callback
+    const unregister = registerAIStreamingCallback(aiStreamingCallback);
 
     return () => {
       unregister();
@@ -122,7 +173,12 @@ export const TreeHierarchy = ({
     return <CWCircleMultiplySpinner />;
   }
 
-  if (streamingReplyIds.includes(thread.id) && !parentCommentId) {
+  // Check if thread has a streaming reply using either format (number or object)
+  const isThreadStreaming = streamingReplyIds.some((id) =>
+    typeof id === 'number' ? id === thread.id : id.commentId === thread.id,
+  );
+
+  if (isThreadStreaming && !parentCommentId) {
     const tempRootComment = {
       id: thread.id,
       body: '',
@@ -141,26 +197,59 @@ export const TreeHierarchy = ({
     };
 
     return (
-      <div className="streaming-root-comment" key={`streaming-${thread.id}`}>
-        <CommentCard
-          comment={tempRootComment}
-          isStreamingAIReply={true}
-          isRootComment={true}
-          threadContext={thread.body}
-          onStreamingComplete={() => {
-            setStreamingReplyIds((prev) =>
-              prev.filter((id) => id !== thread.id),
+      <div className="streaming-root-comment">
+        {/* Find all streaming replies for this thread */}
+        {streamingReplyIds
+          .filter((id) =>
+            typeof id === 'number'
+              ? id === thread.id
+              : id.commentId === thread.id,
+          )
+          .map((streamingReply) => {
+            // Get model ID if it's a StreamingReplyData object
+            const modelId =
+              typeof streamingReply === 'number'
+                ? 'anthropic/claude-3.5-sonnet' // Default model
+                : streamingReply.modelId;
+
+            const modelLabel =
+              selectedModels.find((m) => m.value === modelId)?.label ||
+              modelId.split('/').pop() ||
+              'AI';
+
+            return (
+              <CommentCard
+                key={`streaming-${thread.id}-${modelId}`}
+                comment={{
+                  ...tempRootComment,
+                  modelName: modelLabel,
+                }}
+                isStreamingAIReply={true}
+                isRootComment={true}
+                threadContext={thread.body}
+                streamingModelId={modelId}
+                onStreamingComplete={() => {
+                  setStreamingReplyIds((prev) =>
+                    prev.filter((id) =>
+                      typeof id === 'number'
+                        ? id !== thread.id
+                        : !(
+                            id.commentId === thread.id && id.modelId === modelId
+                          ),
+                    ),
+                  );
+                }}
+                canReply={false}
+                canReact={false}
+                canEdit={false}
+                canDelete={false}
+                canToggleSpam={false}
+                shareURL=""
+                maxReplyLimitReached={false}
+                isThreadArchived={false}
+              />
             );
-          }}
-          canReply={false}
-          canReact={false}
-          canEdit={false}
-          canDelete={false}
-          canToggleSpam={false}
-          shareURL=""
-          maxReplyLimitReached={false}
-          isThreadArchived={false}
-        />
+          })}
       </div>
     );
   }
@@ -266,42 +355,81 @@ export const TreeHierarchy = ({
                     setStreamingReplyIds={setStreamingReplyIds}
                   />
                 )}
-                {streamingReplyIds.includes(comment.id) && (
+                {streamingReplyIds.some((id) =>
+                  typeof id === 'number'
+                    ? id === comment.id
+                    : id.commentId === comment.id,
+                ) && (
                   <div className="replies-container">
-                    <CommentCard
-                      key={`streaming-${comment.id}`}
-                      disabledActionsTooltipText={disabledActionsTooltipText}
-                      isThreadArchived={isThreadArchived}
-                      maxReplyLimitReached={true}
-                      replyBtnVisible={false}
-                      comment={{
-                        ...comment,
-                        id: comment.id,
-                        body: '',
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                        address: comment.address,
-                        comment_level: comment.comment_level + 1,
-                        thread_id: comment.thread_id,
-                        marked_as_spam_at: null,
-                        reaction_count: 0,
-                        reply_count: 0,
-                      }}
-                      isStreamingAIReply={true}
-                      parentCommentText={comment.body}
-                      threadContext={thread.body}
-                      onStreamingComplete={() => {
-                        setStreamingReplyIds((prev) =>
-                          prev.filter((id) => id !== comment.id),
+                    {/* Find all streaming replies for this comment */}
+                    {streamingReplyIds
+                      .filter((id) =>
+                        typeof id === 'number'
+                          ? id === comment.id
+                          : id.commentId === comment.id,
+                      )
+                      .map((streamingReply, index) => {
+                        // Get model ID if it's a StreamingReplyData object
+                        const modelId =
+                          typeof streamingReply === 'number'
+                            ? 'anthropic/claude-3.5-sonnet' // Default model
+                            : streamingReply.modelId;
+
+                        const modelLabel =
+                          selectedModels.find((m) => m.value === modelId)
+                            ?.label ||
+                          modelId.split('/').pop() ||
+                          'AI';
+
+                        return (
+                          <CommentCard
+                            key={`streaming-${comment.id}-${modelId}`}
+                            disabledActionsTooltipText={
+                              disabledActionsTooltipText
+                            }
+                            isThreadArchived={isThreadArchived}
+                            maxReplyLimitReached={true}
+                            replyBtnVisible={false}
+                            comment={{
+                              ...comment,
+                              id: comment.id,
+                              body: '',
+                              created_at: new Date().toISOString(),
+                              updated_at: new Date().toISOString(),
+                              address: comment.address,
+                              comment_level: comment.comment_level + 1,
+                              thread_id: comment.thread_id,
+                              marked_as_spam_at: null,
+                              reaction_count: 0,
+                              reply_count: 0,
+                              // Add model information as custom field
+                              modelName: modelLabel,
+                            }}
+                            isStreamingAIReply={true}
+                            parentCommentText={comment.body}
+                            threadContext={thread.body}
+                            streamingModelId={modelId}
+                            onStreamingComplete={() => {
+                              setStreamingReplyIds((prev) =>
+                                prev.filter((id) =>
+                                  typeof id === 'number'
+                                    ? id !== comment.id
+                                    : !(
+                                        id.commentId === comment.id &&
+                                        id.modelId === modelId
+                                      ),
+                                ),
+                              );
+                            }}
+                            canReply={false}
+                            canReact={false}
+                            canEdit={false}
+                            canDelete={false}
+                            canToggleSpam={false}
+                            shareURL=""
+                          />
                         );
-                      }}
-                      canReply={false}
-                      canReact={false}
-                      canEdit={false}
-                      canDelete={false}
-                      canToggleSpam={false}
-                      shareURL=""
-                    />
+                      })}
                   </div>
                 )}
                 {isReplyingToCommentId === comment.id && (

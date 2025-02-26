@@ -184,6 +184,8 @@ export const CreateComment = ({
       tooltipText={tooltipText}
       isReplying={isReplying}
       replyingToAuthor={replyingToAuthor}
+      rootThread={rootThread}
+      parentCommentId={parentCommentId}
     />
   ) : (
     <ArchiveMsg archivedAt={rootThread.archivedAt!} />

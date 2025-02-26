@@ -1,11 +1,21 @@
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
+
+export type AIModelOption = {
+  value: string;
+  label: string;
+  description?: string;
+  pricing?: any;
+};
+
 interface LocalAISettingsStore {
   aiInteractionsToggleEnabled: boolean;
   aiCommentsToggleEnabled: boolean;
+  selectedModels: AIModelOption[];
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
+  setSelectedModels: (models: AIModelOption[]) => void;
   updateFeatureFlags: (
     aiCommentsToggleEnabled: boolean,
     aiInteractionsToggleEnabled: boolean,
@@ -18,6 +28,7 @@ export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
       (set) => ({
         aiInteractionsToggleEnabled: false,
         aiCommentsToggleEnabled: false,
+        selectedModels: [],
         setAIInteractionsToggleEnabled: (enabled) => {
           set(() => {
             return {
@@ -30,6 +41,12 @@ export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
         setAICommentsToggleEnabled: (enabled) => {
           set(() => {
             return { aiCommentsToggleEnabled: enabled };
+          });
+        },
+
+        setSelectedModels: (models) => {
+          set(() => {
+            return { selectedModels: models };
           });
         },
 
@@ -50,7 +67,8 @@ export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
         partialize: (state) => ({
           aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
           aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
-        }), // persist only these states
+          selectedModels: state.selectedModels,
+        }), // persist these states
       },
     ),
   ),
