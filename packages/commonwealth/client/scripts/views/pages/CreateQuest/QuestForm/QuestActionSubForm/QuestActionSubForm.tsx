@@ -1,4 +1,3 @@
-import { QuestEvents } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { splitCamelOrPascalCase } from 'helpers/string';
@@ -18,7 +17,15 @@ const QuestActionSubForm = ({
   onChange,
   hiddenActions,
 }: QuestActionSubFormProps) => {
-  const actionOptions = Object.keys(QuestEvents)
+  const actionOptions = [
+    'SignUpFlowCompleted',
+    'CommunityCreated',
+    'CommunityJoined',
+    'ThreadCreated',
+    'ThreadUpvoted',
+    'CommentCreated',
+    'CommentUpvoted',
+  ]
     .map((event) => ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
@@ -104,17 +111,18 @@ const QuestActionSubForm = ({
       <div
         className={clsx(
           'grid-row',
-          config?.requires_comment_id || config?.requires_thread_id
+          config?.with_optional_comment_id || config?.with_optional_thread_id
             ? 'cols-2'
             : 'cols-1',
         )}
       >
-        {(config?.requires_comment_id || config?.requires_thread_id) && (
+        {(config?.with_optional_comment_id ||
+          config?.with_optional_thread_id) && (
           <CWTextInput
-            label={`${config?.requires_thread_id ? 'Thread' : 'Comment'} link`}
+            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
             name="contentLink"
             placeholder={
-              config?.requires_thread_id
+              config?.with_optional_thread_id
                 ? placeholders.sampleThreadLink
                 : placeholders.sampleCommentLink
             }
@@ -131,14 +139,16 @@ const QuestActionSubForm = ({
 
         <CWTextInput
           label="Instructions Link (optional)"
-          name="actionLink"
+          name="instructionsLink"
           placeholder="https://example.com"
           fullWidth
-          {...(defaultValues?.actionLink && {
-            defaultValue: defaultValues?.actionLink,
+          {...(defaultValues?.instructionsLink && {
+            defaultValue: defaultValues?.instructionsLink,
           })}
-          onInput={(e) => onChange?.({ actionLink: e?.target?.value?.trim() })}
-          customError={errors?.actionLink}
+          onInput={(e) =>
+            onChange?.({ instructionsLink: e?.target?.value?.trim() })
+          }
+          customError={errors?.instructionsLink}
         />
       </div>
     </div>

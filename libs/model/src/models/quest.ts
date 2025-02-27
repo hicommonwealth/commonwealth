@@ -72,7 +72,7 @@ export const QuestActionMeta = (
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      action_link: { type: Sequelize.STRING, allowNull: true },
+      instructions_link: { type: Sequelize.STRING, allowNull: true },
       content_id: { type: Sequelize.STRING, allowNull: true },
     },
     {

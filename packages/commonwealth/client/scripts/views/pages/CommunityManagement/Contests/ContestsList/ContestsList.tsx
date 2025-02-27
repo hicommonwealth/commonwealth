@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
+import ContestCard from 'views/components/ContestCard';
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
 import { ContestView } from '../types';
-import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
@@ -48,6 +48,13 @@ interface ContestsListProps {
   isContestAvailable: boolean;
   onSetContestView?: (type: ContestView) => void;
   displayAllRecurringContests?: boolean;
+  community?: {
+    id: string;
+    name: string;
+    iconUrl: string;
+    ethChainId: number;
+    chainNodeUrl: string;
+  };
 }
 
 const ContestsList = ({
@@ -57,6 +64,7 @@ const ContestsList = ({
   isContestAvailable,
   onSetContestView,
   displayAllRecurringContests = false,
+  community,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
   const farcasterContestEnabled = useFlag('farcasterContest');
@@ -109,6 +117,7 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={score || []}
+                  community={community}
                 />
               );
             } else {
@@ -136,6 +145,7 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={sc?.score || []}
+                  community={community}
                 />
               ));
             }

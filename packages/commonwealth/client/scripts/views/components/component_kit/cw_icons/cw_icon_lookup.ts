@@ -133,6 +133,8 @@ export const iconLookup = {
   arrowDownBlue500: Icons.CWArrowDownBlue500,
   arrowFatUp: Icons.CWArrowFatUp,
   arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
+  arrowUpHalfGreen: Icons.CWArrowUpHalfGreen,
+  arrowDownHalfOrange: Icons.CWArrowDownHalfOrange,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
   arrowClockwise: withPhosphorIcon(ArrowsClockwise),
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
