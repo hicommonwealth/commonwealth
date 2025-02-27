@@ -1,0 +1,241 @@
+@import '../../../styles/shared';
+
+.ContestCard {
+  max-width: 600px;
+  width: unset;
+  padding: 0;
+  position: relative;
+
+  &.isHorizontal {
+    flex-direction: row;
+    max-width: unset;
+
+    .contest-image {
+      border-radius: 5px 0 0 5px;
+      max-height: 240px;
+      max-width: 522px;
+    }
+
+    .contest-icon-container {
+      display: none;
+    }
+  }
+
+  .active-contest-tag {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+
+  .contest-image-container {
+    width: 100%;
+    padding: 12px;
+
+    .contest-image {
+      border-radius: 6px;
+      width: 100%;
+      max-height: 275px;
+      object-fit: cover;
+
+      @include extraSmall {
+        min-height: 195px;
+      }
+    }
+  }
+
+  .contest-body {
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    position: relative;
+
+    .header-row {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+
+      .header-row-left {
+        display: flex;
+        align-items: self-start;
+        gap: 8px;
+
+        & > .Text {
+          line-height: 1.2;
+        }
+      }
+
+      .contest-icon-container {
+        position: absolute;
+        background: $white;
+        border-radius: 50%;
+        right: 20px;
+        top: -30px;
+        width: 30px;
+        height: 30px;
+
+        .contest-icon {
+          width: 100%;
+          height: 100%;
+
+          &.common-icon {
+            padding: 2px;
+          }
+        }
+      }
+
+      .CWCountDownTimer {
+        margin-left: auto;
+      }
+
+      @include extraSmall {
+        flex-direction: column;
+        align-items: start;
+        gap: 8px;
+
+        .CWCountDownTimer {
+          margin-left: 0;
+        }
+      }
+    }
+
+    .topics {
+      color: $neutral-500;
+    }
+
+    .prizes-header {
+      font-size: 18px;
+      margin-block: 8px;
+      font-family: $font-family-silka;
+      font-weight: 600;
+    }
+
+    .prizes {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+      margin-bottom: 8px;
+
+      .prize-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        background-color: $neutral-50;
+        border: 1px solid $neutral-100;
+        padding: 8px 8px 4px;
+        border-radius: 6px;
+
+        .label {
+          color: $neutral-600;
+          font-family: $font-family-silka;
+          font-weight: 600;
+        }
+
+        .bold {
+          word-break: break-word;
+          font-family: $font-family-monospace;
+        }
+      }
+
+      .prize-row:nth-child(1) {
+        background-color: $yellow-300;
+        border: 1px solid $yellow-400;
+      }
+
+      .prize-row:nth-child(2) {
+        background-color: $neutral-200;
+        border: 1px solid $neutral-300;
+      }
+
+      .prize-row:nth-child(3) {
+        background-color: $rorange-200;
+        border: 1px solid $rorange-300;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+
+      @include extraSmall {
+        justify-content: space-between;
+        margin-top: 12px;
+
+        .ThreadAction {
+          .Text.caption {
+            display: none;
+          }
+
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+    }
+
+    .farcaster-cta {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding-block: 8px;
+      border: 1px solid $neutral-200;
+      border-radius: 6px;
+      margin-top: 8px;
+
+      &:not(:disabled):hover {
+        cursor: pointer;
+        background-color: $neutral-25;
+      }
+
+      &:not(:disabled):active {
+        cursor: pointer;
+        background-color: $neutral-50;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        filter: grayscale(1);
+      }
+
+      img {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+
+  .contest-footer {
+    padding-inline: 16px;
+    padding-bottom: 16px;
+    width: 100%;
+
+    .Divider {
+      margin-bottom: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+
+      @include extraSmall {
+        flex-direction: column;
+
+        .cta-btn,
+        .Button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

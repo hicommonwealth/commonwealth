@@ -109,16 +109,20 @@ const RewardsPage = () => {
 
         <div className="rewards-tab-container">
           <CWTabsRow>
-            {Object.values(TableType).map((type) => (
-              <CWTab
-                key={type}
-                label={type}
-                isSelected={tableTab === type}
-                onClick={() => {
-                  setTableTab(type);
-                }}
-              />
-            ))}
+            {Object.values(TableType).map((type) =>
+              type === TableType.XPEarnings && !xpEnabled ? (
+                <></>
+              ) : (
+                <CWTab
+                  key={type}
+                  label={type}
+                  isSelected={tableTab === type}
+                  onClick={() => {
+                    setTableTab(type);
+                  }}
+                />
+              ),
+            )}
           </CWTabsRow>
         </div>
 

@@ -1,0 +1,18 @@
+@import '../../../styles/shared';
+
+.UpdateQuest {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  .header {
+    .h2 {
+      color: $neutral-800 !important;
+    }
+
+    .b1 {
+      margin-top: 4px;
+      color: $neutral-600 !important;
+    }
+  }
+}

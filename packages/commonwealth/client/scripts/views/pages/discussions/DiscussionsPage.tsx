@@ -235,6 +235,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       ? prettyVoteWeight(
           formatDecimalToWei(voteBalance),
           topicObj!.weighted_voting,
+          topicObj!.vote_weight_multiplier || 1,
         )
       : '';
 

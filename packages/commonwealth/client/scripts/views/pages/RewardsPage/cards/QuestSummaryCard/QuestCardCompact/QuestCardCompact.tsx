@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -30,6 +32,11 @@ const QuestCardCompact = ({
     ? name.slice(0, MAX_CHARS_FOR_LABELS) + '...'
     : name;
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: typeof communityIdOrIsGlobal === 'string' ? communityIdOrIsGlobal : '',
+    enabled: typeof communityIdOrIsGlobal === 'string',
+  });
+
   return (
     <div
       role="button"
@@ -46,9 +53,19 @@ const QuestCardCompact = ({
             isNameTrimmed,
           )}
           <CWText type="caption">
-            {typeof communityIdOrIsGlobal === 'string'
-              ? `by ${communityIdOrIsGlobal}`
-              : `Global`}
+            {typeof communityIdOrIsGlobal === 'string' ? (
+              <>
+                by&nbsp;
+                <Link
+                  to={`/${communityIdOrIsGlobal}`}
+                  className="community-link"
+                >
+                  {community ? community.name : communityIdOrIsGlobal}
+                </Link>
+              </>
+            ) : (
+              `Global Quest`
+            )}
           </CWText>
           <CWCountDownTimer
             className="count-down"

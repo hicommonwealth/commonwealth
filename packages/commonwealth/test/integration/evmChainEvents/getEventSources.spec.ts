@@ -36,15 +36,14 @@ describe('getEventSources', () => {
       expect(result[ethChainId]).haveOwnProperty('rpc');
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
-        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
-      ).to.haveOwnProperty('abi');
-      expect(
-        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
-      ).to.haveOwnProperty('sources');
+        Array.isArray(
+          result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+        ),
+      ).to.be.true;
 
       if (ethChainId === String(cp.ValidChains.SepoliaBase)) {
         expect(
-          result[ethChainId].contracts[singleContestAddress].sources,
+          result[ethChainId].contracts[singleContestAddress],
         ).to.deep.equal([
           {
             eth_chain_id: parseInt(ethChainId),
@@ -60,7 +59,7 @@ describe('getEventSources', () => {
           },
         ]);
         expect(
-          result[ethChainId].contracts[recurringContestAddress].sources,
+          result[ethChainId].contracts[recurringContestAddress],
         ).to.deep.equal([
           {
             eth_chain_id: parseInt(ethChainId),

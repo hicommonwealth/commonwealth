@@ -1,23 +1,21 @@
 import {
+  EventHandler,
   logger,
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { chainEvents, events } from '@hicommonwealth/schemas';
 import { getCommunityUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
-import { DB } from '../../models';
+import { ZodBoolean } from 'zod';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
-export async function notifyCommunityStakeTrades(
-  models: DB,
-  event: z.infer<typeof events.ChainEventCreated>,
-) {
-  const { 1: namespaceAddress, 2: isBuy } = event.parsedArgs as z.infer<
-    typeof chainEvents.CommunityStakeTrade
-  >;
+export const notifyCommunityStakeTrades: EventHandler<
+  'CommunityStakeTrade',
+  ZodBoolean
+> = async ({ payload }) => {
+  const { namespace: namespaceAddress, isBuy } = payload.parsedArgs;
 
   const community = await models.Community.findOne({
     where: {
@@ -27,9 +25,11 @@ export async function notifyCommunityStakeTrades(
 
   if (!community) {
     // Could also be a warning if namespace was created outside of CW
-    log.error('Namespace could not be resolved to a community!', undefined, {
-      event,
-    });
+    log.error(
+      'Namespace could not be resolved to a community!',
+      undefined,
+      payload,
+    );
     return false;
   }
 
@@ -65,4 +65,4 @@ export async function notifyCommunityStakeTrades(
   }
 
   return true;
-}
+};

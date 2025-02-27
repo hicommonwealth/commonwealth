@@ -112,10 +112,7 @@ const tokenCommunityManagerSource: ContractSource = {
 
 const referralFeeManagerSource: ContractSource = {
   abi: referralFeeManager,
-  eventSignatures: [
-    EvmEventSignatures.Referrals.ReferralSet,
-    EvmEventSignatures.Referrals.FeeDistributed,
-  ],
+  eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
 /**

@@ -1,11 +1,16 @@
+import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { createEvmSigner } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
-  getTestSigner,
   sign,
   toCanvasSignedDataApiArgs,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
+
+export const getTestSigner = () => {
+  return new SIWESigner({ signer: createEvmSigner() });
+};
 
 export async function getSignersInfo(roles: readonly string[]): Promise<
   Array<{

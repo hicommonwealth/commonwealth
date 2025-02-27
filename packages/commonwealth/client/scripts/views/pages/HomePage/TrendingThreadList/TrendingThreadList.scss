@@ -3,6 +3,7 @@
 .TrendingThreadList {
   width: 100%;
   margin: 16px 0;
+  height: 450px;
 
   .heading-container {
     display: flex;
@@ -26,15 +27,13 @@
 
   .content {
     width: 100%;
-    height: 450px;
+    height: 100%;
     display: flex;
     gap: 15px;
     justify-content: start;
     margin: 10px 0;
-
-    @include extraSmall {
-      flex-direction: column;
-    }
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .empty-thread {
@@ -45,10 +44,11 @@
   }
 
   .virtuoso-grid-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    height: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
     gap: 15px;
-    justify-content: center;
+    justify-content: flex-start !important;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
@@ -56,8 +56,8 @@
   }
 
   .virtuoso-grid-list > div {
-    width: 100% !important;
-    max-width: 325px;
+    flex: 0 0 auto;
+    width: 325px !important;
     height: 280px !important;
   }
 }

@@ -8,6 +8,7 @@ import './QuestTask.scss';
 
 export type QuestTaskQuest = {
   id: number;
+  communityId?: string;
   imageURL: string;
   xpPoints: { total: number; gained: number };
   isCompleted: boolean;

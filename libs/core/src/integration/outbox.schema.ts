@@ -9,7 +9,6 @@ export const BaseOutboxProperties = z.object({
 });
 
 export const outboxEvents: Events[] = [
-  'ChainEventCreated',
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',
@@ -43,8 +42,14 @@ export const outboxEvents: Events[] = [
   'AddressOwnershipTransferred',
   'TwitterMomBotMentioned',
   'TwitterContestBotMentioned',
-  'TokenLaunched',
-  'TokenTraded',
+  'CommunityStakeTrade',
+  'NamespaceDeployed',
+  'NamespaceDeployedWithReferral',
+  'LaunchpadTokenCreated',
+  'LaunchpadTokenTraded',
+  'ReferralFeeDistributed',
+  'WalletLinked',
+  'SSOLinked',
 ] as const;
 
 export const Outbox = z.union(

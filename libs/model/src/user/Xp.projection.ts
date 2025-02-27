@@ -80,6 +80,7 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
+  content_id?: number, // thread or comment id
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -88,6 +89,12 @@ async function recordXpsForQuest(
 
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
+      if (action_meta.content_id) {
+        const parts = action_meta.content_id.split(':');
+        if (parts.length !== 2) continue;
+        if (parts[1] !== content_id?.toString()) continue;
+      }
+
       // get logged actions for this user and action meta
       const log = await models.XpLog.findAll({
         where: {
@@ -123,12 +130,15 @@ async function recordXpsForQuest(
       }
 
       // calculate xp points and log it
+      const x =
+        (action_meta.amount_multiplier ?? 0) > 0
+          ? action_meta.amount_multiplier!
+          : 1;
+      const reward_amount = Math.round(action_meta.reward_amount * x);
       const creator_xp_points = creator_user_id
-        ? Math.round(
-            action_meta.reward_amount * action_meta.creator_reward_weight,
-          )
+        ? Math.round(reward_amount * action_meta.creator_reward_weight)
         : undefined;
-      const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
+      const xp_points = reward_amount - (creator_xp_points ?? 0);
 
       const [, created] = await models.XpLog.findOrCreate({
         where: {
@@ -211,28 +221,28 @@ async function recordXpsForEvent(
   });
 }
 
+// automatic xp rewards: @dillchen should we softcode these in .env or db?
+const SignUpFlowCompletedReward = 20;
+const SignUpFlowCompletedReferrerRewardWeight = 0.2;
+const WalletLinkedReward = 10;
+const SSOLinkedReward = 10;
+
 export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
     inputs: schemas.QuestEvents,
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
-        // TODO: softcode reward amount and reward weight in some way similar to quests
-        const reward_amount = 20;
-        const creator_reward_weight = 0.2;
-
         const referee_address = await models.User.findOne({
           where: { id: payload.user_id },
         });
-        referee_address &&
-          referee_address.referred_by_address &&
-          (await recordXpsForEvent(
-            payload.user_id,
-            'SignUpFlowCompleted',
-            payload.created_at!,
-            reward_amount,
-            referee_address.referred_by_address,
-            creator_reward_weight,
-          ));
+        await recordXpsForEvent(
+          payload.user_id,
+          'SignUpFlowCompleted',
+          payload.created_at!,
+          SignUpFlowCompletedReward,
+          referee_address?.referred_by_address || undefined,
+          SignUpFlowCompletedReferrerRewardWeight,
+        );
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -281,11 +291,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           where: { id: payload.thread_id },
           include: [
             {
-              model: models.Thread,
-              attributes: ['community_id'],
-              required: true,
-            },
-            {
               model: models.Address,
               as: 'Address',
               attributes: ['address'],
@@ -302,6 +307,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           thread!.Address!.address,
+          thread!.id,
         );
       },
       CommentCreated: async ({ payload }) => {
@@ -344,6 +350,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           comment!.Address!.address,
+          comment!.id,
         );
       },
       UserMentioned: async () => {
@@ -390,25 +397,62 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
-      TokenLaunched: async ({ payload }) => {
-        const created_at = new Date(payload.block_timestamp);
+      LaunchpadTokenCreated: async ({ payload }) => {
+        const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
           { created_at },
-          'TokenLaunched',
+          'LaunchpadTokenCreated',
         );
         const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
-      TokenTraded: async ({ payload }) => {
+      LaunchpadTokenTraded: async ({ payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
         if (!user_id) return;
 
-        const created_at = new Date(payload.block_timestamp);
+        const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
           { created_at },
-          'TokenTraded',
+          'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
+      },
+      WalletLinked: async ({ payload }) => {
+        if (payload.new_user) {
+          await recordXpsForEvent(
+            payload.user_id,
+            'WalletLinked',
+            payload.created_at,
+            WalletLinkedReward,
+          );
+        } else {
+          const action_metas = await getQuestActionMetas(
+            payload,
+            'WalletLinked',
+          );
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.created_at,
+            action_metas,
+          );
+        }
+      },
+      SSOLinked: async ({ payload }) => {
+        if (payload.new_user) {
+          await recordXpsForEvent(
+            payload.user_id,
+            'SSOLinked',
+            payload.created_at,
+            SSOLinkedReward,
+          );
+        } else {
+          const action_metas = await getQuestActionMetas(payload, 'SSOLinked');
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.created_at,
+            action_metas,
+          );
+        }
       },
     },
   };

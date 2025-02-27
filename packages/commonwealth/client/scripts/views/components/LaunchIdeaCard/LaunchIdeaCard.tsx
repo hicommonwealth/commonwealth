@@ -43,6 +43,7 @@ const LaunchIdeaCard = ({
           <span className="ml-auto" />
           <div className="buttons">
             <CWButton
+              className="responsive-cw-button"
               iconLeft="brain"
               label="Randomize"
               onClick={() => onRandomizeClick?.(ideaPrompt)}
