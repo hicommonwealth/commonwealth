@@ -74,9 +74,11 @@ export function UpdateContestManagerFrameHashes(): Command<
           },
         );
 
-        // update contest manager frame hashes
-        contestManager.farcaster_frame_hashes = parent_hashes;
-        await contestManager.save();
+        if (!payload.webhooks_only) {
+          // update contest manager frame hashes
+          contestManager.farcaster_frame_hashes = parent_hashes;
+          await contestManager.save();
+        }
       });
     },
   };

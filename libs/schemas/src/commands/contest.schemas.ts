@@ -204,6 +204,7 @@ export const UpdateContestManagerFrameHashes = {
     contest_address: z.string(),
     frames_to_remove: z.array(z.string()).optional(),
     frames_to_add: z.array(z.string()).optional(),
+    webhooks_only: z.boolean().optional(),
   }),
   output: z.object({}),
 };
