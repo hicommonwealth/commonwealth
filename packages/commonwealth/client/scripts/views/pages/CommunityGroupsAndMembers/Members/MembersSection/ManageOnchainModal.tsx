@@ -84,7 +84,7 @@ export const ManageOnchainModal = ({
         }
       });
       if (refetch) refetch();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error upgrading members:', error);
       notifyError(error?.response?.data?.error || error.message);
     } finally {
@@ -176,6 +176,7 @@ export const ManageOnchainModal = ({
         <CWButton
           label="Confirm & Mint"
           buttonType="secondary"
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={updateAndMint}
           buttonHeight="sm"
           disabled={loading || !hasChanges}
