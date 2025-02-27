@@ -77,7 +77,7 @@ const Analytics = () => {
       });
     }
   }, [initialized]);
-
+  console.log('globalStats', globalStats);
   return (
     <div className="Analytics">
       {!initialized ? (
