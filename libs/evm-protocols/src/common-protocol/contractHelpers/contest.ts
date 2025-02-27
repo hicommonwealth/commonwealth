@@ -1,5 +1,6 @@
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
+import { getContract } from 'viem';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
 import { namespaceAbi } from '../../abis/namespaceAbi';
@@ -8,9 +9,11 @@ import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
+  EvmProtocolChain,
   createPrivateEvmClient,
   decodeParameters,
   estimateGas,
+  getPublicClient,
   getTransactionCount,
 } from '../utils';
 import { getNamespace } from './namespace';
@@ -115,17 +118,17 @@ export const getContestStatus = async (
 
 /**
  * Get the total balance of a given contest
- * @param rpcNodeUrl the rpc node url
+ * @param chain
  * @param contest the address of contest to get the balance of
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
  * @returns a numeric contest balance of the contestToken in wei(ie / 1e18 for decimal value)
  */
 export const getContestBalance = async (
-  rpcNodeUrl: string,
+  chain: EvmProtocolChain,
   contest: string,
   oneOff: boolean = false,
 ): Promise<string> => {
-  const web3 = new Web3(rpcNodeUrl);
+  const web3 = new Web3(chain.rpc);
 
   const contestInstance = new web3.eth.Contract(
     oneOff ? singleContestAbi : recurringContestAbi,
@@ -137,7 +140,7 @@ export const getContestBalance = async (
 
 /**
  * Gets vote and more information about winners of a given contest
- * @param rpcNodeUrl the rpc node url
+ * @param chain
  * @param contest the address of the contest
  * @param prizePercentage the prize percentage of the contest
  * @param payoutStructure the payout structure of the contest
@@ -147,25 +150,36 @@ export const getContestBalance = async (
  * @returns ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
-  rpcNodeUrl: string,
+  chain: EvmProtocolChain,
   contest: string,
   prizePercentage: number,
   payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
 ) => {
-  const web3 = new Web3(rpcNodeUrl);
-  const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
-    contest,
-  );
+  const client = getPublicClient(chain);
 
-  const contestData = await Promise.all([
-    contestId
-      ? contestInstance.methods.getPastWinners(contestId).call()
-      : contestInstance.methods.getWinnerIds().call(),
-    getContestBalance(rpcNodeUrl, contest, oneOff),
-  ]);
+  const promises = [];
+
+  let contestInstance;
+  if (oneOff) {
+    contestInstance = getContract({
+      address: contest as `0x${string}`,
+      abi: singleContestAbi,
+      client,
+    });
+    promises.push(contestInstance.read.getWinnerIds());
+  } else {
+    contestInstance = getContract({
+      address: contest as `0x${string}`,
+      abi: recurringContestAbi,
+      client,
+    });
+    promises.push(contestInstance.read.getPastWinners([BigInt(contestId!)]));
+  }
+  promises.push(getContestBalance(chain, contest, oneOff));
+
+  const contestData = await Promise.all(promises);
 
   const winnerIds: string[] = contestData[0] as string[];
 

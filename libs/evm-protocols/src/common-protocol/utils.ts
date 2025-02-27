@@ -1,16 +1,33 @@
+import { sepolia } from '@alchemy/aa-core';
 import {
   Abi,
+  Chain,
   ContractEventName,
   DecodeEventLogParameters,
   DecodeEventLogReturnType,
   Hex,
+  createPublicClient,
   decodeEventLog,
   getAddress,
+  http,
 } from 'viem';
 import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
+import {
+  anvil,
+  arbitrum,
+  base,
+  baseSepolia,
+  blast,
+  bsc,
+  linea,
+  mainnet,
+  optimism,
+  skaleCalypsoTestnet,
+} from 'viem/chains';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
+import { ValidChains } from './chainConfig';
 
 export type EvmClientType = Web3Type;
 
@@ -221,4 +238,30 @@ export const createEvmSigner = (
     signMessage: (message: string): Promise<string> =>
       account.signMessage({ message }),
   };
+};
+
+export const ViemChains: Record<ValidChains, Chain> = {
+  [ValidChains.Base]: base,
+  [ValidChains.SepoliaBase]: baseSepolia,
+  [ValidChains.Sepolia]: sepolia,
+  [ValidChains.Blast]: blast,
+  [ValidChains.Linea]: linea,
+  [ValidChains.Optimism]: optimism,
+  [ValidChains.Mainnet]: mainnet,
+  [ValidChains.Arbitrum]: arbitrum,
+  [ValidChains.BSC]: bsc,
+  [ValidChains.Anvil]: anvil,
+  [ValidChains.SKALE_TEST]: skaleCalypsoTestnet,
+};
+
+export type EvmProtocolChain = {
+  eth_chain_id: ValidChains;
+  rpc: string;
+};
+
+export const getPublicClient = (chain: EvmProtocolChain) => {
+  return createPublicClient({
+    chain: ViemChains[chain.eth_chain_id],
+    transport: http(chain.rpc),
+  });
 };
