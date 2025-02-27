@@ -50,3 +50,21 @@
     margin: 24px auto;
   }
 }
+
+.Table {
+  table {
+    tbody {
+      tr {
+        td {
+          vertical-align: middle;
+        }
+
+        td:nth-child(2) {
+          div .Text {
+            color: $primary-500 !important;
+          }
+        }
+      }
+    }
+  }
+}
