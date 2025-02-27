@@ -130,8 +130,12 @@ const QuestDetails = ({ id }: { id: number }) => {
     actionContentId?: string,
   ) => {
     switch (actionName) {
-      case 'SignUpFlowCompleted': {
-        !user?.isLoggedIn && setAuthModalType(AuthModalType.CreateAccount);
+      case 'WalletLinked': {
+        setAuthModalType(AuthModalType.CreateAccount);
+        break;
+      }
+      case 'SSOLinked': {
+        setAuthModalType(AuthModalType.CreateAccount);
         break;
       }
       case 'CommunityCreated': {
@@ -385,12 +389,6 @@ const QuestDetails = ({ id }: { id: number }) => {
                   isActionCompleted={
                     !!xpProgressions.find((p) => p.action_meta_id === action.id)
                   }
-                  {...(user?.isLoggedIn &&
-                    action.event_name === 'SignUpFlowCompleted' && {
-                      isActionInEligible: true,
-                      inEligibilityReason:
-                        'You are already signed up with Common',
-                    })}
                   canStartAction={isStarted && !isEnded}
                   {...((!isStarted || isEnded) && {
                     actionStartBlockedReason: !isStarted
