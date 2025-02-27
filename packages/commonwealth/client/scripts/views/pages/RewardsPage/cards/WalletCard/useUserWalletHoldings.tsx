@@ -41,9 +41,6 @@ const useUserWalletHoldings = ({
       tokenSymbols: (tokenMetadatas || []).map((x) => x.symbol),
       enabled: (tokenMetadatas || []).length > 0,
     });
-  const tokensHavingRateConversions = (tokenToUsdDates || []).map(
-    (x) => x.symbol,
-  );
 
   // get eth to usd rate
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
@@ -59,17 +56,37 @@ const useUserWalletHoldings = ({
     .map((t) => {
       return {
         ...t,
-        balance: parseFloat(
-          tokenBalances?.tokenBalances.find(
-            (b) => b.contractAddress === t.tokenId,
-          )?.tokenBalance || '0.',
-        ),
+        balance: (() => {
+          const tempBalance = parseFloat(
+            tokenBalances?.tokenBalances.find(
+              (b) => b.contractAddress === t.tokenId,
+            )?.tokenBalance || '0.',
+          );
+
+          // convert the balance to the decimals that the token is meant to
+          // be represented in. The `tokenBalances` represents tokens in the
+          // smallest possible unit
+          if (t.decimals !== 18) {
+            return tempBalance * Math.pow(10, 18 - t.decimals);
+          }
+
+          return tempBalance;
+        })(),
         toUsdPerUnitRate:
           (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.amount ||
           null,
       };
     })
-    .filter((t) => t.name && tokensHavingRateConversions.includes(t.symbol));
+    .filter(
+      (t) =>
+        // some tokens don't have a name
+        t.name &&
+        // hiding tokens that don't showup in user wallet ex:
+        // - `name="NEIRO",symbol="Visit getneirocoin.xyz to Claim"`
+        // - `name="Venice Token",symbol="Claim: venice-claim.com"`
+        // and more. Filtering by a `.` as these usually have a domain name in symbol
+        !(t.name + t.symbol).includes('.'),
+    );
 
   // get combined usd holding value of all the tokens user has
   const userCombinedUSDBalance = userTokens.reduce((total, token) => {
