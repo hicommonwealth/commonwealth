@@ -1,8 +1,11 @@
 import { sepolia } from '@alchemy/aa-core';
+import { AbiParametersToPrimitiveTypes, ExtractAbiFunction } from 'abitype';
 import {
   Abi,
+  AbiParameterToPrimitiveType,
   Chain,
   ContractEventName,
+  ContractFunctionName,
   DecodeEventLogParameters,
   DecodeEventLogReturnType,
   Hex,
@@ -265,3 +268,34 @@ export const getPublicClient = (chain: EvmProtocolChain) => {
     transport: http(chain.rpc),
   });
 };
+
+export type MappedArgs<
+  abi extends Abi,
+  functionName extends ContractFunctionName<abi>,
+> = {
+  [K in ExtractAbiFunction<abi, functionName>['outputs'][number] as NonNullable<
+    K['name']
+  >]: AbiParameterToPrimitiveType<K, 'outputs'>;
+};
+
+export function mapToAbiRes<
+  abi extends Abi,
+  functionName extends ContractFunctionName<abi>,
+  abiFunction extends ExtractAbiFunction<abi, functionName>,
+  args extends AbiParametersToPrimitiveTypes<abiFunction['outputs']>,
+>(
+  abi: abi,
+  functionName: functionName,
+  args: args,
+): MappedArgs<abi, functionName> {
+  const output = abi
+    .find(
+      (item): item is abiFunction =>
+        item.type === 'function' && item.name === functionName,
+    )!
+    .outputs.reduce((acc, output, index) => {
+      acc[(output.name as keyof args) || index] = args[index];
+      return acc;
+    }, {} as any);
+  return output;
+}

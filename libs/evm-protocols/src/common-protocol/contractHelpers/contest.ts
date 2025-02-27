@@ -7,16 +7,18 @@ import {
 } from '@commonxyz/common-protocol-abis';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { getContract } from 'viem';
+import { GetContractReturnType, getContract } from 'viem';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
   EvmProtocolChain,
+  MappedArgs,
   createPrivateEvmClient,
   decodeParameters,
   estimateGas,
   getPublicClient,
   getTransactionCount,
+  mapToAbiRes,
 } from '../utils';
 import { getNamespace } from './namespace';
 
@@ -162,29 +164,34 @@ export const getContestScore = async (
 ) => {
   const client = getPublicClient(chain);
 
-  const promises = [];
-
-  let contestInstance;
+  let contestIdsPromise: Promise<readonly bigint[]>;
+  let contestInstance:
+    | GetContractReturnType<typeof ContestGovernorAbi, typeof client>
+    | GetContractReturnType<typeof ContestGovernorSingleAbi, typeof client>;
   if (oneOff) {
     contestInstance = getContract({
       address: contest as `0x${string}`,
-      abi: singleContestAbi,
+      abi: ContestGovernorSingleAbi,
       client,
     });
-    promises.push(contestInstance.read.getWinnerIds());
+    contestIdsPromise = contestInstance.read.getWinnerIds();
   } else {
     contestInstance = getContract({
       address: contest as `0x${string}`,
-      abi: recurringContestAbi,
+      abi: ContestGovernorAbi,
       client,
     });
-    promises.push(contestInstance.read.getPastWinners([BigInt(contestId!)]));
+    contestIdsPromise = contestInstance.read.getPastWinners([
+      BigInt(contestId!),
+    ]);
   }
-  promises.push(getContestBalance(chain, contest, oneOff));
 
-  const contestData = await Promise.all(promises);
+  const contestData = await Promise.all([
+    contestIdsPromise,
+    getContestBalance(chain, contest, oneOff),
+  ]);
 
-  const winnerIds: string[] = contestData[0] as string[];
+  const winnerIds = contestData[0];
 
   if (winnerIds.length == 0) {
     console.warn(
@@ -193,12 +200,16 @@ export const getContestScore = async (
     return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const votePromises: any[] = [];
+  const votePromises: Promise<
+    MappedArgs<typeof ContestGovernorAbi, 'content'>
+  >[] = [];
   winnerIds.forEach((w) => {
-    votePromises.push(contestInstance.methods.content(w).call());
+    votePromises.push(
+      contestInstance.read.content([w]).then((res) => {
+        return mapToAbiRes(ContestGovernorAbi, 'content', res);
+      }),
+    );
   });
-
   const contentMeta = await Promise.all(votePromises);
 
   const scores = winnerIds.map((v, i) => {
