@@ -56,11 +56,22 @@ const useUserWalletHoldings = ({
     .map((t) => {
       return {
         ...t,
-        balance: parseFloat(
-          tokenBalances?.tokenBalances.find(
-            (b) => b.contractAddress === t.tokenId,
-          )?.tokenBalance || '0.',
-        ),
+        balance: (() => {
+          const tempBalance = parseFloat(
+            tokenBalances?.tokenBalances.find(
+              (b) => b.contractAddress === t.tokenId,
+            )?.tokenBalance || '0.',
+          );
+
+          // convert the balance to the decimals that the token is meant to
+          // be represented in. The `tokenBalances` represents tokens in the
+          // smallest possible unit
+          if (t.decimals !== 18) {
+            return tempBalance * Math.pow(10, 18 - t.decimals);
+          }
+
+          return tempBalance;
+        })(),
         toUsdPerUnitRate:
           (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.amount ||
           null,
