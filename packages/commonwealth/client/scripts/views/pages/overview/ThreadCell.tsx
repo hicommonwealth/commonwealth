@@ -1,5 +1,5 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { ProposalType, slugify } from '@hicommonwealth/shared';
+import { slugify } from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
@@ -22,7 +22,12 @@ import { ToggleThreadSubscribe } from '../discussions/ThreadCard/ThreadOptions/T
 import { isHot, removeImageFormMarkDown } from '../discussions/helpers';
 
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import {
+  getScopePrefix,
+  useCommonNavigate,
+} from 'client/scripts/navigation/helpers';
 import { Memberships } from 'client/scripts/state/api/groups/refreshMembership';
+import { Link } from 'react-router-dom';
 import './ThreadCell.scss';
 
 type TopicPermission = { id: number; permissions: PermissionEnum[] };
@@ -94,18 +99,20 @@ const ThreadCell = ({
   const threadBody = removeImageFormMarkDown(thread.body);
 
   const discussionLink = getProposalUrlPath(
-    ProposalType.Thread,
-    `${thread?.id}-${slugify(thread?.title)}`,
-    false,
-    thread?.communityId,
+    thread.slug,
+    `${thread.identifier}-${slugify(thread.title)}`,
   );
+
   const shareEndpoint = `${window.location.origin}${discussionLink}`;
   const { data: fetchedCommunity } = useGetCommunityByIdQuery({
     id: thread.communityId,
     enabled: !!thread.communityId,
   });
+  const threadUrl = `${getScopePrefix()}${discussionLink}`;
+  const navigate = useCommonNavigate();
+  const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   return (
-    <div className="ThreadCell">
+    <Link className="ThreadCell" to={threadUrl}>
       <div className="card-image-container">
         <ReactionButton
           thread={thread}
@@ -161,6 +168,7 @@ const ThreadCell = ({
               disabled={false}
               onClick={(e) => {
                 e.preventDefault();
+                navigate(`${discussionLink}?focusComments=true`);
               }}
               tooltipText="comment"
             />
@@ -168,13 +176,14 @@ const ThreadCell = ({
             {user.id > 0 && (
               <ToggleThreadSubscribe
                 thread={thread}
-                isCommunityMember={false}
+                isCommunityMember={isCommunityMember}
+                showLabel={false}
               />
             )}
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

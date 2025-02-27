@@ -54,12 +54,14 @@
 .Table {
   table {
     tbody {
-      .data-container {
-        font-size: 12px;
-        a {
-          .Text {
-            color: $primary-500;
-            font-size: 12px;
+      tr {
+        td {
+          vertical-align: middle;
+        }
+
+        td:nth-child(2) {
+          div .Text {
+            color: $primary-500 !important;
           }
         }
       }

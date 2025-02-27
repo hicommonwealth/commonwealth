@@ -7,7 +7,6 @@ import useUserStore from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -15,7 +14,6 @@ import { CWTable } from '../../components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import '../discussions/DiscussionsPage.scss';
-import { PageLoading } from '../loading';
 import ThreadCell from './ThreadCell';
 import './index.scss';
 
@@ -65,7 +63,7 @@ const OverviewPage = ({
   });
 
   const filterList = useMemo(() => {
-    let newData = recentlyActiveThreads || []; // Start with full data
+    let newData = recentlyActiveThreads || [];
 
     if (topicId) {
       newData = newData.filter((thread) => thread.topic.id === topicId);
@@ -101,7 +99,7 @@ const OverviewPage = ({
             );
 
           case ThreadFeaturedFilterTypes.MostLikes:
-            return (b.reactionCount ?? 0) - (a.reactionCount ?? 0);
+            return (b.reactionWeightsSum ?? 0) - (a.reactionWeightsSum ?? 0);
 
           case ThreadFeaturedFilterTypes.MostComments:
             return (b.numberOfComments ?? 0) - (a.numberOfComments ?? 0);
@@ -120,7 +118,6 @@ const OverviewPage = ({
 
     return newData;
   }, [topicId, featuredFilter, recentlyActiveThreads, timelineFilter]);
-
   const columns: CWTableColumnInfo[] = [
     {
       key: 'title',
@@ -142,6 +139,7 @@ const OverviewPage = ({
       numeric: false,
       sortable: true,
     },
+
     {
       key: 'viewCount',
       header: 'Views',
@@ -155,8 +153,8 @@ const OverviewPage = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  return !recentlyActiveThreads?.length ? (
-    <PageLoading />
+  return !filterList?.length ? (
+    <CWText type="b1">There are no threads matching your filter</CWText>
   ) : (
     <div className="OverviewPage">
       <CWTable
@@ -166,7 +164,7 @@ const OverviewPage = ({
             sortValue: thread.createdAt,
             customElement: (
               <div className="createdAt">
-                <CWText fontWeight="regular">
+                <CWText fontWeight="regular" type="b2">
                   {moment(thread.createdAt)
                     .utc?.()
                     ?.local?.()
@@ -177,25 +175,22 @@ const OverviewPage = ({
           },
           title: {
             customElement: (
-              <>
-                <ThreadCell
-                  thread={thread}
-                  memberships={memberships}
-                  topicPermissions={topicPermissions}
-                />
-              </>
+              <ThreadCell
+                thread={thread}
+                memberships={memberships}
+                topicPermissions={topicPermissions}
+              />
             ),
           },
           topic: {
             customElement: (
-              <Link
-                key={thread.topic.name}
-                to={`${window.location.pathname}/${thread.topic.name}`}
+              <div
+                onClick={() => navigate(`/discussions/${thread.topic.name}`)}
               >
-                <CWText className="collaborator-user-name">
+                <CWText fontWeight="regular" type="b2">
                   {thread.topic.name}
                 </CWText>
-              </Link>
+              </div>
             ),
           },
         }))}
