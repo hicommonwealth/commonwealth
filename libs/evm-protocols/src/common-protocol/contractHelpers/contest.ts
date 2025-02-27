@@ -7,7 +7,7 @@ import {
 } from '@commonxyz/common-protocol-abis';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { GetContractReturnType, getContract } from 'viem';
+import { getContract } from 'viem';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
@@ -183,31 +183,16 @@ export const getContestScore = async (
     }[]
 > => {
   const client = getPublicClient(chain);
-
-  let contestIdsPromise: Promise<readonly bigint[]>;
-  let contestInstance:
-    | GetContractReturnType<typeof ContestGovernorAbi, typeof client>
-    | GetContractReturnType<typeof ContestGovernorSingleAbi, typeof client>;
-  if (oneOff) {
-    contestInstance = getContract({
-      address: contest as `0x${string}`,
-      abi: ContestGovernorSingleAbi,
-      client,
-    });
-    contestIdsPromise = contestInstance.read.getWinnerIds();
-  } else {
-    contestInstance = getContract({
-      address: contest as `0x${string}`,
-      abi: ContestGovernorAbi,
-      client,
-    });
-    contestIdsPromise = contestInstance.read.getPastWinners([
-      BigInt(contestId!),
-    ]);
-  }
+  const contestInstance = getContract({
+    address: contest as `0x${string}`,
+    abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
+    client,
+  });
 
   const { 0: winnerIds, 1: contestBalance } = await Promise.all([
-    contestIdsPromise,
+    oneOff
+      ? contestInstance.read.getWinnerIds()
+      : contestInstance.read.getPastWinners([BigInt(contestId!)]),
     getContestBalance(chain, contest, oneOff),
   ]);
 
