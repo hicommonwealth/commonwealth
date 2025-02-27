@@ -6,7 +6,6 @@ import {
   getContestScore,
   getContestStatus,
   getTokenAttributes,
-  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
@@ -87,7 +86,7 @@ async function updateOrCreateWithAlert(
   );
 
   const { startTime, endTime } = await getContestStatus(
-    url,
+    { rpc: url, eth_chain_id: ethChainId },
     contest_address,
     isOneOff,
   );
@@ -222,7 +221,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    mustBeProtocolChainId(details.eth_chain_id);
+    cp.mustBeProtocolChainId(details.eth_chain_id);
 
     const score = await getContestScore(
       { eth_chain_id: details.eth_chain_id, rpc: details.url },

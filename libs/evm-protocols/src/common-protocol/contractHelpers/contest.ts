@@ -83,13 +83,13 @@ export const getTotalContestBalance = async (
 
 /**
  * Gets relevant contest state information
- * @param rpcNodeUrl the rpc node url
+ * @param chain
  * @param contest the address of the contest
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
  * @returns Contest Status object
  */
 export const getContestStatus = async (
-  rpcNodeUrl: string,
+  chain: EvmProtocolChain,
   contest: string,
   oneOff: boolean = false,
 ): Promise<{
@@ -98,20 +98,33 @@ export const getContestStatus = async (
   contestInterval: number;
   lastContentId: string;
 }> => {
-  const web3 = new Web3(rpcNodeUrl);
-  const contestInstance = new web3.eth.Contract(
-    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
-    contest,
-  );
+  const client = getPublicClient(chain);
+  const contract = {
+    address: contest as `0x${string}`,
+    abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
+  };
 
-  const promise = await Promise.all([
-    contestInstance.methods.startTime().call(),
-    contestInstance.methods.endTime().call(),
-    oneOff
-      ? contestInstance.methods.contestLength().call()
-      : contestInstance.methods.contestInterval().call(),
-    contestInstance.methods.currentContentId().call(),
-  ]);
+  const promise = await client.multicall({
+    contracts: [
+      {
+        ...contract,
+        functionName: 'startTime',
+      },
+      {
+        ...contract,
+        functionName: 'endTime',
+      },
+      {
+        ...contract,
+        functionName: 'currentContentId',
+      },
+      {
+        ...contract,
+        functionName: oneOff ? 'contestLength' : 'contestInterval',
+      },
+    ],
+    allowFailure: false,
+  });
 
   return {
     startTime: Number(promise[0]),
