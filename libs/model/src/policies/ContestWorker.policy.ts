@@ -210,6 +210,7 @@ const rolloverContests = async () => {
     throw new ServerError('WEB3 private key not set!');
 
   const activeContestManagersPassedEndTime = await models.sequelize.query<{
+    eth_chain_id: number;
     contest_address: string;
     interval: number;
     prize_percentage: number;
@@ -221,6 +222,7 @@ const rolloverContests = async () => {
   }>(
     `
 SELECT
+  cn.eth_chain_id,
   cm.contest_address,
   cm.interval,
   coalesce(cm.prize_percentage, 0) as prize_percentage,
@@ -254,6 +256,7 @@ FROM
   const promiseResults = await Promise.allSettled(
     activeContestManagersPassedEndTime.map(
       async ({
+        eth_chain_id,
         url,
         private_url,
         contest_address,
@@ -267,6 +270,7 @@ FROM
         await command(SetContestEnded(), {
           actor: systemActor({}),
           payload: {
+            eth_chain_id,
             contest_address,
             contest_id,
             prize_percentage,

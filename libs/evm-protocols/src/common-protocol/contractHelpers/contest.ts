@@ -161,7 +161,15 @@ export const getContestScore = async (
   payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-) => {
+): Promise<
+  | []
+  | {
+      content_id: string;
+      creator_address: string;
+      votes: string;
+      prize: string;
+    }[]
+> => {
   const client = getPublicClient(chain);
 
   let contestIdsPromise: Promise<readonly bigint[]>;

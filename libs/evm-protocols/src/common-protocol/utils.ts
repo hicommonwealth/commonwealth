@@ -299,3 +299,11 @@ export function mapToAbiRes<
     }, {} as any);
   return output;
 }
+
+export function mustBeProtocolChainId(
+  ethChainId: number,
+): asserts ethChainId is ValidChains {
+  if (!Object.values(ValidChains).includes(ethChainId)) {
+    throw new Error(`${ethChainId} is not a valid protocol eth chain id`);
+  }
+}
