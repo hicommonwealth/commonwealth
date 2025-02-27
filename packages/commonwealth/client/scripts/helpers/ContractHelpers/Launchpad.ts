@@ -1,9 +1,8 @@
 import {
-  commonProtocol as cp,
-  erc20Abi,
-  launchpadFactoryAbi,
-  lpBondingCurveAbi,
-} from '@hicommonwealth/evm-protocols';
+  LaunchpadAbi,
+  LPBondingCurveAbi,
+} from '@commonxyz/common-protocol-abis';
+import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
@@ -11,7 +10,7 @@ import ContractBase from './ContractBase';
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
   launchpadFactoryAddress: string;
-  launchpadFactory: Contract<typeof launchpadFactoryAbi>;
+  launchpadFactory: Contract<typeof LaunchpadAbi>;
   tokenCommunityManager: string;
 
   constructor(
@@ -21,7 +20,7 @@ class LaunchpadBondingCurve extends ContractBase {
     tokenCommunityManager: string,
     rpc: string,
   ) {
-    super(bondingCurveAddress, lpBondingCurveAbi, rpc);
+    super(bondingCurveAddress, LPBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.tokenCommunityManager = tokenCommunityManager;
@@ -33,7 +32,7 @@ class LaunchpadBondingCurve extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     this.launchpadFactory = new this.web3.eth.Contract(
-      launchpadFactoryAbi,
+      LaunchpadAbi,
       this.launchpadFactoryAddress,
     );
   }

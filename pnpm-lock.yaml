@@ -13,6 +13,9 @@ importers:
 
   .:
     dependencies:
+      '@commonxyz/common-protocol-abis':
+        specifier: 1.4.7
+        version: 1.4.7
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -3086,6 +3089,9 @@ packages:
 
   '@coinbase/wallet-sdk@4.0.4':
     resolution: {integrity: sha512-74c040CRnGhfRjr3ArnkAgud86erIqdkPHNt5HR1k9u97uTIZCJww9eGYT67Qf7gHPpGS/xW8Be1D4dvRm63FA==}
+
+  '@commonxyz/common-protocol-abis@1.4.7':
+    resolution: {integrity: sha512-U2SDjgachCwtaCOX0BKNqTaOBMGQxuTRNwmpSldJPnn8cuQojEPu4nUTB0ZMf1btUghEVXKOePe0bqjapZtYsg==}
 
   '@confio/ics23@0.6.8':
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
@@ -13579,6 +13585,7 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.includes@4.3.0:
     resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
@@ -22496,6 +22503,8 @@ snapshots:
       keccak: 3.0.4
       preact: 10.23.2
       sha.js: 2.4.11
+
+  '@commonxyz/common-protocol-abis@1.4.7': {}
 
   '@confio/ics23@0.6.8':
     dependencies:
