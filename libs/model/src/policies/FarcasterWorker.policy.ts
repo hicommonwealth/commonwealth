@@ -185,7 +185,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             include: [
               {
                 model: models.ChainNode.scope('withPrivateData'),
-                required: false,
+                required: true,
               },
             ],
           },
