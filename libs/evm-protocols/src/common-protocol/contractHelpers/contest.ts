@@ -12,7 +12,6 @@ import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
   EvmProtocolChain,
-  MappedArgs,
   createPrivateEvmClient,
   decodeParameters,
   estimateGas,
@@ -207,12 +206,10 @@ export const getContestScore = async (
     ]);
   }
 
-  const contestData = await Promise.all([
+  const { 0: winnerIds, 1: contestBalance } = await Promise.all([
     contestIdsPromise,
     getContestBalance(chain, contest, oneOff),
   ]);
-
-  const winnerIds = contestData[0];
 
   if (winnerIds.length == 0) {
     console.warn(
@@ -221,26 +218,37 @@ export const getContestScore = async (
     return [];
   }
 
-  const votePromises: Promise<
-    MappedArgs<typeof ContestGovernorAbi, 'content'>
-  >[] = [];
-  winnerIds.forEach((w) => {
-    votePromises.push(
-      contestInstance.read.content([w]).then((res) => {
-        return mapToAbiRes(ContestGovernorAbi, 'content', res);
-      }),
-    );
+  const contract = {
+    address: contest as `0x${string}`,
+    abi: ContestGovernorAbi,
+    functionName: 'content',
+  } as const;
+  const multicallContracts: {
+    address: `0x${string}`;
+    abi: typeof ContestGovernorAbi;
+    functionName: 'content';
+    args: [BigInt];
+  }[] = winnerIds.map((w) => ({
+    ...contract,
+    args: [w],
+  }));
+  const contentMeta = await client.multicall({
+    contracts: multicallContracts,
+    allowFailure: false,
   });
-  const contentMeta = await Promise.all(votePromises);
 
   const scores = winnerIds.map((v, i) => {
+    const parsedMeta = mapToAbiRes(
+      ContestGovernorAbi,
+      'content',
+      contentMeta[i],
+    );
     return {
       winningContent: v,
-      winningAddress: contentMeta[i]['creator'],
-      voteCount: contentMeta[i]['cumulativeVotes'],
+      winningAddress: parsedMeta.creator,
+      voteCount: parsedMeta.cumulativeVotes,
     };
   });
-  const contestBalance = contestData[1];
 
   let prizePool =
     (BigInt(contestBalance) *
