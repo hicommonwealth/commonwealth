@@ -1,4 +1,4 @@
-import { ContestGovernor as contestAbi } from '@commonxyz/common-protocol-abis';
+import { ContestGovernorAbi } from '@commonxyz/common-protocol-abis';
 import { commonProtocol, erc20Abi } from '@hicommonwealth/evm-protocols';
 
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
@@ -13,7 +13,7 @@ class Contest extends ContractBase {
   namespaceFactory: NamespaceFactory;
 
   constructor(contractAddress: string, factoryAddress: string, rpc: string) {
-    super(contractAddress, contestAbi, rpc);
+    super(contractAddress, ContestGovernorAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
   }
 

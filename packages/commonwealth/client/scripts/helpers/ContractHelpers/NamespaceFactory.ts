@@ -1,7 +1,7 @@
 import {
-  INamespace as namespaceAbi,
-  NamespaceFactory as namespaceFactoryAbi,
-  INamespaceResHook as reservationHookAbi,
+  INamespaceAbi,
+  INamespaceResHookAbi,
+  NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
@@ -18,7 +18,7 @@ class NamespaceFactory extends ContractBase {
    * @param factoryAddress the address of the active factory to use
    */
   constructor(factoryAddress: string, rpc: string) {
-    super(factoryAddress, namespaceFactoryAbi, rpc);
+    super(factoryAddress, NamespaceFactoryAbi, rpc);
   }
 
   /**
@@ -33,7 +33,7 @@ class NamespaceFactory extends ContractBase {
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
-        reservationHookAbi,
+        INamespaceResHookAbi,
         addr,
       );
     }
@@ -435,7 +435,7 @@ class NamespaceFactory extends ContractBase {
     }
     const namespaceAddr = await this.getNamespaceAddress(namespace);
     const namespaceContract = new this.web3.eth.Contract(
-      namespaceAbi,
+      INamespaceAbi,
       namespaceAddr,
     );
     const balance = await namespaceContract.methods

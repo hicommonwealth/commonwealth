@@ -1,4 +1,3 @@
-import { CommunityStake as communityStakesAbi } from '@commonxyz/common-protocol-abis';
 import { toBigInt } from 'web3-utils';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -21,7 +20,7 @@ class CommunityStakes extends ContractBase {
     rpc: string,
     chainId?: string,
   ) {
-    super(contractAddress, communityStakesAbi, rpc);
+    super(contractAddress, CommunityStakeAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
     this.chainId = chainId;
   }
