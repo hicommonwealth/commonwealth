@@ -80,7 +80,6 @@ export async function getVotingWeight(
       topic.vote_weight_multiplier!,
     );
     if (numTokens === BigInt(0)) {
-      // if the weighted value is not at least a full token, reject the action
       throw new InvalidState('Insufficient token balance');
     }
     return numTokens;

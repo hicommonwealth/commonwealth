@@ -17,6 +17,7 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import NewContestPage from './NewContestPage';
 
+import { trpc } from 'client/scripts/utils/trpcClient';
 import './ContestPage.scss';
 
 export enum SortType {
@@ -49,6 +50,20 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const newContestPageEnabled = useFlag('newContestPage');
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
+
+  const [{ data: communityData }] = trpc.useQueries((t) =>
+    [contest!.community_id].map((id) =>
+      t.community.getCommunity({ id: id!, include_node_info: true }),
+    ),
+  );
+
+  const community = {
+    name: communityData?.name || '',
+    iconUrl: communityData?.icon_url || '',
+    chainNodeUrl: communityData?.ChainNode?.url || '',
+    ethChainId: communityData?.ChainNode?.eth_chain_id || 0,
+    id: communityData?.id || '',
+  };
 
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
@@ -99,6 +114,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
             onFund={() => setFundDrawerContest(contest)}
+            community={community}
           />
         )}
 

@@ -19,6 +19,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
+import { parseFarcasterContentUrl } from './farcasterUtils';
 
 const log = logger(import.meta);
 
@@ -80,13 +81,17 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 export function decodeThreadContentUrl(contentUrl: string): {
   communityId: string | null;
   threadId: number | null;
-  isFarcaster: boolean;
+  farcasterInfo: {
+    parentCastHash: string;
+    replyCastHash: string;
+    fid: number | null;
+  } | null;
 } {
   if (contentUrl.startsWith('/farcaster/')) {
     return {
       communityId: null,
       threadId: null,
-      isFarcaster: true,
+      farcasterInfo: parseFarcasterContentUrl(contentUrl),
     };
   }
   if (!contentUrl.includes('/discussion/')) {
@@ -98,7 +103,7 @@ export function decodeThreadContentUrl(contentUrl: string): {
   return {
     communityId,
     threadId: parseInt(threadId, 10),
-    isFarcaster: false,
+    farcasterInfo: null,
   };
 }
 

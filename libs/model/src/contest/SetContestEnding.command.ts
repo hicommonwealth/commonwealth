@@ -1,10 +1,12 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, logger } from '@hicommonwealth/core';
 import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { config } from '../config';
 import { models } from '../database';
 import { createOnchainContestVote } from '../policies/utils/contest-utils';
 import { emitEvent } from '../utils/utils';
+
+const log = logger(import.meta);
 
 const getPrivateWalletAddress = (): string => {
   const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
@@ -20,21 +22,30 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
         payload;
 
       // add onchain vote to the first content when no upvotes found in the last hour
+
+      // NOTE: on dev environments where contests last 1 hour, this may cause issues
+      // during testing, so use DISABLE_CONTEST_ENDING_VOTE locally
       if (!actions.some((action) => action.action === 'upvoted')) {
-        const firstContent = actions.find(
-          (action) => action.action === 'added',
-        );
-        await createOnchainContestVote({
-          contestManagers: [
-            {
-              url: chain_url,
-              contest_address,
-              content_id: firstContent!.content_id,
-            },
-          ],
-          content_url: firstContent!.content_url!,
-          author_address: getPrivateWalletAddress(),
-        });
+        if (config.CONTESTS.DISABLE_CONTEST_ENDING_VOTE) {
+          log.warn(
+            'Skipped contest ending upvote, DISABLE_CONTEST_ENDING_VOTE is enabled',
+          );
+        } else {
+          const firstContent = actions.find(
+            (action) => action.action === 'added',
+          );
+          await createOnchainContestVote({
+            contestManagers: [
+              {
+                url: chain_url,
+                contest_address,
+                content_id: firstContent!.content_id,
+              },
+            ],
+            content_url: firstContent!.content_url!,
+            author_address: getPrivateWalletAddress(),
+          });
+        }
       }
 
       await models.sequelize.transaction(async (transaction) => {

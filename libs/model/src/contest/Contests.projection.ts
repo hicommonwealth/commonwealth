@@ -19,12 +19,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import { getWeightedNumTokens } from '../services/stakeHelper';
-import {
-  decodeThreadContentUrl,
-  getChainNodeUrl,
-  parseFarcasterContentUrl,
-  publishCast,
-} from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -272,9 +267,10 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId, isFarcaster } = decodeThreadContentUrl(
+        const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
+
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -287,7 +283,7 @@ export function Contests(): Projection<typeof inputs> {
         });
 
         // post confirmation via FC bot
-        if (isFarcaster) {
+        if (farcasterInfo) {
           const contestManager = await models.ContestManager.findByPk(
             payload.contest_address,
           );
@@ -296,11 +292,8 @@ export function Contests(): Projection<typeof inputs> {
             contestManager!.community_id,
             contestManager!.contest_address,
           );
-          const { replyCastHash } = parseFarcasterContentUrl(
-            payload.content_url,
-          );
           await publishCast(
-            replyCastHash,
+            farcasterInfo.replyCastHash,
             ({ username }) =>
               `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
           );

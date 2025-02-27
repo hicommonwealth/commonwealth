@@ -20,6 +20,10 @@ export const ContestAction = z
       .string()
       .nullish()
       .describe('Calculated  weight of the vote when action was recorded'),
+    cast_deleted_at: z.coerce
+      .date()
+      .nullish()
+      .describe('Date-time when content was deleted'),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');
