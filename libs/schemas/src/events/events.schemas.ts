@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -6,23 +6,9 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
-import { Tweet } from '../integrations';
+import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
-
-const DiscordEventBase = z.object({
-  user: z.object({
-    id: z.string(),
-    username: z.string(),
-  }),
-  title: z.string(),
-  content: z.string(),
-  message_id: z.string(),
-  channel_id: z.string(),
-  parent_channel_id: z.string(),
-  guild_id: z.string(),
-  imageUrls: z.array(z.string()),
-});
 
 const ChainEventBase = z.object({
   eventSource: z.object({
@@ -408,7 +394,7 @@ export const events = {
   SSOLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    oauth_provider: z.string(),
+    oauth_provider: z.nativeEnum(WalletSsoSource),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),
