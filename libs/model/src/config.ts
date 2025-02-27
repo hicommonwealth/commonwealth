@@ -43,6 +43,7 @@ const {
   FARCASTER_MANIFEST_SIGNATURE,
   FARCASTER_MANIFEST_DOMAIN,
   FARCASTER_NGROK_DOMAIN,
+  DISABLE_CONTEST_ENDING_VOTE,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
@@ -103,6 +104,7 @@ export const config = configure(
       FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
       FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
       FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
+      DISABLE_CONTEST_ENDING_VOTE: DISABLE_CONTEST_ENDING_VOTE === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -275,6 +277,7 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
+      DISABLE_CONTEST_ENDING_VOTE: z.boolean().optional(),
     }),
     AUTH: z
       .object({
