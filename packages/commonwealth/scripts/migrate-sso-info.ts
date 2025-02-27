@@ -4,7 +4,6 @@ import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import csvParser from 'csv-parser';
 import fs from 'fs/promises';
-import { lowerCase } from 'lodash';
 import path from 'path';
 import { Op } from 'sequelize';
 import { Readable } from 'stream';
@@ -122,7 +121,13 @@ async function main() {
         continue;
       }
 
-      const provider = lowerCase(data[address.address].issuer);
+      if (!data[address.address].issuer) {
+        log.warn(`No issuer for address ${address.address}`);
+        continue;
+      }
+      let provider = data[address.address].issuer.toLowerCase();
+      if (provider === 'sms') provider = WalletSsoSource.SMS;
+
       if (
         !provider ||
         !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
@@ -174,7 +179,8 @@ async function main() {
     }
 
     if (fetchedData.oauthProvider) {
-      const provider = lowerCase(fetchedData.oauthProvider);
+      let provider = fetchedData.oauthProvider.toLowerCase();
+      if (provider === 'sms') provider = WalletSsoSource.SMS;
 
       if (
         !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
