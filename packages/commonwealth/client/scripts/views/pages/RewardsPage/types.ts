@@ -27,6 +27,10 @@ export interface Referral {
   referee_address: ReferralViewType['referee_address'];
   referee_profile: ReferralViewType['referee_profile'];
   referrer_received_eth_amount: ReferralViewType['referrer_received_eth_amount'];
+  community_id: ReferralViewType['community_id'];
+  community_name: ReferralViewType['community_name'];
+  community_icon_url: ReferralViewType['community_icon_url'];
+  namespace_address: string | null;
 }
 
 export interface ReferralFee {
