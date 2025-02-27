@@ -132,6 +132,10 @@ const CommunityHomePage = lazy(
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
+const ReadOnlySiteMetrics = lazy(
+  () => import('../views/pages/ReadOnlyDashboard/ReadOnlySiteMetrics'),
+);
+
 const CommonDomainRoutes = () => [
   <Route
     key="mobile-app-redirect"
@@ -465,6 +469,11 @@ const CommonDomainRoutes = () => [
     key="/admin-panel"
     path="/admin-panel"
     element={withLayout(AdminPanelPage, { type: 'common' })}
+  />,
+  <Route
+    key="/site-metrics"
+    path="/site-metrics"
+    element={withLayout(ReadOnlySiteMetrics, { type: 'common' })}
   />,
 
   // ADMIN
