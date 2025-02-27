@@ -17,6 +17,12 @@
       margin-left: auto;
       color: $primary-500;
       white-space: nowrap;
+
+      &.disabled {
+        cursor: default;
+        color: $neutral-400;
+        opacity: 0.7;
+      }
     }
   }
 
