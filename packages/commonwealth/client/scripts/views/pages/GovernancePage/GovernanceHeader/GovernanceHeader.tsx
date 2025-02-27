@@ -43,7 +43,7 @@ const GovernanceHeader = () => {
     !!community?.snapshot_spaces?.length;
 
   return (
-    <div className="GovernancePage">
+    <div className="GovernanceHeader">
       <div className="header">
         <CWText type="h3" fontWeight="semiBold">
           {community?.name} Governance
@@ -57,7 +57,7 @@ const GovernanceHeader = () => {
             </div>
             <CWTooltip
               placement="top"
-              content="address copied!"
+              content="Address copied!"
               renderTrigger={(handleInteraction, isTooltipOpen) => (
                 <CWIconButton
                   iconName="copySimple"

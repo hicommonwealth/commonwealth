@@ -6,6 +6,9 @@ import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
+const GovernancePage = lazy(
+  () => import('views/pages/GovernancePage/GovernancePage'),
+);
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -313,7 +316,7 @@ const CustomDomainRoutes = ({
           <Route
             key="/:scope/governance"
             path="/:scope/governance"
-            element={withLayout(CommunityHomePage, {
+            element={withLayout(GovernancePage, {
               scoped: true,
             })}
           />,
