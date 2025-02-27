@@ -22,6 +22,7 @@ interface ReferralCardProps {
   trendValue: number;
   totalEarnings: number;
   isLoading?: boolean;
+  isReferralsTabSelected?: boolean;
 }
 
 const ReferralCard = ({
@@ -29,6 +30,7 @@ const ReferralCard = ({
   trendValue,
   totalEarnings,
   isLoading = false,
+  isReferralsTabSelected = false,
 }: ReferralCardProps) => {
   const [currentTab, setCurrentTab] = useState<ReferralTabs>(
     ReferralTabs.Total,
@@ -41,6 +43,7 @@ const ReferralCard = ({
       description="Track your referral rewards"
       icon="userSwitch"
       onSeeAllClick={onSeeAllClick}
+      isAlreadySelected={isReferralsTabSelected}
     >
       <div className="ReferralCard">
         <CWTabsRow>

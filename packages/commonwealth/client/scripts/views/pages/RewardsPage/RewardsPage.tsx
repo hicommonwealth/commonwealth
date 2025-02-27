@@ -99,6 +99,7 @@ const RewardsPage = () => {
               trendValue={trendValue}
               totalEarnings={totalEarnings}
               isLoading={isReferralsLoading}
+              isReferralsTabSelected={tableTab === TableType.Referrals}
             />
           )}
           {(!isWindowSmallInclusive ||
