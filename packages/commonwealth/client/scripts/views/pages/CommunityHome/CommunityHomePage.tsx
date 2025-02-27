@@ -1,10 +1,12 @@
 import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -22,12 +24,22 @@ const CommunityHome = () => {
   const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
   const {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
   const [selectedCommunityId] = useState<string>();
+
+  if (!communityHomeEnabled) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
@@ -41,14 +53,14 @@ const CommunityHome = () => {
               Community Home
             </CWText>
             <TokenDetails
-              communityId={chain}
+              communityDescription={community?.description || ''}
               communityMemberCount={app.chain.meta.profile_count || 0}
-              communityThreadCount={app.chain.meta.numVotingThreads || 0}
+              communityThreadCount={community?.lifetime_thread_count || 0}
             />
           </div>
         </div>
         <TokenPerformance />
-        <ActiveContestList />
+        <ActiveContestList isCommunityHomePage />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList

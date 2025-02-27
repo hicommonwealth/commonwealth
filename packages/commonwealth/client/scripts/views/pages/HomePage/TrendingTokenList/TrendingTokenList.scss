@@ -27,10 +27,10 @@
   .list {
     max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
     gap: 16px;
     margin: 16px 0;
     padding: 8px;
+    overflow-x: auto;
   }
 
   .list::-webkit-scrollbar {
