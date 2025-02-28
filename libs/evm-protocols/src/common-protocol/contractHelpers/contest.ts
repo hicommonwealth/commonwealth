@@ -12,11 +12,14 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { TransactionReceipt, getContract } from 'viem';
-import Web3, {
-  Contract,
-  TransactionReceipt as Web3TransactionReceipt,
-} from 'web3';
+import {
+  Chain,
+  HttpTransport,
+  PublicClient,
+  TransactionReceipt,
+  getContract,
+} from 'viem';
+import { TransactionReceipt as Web3TransactionReceipt } from 'web3';
 import {
   EvmProtocolChain,
   createPrivateEvmClient,
@@ -29,60 +32,66 @@ import {
 import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
-  contestContract: Contract<
-    | Readonly<typeof ContestGovernorSingleAbi>
-    | Readonly<typeof ContestGovernorAbi>
-  >,
   contestAddress: string,
-  web3: Web3,
+  client: PublicClient<HttpTransport, Chain>,
   oneOff?: boolean,
 ): Promise<string> => {
-  const promises = [contestContract.methods.contestToken().call()];
+  const contestContract = getContract({
+    address: contestAddress as `0x${string}`,
+    abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
+    client,
+  });
 
+  let feeManagerAddressPromise: Promise<`0x${string}`> | undefined;
   if (!oneOff) {
-    promises.push(contestContract.methods.FeeMangerAddress().call());
+    feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
   }
 
-  const results = await Promise.all(promises);
+  const { 0: contestToken, 1: feeManagerAddress } = await Promise.all([
+    contestContract.read.contestToken(),
+    feeManagerAddressPromise,
+  ]);
 
-  const balancePromises: Promise<string>[] = [];
-
-  if (!oneOff) {
-    const feeManager = new web3.eth.Contract(FeeManagerAbi, String(results[1]));
-    balancePromises.push(
-      feeManager.methods
-        .getBeneficiaryBalance(contestAddress, results[0])
-        .call(),
-    );
+  let beneficiaryBalancePromise: Promise<bigint> | undefined;
+  if (!oneOff && feeManagerAddress) {
+    beneficiaryBalancePromise = client.readContract({
+      address: feeManagerAddress,
+      abi: FeeManagerAbi,
+      functionName: 'getBeneficiaryBalance',
+      args: [contestAddress as `0x${string}`, contestToken],
+    });
   }
-  if (String(results[0]) === ZERO_ADDRESS) {
-    balancePromises.push(
-      web3.eth.getBalance(contestAddress).then((v: bigint) => {
-        return v.toString();
-      }),
-    );
+
+  let contestBalancePromise: Promise<bigint>;
+  if (contestAddress === ZERO_ADDRESS) {
+    contestBalancePromise = client.getBalance({
+      address: contestAddress,
+    });
   } else {
-    const calldata =
-      '0x70a08231' +
-      web3.eth.abi.encodeParameters(['address'], [contestAddress]).substring(2);
-    balancePromises.push(
-      web3.eth
-        .call({
-          to: String(results[0]),
-          data: calldata,
-        })
-        .then((v: string) => {
-          return String(web3.eth.abi.decodeParameter('uint256', v));
-        }),
-    );
+    contestBalancePromise = client.readContract({
+      address: contestToken,
+      abi: [
+        {
+          name: 'balanceOf',
+          type: 'function',
+          inputs: [{ type: 'address', name: 'account' }],
+          outputs: [{ type: 'uint256', name: '' }],
+          stateMutability: 'view',
+        },
+      ] as const,
+      functionName: 'balanceOf',
+      args: [contestAddress as `0x${string}`],
+    });
   }
 
-  const balanceResults = await Promise.all(balancePromises);
+  const { 0: contestBalance, 1: beneficiaryBalance } = await Promise.all([
+    contestBalancePromise,
+    beneficiaryBalancePromise,
+  ]);
 
-  const balance =
-    balanceResults.length === 2
-      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
-      : BigInt(balanceResults[0]);
+  const balance = beneficiaryBalance
+    ? contestBalance + beneficiaryBalance
+    : contestBalance;
 
   return balance.toString();
 };
@@ -152,14 +161,7 @@ export const getContestBalance = async (
   contest: string,
   oneOff: boolean = false,
 ): Promise<string> => {
-  const web3 = new Web3(chain.rpc);
-
-  const contestInstance = new web3.eth.Contract(
-    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
-    contest,
-  );
-
-  return await getTotalContestBalance(contestInstance, contest, web3, oneOff);
+  return await getTotalContestBalance(contest, getPublicClient(chain), oneOff);
 };
 
 /**
