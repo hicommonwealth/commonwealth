@@ -12,6 +12,7 @@ export const outboxEvents: Events[] = [
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',
+  'CommunityJoined',
   'ContestContentAdded',
   'ContestContentUpvoted',
   'ContestStarted',
