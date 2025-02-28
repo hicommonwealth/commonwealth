@@ -6,7 +6,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { z } from 'zod';
-import { setDarkMode } from '../helpers/darkMode';
+import { darkModeStore } from '../state/ui/darkMode/darkMode';
 import Account from './Account';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
@@ -42,11 +42,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     console.log(`Starting ${this.meta.name}`);
 
     // only on `1inch`, force enable dark mode
-    const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
-      darkModePreferenceSet
-        ? setDarkMode(darkModePreferenceSet === 'on')
-        : setDarkMode(true);
+      darkModeStore.getState().setDarkMode(true);
     }
 
     this._serverLoaded = true;
@@ -56,6 +53,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public deinitServer() {
     this._serverLoaded = false;
     console.log(`${this.meta.name} stopped`);
+
+    if (this.meta.id === '1inch') {
+      darkModeStore.getState().setDarkMode(false);
+    }
   }
 
   public async initApi(): Promise<void> {
@@ -76,11 +77,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
 
-    if (
-      this.meta.id === '1inch' &&
-      !localStorage.getItem('user-dark-mode-state')
-    ) {
-      setDarkMode(false);
+    if (this.meta.id === '1inch' && darkModeStore.getState().isDarkMode) {
+      darkModeStore.getState().setDarkMode(false);
     }
   }
 
