@@ -1,21 +1,37 @@
 import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
+import useTopicGating from 'client/scripts/hooks/useTopicGating';
+import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
+import useUserStore from 'client/scripts/state/ui/user';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useMemo } from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import type Thread from '../../../models/Thread';
-import type { Topic } from '../../../models/Topic';
-import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTable } from '../../components/component_kit/new_designs/CWTable';
+import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import '../discussions/DiscussionsPage.scss';
-import { PageLoading } from '../loading';
-import { TopicSummaryRow } from './TopicSummaryRow';
+import OverViewPageColumn from './OverViewPageColumn';
+import ThreadCell from './ThreadCell';
 import './index.scss';
+type OverViewPageProps = {
+  topicId?: string | number | undefined;
+  featuredFilter?: ThreadFeaturedFilterTypes;
+  timelineFilter?: {
+    toDate: string;
+    fromDate: string | null;
+  };
+};
 
-const OverviewPage = () => {
+const OverviewPage = ({
+  topicId,
+  featuredFilter,
+  timelineFilter,
+}: OverViewPageProps) => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
   const topicNameFromURL = splitAndDecodeURL(location.pathname);
 
   useRunOnceOnCondition({
@@ -31,7 +47,7 @@ const OverviewPage = () => {
   });
 
   const communityId = app.activeChainId() || '';
-  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
+  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
     queryType: 'active',
     communityId,
     topicsPerThread: 3,
@@ -39,74 +55,120 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
-  const { data: topics = [] } = useFetchTopicsQuery({
-    communityId,
-    apiEnabled: !!communityId,
+  const { memberships, topicPermissions } = useTopicGating({
+    communityId: communityId,
+    userAddress: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
-  const anyTopicsFeatured = topics.some((t) => t.featured_in_sidebar);
+  const filterList = useMemo(() => {
+    let newData = recentlyActiveThreads || [];
 
-  const topicsFiltered = anyTopicsFeatured
-    ? topics.filter((t) => t.featured_in_sidebar)
-    : topics;
+    if (topicId) {
+      newData = newData.filter((thread) => thread.topic.id === topicId);
+    }
+    if (timelineFilter) {
+      if (
+        timelineFilter &&
+        timelineFilter?.fromDate &&
+        timelineFilter?.toDate
+      ) {
+        const { fromDate, toDate } = timelineFilter;
+        const from = new Date(fromDate);
+        const to = new Date(toDate);
 
-  const topicsSorted = anyTopicsFeatured
-    ? // @ts-expect-error <StrictNullChecks/>
-      topicsFiltered.sort((a, b) => a.order - b.order)
-    : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
+        newData = newData.filter((thread) => {
+          const threadDate = new Date(thread.createdAt);
+          return threadDate >= from && threadDate <= to;
+        });
+      }
+    }
+    if (featuredFilter) {
+      newData = [...newData].sort((a, b) => {
+        // Spread to avoid mutating original array
+        switch (featuredFilter) {
+          case ThreadFeaturedFilterTypes.Newest:
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
 
-  const topicSummaryRows: Array<{
-    monthlyThreads: Array<Thread>;
-    pinnedThreads: Array<Thread>;
-    topic: Topic;
-  }> = topicsSorted.map((topic) => {
-    const monthlyThreads = (recentlyActiveThreads || []).filter(
-      (thread) =>
-        topic?.id &&
-        thread.topic?.id &&
-        topic.id === thread.topic.id &&
-        thread.archivedAt === null &&
-        !thread.markedAsSpamAt,
-    );
+          case ThreadFeaturedFilterTypes.Oldest:
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
 
-    return {
-      monthlyThreads,
-      pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
-      topic,
-    };
+          case ThreadFeaturedFilterTypes.MostLikes:
+            return (b.reactionWeightsSum ?? 0) - (a.reactionWeightsSum ?? 0);
+
+          case ThreadFeaturedFilterTypes.MostComments:
+            return (b.numberOfComments ?? 0) - (a.numberOfComments ?? 0);
+
+          case ThreadFeaturedFilterTypes.LatestActivity:
+            return (
+              new Date(b.lastActivityAt).getTime() -
+              new Date(a.lastActivityAt).getTime()
+            );
+
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return newData;
+  }, [topicId, featuredFilter, recentlyActiveThreads, timelineFilter]);
+
+  const tableState = useCWTableState({
+    columns: OverViewPageColumn,
+    initialSortColumn: 'createdAt',
+    initialSortDirection: APIOrderDirection.Desc,
   });
 
-  return !topicSummaryRows.length ? (
-    <PageLoading />
+  return !filterList?.length ? (
+    <CWText type="b1">There are no threads matching your filter</CWText>
   ) : (
     <div className="OverviewPage">
-      <div className="column-headers-row">
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="threads-header-row-text"
-        >
-          Topic
-        </CWText>
-        <div className="threads-header-container">
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="threads-header-row-text"
-          >
-            Recent threads
-          </CWText>
-        </div>
-      </div>
-      <CWDivider />
-      {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-      ))}
-      {!isLoading && topicSummaryRows.length === 0 && (
-        <CWText type="b1" className="empty-placeholder">
-          No threads available
-        </CWText>
-      )}
+      <CWTable
+        rowData={filterList.map((thread) => ({
+          ...thread,
+          createdAt: {
+            sortValue: thread.createdAt,
+            customElement: (
+              <div className="createdAt">
+                <CWText fontWeight="regular" type="b2">
+                  {moment(thread.createdAt)
+                    .utc?.()
+                    ?.local?.()
+                    ?.format('MMMM DD YYYY')}
+                </CWText>
+              </div>
+            ),
+          },
+          title: {
+            customElement: (
+              <ThreadCell
+                thread={thread}
+                memberships={memberships}
+                topicPermissions={topicPermissions}
+              />
+            ),
+          },
+          topic: {
+            customElement: (
+              <div
+                onClick={() => navigate(`/discussions/${thread.topic.name}`)}
+              >
+                <CWText fontWeight="regular" type="b2">
+                  {thread.topic.name}
+                </CWText>
+              </div>
+            ),
+          },
+        }))}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
+      />
     </div>
   );
 };
