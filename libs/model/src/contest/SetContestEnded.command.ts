@@ -33,13 +33,6 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         private_url: chain_private_url,
       });
 
-      await rollOverContest({
-        privateKey: config.WEB3.PRIVATE_KEY,
-        rpc,
-        contest: contest_address,
-        oneOff: is_one_off,
-      });
-
       // better to get scores using views to avoid returning unbounded arrays in txs
       const score = await getContestScore(
         rpc,
@@ -49,6 +42,13 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         contest_id,
         is_one_off,
       );
+
+      await rollOverContest({
+        privateKey: config.WEB3.PRIVATE_KEY,
+        rpc,
+        contest: contest_address,
+        oneOff: is_one_off,
+      });
 
       const contestManager = await models.ContestManager.findByPk(
         contest_address,
