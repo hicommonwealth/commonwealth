@@ -28,7 +28,7 @@ const {
   ENABLE_CLIENT_PUBLISHING,
   EVM_CE_LOG_TRACE,
   TWITTER_WORKER_POLL_INTERVAL,
-  ENABLED_TWITTER_BOTS,
+  TWITTER_ENABLED_BOTS,
   TWITTER_APP_BEARER_TOKEN,
 } = process.env;
 
@@ -121,7 +121,7 @@ export const config = configure(
         else return 0;
       })(),
       ENABLED_BOTS:
-        (ENABLED_TWITTER_BOTS?.split(',') as TwitterBotName[]) || [],
+        (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
       APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
     },
   },

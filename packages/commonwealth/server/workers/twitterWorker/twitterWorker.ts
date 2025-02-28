@@ -79,12 +79,19 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
 // eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
   try {
-    log.info('Starting Twitter Worker...');
+    if (config.TWITTER.ENABLED_BOTS.length === 0) {
+      log.info('No Twitter bots enabled. Exiting...');
+      return;
+    }
 
     if (config.TWITTER.WORKER_POLL_INTERVAL === 0) {
       log.info('Twitter Worker disabled. Exiting...');
       return;
     }
+
+    log.info(
+      `Starting Twitter Worker for bots: ${config.TWITTER.ENABLED_BOTS}`,
+    );
 
     // TODO: if the configs are from the same bearer token/app -> split poll interval between each
 
