@@ -20,6 +20,7 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import FarcasterWebWalletController from 'controllers/app/webWallets/farcaster_web_wallet';
+import SubstrateEvmWebWalletController from 'controllers/app/webWallets/polkadot_evm_web_wallet';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -466,6 +467,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onWalletSelect = async (wallet: Wallet) => {
     try {
+      // For Tangle chain, set preferred wallet type based on wallet selection
+      if (
+        app.chain?.meta?.id === 'tangle' &&
+        wallet instanceof SubstrateEvmWebWalletController
+      ) {
+        if (window.ethereum) {
+          wallet = new SubstrateEvmWebWalletController('evm');
+        } else if (window?.injectedWeb3?.['polkadot-js']) {
+          wallet = new SubstrateEvmWebWalletController('substrate');
+        }
+      }
+
       await wallet.enable();
     } catch (error) {
       notifyError(error?.message || error);

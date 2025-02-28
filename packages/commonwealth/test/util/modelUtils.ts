@@ -267,7 +267,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';
-      sessionSigner = new SubstrateSignerCW();
+      sessionSigner = new SubstrateSignerCW({ extension: null });
     } else {
       throw new Error(`invalid chain ${chain}`);
     }
