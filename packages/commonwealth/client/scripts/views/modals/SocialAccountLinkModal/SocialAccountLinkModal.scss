@@ -1,0 +1,12 @@
+@import '../../../styles/shared';
+
+.SocialAccountLinkModal {
+  .link-text {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+    display: block;
+    padding: 8px;
+  }
+}
