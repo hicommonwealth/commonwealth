@@ -1,4 +1,3 @@
-export * from './buildFarcasterWebhookName';
 export * from './decodeContent';
 export * from './denormalizedCountUtils';
 export * from './farcasterUtils';
