@@ -79,31 +79,45 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
 // eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
   try {
-    log.info('Starting Twitter Worker...');
+    if (config.TWITTER.ENABLED_BOTS.length === 0) {
+      log.info('No Twitter bots enabled. Exiting...');
+      return;
+    }
 
     if (config.TWITTER.WORKER_POLL_INTERVAL === 0) {
       log.info('Twitter Worker disabled. Exiting...');
       return;
     }
 
-    await Promise.allSettled([
-      pollMentions(TwitterBotConfigs.MomBot),
-      pollMentions(TwitterBotConfigs.ContestBot),
-    ]);
-
-    setInterval(
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      pollMentions,
-      config.TWITTER.WORKER_POLL_INTERVAL,
-      TwitterBotConfigs.MomBot,
+    log.info(
+      `Starting Twitter Worker for bots: ${config.TWITTER.ENABLED_BOTS}`,
     );
 
-    setInterval(
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      pollMentions,
-      config.TWITTER.WORKER_POLL_INTERVAL,
-      TwitterBotConfigs.ContestBot,
+    // TODO: run 15 minutes apart from each other?
+    await Promise.allSettled(
+      config.TWITTER.ENABLED_BOTS.map((n) =>
+        pollMentions(TwitterBotConfigs[n]),
+      ),
     );
+
+    // schedule the next fetch runs equally distant from each other
+    config.TWITTER.ENABLED_BOTS.forEach((n, i) => {
+      setTimeout(
+        () => {
+          setInterval(
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            pollMentions,
+            config.TWITTER.WORKER_POLL_INTERVAL,
+            TwitterBotConfigs[n],
+          );
+        },
+        i *
+          Math.round(
+            config.TWITTER.WORKER_POLL_INTERVAL /
+              config.TWITTER.ENABLED_BOTS.length,
+          ),
+      );
+    });
 
     isServiceHealthy = true;
     log.info('Twitter Worker started');

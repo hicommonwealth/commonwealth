@@ -4,7 +4,7 @@ export const Tweet = z.object({
   id: z.string(),
   author_id: z.string(),
   username: z.string(),
-  created_at: z.string(),
+  created_at: z.coerce.date(),
   text: z.string().describe('The first 280 characters of the tweet'),
   note_tweet: z
     .string()
@@ -24,15 +24,37 @@ export const Tweet = z.object({
 });
 
 export const TwitterMentionsTimeline = z.object({
-  data: z.array(Tweet),
-  errors: z.array(
-    z.object({
-      title: z.string(),
-      type: z.string(),
-      detail: z.string().optional(),
-      status: z.number().optional(),
-    }),
-  ),
+  data: z
+    .array(
+      z.object({
+        text: z.string(),
+        id: z.string(),
+        created_at: z.string(),
+        author_id: z.string(),
+      }),
+    )
+    .optional(),
+  includes: z
+    .object({
+      users: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          username: z.string(),
+        }),
+      ),
+    })
+    .optional(),
+  errors: z
+    .array(
+      z.object({
+        title: z.string(),
+        type: z.string(),
+        detail: z.string().optional(),
+        status: z.number().optional(),
+      }),
+    )
+    .optional(),
   meta: z
     .object({
       next_token: z.string().optional(),

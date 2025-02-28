@@ -17,6 +17,7 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
 
 export enum QuestParticipationLimit {
