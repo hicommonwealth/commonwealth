@@ -166,7 +166,7 @@ async function createMagicAddressInstances(
   } = verifiedInfo;
 
   for (const { community_id, address } of generatedAddresses) {
-    console.log(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
+    log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
@@ -430,7 +430,7 @@ async function loginExistingMagicUser({
         transaction,
       );
 
-      console.log('SSO TOKEN HANDLED NORMALLY');
+      log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
       const addressInstances = await createMagicAddressInstances(models, {
         generatedAddresses,
@@ -564,7 +564,7 @@ async function magicLoginRoute(
   cb: DoneFunc,
 ) {
   const body = MagicLogin.parse(req.body);
-  console.log(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
+  log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance | undefined,
     error,
     loggedInUser: UserInstance | null | undefined;
@@ -613,7 +613,7 @@ async function magicLoginRoute(
       loggedInUser = await models.User.findOne({
         where: { id },
       });
-      console.log(
+      log.trace(
         `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
       );
       if (!loggedInUser) {
@@ -631,7 +631,7 @@ async function magicLoginRoute(
     isCosmos ? WalletType.COSMOS : WalletType.ETH,
   );
 
-  console.log(
+  log.trace(
     `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
   );
 
@@ -747,14 +747,14 @@ async function magicLoginRoute(
     }
   }
 
-  console.log(
+  log.trace(
     `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
-    console.log('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
+    log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
     await createMagicAddressInstances(models, {
       generatedAddresses,
       user: loggedInUser,
@@ -786,19 +786,19 @@ async function magicLoginRoute(
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
       // merge the existing magic user with the logged in user
-      console.log('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
+      log.trace('CASE 1: EXISTING MAGIC INCOMING TO USER, MERGE LOGINS');
       finalUser = await mergeLogins(magicContext);
     } else if (!loggedInUser && existingUserInstance) {
       // user is logging in with an existing magic account
-      console.log('CASE 2: LOGGING INTO EXISTING MAGIC USER');
+      log.trace('CASE 2: LOGGING INTO EXISTING MAGIC USER');
       finalUser = await loginExistingMagicUser(magicContext);
     } else if (loggedInUser && !existingUserInstance) {
       // user is already logged in and is linking a new magic login to their account
-      console.log('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
+      log.trace('CASE 3: ADDING NEW MAGIC ADDRESSES TO EXISTING USER');
       finalUser = await addMagicToUser(magicContext);
     } else {
       // completely new user: create user, profile, addresses
-      console.log('CASE 4: CREATING NEW MAGIC USER');
+      log.trace('CASE 4: CREATING NEW MAGIC USER');
       finalUser = await createNewMagicUser(magicContext);
     }
   } catch (e) {
@@ -806,7 +806,7 @@ async function magicLoginRoute(
     return cb(e);
   }
 
-  console.log(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
+  log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
   return cb(null, finalUser);
 }
 
