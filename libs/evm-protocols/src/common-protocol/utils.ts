@@ -183,19 +183,6 @@ export const createPrivateEvmClient = ({
   return web3;
 };
 
-export const estimateGas = async (web3: Web3): Promise<bigint | null> => {
-  try {
-    const latestBlock = await web3.eth.getBlock('latest');
-
-    // Calculate maxFeePerGas and maxPriorityFeePerGas
-    const baseFeePerGas = latestBlock.baseFeePerGas;
-    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
-    return baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
-  } catch {
-    return null;
-  }
-};
-
 export const isEvmAddress = (address: string): boolean => {
   return isAddress(address);
 };
@@ -225,7 +212,16 @@ export const arbitraryEvmCall = async ({
 export function decodeLog<
   abi extends Abi,
   eventName extends ContractEventName<abi>,
->({ abi, data, topics }: { abi: abi; data: string; topics: string[] }) {
+>({
+  abi,
+  data,
+  topics,
+}: {
+  abi: abi;
+  eventName: eventName;
+  data: string;
+  topics: string[];
+}) {
   return decodeEventLog<abi, eventName, Hex[], Hex>({
     abi,
     data: data as Hex,

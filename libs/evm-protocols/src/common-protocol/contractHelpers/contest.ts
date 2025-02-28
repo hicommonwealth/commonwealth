@@ -19,12 +19,8 @@ import {
   TransactionReceipt,
   getContract,
 } from 'viem';
-import { TransactionReceipt as Web3TransactionReceipt } from 'web3';
 import {
   EvmProtocolChain,
-  createPrivateEvmClient,
-  decodeParameters,
-  estimateGas,
   getPublicClient,
   getWalletClient,
   mapToAbiRes,
@@ -307,8 +303,9 @@ export const addContent = async (
     throw new Error('Content not added on-chain');
   }
 
-  const { args } = decodeLog<typeof ContestGovernorAbi, 'ContentAdded'>({
+  const { args } = decodeLog({
     abi: ContestGovernorAbi,
+    eventName: 'ContentAdded',
     data: contentAddedEvent.data,
     topics: contentAddedEvent.topics,
   });
@@ -503,6 +500,7 @@ export const rollOverContest = async ({
 };
 
 export const deployERC20Contest = async ({
+  chain,
   privateKey,
   namespaceName,
   contestInterval,
@@ -510,9 +508,8 @@ export const deployERC20Contest = async ({
   voteToken,
   voterShare,
   exchangeToken,
-  namespaceFactory,
-  rpc,
 }: {
+  chain: EvmProtocolChain;
   privateKey: string;
   namespaceName: string;
   contestInterval: number;
@@ -520,50 +517,46 @@ export const deployERC20Contest = async ({
   voteToken: string;
   voterShare: number;
   exchangeToken: string;
-  namespaceFactory: string;
-  rpc: string;
 }) => {
   return nonceMutex.runExclusive(async () => {
-    const web3 = createPrivateEvmClient({ rpc, privateKey });
-    const contract = new web3.eth.Contract(
-      NamespaceFactoryAbi,
-      namespaceFactory,
-    );
-    const maxFeePerGasEst = await estimateGas(web3);
-    let txReceipt: Web3TransactionReceipt;
-    try {
-      txReceipt = await contract.methods
-        .newSingleERC20Contest(
-          namespaceName,
-          contestInterval,
-          winnerShares,
-          voteToken,
-          voterShare,
-          exchangeToken,
-        )
-        .send({
-          from: web3.eth.defaultAccount,
-          type: '0x2',
-          maxFeePerGas: maxFeePerGasEst?.toString(),
-          maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-        });
-    } catch (err) {
-      console.warn('New Contest Transaction failed', err);
-      return;
-    }
+    const client = getWalletClient({
+      ...chain,
+      private_key: privateKey,
+    });
+
+    const { request } = await client.simulateContract({
+      address: factoryContracts[chain.eth_chain_id].factory,
+      abi: NamespaceFactoryAbi,
+      functionName: 'newSingleERC20Contest',
+      args: [
+        namespaceName,
+        BigInt(contestInterval),
+        winnerShares.map((w) => BigInt(w)),
+        voteToken as `0x${string}`,
+        BigInt(voterShare),
+        exchangeToken as `0x${string}`,
+      ],
+      ...(await client.estimateFeesPerGas()),
+    });
+    const txReceipt = await client.getTransactionReceipt({
+      hash: await client.writeContract(request),
+    });
 
     const eventLog = txReceipt.logs.find(
       (log) =>
-        log.topics![0] ==
+        log.topics[0] ==
         EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     );
-    if (!eventLog || !eventLog.data) throw new Error('No event data');
+    if (!eventLog || !eventLog.data) throw new Error('Contest not deployed');
 
-    const { 0: address } = decodeParameters({
-      abiInput: ['address', 'address', 'uint256', 'bool'],
-      data: eventLog.data.toString(),
+    const { args } = decodeLog({
+      abi: NamespaceFactoryAbi,
+      eventName: 'NewContest',
+      data: eventLog.data,
+      topics: eventLog.topics,
     });
-    return address as string;
+
+    return args.contest;
   });
 };
 
