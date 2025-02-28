@@ -86,7 +86,7 @@ async function updateOrCreateWithAlert(
   );
 
   const { startTime, endTime } = await getContestStatus(
-    url,
+    { rpc: url, eth_chain_id: ethChainId },
     contest_address,
     isOneOff,
   );
@@ -171,6 +171,7 @@ async function updateOrCreateWithAlert(
 }
 
 type ContestDetails = {
+  eth_chain_id: number;
   url: string;
   prize_percentage: number;
   payout_structure: number[];
@@ -185,7 +186,8 @@ async function getContestDetails(
 ): Promise<ContestDetails | undefined> {
   const [result] = await models.sequelize.query<ContestDetails>(
     `
-        select cn.private_url,
+        select CN.eth_chain_id,
+               cn.private_url,
                cn.url,
                cm.prize_percentage,
                cm.payout_structure,
@@ -219,8 +221,10 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
+    cp.mustBeProtocolChainId(details.eth_chain_id);
+
     const score = await getContestScore(
-      details.url,
+      { eth_chain_id: details.eth_chain_id, rpc: details.url },
       contest_address,
       details.prize_percentage,
       details.payout_structure,

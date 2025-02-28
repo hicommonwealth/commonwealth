@@ -1,9 +1,15 @@
+import { ContestGovernorAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
-  contestAbi,
   erc20Abi,
+  mustBeProtocolChainId,
+  ValidChains,
+  ViemChains,
 } from '@hicommonwealth/evm-protocols';
+import 'viem/window';
+
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { createPublicClient, http } from 'viem';
 import { AbiItem, TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -13,10 +19,18 @@ const TOPIC_LOG =
 class Contest extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
+  ethChainId: ValidChains;
 
-  constructor(contractAddress: string, factoryAddress: string, rpc: string) {
-    super(contractAddress, contestAbi, rpc);
+  constructor(
+    contractAddress: string,
+    factoryAddress: string,
+    rpc: string,
+    ethChainId: number,
+  ) {
+    super(contractAddress, ContestGovernorAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
+    mustBeProtocolChainId(ethChainId);
+    this.ethChainId = ethChainId;
   }
 
   async initialize(withWallet: boolean = false): Promise<void> {
@@ -282,9 +296,12 @@ class Contest extends ContractBase {
     }
     this.reInitContract();
     const contestBalance = await commonProtocol.getTotalContestBalance(
-      this.contract,
       this.contractAddress,
-      this.web3,
+      createPublicClient({
+        chain: ViemChains[this.ethChainId],
+        transport: http(this.rpc),
+        batch: true,
+      }),
       oneOff,
     );
     return parseInt(contestBalance, 10);

@@ -1,6 +1,7 @@
 import { Command, logger } from '@hicommonwealth/core';
 import {
   getContestScore,
+  mustBeProtocolChainId,
   rollOverContest,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
@@ -36,6 +37,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
     auth: [],
     body: async ({ payload }) => {
       const {
+        eth_chain_id,
         contest_address,
         contest_id,
         is_one_off,
@@ -58,9 +60,11 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         oneOff: is_one_off,
       });
 
+      mustBeProtocolChainId(eth_chain_id);
+
       // better to get scores using views to avoid returning unbounded arrays in txs
       const score = await getContestScore(
-        rpc,
+        { eth_chain_id, rpc },
         contest_address,
         prize_percentage,
         payout_structure,
