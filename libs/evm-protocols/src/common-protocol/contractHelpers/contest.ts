@@ -5,7 +5,11 @@ import {
   INamespaceAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
-import { EvmEventSignatures, decodeLog } from '@hicommonwealth/evm-protocols';
+import {
+  EvmEventSignatures,
+  decodeLog,
+  factoryContracts,
+} from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import { TransactionReceipt, getContract } from 'viem';
@@ -281,7 +285,7 @@ export const addContent = async (
       abi: ContestGovernorSingleAbi,
       address: contest as `0x${string}`,
       functionName: 'addContent',
-      args: [creator as `0x${string}`, url, '' as `0x${string}`],
+      args: [creator as `0x${string}`, url, '0x'],
       ...(await client.estimateFeesPerGas()),
       gas: BigInt(1_000_000),
       nonce,
@@ -562,50 +566,45 @@ export const deployERC20Contest = async ({
 };
 
 export const deployNamespace = async (
-  namespaceFactory: string,
   name: string,
   walletAddress: string,
   feeManager: string,
-  rpcNodeUrl: string,
+  chain: EvmProtocolChain,
   privateKey: string,
 ): Promise<string> => {
-  const web3 = createPrivateEvmClient({ rpc: rpcNodeUrl, privateKey });
-  const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
+  const client = getWalletClient({
+    ...chain,
+    private_key: privateKey,
+  });
+
+  const namespaceCheck = await getNamespace(chain, name);
   if (namespaceCheck === ZERO_ADDRESS) {
     throw new Error('Namespace already reserved');
   }
-  const contract = new web3.eth.Contract(NamespaceFactoryAbi, namespaceFactory);
 
-  const maxFeePerGasEst = await estimateGas(web3);
+  const { request } = await client.simulateContract({
+    address: factoryContracts[chain.eth_chain_id].factory,
+    abi: NamespaceFactoryAbi,
+    functionName: 'deployNamespace',
+    ...(await client.estimateFeesPerGas()),
+    args: [
+      name,
+      `https://common.xyz/api/namespaceMetadata/${name}/{id}`,
+      feeManager as `0x${string}`,
+      '0x',
+    ],
+  });
+  await client.writeContract(request);
 
-  try {
-    const uri = `https://common.xyz/api/namespaceMetadata/${name}/{id}`;
-    await contract.methods.deployNamespace(name, uri, feeManager, []).send({
-      from: web3.eth.defaultAccount,
-      type: '0x2',
-      maxFeePerGas: maxFeePerGasEst?.toString(),
-      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-    });
-  } catch (error) {
-    throw new Error('Transaction failed: ' + error);
-  }
-  const namespaceAddress = await getNamespace(
-    rpcNodeUrl,
-    name,
-    namespaceFactory,
-  );
-  const namespaceContract = new web3.eth.Contract(
-    INamespaceAbi,
-    namespaceAddress,
-  );
+  const namespaceAddress = await getNamespace(chain, name);
 
-  try {
-    await namespaceContract.methods
-      .mintId(walletAddress, 1, 1, '0x')
-      .send({ from: web3.eth.defaultAccount });
-  } catch (error) {
-    throw new Error('Transaction failed: ' + error);
-  }
+  const { request: mintRequest } = await client.simulateContract({
+    address: namespaceAddress,
+    abi: INamespaceAbi,
+    functionName: 'mintId',
+    args: [walletAddress as `0x${string}`, BigInt(1), BigInt(1), '0x'],
+  });
+  await client.writeContract(mintRequest);
 
   return namespaceAddress;
 };
