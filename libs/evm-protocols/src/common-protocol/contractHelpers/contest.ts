@@ -157,7 +157,7 @@ export const getContestScore = async (
   contestBalance: string | null;
   scores: {
     content_id: string;
-    creator_address: any;
+    creator_address: string;
     votes: string;
     prize: string;
   }[];

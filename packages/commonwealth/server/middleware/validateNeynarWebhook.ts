@@ -1,10 +1,9 @@
 import { createHmac } from 'crypto';
 
 export function validateNeynarWebhook(webhookSecret: string) {
-  return async (req, _, next) => {
+  return (req, _, next) => {
     const sig = req.headers['x-neynar-signature'];
     if (!sig) {
-      console.log(req.headers);
       throw new Error('Neynar signature missing from request headers');
     }
 
