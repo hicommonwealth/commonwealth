@@ -51,19 +51,6 @@ export const ExternalLinksModule = () => {
             className="discord-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {elements.map((link) => (
@@ -73,19 +60,6 @@ export const ExternalLinksModule = () => {
             className="element-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {telegrams.map((link) => (
@@ -95,19 +69,6 @@ export const ExternalLinksModule = () => {
             className="telegram-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {tiktoks.map((link) => (
@@ -117,19 +78,6 @@ export const ExternalLinksModule = () => {
             className="tiktok-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {twitters.map((link) => (
@@ -139,19 +87,6 @@ export const ExternalLinksModule = () => {
             className="twitter-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {githubs.map((link) => (
@@ -161,19 +96,6 @@ export const ExternalLinksModule = () => {
             className="github-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
       {[...remainingLinks, ...slacks].map((link) => (
@@ -183,21 +105,21 @@ export const ExternalLinksModule = () => {
             className="website-link"
             onClick={() => setSelectedLink(link)}
           />
-          {selectedLink === link && (
-            <CWModal
-              size="small"
-              content={
-                <SocialAccountLinkModal
-                  onModalClose={handleModalClose}
-                  formattedLink={formatLink(link)}
-                />
-              }
-              onClose={handleModalClose}
-              open={true}
-            />
-          )}
         </React.Fragment>
       ))}
+      {selectedLink && (
+        <CWModal
+          size="small"
+          content={
+            <SocialAccountLinkModal
+              onModalClose={handleModalClose}
+              formattedLink={formatLink(selectedLink)}
+            />
+          }
+          onClose={handleModalClose}
+          open={true}
+        />
+      )}
     </div>
   );
 };
