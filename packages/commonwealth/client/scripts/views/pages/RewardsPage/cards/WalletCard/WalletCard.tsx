@@ -3,6 +3,7 @@ import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -25,7 +26,7 @@ import useUserWalletHoldings from './useUserWalletHoldings';
 
 enum WalletBalanceTabs {
   Tokens = 'Tokens',
-  Staked = 'Staked',
+  Stake = 'Stake',
 }
 
 const WalletCard = () => {
@@ -77,7 +78,7 @@ const WalletCard = () => {
               selectedAddressValue={userSelectedAddress || ''}
             />
           )}
-          label="Select address (Ethereum)"
+          label="Select address"
           isClearable={false}
           isSearchable={false}
           options={(uniqueAddresses || [])?.map(convertAddressToDropdownOption)}
@@ -85,10 +86,14 @@ const WalletCard = () => {
             option?.value && setUserSelectedAddress(option.value)
           }
         />
+        <CWText type="caption">
+          Showing balance for Ethereum on Base (EVM)
+        </CWText>
         <CWText type="h4">
           $&nbsp;
           <FractionalValue type="h4" value={userCombinedUSDBalance} />
         </CWText>
+        <CWDivider />
         {isSelectedAddressMagic && (
           <button
             type="button"
