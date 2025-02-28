@@ -197,7 +197,8 @@ export const events = {
   }),
 
   CommonDiscordServerJoined: z.object({
-    user_id: z.number(),
+    user_id: z.number().nullish(),
+    discord_username: z.string(),
     joined_date: z.coerce.date(),
   }),
 

@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   Client,
   IntentsBitField,
@@ -134,23 +135,32 @@ async function startDiscordListener() {
 
   client.on('guildMemberAdd', (member) => {
     const joinedAt = member.joinedAt || new Date();
-    // TODO: convert discord user_id to common user_id
-    emitEvent(models.Outbox, [
-      {
-        event_name: 'CommonDiscordServerJoined',
-        event_payload: {
-          user_id: 1,
-          joined_date: joinedAt,
-        },
+    models.Address.findOne({
+      where: {
+        oauth_provider: WalletSsoSource.Discord,
+        oauth_username: member.user.username,
       },
-    ]).catch((e) => {
-      log.error('Failed to emit CommonDiscordServerJoined event', e, {
-        discord_user_id: member.id,
-        discord_username: member.user.username,
-        discord_server_join_date: joinedAt,
-        common_user_id: 1,
+    })
+      .then((address) =>
+        emitEvent(models.Outbox, [
+          {
+            event_name: 'CommonDiscordServerJoined',
+            event_payload: {
+              user_id: address?.user_id,
+              discord_username: member.user.username,
+              joined_date: joinedAt,
+            },
+          },
+        ]),
+      )
+      .catch((e) => {
+        log.error('Failed to emit CommonDiscordServerJoined event', e, {
+          discord_user_id: member.id,
+          discord_username: member.user.username,
+          discord_server_join_date: joinedAt,
+          common_user_id: 1,
+        });
       });
-    });
   });
 
   await client.login(config.DISCORD.BOT_TOKEN);
