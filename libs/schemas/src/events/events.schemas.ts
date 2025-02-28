@@ -310,6 +310,7 @@ export const events = {
   SignUpFlowCompleted: z.object({
     user_id: z.number(),
     address: z.string(),
+    referred_by_address: z.string().nullish(),
     created_at: z.coerce.date(),
   }),
 
