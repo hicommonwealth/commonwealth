@@ -93,20 +93,29 @@ async function main() {
       `Starting Twitter Worker for bots: ${config.TWITTER.ENABLED_BOTS}`,
     );
 
-    // TODO: if the configs are from the same bearer token/app -> split poll interval between each
-
+    // TODO: run 15 minutes apart from each other?
     await Promise.allSettled(
       config.TWITTER.ENABLED_BOTS.map((n) =>
         pollMentions(TwitterBotConfigs[n]),
       ),
     );
 
-    config.TWITTER.ENABLED_BOTS.forEach((n) => {
-      setInterval(
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        pollMentions,
-        config.TWITTER.WORKER_POLL_INTERVAL,
-        TwitterBotConfigs[n],
+    // schedule the next fetch runs equally distant from each other
+    config.TWITTER.ENABLED_BOTS.forEach((n, i) => {
+      setTimeout(
+        () => {
+          setInterval(
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            pollMentions,
+            config.TWITTER.WORKER_POLL_INTERVAL,
+            TwitterBotConfigs[n],
+          );
+        },
+        i *
+          Math.round(
+            config.TWITTER.WORKER_POLL_INTERVAL /
+              config.TWITTER.ENABLED_BOTS.length,
+          ),
       );
     });
 
