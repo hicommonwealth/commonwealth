@@ -168,7 +168,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             contest_address: payload.contest_address,
           },
         });
-        mustExist('Contest Manager', contestManager);
+        mustExist(
+          `Contest Manager (contest_address=${payload.contest_address})`,
+          contestManager,
+        );
 
         // find content by url
         const contestActions = await models.ContestAction.findAll({
@@ -178,6 +181,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             content_url,
           },
         });
+        mustExist(
+          `Contest Actions (content_url=${content_url})`,
+          contestActions.at(0),
+        );
 
         const community = await models.Community.findByPk(
           contestManager.community_id,
