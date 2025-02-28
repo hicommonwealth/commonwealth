@@ -3,19 +3,11 @@ import React, { useState } from 'react';
 import './cw_toggle.scss';
 
 import { useFormContext } from 'react-hook-form';
-import { setDarkMode } from '../../../../helpers/darkMode';
 import { CWIcon } from '../cw_icons/cw_icon';
 import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import type { BaseStyleProps } from '../types';
 import { ComponentType } from '../types';
-
-export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
-  setDarkMode(on);
-  localStorage.setItem('user-dark-mode-state', on ? 'on' : 'off');
-  // @ts-expect-error <StrictNullChecks/>
-  stateFn(on);
-};
 
 type FormFieldValidationProps = {
   hookToForm?: boolean;
