@@ -279,12 +279,14 @@ export async function startLoginWithMagicLink({
   provider,
   chain,
   isCosmos,
+  referrer_address,
 }: {
   email?: string;
   phoneNumber?: string;
   provider?: WalletSsoSource;
   chain?: string;
   isCosmos: boolean;
+  referrer_address?: string;
 }) {
   if (!email && !phoneNumber && !provider)
     throw new Error('Must provide email or SMS or SSO provider');
@@ -298,6 +300,7 @@ export async function startLoginWithMagicLink({
     const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Email,
+      referrer_address,
     });
 
     return { bearer, address };
@@ -307,6 +310,7 @@ export async function startLoginWithMagicLink({
     const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Farcaster,
+      referrer_address,
     });
 
     return { bearer, address };
@@ -319,6 +323,7 @@ export async function startLoginWithMagicLink({
     const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.SMS,
+      referrer_address,
     });
 
     return { bearer, address };
@@ -394,11 +399,13 @@ export async function handleSocialLoginCallback({
   chain,
   walletSsoSource,
   isCustomDomain,
+  referrer_address,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource: WalletSsoSource;
   isCustomDomain?: boolean;
+  referrer_address?: string;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -519,6 +526,7 @@ export async function handleSocialLoginCallback({
     magicAddress,
     session: session && serializeCanvas(session),
     walletSsoSource,
+    referrer_address,
   };
 
   try {

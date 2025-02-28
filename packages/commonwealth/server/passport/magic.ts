@@ -44,6 +44,7 @@ type MagicLoginContext = {
   existingUserInstance?: UserInstance | null;
   loggedInUser?: UserInstance | null;
   profileMetadata?: { username?: string | null; avatarUrl?: string | null };
+  referrer_address?: string | null;
 };
 
 const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
@@ -258,6 +259,7 @@ async function createNewMagicUser({
   profileMetadata,
   accessToken,
   walletSsoSource,
+  referrer_address,
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
@@ -274,6 +276,7 @@ async function createNewMagicUser({
         // sign in with unverified email addresses)
         emailVerified: !!magicUserMetadata.email,
         profile: {},
+        referred_by_address: referrer_address,
       },
       { transaction },
     );
@@ -781,6 +784,7 @@ async function magicLoginRoute(
       username: body.username,
       avatarUrl: body.avatarUrl,
     },
+    referrer_address: body.referrer_address,
   };
   try {
     if (loggedInUser && existingUserInstance) {
