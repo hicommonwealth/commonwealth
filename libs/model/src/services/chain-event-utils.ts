@@ -54,8 +54,9 @@ type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof CommunityStakeAbi, 'Trade'>({
+  const decoded = decodeLog({
     abi: CommunityStakeAbi,
+    eventName: 'Trade',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -71,8 +72,9 @@ const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
 const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof NamespaceFactoryAbi, 'DeployedNamespace'>({
+  const decoded = decodeLog({
     abi: NamespaceFactoryAbi,
+    eventName: 'DeployedNamespace',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -88,11 +90,9 @@ const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
 const referralNamespaceDeployedMapper: EvmMapper<
   'NamespaceDeployedWithReferral'
 > = (event: EvmEvent) => {
-  const decoded = decodeLog<
-    typeof NamespaceFactoryAbi,
-    'DeployedNamespaceWithReferral'
-  >({
+  const decoded = decodeLog({
     abi: NamespaceFactoryAbi,
+    eventName: 'DeployedNamespaceWithReferral',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -121,8 +121,9 @@ const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
 const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof LPBondingCurveAbi, 'Trade'>({
+  const decoded = decodeLog({
     abi: LPBondingCurveAbi,
+    eventName: 'Trade',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -145,8 +146,9 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
 const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof ReferralFeeManagerAbi, 'FeesDistributed'>({
+  const decoded = decodeLog({
     abi: ReferralFeeManagerAbi,
+    eventName: 'FeesDistributed',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -162,8 +164,9 @@ const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
 const contestManagerDeployedMapper: EvmMapper<
   'RecurringContestManagerDeployed' | 'OneOffContestManagerDeployed'
 > = (event: EvmEvent) => {
-  const decoded = decodeLog<typeof NamespaceFactoryAbi, 'NewContest'>({
+  const decoded = decodeLog({
     abi: NamespaceFactoryAbi,
+    eventName: 'NewContest',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -196,11 +199,9 @@ const contestManagerDeployedMapper: EvmMapper<
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<
-    typeof ContestGovernorAbi,
-    'NewRecurringContestStarted'
-  >({
+  const decoded = decodeLog({
     abi: ContestGovernorAbi,
+    eventName: 'NewRecurringContestStarted',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -219,11 +220,9 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
 const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<
-    typeof ContestGovernorSingleAbi,
-    'NewSingleContestStarted'
-  >({
+  const decoded = decodeLog({
     abi: ContestGovernorSingleAbi,
+    eventName: 'NewSingleContestStarted',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -242,8 +241,9 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
 const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof ContestGovernorAbi, 'ContentAdded'>({
+  const decoded = decodeLog({
     abi: ContestGovernorAbi,
+    eventName: 'ContentAdded',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -261,8 +261,9 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
 const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof ContestGovernorAbi, 'VoterVoted'>({
+  const decoded = decodeLog({
     abi: ContestGovernorAbi,
+    eventName: 'VoterVoted',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -287,8 +288,9 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
 const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof ContestGovernorSingleAbi, 'VoterVoted'>({
+  const decoded = decodeLog({
     abi: ContestGovernorSingleAbi,
+    eventName: 'VoterVoted',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
