@@ -1,6 +1,6 @@
 import { QuestEvents } from '@hicommonwealth/schemas';
 
-export type QuestAction = keyof typeof QuestEvents;
+export type QuestAction = keyof typeof QuestEvents | 'ExternalXPChainEvent'; // temp added here
 
 export type QuestActionSubFormErrors = {
   action?: string;
@@ -8,6 +8,8 @@ export type QuestActionSubFormErrors = {
   contentLink?: string;
   rewardAmount?: string;
   creatorRewardAmount?: string;
+  ethChainId?: string;
+  contractAddress?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -16,6 +18,8 @@ export type QuestActionSubFormFields = {
   contentLink?: string;
   rewardAmount?: string | number;
   creatorRewardAmount?: string | number;
+  ethChainId?: number;
+  contractAddress?: string;
 };
 
 export type QuestActionSubFormConfig = {

@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { splitCamelOrPascalCase } from 'helpers/string';
@@ -26,6 +27,7 @@ const QuestActionSubForm = ({
     'CommentUpvoted',
     'WalletLinked',
     'SSOLinked',
+    'ExternalXPChainEvent', // temp added here
   ]
     .map((event) => ({
       value: event as QuestAction,
@@ -36,6 +38,13 @@ const QuestActionSubForm = ({
         !(hiddenActions || []).includes(action.value) &&
         action.value !== 'UserMentioned',
     );
+
+  const ethereumChainOptions = Object.entries(commonProtocol.ValidChains).map(
+    ([k, v]) => ({
+      value: v as number,
+      label: `${v} (${k})`,
+    }),
+  );
 
   const placeholders = {
     sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
@@ -108,6 +117,42 @@ const QuestActionSubForm = ({
           />
         )}
       </div>
+
+      {defaultValues?.action === 'ExternalXPChainEvent' && (
+        <div className="grid-row cols-2">
+          <CWSelectList
+            isClearable={false}
+            label="Ethereum Chain"
+            placeholder="Select a chain"
+            name="ethChainId"
+            options={ethereumChainOptions}
+            onChange={(newValue) =>
+              newValue && onChange?.({ ethChainId: newValue.value })
+            }
+            {...(defaultValues?.ethChainId && {
+              value: {
+                value: defaultValues?.ethChainId,
+                label: splitCamelOrPascalCase(defaultValues?.ethChainId),
+              },
+            })}
+            customError={errors?.ethChainId}
+          />
+
+          <CWTextInput
+            label="Contract Address"
+            name="contractAddress"
+            placeholder="0x6b3595068778dd592e39a122f4f5a5cf09c90fe2"
+            fullWidth
+            {...(defaultValues?.contractAddress && {
+              defaultValue: defaultValues?.contractAddress,
+            })}
+            onInput={(e) =>
+              onChange?.({ contractAddress: e?.target?.value?.trim() })
+            }
+            customError={errors?.contractAddress}
+          />
+        </div>
+      )}
 
       <div
         className={clsx(
