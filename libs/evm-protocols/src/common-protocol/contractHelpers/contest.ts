@@ -5,18 +5,19 @@ import {
   INamespaceAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
+import { EvmEventSignatures, decodeLog } from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { getContract } from 'viem';
-import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
-import { CREATE_CONTEST_TOPIC } from '../chainConfig';
+import { TransactionReceipt, getContract } from 'viem';
+import Web3, { Contract } from 'web3';
+import { CREATE_CONTEST_TOPIC, ValidChains } from '../chainConfig';
 import {
   EvmProtocolChain,
   createPrivateEvmClient,
   decodeParameters,
   estimateGas,
   getPublicClient,
-  getTransactionCount,
+  getWalletClient,
   mapToAbiRes,
 } from '../utils';
 import { getNamespace } from './namespace';
@@ -258,100 +259,90 @@ export type AddContentResponse = {
 
 /**
  * Adds content to an active contest. Includes validation of contest state
+ * @param client
  * @param contest the address of the contest
  * @param creator the address of the user to create content on behalf of
  * @param url the common/commonwealth url of the content
- * @param web3 A web3 instance instantiated with a private key
  * @param nonce The nonce of the transaction
  * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
  */
 export const addContent = async (
+  client: ReturnType<typeof getWalletClient>,
   contest: string,
   creator: string,
   url: string,
-  web3: Web3,
   nonce?: number,
 ): Promise<AddContentResponse> => {
-  const contestInstance = new web3.eth.Contract(
-    ContestGovernorSingleAbi,
-    contest,
-  );
-
-  const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt: TransactionReceipt;
   try {
-    const txDetails: PayableCallOptions = {
-      from: web3.eth.defaultAccount,
-      gas: '1000000',
-      type: '0x2',
-      maxFeePerGas: maxFeePerGasEst?.toString(),
-      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-    };
-    if (nonce) {
-      txDetails.nonce = nonce.toString();
-    }
-    txReceipt = await contestInstance.methods
-      .addContent(creator, url, [])
-      .send(txDetails);
-  } catch (error) {
-    throw new Error('Failed to push content to chain: ' + error);
+    const { request } = await client.simulateContract({
+      abi: ContestGovernorSingleAbi,
+      address: contest as `0x${string}`,
+      functionName: 'addContent',
+      args: [creator as `0x${string}`, url, '' as `0x${string}`],
+      ...(await client.estimateFeesPerGas()),
+      gas: BigInt(1_000_000),
+      nonce,
+    });
+    txReceipt = await client.getTransactionReceipt({
+      hash: await client.writeContract(request),
+    });
+  } catch (e) {
+    throw new Error('Failed to push content to chain: ' + e);
   }
 
-  if (!txReceipt.events?.ContentAdded) {
-    throw new Error('Event not included in receipt');
-  }
+  const contentAddedEvent = txReceipt.logs.find(
+    (l) => l.topics[0] === EvmEventSignatures.Contests.ContentAdded,
+  );
 
-  const event = txReceipt.events['ContentAdded'];
-
-  if (!event) {
+  if (!contentAddedEvent) {
     throw new Error('Content not added on-chain');
   }
 
+  const { args } = decodeLog<typeof ContestGovernorAbi, 'ContentAdded'>({
+    abi: ContestGovernorAbi,
+    data: contentAddedEvent.data,
+    topics: contentAddedEvent.topics,
+  });
+
   return {
     txReceipt,
-    contentId: String(event.returnValues.contentId),
+    contentId: args.contentId.toString(),
   };
 };
 
 /**
  * Adds a vote to content if voting power is available and user hasnt voted
+ * @param client
  * @param contest the address of the contest
  * @param voter the address of the voter
  * @param contentId The contentId on the contest to vote
- * @param web3 A web3 instance instantiated with a private key
  * @param nonce The nonce of the transaction
  * @returns a tx receipt
  */
 export const voteContent = async (
+  client: ReturnType<typeof getWalletClient>,
   contest: string,
   voter: string,
   contentId: string,
-  web3: Web3,
   nonce?: number,
 ): Promise<TransactionReceipt> => {
-  const contestInstance = new web3.eth.Contract(
-    ContestGovernorSingleAbi,
-    contest,
-  );
-
-  const maxFeePerGasEst = await estimateGas(web3);
-  let txReceipt;
+  let txReceipt: TransactionReceipt;
   try {
-    const txDetails: PayableCallOptions = {
-      from: web3.eth.defaultAccount,
-      gas: '1000000',
-      type: '0x2',
-      maxFeePerGas: maxFeePerGasEst?.toString(),
-      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-    };
-    if (nonce) {
-      txDetails.nonce = nonce.toString();
-    }
-    txReceipt = await contestInstance.methods
-      .voteContent(voter, contentId)
-      .send(txDetails);
+    const { request } = await client.simulateContract({
+      abi: ContestGovernorSingleAbi,
+      address: contest as `0x${string}`,
+      functionName: 'voteContent',
+      args: [voter as `0x${string}`, BigInt(contentId)],
+      ...(await client.estimateFeesPerGas()),
+      gas: BigInt(1_000_000),
+      nonce,
+    });
+    txReceipt = await client.getTransactionReceipt({
+      hash: await client.writeContract(request),
+    });
   } catch (error) {
-    throw new Error('Failed to push content to chain: ' + error);
+    throw new Error('Failed to put vote on-chain: ' + error);
   }
 
   return txReceipt;
@@ -360,31 +351,35 @@ export const voteContent = async (
 const nonceMutex = new Mutex();
 
 export const addContentBatch = async ({
+  ethChainId,
   privateKey,
   rpc,
   contest,
   creator,
   url,
 }: {
+  ethChainId: ValidChains;
   privateKey: string;
   rpc: string;
   contest: string[];
   creator: string;
   url: string;
-  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<PromiseSettledResult<AddContentResponse>[]> => {
-  return nonceMutex.runExclusive(async () => {
-    const web3 = createPrivateEvmClient({ rpc, privateKey });
-    let currNonce = await getTransactionCount({
-      evmClient: web3,
+  return await nonceMutex.runExclusive(async () => {
+    const client = getWalletClient({
+      eth_chain_id: ethChainId,
       rpc,
-      address: web3.eth.defaultAccount!,
+      private_key: privateKey,
+    });
+
+    let currNonce = await client.getTransactionCount({
+      address: client.account.address,
     });
 
     const promises: Promise<AddContentResponse>[] = [];
 
     contest.forEach((c) => {
-      promises.push(addContent(c, creator, url, web3, currNonce));
+      promises.push(addContent(client, c, creator, url, currNonce));
       currNonce++;
     });
 
@@ -393,11 +388,13 @@ export const addContentBatch = async ({
 };
 
 export const voteContentBatch = async ({
+  ethChainId,
   privateKey,
   rpc,
   voter,
   entries,
 }: {
+  ethChainId: ValidChains;
   privateKey: string;
   rpc: string;
   voter: string;
@@ -405,21 +402,23 @@ export const voteContentBatch = async ({
     contestAddress: string;
     contentId: string;
   }[];
-  // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
-  return nonceMutex.runExclusive(async () => {
-    const web3 = createPrivateEvmClient({ rpc, privateKey });
-    let currNonce = await getTransactionCount({
-      evmClient: web3,
+  return await nonceMutex.runExclusive(async () => {
+    const client = getWalletClient({
+      eth_chain_id: ethChainId,
       rpc,
-      address: web3.eth.defaultAccount!,
+      private_key: privateKey,
+    });
+
+    let currNonce = await client.getTransactionCount({
+      address: client.account.address,
     });
 
     const promises: Promise<TransactionReceipt>[] = [];
 
     entries.forEach(({ contestAddress, contentId }) => {
       promises.push(
-        voteContent(contestAddress, voter, contentId, web3, currNonce),
+        voteContent(client, contestAddress, voter, contentId, currNonce),
       );
       currNonce++;
     });

@@ -10,11 +10,18 @@ import {
   DecodeEventLogReturnType,
   Hex,
   createPublicClient,
+  createWalletClient,
   decodeEventLog,
   getAddress,
   http,
+  publicActions,
 } from 'viem';
-import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
+import {
+  english,
+  generateMnemonic,
+  mnemonicToAccount,
+  privateKeyToAccount,
+} from 'viem/accounts';
 import {
   anvil,
   arbitrum,
@@ -267,6 +274,22 @@ export const getPublicClient = (chain: EvmProtocolChain) => {
     chain: ViemChains[chain.eth_chain_id],
     transport: http(chain.rpc),
   });
+};
+
+export const getWalletClient = (
+  chain: EvmProtocolChain & { private_key: string },
+) => {
+  const moddedChain: Chain = {
+    ...ViemChains[chain.eth_chain_id],
+  };
+  if (moddedChain.fees) moddedChain.fees.baseFeeMultiplier = 2;
+  else moddedChain.fees = { baseFeeMultiplier: 2 };
+
+  return createWalletClient({
+    chain: moddedChain,
+    transport: http(chain.rpc),
+    account: privateKeyToAccount(chain.private_key as `0x${string}`),
+  }).extend(publicActions);
 };
 
 export type MappedArgs<

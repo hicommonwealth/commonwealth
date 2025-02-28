@@ -11,6 +11,7 @@ const log = logger(import.meta);
 
 export async function createOnchainContestContent(payload: {
   contestManagers: Array<{
+    eth_chain_id: number;
     url: string;
     contest_address: string;
     actions: Array<z.infer<typeof ContestAction>>;
@@ -67,6 +68,7 @@ export async function createOnchainContestContent(payload: {
     throw new ServerError('WEB3 private key not set!');
 
   const results = await addContentBatch({
+    ethChainId: payload.contestManagers[0].eth_chain_id,
     privateKey: config.WEB3.PRIVATE_KEY,
     rpc: payload.contestManagers[0].url,
     contest: addressesToProcess,
@@ -88,6 +90,7 @@ export async function createOnchainContestContent(payload: {
 
 export async function createOnchainContestVote(payload: {
   contestManagers: Array<{
+    eth_chain_id: number;
     url: string;
     contest_address: string;
     content_id: number;
@@ -107,6 +110,7 @@ export async function createOnchainContestVote(payload: {
     throw new ServerError('WEB3 private key not set!');
 
   const results = await voteContentBatch({
+    ethChainId: payload.contestManagers[0].eth_chain_id,
     privateKey: config.WEB3.PRIVATE_KEY,
     rpc: payload.contestManagers[0].url,
     voter: payload.author_address,
