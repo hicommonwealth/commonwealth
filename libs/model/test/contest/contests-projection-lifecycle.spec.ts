@@ -351,6 +351,7 @@ describe('Contests projection lifecycle', () => {
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
               votes: BigInt(s.votes).toString(),
             })),
+            contest_balance: '0',
             // actions: [
             //   {
             //     action: 'added',
