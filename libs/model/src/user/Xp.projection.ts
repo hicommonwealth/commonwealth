@@ -4,7 +4,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { isWithinPeriod } from '@hicommonwealth/shared';
+import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
@@ -226,6 +226,7 @@ const SignUpFlowCompletedReward = 20;
 const SignUpFlowCompletedReferrerRewardWeight = 0.2;
 const WalletLinkedReward = 10;
 const SSOLinkedReward = 10;
+const TwitterCommonMentionedReward = 5;
 
 export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
@@ -455,7 +456,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         }
       },
       TwitterCommonMentioned: async ({ payload }) => {
-        console.log('>>>>>>>>>>> IT WORKED', payload);
+        const user = await models.Address.findOne({
+          where: {
+            oauth_provider: WalletSsoSource.Twitter,
+            oauth_username: payload.username,
+          },
+        });
+        if (!user) return;
+        await recordXpsForEvent(
+          user.id!,
+          'TwitterCommonMentioned',
+          payload.created_at,
+          TwitterCommonMentionedReward,
+        );
       },
     },
   };

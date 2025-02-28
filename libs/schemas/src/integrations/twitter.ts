@@ -4,7 +4,7 @@ export const Tweet = z.object({
   id: z.string(),
   author_id: z.string(),
   username: z.string(),
-  created_at: z.string(),
+  created_at: z.coerce.date(),
   text: z.string().describe('The first 280 characters of the tweet'),
   note_tweet: z
     .string()

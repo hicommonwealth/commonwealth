@@ -98,7 +98,7 @@ export async function getMentions({
           author_id: t.author_id,
           username: authorUsername,
           text: t.text,
-          created_at: t.created_at,
+          created_at: new Date(t.created_at),
         };
       }) || [];
 
