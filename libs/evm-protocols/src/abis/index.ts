@@ -12,3 +12,4 @@ export * from './referralFeeManager';
 export * from './reservationHookAbi';
 export * from './singleContestAbi';
 export * from './tokenCommunityManagerAbi';
+export * from './veBridgeAbi';
