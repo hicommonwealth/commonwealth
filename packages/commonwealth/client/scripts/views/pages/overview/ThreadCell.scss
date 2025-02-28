@@ -66,8 +66,10 @@
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    div {
-      padding: 0 !important;
+
+    .popover-container {
+      height: auto;
+      line-height: 0;
     }
     button {
       padding: 0 !important;

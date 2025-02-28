@@ -393,6 +393,7 @@ export const HeaderWithFilters = ({
                         id: 0,
                         label: 'All Topics',
                         value: 'All Topics',
+                        type: true,
                       },
                       ...[...featuredTopics, ...otherTopics].map((t) => ({
                         id: t.id,

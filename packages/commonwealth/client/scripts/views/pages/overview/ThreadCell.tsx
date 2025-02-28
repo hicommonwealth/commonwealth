@@ -177,7 +177,7 @@ const ThreadCell = ({
               <ToggleThreadSubscribe
                 thread={thread}
                 isCommunityMember={isCommunityMember}
-                showLabel={false}
+                showLabel={true}
               />
             )}
           </div>

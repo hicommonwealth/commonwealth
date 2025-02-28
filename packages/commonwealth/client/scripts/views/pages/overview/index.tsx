@@ -11,12 +11,11 @@ import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTable } from '../../components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import '../discussions/DiscussionsPage.scss';
+import OverViewPageColumn from './OverViewPageColumn';
 import ThreadCell from './ThreadCell';
 import './index.scss';
-
 type OverViewPageProps = {
   topicId?: string | number | undefined;
   featuredFilter?: ThreadFeaturedFilterTypes;
@@ -118,37 +117,9 @@ const OverviewPage = ({
 
     return newData;
   }, [topicId, featuredFilter, recentlyActiveThreads, timelineFilter]);
-  const columns: CWTableColumnInfo[] = [
-    {
-      key: 'title',
-      header: 'Title',
-      hasCustomSortValue: true,
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'topic',
-      header: 'Topic',
-      hasCustomSortValue: false,
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'createdAt',
-      header: 'Created Date',
-      numeric: false,
-      sortable: true,
-    },
 
-    {
-      key: 'viewCount',
-      header: 'Views',
-      numeric: false,
-      sortable: true,
-    },
-  ];
   const tableState = useCWTableState({
-    columns,
+    columns: OverViewPageColumn,
     initialSortColumn: 'createdAt',
     initialSortDirection: APIOrderDirection.Desc,
   });
