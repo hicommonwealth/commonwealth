@@ -182,20 +182,23 @@ describe('Contests projection lifecycle', () => {
       },
     ];
     getTokenAttributes.mockResolvedValue({ ticker, decimals });
-    getContestScore.mockResolvedValue([
-      {
-        creator_address: creator1,
-        content_id: content_id.toString(),
-        votes: '1',
-        prize: '972000000',
-      },
-      {
-        creator_address: creator2,
-        content_id: content_id.toString(),
-        votes: '2',
-        prize: '108000000',
-      },
-    ]);
+    getContestScore.mockResolvedValue({
+      contestBalance: '0',
+      scores: [
+        {
+          creator_address: creator1,
+          content_id: content_id.toString(),
+          votes: '1',
+          prize: '972000000',
+        },
+        {
+          creator_address: creator2,
+          content_id: content_id.toString(),
+          votes: '2',
+          prize: '108000000',
+        },
+      ],
+    });
     getContestStatus.mockResolvedValue({
       startTime: 1,
       endTime: 100,

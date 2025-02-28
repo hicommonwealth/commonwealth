@@ -98,7 +98,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     const getContestScoreStub = vi
       .spyOn(evm, 'getContestScore')
-      .mockResolvedValue([]);
+      .mockResolvedValue({ contestBalance: '0', scores: [] });
 
     await emitEvent(models.Outbox, [
       {
