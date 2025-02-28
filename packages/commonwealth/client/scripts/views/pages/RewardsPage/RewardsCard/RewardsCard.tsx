@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 
 import { CWCard } from 'views/components/component_kit/cw_card';
@@ -12,6 +13,7 @@ interface RewardsCardProps {
   description?: string;
   icon: IconName;
   onSeeAllClick?: () => void;
+  isAlreadySelected?: boolean;
   children?: React.ReactNode;
 }
 
@@ -20,6 +22,7 @@ const RewardsCard = ({
   description,
   icon,
   onSeeAllClick,
+  isAlreadySelected = false,
   children,
 }: RewardsCardProps) => {
   return (
@@ -30,7 +33,11 @@ const RewardsCard = ({
           {title}
         </CWText>
         {onSeeAllClick && (
-          <CWText className="see-all-text" onClick={onSeeAllClick} type="b2">
+          <CWText
+            className={clsx('see-all-text', { disabled: isAlreadySelected })}
+            onClick={isAlreadySelected ? undefined : onSeeAllClick}
+            type="b2"
+          >
             See all
           </CWText>
         )}

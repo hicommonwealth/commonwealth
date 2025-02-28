@@ -20,6 +20,18 @@ export const columns: CWTableColumnInfo[] = [
     sortable: false,
   },
   {
+    key: 'community',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'namespace',
+    header: 'Namespace',
+    numeric: false,
+    sortable: false,
+  },
+  {
     key: 'earnings',
     header: 'Earnings',
     numeric: true,
