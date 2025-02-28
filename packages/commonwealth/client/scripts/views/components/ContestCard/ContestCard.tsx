@@ -9,7 +9,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
@@ -34,6 +33,7 @@ import ContestAlert from './ContestAlert';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
+import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -73,6 +73,7 @@ interface ContestCardProps {
     chainNodeUrl: string;
   };
   hideWhenNoPrizes?: boolean;
+  contestBalance?: number;
 }
 
 const ContestCard = ({
@@ -95,6 +96,7 @@ const ContestCard = ({
   score = [],
   community,
   hideWhenNoPrizes = false,
+  contestBalance = 0,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -112,16 +114,16 @@ const ContestCard = ({
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
-  const { data: contestBalance, isLoading: isLoadingContestBalance } =
-    useGetContestBalanceQuery({
-      contestAddress: address,
-      chainRpc: community?.chainNodeUrl || '',
-      ethChainId: community?.ethChainId || 0,
-      isOneOff: !isRecurring,
-    });
+  const { data: onchainContestBalance } = useGetContestBalanceQuery({
+    contestAddress: address,
+    chainRpc: community?.chainNodeUrl || '',
+    ethChainId: community?.ethChainId || 0,
+    isOneOff: !isRecurring,
+  });
 
   const prizes = buildContestPrizes(
-    Number(contestBalance),
+    // if onchain balance is zero, use projected balance
+    Number(onchainContestBalance || contestBalance),
     payoutStructure,
     decimals,
   );
@@ -182,11 +184,7 @@ const ContestCard = ({
     copyFarcasterContestFrameUrl(address).catch(console.log);
   };
 
-  const showNoFundsInfo =
-    isAdmin &&
-    isActive &&
-    !isLoadingContestBalance &&
-    (contestBalance || 0) <= 0;
+  const showNoFundsInfo = isAdmin && isActive && (contestBalance || 0) <= 0;
 
   const isLessThan24HoursLeft =
     moment(finishDate).diff(moment(), 'hours') <= 24;

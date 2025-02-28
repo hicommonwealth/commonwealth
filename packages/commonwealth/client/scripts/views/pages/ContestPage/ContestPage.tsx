@@ -115,6 +115,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             isFarcaster={contest?.is_farcaster_contest}
             onFund={() => setFundDrawerContest(contest)}
             community={community}
+            contestBalance={parseInt(
+              contest?.contests?.[0]?.contest_balance || '0',
+              10,
+            )}
           />
         )}
 

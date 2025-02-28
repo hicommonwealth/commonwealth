@@ -103,7 +103,9 @@ export function GetFarcasterContestCasts(): Query<
           return {
             ...acc,
             // remove fid from hash
-            [replyCastHash.split('?')[0]]: content.voting_weights_sum || 0,
+            [replyCastHash.split('?')[0]]:
+              content.voting_weights_sum *
+              (contestManager.vote_weight_multiplier || 0),
           };
         },
         {} as Record<string, number>,

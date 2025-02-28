@@ -214,7 +214,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const score = await getContestScore(
+    const { scores, contestBalance } = await getContestScore(
       details.url,
       contest_address,
       details.prize_percentage,
@@ -223,7 +223,11 @@ export async function updateScore(contest_address: string, contest_id: number) {
       details.interval === 0,
     );
     await models.Contest.update(
-      { score, score_updated_at: new Date() },
+      {
+        score: scores,
+        score_updated_at: new Date(),
+        contest_balance: contestBalance,
+      },
       { where: { contest_address: contest_address, contest_id } },
     );
   } catch (err) {

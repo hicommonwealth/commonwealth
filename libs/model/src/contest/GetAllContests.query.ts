@@ -46,7 +46,8 @@ from
       'start_time', c.start_time,
       'end_time', c.end_time,
       'score_updated_at', c.score_updated_at,
-      'score', c.score --,
+      'score', c.score,
+      'contest_balance', c.contest_balance::text --,
 --      'actions', coalesce(ca.actions, '[]'::jsonb)
 		) order by c.contest_id desc) as contests
 	from "Contests" c

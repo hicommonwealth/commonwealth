@@ -1,10 +1,14 @@
 import { Command, logger } from '@hicommonwealth/core';
-import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
+import {
+  createPrivateEvmClient,
+  getContestScore,
+} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { config } from '../config';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import { createOnchainContestVote } from '../policies/utils/contest-utils';
-import { emitEvent } from '../utils/utils';
+import { emitEvent, getChainNodeUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
@@ -20,6 +24,25 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
     body: async ({ payload }) => {
       const { contest_address, contest_id, actions, chain_url, is_one_off } =
         payload;
+
+      const contestManager = await models.ContestManager.findByPk(
+        contest_address,
+        {
+          include: [
+            {
+              model: models.Community,
+              required: true,
+              include: [
+                {
+                  model: models.ChainNode.scope('withPrivateData'),
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+      );
+      mustExist('Contest Manager', contestManager);
 
       // add onchain vote to the first content when no upvotes found in the last hour
 
@@ -48,10 +71,29 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
         }
       }
 
+      const rpc = getChainNodeUrl({
+        url: chain_url,
+        private_url:
+          contestManager.Community!.ChainNode?.private_url ||
+          contestManager.Community!.ChainNode?.url,
+      });
+      const { contestBalance, scores } = await getContestScore(
+        rpc,
+        contestManager.contest_address,
+        contestManager.prize_percentage || 0,
+        contestManager.payout_structure,
+        contest_id,
+        is_one_off,
+      );
+
       await models.sequelize.transaction(async (transaction) => {
         await models.ContestManager.update(
           { ending: true },
           { where: { contest_address }, transaction },
+        );
+        await models.Contest.update(
+          { contest_balance: contestBalance, score: scores },
+          { where: { contest_address, contest_id }, transaction },
         );
         await emitEvent(
           models.Outbox,

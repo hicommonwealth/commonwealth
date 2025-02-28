@@ -34,7 +34,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
       });
 
       // better to get scores using views to avoid returning unbounded arrays in txs
-      const score = await getContestScore(
+      const { contestBalance, scores } = await getContestScore(
         rpc,
         contest_address,
         prize_percentage,
@@ -79,7 +79,11 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
       await models.sequelize.transaction(async (transaction) => {
         // update final score
         await models.Contest.update(
-          { score, score_updated_at: new Date() },
+          {
+            score: scores,
+            score_updated_at: new Date(),
+            contest_balance: contestBalance,
+          },
           { where: { contest_address, contest_id }, transaction },
         );
 
@@ -98,7 +102,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
                 contest_address,
                 contest_id,
                 is_one_off,
-                winners: score.map((s) => ({
+                winners: scores.map((s) => ({
                   address: s.creator_address,
                   content: s.content_id,
                   votes: s.votes,
