@@ -85,7 +85,9 @@ const useUserWalletHoldings = ({
         // - `name="NEIRO",symbol="Visit getneirocoin.xyz to Claim"`
         // - `name="Venice Token",symbol="Claim: venice-claim.com"`
         // and more. Filtering by a `.` as these usually have a domain name in symbol
-        !(t.name + t.symbol).includes('.'),
+        !(t.name + t.symbol).includes('.') &&
+        // only include tokens for which we have a coinbase conversion price
+        t.toUsdPerUnitRate,
     );
 
   // get combined usd holding value of all the tokens user has
