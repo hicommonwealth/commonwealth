@@ -86,24 +86,22 @@ async function main() {
       return;
     }
 
-    await Promise.allSettled([
-      pollMentions(TwitterBotConfigs.MomBot),
-      pollMentions(TwitterBotConfigs.ContestBot),
-    ]);
+    // TODO: if the configs are from the same bearer token/app -> split poll interval between each
 
-    setInterval(
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      pollMentions,
-      config.TWITTER.WORKER_POLL_INTERVAL,
-      TwitterBotConfigs.MomBot,
+    await Promise.allSettled(
+      config.TWITTER.ENABLED_BOTS.map((n) =>
+        pollMentions(TwitterBotConfigs[n]),
+      ),
     );
 
-    setInterval(
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      pollMentions,
-      config.TWITTER.WORKER_POLL_INTERVAL,
-      TwitterBotConfigs.ContestBot,
-    );
+    config.TWITTER.ENABLED_BOTS.forEach((n) => {
+      setInterval(
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        pollMentions,
+        config.TWITTER.WORKER_POLL_INTERVAL,
+        TwitterBotConfigs[n],
+      );
+    });
 
     isServiceHealthy = true;
     log.info('Twitter Worker started');

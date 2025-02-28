@@ -1,7 +1,7 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
 import { configure } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
@@ -28,6 +28,8 @@ const {
   ENABLE_CLIENT_PUBLISHING,
   EVM_CE_LOG_TRACE,
   TWITTER_WORKER_POLL_INTERVAL,
+  ENABLED_TWITTER_BOTS,
+  TWITTER_APP_BEARER_TOKEN,
 } = process.env;
 
 const DEFAULTS = {
@@ -118,6 +120,9 @@ export const config = configure(
           return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
         else return 0;
       })(),
+      ENABLED_BOTS:
+        (ENABLED_TWITTER_BOTS?.split(',') as TwitterBotName[]) || [],
+      APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
     },
   },
   z.object({
@@ -203,8 +208,14 @@ export const config = configure(
     }),
     DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
-    TWITTER: z.object({
-      WORKER_POLL_INTERVAL: z.number().int().gte(0),
-    }),
+    TWITTER: z
+      .object({
+        APP_BEARER_TOKEN: z.string().optional(),
+        WORKER_POLL_INTERVAL: z.number().int().gte(0),
+        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
+      })
+      .refine(
+        (data) => !(data.ENABLED_BOTS.length > 0 && !data.APP_BEARER_TOKEN),
+      ),
   }),
 );

@@ -454,6 +454,9 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           );
         }
       },
+      TwitterCommonMentioned: async ({ payload }) => {
+        console.log('>>>>>>>>>>> IT WORKED', payload);
+      },
     },
   };
 }

@@ -317,6 +317,9 @@ export const events = {
 
   TwitterMomBotMentioned: Tweet,
   TwitterContestBotMentioned: Tweet,
+  TwitterCommonMentioned: Tweet.describe(
+    'Emitted when a Twitter/X user mentions @commondotxyz',
+  ),
 
   // Events mapped from ChainEvents
   CommunityStakeTrade: ChainEventBase.extend({
