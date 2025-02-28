@@ -266,6 +266,7 @@
     "sass": "^1.55.0",
     "sequelize": "^6.32.1",
     "sequelize-cli": "^6.2.0",
+    "sharp": "^0.33.5",
     "siwe": "^2.1.4",
     "sleep-promise": "^8.0.1",
     "smart-truncate": "^1.0.1",
