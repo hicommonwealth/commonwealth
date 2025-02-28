@@ -4,20 +4,24 @@ export type QuestAction = keyof typeof QuestEvents;
 
 export type QuestActionSubFormErrors = {
   action?: string;
-  actionLink?: string;
+  instructionsLink?: string;
+  contentLink?: string;
   rewardAmount?: string;
   creatorRewardAmount?: string;
 };
 
 export type QuestActionSubFormFields = {
   action?: QuestAction;
-  actionLink?: string;
+  instructionsLink?: string;
+  contentLink?: string;
   rewardAmount?: string | number;
   creatorRewardAmount?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
   requires_creator_points: boolean;
+  with_optional_thread_id: boolean;
+  with_optional_comment_id: boolean;
 };
 
 export type QuestActionSubFormProps = {

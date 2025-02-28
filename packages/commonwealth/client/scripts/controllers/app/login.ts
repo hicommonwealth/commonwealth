@@ -4,14 +4,15 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { getEvmAddress } from '@hicommonwealth/evm-protocols';
+import { ExtendedCommunity, MagicLogin } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
+  WalletSsoSource,
   chainBaseToCanvasChainId,
   getSessionSigners,
   serializeCanvas,
-  WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { FarcasterExtension } from '@magic-ext/farcaster';
@@ -396,7 +397,7 @@ export async function handleSocialLoginCallback({
 }: {
   bearer?: string | null;
   chain?: string;
-  walletSsoSource?: string;
+  walletSsoSource: WalletSsoSource;
   isCustomDomain?: boolean;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
@@ -412,6 +413,8 @@ export async function handleSocialLoginCallback({
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
 
+  let magicOauthRes;
+
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
@@ -426,29 +429,30 @@ export async function handleSocialLoginCallback({
     if (isCosmos) {
       magicAddress = metadata.publicAddress;
     } else {
-      const { utils } = await import('ethers');
       if (metadata.publicAddress === null) {
         throw new Error('Expected magic to return publicAddress');
       }
-      magicAddress = utils.getAddress(metadata.publicAddress);
+      magicAddress = getEvmAddress(metadata.publicAddress);
     }
   } else {
-    const result = isCustomDomain
+    magicOauthRes = isCustomDomain
       ? await magic.oauth.getRedirectResult()
       : await magic.oauth2.getRedirectResult();
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');
-      bearer = result.magic.idToken;
-      console.log('Magic redirect result:', result);
+      // eslint-disable-next-line no-param-reassign
+      bearer = magicOauthRes.magic.idToken;
+      console.log('Magic redirect result:', magicOauthRes);
     }
     // Get magic metadata
-    profileMetadata = getProfileMetadata(result.oauth);
+    profileMetadata = getProfileMetadata(magicOauthRes.oauth);
     if (isCosmos) {
-      magicAddress = result.magic.userMetadata.publicAddress;
+      magicAddress = magicOauthRes.magic.userMetadata.publicAddress;
     } else {
-      const { utils } = await import('ethers');
-      magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+      magicAddress = getEvmAddress(
+        magicOauthRes.magic.userMetadata.publicAddress,
+      );
     }
   }
 
@@ -480,11 +484,10 @@ export async function handleSocialLoginCallback({
       );
     } else {
       const { Web3Provider } = await import('@ethersproject/providers');
-      const { utils } = await import('ethers');
 
       const provider = new Web3Provider(magic.rpcProvider);
       const signer = provider.getSigner();
-      const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
+      const checksumAddress = getEvmAddress(magicAddress); // get checksum-capitalized eth address
 
       const sessionSigner = new SIWESigner({
         signer,
@@ -507,27 +510,24 @@ export async function handleSocialLoginCallback({
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   let response;
+  const data: z.infer<typeof MagicLogin> = {
+    community_id: desiredChain?.id,
+    access_token: magicOauthRes?.oauth?.accessToken,
+    jwt: userStore.getState().jwt,
+    username: profileMetadata?.username,
+    avatarUrl: profileMetadata?.avatarUrl,
+    magicAddress,
+    session: session && serializeCanvas(session),
+    walletSsoSource,
+  };
+
   try {
-    response = await axios.post(
-      `${SERVER_URL}/auth/magic`,
-      {
-        data: {
-          community_id: desiredChain?.id,
-          jwt: userStore.getState().jwt,
-          username: profileMetadata?.username,
-          avatarUrl: profileMetadata?.avatarUrl,
-          magicAddress,
-          session: session && serializeCanvas(session),
-          walletSsoSource,
-        },
+    response = await axios.post(`${SERVER_URL}/auth/magic`, data, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${bearer}`,
       },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${bearer}`,
-        },
-      },
-    );
+    });
   } catch (e) {
     notifyError(e.response.data.error);
   }

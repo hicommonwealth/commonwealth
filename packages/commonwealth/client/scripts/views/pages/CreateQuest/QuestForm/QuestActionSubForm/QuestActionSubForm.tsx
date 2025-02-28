@@ -1,4 +1,4 @@
-import { QuestEvents } from '@hicommonwealth/schemas';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import React from 'react';
@@ -17,7 +17,15 @@ const QuestActionSubForm = ({
   onChange,
   hiddenActions,
 }: QuestActionSubFormProps) => {
-  const actionOptions = Object.keys(QuestEvents)
+  const actionOptions = [
+    'SignUpFlowCompleted',
+    'CommunityCreated',
+    'CommunityJoined',
+    'ThreadCreated',
+    'ThreadUpvoted',
+    'CommentCreated',
+    'CommentUpvoted',
+  ]
     .map((event) => ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
@@ -27,6 +35,11 @@ const QuestActionSubForm = ({
         !(hiddenActions || []).includes(action.value) &&
         action.value !== 'UserMentioned',
     );
+
+  const placeholders = {
+    sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
+    sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
+  };
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
@@ -56,48 +69,88 @@ const QuestActionSubForm = ({
         customError={errors?.action}
       />
 
-      <CWTextInput
-        label="Total Reward Points"
-        placeholder="Points Earned"
-        fullWidth
-        {...(defaultValues?.rewardAmount && {
-          defaultValue: defaultValues?.rewardAmount,
-        })}
-        onInput={(e) => onChange?.({ rewardAmount: e?.target?.value?.trim() })}
-        name="rewardAmount"
-        customError={errors?.rewardAmount}
-      />
-
-      {config?.requires_creator_points && (
+      <div
+        className={clsx(
+          'grid-row',
+          config?.requires_creator_points ? 'cols-2' : 'cols-1',
+        )}
+      >
         <CWTextInput
-          label="Creater Reward Share"
+          label="Total Reward Points"
           placeholder="Points Earned"
           fullWidth
-          {...(defaultValues?.creatorRewardAmount && {
-            defaultValue: defaultValues?.creatorRewardAmount,
+          {...(defaultValues?.rewardAmount && {
+            defaultValue: defaultValues?.rewardAmount,
           })}
           onInput={(e) =>
-            onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
+            onChange?.({ rewardAmount: e?.target?.value?.trim() })
           }
-          name="creatorRewardAmount"
-          customError={errors?.creatorRewardAmount}
-          // eslint-disable-next-line max-len
-          instructionalMessage="Number of reward points the action creator would get. Deducted from total reward points."
+          name="rewardAmount"
+          customError={errors?.rewardAmount}
         />
-      )}
 
-      <CWTextInput
-        label="Relevant Quest Link (optional)"
-        name="actionLink"
-        placeholder="https://example.com"
-        instructionalMessage="Note: Social media task links will appear here (e.g., follow on X, join Discord)"
-        fullWidth
-        {...(defaultValues?.actionLink && {
-          defaultValue: defaultValues?.actionLink,
-        })}
-        onInput={(e) => onChange?.({ actionLink: e?.target?.value?.trim() })}
-        customError={errors?.actionLink}
-      />
+        {config?.requires_creator_points && (
+          <CWTextInput
+            label="Creater Reward Share"
+            placeholder="Points Earned"
+            fullWidth
+            {...(defaultValues?.creatorRewardAmount && {
+              defaultValue: defaultValues?.creatorRewardAmount,
+            })}
+            onInput={(e) =>
+              onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
+            }
+            name="creatorRewardAmount"
+            customError={errors?.creatorRewardAmount}
+            // eslint-disable-next-line max-len
+            instructionalMessage="Reward points for action creator. Deducted from total reward points."
+          />
+        )}
+      </div>
+
+      <div
+        className={clsx(
+          'grid-row',
+          config?.with_optional_comment_id || config?.with_optional_thread_id
+            ? 'cols-2'
+            : 'cols-1',
+        )}
+      >
+        {(config?.with_optional_comment_id ||
+          config?.with_optional_thread_id) && (
+          <CWTextInput
+            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
+            name="contentLink"
+            placeholder={
+              config?.with_optional_thread_id
+                ? placeholders.sampleThreadLink
+                : placeholders.sampleCommentLink
+            }
+            fullWidth
+            {...(defaultValues?.contentLink && {
+              defaultValue: defaultValues?.contentLink,
+            })}
+            onInput={(e) =>
+              onChange?.({ contentLink: e?.target?.value?.trim() })
+            }
+            customError={errors?.contentLink}
+          />
+        )}
+
+        <CWTextInput
+          label="Instructions Link (optional)"
+          name="instructionsLink"
+          placeholder="https://example.com"
+          fullWidth
+          {...(defaultValues?.instructionsLink && {
+            defaultValue: defaultValues?.instructionsLink,
+          })}
+          onInput={(e) =>
+            onChange?.({ instructionsLink: e?.target?.value?.trim() })
+          }
+          customError={errors?.instructionsLink}
+        />
+      </div>
     </div>
   );
 };

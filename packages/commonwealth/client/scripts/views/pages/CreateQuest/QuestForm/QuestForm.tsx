@@ -9,10 +9,14 @@ import {
 } from 'views/components/component_kit/CWImageInput';
 import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
@@ -42,6 +46,8 @@ const QuestForm = (props: QuestFormProps) => {
     formMethodsRef,
   } = useQuestForm(props);
 
+  const popoverProps = usePopover();
+
   return (
     <CWForm
       ref={formMethodsRef}
@@ -67,6 +73,46 @@ const QuestForm = (props: QuestFormProps) => {
           })}
       className="QuestForm"
     >
+      <div className="basic-information-section">
+        <CWText type="b1" fontWeight="semiBold">
+          Basic information
+        </CWText>
+
+        <CWTextInput
+          label="Quest name"
+          placeholder="Quest name"
+          fullWidth
+          name="name"
+          hookToForm
+        />
+
+        <CWTextArea
+          label="Description"
+          placeholder="Add a description for your Quest"
+          name="description"
+          hookToForm
+        />
+
+        <CWImageInput
+          label="Quest Image - Accepts JPG and PNG files - (optional)"
+          onImageProcessingChange={({ isGenerating, isUploading }) => {
+            setIsProcessingQuestImage(isGenerating || isUploading);
+          }}
+          name="image"
+          hookToForm
+          imageBehavior={ImageBehavior.Fill}
+          withAIImageGeneration
+        />
+        <CWCommunityInput
+          name="community"
+          hookToForm
+          label="Community (optional)"
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
+        />
+      </div>
+
+      <CWDivider />
+
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
@@ -110,50 +156,39 @@ const QuestForm = (props: QuestFormProps) => {
 
       <CWDivider />
 
-      <div className="basic-information-section">
-        <CWText type="b1" fontWeight="semiBold">
-          Basic information
-        </CWText>
-
-        <CWTextInput
-          label="Quest name"
-          placeholder="Quest name"
-          fullWidth
-          name="name"
-          hookToForm
-        />
-
-        <CWTextArea
-          label="Description"
-          placeholder="Add a description for your Quest"
-          name="description"
-          hookToForm
-        />
-
-        <CWImageInput
-          label="Quest Image (Accepts JPG and PNG files)"
-          onImageProcessingChange={({ isGenerating, isUploading }) => {
-            setIsProcessingQuestImage(isGenerating || isUploading);
-          }}
-          name="image"
-          hookToForm
-          imageBehavior={ImageBehavior.Fill}
-          withAIImageGeneration
-        />
-        <CWCommunityInput
-          name="community"
-          hookToForm
-          label="Community (optional)"
-          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
-        />
-      </div>
-
-      <CWDivider />
-
       <div className="actions-section">
         <div className="header">
           <CWText type="b1" fontWeight="semiBold">
-            Actions
+            Actions&nbsp;
+            <CWPopover
+              body={
+                <div>
+                  <CWText type="b2">
+                    Quest actions engage users to complete specific tasks.
+                  </CWText>
+                  <br />
+
+                  <CWText type="b2" fontWeight="semiBold">
+                    Examples:
+                  </CWText>
+                  <br />
+
+                  <CWText type="b2">
+                    &#9679; Join &apos;Common&apos; Community to earn 70 XP
+                  </CWText>
+
+                  <CWText type="b2">
+                    &#9679; Participate in any contest to earn 90 XP
+                  </CWText>
+                </div>
+              }
+              {...popoverProps}
+            />
+            <CWIconButton
+              iconName="question"
+              onMouseEnter={popoverProps.handleInteraction}
+              onMouseLeave={popoverProps.handleInteraction}
+            />
           </CWText>
           <CWText type="b2">
             Add actions that users should take to earn points

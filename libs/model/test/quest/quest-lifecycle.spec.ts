@@ -205,6 +205,41 @@ describe('Quest lifecycle', () => {
         `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
       );
     });
+
+    it('should not update a quest with invalid content_id', async () => {
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          name: chance.name() + Math.random(),
+          description: 'test description',
+          image_url: chance.url(),
+          start_date,
+          end_date,
+        },
+      });
+      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
+        [
+          {
+            event_name: 'CommentUpvoted',
+            reward_amount: 200,
+            participation_limit: QuestParticipationLimit.OncePerPeriod,
+            participation_period: QuestParticipationPeriod.Monthly,
+            participation_times_per_period: 3,
+            creator_reward_weight: 0.1,
+            content_id: 'comment:1000',
+          },
+        ];
+      await expect(
+        command(UpdateQuest(), {
+          actor: superadmin,
+          payload: {
+            quest_id: quest!.id!,
+            action_metas,
+          },
+        }),
+      ).rejects.toThrowError(`Comment with id "1000" must exist`);
+    });
   });
 
   describe('query', () => {
@@ -274,7 +309,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(8);
+      expect(retrieved?.results?.length).toBe(9);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
