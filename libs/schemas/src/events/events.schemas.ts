@@ -123,8 +123,9 @@ export const events = {
   CommunityJoined: z.object({
     community_id: z.string(),
     user_id: z.number(),
-    created_at: z.coerce.date(),
     oauth_provider: z.string().nullish(),
+    referrer_address: z.string().nullish(),
+    created_at: z.coerce.date(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -310,6 +311,7 @@ export const events = {
   SignUpFlowCompleted: z.object({
     user_id: z.number(),
     address: z.string(),
+    referred_by_address: z.string().nullish(),
     created_at: z.coerce.date(),
   }),
 

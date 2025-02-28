@@ -157,6 +157,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               event_payload: {
                 community_id,
                 user_id: addr.user_id!,
+                referrer_address,
                 created_at: addr.created_at!,
               },
             });
