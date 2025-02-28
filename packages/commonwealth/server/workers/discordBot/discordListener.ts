@@ -47,6 +47,7 @@ async function startDiscordListener() {
       IntentsBitField.Flags.Guilds,
       IntentsBitField.Flags.MessageContent,
       IntentsBitField.Flags.GuildMessages,
+      IntentsBitField.Flags.GuildMembers,
     ],
   });
 
