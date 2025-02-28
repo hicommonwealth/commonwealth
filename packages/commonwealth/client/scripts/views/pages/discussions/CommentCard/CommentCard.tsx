@@ -18,6 +18,7 @@ import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { SharePopover } from 'views/components/SharePopover';
@@ -131,7 +132,7 @@ export const CommentCard = ({
     communityId: comment.community_id,
     existingNumberOfComments: 0,
   });
-
+  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -464,26 +465,27 @@ export const CommentCard = ({
                         void onReply?.();
                       }}
                     />
-                    {aiCommentsFeatureEnabled && (
-                      <CWThreadAction
-                        action="ai-reply"
-                        label="AI Reply"
-                        disabled={maxReplyLimitReached || !canReply}
-                        tooltipText={
-                          (typeof disabledActionsTooltipText === 'function'
-                            ? disabledActionsTooltipText?.('reply')
-                            : disabledActionsTooltipText) ||
-                          (canReply && maxReplyLimitReached
-                            ? 'Further replies not allowed'
-                            : '')
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          void onAIReply?.();
-                        }}
-                      />
-                    )}
+                    {aiCommentsFeatureEnabled &&
+                      aiInteractionsToggleEnabled && (
+                        <CWThreadAction
+                          action="ai-reply"
+                          label="AI Reply"
+                          disabled={maxReplyLimitReached || !canReply}
+                          tooltipText={
+                            (typeof disabledActionsTooltipText === 'function'
+                              ? disabledActionsTooltipText?.('reply')
+                              : disabledActionsTooltipText) ||
+                            (canReply && maxReplyLimitReached
+                              ? 'Further replies not allowed'
+                              : '')
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            void onAIReply?.();
+                          }}
+                        />
+                      )}
                   </>
                 )}
 

@@ -399,7 +399,7 @@ const EditProfile = () => {
               title="Beta Features"
               description="Enable experimental features and help us test new functionality."
             >
-              {aiCommentsFeatureEnabled && (
+              {aiCommentsFeatureEnabled ? (
                 <div className="beta-features-section">
                   <div className="beta-feature-item">
                     <div className="beta-feature-header">
@@ -426,6 +426,12 @@ const EditProfile = () => {
                       time.
                     </CWText>
                   </div>
+                </div>
+              ) : (
+                <div className="beta-features-section">
+                  <CWText type="b1">
+                    No beta features are available for your community.
+                  </CWText>
                 </div>
               )}
             </ProfileSection>
