@@ -17,8 +17,14 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
     auth: [authRoles('admin')],
     body: async ({ actor, payload }) => {
       const { community_id } = payload;
-      const { name, description, featured_in_sidebar, featured_in_new_post } =
-        payload;
+      const {
+        name,
+        description,
+        featured_in_sidebar,
+        featured_in_new_post,
+        private: isPrivate,
+        group_ids,
+      } = payload;
 
       let default_offchain_template = payload.default_offchain_template?.trim();
       if (featured_in_new_post && !default_offchain_template) {
@@ -36,7 +42,8 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
         featured_in_new_post,
         default_offchain_template,
         community_id: community_id!,
-        group_ids: [],
+        group_ids: group_ids || [],
+        private: isPrivate || false,
       };
 
       const stake = await models.CommunityStake.findOne({
