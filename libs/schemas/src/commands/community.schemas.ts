@@ -176,6 +176,7 @@ export const CreateTopic = {
         featured_in_new_post: true,
         default_offchain_template: true,
         private: true,
+        group_ids: true,
         weighted_voting: true,
         token_address: true,
         token_symbol: true,
@@ -205,6 +206,7 @@ export const UpdateTopic = {
         featured_in_new_post: true,
         default_offchain_template: true,
         private: true,
+        group_ids: true,
       }).partial(),
     ),
   output: z.object({

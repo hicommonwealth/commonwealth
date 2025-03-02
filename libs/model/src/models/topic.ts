@@ -38,6 +38,11 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      group_ids: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        allowNull: false,
+        defaultValue: [],
+      },
       community_id: { type: Sequelize.STRING, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },

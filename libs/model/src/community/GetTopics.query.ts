@@ -73,6 +73,7 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
                                      t.token_symbol,
                                      t.vote_weight_multiplier,
                                      t.token_address,
+                                     t.private,
                                      cn.url as chain_node_url,
                                      cn.eth_chain_id as eth_chain_id,
                                      t.created_at::text           AS created_at,
