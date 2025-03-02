@@ -589,16 +589,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
                 label: 'Confirm Transfer',
                 buttonType: 'destructive',
                 buttonHeight: 'sm',
-                onClick: async () => {
-                  handleWalletTransfer(wallet, address);
+                onClick: () => {
+                  void handleWalletTransfer(wallet, address);
                 },
               },
               {
                 label: 'Cancel',
                 buttonType: 'secondary',
                 buttonHeight: 'sm',
-                onClick: async () => {
-                  await props.onSuccess?.(null, false);
+                onClick: () => {
+                  void props.onSuccess?.(null, false).catch(console.error);
                   return;
                 },
               },
