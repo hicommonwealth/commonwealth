@@ -53,7 +53,7 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   convoHistory.push({ role: 'user', content: prompt }); // user msg
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo',
+    model: 'gpt-4o-mini',
     messages: convoHistory,
   });
   convoHistory.push(response.choices[0].message); // assistant msg
