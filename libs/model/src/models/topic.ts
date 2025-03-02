@@ -49,11 +49,6 @@ export default (
         allowNull: true,
       },
       channel_id: { type: Sequelize.STRING, allowNull: true },
-      group_ids: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        allowNull: false,
-        defaultValue: [],
-      },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true },

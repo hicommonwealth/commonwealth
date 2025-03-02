@@ -11,6 +11,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.removeColumn('Topics', 'private');
+    return queryInterface.removeColumn('Topics', 'group_id');
   },
 };
