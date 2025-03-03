@@ -59,8 +59,11 @@ const CommentEditor = ({
   onCommentCreated,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    aiInteractionsToggleEnabled,
+  } = useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
   const effectiveSetAiStreaming =
@@ -190,7 +193,7 @@ const CommentEditor = ({
           </CWText>
         </div>
         <div className="attribution-right-content">
-          {aiCommentsFeatureEnabled && (
+          {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
             <div className="ai-toggle-wrapper">
               <CWToggle
                 className="ai-toggle"
