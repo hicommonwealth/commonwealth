@@ -20,24 +20,11 @@ export function CreateNamespaceAdminGroup(): Command<
         include: [
           {
             model: models.ChainNode,
-            required: false,
+            required: true,
           },
         ],
       });
       mustExist('Community', community);
-
-      if (!community.ChainNode) {
-        log.warn(
-          `Community namespace_address=(${namespace_address}) is missing ChainNode, skipping namespace admin group creation`,
-        );
-        return;
-      }
-      if (!community.namespace_address) {
-        log.warn(
-          `Community namespace_address=(${namespace_address}) is missing namespace_address, skipping namespace admin group creation`,
-        );
-        return;
-      }
 
       const group = await models.Group.create({
         community_id: community.id,
@@ -54,7 +41,7 @@ export function CreateNamespaceAdminGroup(): Command<
               threshold: '0',
               source: {
                 source_type: 'erc1155',
-                evm_chain_id: community.ChainNode.eth_chain_id,
+                evm_chain_id: community.ChainNode!.eth_chain_id,
                 contract_address: namespace_address,
                 token_id: '0',
               },
