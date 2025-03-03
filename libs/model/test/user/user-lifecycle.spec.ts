@@ -560,7 +560,7 @@ describe('User lifecycle', () => {
       });
 
       // setup quest actions
-      const updated1 = await command(UpdateQuest(), {
+      await command(UpdateQuest(), {
         actor: superadmin,
         payload: {
           quest_id: quest1!.id!,
@@ -573,7 +573,7 @@ describe('User lifecycle', () => {
           ],
         },
       });
-      const updated2 = await command(UpdateQuest(), {
+      await command(UpdateQuest(), {
         actor: superadmin,
         payload: {
           quest_id: quest2!.id!,
@@ -598,7 +598,7 @@ describe('User lifecycle', () => {
       );
 
       // act on community, triggering quest rewards
-      const thread = await command(CreateThread(), {
+      await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
