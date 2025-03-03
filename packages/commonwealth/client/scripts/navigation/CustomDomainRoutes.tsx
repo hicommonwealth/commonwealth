@@ -6,9 +6,7 @@ import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
-const GovernancePage = lazy(
-  () => import('views/pages/GovernancePage/GovernancePage'),
-);
+const GovernancePage = lazy(() => import('views/pages/GovernancePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));

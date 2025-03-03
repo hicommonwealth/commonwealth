@@ -1,1 +1,3 @@
-export * from './GovernancePage';
+import GovernancePage from './GovernancePage';
+
+export default GovernancePage;
