@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
@@ -70,6 +71,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       urlQueryParams.delete('openAuthModal');
       const newUrl = `${window.location.pathname}`;
       window.history.replaceState(null, '', newUrl);
+    }
+
+    if (isMobileApp() && user.isLoggedIn) {
     }
 
     if (
