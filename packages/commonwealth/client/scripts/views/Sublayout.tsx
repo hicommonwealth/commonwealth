@@ -8,6 +8,8 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { MobileAppOnboardModal } from 'views/modals/MobileAppOnboard/MobileAppOnboardModal';
+import { useMobileAppOnboarding } from 'views/modals/MobileAppOnboard/useMobileAppOnboarding';
 import { useFlag } from '../hooks/useFlag';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -65,6 +67,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
     useInviteLinkModal();
 
+  const [hasMobileAppOnboarding, setHasMobileAppOnboarding] =
+    useMobileAppOnboarding();
+
+  const [mobileAppOnboardModalOpen, setMobileAppOnboardModalOpen] =
+    useState(false);
+
   useNecessaryEffect(() => {
     if (Object.fromEntries(urlQueryParams.entries())?.openAuthModal) {
       setAuthModalType(AuthModalType.SignIn);
@@ -73,7 +81,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       window.history.replaceState(null, '', newUrl);
     }
 
-    if (isMobileApp() && user.isLoggedIn) {
+    if (isMobileApp() && user.isLoggedIn && !hasMobileAppOnboarding) {
+      setMobileAppOnboardModalOpen(true);
+      return;
     }
 
     if (
@@ -83,10 +93,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       !user.isWelcomeOnboardFlowComplete
     ) {
       setIsWelcomeOnboardModalOpen(true);
+      return;
     }
 
     if (!user.isLoggedIn && isWelcomeOnboardModalOpen) {
       setIsWelcomeOnboardModalOpen(false);
+      return;
     }
   }, [
     user.id,
@@ -216,6 +228,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             />
           )}
         </div>
+
+        <MobileAppOnboardModal
+          onClose={() => setMobileAppOnboardModalOpen(false)}
+          isOpen={mobileAppOnboardModalOpen}
+        />
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
           onClose={() => setIsWelcomeOnboardModalOpen(false)}

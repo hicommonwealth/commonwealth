@@ -9,15 +9,16 @@ import './MobileAppOnboardModal.scss';
 
 type Props = {
   onClose: () => void;
+  isOpen: boolean;
 };
 
 export const MobileAppOnboardModal = (props: Props) => {
-  const { onClose } = props;
+  const { onClose, isOpen } = props;
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
   return (
     <CWModal
-      open={true}
+      open={isOpen}
       onClose={onClose}
       size="medium"
       className={clsx('MobileAppOnboardModal')}
