@@ -14,17 +14,16 @@ import './QuestActionCard.scss';
 // TODO: fix types with schemas.Events keys
 const actionCopies = {
   title: {
-    ['SignUpFlowCompleted']: 'Signup on Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
     ['ThreadUpvoted']: 'Upvote a thread',
     ['CommentCreated']: 'Create a comment',
     ['CommentUpvoted']: 'Upvote a comment',
-    ['UserMentioned']: 'Mention a user',
+    ['WalletLinked']: 'Link a Web3 wallet with your account',
+    ['SSOLinked']: 'Link an SSO method with your account',
   },
   shares: {
-    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: 'referrer',
     ['CommunityJoined']: 'referrer',
     ['ThreadCreated']: '',
@@ -76,23 +75,24 @@ const QuestActionCard = ({
           <CWText type="b1" fontWeight="semiBold">
             {actionCopies.title[questAction.event_name]}
           </CWText>
-          {doesActionRequireCreatorReward(questAction.event_name) && (
-            <CWText type="caption" className="xp-shares">
-              <span className="creator-share">
-                {creatorXP.percentage}% (
-                {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
-              </span>
-              &nbsp; shared with {actionCopies.shares[questAction.event_name]}.
-              Your share ={' '}
-              {Math.abs(questAction.reward_amount - creatorXP.value)} XP
-            </CWText>
-          )}
+          {doesActionRequireCreatorReward(questAction.event_name) &&
+            creatorXP.percentage > 0 && (
+              <CWText type="caption" className="xp-shares">
+                <span className="creator-share">
+                  {creatorXP.percentage}% (
+                  {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
+                </span>
+                &nbsp; shared with {actionCopies.shares[questAction.event_name]}
+                . Your share ={' '}
+                {Math.abs(questAction.reward_amount - creatorXP.value)} XP
+              </CWText>
+            )}
           <div className="points-row">
             <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {questAction.action_link && (
+            {questAction.instructions_link && (
               <a
                 target="_blank"
-                href={questAction.action_link}
+                href={questAction.instructions_link}
                 rel="noreferrer"
                 className="action-link"
               >

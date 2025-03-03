@@ -1,34 +1,17 @@
-import { Command, logger } from '@hicommonwealth/core';
+import { command, Command, logger } from '@hicommonwealth/core';
 import {
   getContestScore,
   rollOverContest,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
 import { models } from '../database';
+import { systemActor } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import { emitEvent, getChainNodeUrl } from '../utils/utils';
+import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
 
 const log = logger(import.meta);
-
-async function cleanNeynarWebhook(
-  contest_address: string,
-  neynar_webhook_id: string,
-) {
-  try {
-    const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-    await client.deleteWebhook(neynar_webhook_id);
-    await models.ContestManager.update(
-      {
-        neynar_webhook_id: null,
-        neynar_webhook_secret: null,
-      },
-      { where: { contest_address } },
-    );
-  } catch (err) {
-    log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
-  }
-}
 
 export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
   return {
@@ -43,7 +26,6 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         payout_structure,
         chain_url,
         chain_private_url,
-        neynar_webhook_id,
       } = payload;
 
       const rpc = getChainNodeUrl({
@@ -51,15 +33,8 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         private_url: chain_private_url,
       });
 
-      await rollOverContest({
-        privateKey: config.WEB3.PRIVATE_KEY,
-        rpc,
-        contest: contest_address,
-        oneOff: is_one_off,
-      });
-
       // better to get scores using views to avoid returning unbounded arrays in txs
-      const score = await getContestScore(
+      const { contestBalance, scores } = await getContestScore(
         rpc,
         contest_address,
         prize_percentage,
@@ -68,10 +43,47 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         is_one_off,
       );
 
+      await rollOverContest({
+        privateKey: config.WEB3.PRIVATE_KEY,
+        rpc,
+        contest: contest_address,
+        oneOff: is_one_off,
+      });
+
+      const contestManager = await models.ContestManager.findByPk(
+        contest_address,
+        {
+          attributes: ['farcaster_frame_hashes'],
+        },
+      );
+      mustExist('Contest Manager', contestManager);
+
+      if (contestManager.farcaster_frame_hashes?.length) {
+        try {
+          await command(UpdateContestManagerFrameHashes(), {
+            actor: systemActor({}),
+            payload: {
+              contest_address,
+              frames_to_remove: contestManager.farcaster_frame_hashes,
+              webhooks_only: true,
+            },
+          });
+        } catch (err) {
+          log.error(
+            'Failed to update contest manager frame hashes',
+            err as Error,
+          );
+        }
+      }
+
       await models.sequelize.transaction(async (transaction) => {
         // update final score
         await models.Contest.update(
-          { score, score_updated_at: new Date() },
+          {
+            score: scores,
+            score_updated_at: new Date(),
+            contest_balance: contestBalance,
+          },
           { where: { contest_address, contest_id }, transaction },
         );
 
@@ -90,7 +102,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
                 contest_address,
                 contest_id,
                 is_one_off,
-                winners: score.map((s) => ({
+                winners: scores.map((s) => ({
                   address: s.creator_address,
                   content: s.content_id,
                   votes: s.votes,
@@ -102,10 +114,6 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
           transaction,
         );
       });
-
-      // clean up neynar webhooks when farcaster contest ends (fire and forget)
-      if (neynar_webhook_id)
-        void cleanNeynarWebhook(contest_address, neynar_webhook_id);
 
       return {};
     },

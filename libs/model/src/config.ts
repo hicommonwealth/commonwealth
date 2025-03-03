@@ -35,8 +35,7 @@ const {
   NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
-  NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-  NEYNAR_REPLY_WEBHOOK_URL,
+  NEYNAR_CAST_WEBHOOK_ID,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
   FARCASTER_MANIFEST_HEADER,
@@ -44,6 +43,7 @@ const {
   FARCASTER_MANIFEST_SIGNATURE,
   FARCASTER_MANIFEST_DOMAIN,
   FARCASTER_NGROK_DOMAIN,
+  DISABLE_CONTEST_ENDING_VOTE,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
@@ -98,14 +98,13 @@ export const config = configure(
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
-      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET:
-        NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-      NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
+      NEYNAR_CAST_WEBHOOK_ID: NEYNAR_CAST_WEBHOOK_ID,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
       FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
       FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
       FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
       FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
+      DISABLE_CONTEST_ENDING_VOTE: DISABLE_CONTEST_ENDING_VOTE === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -236,19 +235,12 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
         ),
-      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET: z
+      NEYNAR_CAST_WEBHOOK_ID: z
         .string()
         .optional()
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET must be set to a non-default value in production.',
-        ),
-      NEYNAR_REPLY_WEBHOOK_URL: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
+          'NEYNAR_CAST_WEBHOOK_ID must be set to a non-default value in production.',
         ),
       FARCASTER_ACTION_URL: z
         .string()
@@ -285,6 +277,7 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
+      DISABLE_CONTEST_ENDING_VOTE: z.boolean().optional(),
     }),
     AUTH: z
       .object({

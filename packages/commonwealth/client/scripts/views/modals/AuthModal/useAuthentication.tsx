@@ -147,6 +147,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     isNew?: boolean,
     isUserFromWebView?: boolean,
   ) => {
+    removeLocalStorageItem(LocalStorageKeys.ReferralCode);
     await props?.onSuccess?.(authAddress, isNew, isUserFromWebView);
   };
 
@@ -182,6 +183,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         phoneNumber: tempSMSToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -214,6 +216,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         email: tempEmailToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -238,6 +241,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         provider,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 

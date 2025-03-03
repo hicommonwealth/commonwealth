@@ -21,7 +21,7 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   farcasterWebhook: trpc.command(
-    Contest.FarcasterCastCreatedWebhook,
+    Contest.FarcasterCastWebhook,
     trpc.Tag.Integration,
   ),
 });
