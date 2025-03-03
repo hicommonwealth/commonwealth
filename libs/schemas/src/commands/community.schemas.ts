@@ -252,6 +252,13 @@ export const CreateGroup = {
   context: AuthContext,
 };
 
+export const CreateNamespaceAdminGroup = {
+  input: z.object({
+    namespace_address: z.string(),
+  }),
+  output: Group,
+};
+
 export const UpdateGroup = {
   input: z.object({
     community_id: z.string(),
