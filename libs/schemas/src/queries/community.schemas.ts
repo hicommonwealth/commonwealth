@@ -179,7 +179,7 @@ export const ConstestManagerView = ContestManager.extend({
   contests: z.undefined(),
   content: z.array(
     projections.ContestAction.extend({
-      cast_deleted_at: z.string(),
+      cast_deleted_at: z.string().nullish(),
       created_at: z.string(),
     }),
   ),
