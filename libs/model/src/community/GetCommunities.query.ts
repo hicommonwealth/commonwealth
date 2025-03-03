@@ -98,17 +98,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
-                      ${
-                        relevance_by === 'membership'
-                          ? `
-                        AND name NOT LIKE '%<%'
-                        AND name NOT LIKE '%>%'
-                        AND name NOT LIKE '%\`%'
-                        AND name NOT LIKE '%"%'
-                        AND name NOT LIKE '%''%'
-                        `
-                          : ''
-                      }
                         ${
                           base
                             ? `
@@ -126,9 +115,9 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                           community_type
                             ? `
                            AND (
-                            SELECT "community_id"
+                            SELECT 1
                             FROM   "LaunchpadTokens" AS "LaunchpadTokens"
-                            WHERE  ( "LaunchpadTokens"."community_id" = "Community"."id" )
+                            WHERE  ( "LaunchpadTokens"."namespace" = "Community"."namespace_address" )
                             LIMIT  1
                           ) IS ${community_type === CommunityType.Launchpad ? 'NOT' : ''} NULL
                           `
