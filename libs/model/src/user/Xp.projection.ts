@@ -94,7 +94,7 @@ async function recordXpsForQuest(
       : undefined;
 
     for (const action_meta of action_metas) {
-      if (!action_meta) continue;
+      if (!action_meta?.id) continue;
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
         if (parts.length !== 2) continue;
