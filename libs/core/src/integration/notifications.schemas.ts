@@ -204,3 +204,9 @@ export const QuestStartedNotification = z.object({
   end_date: z.date(),
   community_id: z.string().nullish(),
 });
+
+export const ReferrerSignedUpNotification = z.object({
+  referee_user_id: z.number(),
+  referee_profile_name: z.string(),
+  referee_profile_avatar_url: z.string(),
+});
