@@ -15,7 +15,7 @@ type NotificationModalProps = {
   onComplete: () => void;
 };
 
-const NotificationModal = ({ onComplete }: NotificationModalProps) => {
+export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
   const checked = useSubscriptionPreferenceSetting(
     'mobile_push_notifications_enabled',
   );
@@ -90,5 +90,3 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
     </section>
   );
 };
-
-export { NotificationModal };

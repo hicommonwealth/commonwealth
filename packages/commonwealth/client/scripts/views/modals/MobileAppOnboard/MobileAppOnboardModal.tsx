@@ -1,0 +1,38 @@
+import commonLogo from '*.svg';
+import clsx from 'clsx';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { NotificationModal } from 'views/modals/MobileAppOnboard/NotificationModal';
+import './MobileAppOnboardModal.scss';
+
+type Props = {
+  onClose: () => void;
+};
+
+export const MobileAppOnboardModal = (props: Props) => {
+  const { onClose } = props;
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+
+  return (
+    <CWModal
+      open={true}
+      onClose={onClose}
+      size="medium"
+      className={clsx('MobileAppOnboardModal')}
+      isFullScreen={isWindowSmallInclusive}
+      content={
+        <>
+          <section className="content">
+            <img src={commonLogo} className="logo" />
+            <CWText type="h2" className="modal-heading">
+              Enable Notifications
+            </CWText>
+            <NotificationModal onComplete={onClose} />
+          </section>
+        </>
+      }
+    />
+  );
+};
