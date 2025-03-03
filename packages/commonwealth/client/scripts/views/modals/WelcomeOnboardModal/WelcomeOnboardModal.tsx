@@ -15,11 +15,15 @@ import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
 import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import './WelcomeOnboardModal.scss';
 import { InviteModal } from './steps/InviteModal';
 import { NotificationModal } from './steps/NotificationModal';
+
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const referralsEnabled = useFlag('referrals');
+
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.OptionalWalletModal,
   );
@@ -132,13 +136,19 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           component: (
             <JoinCommunityStep
               onComplete={() =>
-                setActiveStep(WelcomeOnboardModalSteps.InviteModal)
+                referralsEnabled
+                  ? setActiveStep(WelcomeOnboardModalSteps.InviteModal)
+                  : handleClose()
               }
             />
           ),
         };
       }
       case WelcomeOnboardModalSteps.InviteModal: {
+        if (!referralsEnabled) {
+          return handleClose();
+        }
+
         return {
           index: 8,
           title: '',

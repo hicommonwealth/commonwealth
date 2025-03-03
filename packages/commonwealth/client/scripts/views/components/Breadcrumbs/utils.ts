@@ -1,5 +1,5 @@
 import { getDecodedString } from '@hicommonwealth/shared';
-import { To } from 'react-router-dom';
+import { NavigateOptions, To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
 type CurrentDiscussion = {
@@ -45,7 +45,11 @@ const findMatchedBreadcrumb = (index: number, pathSegments: Array<string>) => {
 
 export const generateBreadcrumbs = (
   locationPath: string,
-  navigate: (val: To) => void,
+  navigate: (
+    val: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
   customDomain: string,
   currentDiscussion?: CurrentDiscussion,
   userId?: number,
@@ -209,7 +213,7 @@ export const generateBreadcrumbs = (
     return {
       label,
       path: link ? `/${link}` : locationPath,
-      navigate: (val: To) => navigate(val),
+      navigate: (val: To) => navigate(val, {}, null),
       isParent:
         isParent ||
         matchedBreadcrumb?.isParent ||
@@ -224,7 +228,7 @@ export const generateBreadcrumbs = (
       label: currentDiscussion.currentTopic,
       // @ts-expect-error StrictNullChecks
       path: currentDiscussion.topicURL,
-      navigate: (val: To) => navigate(val),
+      navigate: (val: To) => navigate(val, {}, null),
       isParent: false,
     });
 

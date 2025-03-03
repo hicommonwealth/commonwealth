@@ -16,8 +16,7 @@ import { SignIn } from '../../src/user/SignIn.command';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [evmSigner, _, cosmosSigner, substrateSigner, solanaSigner] =
+  const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
   const refs = {} as Record<
@@ -344,12 +343,16 @@ describe('SignIn Lifecycle', async () => {
       const events = await models.Outbox.findAll({});
       expect(events.map((e) => e.event_name)).toEqual([
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'CommunityJoined',
+        'WalletLinked',
         'UserCreated',
         'AddressOwnershipTransferred',
         'AddressOwnershipTransferred',

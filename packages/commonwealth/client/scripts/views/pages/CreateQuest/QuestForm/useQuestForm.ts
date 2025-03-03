@@ -3,6 +3,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
@@ -21,7 +22,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
 import {
-  doesActionRequireContentId,
+  doesActionAllowContentId,
   doesActionRequireCreatorReward,
 } from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
@@ -81,14 +82,13 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
               const chosenAction = subForm.action as QuestAction;
-              const requiresContentId =
-                doesActionRequireContentId(chosenAction);
+              const allowsContentId = doesActionAllowContentId(chosenAction);
 
               return {
                 id: index + 1,
                 values: {
                   action: chosenAction,
-                  actionLink: subForm.actionLink || '',
+                  instructionsLink: subForm.instructionsLink || '',
                   contentLink:
                     (subForm as QuestActionSubFormValuesWithContentLink)
                       .contentLink || '',
@@ -104,12 +104,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 config: {
                   requires_creator_points:
                     doesActionRequireCreatorReward(chosenAction),
-                  requires_thread_id:
-                    requiresContentId &&
+                  with_optional_thread_id:
+                    allowsContentId &&
                     (chosenAction === 'CommentCreated' ||
                       chosenAction === 'ThreadUpvoted'),
-                  requires_comment_id:
-                    requiresContentId && chosenAction === 'CommentUpvoted',
+                  with_optional_comment_id:
+                    allowsContentId && chosenAction === 'CommentUpvoted',
                 },
               };
             }),
@@ -240,7 +240,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       description: values.description.trim(),
       end_date: new Date(values.end_date),
       start_date: new Date(values.start_date),
-      image_url: values.image,
+      image_url: values.image || getDefaultContestImage(),
       ...(values?.community && {
         community_id: values.community.value,
       }),
@@ -259,11 +259,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             ),
           }),
           ...(subForm.values.contentLink &&
-            (subForm.config?.requires_comment_id ||
-              subForm.config?.requires_thread_id) && {
+            (subForm.config?.with_optional_comment_id ||
+              subForm.config?.with_optional_thread_id) && {
               content_id: buildContentIdFromURL(
                 subForm.values.contentLink,
-                subForm.config?.requires_comment_id ? 'comment' : 'thread',
+                subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
               ),
             }),
           participation_limit: values.participation_limit,
@@ -273,8 +273,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           participation_times_per_period: parseInt(
             `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
           ),
-          ...(subForm.values.actionLink && {
-            action_link: subForm.values.actionLink.trim(),
+          ...(subForm.values.instructionsLink && {
+            instructions_link: subForm.values.instructionsLink.trim(),
           }),
           amount_multiplier: 0,
         })),
@@ -299,7 +299,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(initialValues.start_date !== values.start_date && {
         start_date: new Date(values.start_date),
       }),
-      image_url: values.image,
+      image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || undefined,
       action_metas: questActionSubForms.map((subForm) => ({
         event_name: subForm.values.action as QuestAction,
@@ -311,11 +311,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           ),
         }),
         ...(subForm.values.contentLink &&
-          (subForm.config?.requires_comment_id ||
-            subForm.config?.requires_thread_id) && {
+          (subForm.config?.with_optional_comment_id ||
+            subForm.config?.with_optional_thread_id) && {
             content_id: buildContentIdFromURL(
               subForm.values.contentLink,
-              subForm.config?.requires_comment_id ? 'comment' : 'thread',
+              subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
             ),
           }),
         participation_limit: values.participation_limit,
@@ -325,8 +325,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         participation_times_per_period: parseInt(
           `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
         ),
-        ...(subForm.values.actionLink && {
-          action_link: subForm.values.actionLink.trim(),
+        ...(subForm.values.instructionsLink && {
+          instructions_link: subForm.values.instructionsLink.trim(),
         }),
         amount_multiplier: 0,
       })),
@@ -356,7 +356,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'update') {
           await handleUpdateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate(`/quest/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
+          navigate(`/quests/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
         }
       } catch (e) {
         console.error(e);

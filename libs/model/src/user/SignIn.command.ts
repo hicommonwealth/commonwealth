@@ -132,7 +132,12 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             },
             transaction,
           });
+
+          let wallet_found = undefined;
           if (!new_address) {
+            wallet_found = await models.Address.findOne({
+              where: { user_id, wallet_id },
+            });
             addr.user_id = user_id;
             addr.wallet_id = wallet_id;
             addr.verification_token = verification_token;
@@ -152,6 +157,17 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               event_payload: {
                 community_id,
                 user_id: addr.user_id!,
+                created_at: addr.created_at!,
+              },
+            });
+          (new_address || !wallet_found) &&
+            events.push({
+              event_name: 'WalletLinked',
+              event_payload: {
+                user_id: addr.user_id!,
+                new_user,
+                wallet_id: wallet_id,
+                community_id,
                 created_at: addr.created_at!,
               },
             });

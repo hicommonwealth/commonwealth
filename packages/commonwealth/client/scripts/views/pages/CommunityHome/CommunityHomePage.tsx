@@ -1,4 +1,5 @@
 import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
@@ -23,6 +24,12 @@ const CommunityHome = () => {
   const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
   const {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
@@ -46,14 +53,14 @@ const CommunityHome = () => {
               Community Home
             </CWText>
             <TokenDetails
-              communityId={chain}
+              communityDescription={community?.description || ''}
               communityMemberCount={app.chain.meta.profile_count || 0}
-              communityThreadCount={app.chain.meta.numVotingThreads || 0}
+              communityThreadCount={community?.lifetime_thread_count || 0}
             />
           </div>
         </div>
         <TokenPerformance />
-        <ActiveContestList />
+        <ActiveContestList isCommunityHomePage />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList

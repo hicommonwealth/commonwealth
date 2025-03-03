@@ -84,6 +84,11 @@ export const Address = z.object({
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
+  oauth_provider: z.string().max(255).nullish(),
+  oauth_email: z.string().max(255).nullish(),
+  oauth_email_verified: z.boolean().nullish(),
+  oauth_username: z.string().max(255).nullish(),
+  oauth_phone_number: z.string().max(255).nullish(),
 
   User: User.optional().nullish(),
 
@@ -99,6 +104,8 @@ export const SsoToken = z.object({
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  Address: Address.nullish(),
 });
 
 export const CommunityMember = z.object({

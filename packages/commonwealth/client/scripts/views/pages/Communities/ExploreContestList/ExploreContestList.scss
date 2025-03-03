@@ -13,6 +13,21 @@
     @include extraSmall {
       grid-template-columns: 1fr;
     }
+
+    .ContestCard {
+      .contest-image {
+        max-height: 160px;
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: start;
+
+        .CWCountDownTimer {
+          margin-left: 0;
+        }
+      }
+    }
   }
 
   .empty-contests {

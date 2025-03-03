@@ -20,6 +20,10 @@ export const ContestAction = z
       .string()
       .nullish()
       .describe('Calculated  weight of the vote when action was recorded'),
+    cast_deleted_at: z.coerce
+      .date()
+      .nullish()
+      .describe('Date-time when content was deleted'),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');
@@ -45,5 +49,11 @@ export const Contest = z
     score_updated_at: z.date().nullish(),
     score: ContestScore.nullish(),
     actions: z.array(ContestAction).nullish(),
+    contest_balance: z
+      .string()
+      .nullish()
+      .describe(
+        'Last recorded contest balance (not always up to date with onchain balance)',
+      ),
   })
   .describe('On-Chain contest instance');

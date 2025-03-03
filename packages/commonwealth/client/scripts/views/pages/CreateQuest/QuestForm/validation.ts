@@ -23,7 +23,7 @@ export const questFormValidationSchema = z
       .min(10, { message: VALIDATION_MESSAGES.MIN_CHAR_LIMIT_REQUIRED(10) })
       .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-    image: linkValidationSchema.required,
+    image: linkValidationSchema.optional,
     community: z
       .object(
         {

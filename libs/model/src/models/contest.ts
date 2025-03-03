@@ -33,6 +33,10 @@ export default (
       score: {
         type: Sequelize.JSONB,
       },
+      contest_balance: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
     },
     {
       tableName: 'Contests',

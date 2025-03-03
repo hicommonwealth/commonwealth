@@ -39,3 +39,11 @@ export const TwitterMentionsTimeline = z.object({
     })
     .optional(),
 });
+
+export const TwitterUser = z.object({
+  data: z.object({
+    id: z.string(),
+    name: z.string(),
+    username: z.string(),
+  }),
+});

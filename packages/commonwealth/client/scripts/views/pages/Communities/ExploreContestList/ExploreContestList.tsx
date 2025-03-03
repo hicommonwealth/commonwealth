@@ -1,13 +1,17 @@
+import { useFlag } from 'hooks/useFlag';
+import moment from 'moment';
 import React from 'react';
 import { trpc } from 'utils/trpcClient';
+import ContestCard from 'views/components/ContestCard/ContestCard';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
-import ExploreContestCard from './ExploreContestCard';
 
 import './ExploreContestList.scss';
 
 const ExploreContestList = () => {
+  const farcasterContestEnabled = useFlag('farcasterContest');
+
   const {
     contestsData: { active: activeContests },
     isContestDataLoading,
@@ -34,6 +38,7 @@ const ExploreContestList = () => {
         iconUrl: communityData?.icon_url || '',
         chainNodeUrl: communityData?.ChainNode?.url,
         ethChainId: communityData?.ChainNode?.eth_chain_id,
+        id: communityData?.id,
       },
     };
   }, {});
@@ -56,13 +61,37 @@ const ExploreContestList = () => {
           </div>
         ) : (
           <div className="content">
-            {activeContests.map((contest) => (
-              <ExploreContestCard
-                key={contest.contest_address}
-                contest={contest}
-                community={community[contest.community_id as string]}
-              />
-            ))}
+            {activeContests.map((contest) => {
+              const sortedContests = (contest?.contests || []).toSorted(
+                (a, b) => (moment(a.end_time).isBefore(b.end_time) ? -1 : 1),
+              );
+
+              const { end_time, score } =
+                sortedContests[sortedContests.length - 1] || {};
+
+              return (
+                <ContestCard
+                  key={contest.contest_address}
+                  isAdmin={false}
+                  address={contest.contest_address || ''}
+                  name={contest.name || ''}
+                  imageUrl={contest.image_url || ''}
+                  topics={contest.topics || []}
+                  decimals={contest.decimals}
+                  ticker={contest.ticker}
+                  finishDate={end_time ? moment(end_time).toISOString() : ''}
+                  isCancelled={contest.cancelled}
+                  isRecurring={!contest.funding_token_address}
+                  payoutStructure={contest.payout_structure}
+                  score={score || []}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
+                  community={community[contest.community_id as string]}
+                  hideWhenNoPrizes={true}
+                />
+              );
+            })}
           </div>
         )}
       </>

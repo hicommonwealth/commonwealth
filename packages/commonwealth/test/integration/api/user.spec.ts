@@ -78,19 +78,6 @@ describe('User Model Routes', () => {
       expect(res.body.error).to.be.equal(updateEmailErrors.NoEmail);
     });
 
-    test('should fail to update if email in use by another user', async () => {
-      const res = await chai
-        .request(server.app)
-        .post('/api/updateEmail')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: jwtToken,
-          email: `test@${PRODUCTION_DOMAIN}`,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(updateEmailErrors.EmailInUse);
-    });
-
     test('should fail with an invalid email', async () => {
       const email = 'testatcommonwealthdotim';
       const res = await chai

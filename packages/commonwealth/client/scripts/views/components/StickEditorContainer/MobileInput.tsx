@@ -2,6 +2,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
@@ -10,7 +11,6 @@ import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
-
 export type MobileInputProps = CommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
@@ -35,6 +35,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const { generateComment } = useGenerateCommentText();
   const stickyCommentReset = useActiveStickCommentReset();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
+  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -132,7 +133,7 @@ export const MobileInput = (props: MobileInputProps) => {
             className="input"
           />
           <div className="ai-toggle-row">
-            {aiCommentsFeatureEnabled && (
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
               <div className="ai-toggle">
                 <div className="ai-toggle-container">
                   <CWToggle

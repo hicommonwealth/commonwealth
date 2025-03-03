@@ -37,6 +37,7 @@
     "@hicommonwealth/evm-protocols": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@magic-sdk/admin": "^2.4.1",
     "@neynar/nodejs-sdk": "^1.55.0",
     "@sendgrid/mail": "^6.5.0",
     "@solana/spl-token": "^0.4.6",

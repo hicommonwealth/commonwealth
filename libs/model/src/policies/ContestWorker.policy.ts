@@ -214,7 +214,6 @@ const rolloverContests = async () => {
     interval: number;
     prize_percentage: number;
     payout_structure: number[];
-    neynar_webhook_id?: string;
     contest_id: number;
     url: string;
     private_url: string;
@@ -225,7 +224,6 @@ SELECT
   cm.interval,
   coalesce(cm.prize_percentage, 0) as prize_percentage,
   cm.payout_structure,
-  cm.neynar_webhook_id,
   co.contest_id,
   cn.url,
   cn.private_url,
@@ -261,7 +259,6 @@ FROM
         interval,
         prize_percentage,
         payout_structure,
-        neynar_webhook_id,
       }) => {
         log.info(`ROLLOVER: ${contest_address}`);
         await command(SetContestEnded(), {
@@ -274,7 +271,6 @@ FROM
             is_one_off: interval === 0,
             chain_url: url,
             chain_private_url: private_url,
-            neynar_webhook_id,
           },
         });
       },

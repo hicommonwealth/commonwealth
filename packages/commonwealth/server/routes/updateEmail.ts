@@ -3,7 +3,6 @@ import { type DB } from '@hicommonwealth/model';
 import { DynamicTemplate, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
-import Sequelize from 'sequelize';
 import { config } from '../config';
 
 const log = logger(import.meta);
@@ -16,7 +15,6 @@ export const Errors = {
   NoEmail: 'Must provide email',
   NoUser: 'Could not find a user with this email',
   InvalidEmail: 'Invalid email',
-  EmailInUse: 'Email already in use',
   NoUpdateForMagic: 'Cannot update email if registered with Magic Link',
 };
 
@@ -35,22 +33,9 @@ const updateEmail = async (
     return next(new AppError(Errors.InvalidEmail));
   }
 
-  // check if email is already in use
-  // XXX JAKE 5/17/24: we're currently enforcing a unique cosntraint on emails,
-  //   but this MAY no longer be necessary following removal of email-login
-  const existingUser = await models.User.findOne({
-    where: {
-      email,
-      // @ts-expect-error StrictNullChecks
-      id: { [Sequelize.Op.ne]: req.user.id },
-    },
-  });
-  if (existingUser) return next(new AppError(Errors.EmailInUse));
-
   const user = await models.User.scope('withPrivateData').findOne({
     where: {
-      // @ts-expect-error StrictNullChecks
-      id: req.user.id,
+      id: req.user!.id,
     },
   });
   if (!user) return next(new AppError(Errors.NoUser));

@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
+import ContestCard from 'views/components/ContestCard';
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
 import { ContestView } from '../types';
-import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
@@ -38,6 +38,7 @@ export type Contest = {
     score_updated_at?: Date;
     start_time?: Date;
     end_time?: Date;
+    contest_balance?: string;
   }[];
 };
 
@@ -48,6 +49,13 @@ interface ContestsListProps {
   isContestAvailable: boolean;
   onSetContestView?: (type: ContestView) => void;
   displayAllRecurringContests?: boolean;
+  community?: {
+    id: string;
+    name: string;
+    iconUrl: string;
+    ethChainId: number;
+    chainNodeUrl: string;
+  };
 }
 
 const ContestsList = ({
@@ -57,6 +65,7 @@ const ContestsList = ({
   isContestAvailable,
   onSetContestView,
   displayAllRecurringContests = false,
+  community,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
   const farcasterContestEnabled = useFlag('farcasterContest');
@@ -84,7 +93,7 @@ const ContestsList = ({
 
             if (!displayAllRecurringContests) {
               // only last contest is relevant
-              const { end_time, score } =
+              const { end_time, score, contest_balance } =
                 sortedContests[sortedContests.length - 1] || {};
 
               return (
@@ -109,6 +118,8 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={score || []}
+                  community={community}
+                  contestBalance={parseInt(contest_balance || '0', 10)}
                 />
               );
             } else {
@@ -136,6 +147,8 @@ const ContestsList = ({
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
                   score={sc?.score || []}
+                  community={community}
+                  contestBalance={parseInt(sc.contest_balance || '0', 10)}
                 />
               ));
             }

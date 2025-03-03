@@ -7,6 +7,7 @@ export * from './community.schemas';
 export * from './contest.schemas';
 export * from './discord.schemas';
 export * from './load-testing.schemas';
+export * from './magic.schemas';
 export * from './poll.schemas';
 export * from './quest.schemas';
 export * from './snapshot.schemas';

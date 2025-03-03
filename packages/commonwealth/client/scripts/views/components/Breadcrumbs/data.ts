@@ -26,6 +26,11 @@ export const breadCrumbURLS = [
     isParent: true,
   },
   {
+    url: 'createQuest',
+    breadcrumb: 'Create Quest',
+    isParent: true,
+  },
+  {
     url: 'communities',
     breadcrumb: 'Explore Communities',
     isParent: true,

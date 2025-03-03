@@ -55,6 +55,7 @@ export function GetFarcasterContestCasts(): Query<
             ca1.action = 'added'
             AND ca1.contest_address = :contest_address
             AND ca1.contest_id = :contest_id
+            AND ca1.cast_deleted_at IS NULL
         GROUP BY
             ca1.contest_address,
             ca1.contest_id,
@@ -86,7 +87,11 @@ export function GetFarcasterContestCasts(): Query<
         const [, , , replyCastHash] = action.content_url!.split('/');
         return replyCastHash;
       });
-      const frameHashesToFetch = [...replyCastHashes];
+      // frame hash from contest action content url has fid added
+      // e.g. "0xdbc2876f07addee03a679abf8bcaa7c34ed74772?fid=809786"
+      const frameHashesToFetch = [...replyCastHashes].map(
+        (hash) => hash.split('?')[0],
+      );
       const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
       const castsResponse = await client.fetchBulkCasts(frameHashesToFetch);
 
@@ -97,7 +102,10 @@ export function GetFarcasterContestCasts(): Query<
           const [, , , replyCastHash] = content.content_url!.split('/');
           return {
             ...acc,
-            [replyCastHash]: content.voting_weights_sum || 0,
+            // remove fid from hash
+            [replyCastHash.split('?')[0]]:
+              content.voting_weights_sum *
+              (contestManager.vote_weight_multiplier || 0),
           };
         },
         {} as Record<string, number>,

@@ -1,3 +1,4 @@
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -35,12 +36,15 @@ const validate = async (
 
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
+  if (!walletSsoSource) {
+    return 'Error: No wallet SSO source';
+  }
+
   try {
     await handleSocialLoginCallback({
       // @ts-expect-error <StrictNullChecks/>
       chain,
-      // @ts-expect-error <StrictNullChecks/>
-      walletSsoSource,
+      walletSsoSource: walletSsoSource as WalletSsoSource,
       isLoggedIn,
       isCustomDomain,
     });

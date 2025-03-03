@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ContestsList from 'views/pages/CommunityManagement/Contests/ContestsList';
@@ -9,11 +10,20 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 
 import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+
 import './Contests.scss';
 
 const Contests = () => {
   const { contestsData, isContestAvailable, isContestDataLoading } =
     useCommunityContests();
+
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const chainNodeUrl = app?.chain?.meta?.ChainNode?.url || '';
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+  });
 
   if (!isContestDataLoading && !isContestAvailable) {
     return <Navigate replace to={`/${app.activeChainId()}`} />;
@@ -41,6 +51,13 @@ const Contests = () => {
             isAdmin={false}
             isLoading={isContestDataLoading}
             isContestAvailable={isContestAvailable}
+            community={{
+              id: community?.id || '',
+              name: community?.name || '',
+              iconUrl: community?.icon_url || '',
+              ethChainId,
+              chainNodeUrl,
+            }}
           />
         )}
 
@@ -57,6 +74,13 @@ const Contests = () => {
             isLoading={isContestDataLoading}
             isContestAvailable={isContestAvailable}
             displayAllRecurringContests
+            community={{
+              id: community?.id || '',
+              name: community?.name || '',
+              iconUrl: community?.icon_url || '',
+              ethChainId,
+              chainNodeUrl,
+            }}
           />
         )}
       </div>

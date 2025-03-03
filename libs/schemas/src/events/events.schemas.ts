@@ -1,3 +1,4 @@
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -5,23 +6,9 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
-import { Tweet } from '../integrations';
+import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
-
-const DiscordEventBase = z.object({
-  user: z.object({
-    id: z.string(),
-    username: z.string(),
-  }),
-  title: z.string(),
-  content: z.string(),
-  message_id: z.string(),
-  channel_id: z.string(),
-  parent_channel_id: z.string(),
-  guild_id: z.string(),
-  imageUrls: z.array(z.string()),
-});
 
 const ChainEventBase = z.object({
   eventSource: z.object({
@@ -296,12 +283,20 @@ export const events = {
   }).merge(SubscriptionPreference.pick({ user_id: true })),
 
   FarcasterCastCreated: FarcasterCast.describe(
-    'When a farcaster contest cast has been posted',
+    'When a farcaster contest frame cast has been posted',
+  ),
+
+  FarcasterCastDeleted: FarcasterCast.describe(
+    'When a farcaster contest frame cast has been deleted',
   ),
 
   FarcasterReplyCastCreated: FarcasterCast.extend({
     verified_address: z.string(),
-  }).describe('When a reply is posted to a farcaster contest cast'),
+  }).describe('When cast is created as a reply to a contest frame'),
+
+  FarcasterReplyCastDeleted: FarcasterCast.extend({
+    verified_address: z.string(),
+  }).describe('When cast is deleted on a contest frame cast'),
 
   FarcasterContestBotMentioned: FarcasterCast.extend({
     verified_address: z.string(),
@@ -394,5 +389,21 @@ export const events = {
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
+  }),
+
+  WalletLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    wallet_id: z.nativeEnum(WalletId),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  SSOLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    oauth_provider: z.nativeEnum(WalletSsoSource),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
   }),
 } as const;
