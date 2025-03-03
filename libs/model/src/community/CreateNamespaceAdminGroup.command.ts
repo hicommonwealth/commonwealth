@@ -1,10 +1,8 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
-
-const log = logger(import.meta);
 
 export function CreateNamespaceAdminGroup(): Command<
   typeof schemas.CreateNamespaceAdminGroup
