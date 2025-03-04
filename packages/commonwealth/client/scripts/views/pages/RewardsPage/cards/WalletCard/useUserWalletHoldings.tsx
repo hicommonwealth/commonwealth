@@ -38,7 +38,7 @@ const useUserWalletHoldings = ({
   // get usd conversion rates of all the tokens user is holding
   const { data: tokenToUsdDates, isLoading: isLoadingTokenToUsdDates } =
     useFetchTokensUsdRateQuery({
-      tokenSymbols: (tokenMetadatas || []).map((x) => x.symbol),
+      tokenContractAddresses: tokenAddresses || [],
       enabled: (tokenMetadatas || []).length > 0,
     });
 
@@ -73,7 +73,7 @@ const useUserWalletHoldings = ({
           return tempBalance;
         })(),
         toUsdPerUnitRate:
-          (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.amount ||
+          (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.price ||
           null,
       };
     })
@@ -93,7 +93,7 @@ const useUserWalletHoldings = ({
   // get combined usd holding value of all the tokens user has
   const userCombinedUSDBalance = userTokens.reduce((total, token) => {
     const tokenValue = token.toUsdPerUnitRate
-      ? token.balance * parseFloat(token.toUsdPerUnitRate)
+      ? token.balance * token.toUsdPerUnitRate
       : 0;
     return total + tokenValue;
   }, 0);
