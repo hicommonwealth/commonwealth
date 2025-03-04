@@ -123,6 +123,13 @@ export const EventRegistry = {
   [ValidChains.Base]: {
     [factoryContracts[ValidChains.Base].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Base].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.SepoliaBase].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.SepoliaBase].lpBondingCurve]:
+      lpBondingCurveSource,
+    [factoryContracts[ValidChains.SepoliaBase].tokenCommunityManager]:
+      tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {
     [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,
