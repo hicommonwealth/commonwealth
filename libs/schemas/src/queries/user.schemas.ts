@@ -1,10 +1,10 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { Referral, ReferralFees, User } from '../entities';
+import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
-import { PG_INT } from '../utils';
+import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import {
   AddressView,
@@ -103,14 +103,17 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
-  created_on_chain_timestamp: z.string(),
-  referrer_received_eth_amount: z.string(),
+export const ReferralView = z.object({
+  referrer_address: EVM_ADDRESS,
+  referee_address: EVM_ADDRESS,
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
+  // when referee creates a community
   community_id: z.string().nullish(),
   community_name: z.string().nullish(),
   community_icon_url: z.string().nullish(),
+  namespace_address: EVM_ADDRESS.nullish(),
+  referrer_received_eth_amount: z.string(),
 });
 
 export const GetUserReferrals = {
