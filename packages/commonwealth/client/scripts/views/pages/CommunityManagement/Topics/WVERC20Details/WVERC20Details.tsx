@@ -53,6 +53,7 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
       erc20: {
         tokenAddress: debouncedTokenValue,
         tokenSymbol: tokenMetadata?.symbol,
+        tokenDecimals: tokenMetadata?.decimals,
         voteWeightMultiplier: multiplier,
         chainNodeId: Number(selectedChain?.chainNodeId),
         weightedVoting: TopicWeightedVoting.ERC20,
