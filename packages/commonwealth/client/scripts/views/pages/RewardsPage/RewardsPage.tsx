@@ -68,8 +68,6 @@ const RewardsPage = () => {
     return <PageNotFound />;
   }
 
-  const showOtherCards = true;
-
   return (
     <CWPageLayout>
       <section className="RewardsPage">
@@ -79,15 +77,18 @@ const RewardsPage = () => {
 
         {/* visible only on mobile */}
         <div className="rewards-button-tabs">
-          {Object.values(MobileTabType).map((type) => (
-            <CWMobileTab
-              key={type}
-              icon={typeToIcon[type] as IconName}
-              label={type}
-              isActive={mobileTab === type}
-              onClick={() => handleTabChange(type)}
-            />
-          ))}
+          {Object.values(MobileTabType).map((type) => {
+            if (type === MobileTabType.Quests && !xpEnabled) return null;
+            return (
+              <CWMobileTab
+                key={type}
+                icon={typeToIcon[type] as IconName}
+                label={type}
+                isActive={mobileTab === type}
+                onClick={() => handleTabChange(type)}
+              />
+            );
+          })}
         </div>
 
         {/* on mobile show only one card */}
@@ -105,7 +106,7 @@ const RewardsPage = () => {
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
-            showOtherCards && <QuestSummaryCard />}
+            xpEnabled && <QuestSummaryCard />}
         </div>
 
         <div className="rewards-tab-container">
