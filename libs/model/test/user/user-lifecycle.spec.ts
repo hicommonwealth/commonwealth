@@ -644,7 +644,7 @@ describe('User lifecycle', () => {
         },
       });
       // setup quest actions
-      const updated = await command(UpdateQuest(), {
+      await command(UpdateQuest(), {
         actor: superadmin,
         payload: {
           quest_id: quest!.id!,
