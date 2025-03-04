@@ -74,6 +74,8 @@ export const Quest = z
     image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
+    xp_awarded: z.number().default(0),
+    max_xp_to_end: z.number().default(0),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
     community_id: z

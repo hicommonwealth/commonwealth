@@ -58,7 +58,8 @@ async function getQuestActionMetas(
   return metas.flatMap((q) => q.get({ plain: true }).action_metas);
 }
 
-async function addPointsToUsers(
+async function accumulatePoints(
+  quest_id: number,
   user_id: number,
   xp_points: number,
   transaction: Transaction,
@@ -79,6 +80,19 @@ async function addPointsToUsers(
       { where: { id: creator_user_id }, transaction },
     );
   }
+  // update xp_awarded and end quest if max_xp_to_end is reached
+  await models.Quest.update(
+    {
+      xp_awarded: sequelize.literal(`xp_awarded + ${xp_points}`),
+      end_date: sequelize.literal(`
+        CASE WHEN (xp_awarded + ${xp_points}) >= max_xp_to_end
+        THEN NOW()
+        ELSE end_date
+        END
+      `),
+    },
+    { where: { id: quest_id }, transaction },
+  );
 }
 
 async function recordXpsForQuest(
@@ -161,7 +175,8 @@ async function recordXpsForQuest(
       });
 
       if (created)
-        await addPointsToUsers(
+        await accumulatePoints(
+          action_meta.quest_id,
           user_id,
           xp_points,
           transaction,
