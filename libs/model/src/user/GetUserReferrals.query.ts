@@ -38,7 +38,7 @@ SELECT
 FROM referrals R
   JOIN referee_addresses RA ON RA.address = R.referee_address
   JOIN "Users" U ON U.id = RA.user_id
-  LEFT JOIN "Communities" C ON C.namespace = R.namespace_address
+  LEFT JOIN "Communities" C ON C.namespace_address = R.namespace_address
   ;
 `;
 
