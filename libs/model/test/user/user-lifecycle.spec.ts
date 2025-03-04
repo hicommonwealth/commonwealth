@@ -472,12 +472,12 @@ describe('User lifecycle', () => {
     });
 
     it('should query previous xp logs', async () => {
-      // 9 events
+      // 8 events (skipping negative system quest id)
       const xps1 = await query(GetXps(), {
         actor: admin,
         payload: {},
       });
-      expect(xps1!.length).to.equal(9);
+      expect(xps1!.length).to.equal(8);
       xps1?.forEach((xp) => {
         expect(xp.quest_id).to.be.a('number');
         expect(xp.quest_action_meta_id).to.be.a('number');
@@ -493,12 +493,12 @@ describe('User lifecycle', () => {
         expect(xp.event_name).to.equal('CommentUpvoted');
       });
 
-      // 5 events after first CommentUpvoted
+      // 4 events after first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
         payload: { from: xps2!.at(-1)!.created_at },
       });
-      expect(xps3!.length).to.equal(5);
+      expect(xps3!.length).to.equal(4);
 
       // 4 events for member (ThreadCreated and CommentUpvoted)
       const xps4 = await query(GetXps(), {
@@ -511,16 +511,14 @@ describe('User lifecycle', () => {
           .be.true;
       });
 
-      // 2 events for new actor (joining and sign up flow completed)
+      // 1 event for new actor (joining)
       const xps5 = await query(GetXps(), {
         actor: admin,
         payload: { user_id: new_actor.user.id },
       });
-      expect(xps5!.length).to.equal(2);
+      expect(xps5!.length).to.equal(1);
       xps5?.forEach((xp) => {
-        expect(
-          ['SignUpFlowCompleted', 'CommunityJoined'].includes(xp.event_name),
-        ).to.be.true;
+        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
       });
 
       // 3 CommentCreated events for admin
