@@ -242,7 +242,7 @@ module.exports = {
           FROM "Communities"
           WHERE id IN (:communityIds);
       `,
-        { transaction, replacements: { communityIdsToDelete } },
+        { transaction, replacements: { communityIds: communityIdsToDelete } },
       );
     });
   },

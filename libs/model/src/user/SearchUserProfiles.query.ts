@@ -29,7 +29,7 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
         search.length > 0
           ? exact_match
             ? `U.profile->>'name' = :searchTerm`
-            : `(U.profile->>'name' ILIKE :searchTerm)`
+            : `U.profile->>'name' ILIKE :searchTerm`
           : '';
 
       // pagination configuration
@@ -59,7 +59,8 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
                  COUNT(U.id) OVER ()::integer as total
           FROM "Users" U
                    JOIN "Addresses" A ON U.id = A.user_id
-          WHERE ${communityFilter} ${communityFilter && nameFilter ? ' AND ' : ''}
+              ${communityFilter || nameFilter ? 'WHERE' : ''} 
+              ${communityFilter} ${communityFilter && nameFilter ? ' AND ' : ''}
               ${nameFilter}
           GROUP BY U.id
           ORDER BY ${order_col} ${direction}
@@ -75,6 +76,7 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
           limit,
           offset,
         },
+        logging: console.log,
         type: QueryTypes.SELECT,
       });
 
