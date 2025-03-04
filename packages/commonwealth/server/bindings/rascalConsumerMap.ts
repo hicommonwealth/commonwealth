@@ -6,7 +6,6 @@ import {
   DiscordBotPolicy,
   FarcasterWorker,
   NotificationsPolicy,
-  Statistics,
   User,
 } from '@hicommonwealth/model';
 import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
@@ -17,7 +16,6 @@ export const rascalConsumerMap = [
   Contest.Contests,
   FarcasterWorker,
   NotificationsSettingsPolicy,
-  Statistics,
   {
     consumer: ContestWorker,
     overrides: {

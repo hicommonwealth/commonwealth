@@ -74,8 +74,6 @@ export const events = {
       .nullish(),
   }),
 
-  ThreadDeleted: Thread.pick({ community_id: true }),
-
   ThreadUpvoted: Reaction.omit({
     comment_id: true,
   }).extend({
@@ -409,12 +407,5 @@ export const events = {
     oauth_provider: z.nativeEnum(WalletSsoSource),
     community_id: z.string(),
     created_at: z.coerce.date(),
-  }),
-
-  ThreadViewed: z.object({
-    thread_id: PG_INT,
-  }),
-  ThreadReacted: z.object({
-    thread_id: PG_INT,
   }),
 } as const;

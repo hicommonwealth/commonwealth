@@ -45,7 +45,6 @@ describe('CacheDecorator', () => {
       setKey: vi.fn(),
       getKeys: vi.fn(),
       scan: vi.fn(),
-      getDel: vi.fn(),
       setKeys: vi.fn(),
       getNamespaceKeys: vi.fn(),
       deleteKey: vi.fn(),

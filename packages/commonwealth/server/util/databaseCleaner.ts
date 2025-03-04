@@ -87,26 +87,7 @@ export class DatabaseCleaner {
     }
 
     try {
-      await this.processCountCache(
-        CacheNamespaces.Thread_View_Count,
-        'Threads',
-        'view_count',
-      );
-      await this.processCountCache(
-        CacheNamespaces.Lifetime_Thread_Count,
-        'Communities',
-        'lifetime_thread_count',
-      );
-      await this.processCountCache(
-        CacheNamespaces.Thread_Reacted,
-        'Threads',
-        'reaction_count',
-      );
-      await this.processCountCache(
-        CacheNamespaces.Community_Joined,
-        'Communities',
-        'profile_count',
-      );
+      await this.processViewCounts();
     } catch (e) {
       this.log.error('Failed to run processCountCache', e);
     }
@@ -114,22 +95,35 @@ export class DatabaseCleaner {
     this.log.info('Database clean-up finished.');
   }
 
-  // Goes through count cache in Redis. Bulk updates associated counts in DB
-  // and clears corresponding counts from cache.
-  public async processCountCache(
-    namespace: CacheNamespaces,
-    tableName: string,
-    countName: string,
-  ) {
-    const result = (await cache().scan(namespace, 0, 100)) as {
+  // 1. Creates mapping of thread_id -> redis count
+  // 2. Updates DB
+  // 3. Clears thread view count namespace
+  public async processViewCounts() {
+    const result = (await cache().scan(
+      CacheNamespaces.Thread_View_Count,
+      0,
+      100,
+    )) as {
       cursor: number;
       keys: string[];
     };
-    const idToCount: [number, number][] = [];
+    const ids = result.keys.map((key) =>
+      parseInt(key.substring(key.indexOf('_') + 1), 10),
+    );
+    const values = await cache().getKeys(
+      CacheNamespaces.Thread_View_Count,
+      result.keys,
+    );
+    const idToCount = ids
+      .map((id, index) => [id, parseInt(values[index]!, 10)])
+      .filter(([_, count]) => !isNaN(count));
 
     for (const key of result.keys) {
       const id = parseInt(key.substring(key.indexOf('_') + 1), 10);
-      const count = parseInt((await cache().getDel(namespace, key))!, 10);
+      const count = parseInt(
+        (await cache().getKey(CacheNamespaces.Thread_View_Count, key))!,
+        10,
+      );
 
       idToCount.push([id, count]);
     }
@@ -138,22 +132,23 @@ export class DatabaseCleaner {
     if (idToCount.length > 0) {
       const cases = idToCount
         .map(
-          ([threadId, count]) =>
-            `WHEN ${threadId} THEN ${countName} + ${count}`,
+          ([threadId, count]) => `WHEN ${threadId} THEN view_count + ${count}`,
         )
         .join(' ');
 
       const threadIds = idToCount.map(([threadId]) => threadId).join(', ');
 
       const query = `
-        UPDATE "${tableName}"
-        SET ${countName} = CASE id
+        UPDATE "Threads"
+        SET view_count = CASE id
           ${cases}
         END
         WHERE id IN (${threadIds});
       `;
 
       await this._models.sequelize.query(query);
+
+      await cache().deleteNamespaceKeys(CacheNamespaces.Thread_View_Count);
     }
   }
 
@@ -178,19 +173,12 @@ export class DatabaseCleaner {
         `;
       await this._models.sequelize.query(
         `
-            CREATE
-            TEMPORARY TABLE user_ids_to_delete as (SELECT U.id
+            CREATE TEMPORARY TABLE user_ids_to_delete as (SELECT U.id
                                                           FROM "Users" U
                                                                    LEFT JOIN "Addresses" A ON U.id = A.user_id
                                                           GROUP BY U.id
-                                                          HAVING (
-            ${noAccountsAndIsOldUser}
-            )
-            OR
-            (
-            ${noActiveAccountsQuery}
-            )
-            );
+                                                          HAVING (${noAccountsAndIsOldUser})
+                                                              OR (${noActiveAccountsQuery}));
         `,
         { transaction: t },
       );
@@ -198,7 +186,8 @@ export class DatabaseCleaner {
       subsDeleted += await this._models.sequelize.query(
         `
             DELETE
-            FROM "ThreadSubscriptions" TS USING user_ids_to_delete U
+            FROM "ThreadSubscriptions" TS
+                USING user_ids_to_delete U
             WHERE TS.user_id = U.id;
         `,
         { type: QueryTypes.BULKDELETE, transaction: t },
@@ -207,7 +196,8 @@ export class DatabaseCleaner {
       subsDeleted += await this._models.sequelize.query(
         `
             DELETE
-            FROM "CommentSubscriptions" CS USING user_ids_to_delete U
+            FROM "CommentSubscriptions" CS
+                USING user_ids_to_delete U
             WHERE CS.user_id = U.id;
         `,
         { type: QueryTypes.BULKDELETE, transaction: t },
@@ -216,7 +206,8 @@ export class DatabaseCleaner {
       subsDeleted += await this._models.sequelize.query(
         `
             DELETE
-            FROM "CommunityAlerts" CA USING user_ids_to_delete U
+            FROM "CommunityAlerts" CA
+                USING user_ids_to_delete U
             WHERE CA.user_id = U.id;
         `,
         { type: QueryTypes.BULKDELETE, transaction: t },

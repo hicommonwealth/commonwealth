@@ -293,27 +293,6 @@ export class RedisCache implements Cache {
   }
 
   /**
-   * Atomic GET + Delete
-   * @param namespace The namespace of the key to get.
-   * @param key the key to get.
-   * @returns The value of the key.
-   */
-  public async getDel(
-    namespace: CacheNamespaces,
-    key: string,
-  ): Promise<string | null> {
-    if (!this.isReady()) return null;
-    try {
-      const finalKey = RedisCache.getNamespaceKey(namespace, key);
-      return await this._client.GETDEL(finalKey);
-    } catch (e) {
-      const msg = 'An error occurred while running GETDEL';
-      this._log.error(msg, e as Error);
-      return null;
-    }
-  }
-
-  /**
    * Sets the expiration (TTL) of a key within a specific namespace.
    * @param namespace The namespace of the key for which to set the expiration.
    * @param key The key for which to set the expiration.

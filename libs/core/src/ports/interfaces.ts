@@ -83,9 +83,6 @@ export enum CacheNamespaces {
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
   Thread_View_Count = 'thread_view_count',
-  Lifetime_Thread_Count = 'lifetime_thread_count',
-  Thread_Reacted = 'thread_reacted',
-  Community_Joined = 'community_joined',
 }
 
 /**
@@ -110,8 +107,6 @@ export interface Cache extends Disposable {
     namespace: CacheNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>>;
-
-  getDel(namespace: CacheNamespaces, key: string): Promise<string | null>;
 
   scan(
     namespace: CacheNamespaces,

@@ -1,5 +1,10 @@
-import { InvalidInput, Query } from '@hicommonwealth/core';
-import { ThreadInstance, emitEvent } from '@hicommonwealth/model';
+import {
+  cache,
+  CacheNamespaces,
+  InvalidInput,
+  Query,
+} from '@hicommonwealth/core';
+import { ThreadInstance } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -130,16 +135,12 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
           ],
           transaction,
         });
+      });
 
-        await emitEvent(
-          models.Outbox,
-          parsedThreadIds.map((t) => ({
-            event_name: 'ThreadViewed',
-            event_payload: {
-              thread_id: t,
-            },
-          })),
-          transaction,
+      parsedThreadIds.forEach(async (t) => {
+        await cache().incrementKey(
+          CacheNamespaces.Thread_View_Count,
+          t.toString(),
         );
       });
 

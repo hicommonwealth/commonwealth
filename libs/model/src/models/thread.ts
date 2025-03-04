@@ -129,7 +129,13 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Outbox, Address } = sequelize.models;
+          const { Community, Outbox, Address } = sequelize.models;
+
+          await Community.increment('lifetime_thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
 
           const { topic_id, community_id } = thread.get({
             plain: true,
@@ -161,19 +167,12 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.InstanceDestroyOptions,
         ) => {
-          const { Outbox } = sequelize.models;
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: 'ThreadDeleted',
-                event_payload: {
-                  community_id: thread.community_id,
-                },
-              },
-            ],
-            options.transaction,
-          );
+          const { Community } = sequelize.models;
+          await Community.decrement('lifetime_thread_count', {
+            by: 1,
+            where: { id: thread.community_id },
+            transaction: options.transaction,
+          });
         },
       },
     },

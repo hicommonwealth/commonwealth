@@ -260,7 +260,6 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       isReady: () => true,
       getKey: () => Promise.resolve(''),
       scan: () => Promise.resolve(null),
-      getDel: () => Promise.resolve(null),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
       setKeys: () => Promise.resolve(false),
