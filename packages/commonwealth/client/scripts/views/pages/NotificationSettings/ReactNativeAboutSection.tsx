@@ -56,8 +56,13 @@ export const ReactNativeAboutSection = () => {
   }, []);
 
   if (!reactNativeWebView) {
+    console.log(
+      'React native about section NOT active - no reactNativeWebView',
+    );
     return null;
   }
+
+  console.log('React native about section enabled!');
 
   return (
     <div>
