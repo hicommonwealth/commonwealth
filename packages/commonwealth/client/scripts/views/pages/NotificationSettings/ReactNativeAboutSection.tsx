@@ -14,6 +14,12 @@ export const ReactNativeAboutSection = () => {
     }
   }, [reactNativeWebView]);
 
+  /**
+   * This code is needed for the local react-native app because there's no easy
+   * way to reach in and reset this information for regular users that are
+   * trying to debug production issues. This could be members of the Common team
+   * that aren't deeply technical or don't have ready access to debug tools.
+   */
   const logoutAndClearSession = useCallback(async () => {
     function clearCookies() {
       document.cookie.split(';').forEach(function (c) {
