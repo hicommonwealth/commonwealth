@@ -57,6 +57,7 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
           weighted_voting: payload.weighted_voting,
           token_address: payload.token_address || undefined,
           token_symbol: payload.token_symbol || undefined,
+          token_decimals: payload.token_decimals || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
           chain_node_id: payload.chain_node_id || undefined,
         };
