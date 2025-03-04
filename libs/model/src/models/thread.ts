@@ -168,7 +168,7 @@ export default (
               {
                 event_name: 'ThreadDeleted',
                 event_payload: {
-                  id: thread.id,
+                  community_id: thread.community_id,
                 },
               },
             ],

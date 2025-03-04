@@ -111,7 +111,7 @@ export interface Cache extends Disposable {
     keys: string[],
   ): Promise<false | Record<string, unknown>>;
 
-  getDel(key: string): Promise<string | null>;
+  getDel(namespace: CacheNamespaces, key: string): Promise<string | null>;
 
   scan(
     namespace: CacheNamespaces,

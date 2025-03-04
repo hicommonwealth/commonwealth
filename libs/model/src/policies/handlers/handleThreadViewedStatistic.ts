@@ -7,5 +7,8 @@ export const handleThreadViewedStatistic: EventHandler<
 > = async ({ payload }) => {
   const { thread_id } = payload;
 
-  await cache().incrementKey(CacheNamespaces.Thread_View_Count, thread_id);
+  await cache().incrementKey(
+    CacheNamespaces.Thread_View_Count,
+    thread_id.toString(),
+  );
 };

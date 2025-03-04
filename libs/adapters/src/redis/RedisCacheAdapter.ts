@@ -294,13 +294,18 @@ export class RedisCache implements Cache {
 
   /**
    * Atomic GET + Delete
-   * @param key The key.
+   * @param namespace The namespace of the key to get.
+   * @param key the key to get.
    * @returns The value of the key.
    */
-  public async getDel(key: string): Promise<string | null> {
+  public async getDel(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<string | null> {
     if (!this.isReady()) return null;
     try {
-      return await this._client.GETDEL(key);
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      return await this._client.GETDEL(finalKey);
     } catch (e) {
       const msg = 'An error occurred while running GETDEL';
       this._log.error(msg, e as Error);

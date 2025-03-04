@@ -128,8 +128,8 @@ export class DatabaseCleaner {
     const idToCount: [number, number][] = [];
 
     for (const key of result.keys) {
-      const id = parseInt(key.substring(key.indexOf(':') + 1), 10);
-      const count = parseInt((await cache().getDel(key))!, 10);
+      const id = parseInt(key.substring(key.indexOf('_') + 1), 10);
+      const count = parseInt((await cache().getDel(namespace, key))!, 10);
 
       idToCount.push([id, count]);
     }
