@@ -107,12 +107,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await models.Community.increment('profile_count', {
-            by: 1,
-            where: { id: community_id },
-            transaction,
-          });
-
           await emitEvent(models.Outbox, [
             {
               event_name: 'CommunityJoined',

@@ -293,6 +293,22 @@ export class RedisCache implements Cache {
   }
 
   /**
+   * Atomic GET + Delete
+   * @param key The key.
+   * @returns The value of the key.
+   */
+  public async getDel(key: string): Promise<string | null> {
+    if (!this.isReady()) return null;
+    try {
+      return await this._client.GETDEL(key);
+    } catch (e) {
+      const msg = 'An error occurred while running GETDEL';
+      this._log.error(msg, e as Error);
+      return null;
+    }
+  }
+
+  /**
    * Sets the expiration (TTL) of a key within a specific namespace.
    * @param namespace The namespace of the key for which to set the expiration.
    * @param key The key for which to set the expiration.
@@ -414,6 +430,31 @@ export class RedisCache implements Cache {
       return this._client.del(finalKey);
     } catch (e) {
       return 0;
+    }
+  }
+
+  /**
+   * Returns the paginated matching namespace:keys in the namespace.
+   * @param namespace The prefix to check for keys in.
+   * @param cursor Start index of the scan.
+   * @param count How many keys to return.
+   * @returns The cursor pointing to the next pagination and the keys scanned.
+   */
+  public async scan(
+    namespace: CacheNamespaces,
+    cursor: number,
+    count: number,
+  ): Promise<{ cursor: number; keys: string[] } | null> {
+    if (!this.isReady()) return null;
+    try {
+      return this._client.scan(cursor, {
+        MATCH: `${namespace}:`,
+        COUNT: count,
+      });
+    } catch (e) {
+      const msg = 'An error occurred while running scan';
+      this._log.error(msg, e as Error);
+      return null;
     }
   }
 
