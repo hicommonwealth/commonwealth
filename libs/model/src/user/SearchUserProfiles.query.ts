@@ -11,8 +11,26 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { community_id, search, limit, cursor, order_by, order_direction } =
-        payload;
+      const {
+        community_id,
+        search,
+        limit,
+        cursor,
+        order_by,
+        order_direction,
+        exact_match,
+      } = payload;
+
+      const communityFilter =
+        community_id && community_id !== ALL_COMMUNITIES
+          ? `A.community_id = :community_id`
+          : '';
+      const nameFilter =
+        search.length > 0
+          ? exact_match
+            ? `U.profile->>'name' = :searchTerm`
+            : `(U.profile->>'name' ILIKE :searchTerm)`
+          : '';
 
       // pagination configuration
       const direction = order_direction || 'DESC';
@@ -25,39 +43,34 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
       const offset = limit! * (cursor! - 1);
 
       const sql = `
-        SELECT
-          U.id AS user_id,
-          U.profile->>'name' AS profile_name,
-          U.profile->>'avatar_url' AS avatar_url,
-          U.created_at,
-          MAX(A.last_active) as last_active,
-          array_agg(
-            json_build_object(
-              'id', A.id,
-              'community_id', A.community_id,
-              'address', A.address,
-              'role', A.role
-            )
-          ) as addresses,
-          COUNT(U.id) OVER()::integer as total
-        FROM
-          "Users" U
-          JOIN "Addresses" A ON U.id = A.user_id 
-        WHERE
-          ${community_id && community_id !== ALL_COMMUNITIES ? `A.community_id = :community_id AND` : ''}
-          (U.profile->>'name' ILIKE :searchTerm)
-        GROUP BY
-          U.id
-        ORDER BY ${order_col} ${direction}
-        LIMIT :limit
-        OFFSET :offset
+          SELECT U.id                         AS user_id,
+                 U.profile ->> 'name'         AS profile_name,
+                 U.profile ->> 'avatar_url'   AS avatar_url,
+                 U.created_at,
+                 MAX(A.last_active)           as last_active,
+                 array_agg(
+                         json_build_object(
+                                 'id', A.id,
+                                 'community_id', A.community_id,
+                                 'address', A.address,
+                                 'role', A.role
+                         )
+                 )                            as addresses,
+                 COUNT(U.id) OVER ()::integer as total
+          FROM "Users" U
+                   JOIN "Addresses" A ON U.id = A.user_id
+          WHERE ${communityFilter} ${communityFilter && nameFilter ? ' AND ' : ''}
+              ${nameFilter}
+          GROUP BY U.id
+          ORDER BY ${order_col} ${direction}
+          LIMIT :limit OFFSET :offset
       `;
 
       const profiles = await models.sequelize.query<
         z.infer<typeof schemas.SearchUserProfilesView> & { total: number }
       >(sql, {
         replacements: {
-          searchTerm: `%${search}%`,
+          searchTerm: exact_match ? search : `${search}%`,
           community_id,
           limit,
           offset,

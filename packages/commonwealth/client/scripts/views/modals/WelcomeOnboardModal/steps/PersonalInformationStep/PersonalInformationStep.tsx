@@ -87,7 +87,8 @@ const PersonalInformationStep = ({
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
-      limit: 50,
+      limit: 1,
+      exactMatch: true,
       searchTerm: debouncedSearchTerm,
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,
