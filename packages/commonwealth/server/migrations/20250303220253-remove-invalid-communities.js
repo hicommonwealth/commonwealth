@@ -17,6 +17,8 @@ module.exports = {
       const communityIdsToDelete = community_ids.map(
         (community) => community.id,
       );
+      if (communityIdsToDelete.length === 0) return;
+
       // Fetch thread IDs to delete
       const threadIdsToDelete = (
         await queryInterface.sequelize.query(
@@ -238,10 +240,9 @@ module.exports = {
         `
           DELETE
           FROM "Communities"
-          WHERE "name" LIKE '%<%'
-             OR "name" LIKE '%>%';
+          WHERE id IN (:communityIds);
       `,
-        { transaction },
+        { transaction, replacements: { communityIdsToDelete } },
       );
     });
   },
