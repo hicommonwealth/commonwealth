@@ -16,7 +16,7 @@ export const ICONS = {
   Marketplace: '🛍️',
   DeSci: '🔬',
   DataDAO: '💾',
-  RWA: '🪙',
+  RWA: '🖼️',
   Launchpad: '🚀',
   '🔛  Swaps': '🔛',
 };
