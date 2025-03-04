@@ -12,6 +12,7 @@ module.exports = {
       UPDATE "Topics"
       SET "token_decimals" = CASE
         WHEN token_symbol = 'USDC' THEN 6
+        WHEN token_symbol = 'MOCHI' THEN 8
         WHEN token_symbol IS NOT NULL THEN 18
         ELSE NULL
       END;
