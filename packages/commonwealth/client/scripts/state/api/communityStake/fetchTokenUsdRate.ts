@@ -4,34 +4,40 @@ import { ExternalEndpoints } from 'state/api/config';
 
 const TOKEN_USD_RATE_STALE_TIME = 10 * 60 * 1_000; // 10 min
 
-export type CoinbaseResponseType = {
-  data: {
-    data: {
-      amount: string;
-      base: string;
-      currency: string;
-    };
+export type DefiLlamaCoinPriceResponse = {
+  decimals: number;
+  symbol: string;
+  price: number;
+  timestamp: number;
+  confidence: number;
+};
+
+export type DefiLlamaResponseType = {
+  coins: {
+    [key: string]: DefiLlamaCoinPriceResponse;
   };
 };
 
-export const fetchTokenUsdRate = async (tokenSymbol: string) => {
+export const fetchTokenUsdRate = async (tokenContractAddress: string) => {
   return await axios.get(
-    ExternalEndpoints.coinbase.tokenToUsdRate(tokenSymbol),
+    ExternalEndpoints.defiLlama.tokenToUsdRate(tokenContractAddress),
   );
 };
 
 type UseFetchTokenUsdRateQueryProps = {
-  tokenSymbol: string; // any token symbol ex: `ETH`, `SUSHI`, `DOGE` etc.
+  tokenContractAddress: string; // `0x....xx`
   enabled?: boolean;
 };
 
 const useFetchTokenUsdRateQuery = ({
-  tokenSymbol,
+  tokenContractAddress,
   enabled,
 }: UseFetchTokenUsdRateQueryProps) => {
-  return useQuery<CoinbaseResponseType>({
-    queryKey: [ExternalEndpoints.coinbase.tokenToUsdRate(tokenSymbol)],
-    queryFn: () => fetchTokenUsdRate(tokenSymbol),
+  return useQuery<DefiLlamaResponseType>({
+    queryKey: [
+      ExternalEndpoints.defiLlama.tokenToUsdRate(tokenContractAddress),
+    ],
+    queryFn: () => fetchTokenUsdRate(tokenContractAddress),
     staleTime: TOKEN_USD_RATE_STALE_TIME,
     enabled,
   });
