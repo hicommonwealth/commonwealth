@@ -28,23 +28,19 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         {
           model: models.QuestActionMeta,
           as: 'quest_action_meta',
-          include: community_id
-            ? [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                  where: { community_id, ...(quest_id && { id: quest_id }) },
-                },
-              ]
-            : [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                  ...(quest_id && { where: { id: quest_id } }),
-                },
-              ],
+          required: true,
+          where: event_name ? { event_name } : {},
+          include: [
+            {
+              model: models.Quest,
+              required: true,
+              attributes: ['id', 'name'],
+              where: {
+                ...(community_id && { community_id }),
+                ...(quest_id ? { id: quest_id } : { id: { [Op.gt]: 0 } }),
+              },
+            },
+          ],
         },
       ];
 
