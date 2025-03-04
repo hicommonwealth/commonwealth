@@ -230,7 +230,10 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
         </div>
 
         <MobileAppOnboardModal
-          onClose={() => setMobileAppOnboardModalOpen(false)}
+          onClose={() => {
+            setMobileAppOnboardModalOpen(false);
+            setHasMobileAppOnboarding(true);
+          }}
           isOpen={mobileAppOnboardModalOpen}
         />
         <WelcomeOnboardModal
