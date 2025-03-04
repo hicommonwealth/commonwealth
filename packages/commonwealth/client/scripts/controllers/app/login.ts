@@ -205,6 +205,7 @@ export function updateActiveUser(data) {
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
       isLoggedIn: false,
+      referredByAddress: undefined,
     });
   } else {
     const addresses = data.addresses.map(
@@ -243,6 +244,7 @@ export function updateActiveUser(data) {
         isStarred: c.is_starred || false,
       })),
       isLoggedIn: true,
+      referredByAddress: data?.referred_by_address,
     });
   }
 }

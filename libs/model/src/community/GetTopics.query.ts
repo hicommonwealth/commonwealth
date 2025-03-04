@@ -11,7 +11,19 @@ const includeContestManagersQuery = `
                                                 '{content}', -- Set the 'content' key in the resulting JSONB
                                                 coalesce(
                                                     -- Aggregates the filtered actions into content
-                                                        (SELECT jsonb_agg(ca)
+                                                        (SELECT jsonb_agg(json_build_object(
+                                                          'contest_address', ca.contest_address,
+                                                          'contest_id', ca.contest_id,
+                                                          'content_id', ca.content_id,
+                                                          'actor_address', ca.actor_address,
+                                                          'action', ca.action,
+                                                          'content_url', ca.content_url,
+                                                          'voting_power', ca.voting_power::text,
+                                                          'created_at', ca.created_at,
+                                                          'thread_id', ca.thread_id,
+                                                          'calculated_voting_weight', ca.calculated_voting_weight,
+                                                          'cast_deleted_at', ca.cast_deleted_at
+                                                        ))
                                                          FROM "ContestActions" ca
                                                          WHERE ca.contest_address = cm.contest_address
                                                            AND ca.action = 'added'
