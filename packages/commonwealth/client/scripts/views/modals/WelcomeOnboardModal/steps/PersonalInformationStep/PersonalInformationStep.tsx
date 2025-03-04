@@ -93,6 +93,7 @@ const PersonalInformationStep = ({
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,
       orderDirection: APIOrderDirection.Desc,
+      enabled: debouncedSearchTerm !== '',
     });
 
   const existingUsernames = (profiles?.pages?.[0]?.results || []).map(
