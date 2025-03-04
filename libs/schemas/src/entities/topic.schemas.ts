@@ -47,6 +47,11 @@ export const Topic = z.object({
     .gt(0)
     .nullish()
     .describe('vote weight multiplier, used for ERC20 topics'),
+  token_decimals: z
+    .number()
+    .gte(0)
+    .nullish()
+    .describe('number of decimals of ERC20 token'),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
