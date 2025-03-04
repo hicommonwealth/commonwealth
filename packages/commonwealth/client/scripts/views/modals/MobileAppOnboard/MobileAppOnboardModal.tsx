@@ -1,4 +1,4 @@
-import commonLogo from '*.svg';
+import commonLogo from 'assets/img/branding/common-logo.svg';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React from 'react';
