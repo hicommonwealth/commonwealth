@@ -410,7 +410,7 @@ describe('User lifecycle', () => {
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events
+      // 8 events (skipping negative system quest id)
       const xps1 = await query(GetXps(), {
         actor: admin,
         payload: {},
@@ -451,16 +451,14 @@ describe('User lifecycle', () => {
           .be.true;
       });
 
-      // 1 event for new actor (joining and sign up flow completed)
+      // 2 events for new actor (joining and sign up flow completed)
       const xps5 = await query(GetXps(), {
         actor: admin,
         payload: { user_id: new_actor.user.id },
       });
       expect(xps5!.length).to.equal(1);
       xps5?.forEach((xp) => {
-        expect(
-          ['SignUpFlowCompleted', 'CommunityJoined'].includes(xp.event_name),
-        ).to.be.true;
+        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
       });
 
       // 3 CommentCreated events for admin
