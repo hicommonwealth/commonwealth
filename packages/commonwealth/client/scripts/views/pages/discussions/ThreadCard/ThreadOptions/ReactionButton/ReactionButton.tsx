@@ -136,8 +136,12 @@ export const ReactionButton = ({
     }
   };
 
+  console.log({ thread });
+
   const formattedVoteCount = prettyVoteWeight(
-    reactionWeightsSum,
+    thread.topic!.weighted_voting
+      ? reactionWeightsSum
+      : thread.reactionCount.toString(),
     thread.topic!.token_decimals,
     thread.topic!.weighted_voting,
     1,

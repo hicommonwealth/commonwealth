@@ -4,6 +4,15 @@ import { prettyVoteWeight } from 'shared/adapters/currency';
 import { describe, test } from 'vitest';
 
 describe('prettyVoteWeight', () => {
+  test('Unweighted', () => {
+    expect(prettyVoteWeight('0'), 'handle unweighted 0').to.eq('0');
+
+    expect(prettyVoteWeight('1'), 'handle unweighted 1').to.eq('1');
+
+    expect(prettyVoteWeight('5'), 'handle unweighted > 1').to.eq('5');
+
+    expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5000');
+  });
   test('erc20 and native ETH', () => {
     expect(
       prettyVoteWeight('0', 18, TopicWeightedVoting.ERC20),
