@@ -289,16 +289,13 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           OFFSET ${offset};
           `;
 
-      console.time('query-time');
       const communities = await models.sequelize.query<
         z.infer<typeof schemas.Community> & { total?: number }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
-        logging: console.log,
       });
-      console.timeEnd('query-time');
 
       if (include_node_info) {
         for (const community of communities) {

@@ -77,6 +77,7 @@ export const SearchUserProfilesView = z.object({
 export const SearchUserProfiles = {
   input: PaginationParamsSchema.extend({
     search: z.string(),
+    exact_match: z.boolean().optional(),
     community_id: z.string().optional(),
     order_by: z
       .enum(['last_active', 'created_at', 'profile_name', 'rank'])
