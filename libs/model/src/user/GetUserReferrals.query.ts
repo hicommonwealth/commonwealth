@@ -14,18 +14,7 @@ referee AS (
   FROM "Users" U
     JOIN referrer ON U.referred_by_address = referrer.address
     JOIN "Addresses" A ON A.user_id = U.id
-),
-referrals AS (
-  SELECT
-    namespace_address,
-    referrer_address,
-    referee_address,
-    eth_chain_id,
-    transaction_hash,
-    referrer_received_eth_amount,
-    created_on_chain_timestamp
-  FROM "Referrals"
-  WHERE referrer_address IN (SELECT * FROM referrer))
+)
 SELECT 
   referee.referred_by_address as referrer_address,
   referee.address as referee_address,
@@ -39,7 +28,7 @@ SELECT
   COALESCE(referrals.referrer_received_eth_amount, '0') as referrer_received_eth_amount
 FROM referee 
   JOIN "Users" U ON U.id = referee.user_id
-  LEFT JOIN referrals
+  LEFT JOIN "Referrals" referrals
     ON referrals.referrer_address = referee.referred_by_address
     AND referrals.referee_address = referee.address
   LEFT JOIN "Communities" C ON C.namespace_address = referrals.namespace_address
