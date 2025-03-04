@@ -33,7 +33,7 @@ const useFetchTokenUsdRateQuery = ({
   tokenContractAddress,
   enabled,
 }: UseFetchTokenUsdRateQueryProps) => {
-  return useQuery<DefiLlamaResponseType>({
+  return useQuery({
     queryKey: [
       ExternalEndpoints.defiLlama.tokenToUsdRate(tokenContractAddress),
     ],
