@@ -23,7 +23,7 @@ import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
 import {
   doesActionAllowContentId,
-  doesActionRequireCreatorReward,
+  doesActionRequireRewardShare,
 } from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
@@ -103,7 +103,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 errors: {},
                 config: {
                   requires_creator_points:
-                    doesActionRequireCreatorReward(chosenAction),
+                    doesActionRequireRewardShare(chosenAction),
                   with_optional_thread_id:
                     allowsContentId &&
                     (chosenAction === 'CommentCreated' ||

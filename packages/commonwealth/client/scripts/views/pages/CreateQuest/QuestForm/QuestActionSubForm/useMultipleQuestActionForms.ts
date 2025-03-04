@@ -4,7 +4,7 @@ import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
   doesActionAllowContentId,
-  doesActionRequireCreatorReward,
+  doesActionRequireRewardShare,
 } from './helpers';
 import {
   QuestAction,
@@ -126,8 +126,7 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
-      const requiresCreatorPoints =
-        doesActionRequireCreatorReward(chosenAction);
+      const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
 
       // update config based on chosen action
