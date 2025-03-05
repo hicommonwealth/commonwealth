@@ -150,6 +150,9 @@ export const XpLogView = XpLog.extend({
 export const GetXps = {
   input: z.object({
     user_id: PG_INT.optional().describe('Filters events by user id'),
+    user_or_creator_id: PG_INT.optional().describe(
+      'Filters events by user or creator id',
+    ),
     community_id: z
       .string()
       .optional()

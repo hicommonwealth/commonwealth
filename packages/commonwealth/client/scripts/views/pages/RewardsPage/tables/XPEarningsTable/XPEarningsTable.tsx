@@ -10,8 +10,17 @@ import {
   CWTableColumnInfo,
 } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import {
+  CWTag,
+  TagType,
+} from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
+import {
+  doesActionRequireRewardShare,
+  doesActionRewardShareForCreator,
+  doesActionRewardShareForReferrer,
+} from '../../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
 import './XPEarningsTable.scss';
 
 const columns: CWTableColumnInfo[] = [
@@ -24,6 +33,12 @@ const columns: CWTableColumnInfo[] = [
   {
     key: 'earnTime',
     header: 'Earn Time',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'rewardType',
+    header: 'Reward Type',
     numeric: false,
     sortable: true,
   },
@@ -41,6 +56,34 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
+const getTagConfigForRewardType = ({
+  action,
+  auth_user_id,
+  log,
+}: {
+  action: QuestAction;
+  auth_user_id: number;
+  log: { user_id: number; creator_id };
+}) => {
+  if (doesActionRequireRewardShare(action)) {
+    if (
+      doesActionRewardShareForCreator(action) &&
+      auth_user_id === log.creator_id
+    ) {
+      return { type: 'proposal', copy: `Creator Bonus` };
+    }
+
+    if (
+      doesActionRewardShareForReferrer(action) &&
+      auth_user_id === log.creator_id
+    ) {
+      return { type: 'trending', copy: `Referrer Bonus` };
+    }
+  }
+
+  return { type: 'new', copy: `Task Completion` };
+};
+
 export const XPEarningsTable = () => {
   const tableState = useCWTableState({
     columns,
@@ -51,7 +94,7 @@ export const XPEarningsTable = () => {
   const user = useUserStore();
 
   const { data: xpLogs = [] } = useGetXPs({
-    user_id: user.id,
+    user_or_creator_id: user.id,
   });
 
   const tableData = xpLogs.map((log) => ({
@@ -66,6 +109,25 @@ export const XPEarningsTable = () => {
         moment(log.event_created_at).toLocaleString(),
         true,
       ),
+    },
+    rewardType: {
+      customElement: (() => {
+        const config = getTagConfigForRewardType({
+          action: log.event_name as QuestAction,
+          auth_user_id: user.id,
+          log: {
+            creator_id: log.creator_user_id,
+            user_id: log.user_id,
+          },
+        });
+        return (
+          <CWTag
+            classNames="rewardType"
+            type={config.type as TagType}
+            label={config.copy}
+          />
+        );
+      })(),
     },
     xpAmount: log.xp_points,
     questLink: {

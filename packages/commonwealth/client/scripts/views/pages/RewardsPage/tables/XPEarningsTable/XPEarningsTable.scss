@@ -3,6 +3,12 @@
 .XPEarningsTable {
   .Table {
     .data-container {
+      .rewardType {
+        &.proposal {
+          border: 1px solid $primary-500;
+        }
+      }
+
       .questLink {
         cursor: pointer;
         color: $primary-500;
