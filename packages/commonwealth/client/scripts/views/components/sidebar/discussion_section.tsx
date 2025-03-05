@@ -158,7 +158,7 @@ export const DiscussionSection = ({
               );
             },
             displayData: null,
-            leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+            leftIcon: <CWIcon iconName="houseSimple" iconSize="small" />,
           },
         ]
       : []),

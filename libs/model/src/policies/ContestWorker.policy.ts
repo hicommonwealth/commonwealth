@@ -159,6 +159,9 @@ const checkContests = async () => {
   // active contests with content that are ending in one hour
   const contestsEndingInOneHour = activeContestManagers!.filter(
     (contestManager) => {
+      if (contestManager.environment !== config.APP_ENV) {
+        return false;
+      }
       const firstContent = contestManager.actions.find(
         (action) => action.action === 'added',
       );
@@ -211,22 +214,21 @@ const rolloverContests = async () => {
     interval: number;
     prize_percentage: number;
     payout_structure: number[];
-    neynar_webhook_id?: string;
     contest_id: number;
     url: string;
     private_url: string;
   }>(
     `
-SELECT 
+SELECT
   cm.contest_address,
   cm.interval,
   coalesce(cm.prize_percentage, 0) as prize_percentage,
   cm.payout_structure,
-  cm.neynar_webhook_id,
   co.contest_id,
   cn.url,
-  cn.private_url
-FROM 
+  cn.private_url,
+  cm.environment
+FROM
   "ContestManagers" cm
   JOIN (SELECT * FROM "Contests" WHERE (contest_address, contest_id) IN (
       SELECT contest_address, MAX(contest_id) AS contest_id FROM "Contests" GROUP BY contest_address)
@@ -234,12 +236,16 @@ FROM
     AND ((cm.interval = 0 AND cm.ended IS NOT TRUE) OR cm.interval > 0)
     AND NOW() > co.end_time
     AND cm.cancelled IS NOT TRUE
+    AND cm.environment = :environment
   JOIN "Communities" cu ON cm.community_id = cu.id
   JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
 `,
     {
       type: QueryTypes.SELECT,
       raw: true,
+      replacements: {
+        environment: config.APP_ENV,
+      },
     },
   );
 
@@ -253,7 +259,6 @@ FROM
         interval,
         prize_percentage,
         payout_structure,
-        neynar_webhook_id,
       }) => {
         log.info(`ROLLOVER: ${contest_address}`);
         await command(SetContestEnded(), {
@@ -266,7 +271,6 @@ FROM
             is_one_off: interval === 0,
             chain_url: url,
             chain_private_url: private_url,
-            neynar_webhook_id,
           },
         });
       },

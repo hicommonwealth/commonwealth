@@ -6,6 +6,11 @@
   gap: 4px;
   min-width: fit-content;
 
+  &.show-tag {
+    padding: 0 6px 2px;
+    border-radius: 6px;
+  }
+
   svg {
     margin-top: 4px;
     color: $neutral-600;
@@ -15,10 +20,18 @@
     color: $neutral-600;
   }
 
+  &.show-tag {
+    background-color: $neutral-100;
+  }
+
   &.warning {
     svg,
     .Text {
       color: $yellow-500;
+    }
+
+    &.show-tag {
+      background-color: $yellow-50;
     }
   }
 
@@ -26,6 +39,10 @@
     svg,
     .Text {
       color: $rorange-500;
+    }
+
+    &.show-tag {
+      background-color: $rorange-50;
     }
   }
 }

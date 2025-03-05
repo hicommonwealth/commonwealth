@@ -1,12 +1,9 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import { command, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { config } from '../config';
 import { models } from '../database';
-import { authRoles } from '../middleware';
+import { authRoles, systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
-
-const log = logger(import.meta);
+import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
 
 export function CancelContestManagerMetadata(): Command<
   typeof schemas.CancelContestManagerMetadata
@@ -23,17 +20,14 @@ export function CancelContestManagerMetadata(): Command<
       });
       mustExist('Contest Manager', contestManager);
 
-      if (contestManager.neynar_webhook_id) {
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-        try {
-          await client.deleteWebhook(contestManager.neynar_webhook_id);
-          contestManager.neynar_webhook_id = null;
-          contestManager.neynar_webhook_secret = null;
-        } catch (err) {
-          log.warn(
-            `failed to delete neynar webhook: ${contestManager.neynar_webhook_id}`,
-          );
-        }
+      if (contestManager.farcaster_frame_hashes?.length) {
+        await command(UpdateContestManagerFrameHashes(), {
+          actor: systemActor({}),
+          payload: {
+            contest_address: contestManager.contest_address,
+            frames_to_remove: contestManager.farcaster_frame_hashes,
+          },
+        });
       }
 
       contestManager.cancelled = true;

@@ -72,7 +72,7 @@ export const QuestActionMeta = (
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      action_link: { type: Sequelize.STRING, allowNull: true },
+      instructions_link: { type: Sequelize.STRING, allowNull: true },
       content_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
@@ -81,30 +81,5 @@ export const QuestActionMeta = (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'QuestActionMetas',
-    },
-  );
-
-export type QuestActionAttributes = z.infer<typeof schemas.QuestAction>;
-export type QuestActionInstance = ModelInstance<QuestActionAttributes>;
-
-export const QuestAction = (
-  sequelize: Sequelize.Sequelize,
-): Sequelize.ModelStatic<QuestActionInstance> =>
-  sequelize.define<QuestActionInstance>(
-    'QuestAction',
-    {
-      user_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true },
-      quest_action_meta_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-      },
-    },
-    {
-      timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: false,
-      underscored: true,
-      tableName: 'QuestActions',
     },
   );
