@@ -131,11 +131,11 @@ const QuestDetails = ({ id }: { id: number }) => {
   ) => {
     switch (actionName) {
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'CommunityCreated': {
