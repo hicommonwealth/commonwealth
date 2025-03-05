@@ -2,8 +2,6 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
-import useFetchFarcasterCastsQuery from 'client/scripts/state/api/contests/getFarcasterCasts';
-import useFetchThreadsQuery from 'client/scripts/state/api/threads/fetchThreads';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import ContestCard from '../../components/ContestCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -11,16 +9,13 @@ import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
-import { RenderThreadCard } from '../discussions/RenderThreadCard';
 import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
-import EntriesTab from './tabs/Entries';
+import EntriesTab, { EntriesTabProps } from './tabs/Entries';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
-import { SortType } from './types';
 import { getCurrentContestIndex, getSortedContests } from './utils';
 
-import { CWText } from '../../components/component_kit/cw_text';
 import './NewContestPage.scss';
 
 interface NewContestPageProps {
@@ -38,22 +33,6 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
   >();
-
-  const { data: farcasterCasts, isLoading: isFarcasterCastsLoading } =
-    useFetchFarcasterCastsQuery({
-      contest_address: contestAddress,
-      selectedSort: SortType.Upvotes,
-      isEnabled: !!contest?.is_farcaster_contest,
-    });
-
-  const { data: threads } = useFetchThreadsQuery({
-    communityId: contest?.community_id || '',
-    queryType: 'bulk',
-    page: 1,
-    limit: 30,
-    topicId: contest?.topic_id || undefined,
-    apiEnabled: !!contest && !contest?.is_farcaster_contest,
-  });
 
   const { chain, address } = useTokenData();
 
@@ -74,6 +53,13 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     if (targetContest) {
       navigate(`/contests/${targetContest.contest_address}`);
     }
+  };
+
+  const entriesTabProps: EntriesTabProps = {
+    contestAddress,
+    communityId: contest?.community_id || '',
+    topicId: contest?.topic_id || undefined,
+    isFarcasterContest: !!contest?.is_farcaster_contest,
   };
 
   return (
@@ -154,25 +140,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
 
         <div className="mobile-tab-content">
           {selectedMobileTab === MobileTabType.Entries && (
-            <>
-              {contest?.is_farcaster_contest ? (
-                <EntriesTab
-                  isLoading={isFarcasterCastsLoading}
-                  entries={farcasterCasts || []}
-                  selectedSort={SortType.Upvotes}
-                  onSortChange={() => {}}
-                />
-              ) : (
-                threads?.map((thread) => (
-                  <RenderThreadCard
-                    key={thread.id}
-                    thread={thread}
-                    communityId={contest?.community_id || ''}
-                    contestsData={contestsData}
-                  />
-                ))
-              )}
-            </>
+            <EntriesTab {...entriesTabProps} />
           )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
@@ -181,29 +149,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
         <div className="desktop-view">
           <CWGrid>
             <div className="thread-list-container">
-              {contest?.is_farcaster_contest ? (
-                <EntriesTab
-                  isLoading={false}
-                  entries={farcasterCasts || []}
-                  selectedSort={SortType.Upvotes}
-                  onSortChange={() => {}}
-                />
-              ) : threads.length > 0 ? (
-                threads?.map((thread) => (
-                  <RenderThreadCard
-                    key={thread.id}
-                    thread={thread}
-                    communityId={contest?.community_id || ''}
-                    contestsData={contestsData}
-                  />
-                ))
-              ) : (
-                <div className="no-threads-container">
-                  <CWText type="b2" fontWeight="medium">
-                    No threads found
-                  </CWText>
-                </div>
-              )}
+              <EntriesTab {...entriesTabProps} />
             </div>
             <div>
               <TokenSwapTab />

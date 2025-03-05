@@ -1,24 +1,20 @@
+import Thread from 'client/scripts/models/Thread';
 import React from 'react';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { RenderThreadCard } from 'views/pages/discussions/RenderThreadCard';
+import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import { SortType, sortOptions } from '../types';
 
 import './CommonEntriesList.scss';
 
 interface CommonEntriesListProps {
   isLoading: boolean;
-  entries: Array<{
-    id: string;
-    calculated_vote_weight: string;
-    author: {
-      username: string;
-    };
-    content: string;
-  }>;
+  entries: Thread[];
   selectedSort: SortType;
   onSortChange: (sort: SortType) => void;
+  communityId: string;
 }
 
 export const CommonEntriesList = ({
@@ -26,7 +22,10 @@ export const CommonEntriesList = ({
   entries,
   selectedSort,
   onSortChange,
+  communityId,
 }: CommonEntriesListProps) => {
+  const { contestsData } = useCommunityContests();
+
   if (isLoading) {
     return (
       <>
@@ -55,17 +54,13 @@ export const CommonEntriesList = ({
         />
       </div>
 
-      {entries.map((entry) => (
-        <div key={entry.id} className="entry-container">
-          <CWUpvote disabled voteCount={entry.calculated_vote_weight || '0'} />
-
-          <div className="entry-content">
-            <CWText type="b2" fontWeight="medium">
-              {entry.author.username}
-            </CWText>
-            <CWText>{entry.content}</CWText>
-          </div>
-        </div>
+      {entries.map((thread) => (
+        <RenderThreadCard
+          key={thread.id}
+          thread={thread}
+          communityId={communityId}
+          contestsData={contestsData}
+        />
       ))}
     </div>
   );
