@@ -167,7 +167,7 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    isFarcaster
+    true
       ? navigate(`/contests/${address}`, {}, community?.id)
       : navigate(
           `/discussions?featured=mostLikes&contest=${address}`,

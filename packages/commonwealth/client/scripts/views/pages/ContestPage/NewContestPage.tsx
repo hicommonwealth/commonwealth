@@ -20,6 +20,7 @@ import TokenSwapTab from './tabs/TokenSwap';
 import { SortType } from './types';
 import { getCurrentContestIndex, getSortedContests } from './utils';
 
+import { CWText } from '../../components/component_kit/cw_text';
 import './NewContestPage.scss';
 
 interface NewContestPageProps {
@@ -98,6 +99,10 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
               payoutStructure={contest?.payout_structure}
               isFarcaster={contest?.is_farcaster_contest}
               onFund={() => setFundDrawerContest(contest)}
+              contestBalance={parseInt(
+                contest?.contests?.[0]?.contest_balance || '0',
+                10,
+              )}
             />
           )}
 
@@ -183,7 +188,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
                   selectedSort={SortType.Upvotes}
                   onSortChange={() => {}}
                 />
-              ) : (
+              ) : threads.length > 0 ? (
                 threads?.map((thread) => (
                   <RenderThreadCard
                     key={thread.id}
@@ -192,6 +197,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
                     contestsData={contestsData}
                   />
                 ))
+              ) : (
+                <div className="no-threads-container">
+                  <CWText type="b2" fontWeight="medium">
+                    No threads found
+                  </CWText>
+                </div>
               )}
             </div>
             <div>
