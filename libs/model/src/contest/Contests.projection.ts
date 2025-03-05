@@ -242,6 +242,19 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            contest_address: payload.contest_address,
+            environment: config.APP_ENV,
+          },
+        });
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
@@ -259,9 +272,6 @@ export function Contests(): Projection<typeof inputs> {
 
         // post confirmation via FC bot
         if (farcasterInfo) {
-          const contestManager = await models.ContestManager.findByPk(
-            payload.contest_address,
-          );
           const leaderboardUrl = buildContestLeaderboardUrl(
             getBaseUrl(config.APP_ENV),
             contestManager!.community_id,
