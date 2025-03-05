@@ -1,5 +1,6 @@
 import {
   Actor,
+  config,
   DeepPartial,
   dispose,
   handleEvent,
@@ -108,6 +109,7 @@ describe('Contests projection lifecycle', () => {
               cancelled,
               topic_id,
               is_farcaster_contest: true,
+              environment: config.APP_ENV,
             },
             {
               contest_address: oneoff,
@@ -122,6 +124,7 @@ describe('Contests projection lifecycle', () => {
               cancelled,
               topics: [],
               is_farcaster_contest: false,
+              environment: config.APP_ENV,
             },
           ],
         },
