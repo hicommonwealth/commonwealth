@@ -391,18 +391,23 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
       },
       TwitterCommonMentioned: async ({ payload }) => {
-        const user = await models.Address.findOne({
+        const address = await models.Address.findOne({
           where: {
             oauth_provider: WalletSsoSource.Twitter,
             oauth_username: payload.username,
           },
         });
-        if (!user) return;
-        await recordXpsForEvent(
-          user.id!,
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
           'TwitterCommonMentioned',
+          // TODO: create system quest?
+          undefined,
+        );
+        await recordXpsForQuest(
+          address.user_id!,
           payload.created_at,
-          TwitterCommonMentionedReward,
+          action_metas,
         );
       },
     },
