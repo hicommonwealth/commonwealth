@@ -178,6 +178,7 @@ export const CreateTopic = {
         weighted_voting: true,
         token_address: true,
         token_symbol: true,
+        token_decimals: true,
         vote_weight_multiplier: true,
         chain_node_id: true,
       }),

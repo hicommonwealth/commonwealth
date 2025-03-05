@@ -110,7 +110,9 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                     'description', T.description,
                     'community_id', T.community_id,
                     'telegram', T.telegram,
-                    'weighted_voting', T.weighted_voting
+                    'weighted_voting', T.weighted_voting,
+                    'token_decimals', T.token_decimals,
+                    'vote_weight_multiplier', T.vote_weight_multiplier
                 ) as topic,
                 json_build_object(
                     'id', A.id,

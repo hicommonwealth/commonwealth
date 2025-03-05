@@ -41,6 +41,7 @@ export const ViewThreadUpvotesDrawer = ({
           ? app.chain.accounts.get(thread?.author)
           : null
       }
+      tokenDecimals={thread?.topic?.token_decimals}
       topicWeight={thread?.topic?.weighted_voting}
       publishDate={thread.createdAt}
     />

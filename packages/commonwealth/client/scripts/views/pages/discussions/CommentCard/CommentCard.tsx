@@ -81,6 +81,8 @@ type CommentCardProps = {
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
+  // voting
+  tokenNumDecimals?: number;
 };
 
 export const CommentCard = ({
@@ -121,6 +123,7 @@ export const CommentCard = ({
   isStreamingAIReply,
   parentCommentText,
   onStreamingComplete,
+  tokenNumDecimals,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -423,6 +426,7 @@ export const CommentCard = ({
                     }
                     onReaction={handleReaction}
                     weightType={weightType}
+                    tokenNumDecimals={tokenNumDecimals}
                   />
                 )}
 
@@ -438,6 +442,7 @@ export const CommentCard = ({
                       comment={comment}
                       isOpen={isUpvoteDrawerOpen}
                       setIsOpen={setIsUpvoteDrawerOpen}
+                      tokenDecimals={tokenNumDecimals}
                       weightType={weightType}
                     />
                   </>

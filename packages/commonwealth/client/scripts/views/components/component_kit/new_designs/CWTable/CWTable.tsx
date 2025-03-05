@@ -113,6 +113,7 @@ export type CWTableColumnInfo = {
     content: string;
   };
   numeric: boolean;
+  tokenDecimals?: number | null | undefined;
   weightedVoting?: TopicWeightedVoting | null | undefined;
   sortable: boolean;
   chronological?: boolean;
@@ -196,7 +197,11 @@ export const CWTable = ({
                 return (
                   <div className="numeric">
                     {col.weightedVoting
-                      ? prettyVoteWeight(numericColVal, col.weightedVoting)
+                      ? prettyVoteWeight(
+                          numericColVal,
+                          col.tokenDecimals,
+                          col.weightedVoting,
+                        )
                       : numericColVal}
                   </div>
                 );

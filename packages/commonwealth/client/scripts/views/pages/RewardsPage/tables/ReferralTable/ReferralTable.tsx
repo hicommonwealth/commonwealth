@@ -87,7 +87,7 @@ export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
                   },
                   community: {
                     sortValue: item.community_name || '',
-                    customElement: (
+                    customElement: item.community_name ? (
                       <div className="table-cell community-cell">
                         <Link
                           to={`/${item.community_id}`}
@@ -104,11 +104,13 @@ export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
                           <p>{item.community_name}</p>
                         </Link>
                       </div>
+                    ) : (
+                      '-'
                     ),
                   },
                   namespace: {
                     sortValue: namespaceAddress || '',
-                    customElement: (
+                    customElement: namespaceAddress ? (
                       <div className="table-cell namespace-cell">
                         {withTooltip(
                           formatAddressShort(namespaceAddress || '', 6, 4),
@@ -116,6 +118,8 @@ export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
                           true,
                         )}
                       </div>
+                    ) : (
+                      '-'
                     ),
                   },
                   earnings: {

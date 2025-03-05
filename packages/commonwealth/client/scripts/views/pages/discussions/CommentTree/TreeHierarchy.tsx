@@ -194,6 +194,7 @@ export const TreeHierarchy = ({
                     comment={comment}
                     shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
                     weightType={thread.topic?.weighted_voting}
+                    tokenNumDecimals={thread.topic?.token_decimals || undefined}
                   />
                 </div>
                 {comment.reply_count > 0 && (
@@ -254,6 +255,9 @@ export const TreeHierarchy = ({
                       canDelete={false}
                       canToggleSpam={false}
                       shareURL=""
+                      tokenNumDecimals={
+                        thread.topic?.token_decimals || undefined
+                      }
                     />
                   </div>
                 )}

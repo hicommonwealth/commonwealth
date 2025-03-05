@@ -75,7 +75,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         FROM 
           "Quests" as Q
         LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
-        ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
+        ${filterConditions.length > 0 ? `WHERE Q.id > 0 AND ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset

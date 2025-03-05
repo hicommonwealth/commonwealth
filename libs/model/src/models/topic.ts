@@ -54,6 +54,7 @@ export default (
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
+      token_decimals: { type: Sequelize.INTEGER, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
     },
     {
