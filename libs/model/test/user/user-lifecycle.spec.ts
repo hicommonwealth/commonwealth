@@ -49,6 +49,7 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
         },
       });
       // setup quest actions
@@ -200,6 +201,7 @@ describe('User lifecycle', () => {
           image_url: chance.url(),
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
         },
       });
       // setup quest actions
@@ -288,6 +290,8 @@ describe('User lifecycle', () => {
           "name",
           "description",
           "image_url",
+          "xp_awarded",
+          "max_xp_to_end",
           "start_date",
           "end_date",
           "created_at",
@@ -297,6 +301,7 @@ describe('User lifecycle', () => {
           'System Quest',
           'Referrals and address linking system-level quest',
           '',
+          0, 100,
           NOW(), NOW(), NOW(), NOW());
 
         -- create "artificial" system quest action metas for quest above
@@ -543,6 +548,7 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
         },
       });
       const quest2 = await command(CreateQuest(), {
@@ -554,6 +560,7 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
         },
       });
 
@@ -618,6 +625,80 @@ describe('User lifecycle', () => {
         payload: {},
       });
       expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4 + 20);
+    });
+
+    it('should end quest when max_xp_to_end is reached', async () => {
+      // setup quest
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp quest with low cap',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          community_id,
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 20,
+        },
+      });
+      // setup quest actions
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest!.id!,
+          action_metas: [
+            {
+              event_name: 'ThreadCreated',
+              reward_amount: 12,
+              creator_reward_weight: 0,
+            },
+            {
+              event_name: 'CommentCreated',
+              reward_amount: 25,
+              creator_reward_weight: 0,
+              participation_limit: QuestParticipationLimit.OncePerPeriod,
+              participation_period: QuestParticipationPeriod.Daily,
+            },
+          ],
+        },
+      });
+      // hack start date to make it active
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
+
+      const watermark = new Date();
+
+      // act on community, triggering quest rewards
+      const thread = await command(CreateThread(), {
+        actor: member,
+        payload: {
+          community_id,
+          topic_id,
+          title: 'Thread title 3',
+          body: 'Thread body',
+          kind: 'discussion',
+          stage: '',
+          read_only: false,
+        },
+      });
+      await command(CreateComment(), {
+        actor: member,
+        payload: {
+          thread_id: thread!.id!,
+          body: 'Comment body 3',
+        },
+      });
+
+      // drain the outbox
+      await drainOutbox(['ThreadCreated', 'CommentCreated'], Xp, watermark);
+
+      const final = await models.Quest.findOne({
+        where: { id: quest!.id },
+      });
+      expect(final!.end_date < new Date()).toBe(true);
+      expect(final!.xp_awarded).toBe(37);
     });
   });
 });
