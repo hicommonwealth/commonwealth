@@ -300,7 +300,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         start_date: new Date(values.start_date),
       }),
       image_url: values.image || getDefaultContestImage(),
-      community_id: values?.community?.value || undefined,
+      community_id: values?.community?.value || null, // send null to remove community association
       action_metas: questActionSubForms.map((subForm) => ({
         event_name: subForm.values.action as QuestAction,
         reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
