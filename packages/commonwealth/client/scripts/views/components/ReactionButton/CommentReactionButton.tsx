@@ -114,12 +114,6 @@ export const CommentReactionButton = ({
     }
   };
 
-  console.log({
-    reactionWeightsSum,
-    count: comment.reaction_count,
-    tokenNumDecimals,
-  });
-
   const formattedVoteCount = prettyVoteWeight(
     weightType
       ? reactionWeightsSum.toString()
