@@ -38,8 +38,7 @@ const inputs = {
 };
 
 /**
- * Makes sure initial contest (off-chain metadata) record exists
- * and adds EVM event sources
+ * Creates initial contest projection and adds EVM event sources
  */
 async function createInitialContest(
   namespace: string,
