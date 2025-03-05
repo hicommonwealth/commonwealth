@@ -41,7 +41,7 @@ export const trpcRouter = trpc.router({
     }),
   ]),
   getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
-    ttlSecs: ({ relevance_by, include_node_info, cursor }) => {
+    ttlSecs: ({ relevance_by, include_node_info }) => {
       // (1h) Used by trending communities (user dashboard) when signed in
       if (relevance_by === 'membership')
         return config.CACHE_TTL.GET_COMMUNITIES_TRENDING_SIGNED_IN;
