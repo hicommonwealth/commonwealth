@@ -7,6 +7,8 @@ import { decodeContent, sanitizeQuillText } from '../utils';
 
 const Errors = {
   DefaultTemplateRequired: 'Default Template required',
+  PublicToPrivateNotAllowed:
+    'Cannot change a public topic to private. Create a new private topic instead.',
 };
 
 export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
@@ -31,6 +33,7 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
         group_ids,
         featured_in_sidebar,
         featured_in_new_post,
+        private: isPrivate,
       } = payload;
 
       const decodedDescription = decodeContent(description ?? '');
@@ -65,6 +68,13 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
       }
       if (typeof default_community_template !== 'undefined') {
         topic.default_offchain_template = default_community_template || '';
+      }
+      if (typeof isPrivate !== 'undefined') {
+        // Prevent changing a public topic to private
+        if (!topic.private && isPrivate === true) {
+          throw new InvalidState(Errors.PublicToPrivateNotAllowed);
+        }
+        topic.private = isPrivate;
       }
       await topic.save();
 

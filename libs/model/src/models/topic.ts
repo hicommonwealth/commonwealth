@@ -33,6 +33,16 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      private: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      group_ids: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        allowNull: false,
+        defaultValue: [],
+      },
       community_id: { type: Sequelize.STRING, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -44,11 +54,6 @@ export default (
         allowNull: true,
       },
       channel_id: { type: Sequelize.STRING, allowNull: true },
-      group_ids: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        allowNull: false,
-        defaultValue: [],
-      },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
