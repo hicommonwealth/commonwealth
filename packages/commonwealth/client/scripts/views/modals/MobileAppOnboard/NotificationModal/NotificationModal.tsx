@@ -13,6 +13,19 @@ type NotificationModalProps = {
   onComplete: () => void;
 };
 
+/**
+ * Forcibly turn on mobile notifications when the device is a new mobile
+ * installation.
+ *
+ * Note that this should ALWAYS force the user to turn on push notifications
+ * because, while the cloud settings could be enabled for the user's account,
+ * they might not have permissions locally.
+ *
+ * Even if they DO have permissions enabled, which is probably false, we should
+ * ask again.
+ *
+ * The only way it would not be the case is if their localStorage was reset.
+ */
 export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
   const activate = useSubscriptionPreferenceSettingToggle([
     'mobile_push_notifications_enabled',
