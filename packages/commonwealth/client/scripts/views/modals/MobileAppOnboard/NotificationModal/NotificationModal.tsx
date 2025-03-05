@@ -1,12 +1,10 @@
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+// eslint-disable-next-line max-len
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-// eslint-disable-next-line max-len
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-// eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSetting } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
 // eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 import './NotificationModal.scss';
@@ -16,21 +14,22 @@ type NotificationModalProps = {
 };
 
 export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
-  const checked = useSubscriptionPreferenceSetting(
-    'mobile_push_notifications_enabled',
-  );
-
   const activate = useSubscriptionPreferenceSettingToggle([
     'mobile_push_notifications_enabled',
     'mobile_push_discussion_activity_enabled',
     'mobile_push_admin_alerts_enabled',
   ]);
 
-  const [enableNotifications, setEnableNotification] = useState(checked);
+  const [enableNotifications, setEnableNotification] = useState(false);
 
-  useEffect(() => {
-    setEnableNotification(checked);
-  }, [checked]);
+  const handleActivate = useCallback(() => {
+    async function doAsync() {
+      await activate(true);
+      setEnableNotification(true);
+    }
+
+    doAsync().catch(console.error);
+  }, [activate]);
 
   return (
     <section className="NotificationModal">
@@ -40,7 +39,7 @@ export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
       <button
         className={`notificationButton ${enableNotifications ? 'enabled' : ''}`}
         onClick={() => {
-          activate(!checked);
+          handleActivate();
         }}
       >
         <CWIcon iconSize="large" iconName="bellRinging" />
@@ -58,7 +57,7 @@ export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
           <CWCheckbox
             checked={enableNotifications}
             onChange={() => {
-              activate(!checked);
+              handleActivate();
             }}
           />
         </div>
