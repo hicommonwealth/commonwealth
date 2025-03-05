@@ -48,14 +48,20 @@
     }
 
     .profile-name {
+      @include multiline-text-ellipsis(1);
       margin-top: 20px;
       font-size: 18px;
       font-weight: bold;
       color: #333;
+      max-width: 200px;
+      word-break: break-word;
+      overflow: hidden;
+      white-space: pre-wrap;
 
       &:hover {
         color: $neutral-600;
       }
     }
+    white-space: nowrap;
   }
 }

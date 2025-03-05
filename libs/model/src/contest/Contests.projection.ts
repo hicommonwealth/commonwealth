@@ -9,19 +9,17 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import {
+  buildContestLeaderboardUrl,
+  getBaseUrl,
+  getDefaultContestImage,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import { getWeightedNumTokens } from '../services/stakeHelper';
-import {
-  decodeThreadContentUrl,
-  getChainNodeUrl,
-  getDefaultContestImage,
-  parseFarcasterContentUrl,
-  publishCast,
-} from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -119,6 +117,7 @@ async function updateOrCreateWithAlert(
           image_url: getDefaultContestImage(),
           payout_structure: [],
           is_farcaster_contest: false,
+          environment: config.APP_ENV,
         },
         { transaction },
       );
@@ -215,7 +214,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const score = await getContestScore(
+    const { scores, contestBalance } = await getContestScore(
       details.url,
       contest_address,
       details.prize_percentage,
@@ -224,7 +223,11 @@ export async function updateScore(contest_address: string, contest_id: number) {
       details.interval === 0,
     );
     await models.Contest.update(
-      { score, score_updated_at: new Date() },
+      {
+        score: scores,
+        score_updated_at: new Date(),
+        contest_balance: contestBalance,
+      },
       { where: { contest_address: contest_address, contest_id } },
     );
   } catch (err) {
@@ -260,19 +263,18 @@ export function Contests(): Projection<typeof inputs> {
         );
       },
 
-      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
-        const contest_id = payload.contest_id!;
-        await models.Contest.create({
-          ...payload,
-          contest_id,
-        });
+        // ignore ContestStarted events from OneOff/Single contests
+        if (payload.contest_id !== 0) {
+          await models.Contest.create(payload);
+        }
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId, isFarcaster } = decodeThreadContentUrl(
+        const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
+
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -285,7 +287,7 @@ export function Contests(): Projection<typeof inputs> {
         });
 
         // post confirmation via FC bot
-        if (isFarcaster) {
+        if (farcasterInfo) {
           const contestManager = await models.ContestManager.findByPk(
             payload.contest_address,
           );
@@ -294,11 +296,8 @@ export function Contests(): Projection<typeof inputs> {
             contestManager!.community_id,
             contestManager!.contest_address,
           );
-          const { replyCastHash } = parseFarcasterContentUrl(
-            payload.content_url,
-          );
           await publishCast(
-            replyCastHash,
+            farcasterInfo.replyCastHash,
             ({ username }) =>
               `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
           );

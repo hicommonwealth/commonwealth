@@ -12,6 +12,7 @@ export const outboxEvents: Events[] = [
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',
+  'CommunityJoined',
   'ContestContentAdded',
   'ContestContentUpvoted',
   'ContestStarted',
@@ -26,7 +27,9 @@ export const outboxEvents: Events[] = [
   'DiscordThreadDeleted',
   'DiscordThreadTitleUpdated',
   'FarcasterCastCreated',
+  'FarcasterCastDeleted',
   'FarcasterReplyCastCreated',
+  'FarcasterReplyCastDeleted',
   'FarcasterVoteCreated',
   'FarcasterContestBotMentioned',
   'GroupCreated',
@@ -48,6 +51,8 @@ export const outboxEvents: Events[] = [
   'LaunchpadTokenCreated',
   'LaunchpadTokenTraded',
   'ReferralFeeDistributed',
+  'WalletLinked',
+  'SSOLinked',
   'XpChainEventCreated',
 ] as const;
 

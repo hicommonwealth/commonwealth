@@ -28,7 +28,7 @@ import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
-import { Quest, QuestAction, QuestActionMeta } from './quest';
+import { Quest, QuestActionMeta } from './quest';
 import Reaction from './reaction';
 import { Referral } from './referral';
 import { ReferralFee } from './referral_fee';
@@ -78,7 +78,6 @@ export const Factories = {
   Poll,
   ProfileTags,
   Quest,
-  QuestAction,
   QuestActionMeta,
   Reaction,
   Referral,

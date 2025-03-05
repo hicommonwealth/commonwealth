@@ -1,4 +1,4 @@
-import { dispose, handleEvent } from '@hicommonwealth/core';
+import { config, dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -66,6 +66,7 @@ describe('Contest Worker Policy Lifecycle', () => {
               score: [],
             },
           ],
+          environment: config.APP_ENV,
         },
       ],
     });
@@ -97,7 +98,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     const getContestScoreStub = vi
       .spyOn(evm, 'getContestScore')
-      .mockResolvedValue([]);
+      .mockResolvedValue({ contestBalance: '0', scores: [] });
 
     await emitEvent(models.Outbox, [
       {
@@ -216,7 +217,8 @@ describe('Contest Worker Policy Lifecycle', () => {
     });
 
     expect(rolloverContestStub, 'contest rolled over').toHaveBeenCalledOnce();
-    expect(getContestScoreStub, 'get final score').toHaveBeenCalledOnce();
+    // score is fetched for upvote and rollover
+    expect(getContestScoreStub, 'get final score').toHaveBeenCalledTimes(2);
 
     const contestManagerAfterContestEnded =
       await models.ContestManager.findByPk(contestAddress);

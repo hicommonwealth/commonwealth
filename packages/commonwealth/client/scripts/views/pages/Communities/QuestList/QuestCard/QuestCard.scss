@@ -24,6 +24,13 @@
     cursor: initial;
   }
 
+  .quest-scope {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
   .image {
     border-radius: $border-radius-corners;
     width: 100%;
@@ -45,6 +52,36 @@
       flex-direction: column;
       justify-content: flex-start;
       width: 100%;
+    }
+
+    .progress {
+      cursor: default;
+
+      .progress-label {
+        margin-left: auto;
+        width: fit-content;
+      }
+      .progress-bar {
+        height: 10px;
+        width: 100%;
+        border: 1px solid $neutral-100;
+
+        &.isEnded {
+          &::-webkit-progress-value {
+            background-color: $neutral-400 !important;
+          }
+        }
+
+        &::-webkit-progress-bar {
+          background-color: $neutral-200;
+          border-radius: $border-radius-corners;
+        }
+
+        &::-webkit-progress-value {
+          background-color: $primary-400;
+          border-radius: $border-radius-corners;
+        }
+      }
     }
 
     .time-label {

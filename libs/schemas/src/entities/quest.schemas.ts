@@ -15,6 +15,8 @@ export const QuestEvents = {
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  WalletLinked: events.WalletLinked,
+  SSOLinked: events.SSOLinked,
   XpChainEventCreated: events.XpChainEventCreated,
 } as const;
 
@@ -45,8 +47,13 @@ export const QuestActionMeta = z
     amount_multiplier: z.number().min(0).optional(),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
-    action_link: z.string().url().optional().nullish(),
+    instructions_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().optional(),
+    content_id: z
+      .string()
+      .regex(/(thread:\d+)|(comment:\d+)/)
+      .optional()
+      .nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
   })
@@ -81,11 +88,3 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
-
-export const QuestAction = z
-  .object({
-    user_id: PG_INT.describe('The user who took the action'),
-    quest_action_meta_id: PG_INT.describe('The action metadata for the action'),
-    created_at: z.coerce.date().optional(),
-  })
-  .describe('Records user actions in a quest');

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
@@ -68,10 +67,10 @@ export const getTotalContestBalance = async (
 
   const balance =
     balanceResults.length === 2
-      ? BigNumber.from(balanceResults[0]).add(balanceResults[1])
-      : BigNumber.from(balanceResults[0]);
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]);
 
-  return BigNumber.from(balance).toString();
+  return balance.toString();
 };
 
 /**
@@ -145,7 +144,7 @@ export const getContestBalance = async (
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing equal indexed content ids, addresses, and votes
+ * @returns Contest balance and ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
@@ -154,7 +153,15 @@ export const getContestScore = async (
   payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-) => {
+): Promise<{
+  contestBalance: string | null;
+  scores: {
+    content_id: string;
+    creator_address: string;
+    votes: string;
+    prize: string;
+  }[];
+}> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     oneOff ? singleContestAbi : recurringContestAbi,
@@ -169,11 +176,13 @@ export const getContestScore = async (
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
+  const contestBalance = contestData[1];
 
   if (winnerIds.length == 0) {
-    throw new Error(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
+    console.warn(
+      `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
+    return { contestBalance, scores: [] };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,21 +200,24 @@ export const getContestScore = async (
       voteCount: contentMeta[i]['cumulativeVotes'],
     };
   });
-  const contestBalance = contestData[1];
 
-  let prizePool = BigNumber.from(contestBalance)
-    .mul(oneOff ? 100 : prizePercentage)
-    .div(100);
-  prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
-  return scores.map((s, i) => ({
-    content_id: s.winningContent.toString(),
-    creator_address: s.winningAddress,
-    votes: BigNumber.from(s.voteCount).toString(),
-    prize:
-      i < Number(payoutStructure.length)
-        ? BigNumber.from(prizePool).mul(payoutStructure[i]).div(100).toString()
-        : '0',
-  }));
+  let prizePool =
+    (BigInt(contestBalance) *
+      (oneOff ? BigInt(100) : BigInt(prizePercentage))) /
+    BigInt(100);
+  prizePool = (prizePool * BigInt(100 - CONTEST_FEE_PERCENT)) / BigInt(100); // deduct contest fee from prize pool
+  return {
+    contestBalance,
+    scores: scores.map((s, i) => ({
+      content_id: s.winningContent.toString(),
+      creator_address: s.winningAddress,
+      votes: BigInt(s.voteCount).toString(),
+      prize:
+        i < Number(payoutStructure.length)
+          ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
+          : '0',
+    })),
+  };
 };
 
 export type AddContentResponse = {

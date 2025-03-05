@@ -2,6 +2,7 @@ import {
   communityStakesAbi,
   decodeLog,
   EvmEventSignatures,
+  getEvmAddress,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
   recurringContestAbi,
@@ -129,22 +130,27 @@ const contestManagerDeployedMapper: EvmMapper<
   });
   const { contest: contest_address, namespace, interval } = decoded.args;
   const event_payload = {
-    contest_address: contest_address as string,
     namespace: namespace as string,
-    length: Number(interval),
+    contest_address: contest_address as string,
     block_number: Number(event.block.number),
   };
 
   if (decoded.args.oneOff) {
     return {
       event_name: 'OneOffContestManagerDeployed',
-      event_payload,
+      event_payload: {
+        ...event_payload,
+        length: Number(interval),
+      },
     };
   }
 
   return {
     event_name: 'RecurringContestManagerDeployed',
-    event_payload,
+    event_payload: {
+      ...event_payload,
+      interval: Number(interval),
+    },
   };
 };
 
@@ -162,7 +168,7 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
   return {
     event_name: 'ContestStarted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: Number(decoded.args.contestId),
       start_time: new Date(Number(decoded.args.startTime) * 1000),
       end_time: new Date(Number(decoded.args.endTime) * 1000),
@@ -184,7 +190,7 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
   return {
     event_name: 'ContestStarted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: 0,
       start_time: new Date(Number(decoded.args.startTime) * 1000),
       end_time: new Date(Number(decoded.args.endTime) * 1000),
@@ -204,7 +210,7 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
   return {
     event_name: 'ContestContentAdded',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       content_id: Number(decoded.args.contentId),
       creator_address: decoded.args.creator,
       content_url: decoded.args.url,
@@ -229,7 +235,7 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   return {
     event_name: 'ContestContentUpvoted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: Number(contestId),
       content_id: Number(contentId),
       voter_address,
@@ -250,7 +256,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   return {
     event_name: 'ContestContentUpvoted',
     event_payload: {
-      contest_address: event.rawLog.address,
+      contest_address: getEvmAddress(event.rawLog.address),
       contest_id: 0,
       content_id: Number(contentId),
       voter_address,
