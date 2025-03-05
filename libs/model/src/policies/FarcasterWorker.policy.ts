@@ -11,7 +11,11 @@ import { UpdateContestManagerFrameHashes } from '../contest/UpdateContestManager
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
-import { buildFarcasterContentUrl, publishCast } from '../utils';
+import {
+  buildFarcasterContentUrl,
+  getChainNodeUrl,
+  publishCast,
+} from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -83,7 +87,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             include: [
               {
                 model: models.ChainNode.scope('withPrivateData'),
-                required: false,
+                required: true,
               },
             ],
           },
@@ -99,7 +103,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         // create onchain content from reply cast
         const contestManagers = [
           {
-            url: community.ChainNode!.private_url! || community.ChainNode!.url!,
+            url: getChainNodeUrl(community.ChainNode!),
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -193,7 +197,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Community with Chain Node', community?.ChainNode);
 
         const contestManagers = contestActions.map((ca) => ({
-          url: community.ChainNode!.private_url! || community.ChainNode!.url!,
+          url: getChainNodeUrl(community.ChainNode!),
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));
