@@ -12,6 +12,7 @@ import { events } from '@hicommonwealth/schemas';
 import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import { getWeightedNumTokens } from '../services/stakeHelper';
 import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
@@ -89,10 +90,7 @@ async function createInitialContest(
       },
       { where: { contest_address }, returning: true, transaction },
     );
-    if (!contestManager) {
-      log.error(`ContestManager not found for contest ${contest_address}`);
-      return;
-    }
+    mustExist('Contest Manager', contestManager);
 
     // create first contest instance
     await models.Contest.create(
