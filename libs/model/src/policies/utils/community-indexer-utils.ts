@@ -4,7 +4,7 @@ import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ClankerToken } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
 import moment from 'moment';
@@ -47,8 +47,8 @@ export async function* paginateClankerTokens({
   const axiosInstance = axios.create();
   axiosRetry(axiosInstance, {
     retries: 3,
-    retryDelay: (retryCount) => 5000 * Math.pow(2, retryCount - 1),
-    retryCondition: (error) =>
+    retryDelay: (retryCount: number) => 5000 * Math.pow(2, retryCount - 1),
+    retryCondition: (error: AxiosError) =>
       error.response?.status === 429 || (error.response?.status ?? 0) >= 500,
   });
 

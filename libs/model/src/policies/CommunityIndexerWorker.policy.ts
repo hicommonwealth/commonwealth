@@ -2,7 +2,6 @@ import { logger, Policy } from '@hicommonwealth/core';
 import {
   ClankerToken,
   CommunityIndexer as CommunityIndexerSchema,
-  EventNames,
   EventPairs,
   events,
 } from '@hicommonwealth/schemas';
@@ -83,8 +82,11 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
             if (indexer.id === 'clanker') {
               const cutoffDate = moment(indexer.last_checked).toDate();
 
-              // fetch pages descending and add to buffer
-              // so they can be inserted in ascending order
+              // Fetch pages descending and add to buffer
+              // so they can be inserted in ascending order.
+              // Order is important because duplicate token
+              // names are enumerated e.g. "Token", "Token (1)",
+              // "Token (2)", etc.
               const tokensBuffer: Array<z.infer<typeof ClankerToken>> = [];
 
               for await (const tokens of paginateClankerTokens({
@@ -94,22 +96,22 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
                 tokensBuffer.push(...tokens);
               }
 
-              // sort from oldest to newest,
-              // id reflects website sorting better than created timestamp
+              // Sort from oldest to newest,
+              // id reflects clanker's sorting better than created timestamp.
               tokensBuffer.sort(
                 (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
               );
 
               const eventsBuffer: Array<EventPairs> = tokensBuffer.map(
                 (token) => ({
-                  event_name: EventNames.ClankerTokenFound,
+                  event_name: 'ClankerTokenFound',
                   event_payload: token,
                 }),
               );
 
               await emitEvent(models.Outbox, eventsBuffer);
 
-              // after all fetching is done, save timestamp for next run
+              // After all fetching is done, save watermark for next run.
               await setIndexerStatus(indexer.id, {
                 status: 'idle',
                 last_checked: startedAt,
