@@ -55,6 +55,10 @@ export const ExternalEndpoints = {
     tokenToUsdRate: (tokenSymbol: string) =>
       `https://api.coinbase.com/v2/prices/${tokenSymbol}-USD/sell`,
   },
+  defiLlama: {
+    tokenToUsdRate: (tokenContractAddress: string) =>
+      `https://coins.llama.fi/prices/current/base:${tokenContractAddress}`,
+  },
   snapshotHub: {
     url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',
     graphql: process.env.SNAPSHOT_HUB_URL

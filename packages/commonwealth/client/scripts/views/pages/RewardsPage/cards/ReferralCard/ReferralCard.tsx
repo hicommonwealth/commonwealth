@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -37,6 +38,8 @@ const ReferralCard = ({
   );
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
+  const xpEnabled = useFlag('xp');
+
   return (
     <RewardsCard
       title="Referrals"
@@ -47,15 +50,17 @@ const ReferralCard = ({
     >
       <div className="ReferralCard">
         <CWTabsRow>
-          {Object.values(ReferralTabs).map((tab) => (
-            <CWTab
-              key={tab}
-              label={tab}
-              isSelected={currentTab === tab}
-              onClick={() => setCurrentTab(tab)}
-              isDisabled={tab === ReferralTabs.XP}
-            />
-          ))}
+          {Object.values(ReferralTabs).map((tab) => {
+            if (tab === ReferralTabs.XP && !xpEnabled) return null;
+            return (
+              <CWTab
+                key={tab}
+                label={tab}
+                isSelected={currentTab === tab}
+                onClick={() => setCurrentTab(tab)}
+              />
+            );
+          })}
         </CWTabsRow>
         <div className="referral-card-body">
           {currentTab === ReferralTabs.Total && (

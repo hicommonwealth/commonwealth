@@ -60,7 +60,7 @@ export const GetUser = {
 
 export const SearchUserProfilesView = z.object({
   user_id: PG_INT,
-  profile_name: z.string(),
+  profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   created_at: z.date().or(z.string()),
   last_active: z.date().or(z.string()).nullish(),
@@ -77,6 +77,7 @@ export const SearchUserProfilesView = z.object({
 export const SearchUserProfiles = {
   input: PaginationParamsSchema.extend({
     search: z.string(),
+    exact_match: z.boolean().optional(),
     community_id: z.string().optional(),
     order_by: z
       .enum(['last_active', 'created_at', 'profile_name', 'rank'])

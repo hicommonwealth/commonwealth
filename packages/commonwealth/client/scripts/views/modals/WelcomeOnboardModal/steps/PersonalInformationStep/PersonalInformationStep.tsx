@@ -87,11 +87,13 @@ const PersonalInformationStep = ({
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
-      limit: 50,
+      limit: 1,
+      exactMatch: true,
       searchTerm: debouncedSearchTerm,
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,
       orderDirection: APIOrderDirection.Desc,
+      enabled: debouncedSearchTerm !== '',
     });
 
   const existingUsernames = (profiles?.pages?.[0]?.results || []).map(

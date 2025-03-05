@@ -3,6 +3,7 @@ import { setActiveAccount } from 'client/scripts/controllers/app/login';
 import Account from 'client/scripts/models/Account';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
 import { useState } from 'react';
 import {
   BaseMixpanelPayload,
@@ -13,7 +14,6 @@ import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
 import { ActionState, defaultActionState } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
-
 interface UseReserveCommunityNamespaceProps {
   communityId: string;
   namespace: string;
@@ -40,6 +40,8 @@ const useReserveCommunityNamespace = ({
       ? { state: 'completed', errorText: '' }
       : defaultActionState,
   );
+
+  const onchainReferralsEnabled = useFlag('onchainReferrals');
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
@@ -72,20 +74,21 @@ const useReserveCommunityNamespace = ({
         }),
       );
 
-      const txReceipt = referrerAddress
-        ? await namespaceFactory.deployNamespaceWithReferrer(
-            namespace,
-            userAddress,
-            userAddress,
-            referrerAddress,
-            chainId,
-          )
-        : await namespaceFactory.deployNamespace(
-            namespace,
-            userAddress,
-            userAddress,
-            chainId,
-          );
+      const txReceipt =
+        referrerAddress && onchainReferralsEnabled
+          ? await namespaceFactory.deployNamespaceWithReferrer(
+              namespace,
+              userAddress,
+              userAddress,
+              referrerAddress,
+              chainId,
+            )
+          : await namespaceFactory.deployNamespace(
+              namespace,
+              userAddress,
+              userAddress,
+              chainId,
+            );
 
       await updateCommunity(
         buildUpdateCommunityInput({

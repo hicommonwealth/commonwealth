@@ -1,17 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { ExternalEndpoints } from 'state/api/config';
-import { CoinbaseResponseType, fetchTokenUsdRate } from './fetchTokenUsdRate';
+import {
+  DefiLlamaCoinPriceResponse,
+  fetchTokenUsdRate,
+} from './fetchTokenUsdRate';
 
 const TOKENS_USD_RATE_STALE_TIME = 10 * 60 * 1_000; // 10 min
 
-const fetchTokensUsdRate = async (tokenSymbols: string[]) => {
+const fetchTokensUsdRate = async (tokenContractAddresses: string[]) => {
   const tokenRates = await Promise.all(
-    tokenSymbols.map(async (symbol) => {
+    tokenContractAddresses.map(async (address) => {
       try {
-        const response = await fetchTokenUsdRate(symbol);
+        const response = await fetchTokenUsdRate(address);
+        if (!response.data.coins[`base:${address}`])
+          throw new Error('Price not found');
         return {
-          ...response.data.data,
-          symbol,
+          ...response.data.coins[`base:${address}`],
+          address,
         };
       } catch {
         return null;
@@ -23,22 +28,22 @@ const fetchTokensUsdRate = async (tokenSymbols: string[]) => {
 };
 
 type UseFetchTokensUsdRateQueryProps = {
-  tokenSymbols: string[];
+  tokenContractAddresses: string[];
   enabled?: boolean;
 };
 
 const useFetchTokensUsdRateQuery = ({
-  tokenSymbols,
+  tokenContractAddresses,
   enabled,
 }: UseFetchTokensUsdRateQueryProps) => {
-  return useQuery<
-    (CoinbaseResponseType['data']['data'] & { symbol: string })[]
-  >({
+  return useQuery<(DefiLlamaCoinPriceResponse & { address: string })[]>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
-      ExternalEndpoints.coinbase.tokenToUsdRate('TOKEN'),
-      ...tokenSymbols,
+      ...tokenContractAddresses.map((address) =>
+        ExternalEndpoints.defiLlama.tokenToUsdRate(address),
+      ),
     ],
-    queryFn: () => fetchTokensUsdRate(tokenSymbols),
+    queryFn: () => fetchTokensUsdRate(tokenContractAddresses),
     staleTime: TOKENS_USD_RATE_STALE_TIME,
     enabled,
   });
