@@ -9,14 +9,9 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import {
-  buildContestLeaderboardUrl,
-  getBaseUrl,
-  getDefaultContestImage,
-} from '@hicommonwealth/shared';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
-import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import { getWeightedNumTokens } from '../services/stakeHelper';
 import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
@@ -43,10 +38,10 @@ const inputs = {
 };
 
 /**
- * Makes sure contest manager (off-chain metadata) record exists
- * - Alerts when not found and inserts default record to patch distributed transaction
+ * Makes sure initial contest (off-chain metadata) record exists
+ * and adds EVM event sources
  */
-async function updateOrCreateWithAlert(
+async function createInitialContest(
   namespace: string,
   contest_address: string,
   interval: number,
@@ -87,7 +82,7 @@ async function updateOrCreateWithAlert(
   );
 
   await models.sequelize.transaction(async (transaction) => {
-    const [updated] = await models.ContestManager.update(
+    const [contestManager] = await models.ContestManager.update(
       {
         interval,
         ticker,
@@ -95,32 +90,9 @@ async function updateOrCreateWithAlert(
       },
       { where: { contest_address }, returning: true, transaction },
     );
-    if (!updated) {
-      // when contest manager metadata is not found, it means it failed creation or was deleted
-      // here we are alerting admins and creating a default entry
-      const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
-      log.error(
-        msg,
-        new MissingContestManager(msg, namespace, contest_address),
-      );
-      mustExist(`Community with namespace: ${namespace}`, community);
-
-      await models.ContestManager.create(
-        {
-          contest_address,
-          community_id: community.id!,
-          interval,
-          ticker,
-          decimals,
-          created_at: new Date(),
-          name: community.name,
-          image_url: getDefaultContestImage(),
-          payout_structure: [],
-          is_farcaster_contest: false,
-          environment: config.APP_ENV,
-        },
-        { transaction },
-      );
+    if (!contestManager) {
+      log.error(`ContestManager not found for contest ${contest_address}`);
+      return;
     }
 
     // create first contest instance
@@ -243,7 +215,7 @@ export function Contests(): Projection<typeof inputs> {
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           payload.interval,
@@ -254,7 +226,7 @@ export function Contests(): Projection<typeof inputs> {
 
       OneOffContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           0,
