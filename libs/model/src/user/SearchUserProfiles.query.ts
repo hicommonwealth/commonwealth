@@ -76,7 +76,6 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
           limit,
           offset,
         },
-        logging: console.log,
         type: QueryTypes.SELECT,
       });
 
