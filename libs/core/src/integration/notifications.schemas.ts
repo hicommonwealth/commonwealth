@@ -219,3 +219,12 @@ export const ReferrerCommunityJoinedNotification = z.object({
   referee_profile_name: z.string(),
   referee_profile_avatar_url: z.string(),
 });
+
+export const ReferrerCommunityCreatedNotification = z.object({
+  community_id: z.string(),
+  community_name: z.string(),
+  community_icon_url: z.string(),
+  referee_user_id: z.number(),
+  referee_profile_name: z.string(),
+  referee_profile_avatar_url: z.string(),
+});
