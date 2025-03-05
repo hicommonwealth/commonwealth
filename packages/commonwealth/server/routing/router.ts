@@ -42,7 +42,7 @@ import updateCommunityPriority from '../routes/updateCommunityPriority';
 import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
-import { generateTokenIdea } from '@hicommonwealth/model';
+import { generateCommentText, generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImage from '../routes/generateImage';
 
@@ -463,7 +463,6 @@ function setupRouter(
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Transfer-Encoding', 'chunked');
-
       const ideaPrompt =
         typeof req.body?.ideaPrompt === 'string'
           ? req.body?.ideaPrompt
@@ -472,21 +471,54 @@ function setupRouter(
       const ideaGenerator = generateTokenIdea({ ideaPrompt });
 
       for await (const chunk of ideaGenerator) {
-        // generation error
-        if (chunk.error) {
+        if ((chunk as { error?: string }).error) {
           return res.end(
-            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
           );
         }
 
-        // stream chunks as they are generated
-        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.write(chunk);
         res.flush();
       }
 
-      return res.end(
-        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
-      );
+      return res.end();
+    },
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/generateCommentText',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateCommentText',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+      const userText =
+        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
+      const commentGenerator = generateCommentText({ userText });
+
+      for await (const chunk of commentGenerator) {
+        if ((chunk as { error?: string }).error) {
+          return res.end(
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
+          );
+        }
+
+        res.write(chunk);
+        res.flush();
+      }
+
+      return res.end();
     },
   );
 

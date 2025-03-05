@@ -5,7 +5,6 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -71,7 +70,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should not throw if the proposal event is not supported', async () => {
     const res = await notifySnapshotProposalCreated({
-      name: EventNames.SnapshotProposalCreated,
+      name: 'SnapshotProposalCreated',
       payload: { event: 'ranndommmm' } as z.infer<
         typeof schemas.events.SnapshotProposalCreated
       >,
@@ -81,7 +80,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should not throw if the proposal space or id is not provided', async () => {
     const res = await notifySnapshotProposalCreated({
-      name: EventNames.SnapshotProposalCreated,
+      name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
       } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
@@ -95,7 +94,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     const res = await notifySnapshotProposalCreated({
-      name: EventNames.SnapshotProposalCreated,
+      name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
         space,
@@ -118,7 +117,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     const res = await notifySnapshotProposalCreated({
-      name: EventNames.SnapshotProposalCreated,
+      name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
         space,
@@ -156,7 +155,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
     await expect(
       notifySnapshotProposalCreated({
-        name: EventNames.SnapshotProposalCreated,
+        name: 'SnapshotProposalCreated',
         payload: {
           event: SnapshotEventType.Created,
           space,

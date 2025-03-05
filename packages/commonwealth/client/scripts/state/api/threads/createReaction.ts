@@ -15,6 +15,7 @@ interface IUseCreateThreadReactionMutation {
   threadMsgId: string;
   communityId: string;
 }
+
 interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
@@ -57,15 +58,21 @@ const useCreateThreadReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = useUserStore();
+  const utils = trpc.useUtils();
 
   return trpc.thread.createThreadReaction.useMutation({
     onSuccess: (newReaction) => {
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
+
       const reaction: any = {
         id: newReaction.id,
         address: newReaction.Address!.address,
         type: 'like',
         updated_at: newReaction.updated_at,
         voting_weight: newReaction.calculated_voting_weight || 0,
+        calculated_voting_weight: newReaction.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,
@@ -73,12 +80,16 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+
+      const addition = (
+        BigInt(currentReactionWeightsSum) +
+        BigInt(reaction.voting_weight || '0')
+      ).toString();
+
       updateThreadInAllCaches(communityId, threadId, {
         reactionCount: currentReactionCount + 1,
-        reactionWeightsSum: `${
-          parseInt(currentReactionWeightsSum) +
-          parseInt(newReaction.calculated_voting_weight || `0`)
-        }`,
+        // I think it is broken here
+        reactionWeightsSum: addition,
       });
 
       const userId = user.addresses?.[0]?.profile?.userId;

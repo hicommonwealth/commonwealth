@@ -5,7 +5,6 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -22,7 +21,7 @@ import {
 import z from 'zod';
 import { tester } from '../../src';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
-import { getThreadUrl } from '../../src/policies/utils/utils';
+import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -89,7 +88,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
-      name: EventNames.UserMentioned,
+      name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',
       } as z.infer<typeof schemas.events.UserMentioned>,
@@ -103,7 +102,7 @@ describe('userMentioned Event Handler', () => {
     });
 
     const res = await notifyUserMentioned({
-      name: EventNames.UserMentioned,
+      name: 'UserMentioned',
       payload: {
         // @ts-expect-error StrictNullChecks
         authorAddressId: community!.Addresses[0].id,
@@ -135,6 +134,13 @@ describe('userMentioned Event Handler', () => {
         object_body: safeTruncateBody(thread!.body!, 255),
         object_url: getThreadUrl(community!.id!, thread!.id!),
       },
+      actor: {
+        id: String(author!.id),
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, community!.custom_domain),
+        email: author!.profile.email,
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 
@@ -145,7 +151,7 @@ describe('userMentioned Event Handler', () => {
 
     await expect(
       notifyUserMentioned({
-        name: EventNames.UserMentioned,
+        name: 'UserMentioned',
         payload: {
           // @ts-expect-error StrictNullChecks
           authorAddressId: community!.Addresses[0].id,

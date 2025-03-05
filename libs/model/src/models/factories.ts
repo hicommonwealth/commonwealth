@@ -28,7 +28,7 @@ import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
-import { Quest, QuestAction, QuestActionMeta } from './quest';
+import { Quest, QuestActionMeta } from './quest';
 import Reaction from './reaction';
 import { Referral } from './referral';
 import { ReferralFee } from './referral_fee';
@@ -42,6 +42,7 @@ import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
 import Topic from './topic';
+import TwitterCursor from './twitter_cursor';
 import User from './user';
 import Vote from './vote';
 import Wallets from './wallets';
@@ -77,7 +78,6 @@ export const Factories = {
   Poll,
   ProfileTags,
   Quest,
-  QuestAction,
   QuestActionMeta,
   Reaction,
   Referral,
@@ -91,6 +91,7 @@ export const Factories = {
   ThreadVersionHistory,
   ThreadSubscription,
   Topic,
+  TwitterCursor,
   User,
   Vote,
   Webhook,

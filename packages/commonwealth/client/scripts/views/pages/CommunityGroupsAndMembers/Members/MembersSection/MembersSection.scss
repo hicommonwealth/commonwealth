@@ -11,6 +11,18 @@
   table {
     width: 100%;
     @include table-cell;
+
+    .table-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .Button.secondary {
+      .Text.button-text {
+        color: $rorange-400;
+      }
+    }
   }
 
   .group-item {

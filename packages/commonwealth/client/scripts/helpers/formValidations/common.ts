@@ -32,3 +32,32 @@ export const quillValidationSchema = z.object({
     .length(1),
   ___isMarkdown: z.boolean(),
 });
+
+export const numberValidationSchema = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => {
+      const intVal = parseInt(value, 10);
+      return !isNaN(intVal) && intVal.toString() === value.trim();
+    },
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
+  );
+
+// non decimal number
+export const numberNonDecimalValidationSchema = numberValidationSchema.refine(
+  (value) => {
+    return !Number.isInteger(value);
+  },
+  { message: VALIDATION_MESSAGES.MUST_BE_TYPE('integer') },
+);
+
+// non decimal number greater than 0
+export const numberNonDecimalGTZeroValidationSchema =
+  numberNonDecimalValidationSchema.refine(
+    (value) => {
+      const intVal = parseInt(value, 10);
+      return intVal > 0;
+    },
+    { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+  );

@@ -3,15 +3,15 @@
     "apps": [],
     "details": [
       {
-        "appID": "M7RA9XJ52W.commonwealth-mobile2",
+        "appID": "M7RA9XJ52W.xyz.common.mobile",
         "paths": ["/*"]
       }
     ]
   },
   "activitycontinuation": {
-    "apps": ["M7RA9XJ52W.commonwealth-mobile2"]
+    "apps": ["M7RA9XJ52W.xyz.common.mobile"]
   },
   "webcredentials": {
-    "apps": ["M7RA9XJ52W.commonwealth-mobile2"]
+    "apps": ["M7RA9XJ52W.xyz.common.mobile"]
   }
 }

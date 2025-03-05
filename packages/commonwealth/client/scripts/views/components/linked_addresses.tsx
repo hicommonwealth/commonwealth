@@ -2,14 +2,16 @@ import React, { useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
-import { formatAddressShort } from 'client/scripts/helpers';
+import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
+import { CWIdentificationTag } from './component_kit/new_designs/CWIdentificationTag';
 import { CWModal } from './component_kit/new_designs/CWModal';
 import { CWTable } from './component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
@@ -17,7 +19,7 @@ import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
 /* eslint-disable react/no-multi-comp */
 
 type AddressProps = {
-  address: string;
+  addressInfo: AddressInfo;
 };
 
 type AddressDetailsProps = {
@@ -37,12 +39,18 @@ type LinkedAddressesProps = {
   refreshProfiles: (addressInfo: AddressInfo) => void;
 };
 
-const Address = (props: AddressProps) => {
-  const { address } = props;
+const Address = ({ addressInfo }: AddressProps) => {
+  const { address, walletId } = addressInfo;
 
   return (
     <div className="AddressContainer">
-      <CWTruncatedAddress address={address} />
+      <div className="address">
+        <CWIcon iconName="ethereum" iconSize="small" />
+        <CWIdentificationTag
+          iconLeft={walletId}
+          address={`\u2022 ${formatAddressShort(address)}`}
+        />
+      </div>
     </div>
   );
 };
@@ -132,33 +140,36 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   }, [addresses]);
 
   const rowData = Object.entries(groupedAddresses).map(
-    ([address, communities]) => ({
-      address: <Address address={address} />,
-      communities: (
-        <div>
-          {communities.map((addr, index) => {
-            return (
-              <AddressDetails
-                key={index}
-                profile={profile}
-                addressInfo={addr}
-                toggleRemoveModal={(
-                  val: boolean,
-                  selectedAddress: AddressInfo,
-                  isBulkDelete: boolean = false,
-                  community,
-                ) => {
-                  setIsRemoveModalOpen(val);
-                  setCurrentAddress(selectedAddress);
-                  setIsBulkDeleteState(isBulkDelete);
-                  setSelectedCommunity(community);
-                }}
-              />
-            );
-          })}
-        </div>
-      ),
-    }),
+    ([address, communities]) => {
+      const addressInfo = addresses.find((addr) => addr.address === address);
+      return {
+        address: addressInfo ? <Address addressInfo={addressInfo} /> : null,
+        communities: (
+          <div>
+            {communities.map((addr, index) => {
+              return (
+                <AddressDetails
+                  key={index}
+                  profile={profile}
+                  addressInfo={addr}
+                  toggleRemoveModal={(
+                    val: boolean,
+                    selectedAddress: AddressInfo,
+                    isBulkDelete: boolean = false,
+                    community,
+                  ) => {
+                    setIsRemoveModalOpen(val);
+                    setCurrentAddress(selectedAddress);
+                    setIsBulkDeleteState(isBulkDelete);
+                    setSelectedCommunity(community);
+                  }}
+                />
+              );
+            })}
+          </div>
+        ),
+      };
+    },
   );
 
   // Memoize CWTable to prevent unnecessary re-renders.

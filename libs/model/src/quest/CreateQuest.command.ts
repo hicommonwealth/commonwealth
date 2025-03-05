@@ -10,7 +10,15 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
     auth: [isSuperAdmin],
     secure: true,
     body: async ({ payload }) => {
-      const { community_id, name, description, start_date, end_date } = payload;
+      const {
+        community_id,
+        name,
+        description,
+        image_url,
+        start_date,
+        end_date,
+        max_xp_to_end,
+      } = payload;
 
       const existingName = await models.Quest.findOne({
         where: { community_id: community_id ?? null, name },
@@ -26,8 +34,11 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
       const quest = await models.Quest.create({
         name,
         description,
+        image_url,
         start_date,
         end_date,
+        max_xp_to_end,
+        xp_awarded: 0,
         community_id: community_id ?? null,
       });
       return quest.toJSON();

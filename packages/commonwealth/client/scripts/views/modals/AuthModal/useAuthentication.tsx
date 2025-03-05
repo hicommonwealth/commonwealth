@@ -1,10 +1,11 @@
 import type { Session } from '@canvas-js/interfaces';
 import {
-  addressSwapper,
   ChainBase,
   DEFAULT_NAME,
-  verifySession,
+  WalletId,
   WalletSsoSource,
+  addressSwapper,
+  verifySession,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
@@ -18,17 +19,18 @@ import {
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
-import WebWalletController from 'controllers/app/web_wallets';
+import FarcasterWebWalletController from 'controllers/app/webWallets/farcaster_web_wallet';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import WebWalletController from 'controllers/app/web_wallets';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import {
-  getLocalStorageItem,
   LocalStorageKeys,
+  getLocalStorageItem,
   removeLocalStorageItem,
 } from 'helpers/localStorage';
 import _ from 'lodash';
@@ -47,20 +49,22 @@ import {
   MixpanelLoginPayload,
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import { setDarkMode } from '../../../helpers/darkMode';
 import { getAddressFromWallet } from '../../../helpers/wallet';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
+import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
 
 type UseAuthenticationProps = {
   onSuccess?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
+    isUserFromWebView?: boolean,
   ) => Promise<void>;
   onModalClose?: () => void;
   withSessionKeyLoginFlow?: boolean;
+  isUserFromWebView?: boolean;
 };
 
 const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
@@ -141,8 +145,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
+    isUserFromWebView?: boolean,
   ) => {
-    await props?.onSuccess?.(authAddress, isNew);
+    removeLocalStorageItem(LocalStorageKeys.ReferralCode);
+    await props?.onSuccess?.(authAddress, isNew, isUserFromWebView);
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
@@ -177,6 +183,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         phoneNumber: tempSMSToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -209,6 +216,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         email: tempEmailToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -233,6 +241,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         provider,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -252,6 +261,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     exitOnComplete: boolean,
     newelyCreated = false,
+    isUserFromWebView = false,
   ) => {
     const profile = account.profile;
 
@@ -266,8 +276,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } else {
       // log in as the new user
       await initAppState(false);
-      if (localStorage.getItem('user-dark-mode-state') === 'on') {
-        setDarkMode(true);
+      const darkMode = darkModeStore.getState();
+      if (!darkMode.isDarkMode) {
+        darkMode.setDarkMode(true);
       }
       if (app.chain) {
         await updateActiveAddresses(app.activeChainId() || '');
@@ -278,7 +289,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (exitOnComplete) {
       props?.onModalClose?.();
-      await handleSuccess(account.address, newelyCreated);
+      await handleSuccess(account.address, newelyCreated, isUserFromWebView);
     }
   };
 
@@ -292,7 +303,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (props.withSessionKeyLoginFlow) {
       await setActiveAccount(account);
       notifySuccess('Account verified!');
-      await handleSuccess(account.address, newlyCreated);
+      await handleSuccess(
+        account.address,
+        newlyCreated,
+        props.isUserFromWebView,
+      );
       return;
     }
 
@@ -309,7 +324,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         block_info: account.validationBlockInfo,
         referrer_address: refcode,
       });
-      await onLogInWithAccount(account, true, newlyCreated);
+      await onLogInWithAccount(
+        account,
+        true,
+        newlyCreated,
+        props.isUserFromWebView,
+      );
       return;
     }
 
@@ -340,7 +360,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
-        await onLogInWithAccount(account, true, newlyCreated);
+        await onLogInWithAccount(
+          account,
+          true,
+          newlyCreated,
+          props.isUserFromWebView,
+        );
       } catch (e) {
         notifyError(`Error verifying account`);
         console.error(`Error verifying account: ${e}`);
@@ -388,7 +413,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           [account!.profile!.chain],
           [account!.profile!.address],
         );
-      const currentUserAddress = userAddresses[0];
+      const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
       } else {
@@ -617,6 +642,46 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const onFarcasterLogin = async (
+    signature: string,
+    message: string,
+    sessionPrivateKey: Uint8Array,
+  ) => {
+    try {
+      const farcasterWallet = new FarcasterWebWalletController(
+        signature,
+        message,
+        sessionPrivateKey,
+      );
+      await farcasterWallet.enable();
+
+      const session = await getSessionFromWallet(farcasterWallet);
+      const chainIdentifier = app.chain?.id || ChainBase.Ethereum;
+
+      const { account, newlyCreated, joinedCommunity } = await signIn(session, {
+        address: farcasterWallet.accounts[0],
+        community_id: chainIdentifier,
+        wallet_id: WalletId.Farcaster,
+        block_info: null,
+      });
+
+      setIsNewlyCreated(newlyCreated);
+      await onAccountVerified(account, newlyCreated, false, farcasterWallet);
+
+      if (joinedCommunity) {
+        trackAnalytics({
+          event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
+        });
+      }
+
+      trackLoginEvent('farcaster', true);
+    } catch (err) {
+      notifyError('Error authenticating with Farcaster');
+      console.error('Error authenticating with Farcaster:', err);
+    }
+  };
+
   return {
     wallets,
     isMagicLoading,
@@ -628,6 +693,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onEmailLogin,
     onSMSLogin,
     onSocialLogin,
+    onFarcasterLogin,
     setEmail,
     setSMS,
     onVerifyMobileWalletSignature,

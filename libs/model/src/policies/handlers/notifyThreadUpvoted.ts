@@ -7,7 +7,7 @@ import {
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
 import { models } from '../../database';
-import { getThreadUrl } from '../utils/utils';
+import { getProfileUrl, getThreadUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 const output = z.boolean();
@@ -81,6 +81,19 @@ export const notifyThreadUpvoted: EventHandler<
         payload.thread_id,
         community.custom_domain,
       ),
+    },
+    actor: {
+      id: String(threadAndAuthor.Address.User!.id),
+      profile_name:
+        threadAndAuthor.Address.User!.profile.name ||
+        threadAndAuthor.Address.address.substring(0, 8),
+      profile_url: getProfileUrl(
+        threadAndAuthor.Address.User!.id!,
+        community.custom_domain,
+      ),
+      email: threadAndAuthor.Address.User!.profile.email ?? undefined,
+      profile_avatar_url:
+        threadAndAuthor.Address.User!.profile.avatar_url ?? undefined,
     },
   });
 

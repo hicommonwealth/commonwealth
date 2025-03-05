@@ -1,10 +1,6 @@
+import type { ReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface ReactNativeWebView {
-  // allows us to send messages to ReactNative.
-  postMessage: (message: string) => void;
-}
 
 declare global {
   interface Window {
@@ -66,8 +62,14 @@ export const ReactNativeBridgeRouter = () => {
   return null;
 };
 
-function messageToObject(message: string | object): object {
-  return typeof message === 'string' ? JSON.parse(message) : message;
+function messageToObject(message: string | object): object | null {
+  try {
+    return typeof message === 'string' ? JSON.parse(message) : message;
+  } catch (e) {
+    // this could happen if another library is sending non-JSON data via
+    // postMessage
+    return null;
+  }
 }
 
 function getPathAndQuery(url: string): string {

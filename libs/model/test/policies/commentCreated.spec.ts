@@ -5,7 +5,6 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -23,7 +22,7 @@ import {
 import z from 'zod';
 import { models, tester } from '../../src';
 import { notifyCommentCreated } from '../../src/policies/handlers/notifyCommentCreated';
-import { getCommentUrl } from '../../src/policies/utils/utils';
+import { getCommentUrl, getProfileUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -132,7 +131,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid author is not found', async () => {
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: { address_id: -999999 } as z.infer<
         typeof schemas.events.CommentCreated
       >,
@@ -142,7 +141,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid community is not found', async () => {
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
@@ -158,7 +157,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
@@ -186,7 +185,7 @@ describe('CommentCreated Event Handler', () => {
       thread_id: rootComment.thread_id,
     });
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: { ...rootComment, community_id: community.id },
     });
@@ -198,8 +197,7 @@ describe('CommentCreated Event Handler', () => {
     expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
     expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
-      // @ts-expect-error StrictNullChecks
-      users: [{ id: String(subscriber.id) }],
+      users: [{ id: String(subscriber!.id) }],
       data: {
         author: author?.profile.name,
         comment_parent_name: 'thread',
@@ -212,8 +210,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      // @ts-expect-error StrictNullChecks
-      actor: { id: String(author.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 
@@ -229,7 +232,7 @@ describe('CommentCreated Event Handler', () => {
       comment_id: rootComment.id,
     });
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: { ...replyComment, community_id: community.id },
     });
@@ -259,8 +262,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      // @ts-expect-error StrictNullChecks
-      actor: { id: String(author.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 
@@ -278,7 +286,7 @@ describe('CommentCreated Event Handler', () => {
 
     await expect(
       notifyCommentCreated({
-        name: EventNames.CommentCreated,
+        name: 'CommentCreated',
         // @ts-expect-error StrictNullChecks
         payload: { ...rootComment, community_id: community.id },
       }),
@@ -300,7 +308,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
-      name: EventNames.CommentCreated,
+      name: 'CommentCreated',
       // @ts-expect-error StrictNullChecks
       payload: {
         ...mentionedComment,
@@ -335,7 +343,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      actor: { id: String(author!.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 });

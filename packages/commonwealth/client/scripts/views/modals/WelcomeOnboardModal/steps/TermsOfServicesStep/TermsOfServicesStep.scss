@@ -13,7 +13,6 @@
       color: $neutral-500;
     }
   }
-
   .logo {
     height: auto;
     margin: auto;
@@ -29,6 +28,10 @@
     border: 1px solid #e0dfe1;
     border-radius: 6px;
     overflow: auto;
+    @include extraSmall {
+      height: 50vh;
+      max-height: 50vh;
+    }
   }
 
   .notification-section {
@@ -39,20 +42,43 @@
     margin-top: 16px;
     margin-bottom: 16px;
   }
-
-  .button-container {
+  .footerContainer {
+    bottom: 40px;
+    align-self: center;
     display: flex;
-    gap: 8px;
-  }
+    flex-direction: column;
+    width: 90vw;
+    max-width: 400px;
+    @include heightSmallInclusive {
+      bottom: 0px;
+    }
+    @include extraSmall {
+      position: absolute;
+    }
+    .primary {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      background-color: $primary-600 !important;
+    }
+    .footer {
+      display: block;
 
-  .footer {
-    display: block;
-
-    a,
-    a:visited,
-    a:active,
-    a:hover {
-      color: $primary-600;
+      a,
+      a:visited,
+      a:active,
+      a:hover {
+        color: $primary-600;
+      }
+    }
+    .button-container {
+      display: flex;
+      gap: 8px;
+    }
+    @include heightSmallInclusive {
+      .Text {
+        font-size: 14px;
+        line-height: 18px;
+      }
     }
   }
 }

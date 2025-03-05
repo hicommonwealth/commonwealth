@@ -10,7 +10,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { user_id, community_id, from, to, event_name } = payload;
+      const { user_id, community_id, quest_id, from, to, event_name } = payload;
 
       const include: FindOptions['include'] = [
         {
@@ -28,28 +28,24 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         {
           model: models.QuestActionMeta,
           as: 'quest_action_meta',
-          include: community_id
-            ? [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                  where: { community_id },
-                },
-              ]
-            : [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                },
-              ],
+          required: true,
+          where: event_name ? { event_name } : {},
+          include: [
+            {
+              model: models.Quest,
+              required: true,
+              attributes: ['id', 'name'],
+              where: {
+                ...(community_id && { community_id }),
+                ...(quest_id ? { id: quest_id } : { id: { [Op.gt]: 0 } }),
+              },
+            },
+          ],
         },
       ];
 
       const where: WhereOptions<XpLogInstance> = {};
       user_id && (where.user_id = user_id);
-      event_name && (where.event_name = event_name);
       from && (where.created_at = { [Op.gt]: from });
       to && (where.created_at = { [Op.lte]: to });
 
@@ -59,16 +55,21 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         order: [['created_at', 'DESC']],
       });
 
-      return xps.map((xp) => {
-        const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
-        return {
-          ...rest,
-          user_profile: user!.profile,
-          creator_profile: creator?.profile,
-          quest_id: quest_action_meta?.quest_id,
-          quest_action_meta_id: quest_action_meta?.id,
-        };
-      });
+      const finalXps = xps
+        .map((xp) => {
+          const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
+          return {
+            ...rest,
+            user_profile: user!.profile,
+            quest_id: quest_action_meta!.quest_id,
+            quest_action_meta_id: quest_action_meta!.id!,
+            event_name: quest_action_meta!.event_name,
+            creator_profile: creator?.profile,
+          };
+        })
+        .filter((x) => x.quest_id);
+
+      return finalXps;
     },
   };
 }

@@ -1,12 +1,17 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { Referral, ReferralFees, User } from '../entities';
+import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
-import { PG_INT } from '../utils';
+import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
-import { AddressView, CommentView, ThreadView } from './thread.schemas';
+import {
+  AddressView,
+  CommentView,
+  CommentViewType,
+  ThreadView,
+} from './thread.schemas';
 
 export const UserProfileAddressView = AddressView.extend({
   Community: z.object({
@@ -29,7 +34,7 @@ export const UserProfileView = z.object({
     UserProfileAddressView[]
   >,
   threads: z.array(ThreadView),
-  comments: z.array(CommentView),
+  comments: z.array(CommentView) as ZodType<CommentViewType[]>,
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
@@ -39,11 +44,13 @@ export const UserProfileView = z.object({
   xp_points: PG_INT.default(0),
 });
 
+type UserProfileView = z.infer<typeof UserProfileView>;
+
 export const GetUserProfile = {
   input: z.object({
     userId: PG_INT.optional(),
   }),
-  output: UserProfileView,
+  output: UserProfileView as ZodType<UserProfileView>,
 };
 
 export const GetUser = {
@@ -53,7 +60,7 @@ export const GetUser = {
 
 export const SearchUserProfilesView = z.object({
   user_id: PG_INT,
-  profile_name: z.string(),
+  profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   created_at: z.date().or(z.string()),
   last_active: z.date().or(z.string()).nullish(),
@@ -70,6 +77,7 @@ export const SearchUserProfilesView = z.object({
 export const SearchUserProfiles = {
   input: PaginationParamsSchema.extend({
     search: z.string(),
+    exact_match: z.boolean().optional(),
     community_id: z.string().optional(),
     order_by: z
       .enum(['last_active', 'created_at', 'profile_name', 'rank'])
@@ -96,12 +104,17 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
+export const ReferralView = z.object({
+  referrer_address: EVM_ADDRESS,
+  referee_address: EVM_ADDRESS,
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
+  // when referee creates a community
   community_id: z.string().nullish(),
   community_name: z.string().nullish(),
   community_icon_url: z.string().nullish(),
+  namespace_address: EVM_ADDRESS.nullish(),
+  referrer_received_eth_amount: z.string(),
 });
 
 export const GetUserReferrals = {
@@ -110,6 +123,8 @@ export const GetUserReferrals = {
 };
 
 export const ReferralFeesView = ReferralFees.extend({
+  referrer_received_amount: z.string(),
+  transaction_timestamp: z.string(),
   referee_profile: UserProfile.nullish(),
   community_id: z.string().nullish(),
   community_name: z.string().nullish(),
@@ -117,15 +132,19 @@ export const ReferralFeesView = ReferralFees.extend({
 });
 
 export const GetUserReferralFees = {
-  input: z.object({}),
+  input: z.object({
+    distributed_token_address: z.string().optional(),
+    user_id: PG_INT.optional(),
+  }),
   output: z.array(ReferralFeesView),
 };
 
 export const XpLogView = XpLog.extend({
   user_profile: UserProfile,
+  quest_id: PG_INT,
+  quest_action_meta_id: PG_INT,
+  event_name: z.string(),
   creator_profile: UserProfile.nullish(),
-  quest_id: PG_INT.nullish(),
-  quest_action_meta_id: PG_INT.nullish(),
 });
 
 export const GetXps = {
@@ -135,6 +154,10 @@ export const GetXps = {
       .string()
       .optional()
       .describe('Filters events by community id associated to quest'),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
     from: z.coerce
       .date()
       .optional()
@@ -146,4 +169,19 @@ export const GetXps = {
     event_name: z.string().optional().describe('Filters events by event name'),
   }),
   output: z.array(XpLogView),
+};
+
+export const RandomResourceIdsView = z.object({
+  community_id: z.string(),
+  thread_id: z.number(),
+  comment_id: z.number(),
+});
+
+export const GetRandomResourceIds = {
+  input: PaginationParamsSchema.extend({
+    exclude_joined_communities: z.boolean().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(RandomResourceIdsView),
+  }),
 };

@@ -1,0 +1,63 @@
+@import '../../../../styles/shared';
+
+.TrendingThreadList {
+  width: 100%;
+  margin: 16px 0;
+  height: 450px;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+
+      .link {
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+    }
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    gap: 15px;
+    justify-content: start;
+    margin: 10px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .empty-thread {
+    margin: 24px auto;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .virtuoso-grid-list {
+    height: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 15px;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding-bottom: 10px;
+  }
+
+  .virtuoso-grid-list > div {
+    flex: 0 0 auto;
+    width: 325px !important;
+    height: 280px !important;
+  }
+}

@@ -160,4 +160,8 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  &.faded {
+    color: $neutral-500;
+  }
 }

@@ -12,14 +12,16 @@ import {
   MixpanelPageViewEventPayload,
 } from 'shared/analytics/types';
 import app from 'state';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useGetMembersQuery,
+} from 'state/api/communities';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
-import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -120,9 +122,8 @@ const CommunityMembersPage = () => {
       sortable: true,
     },
     {
-      key: 'groups',
-      header: 'Groups',
-      hasCustomSortValue: true,
+      key: 'addresses',
+      header: 'Address',
       numeric: false,
       sortable: false,
     },
@@ -135,10 +136,17 @@ const CommunityMembersPage = () => {
       hidden: !isStakedCommunity,
     },
     {
-      key: 'lastActive',
-      header: 'Last Active',
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
       numeric: false,
-      sortable: true,
+      sortable: false,
+    },
+    {
+      key: 'actions',
+      header: 'Onchain Role',
+      numeric: false,
+      sortable: false,
     },
   ];
 
@@ -163,38 +171,24 @@ const CommunityMembersPage = () => {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
-  } = trpc.community.getMembers.useInfiniteQuery(
-    {
-      limit: 30,
-      order_by: (tableState.orderBy === 'lastActive'
-        ? 'last_active'
-        : tableState.orderBy) as MemberResultsOrderBy,
-      // @ts-expect-error <StrictNullChecks/>
-      order_direction: tableState.orderDirection,
-      ...(debouncedSearchTerm && {
-        search: debouncedSearchTerm,
-      }),
-      community_id: communityId,
-      include_roles: true,
-      ...(membershipsFilter && {
-        memberships: membershipsFilter,
-      }),
-      include_group_ids: true,
-      // only include stake balances if community has staking enabled
-      include_stake_balances: !!community?.namespace,
-    },
-    {
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) {
-          return nextPageNum;
-        }
-        return undefined;
-      },
-      enabled: user.activeAccount?.address ? !!memberships : true,
-    },
-  );
+    refetch: refetchMembers,
+  } = useGetMembersQuery({
+    order_by: (tableState.orderBy === 'lastActive'
+      ? 'last_active'
+      : tableState.orderBy) as MemberResultsOrderBy,
+    order_direction: tableState.orderDirection as APIOrderDirection,
+    ...(debouncedSearchTerm && {
+      search: debouncedSearchTerm,
+    }),
+    community_id: communityId,
+    include_roles: true,
+    ...(membershipsFilter && {
+      memberships: String(membershipsFilter),
+    }),
+    include_group_ids: true,
+    include_stake_balances: !!community?.namespace,
+    apiEnabled: user.activeAccount?.address ? !!memberships : true,
+  });
 
   const { data: groups, refetch } = useFetchGroupsQuery({
     communityId,
@@ -239,6 +233,7 @@ const CommunityMembersPage = () => {
         avatarUrl: p.avatar_url,
         name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
+        addresses: p.addresses,
         groups: (p.group_ids || [])
           .map((groupId) => {
             const matchedGroup = (groups || []).find((g) => g.id === groupId);
@@ -394,7 +389,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TabValues.Leaderboard && groups?.length === 0 ? (
+        {selectedTab === TabValues.Leaderboard ? (
           <></>
         ) : (
           <section
@@ -482,6 +477,7 @@ const CommunityMembersPage = () => {
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
             extraColumns={extraColumns}
+            refetch={() => void refetchMembers()}
           />
         )}
       </section>

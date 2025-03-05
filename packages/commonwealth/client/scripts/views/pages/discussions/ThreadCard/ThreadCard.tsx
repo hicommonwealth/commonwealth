@@ -7,7 +7,7 @@ import {
 } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
@@ -64,6 +64,8 @@ type CardProps = AdminActionsProps & {
   hideSpamTag?: boolean;
   maxChars?: number;
   cutoffLines?: number;
+  showOnlyThreadActionIcons?: boolean;
+  communityHomeLayout?: boolean;
 };
 
 export const ThreadCard = ({
@@ -107,6 +109,8 @@ export const ThreadCard = ({
   hideSpamTag = false,
   maxChars,
   cutoffLines,
+  showOnlyThreadActionIcons = false,
+  communityHomeLayout = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -116,12 +120,6 @@ export const ThreadCard = ({
     useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
-
-  useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
-      document.getElementsByTagName('html')[0].classList.add('invert');
-    }
-  }, []);
 
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
@@ -201,6 +199,7 @@ export const ThreadCard = ({
               hidePublishDate={hidePublishDate}
               hideSpamTag={hideSpamTag}
               hideTrendingTag={hideTrendingTag}
+              communityHomeLayout={communityHomeLayout}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -345,6 +344,7 @@ export const ThreadCard = ({
                   expandCommentBtnVisible={expandCommentBtnVisible}
                   showCommentVisible={showCommentVisible}
                   toggleShowComments={toggleShowComments}
+                  showOnlyThreadActionIcons={showOnlyThreadActionIcons}
                 />
               )}
             </div>
@@ -389,7 +389,7 @@ export const ThreadCard = ({
                     marked_as_spam_at:
                       recentComment?.markedAsSpamAt?.toISOString(),
                     profile_name: recentComment?.profile?.name,
-                    profile_avatar: recentComment?.profile?.avatarUrl,
+                    avatar_url: recentComment?.profile?.avatarUrl,
                     reactions: recentComment.reactions.map((x) => ({
                       address_id: 0, // not needed here
                       id: x.id,
@@ -409,6 +409,7 @@ export const ThreadCard = ({
                       null,
                     )
                   }
+                  tokenNumDecimals={thread.topic?.token_decimals || undefined}
                 />
               </Link>
             ))}

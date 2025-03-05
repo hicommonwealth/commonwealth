@@ -8,7 +8,11 @@ export const refreshProfileCount = async (community_id: string) => {
   await models.sequelize.query(
     `
 UPDATE "Communities" C
-SET profile_count = (SELECT COUNT(*) FROM "Addresses" A WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL)
+SET profile_count = (
+    SELECT COUNT(*) 
+    FROM "Addresses" A 
+    WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
+)
 WHERE C.id = :community_id;
     `,
     { replacements: { community_id } },

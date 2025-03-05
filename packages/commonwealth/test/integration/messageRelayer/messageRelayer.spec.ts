@@ -1,6 +1,5 @@
 import { disposeAdapter } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import {
@@ -20,25 +19,25 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
   test('should correctly increment number of unrelayed events on startup', async () => {
     await models.Outbox.bulkCreate([
       {
-        event_name: EventNames.ChainEventCreated,
+        event_name: 'ChainEventCreated',
         event_payload: {
-          event_name: EventNames.ChainEventCreated,
+          event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: true,
       },
       {
-        event_name: EventNames.ChainEventCreated,
+        event_name: 'ChainEventCreated',
         event_payload: {
-          event_name: EventNames.ChainEventCreated,
+          event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: false,
       },
       {
-        event_name: EventNames.ChainEventCreated,
+        event_name: 'ChainEventCreated',
         event_payload: {
-          event_name: EventNames.ChainEventCreated,
+          event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         relayed: false,

@@ -1,4 +1,4 @@
-import { EventNames, Thread } from '@hicommonwealth/schemas';
+import { Thread } from '@hicommonwealth/schemas';
 import {
   MAX_TRUNCATED_CONTENT_LENGTH,
   getDecodedString,
@@ -152,7 +152,7 @@ export default (
             Outbox,
             [
               {
-                event_name: EventNames.ThreadCreated,
+                event_name: 'ThreadCreated',
                 event_payload: {
                   ...thread.get({ plain: true }),
                   address: address!.address,

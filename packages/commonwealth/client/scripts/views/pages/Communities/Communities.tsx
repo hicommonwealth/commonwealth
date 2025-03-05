@@ -36,6 +36,7 @@ import {
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import QuestList from './QuestList';
 import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
@@ -323,6 +324,7 @@ const CommunitiesPage = () => {
           <IdeaLaunchpad />
         </div>
         <TokensList filters={filters} />
+        <QuestList />
         <ExploreContestList />
         {launchpadEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (

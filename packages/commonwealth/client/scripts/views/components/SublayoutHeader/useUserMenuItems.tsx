@@ -6,11 +6,14 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import {
+  LocalStorageKeys,
+  setLocalStorageItem,
+} from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -19,6 +22,7 @@ import app, { initAppState } from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
+import { darkModeStore, useDarkMode } from 'state/ui/darkMode/darkMode';
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
   useAuthModalStore,
@@ -26,11 +30,8 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import {
-  CWToggle,
-  toggleDarkMode,
-} from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/RewardsPage/types';
 import { mobileTabParam } from '../../pages/RewardsPage/utils';
@@ -58,7 +59,9 @@ export const handleLogout = async () => {
       signer.target.clear();
     }
     notifySuccess('Signed out');
-    setDarkMode(false);
+    darkModeStore.getState().setDarkMode(false);
+    setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
+    setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();
@@ -78,9 +81,7 @@ const useUserMenuItems = ({
   onAddressItemClick,
   onReferralItemClick,
 }: UseUserMenuItemsProps) => {
-  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on',
-  );
+  const darkMode = useDarkMode();
   const { clearSetGatingGroupBannerForCommunities } =
     useGroupMutationBannerStore();
   const { clearSetAdminOnboardingCardVisibilityForCommunities } =
@@ -91,6 +92,7 @@ const useUserMenuItems = ({
 
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
+  const xpEnabled = useFlag('xp');
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -309,6 +311,15 @@ const useUserMenuItems = ({
             null,
           ),
       },
+      ...(xpEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Leaderboard',
+              onClick: () => navigate(`/leaderboard`, {}, null),
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'Notification settings',
@@ -319,11 +330,13 @@ const useUserMenuItems = ({
         label: (
           <div className="UserMenuItem">
             <div>Dark mode</div>
-            <CWToggle readOnly checked={isDarkModeOn} />
+            <CWToggle checked={darkMode.isDarkMode} />
           </div>
         ),
+        onClick: () => {
+          darkMode.toggleDarkMode();
+        },
         preventClosing: true,
-        onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
       },
       {
         type: 'default',

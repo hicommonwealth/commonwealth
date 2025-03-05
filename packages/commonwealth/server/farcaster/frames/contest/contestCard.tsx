@@ -87,7 +87,10 @@ export const contestCard = frames(async (ctx) => {
                 lineHeight: '1.2',
               }}
             >
-              Submit entries by replying below until {endTime.toLocaleString()}
+              Submit entries by replying below until{' '}
+              {endTime.toLocaleString(undefined, {
+                timeZoneName: 'longGeneric',
+              })}
             </p>
           )}
 
@@ -121,11 +124,11 @@ export const contestCard = frames(async (ctx) => {
         Leaderboard
       </Button>,
       <Button
-        key="prizes"
+        key="voting-rules"
         action="post"
-        target={`/${contest_address}/contestPrizes`}
+        target={`/${contest_address}/votingRules`}
       >
-        Prizes
+        Voting Rules
       </Button>,
       <Button key="install" action="link" target={getActionInstallUrl()}>
         Add Upvote Action

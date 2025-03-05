@@ -1,4 +1,4 @@
-import { Query } from '@hicommonwealth/core';
+import { InvalidInput, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -11,10 +11,25 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
     secure: false,
     body: async ({ payload }) => {
       const { community_id, thread_ids } = payload;
+      if (thread_ids === '') return [];
+
+      let parsedThreadIds: number[];
+
+      try {
+        parsedThreadIds = z
+          .string()
+          .transform((ids) =>
+            ids.split(',').map((id) => parseInt(id.trim(), 10)),
+          )
+          .parse(thread_ids);
+      } catch (e) {
+        throw new InvalidInput('Invalid thread_ids format');
+      }
+
       const threads = await models.Thread.findAll({
         where: {
-          community_id,
-          id: { [Op.in]: thread_ids.split(',') },
+          ...(community_id && { community_id }),
+          id: { [Op.in]: parsedThreadIds },
         },
 
         include: [

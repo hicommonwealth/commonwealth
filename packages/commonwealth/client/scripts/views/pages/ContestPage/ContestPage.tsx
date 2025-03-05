@@ -1,8 +1,10 @@
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import 'react-farcaster-embed/dist/styles.css';
 import useFetchFarcasterCastsQuery from 'state/api/contests/getFarcasterCasts';
+import ContestCard from 'views/components/ContestCard';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -10,11 +12,12 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { PageNotFound } from 'views/pages/404';
-import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import NewContestPage from './NewContestPage';
 
+import { trpc } from 'client/scripts/utils/trpcClient';
 import './ContestPage.scss';
 
 export enum SortType {
@@ -33,13 +36,34 @@ const sortOptions = [
   },
 ];
 
+export enum MobileTabType {
+  Entries = 'Entries',
+  PriceChart = 'Price Chart',
+  TokenSwap = 'Token Swap',
+}
+
 interface ContestPageProps {
   contestAddress: string;
 }
 
 const ContestPage = ({ contestAddress }: ContestPageProps) => {
+  const newContestPageEnabled = useFlag('newContestPage');
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
+
+  const [{ data: communityData }] = trpc.useQueries((t) =>
+    [contest!.community_id].map((id) =>
+      t.community.getCommunity({ id: id!, include_node_info: true }),
+    ),
+  );
+
+  const community = {
+    name: communityData?.name || '',
+    iconUrl: communityData?.icon_url || '',
+    chainNodeUrl: communityData?.ChainNode?.url || '',
+    ethChainId: communityData?.ChainNode?.eth_chain_id || 0,
+    id: communityData?.id || '',
+  };
 
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
@@ -59,6 +83,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   }
 
   const { end_time } = contest?.contests[0] || {};
+
+  if (newContestPageEnabled) {
+    return <NewContestPage contestAddress={contestAddress} />;
+  }
 
   return (
     <CWPageLayout>
@@ -86,6 +114,11 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
             onFund={() => setFundDrawerContest(contest)}
+            community={community}
+            contestBalance={parseInt(
+              contest?.contests?.[0]?.contest_balance || '0',
+              10,
+            )}
           />
         )}
 

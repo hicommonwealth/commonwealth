@@ -21,6 +21,10 @@ export default (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      creator_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       community_id: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -50,16 +54,16 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
       ended: { type: Sequelize.BOOLEAN },
+      ending: { type: Sequelize.BOOLEAN },
       farcaster_frame_url: { type: Sequelize.STRING, allowNull: true },
       farcaster_frame_hashes: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
-      neynar_webhook_id: { type: Sequelize.STRING, allowNull: true },
-      neynar_webhook_secret: { type: Sequelize.STRING, allowNull: true },
       topic_id: { type: Sequelize.INTEGER, allowNull: true },
       is_farcaster_contest: { type: Sequelize.BOOLEAN, allowNull: false },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
+      environment: { type: Sequelize.STRING, allowNull: false },
     },
     {
       tableName: 'ContestManagers',

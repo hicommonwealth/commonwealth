@@ -1,9 +1,9 @@
 import React from 'react';
-
+import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
+import { CWTooltip } from '../components/component_kit/new_designs/CWTooltip';
 import './community_label.scss';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import type { IconSize } from './component_kit/cw_icons/types';
-
 import { CWText } from './component_kit/cw_text';
 
 type CommunityLabelProps = {
@@ -26,9 +26,27 @@ export const CommunityLabel = ({
         }}
         size={size}
       />
-      <CWText noWrap type="b1" fontWeight="medium" title={name}>
-        {name}
-      </CWText>
+      <CWTooltip
+        content={name && name.length > 17 ? name : null}
+        placement="top"
+        renderTrigger={(handleInteraction, isTooltipOpen) => (
+          <CWText
+            className="community-name"
+            noWrap
+            type="b1"
+            fontWeight="medium"
+            title={name}
+            onMouseEnter={(e) => {
+              handleMouseEnter({ e, isTooltipOpen, handleInteraction });
+            }}
+            onMouseLeave={(e) => {
+              handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+            }}
+          >
+            {name}
+          </CWText>
+        )}
+      />
     </div>
   );
 };

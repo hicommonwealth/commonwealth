@@ -73,19 +73,27 @@ export const FarcasterAction = z.object({
     embeds: z.array(
       z.object({
         url: z.string(),
-        metadata: z.object({
-          content_type: z.string(),
-          content_length: z.number().nullable(),
-          _status: z.string(),
-          html: z.object({
-            ogImage: z.array(
-              z.object({
-                url: z.string(),
-              }),
-            ),
-            ogTitle: z.string(),
-          }),
-        }),
+        metadata: z
+          .object({
+            content_type: z.string().nullish(),
+            content_length: z.number().nullish(),
+            _status: z.string().nullish(),
+            html: z
+              .object({
+                ogImage: z
+                  .array(
+                    z
+                      .object({
+                        url: z.string().nullish(),
+                      })
+                      .nullish(),
+                  )
+                  .nullish(),
+                ogTitle: z.string().nullish(),
+              })
+              .nullish(),
+          })
+          .nullish(),
       }),
     ),
     channel: z.any().nullable(),

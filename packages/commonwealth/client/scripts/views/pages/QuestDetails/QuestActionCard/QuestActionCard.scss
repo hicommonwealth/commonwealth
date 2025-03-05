@@ -1,0 +1,86 @@
+@import '../../../../styles/shared';
+
+.QuestActionCard {
+  display: flex;
+  border: 1px solid $neutral-200;
+  border-radius: 12px;
+  gap: 12px;
+
+  .counter {
+    background-color: $green-50;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .b1 {
+      color: $neutral-700;
+    }
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    width: 100%;
+
+    @include extraSmall {
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .total-xp-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .b1 {
+        color: $neutral-700;
+      }
+
+      .points-row {
+        display: flex;
+        gap: 12px;
+      }
+
+      .action-link {
+        color: $primary-500;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        gap: 4px;
+
+        &:hover,
+        &:focus,
+        :focus-within,
+        :focus-within,
+        :active {
+          color: $primary-500;
+        }
+      }
+
+      .xp-shares {
+        display: inline;
+        margin-top: -4px;
+
+        .creator-share {
+          color: $neutral-600;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

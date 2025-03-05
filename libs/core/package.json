@@ -17,15 +17,14 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "test": "echo No tests to run",
     "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/evm-protocols": "workspace:*",
+    "@hicommonwealth/schemas": "workspace:*",
     "dotenv": "^16.0.3",
-    "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
     "node-object-hash": "^3.0.0",

@@ -98,6 +98,11 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               is_user_default: false,
               ghost_address: false,
               is_banned: false,
+              oauth_provider: selectedAddress.oauth_provider,
+              oauth_email: selectedAddress.oauth_email,
+              oauth_email_verified: selectedAddress.oauth_email_verified,
+              oauth_username: selectedAddress.oauth_username,
+              oauth_phone_number: selectedAddress.oauth_phone_number,
             },
             { transaction },
           );
@@ -110,7 +115,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
 
           await emitEvent(models.Outbox, [
             {
-              event_name: schemas.EventNames.CommunityJoined,
+              event_name: 'CommunityJoined',
               event_payload: {
                 community_id,
                 user_id: actor.user.id!,

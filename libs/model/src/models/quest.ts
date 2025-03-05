@@ -15,8 +15,11 @@ export const Quest = (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: Sequelize.STRING, allowNull: false },
       description: { type: Sequelize.STRING, allowNull: false },
+      image_url: { type: Sequelize.STRING, allowNull: false },
       start_date: { type: Sequelize.DATE, allowNull: false },
       end_date: { type: Sequelize.DATE, allowNull: false },
+      xp_awarded: { type: Sequelize.INTEGER, allowNull: false },
+      max_xp_to_end: { type: Sequelize.INTEGER, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
@@ -53,6 +56,10 @@ export const QuestActionMeta = (
         allowNull: false,
         defaultValue: 0,
       },
+      amount_multiplier: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
       participation_limit: {
         type: Sequelize.ENUM,
         values: Object.values(schemas.QuestParticipationLimit),
@@ -67,6 +74,8 @@ export const QuestActionMeta = (
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      instructions_link: { type: Sequelize.STRING, allowNull: true },
+      content_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -74,30 +83,5 @@ export const QuestActionMeta = (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'QuestActionMetas',
-    },
-  );
-
-export type QuestActionAttributes = z.infer<typeof schemas.QuestAction>;
-export type QuestActionInstance = ModelInstance<QuestActionAttributes>;
-
-export const QuestAction = (
-  sequelize: Sequelize.Sequelize,
-): Sequelize.ModelStatic<QuestActionInstance> =>
-  sequelize.define<QuestActionInstance>(
-    'QuestAction',
-    {
-      user_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true },
-      quest_action_meta_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-      },
-    },
-    {
-      timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: false,
-      underscored: true,
-      tableName: 'QuestActions',
     },
   );

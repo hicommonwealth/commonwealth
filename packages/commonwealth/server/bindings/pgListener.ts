@@ -58,7 +58,7 @@ export async function setupListener(): Promise<pg.Client> {
   });
 
   client.on('notification', (payload) => {
-    log.info('Notification received', { payload });
+    log.info('Outbox notification received', { payload });
     incrementNumUnrelayedEvents(1);
     stats().increment('messageRelayerNotificationReceived');
   });

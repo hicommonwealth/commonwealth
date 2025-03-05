@@ -20,7 +20,12 @@ import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
 import './markdown_formatted_text.scss';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
+import {
+  countLinesMarkdown,
+  dompurifyConfig,
+  dompurifyConfigForHTML,
+  fetchTwitterEmbedInfo,
+} from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -104,14 +109,8 @@ export const MarkdownFormattedText = ({
 
   const sanitizedHTML: string = useMemo(() => {
     return hideFormatting || searchTerm
-      ? DOMPurify.sanitize(unsanitizedHTML, {
-          ALLOWED_TAGS: ['a', 'img'],
-          ADD_ATTR: ['target', 'onclick'],
-        })
-      : DOMPurify.sanitize(unsanitizedHTML, {
-          USE_PROFILES: { html: true },
-          ADD_ATTR: ['target', 'onclick'],
-        });
+      ? DOMPurify.sanitize(unsanitizedHTML, dompurifyConfig)
+      : DOMPurify.sanitize(unsanitizedHTML, dompurifyConfigForHTML);
   }, [hideFormatting, searchTerm, unsanitizedHTML]);
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {

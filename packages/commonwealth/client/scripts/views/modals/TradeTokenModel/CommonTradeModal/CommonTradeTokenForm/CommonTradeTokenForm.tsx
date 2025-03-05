@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -7,7 +7,7 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -57,26 +57,7 @@ const CommonTradeTokenForm = ({
         return labels.insufficientFunds;
     }
   };
-
-  const withOptionalTooltip = (children: ReactNode) => {
-    const tooltipText = getCTADisabledTooltipText();
-    if (!tooltipText) return children;
-
-    return (
-      <CWTooltip
-        placement="top"
-        content={tooltipText}
-        renderTrigger={(handleInteraction) => (
-          <span
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleInteraction}
-          >
-            {children}
-          </span>
-        )}
-      />
-    );
-  };
+  const tooltipText = getCTADisabledTooltipText();
 
   return (
     <section className="CommonTradeTokenForm">
@@ -142,13 +123,15 @@ const CommonTradeTokenForm = ({
       <div className="receipt-and-fees">
         <div className="header">
           <CWText type="caption" className="dropdown">
-            {withOptionalTooltip(
+            {withTooltip(
               <CWIconButton
                 iconName={isReceiptDetailOpen ? 'caretUp' : 'caretDown'}
                 weight="fill"
                 onClick={() => setIsReceiptDetailOpen((o) => !o)}
                 disabled={!!getCTADisabledTooltipText()}
               />,
+              tooltipText || '',
+              !!tooltipText,
             )}
             Subtotal + fees
           </CWText>
@@ -164,7 +147,7 @@ const CommonTradeTokenForm = ({
         )}
       </div>
 
-      {withOptionalTooltip(
+      {withTooltip(
         <CWButton
           label={trading.mode.value}
           containerClassName="action-btn"
@@ -177,6 +160,8 @@ const CommonTradeTokenForm = ({
           disabled={!!getCTADisabledTooltipText()}
           onClick={onCTAClick}
         />,
+        tooltipText || '',
+        !!tooltipText,
       )}
     </section>
   );

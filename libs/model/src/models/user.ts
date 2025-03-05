@@ -1,7 +1,7 @@
 import { User, UserProfile } from '@hicommonwealth/schemas';
+import { getRandomAvatar } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { getRandomAvatar } from '../utils/defaultAvatar';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';

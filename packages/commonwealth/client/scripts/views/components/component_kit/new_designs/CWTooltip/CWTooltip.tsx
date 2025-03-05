@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import './CWTooltip.scss';
 
@@ -41,5 +41,25 @@ export const CWTooltip: FC<TooltipProps> = ({
         />
       )}
     </>
+  );
+};
+
+export const withTooltip = (
+  children: ReactNode,
+  content: string,
+  shouldDisplay,
+) => {
+  if (!shouldDisplay) return children;
+
+  return (
+    <CWTooltip
+      placement="bottom"
+      content={content}
+      renderTrigger={(handleInteraction) => (
+        <span onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+          {children}
+        </span>
+      )}
+    />
   );
 };

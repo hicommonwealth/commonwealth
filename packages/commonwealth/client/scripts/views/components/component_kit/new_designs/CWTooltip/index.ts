@@ -1,3 +1,3 @@
-import { CWTooltip } from './CWTooltip';
+import { CWTooltip, withTooltip } from './CWTooltip';
 
-export { CWTooltip };
+export { CWTooltip, withTooltip };

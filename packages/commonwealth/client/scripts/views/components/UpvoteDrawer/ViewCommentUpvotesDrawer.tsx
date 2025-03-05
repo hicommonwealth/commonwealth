@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
@@ -8,12 +9,16 @@ type ViewCommentUpvotesDrawerProps = {
   comment?: CommentViewParams;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  tokenDecimals?: number | null | undefined;
+  weightType?: TopicWeightedVoting | null;
 };
 
 export const ViewCommentUpvotesDrawer = ({
   comment,
   isOpen,
   setIsOpen,
+  tokenDecimals,
+  weightType,
 }: ViewCommentUpvotesDrawerProps) => {
   return (
     <ViewUpvotesDrawer
@@ -35,6 +40,8 @@ export const ViewCommentUpvotesDrawer = ({
       }
       // @ts-expect-error <StrictNullChecks/>
       publishDate={(comment?.created_at as string) || ''} // TODO: fix type
+      tokenDecimals={tokenDecimals}
+      topicWeight={weightType}
     />
   );
 };

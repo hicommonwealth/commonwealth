@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,16 +20,25 @@ enum ReferralTabs {
 
 interface ReferralCardProps {
   onSeeAllClick: () => void;
+  trendValue: number;
+  totalEarnings: number;
+  isLoading?: boolean;
+  isReferralsTabSelected?: boolean;
 }
 
-const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
+const ReferralCard = ({
+  onSeeAllClick,
+  trendValue,
+  totalEarnings,
+  isLoading = false,
+  isReferralsTabSelected = false,
+}: ReferralCardProps) => {
   const [currentTab, setCurrentTab] = useState<ReferralTabs>(
     ReferralTabs.Total,
   );
-
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
-  const trendValue = 10;
+  const xpEnabled = useFlag('xp');
 
   return (
     <RewardsCard
@@ -36,25 +46,31 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
       description="Track your referral rewards"
       icon="userSwitch"
       onSeeAllClick={onSeeAllClick}
+      isAlreadySelected={isReferralsTabSelected}
     >
       <div className="ReferralCard">
         <CWTabsRow>
-          {Object.values(ReferralTabs).map((tab) => (
-            <CWTab
-              key={tab}
-              label={tab}
-              isSelected={currentTab === tab}
-              onClick={() => setCurrentTab(tab)}
-            />
-          ))}
+          {Object.values(ReferralTabs).map((tab) => {
+            if (tab === ReferralTabs.XP && !xpEnabled) return null;
+            return (
+              <CWTab
+                key={tab}
+                label={tab}
+                isSelected={currentTab === tab}
+                onClick={() => setCurrentTab(tab)}
+              />
+            );
+          })}
         </CWTabsRow>
         <div className="referral-card-body">
           {currentTab === ReferralTabs.Total && (
             <div className="total-body">
               <CWText fontWeight="bold" type="h4">
-                ${(1234.56).toLocaleString()}
+                ETH {totalEarnings}
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
           {currentTab === ReferralTabs.XP && (
@@ -62,7 +78,9 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
               <CWText fontWeight="bold" type="h4">
                 {123456} XP
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
         </div>

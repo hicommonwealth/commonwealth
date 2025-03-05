@@ -56,9 +56,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   return (
     <div className="InviteLinkModal">
       <CWModalHeader
-        label={
-          communityId ? 'Community invite link' : 'Commonwealth invite link'
-        }
+        label={communityId ? 'Community invite link' : 'Common invite link'}
         onModalClose={onModalClose}
       />
       <CWModalBody>
@@ -66,8 +64,11 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
           <CWText>
             {communityId
               ? 'Get more voting power in your communities when people join with your referral link.'
-              : `When you refer your friends to Common, you'll get a portion of any fees they pay to 
-              Common over their lifetime engaging with web 3 native forums.`}
+              : `When you refer your friends to Common, you'll get XP and a portion of any unchain 
+               fees from trades, swaps, and transactions they make on Common.`}
+          </CWText>
+          <CWText type="b2">
+            Fees are Base only for now, more networks coming soon!
           </CWText>
           <>
             <CWSelectList
@@ -82,6 +83,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
             />
 
             <CWTextInput
+              inputClassName="invite-link-input"
               fullWidth
               type="text"
               value={inviteLink}

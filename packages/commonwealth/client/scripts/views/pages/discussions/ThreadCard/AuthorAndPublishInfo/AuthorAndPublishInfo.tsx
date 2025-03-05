@@ -61,6 +61,7 @@ export type AuthorAndPublishInfoProps = {
   hidePublishDate?: boolean;
   hideSpamTag?: boolean;
   hideTrendingTag?: boolean;
+  communityHomeLayout?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -91,6 +92,7 @@ export const AuthorAndPublishInfo = ({
   hidePublishDate,
   hideSpamTag,
   hideTrendingTag,
+  communityHomeLayout = false,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -131,7 +133,12 @@ export const AuthorAndPublishInfo = ({
     });
 
   return (
-    <div className="AuthorAndPublishInfo" ref={containerRef}>
+    <div
+      className={`AuthorAndPublishInfo ${
+        communityHomeLayout ? 'community-home-layout' : ''
+      }`}
+      ref={containerRef}
+    >
       {isCommunityFirstLayout && (
         <>
           {isLoadingCommunity ? (
@@ -149,25 +156,28 @@ export const AuthorAndPublishInfo = ({
           )}
         </>
       )}
-      <FullUser
-        className={isCommunityFirstLayout ? 'community-user-info' : ''}
-        avatarSize={24}
-        userAddress={authorAddress}
-        userCommunityId={authorCommunityId}
-        shouldShowPopover
-        shouldLinkProfile
-        shouldHideAvatar={isCommunityFirstLayout}
-        shouldShowAsDeleted={!authorAddress && !authorCommunityId}
-        shouldShowAddressWithDisplayName={
-          fromDiscordBot || isCommunityFirstLayout
-            ? false
-            : showUserAddressWithInfo
-        }
-        popoverPlacement={popoverPlacement}
-        // @ts-expect-error <StrictNullChecks>
-        profile={profile}
-      />
-
+      {authorAddress && (
+        <FullUser
+          className={isCommunityFirstLayout ? 'community-user-info' : ''}
+          avatarSize={communityHomeLayout ? 32 : 24}
+          userAddress={authorAddress}
+          userCommunityId={authorCommunityId}
+          shouldShowPopover={communityHomeLayout ? false : true}
+          shouldLinkProfile
+          shouldHideAvatar={
+            communityHomeLayout ? false : isCommunityFirstLayout
+          }
+          shouldShowAsDeleted={!authorAddress && !authorCommunityId}
+          shouldShowAddressWithDisplayName={
+            fromDiscordBot || isCommunityFirstLayout
+              ? false
+              : showUserAddressWithInfo
+          }
+          popoverPlacement={popoverPlacement}
+          // @ts-expect-error <StrictNullChecks>
+          profile={profile}
+        />
+      )}
       {fromDiscordBot && (
         <>
           {dotIndicator}
@@ -182,7 +192,6 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
-
       {/*@ts-expect-error <StrictNullChecks>*/}
       {collaboratorsInfo?.length > 0 && (
         <>
@@ -225,8 +234,7 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
-
-      {publishDate && (
+      {!communityHomeLayout && publishDate && (
         <>
           {dotIndicator}
           {/*@ts-expect-error <StrictNullChecks>*/}
@@ -277,7 +285,6 @@ export const AuthorAndPublishInfo = ({
           )}
         </>
       )}
-
       {/*@ts-expect-error <StrictNullChecks>*/}
       {viewsCount !== null && viewsCount >= 0 && (
         <>
@@ -288,9 +295,7 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
-
       {archivedAt && <ArchiveTrayWithTooltip archivedAt={moment(archivedAt)} />}
-
       {threadStage && (
         <>
           {dotIndicator}
@@ -310,17 +315,13 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
-
       {!hidePublishDate && (
         <NewThreadTag threadCreatedAt={moment(publishDate)} />
       )}
-
       {!hideTrendingTag && isHot && (
         <CWTag iconName="trendUp" label="Trending" type="trending" />
       )}
-
       {!hideSpamTag && isSpamThread && <CWTag label="SPAM" type="disabled" />}
-
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip
           lockedAt={moment(lockedAt)}

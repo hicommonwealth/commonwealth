@@ -3,7 +3,7 @@ import { trpc } from 'client/scripts/utils/trpcClient';
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
 interface GetThreadsByIdProps {
-  community_id: string;
+  community_id?: string;
   thread_ids: number[];
   apiCallEnabled?: boolean;
 }

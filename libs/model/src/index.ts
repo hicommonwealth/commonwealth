@@ -1,4 +1,5 @@
 // Core Domain
+export * as Bot from './bot';
 export * as ChainEvents from './chain-events';
 export * as Comment from './comment';
 export * as Community from './community';

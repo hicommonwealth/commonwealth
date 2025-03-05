@@ -26,14 +26,16 @@ export const ContestView = z.object({
   contest_address: z.string(),
   start_time: z.date().or(z.string()),
   end_time: z.date().or(z.string()),
-  score: z.array(
-    z.object({
-      prize: z.string(),
-      votes: z.string(),
-      content_id: z.string(),
-      creator_address: z.string(),
-    }),
-  ),
+  score: z
+    .array(
+      z.object({
+        prize: z.string(),
+        votes: z.string(),
+        content_id: z.string(),
+        creator_address: z.string(),
+      }),
+    )
+    .nullish(),
   contest_name: z.string().nullish(),
   contest_interval: z.number().nullish(),
   content_id: z.number().nullish(),
@@ -85,6 +87,12 @@ export const AddressView = Address.extend({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+}).omit({
+  oauth_email: true,
+  oauth_provider: true,
+  oauth_phone_number: true,
+  oauth_username: true,
+  oauth_email_verified: true,
 });
 
 export const ReactionView = z.object({
@@ -128,10 +136,12 @@ export const CommentView = Comment.extend({
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
-  profile_avatar: z.string().optional(),
+  avatar_url: z.string().optional(),
   user_id: PG_INT,
   CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
+
+export type CommentViewType = z.infer<typeof CommentView>;
 
 export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
   id: PG_INT,
@@ -284,7 +294,7 @@ export const DEPRECATED_GetBulkThreads = z.object({
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),

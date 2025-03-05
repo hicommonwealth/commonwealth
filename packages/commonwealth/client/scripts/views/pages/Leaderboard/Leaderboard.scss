@@ -1,0 +1,22 @@
+@import '../../../styles/shared';
+
+.Leaderboard {
+  .body {
+    display: grid;
+    gap: 56px;
+    grid-template-columns: 3fr 2fr;
+    width: 100%;
+    padding-top: 12px;
+
+    @include smallInclusive {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+}

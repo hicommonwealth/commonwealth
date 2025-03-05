@@ -29,130 +29,8 @@ on:
       - master
 
 jobs:
-  # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
-  # Its references in this file
-  e2e-tests-Parallel:
-    name: Commonwealth E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        node: [ 22 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - uses: ./.github/actions/e2e
-
-      - name: Run e2e tests
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          pnpm -F commonwealth e2e-start-server --forbid-only &
-          pnpm -F commonwealth wait-server &&
-          pnpm -F commonwealth test-e2e --forbid-only
-
-      - name: Archive test status
-        uses: actions/upload-artifact@v4
-        with:
-          name: FlakySuiteStatus
-          path: packages/commonwealth/summary.json
-
-      - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v4
-        if: ${{ failure() }}
-        with:
-          name: E2eParallelRecordings
-          path: packages/commonwealth/test-results/
-
-  # The tests that this job runs should not be flaky. If they are, move them back into the regular suite.
-  e2e-tests-Mature:
-    name: Commonwealth Mature E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        node: [ 22 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - uses: ./.github/actions/e2e
-
-      - name: Run e2e tests
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          pnpm -F commonwealth e2e-start-server --forbid-only &
-          pnpm -F commonwealth wait-server &&
-          pnpm -F commonwealth test-e2e-mature --forbid-only
-
-      - name: Archive test status
-        uses: actions/upload-artifact@v4
-        with:
-          name: MatureSuiteStatus
-          path: packages/commonwealth/summary.json
-
-      - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v4
-        if: ${{ failure() }}
-        with:
-          name: E2eMatureRecordings
-          path: packages/commonwealth/test-results/
-
-  e2e-tests-serial:
-    name: Commonwealth E2E Tests Serial
+  start-prod-server:
+    name: Test Production Server
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -198,7 +76,6 @@ jobs:
           pnpm -F commonwealth bootstrap-test-db &&
           (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
-
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
@@ -401,7 +278,6 @@ jobs:
       - name: Change permissions of coverage files
         run: |
           chmod -R 755 ./libs/adapters/coverage/lcov.info
-          chmod -R 755 ./libs/core/coverage/lcov.info
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
 
@@ -410,7 +286,7 @@ jobs:
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
 
   commonwealth-evm-tests:

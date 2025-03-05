@@ -1,5 +1,5 @@
 import { stats } from '@hicommonwealth/core';
-import { EventNames, Reaction } from '@hicommonwealth/schemas';
+import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -74,7 +74,7 @@ export default (
                 Outbox,
                 [
                   {
-                    event_name: EventNames.ThreadUpvoted,
+                    event_name: 'ThreadUpvoted',
                     event_payload: {
                       ...reaction.toJSON(),
                       topic_id: thread.topic_id!,
@@ -113,7 +113,7 @@ export default (
                 sequelize.models.Outbox,
                 [
                   {
-                    event_name: EventNames.CommentUpvoted,
+                    event_name: 'CommentUpvoted',
                     event_payload: {
                       ...reaction.toJSON(),
                     },

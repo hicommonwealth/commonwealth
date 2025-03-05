@@ -3,25 +3,48 @@
 .ProfileActivityRow {
   display: flex;
   position: relative;
+  gap: 4px;
   padding: 20px 0 0 0;
+  cursor: pointer;
   min-width: 100%;
   flex-direction: column;
   border-bottom: 1px solid #dddddd;
+  padding: 16px 60px 16px 60px;
+  @include extraSmall {
+    padding: 10px 30px 0px 30px;
+  }
+  .AuthorAndPublishInfo {
+    flex-wrap: nowrap;
+    .community-user-info a {
+      color: $black;
+    }
+  }
 
+  &:hover {
+    background: $neutral-50;
+    text-decoration: none;
+    color: unset;
+  }
+
+  @include extraSmall {
+    min-height: 150px;
+    max-height: 250px;
+    padding-bottom: 10px;
+  }
   .ProfileActivityRowContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     @include extraSmall {
-      flex-wrap: wrap;
       margin-bottom: 2px;
+      flex-wrap: wrap;
     }
 
     .created_at {
-      color: $neutral-700 !important;
       margin-bottom: 10px;
       min-width: fit-content;
+      color: $neutral-500;
       @include extraSmall {
         margin-bottom: 0px;
         font-size: 12px !important;
@@ -31,7 +54,7 @@
     .heading {
       width: 100%;
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       max-width: 90%;
 
       @include isWindowSmallToMediumInclusive {
@@ -46,8 +69,9 @@
         color: $neutral-900;
       }
       .Text {
-        font-size: 20px;
-        line-height: 20px;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 18px;
         color: $neutral-700;
         word-spacing: 0.1cap;
 
@@ -158,13 +182,30 @@
     overflow: auto;
     align-items: center;
     justify-content: space-between;
+    height: fit-content;
+    max-height: 80px;
+    @include extraSmall {
+      overflow: hidden;
+    }
     .MarkdownFormattedText {
+      @include extraSmall {
+        padding-top: 0px !important;
+      }
+
       div {
-        max-height: max-content;
+        overflow: hidden;
+        @include extraSmall {
+          display: flex;
+          overflow: hidden;
+        }
       }
 
       width: 90%;
       height: 100%;
+      @include extraSmall {
+        height: auto;
+        width: auto;
+      }
       padding-top: 10px;
       margin-right: 16px;
       margin-right: 16px;
@@ -174,6 +215,11 @@
         font-size: 21px !important;
         line-height: 21px !important;
         font-family: $font-family-neue-haas-unica;
+
+        @include extraSmall {
+          font-size: 14px !important;
+          line-height: 20px !important;
+        }
       }
 
       p {
@@ -185,5 +231,18 @@
         line-height: 14px !important;
       }
     }
+  }
+
+  .show-more-button-wrapper {
+    display: none !important;
+  }
+  .footer {
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 8px;
+    padding-bottom: 0px;
   }
 }

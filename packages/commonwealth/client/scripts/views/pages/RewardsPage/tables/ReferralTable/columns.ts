@@ -20,9 +20,29 @@ export const columns: CWTableColumnInfo[] = [
     sortable: false,
   },
   {
+    key: 'community',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'namespace',
+    header: 'Namespace',
+    numeric: false,
+    sortable: false,
+  },
+  {
     key: 'earnings',
     header: 'Earnings',
     numeric: true,
     sortable: true,
+    headerInfo: {
+      title: 'Earnings',
+      content: `This column displays your referral earnings from ETH only.
+
+You may be accumulating earnings from other tokens such as earnings from meme contests.
+
+Earnings in other tokens are directly displayed in your wallet.`,
+    },
   },
 ];

@@ -8,24 +8,24 @@ import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useUpdateContestMutation from 'state/api/contests/updateContest';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
-import {
-  CWImageInput,
-  ImageBehavior,
-} from 'views/components/component_kit/CWImageInput';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import {
+  CWImageInput,
+  ImageBehavior,
+} from 'views/components/component_kit/CWImageInput';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
-import { BLOG_SUBDOMAIN, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -34,15 +34,18 @@ import {
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
+import ContestTopicDescription from './ContestTopicDescription';
+import CustomContestTopicOption from './CustomContestTopicOption';
 import './DetailsFormStep.scss';
 import PayoutRow from './PayoutRow';
 import {
-  INITIAL_PERCENTAGE_VALUE,
-  MAX_WINNERS,
-  MIN_WINNERS,
   contestDurationOptions,
+  createNewTopicOption,
+  INITIAL_PERCENTAGE_VALUE,
   initialContestDuration,
   initialPayoutStructure,
+  MAX_WINNERS,
+  MIN_WINNERS,
   prizePercentageOptions,
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
@@ -108,12 +111,13 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting && t.token_address !== ZERO_ADDRESS)
+    .filter((t) => t?.weighted_voting)
     .map((t) => ({
       value: t.id,
       label: t.name,
       weightedVoting: t.weighted_voting,
       helpText: weightedVotingValueToLabel(t.weighted_voting!),
+      tokenAddress: t.token_address,
     }));
 
   const getInitialValues = () => {
@@ -290,9 +294,19 @@ const DetailsFormStep = ({
                     placeholder="Select topic"
                     isClearable={false}
                     isSearchable={false}
-                    options={weightedTopics}
+                    options={[...weightedTopics, createNewTopicOption]}
                     isDisabled={editMode}
+                    components={{
+                      Option: (originalProps) =>
+                        CustomContestTopicOption({
+                          originalProps,
+                        }),
+                    }}
                     onChange={(t) => {
+                      if (t?.value === 'create-new') {
+                        return navigate('/manage/topics');
+                      }
+
                       if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
                         const token = topicsData?.find(
                           (topic) => topic.id === t.value,
@@ -306,13 +320,17 @@ const DetailsFormStep = ({
                       }
                     }}
                   />
+                  <ContestTopicDescription
+                    topic={watch('contestTopic')}
+                    topicsData={topicsData}
+                  />
                 </div>
               )}
 
               <div className="contest-section contest-section-name">
                 <CWText type="h4">Name your contest</CWText>
                 <CWText type="b1">
-                  We recommend naming your contest if you’re going to have
+                  We recommend naming your contest if you&apos;re going to have
                   multiple contest
                 </CWText>
                 <CWTextInput

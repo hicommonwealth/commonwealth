@@ -1,4 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
+import { createEventSource } from 'eventsource-client';
 import { useRef, useState } from 'react';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
@@ -8,11 +9,6 @@ type TokenIdea = {
   description: string;
   imageURL: string;
   symbol: string;
-};
-
-type StreamEnd = {
-  status: 'success' | 'failure';
-  message: string;
 };
 
 type UseGenerateTokenIdeaProps = {
@@ -56,102 +52,71 @@ export const useGenerateTokenIdea = ({
 
       // Special case for `fetch` API usage:
       // streaming responses doesn't work with axios POST method: https://github.com/axios/axios/issues/5806
-      const response = await fetch(
-        `${SERVER_URL}/${ApiEndpoints.GENERATE_TOKEN_IDEA}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jwt: userStore.getState().jwt,
-            ideaPrompt,
-            auth: true,
-          }),
+      const es = createEventSource({
+        url: `${SERVER_URL}/${ApiEndpoints.GENERATE_TOKEN_IDEA}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
-
-      const reader = response?.body?.getReader();
-      const decoder = new TextDecoder('utf-8');
+        body: JSON.stringify({
+          jwt: userStore.getState().jwt,
+          ideaPrompt,
+          auth: true,
+        }),
+        fetch: fetch,
+      });
 
       let timeoutSec = 30;
-      let chunkIndex = 1;
-      const chunkIndexToFieldNameMap = {
-        1: 'name',
-        2: 'symbol',
-        3: 'description',
-        4: 'imageURL',
-        5: 'imageURL',
-      };
+      for await (const { data, event } of es) {
+        if (event === 'imageURL') {
+          // we dont want imageURL to be updated in chunks
+          setTokenIdeas((ti) => {
+            const temp = [...ti];
+            temp[ideaIndex] = {
+              ...(temp[ideaIndex] || {}),
+              chunkingField: undefined,
+              token: {
+                ...(tokenIdeas[ideaIndex]?.token || ({} as TokenIdea)),
+                [event]: data,
+              },
+            };
+            return temp;
+          });
 
-      while (true) {
-        if (reader) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          es.close();
+        } else {
+          for (let i = 1; i <= data.length; i++) {
+            setTimeout(() => {
+              setTokenIdeas((ti) => {
+                const temp = [...ti];
+                temp[ideaIndex] = {
+                  ...(temp[ideaIndex] || {}),
+                  chunkingField: event as keyof TokenIdea,
+                  token: {
+                    ...(tokenIdeas[ideaIndex]?.token || ({} as TokenIdea)),
+                    [event!]: data.slice(0, i),
+                  },
+                };
+                return temp;
+              });
+            }, timeoutSec);
 
-          const chunk = decoder.decode(value || '', { stream: true });
-          const chunkJSON = JSON.parse(chunk);
-
-          if ((chunkJSON as StreamEnd).status === 'failure') {
-            throw new Error((chunkJSON as StreamEnd).message);
+            // we want to render description chunks faster as trhey have more text
+            timeoutSec += event === 'description' ? 15 : 30;
           }
 
-          if (!(chunkJSON as StreamEnd)?.status) {
-            const valueToSet = chunkJSON as TokenIdea;
-            const fieldName = chunkIndexToFieldNameMap[chunkIndex];
-            const fieldValue = valueToSet[fieldName];
-
-            if (fieldName === 'imageURL') {
-              // we dont want imageURL to be updated in chunks
+          // reset chunking state after `description` is chunked
+          if (event === 'description') {
+            setTimeout(() => {
               setTokenIdeas((ti) => {
                 const temp = [...ti];
                 temp[ideaIndex] = {
                   ...(temp[ideaIndex] || {}),
                   chunkingField: undefined,
-                  token: {
-                    ...(tokenIdeas[ideaIndex]?.token || valueToSet),
-                    [fieldName]: fieldValue,
-                  },
                 };
                 return temp;
               });
-            } else {
-              for (let i = 1; i <= fieldValue.length; i++) {
-                setTimeout(() => {
-                  setTokenIdeas((ti) => {
-                    const temp = [...ti];
-                    temp[ideaIndex] = {
-                      ...(temp[ideaIndex] || {}),
-                      chunkingField: fieldName,
-                      token: {
-                        ...(tokenIdeas[ideaIndex]?.token || valueToSet),
-                        [fieldName]: fieldValue.slice(0, i),
-                      },
-                    };
-                    return temp;
-                  });
-                }, timeoutSec);
-
-                // we want to render description chunks faster as trhey have more text
-                timeoutSec += fieldName === 'description' ? 15 : 30;
-              }
-
-              // reset chunking state after `description` is chunked
-              if (fieldName === 'description') {
-                setTimeout(() => {
-                  setTokenIdeas((ti) => {
-                    const temp = [...ti];
-                    temp[ideaIndex] = {
-                      ...(temp[ideaIndex] || {}),
-                      chunkingField: undefined,
-                    };
-                    return temp;
-                  });
-                }, timeoutSec);
-              }
-            }
-
-            chunkIndex += 1;
+            }, timeoutSec);
           }
         }
       }

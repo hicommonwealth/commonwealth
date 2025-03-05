@@ -61,7 +61,7 @@ export const startCanvasNode = async (config: {
 
   const libp2p =
     process.env.APP_ENV === 'production'
-      ? await app.startLibp2p({
+      ? ((await app.startLibp2p({
           announce: [announce],
           listen: [listen],
           bootstrapList: [explorerNode],
@@ -69,7 +69,8 @@ export const startCanvasNode = async (config: {
             multiaddr.toString() !== explorerNode,
           privateKey,
           start: true,
-        })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        })) as Libp2p<any>)
       : null;
 
   return { app, libp2p };

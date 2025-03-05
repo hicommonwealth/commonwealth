@@ -108,10 +108,11 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   models.Outbox,
                   [
                     {
-                      event_name: schemas.EventNames.SignUpFlowCompleted,
+                      event_name: 'SignUpFlowCompleted',
                       event_payload: {
                         user_id: id,
                         address: actor.address!,
+                        referred_by_address: user.referred_by_address,
                         created_at: updated_user.created_at!,
                       },
                     },

@@ -11,6 +11,13 @@ export const QuestEvents = {
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
   UserMentioned: events.UserMentioned,
+  RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  WalletLinked: events.WalletLinked,
+  SSOLinked: events.SSOLinked,
+  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
 } as const;
 
 export enum QuestParticipationLimit {
@@ -37,9 +44,16 @@ export const QuestActionMeta = z
     ),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
+    amount_multiplier: z.number().min(0).optional(),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    instructions_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().optional(),
+    content_id: z
+      .string()
+      .regex(/(thread:\d+)|(comment:\d+)/)
+      .optional()
+      .nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
   })
@@ -58,8 +72,11 @@ export const Quest = z
     id: PG_INT.nullish(),
     name: z.string().max(255),
     description: z.string().max(1000),
+    image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
+    xp_awarded: z.number().default(0),
+    max_xp_to_end: z.number().default(0),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
     community_id: z
@@ -73,11 +90,3 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
-
-export const QuestAction = z
-  .object({
-    user_id: PG_INT.describe('The user who took the action'),
-    quest_action_meta_id: PG_INT.describe('The action metadata for the action'),
-    created_at: z.coerce.date().optional(),
-  })
-  .describe('Records user actions in a quest');

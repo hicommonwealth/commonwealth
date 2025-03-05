@@ -7,6 +7,7 @@ export enum ServiceKey {
   CommonwealthConsumer = 'commonwealth-consumer',
   MessageRelayer = 'message-relayer',
   DiscordBotListener = 'discord-bot-listener',
+  TwitterWorker = 'twitter-worker',
 }
 
 export type HealthCheckOptions = {
