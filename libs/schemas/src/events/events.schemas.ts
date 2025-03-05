@@ -123,8 +123,9 @@ export const events = {
   CommunityJoined: z.object({
     community_id: z.string(),
     user_id: z.number(),
-    created_at: z.coerce.date(),
     oauth_provider: z.string().nullish(),
+    referrer_address: z.string().nullish(),
+    created_at: z.coerce.date(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -283,12 +284,20 @@ export const events = {
   }).merge(SubscriptionPreference.pick({ user_id: true })),
 
   FarcasterCastCreated: FarcasterCast.describe(
-    'When a farcaster contest cast has been posted',
+    'When a farcaster contest frame cast has been posted',
+  ),
+
+  FarcasterCastDeleted: FarcasterCast.describe(
+    'When a farcaster contest frame cast has been deleted',
   ),
 
   FarcasterReplyCastCreated: FarcasterCast.extend({
     verified_address: z.string(),
-  }).describe('When a reply is posted to a farcaster contest cast'),
+  }).describe('When cast is created as a reply to a contest frame'),
+
+  FarcasterReplyCastDeleted: FarcasterCast.extend({
+    verified_address: z.string(),
+  }).describe('When cast is deleted on a contest frame cast'),
 
   FarcasterContestBotMentioned: FarcasterCast.extend({
     verified_address: z.string(),
@@ -302,6 +311,7 @@ export const events = {
   SignUpFlowCompleted: z.object({
     user_id: z.number(),
     address: z.string(),
+    referred_by_address: z.string().nullish(),
     created_at: z.coerce.date(),
   }),
 

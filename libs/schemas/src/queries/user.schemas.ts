@@ -1,10 +1,10 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { Referral, ReferralFees, User } from '../entities';
+import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
-import { PG_INT } from '../utils';
+import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import {
   AddressView,
@@ -60,7 +60,7 @@ export const GetUser = {
 
 export const SearchUserProfilesView = z.object({
   user_id: PG_INT,
-  profile_name: z.string(),
+  profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   created_at: z.date().or(z.string()),
   last_active: z.date().or(z.string()).nullish(),
@@ -77,6 +77,7 @@ export const SearchUserProfilesView = z.object({
 export const SearchUserProfiles = {
   input: PaginationParamsSchema.extend({
     search: z.string(),
+    exact_match: z.boolean().optional(),
     community_id: z.string().optional(),
     order_by: z
       .enum(['last_active', 'created_at', 'profile_name', 'rank'])
@@ -103,14 +104,17 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
-  created_on_chain_timestamp: z.string(),
-  referrer_received_eth_amount: z.string(),
+export const ReferralView = z.object({
+  referrer_address: EVM_ADDRESS,
+  referee_address: EVM_ADDRESS,
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
+  // when referee creates a community
   community_id: z.string().nullish(),
   community_name: z.string().nullish(),
   community_icon_url: z.string().nullish(),
+  namespace_address: EVM_ADDRESS.nullish(),
+  referrer_received_eth_amount: z.string(),
 });
 
 export const GetUserReferrals = {
@@ -137,9 +141,10 @@ export const GetUserReferralFees = {
 
 export const XpLogView = XpLog.extend({
   user_profile: UserProfile,
+  quest_id: PG_INT,
+  quest_action_meta_id: PG_INT,
+  event_name: z.string(),
   creator_profile: UserProfile.nullish(),
-  quest_id: PG_INT.nullish(),
-  quest_action_meta_id: PG_INT.nullish(),
 });
 
 export const GetXps = {

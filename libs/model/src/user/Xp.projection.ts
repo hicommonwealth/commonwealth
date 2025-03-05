@@ -5,9 +5,10 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
+import { QuestInstance } from '../models/quest';
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -33,23 +34,28 @@ async function getUserByAddress(address: string) {
 async function getQuestActionMetas(
   event_payload: { community_id?: string; created_at?: Date },
   event_name: keyof typeof schemas.QuestEvents,
+  quest_id?: number, // to get system quest action metas
 ) {
+  const where: WhereOptions<QuestInstance> = quest_id
+    ? { id: quest_id }
+    : {
+        community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
+        start_date: { [Op.lte]: event_payload.created_at },
+        end_date: { [Op.gte]: event_payload.created_at },
+      };
   // make sure quest was active when event was created
-  const quests = await models.Quest.findAll({
-    where: {
-      community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
-      start_date: { [Op.lte]: event_payload.created_at },
-      end_date: { [Op.gte]: event_payload.created_at },
-    },
+  const metas = await models.Quest.findAll({
+    where,
     include: [
-      { required: true, model: models.QuestActionMeta, as: 'action_metas' },
+      {
+        required: true,
+        model: models.QuestActionMeta,
+        as: 'action_metas',
+        where: { event_name },
+      },
     ],
   });
-  return quests.flatMap((q) =>
-    q
-      .get({ plain: true })
-      .action_metas!.find((a) => a.event_name === event_name),
-  );
+  return metas.flatMap((q) => q.get({ plain: true }).action_metas);
 }
 
 async function addPointsToUsers(
@@ -88,7 +94,7 @@ async function recordXpsForQuest(
       : undefined;
 
     for (const action_meta of action_metas) {
-      if (!action_meta) continue;
+      if (!action_meta?.id) continue;
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
         if (parts.length !== 2) continue;
@@ -97,11 +103,7 @@ async function recordXpsForQuest(
 
       // get logged actions for this user and action meta
       const log = await models.XpLog.findAll({
-        where: {
-          user_id,
-          event_name: action_meta.event_name,
-          action_meta_id: action_meta.id,
-        },
+        where: { user_id, action_meta_id: action_meta.id },
       });
 
       // validate action participation
@@ -143,15 +145,14 @@ async function recordXpsForQuest(
       const [, created] = await models.XpLog.findOrCreate({
         where: {
           user_id,
-          event_name: action_meta.event_name,
+          action_meta_id: action_meta.id,
           event_created_at,
         },
         defaults: {
-          event_name: action_meta.event_name,
-          event_created_at,
           user_id,
-          xp_points,
           action_meta_id: action_meta.id,
+          event_created_at,
+          xp_points,
           creator_user_id,
           creator_xp_points,
           created_at: new Date(),
@@ -170,62 +171,6 @@ async function recordXpsForQuest(
     }
   });
 }
-
-async function recordXpsForEvent(
-  user_id: number,
-  event_name: keyof typeof schemas.QuestEvents,
-  event_created_at: Date,
-  reward_amount: number,
-  creator_address?: string, // referrer address
-  creator_reward_weight?: number, // referrer reward weight
-) {
-  await sequelize.transaction(async (transaction) => {
-    const creator_user_id = creator_address
-      ? await getUserByAddress(creator_address)
-      : undefined;
-
-    // get logged actions for this user and event
-    const log = await models.XpLog.findAll({
-      where: { user_id, event_name },
-    });
-    if (log.length > 0) return; // already recorded
-
-    // calculate xp points and log it
-    const creator_xp_points = creator_user_id
-      ? Math.round(reward_amount * (creator_reward_weight ?? 0))
-      : undefined;
-    const xp_points = reward_amount - (creator_xp_points ?? 0);
-
-    const [, created] = await models.XpLog.findOrCreate({
-      where: { user_id, event_name, event_created_at },
-      defaults: {
-        event_name,
-        event_created_at,
-        user_id,
-        xp_points,
-        creator_user_id,
-        creator_xp_points,
-        created_at: new Date(),
-      },
-      transaction,
-    });
-
-    if (created)
-      await addPointsToUsers(
-        user_id,
-        xp_points,
-        transaction,
-        creator_user_id,
-        creator_xp_points,
-      );
-  });
-}
-
-// automatic xp rewards: @dillchen should we softcode these in .env or db?
-const SignUpFlowCompletedReward = 20;
-const SignUpFlowCompletedReferrerRewardWeight = 0.2;
-const WalletLinkedReward = 10;
-const SSOLinkedReward = 10;
 const TwitterCommonMentionedReward = 5;
 
 export function Xp(): Projection<typeof schemas.QuestEvents> {
@@ -236,13 +181,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const referee_address = await models.User.findOne({
           where: { id: payload.user_id },
         });
-        await recordXpsForEvent(
-          payload.user_id,
+        const action_metas = await getQuestActionMetas(
+          payload,
           'SignUpFlowCompleted',
+          -1,
+        );
+        await recordXpsForQuest(
+          payload.user_id,
           payload.created_at!,
-          SignUpFlowCompletedReward,
+          action_metas,
           referee_address?.referred_by_address || undefined,
-          SignUpFlowCompletedReferrerRewardWeight,
         );
       },
       CommunityCreated: async ({ payload }) => {
@@ -419,41 +367,28 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       WalletLinked: async ({ payload }) => {
-        if (payload.new_user) {
-          await recordXpsForEvent(
-            payload.user_id,
-            'WalletLinked',
-            payload.created_at,
-            WalletLinkedReward,
-          );
-        } else {
-          const action_metas = await getQuestActionMetas(
-            payload,
-            'WalletLinked',
-          );
-          await recordXpsForQuest(
-            payload.user_id,
-            payload.created_at,
-            action_metas,
-          );
-        }
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'WalletLinked',
+          payload.new_user ? -1 : undefined, // first user linking is system quest
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.created_at,
+          action_metas,
+        );
       },
       SSOLinked: async ({ payload }) => {
-        if (payload.new_user) {
-          await recordXpsForEvent(
-            payload.user_id,
-            'SSOLinked',
-            payload.created_at,
-            SSOLinkedReward,
-          );
-        } else {
-          const action_metas = await getQuestActionMetas(payload, 'SSOLinked');
-          await recordXpsForQuest(
-            payload.user_id,
-            payload.created_at,
-            action_metas,
-          );
-        }
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'WalletLinked',
+          payload.new_user ? -1 : undefined, // first user linking is system quest
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.created_at,
+          action_metas,
+        );
       },
       TwitterCommonMentioned: async ({ payload }) => {
         const user = await models.Address.findOne({

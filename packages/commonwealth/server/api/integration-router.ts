@@ -29,59 +29,39 @@ function build() {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
-  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
-    // Farcaster frames
-    // WARNING: do not change this because cloudflare may route to it
-    router.use('/farcaster/contests', farcasterRouter);
+  // Farcaster frames
+  // WARNING: do not change this because cloudflare may route to it
+  router.use('/farcaster/contests', farcasterRouter);
 
-    // Farcaster webhooks/actions
-    router.post(
-      '/farcaster/CastCreated',
-      (req, _, next) => {
-        validateNeynarWebhook(
-          config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
-        )(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterCastCreatedWebhook()),
-    );
+  // Farcaster webhooks/actions
+  router.post(
+    '/farcaster/CastEvent',
+    (req, _, next) => {
+      validateNeynarWebhook(
+        config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET!,
+      )(req, _, next);
+    },
+    express.command(Contest.FarcasterCastWebhook()),
+  );
 
-    router.post(
-      '/farcaster/ReplyCastCreated',
-      (req, _, next) => {
-        validateNeynarWebhook(null)(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
-    );
+  router.get(
+    '/farcaster/CastUpvoteAction',
+    express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+  );
 
-    router.post(
-      '/farcaster/ContestBotMentioned',
-      (req, _, next) => {
-        validateNeynarWebhook(
-          config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
-        )(req, _, next).catch(next);
-      },
-      express.command(Contest.RelayFarcasterContestBotMentioned()),
-    );
+  router.post(
+    '/farcaster/CastUpvoteAction',
+    (req, _, next) => {
+      validateFarcasterAction()(req, _, next).catch(next);
+    },
+    express.command(Contest.FarcasterUpvoteAction()),
+  );
 
-    router.get(
-      '/farcaster/CastUpvoteAction',
-      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
-    );
-
-    router.post(
-      '/farcaster/CastUpvoteAction',
-      (req, _, next) => {
-        validateFarcasterAction()(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterUpvoteAction()),
-    );
-
-    router.post(
-      '/farcaster/NotificationsWebhook',
-      // TODO: add validation middleware
-      express.command(Contest.FarcasterNotificationsWebhook()),
-    );
-  }
+  router.post(
+    '/farcaster/NotificationsWebhook',
+    // TODO: add validation middleware
+    express.command(Contest.FarcasterNotificationsWebhook()),
+  );
 
   router.post(
     '/snapshot/webhook',

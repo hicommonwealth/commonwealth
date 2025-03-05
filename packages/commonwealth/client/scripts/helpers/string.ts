@@ -1,5 +1,5 @@
 /**
- * Sample usage: Input = 'SignUpFlowCompleted', Output = 'Sign Up Flow Completed'
+ * Sample usage: Input = 'CommunityJoined', Output = 'Community Joined'
  * @param str
  * @returns
  */

@@ -1,10 +1,16 @@
-import { Command } from '@hicommonwealth/core';
-import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
+import { Command, logger } from '@hicommonwealth/core';
+import {
+  createPrivateEvmClient,
+  getContestScore,
+} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { config } from '../config';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import { createOnchainContestVote } from '../policies/utils/contest-utils';
-import { emitEvent } from '../utils/utils';
+import { emitEvent, getChainNodeUrl } from '../utils/utils';
+
+const log = logger(import.meta);
 
 const getPrivateWalletAddress = (): string => {
   const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
@@ -19,28 +25,75 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
       const { contest_address, contest_id, actions, chain_url, is_one_off } =
         payload;
 
-      // add onchain vote to the first content when no upvotes found in the last hour
-      if (!actions.some((action) => action.action === 'upvoted')) {
-        const firstContent = actions.find(
-          (action) => action.action === 'added',
-        );
-        await createOnchainContestVote({
-          contestManagers: [
+      const contestManager = await models.ContestManager.findByPk(
+        contest_address,
+        {
+          include: [
             {
-              url: chain_url,
-              contest_address,
-              content_id: firstContent!.content_id,
+              model: models.Community,
+              required: true,
+              include: [
+                {
+                  model: models.ChainNode.scope('withPrivateData'),
+                  required: true,
+                },
+              ],
             },
           ],
-          content_url: firstContent!.content_url!,
-          author_address: getPrivateWalletAddress(),
-        });
+        },
+      );
+      mustExist('Contest Manager', contestManager);
+
+      // add onchain vote to the first content when no upvotes found in the last hour
+
+      // NOTE: on dev environments where contests last 1 hour, this may cause issues
+      // during testing, so use DISABLE_CONTEST_ENDING_VOTE locally
+      if (!actions.some((action) => action.action === 'upvoted')) {
+        if (config.CONTESTS.DISABLE_CONTEST_ENDING_VOTE) {
+          log.warn(
+            'Skipped contest ending upvote, DISABLE_CONTEST_ENDING_VOTE is enabled',
+          );
+        } else {
+          const firstContent = actions.find(
+            (action) => action.action === 'added',
+          );
+          await createOnchainContestVote({
+            contestManagers: [
+              {
+                url: chain_url,
+                contest_address,
+                content_id: firstContent!.content_id,
+              },
+            ],
+            content_url: firstContent!.content_url!,
+            author_address: getPrivateWalletAddress(),
+          });
+        }
       }
+
+      const rpc = getChainNodeUrl({
+        url: chain_url,
+        private_url:
+          contestManager.Community!.ChainNode?.private_url ||
+          contestManager.Community!.ChainNode?.url,
+      });
+      const { contestBalance, scores } = await getContestScore(
+        rpc,
+        contestManager.contest_address,
+        contestManager.prize_percentage || 0,
+        contestManager.payout_structure,
+        contest_id,
+        is_one_off,
+      );
 
       await models.sequelize.transaction(async (transaction) => {
         await models.ContestManager.update(
           { ending: true },
           { where: { contest_address }, transaction },
+        );
+        await models.Contest.update(
+          { contest_balance: contestBalance, score: scores },
+          { where: { contest_address, contest_id }, transaction },
         );
         await emitEvent(
           models.Outbox,
