@@ -1,6 +1,5 @@
+import { LocalStorageKeys } from 'helpers/localStorage';
 import { useCallback, useState } from 'react';
-
-const LOCALSTORAGE_KEY = 'hasMobileAppOnboarded';
 
 /**
  * Basic hook so we can see if we have been onboarded, and a function to set it
@@ -8,11 +7,14 @@ const LOCALSTORAGE_KEY = 'hasMobileAppOnboarded';
  */
 export function useMobileAppOnboarding(): [boolean, (value: boolean) => void] {
   const [hasOnboarded, setHasOnboarded] = useState(
-    localStorage.getItem(LOCALSTORAGE_KEY) === 'true',
+    localStorage.getItem(LocalStorageKeys.HasMobileAppOnboarded) === 'true',
   );
 
   const changeOnboarded = useCallback((value: boolean) => {
-    localStorage.setItem(LOCALSTORAGE_KEY, value.toString());
+    localStorage.setItem(
+      LocalStorageKeys.HasMobileAppOnboarded,
+      value.toString(),
+    );
     setHasOnboarded(value);
   }, []);
 
