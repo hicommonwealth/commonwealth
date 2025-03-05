@@ -1,2 +1,21 @@
+@import '../../../../../styles/shared';
+
 .XPEarningsTable {
+  .Table {
+    .data-container {
+      .questLink {
+        cursor: pointer;
+        color: $primary-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
 }
