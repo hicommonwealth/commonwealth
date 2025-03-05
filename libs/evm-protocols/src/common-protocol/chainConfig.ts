@@ -65,10 +65,10 @@ export const factoryContracts = {
   [ValidChains.Base]: {
     factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
-    launchpad: '0x94dd2adcabe419eaebc7041f42fa7553b0e6df5c',
-    lpBondingCurve: '0x1bb3bfbeb844a453dcc36a6d7c26ed4a19847815',
-    tokenCommunityManager: '0x2a813bdf2eac0c5cb270570218bc436a996da6c1',
-    referralFeeManager: '0x9d3be262bed6f3a0aab4e97c0232071ef730632f',
+    launchpad: '0x94Dd2adCaBe419eaEbc7041f42fa7553b0E6DF5c',
+    lpBondingCurve: '0x1bb3bfbeB844a453dcC36a6d7C26eD4A19847815',
+    tokenCommunityManager: '0x2A813BDF2eAC0C5cB270570218bC436a996Da6c1',
+    referralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
     chainId: 8453,
   },
   [ValidChains.Linea]: {
