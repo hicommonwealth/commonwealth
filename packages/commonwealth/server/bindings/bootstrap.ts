@@ -128,11 +128,12 @@ export async function bootstrapRelayer(
 }
 
 export function bootstrapContestRolloverLoop() {
-  const cronFrequency = '* * * * *';
+  const cronFrequency = '* * * * *'; // every minute
+
   log.info(`Starting rollover cron job (${cronFrequency})`);
 
   CronJob.from({
-    cronTime: cronFrequency, // every minute
+    cronTime: cronFrequency,
     onTick: async () => {
       try {
         await handleEvent(ContestWorker(), {
