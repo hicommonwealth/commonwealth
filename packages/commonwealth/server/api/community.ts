@@ -5,6 +5,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
 } from '../../shared/analytics/types';
+import { config } from '../config';
 
 export const trpcRouter = trpc.router({
   createCommunity: trpc.command(Community.CreateCommunity, trpc.Tag.Community, [
@@ -39,7 +40,25 @@ export const trpcRouter = trpc.router({
       ];
     }),
   ]),
-  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community),
+  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
+    ttlSecs: ({ relevance_by, include_node_info, cursor }) => {
+      // (1h) Used by trending communities (user dashboard) when signed in
+      if (relevance_by === 'membership')
+        return config.CACHE_TTL.GET_COMMUNITIES_TRENDING_SIGNED_IN;
+      // (24h) Used by join community onboarding modal
+      else if (relevance_by === 'tag_ids')
+        return config.CACHE_TTL.GET_COMMUNITIES_JOIN_COMMUNITY;
+      // (24) Used by explore page
+      else if (include_node_info) {
+        // don't cache explore page since it is infinitely scrollable
+        // caching first page but not subsequent could cause duplicates or
+        // missing communities
+        return undefined;
+      }
+      // (2h) Used by trending communities (user dashboard) when signed out
+      return config.CACHE_TTL.GET_COMMUNITIES_TRENDING_SIGNED_OUT;
+    },
+  }),
   getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community),
   getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
   getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
