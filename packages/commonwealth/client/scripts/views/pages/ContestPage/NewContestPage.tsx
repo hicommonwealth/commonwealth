@@ -11,7 +11,8 @@ import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayou
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
-import EntriesTab, { EntriesTabProps } from './tabs/Entries';
+import type { EntriesTabProps } from './tabs/Entries';
+import EntriesTab from './tabs/Entries';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 import { getCurrentContestIndex, getSortedContests } from './utils';

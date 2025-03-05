@@ -14,7 +14,6 @@ export interface EntriesTabProps {
   communityId: string;
   topicId?: number;
   isFarcasterContest: boolean;
-  contestsData?: any;
 }
 
 const EntriesTab = ({
