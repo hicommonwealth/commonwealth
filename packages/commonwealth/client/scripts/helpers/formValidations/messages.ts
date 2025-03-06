@@ -10,4 +10,5 @@ export const VALIDATION_MESSAGES = {
     `Must be less or equal to ${value}`,
   MUST_BE_APART: (fieldName: string, differenceValue: string | number) =>
     `Must be atleast ${differenceValue} apart from ${fieldName}`,
+  GITHUB_FORMAT: 'Invalid GitHub URL',
 };
