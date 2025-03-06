@@ -1,4 +1,4 @@
-import { command, Policy } from '@hicommonwealth/core';
+import { command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import {
   buildFarcasterContestFrameUrl,
@@ -20,6 +20,8 @@ import {
   createOnchainContestContent,
   createOnchainContestVote,
 } from './utils/contest-utils';
+
+const log = logger(import.meta);
 
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
@@ -94,8 +96,8 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
-        console.log(
-          `[FarcasterVoteCreated] CHAIN NODE: ${JSON.stringify(community.ChainNode)}`,
+        log.error(
+          `[FarcasterReplyCastCreated] CHAIN NODE: ${community.ChainNode.id}`,
         );
 
         const content_url = buildFarcasterContentUrl(
@@ -200,8 +202,8 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
-        console.log(
-          `[FarcasterVoteCreated] CHAIN NODE: ${JSON.stringify(community.ChainNode)}`,
+        log.error(
+          `[FarcasterVoteCreated] CHAIN NODE: ${community.ChainNode.id!}`,
         );
 
         const contestManagers = contestActions.map((ca) => ({
