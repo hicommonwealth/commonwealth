@@ -12,6 +12,7 @@ main().catch((error) => {
 
 export async function main() {
   config.CACHE.REDIS_URL &&
+    config.NODE_ENV !== 'test' &&
     cache({
       adapter: new RedisCache(config.CACHE.REDIS_URL),
     });
