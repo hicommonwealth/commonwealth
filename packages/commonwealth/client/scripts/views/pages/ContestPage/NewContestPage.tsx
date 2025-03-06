@@ -154,10 +154,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             <div className="thread-list-container">
               <EntriesTab {...entriesTabProps} />
             </div>
-            <div>
-              <TokenSwapTab />
-              <PriceChartTab />
-            </div>
+            {address ? (
+              <div>
+                <TokenSwapTab />
+                <PriceChartTab />
+              </div>
+            ) : null}
           </CWGrid>
         </div>
       </div>
