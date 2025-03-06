@@ -9,10 +9,6 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      tweet_url: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -25,15 +21,15 @@ module.exports = {
       },
       retweet_cap: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
       },
       like_cap: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
       },
       replies_cap: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
       },
       num_likes: {
         type: Sequelize.INTEGER,

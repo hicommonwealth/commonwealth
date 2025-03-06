@@ -132,23 +132,23 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
 
       tweetUpdates.num_likes.push({
         newValue:
-          t.public_metrics.like_count >= queryTweet.like_cap
-            ? queryTweet.like_cap
+          t.public_metrics.like_count >= queryTweet.like_cap!
+            ? queryTweet.like_cap!
             : t.public_metrics.like_count,
         whenCaseValue: t.id,
       });
 
       tweetUpdates.num_replies.push({
         newValue:
-          t.public_metrics.reply_count >= queryTweet.replies_cap
-            ? queryTweet.replies_cap
+          t.public_metrics.reply_count >= queryTweet.replies_cap!
+            ? queryTweet.replies_cap!
             : t.public_metrics.reply_count,
         whenCaseValue: t.id,
       });
       tweetUpdates.num_retweets.push({
         newValue:
-          retweetCount >= queryTweet.retweet_cap
-            ? queryTweet.retweet_cap
+          retweetCount >= queryTweet.retweet_cap!
+            ? queryTweet.retweet_cap!
             : retweetCount,
         whenCaseValue: t.id,
       });
@@ -156,9 +156,9 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       let endedAt: Date | null = null;
 
       if (
-        t.public_metrics.like_count >= queryTweet.like_cap &&
-        t.public_metrics.reply_count >= queryTweet.replies_cap &&
-        retweetCount >= queryTweet.retweet_cap
+        t.public_metrics.like_count >= queryTweet.like_cap! &&
+        t.public_metrics.reply_count >= queryTweet.replies_cap! &&
+        retweetCount >= queryTweet.retweet_cap!
       ) {
         endedAt = new Date();
       }

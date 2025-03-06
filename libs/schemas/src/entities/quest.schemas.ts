@@ -96,11 +96,10 @@ export const Quest = z
 export const QuestTweet = z
   .object({
     tweet_id: z.string(),
-    tweet_url: z.string(),
-    quest_action_meta_id: z.number(),
-    retweet_cap: z.number(),
-    like_cap: z.number(),
-    replies_cap: z.number(),
+    quest_action_meta_id: z.number().optional(),
+    retweet_cap: z.number().optional(),
+    like_cap: z.number().optional(),
+    replies_cap: z.number().optional(),
     num_likes: z.number().optional().default(0),
     num_retweets: z.number().optional().default(0),
     num_replies: z.number().optional().default(0),
