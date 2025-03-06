@@ -73,6 +73,10 @@ async function processLifetimeThreadCounts() {
       type: QueryTypes.UPDATE,
     },
   );
+
+  await cache().deleteNamespaceKeys(
+    CacheNamespaces.Community_Thread_Count_Changed,
+  );
 }
 
 async function processProfileCounts() {
@@ -100,6 +104,10 @@ async function processProfileCounts() {
       type: QueryTypes.UPDATE,
     },
   );
+
+  await cache().deleteNamespaceKeys(
+    CacheNamespaces.Community_Profile_Count_Changed,
+  );
 }
 
 async function processReactionCounts() {
@@ -126,6 +134,10 @@ async function processReactionCounts() {
       replacements: { communityIds: threadIds },
       type: QueryTypes.UPDATE,
     },
+  );
+
+  await cache().deleteNamespaceKeys(
+    CacheNamespaces.Thread_Reaction_Count_Changed,
   );
 }
 
