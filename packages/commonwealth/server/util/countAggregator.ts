@@ -62,7 +62,7 @@ async function processLifetimeThreadCounts() {
     CacheNamespaces.Community_Thread_Count_Changed,
   );
 
-  if (!communityIds) {
+  if (!communityIds?.length) {
     return;
   }
 
@@ -93,7 +93,7 @@ async function processProfileCounts() {
     CacheNamespaces.Community_Profile_Count_Changed,
   );
 
-  if (!communityIds) {
+  if (!communityIds?.length) {
     return;
   }
 
@@ -124,7 +124,7 @@ async function processReactionCounts() {
     CacheNamespaces.Thread_Reaction_Count_Changed,
   );
 
-  if (!threadIds) {
+  if (!threadIds?.length) {
     return;
   }
 
@@ -167,7 +167,7 @@ async function processViewCounts() {
   const ids = result?.keys?.map((key) => {
     return key.substring(namespaceLength + 1);
   });
-  if (!ids) {
+  if (!ids?.length) {
     return;
   }
 
