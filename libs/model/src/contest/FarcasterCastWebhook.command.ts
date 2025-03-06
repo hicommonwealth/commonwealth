@@ -74,16 +74,16 @@ const handleFrameCast = async (
       null,
     );
   } else if (payload.type === 'cast.deleted') {
-    await emitEvent(
-      models.Outbox,
-      [
-        {
-          event_name: 'FarcasterCastDeleted',
-          event_payload: payload.data,
-        },
-      ],
-      null,
-    );
+    // await emitEvent(
+    //   models.Outbox,
+    //   [
+    //     {
+    //       event_name: 'FarcasterCastDeleted',
+    //       event_payload: payload.data,
+    //     },
+    //   ],
+    //   null,
+    // );
   } else {
     log.warn(
       `handleFrameCast: unsupported event: ${JSON.stringify(payload, null, 2)}`,
