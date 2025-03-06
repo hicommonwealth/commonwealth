@@ -92,3 +92,19 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
+
+export const QuestTweet = z
+  .object({
+    tweet_id: z.string(),
+    tweet_url: z.string(),
+    quest_action_meta_id: z.number(),
+    retweet_cap: z.number(),
+    like_cap: z.number(),
+    replies_cap: z.number(),
+    num_likes: z.number(),
+    num_retweets: z.number(),
+    num_replies: z.number(),
+    created_at: z.coerce.date(),
+    updated_at: z.coerce.date(),
+  })
+  .describe('A tweet associated to a quest from which XP can be earned');
