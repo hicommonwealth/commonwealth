@@ -169,7 +169,7 @@ export const getContestBalance = async (
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing equal indexed content ids, addresses, and votes
+ * @returns Contest balance and ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   chain: EvmProtocolChain,
@@ -178,15 +178,15 @@ export const getContestScore = async (
   payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-): Promise<
-  | []
-  | {
-      content_id: string;
-      creator_address: string;
-      votes: string;
-      prize: string;
-    }[]
-> => {
+): Promise<{
+  contestBalance: string | null;
+  scores: {
+    content_id: string;
+    creator_address: string;
+    votes: string;
+    prize: string;
+  }[];
+}> => {
   const client = getPublicClient(chain);
   const contestInstance = getContract({
     address: contest as `0x${string}`,
@@ -205,7 +205,7 @@ export const getContestScore = async (
     console.warn(
       `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
-    return [];
+    return { contestBalance, scores: [] };
   }
 
   const contract = {
@@ -245,15 +245,18 @@ export const getContestScore = async (
       (oneOff ? BigInt(100) : BigInt(prizePercentage))) /
     BigInt(100);
   prizePool = (prizePool * BigInt(100 - CONTEST_FEE_PERCENT)) / BigInt(100); // deduct contest fee from prize pool
-  return scores.map((s, i) => ({
-    content_id: s.winningContent.toString(),
-    creator_address: s.winningAddress,
-    votes: BigInt(s.voteCount).toString(),
-    prize:
-      i < Number(payoutStructure.length)
-        ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
-        : '0',
-  }));
+  return {
+    contestBalance,
+    scores: scores.map((s, i) => ({
+      content_id: s.winningContent.toString(),
+      creator_address: s.winningAddress,
+      votes: BigInt(s.voteCount).toString(),
+      prize:
+        i < Number(payoutStructure.length)
+          ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
+          : '0',
+    })),
+  };
 };
 
 export type AddContentResponse = {

@@ -68,9 +68,10 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
  */
 export const prettyVoteWeight = (
   wei: string,
+  tokenNumDecimals?: number | null | undefined, // ERC20 num decimals
   weightType?: TopicWeightedVoting | null | undefined,
   multiplier: number = 1,
-  decimalsOverride?: number,
+  decimalsOverride?: number, // number of digits after decimal
 ): string => {
   const weiStr = parseFloat(wei).toLocaleString('fullwide', {
     useGrouping: false,
@@ -85,7 +86,7 @@ export const prettyVoteWeight = (
     return parseFloat((weiValue || 0).toString()).toString();
   }
 
-  const n = Number(weiValue) / 1e18;
+  const n = Number(weiValue) / 10 ** (tokenNumDecimals || 18);
   if (n === 0) {
     return '0';
   }

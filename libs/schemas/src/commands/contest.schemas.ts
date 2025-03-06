@@ -139,7 +139,7 @@ export const FarcasterCast = z.object({
   event_timestamp: z.string(),
 });
 
-export const FarcasterCastCreatedWebhook = {
+export const FarcasterCastWebhook = {
   input: z.object({
     created_at: z.number(),
     type: z.string(),
@@ -196,7 +196,16 @@ export const SetContestEnded = {
     is_one_off: z.boolean(),
     chain_url: z.string(),
     chain_private_url: z.string().nullish(),
-    neynar_webhook_id: z.string().nullish(),
+  }),
+  output: z.object({}),
+};
+
+export const UpdateContestManagerFrameHashes = {
+  input: z.object({
+    contest_address: z.string(),
+    frames_to_remove: z.array(z.string()).optional(),
+    frames_to_add: z.array(z.string()).optional(),
+    webhooks_only: z.boolean().optional(),
   }),
   output: z.object({}),
 };

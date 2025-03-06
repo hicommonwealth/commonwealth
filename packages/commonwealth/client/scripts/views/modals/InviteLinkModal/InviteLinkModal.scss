@@ -6,6 +6,11 @@
     flex-direction: column;
     gap: 16px;
 
+    .b2 {
+      color: $neutral-400;
+      margin-top: -12px;
+    }
+
     .invite-link-input {
       padding-right: 32px !important;
       text-overflow: ellipsis;

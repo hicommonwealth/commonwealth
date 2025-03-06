@@ -24,6 +24,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         image_url,
         start_date,
         end_date,
+        max_xp_to_end,
         action_metas,
       } = payload;
 
@@ -103,6 +104,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
           image_url,
           start_date,
           end_date,
+          max_xp_to_end,
         });
         if (Object.keys(delta).length)
           await models.Quest.update(delta, {
