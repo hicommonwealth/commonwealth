@@ -54,6 +54,7 @@ export const outboxEvents: Events[] = [
   'ReferralFeeDistributed',
   'WalletLinked',
   'SSOLinked',
+  'XpChainEventCreated',
 ] as const;
 
 export const Outbox = z.union(
