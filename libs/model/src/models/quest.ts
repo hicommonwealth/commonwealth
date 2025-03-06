@@ -18,6 +18,8 @@ export const Quest = (
       image_url: { type: Sequelize.STRING, allowNull: false },
       start_date: { type: Sequelize.DATE, allowNull: false },
       end_date: { type: Sequelize.DATE, allowNull: false },
+      xp_awarded: { type: Sequelize.INTEGER, allowNull: false },
+      max_xp_to_end: { type: Sequelize.INTEGER, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: true },
     },
     {

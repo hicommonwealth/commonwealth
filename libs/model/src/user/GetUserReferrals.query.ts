@@ -6,39 +6,32 @@ import { models } from '../database';
 
 const sql = `
 WITH 
-referrer_addresses AS (
-  SELECT DISTINCT address
-  FROM "Addresses"
+referrer AS (
+  SELECT DISTINCT address FROM "Addresses"
   WHERE user_id = :user_id AND address LIKE '0x%'),
-referrals AS (
-  SELECT
-    namespace_address,
-    referrer_address,
-    referee_address,
-    eth_chain_id,
-    transaction_hash,
-    referrer_received_eth_amount,
-    created_on_chain_timestamp,
-    created_at,
-    updated_at
-  FROM "Referrals"
-  WHERE referrer_address IN (SELECT * FROM referrer_addresses)),
-referee_addresses AS (
-  SELECT DISTINCT A.address, A.user_id
-  FROM "Addresses" A
-  JOIN referrals ON referee_address = A.address
+referee AS (
+  SELECT DISTINCT A.address, A.user_id, U.referred_by_address
+  FROM "Users" U
+    JOIN referrer ON U.referred_by_address = referrer.address
+    JOIN "Addresses" A ON A.user_id = U.id
 )
 SELECT 
-  R.*,
-  U.id as referee_user_id, 
+  referee.referred_by_address as referrer_address,
+  referee.address as referee_address,
+  referee.user_id as referee_user_id,
   U.profile as referee_profile,
+  -- when referee creates a community
   C.id as community_id,
   C.name as community_name,
-  C.icon_url as community_icon_url
-FROM referrals R
-  JOIN referee_addresses RA ON RA.address = R.referee_address
-  JOIN "Users" U ON U.id = RA.user_id
-  LEFT JOIN "Communities" C ON C.namespace_address = R.namespace_address
+  C.icon_url as community_icon_url,
+  referrals.namespace_address,
+  COALESCE(referrals.referrer_received_eth_amount, '0') as referrer_received_eth_amount
+FROM referee 
+  JOIN "Users" U ON U.id = referee.user_id
+  LEFT JOIN "Referrals" referrals
+    ON referrals.referrer_address = referee.referred_by_address
+    AND referrals.referee_address = referee.address
+  LEFT JOIN "Communities" C ON C.namespace_address = referrals.namespace_address
   ;
 `;
 

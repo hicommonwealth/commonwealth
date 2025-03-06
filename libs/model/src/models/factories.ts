@@ -3,6 +3,7 @@ import type { Associable } from './types';
 
 import Address from './address';
 import ApiKey from './api_key';
+import ChainEventXpSource from './chain_event_xp_sources';
 import ChainNode from './chain_node';
 import Collaboration from './collaboration';
 import Comment from './comment';
@@ -63,6 +64,7 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
+  ChainEventXpSource,
   DiscordBotConfig,
   EmailUpdateToken,
   EvmEventSource,

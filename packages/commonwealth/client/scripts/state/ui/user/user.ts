@@ -36,6 +36,7 @@ type CommonProps = {
   isLoggedIn: boolean;
   addressSelectorSelectedAddress: string | undefined;
   hasMagicWallet: boolean;
+  referredByAddress?: string;
 };
 
 export type UserStoreProps = CommonProps & {
@@ -63,6 +64,7 @@ export const userStore = createStore<UserStoreProps>()(
     isLoggedIn: false,
     addressSelectorSelectedAddress: undefined,
     hasMagicWallet: false,
+    referredByAddress: undefined,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {

@@ -69,6 +69,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     apiEnabled: !!baseNode && !!uniqueAddresses[0],
   });
 
+  const balance = ethBalance === '0.' ? '0' : ethBalance;
+
   return (
     <div className="DesktopHeader">
       <div className="header-left">
@@ -173,7 +175,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                           fontWeight="medium"
                           type="caption"
                         >
-                          {capDecimals(ethBalance || '0')} ETH
+                          {capDecimals(balance || '0')} ETH
                         </CWText>
                         <CWCustomIcon iconName="base" iconSize="xs" />
                       </div>

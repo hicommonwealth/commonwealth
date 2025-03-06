@@ -6,6 +6,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import './QuestActionSubForm.scss';
+import { doesActionRewardShareForReferrer } from './helpers';
 import { QuestAction, QuestActionSubFormProps } from './types';
 
 const QuestActionSubForm = ({
@@ -92,7 +93,13 @@ const QuestActionSubForm = ({
 
         {config?.requires_creator_points && (
           <CWTextInput
-            label="Creater Reward Share"
+            label={`${
+              doesActionRewardShareForReferrer(
+                defaultValues?.action as QuestAction,
+              )
+                ? 'Referrer'
+                : 'Creater'
+            } Reward Share`}
             placeholder="Points Earned"
             fullWidth
             {...(defaultValues?.creatorRewardAmount && {
@@ -104,7 +111,13 @@ const QuestActionSubForm = ({
             name="creatorRewardAmount"
             customError={errors?.creatorRewardAmount}
             // eslint-disable-next-line max-len
-            instructionalMessage="Reward points for action creator. Deducted from total reward points."
+            instructionalMessage={`Deducted from total reward points. ${
+              doesActionRewardShareForReferrer(
+                defaultValues?.action as QuestAction,
+              )
+                ? 'Only applied for referred user.'
+                : ''
+            }`}
           />
         )}
       </div>

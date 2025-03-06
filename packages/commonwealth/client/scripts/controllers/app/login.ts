@@ -205,6 +205,7 @@ export function updateActiveUser(data) {
       isPromotionalEmailEnabled: false,
       isWelcomeOnboardFlowComplete: false,
       isLoggedIn: false,
+      referredByAddress: undefined,
     });
   } else {
     const addresses = data.addresses.map(
@@ -243,6 +244,7 @@ export function updateActiveUser(data) {
         isStarred: c.is_starred || false,
       })),
       isLoggedIn: true,
+      referredByAddress: data?.referred_by_address,
     });
   }
 }
@@ -371,10 +373,7 @@ function getProfileMetadata({ provider, userInfo }): {
 } {
   // provider: result.oauth.provider (twitter, discord, github)
   if (provider === 'discord') {
-    // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
-    //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } =
-      userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } = userInfo;
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
