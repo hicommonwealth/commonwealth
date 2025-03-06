@@ -5,13 +5,15 @@ import {
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
+import { Op } from 'node_modules/sequelize/types';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
-import { getMentions } from './pollTwitter';
+import { getMentions, getTweets } from './pollTwitter';
 import {
   TwitterBotConfig,
   TwitterBotConfigs,
   createMentionEvents,
+  pgMultiRowUpdate,
 } from './utils';
 
 const log = logger(import.meta);
@@ -73,6 +75,116 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
     log.info('Mentions polled successfully');
   } catch (error) {
     log.error('Error fetching mentions', error);
+  }
+}
+
+async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
+  try {
+    const tweetsToQuery = await models.QuestTweets.findAll({
+      where: {
+        ended_at: null,
+      },
+      // Rotates through tweets so that all tweets are updated eventually
+      // even if we get rate limited occasionally
+      order: [['updated_at', 'ASC']],
+      include: [
+        {
+          model: models.QuestActionMeta,
+          required: true,
+          include: [
+            {
+              model: models.Quest,
+              required: true,
+              where: {
+                end_date: {
+                  [Op.gt]: new Date(),
+                },
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    const tweets = await getTweets({
+      twitterBotConfig,
+      tweetIds: tweetsToQuery.map((t) => t.tweet_id),
+    });
+    const tweetUpdates: {
+      num_likes: { newValue: number; whenCaseValue: string }[];
+      num_replies: { newValue: number; whenCaseValue: string }[];
+      num_retweets: { newValue: number; whenCaseValue: string }[];
+      ended_at: { newValue: Date | null; whenCaseValue: string }[];
+    } = {
+      num_likes: [],
+      num_replies: [],
+      num_retweets: [],
+      ended_at: [],
+    };
+
+    for (const t of tweets) {
+      const queryTweet = tweetsToQuery.find((q) => q.tweet_id === t.id);
+      if (!queryTweet) throw new Error('Tweet not found');
+
+      tweetUpdates.num_likes.push({
+        newValue:
+          t.public_metrics.like_count >= queryTweet.like_cap
+            ? queryTweet.like_cap
+            : t.public_metrics.like_count,
+        whenCaseValue: t.id,
+      });
+
+      tweetUpdates.num_replies.push({
+        newValue:
+          t.public_metrics.reply_count >= queryTweet.replies_cap
+            ? queryTweet.replies_cap
+            : t.public_metrics.reply_count,
+        whenCaseValue: t.id,
+      });
+      tweetUpdates.num_retweets.push({
+        newValue:
+          t.public_metrics.retweet_count >= queryTweet.retweet_cap
+            ? queryTweet.retweet_cap
+            : t.public_metrics.retweet_count,
+        whenCaseValue: t.id,
+      });
+
+      let endedAt: Date | null = null;
+
+      if (
+        t.public_metrics.like_count >= queryTweet.like_cap &&
+        t.public_metrics.reply_count >= queryTweet.replies_cap &&
+        t.public_metrics.retweet_count >= queryTweet.retweet_cap
+      ) {
+        endedAt = new Date();
+      }
+
+      tweetUpdates.ended_at.push({
+        newValue: endedAt,
+        whenCaseValue: t.id,
+      });
+    }
+
+    await pgMultiRowUpdate(
+      'QuestTweets',
+      [
+        {
+          setColumn: 'num_likes',
+          rows: tweetUpdates.num_likes,
+        },
+        {
+          setColumn: 'num_replies',
+          rows: tweetUpdates.num_replies,
+        },
+        {
+          setColumn: 'num_retweets',
+          rows: tweetUpdates.num_retweets,
+        },
+      ],
+      'tweet_id',
+    );
+  } catch (error) {
+    log.error('Error fetching tweet metrics', error);
   }
 }
 

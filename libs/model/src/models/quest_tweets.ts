@@ -38,14 +38,21 @@ export default (sequelize: Sequelize.Sequelize) =>
       num_likes: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        defaultValue: 0,
       },
       num_retweets: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        defaultValue: 0,
       },
       num_replies: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        defaultValue: 0,
+      },
+      ended_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,

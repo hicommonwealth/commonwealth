@@ -101,10 +101,13 @@ export const QuestTweet = z
     retweet_cap: z.number(),
     like_cap: z.number(),
     replies_cap: z.number(),
-    num_likes: z.number(),
-    num_retweets: z.number(),
-    num_replies: z.number(),
+    num_likes: z.number().optional().default(0),
+    num_retweets: z.number().optional().default(0),
+    num_replies: z.number().optional().default(0),
+    ended_at: z.coerce.date().nullish(),
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
+
+    QuestActionMeta: QuestActionMeta.optional(),
   })
   .describe('A tweet associated to a quest from which XP can be earned');
