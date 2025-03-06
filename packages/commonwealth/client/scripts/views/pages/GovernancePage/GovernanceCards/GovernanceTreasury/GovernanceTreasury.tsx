@@ -1,6 +1,5 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
-import app from 'client/scripts/state';
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
@@ -19,8 +18,6 @@ import { z } from 'zod';
 import './GovernanceTresury.scss';
 
 const GovernanceTresury = () => {
-  const communityId = app.activeChainId() || '';
-
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
