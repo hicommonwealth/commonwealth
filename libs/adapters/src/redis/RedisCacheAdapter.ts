@@ -432,7 +432,7 @@ export class RedisCache implements Cache {
     if (!this.isReady()) return null;
     try {
       return this._client.scan(cursor, {
-        MATCH: `${namespace}:`,
+        MATCH: `${namespace}*`,
         COUNT: count,
       });
     } catch (e) {

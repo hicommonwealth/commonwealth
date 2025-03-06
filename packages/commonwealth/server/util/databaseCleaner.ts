@@ -1,4 +1,4 @@
-import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
@@ -86,70 +86,7 @@ export class DatabaseCleaner {
       this.log.error('Failed to run pg_partman maintenance', e);
     }
 
-    try {
-      await this.processViewCounts();
-    } catch (e) {
-      this.log.error('Failed to run processCountCache', e);
-    }
-
     this.log.info('Database clean-up finished.');
-  }
-
-  // 1. Creates mapping of thread_id -> redis count
-  // 2. Updates DB
-  // 3. Clears thread view count namespace
-  public async processViewCounts() {
-    const result = (await cache().scan(
-      CacheNamespaces.Thread_View_Count,
-      0,
-      100,
-    )) as {
-      cursor: number;
-      keys: string[];
-    };
-    const ids = result.keys.map((key) =>
-      parseInt(key.substring(key.indexOf('_') + 1), 10),
-    );
-    const values = await cache().getKeys(
-      CacheNamespaces.Thread_View_Count,
-      result.keys,
-    );
-    const idToCount = ids
-      .map((id, index) => [id, parseInt(values[index]!, 10)])
-      .filter(([_, count]) => !isNaN(count));
-
-    for (const key of result.keys) {
-      const id = parseInt(key.substring(key.indexOf('_') + 1), 10);
-      const count = parseInt(
-        (await cache().getKey(CacheNamespaces.Thread_View_Count, key))!,
-        10,
-      );
-
-      idToCount.push([id, count]);
-    }
-
-    // convert idToCount into a bulk update sql statement
-    if (idToCount.length > 0) {
-      const cases = idToCount
-        .map(
-          ([threadId, count]) => `WHEN ${threadId} THEN view_count + ${count}`,
-        )
-        .join(' ');
-
-      const threadIds = idToCount.map(([threadId]) => threadId).join(', ');
-
-      const query = `
-        UPDATE "Threads"
-        SET view_count = CASE id
-          ${cases}
-        END
-        WHERE id IN (${threadIds});
-      `;
-
-      await this._models.sequelize.query(query);
-
-      await cache().deleteNamespaceKeys(CacheNamespaces.Thread_View_Count);
-    }
   }
 
   /**

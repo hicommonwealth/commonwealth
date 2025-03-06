@@ -1,4 +1,10 @@
-import { InvalidActor, InvalidInput, type Command } from '@hicommonwealth/core';
+import {
+  CacheNamespaces,
+  InvalidActor,
+  InvalidInput,
+  cache,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -107,11 +113,11 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await models.Community.increment('profile_count', {
-            by: 1,
-            where: { id: community_id },
-            transaction,
-          });
+          await cache().setKey(
+            CacheNamespaces.Community_Profile_Count_Changed,
+            community_id,
+            'true',
+          );
 
           await emitEvent(models.Outbox, [
             {
