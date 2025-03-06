@@ -1,9 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import {
-  ChildContractNames,
   EventRegistry,
   EvmEventSignatures,
-  commonProtocol,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes } from '@hicommonwealth/model';
@@ -49,13 +47,9 @@ describe('getEventSources', () => {
             eth_chain_id: parseInt(ethChainId),
             contract_address: singleContestAddress,
             event_signature: EvmEventSignatures.Contests.SingleContestStarted,
-            contract_name: ChildContractNames.SingleContest,
-            parent_contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.SepoliaBase
-              ].factory,
-            events_migrated: true,
-            created_at_block: 1,
+            meta: {
+              events_migrated: true,
+            },
           },
         ]);
         expect(
@@ -66,13 +60,9 @@ describe('getEventSources', () => {
             contract_address: recurringContestAddress,
             event_signature:
               EvmEventSignatures.Contests.RecurringContestStarted,
-            contract_name: ChildContractNames.RecurringContest,
-            parent_contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.SepoliaBase
-              ].factory,
-            events_migrated: true,
-            created_at_block: 1,
+            meta: {
+              events_migrated: true,
+            },
           },
         ]);
         flag = true;
