@@ -16,6 +16,8 @@ export interface EntriesTabProps {
   communityId: string;
   topicId?: number;
   isFarcasterContest: boolean;
+  contestDecimals: number;
+  voteWeightMultiplier: number;
 }
 
 const EntriesTab = ({
@@ -23,6 +25,8 @@ const EntriesTab = ({
   communityId,
   topicId,
   isFarcasterContest,
+  contestDecimals,
+  voteWeightMultiplier,
 }: EntriesTabProps) => {
   const [selectedSort, setSelectedSort] = React.useState<SortType>(
     SortType.Upvotes,
@@ -68,6 +72,8 @@ const EntriesTab = ({
           entries={farcasterCasts || []}
           selectedSort={selectedSort}
           onSortChange={handleSortChange}
+          contestDecimals={contestDecimals}
+          voteWeightMultiplier={voteWeightMultiplier}
         />
       ) : (
         <CommonEntriesList

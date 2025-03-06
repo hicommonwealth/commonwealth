@@ -59,6 +59,8 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const entriesTabProps: EntriesTabProps = {
     contestAddress,
     communityId: contest?.community_id || '',
+    contestDecimals: contest?.decimals || 18,
+    voteWeightMultiplier: contest?.vote_weight_multiplier || 1,
     topicId: contest?.topic_id || undefined,
     isFarcasterContest: !!contest?.is_farcaster_contest,
   };

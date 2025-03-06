@@ -1,5 +1,7 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,6 +21,8 @@ interface FarcasterEntriesListProps {
   }>;
   selectedSort: SortType;
   onSortChange: (sort: SortType) => void;
+  contestDecimals: number;
+  voteWeightMultiplier: number;
 }
 
 export const FarcasterEntriesList = ({
@@ -26,6 +30,8 @@ export const FarcasterEntriesList = ({
   entries,
   selectedSort,
   onSortChange,
+  contestDecimals,
+  voteWeightMultiplier,
 }: FarcasterEntriesListProps) => {
   if (isLoading) {
     return (
@@ -39,6 +45,16 @@ export const FarcasterEntriesList = ({
   if (!entries.length) {
     return <CWText>No entries for the contest yet</CWText>;
   }
+
+  const getVoteCount = (entry) => {
+    return prettyVoteWeight(
+      entry.calculated_vote_weight,
+      contestDecimals,
+      TopicWeightedVoting.ERC20,
+      voteWeightMultiplier,
+      1,
+    );
+  };
 
   return (
     <div className="FarcasterEntriesList">
@@ -57,7 +73,7 @@ export const FarcasterEntriesList = ({
 
       {entries.map((entry) => (
         <div key={entry.hash} className="cast-container">
-          <CWUpvote disabled voteCount={entry.calculated_vote_weight || '0'} />
+          <CWUpvote disabled voteCount={getVoteCount(entry)} />
 
           <FarcasterEmbed
             key={entry.hash}
