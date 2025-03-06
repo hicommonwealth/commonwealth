@@ -7,8 +7,8 @@ import {
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
-  veBridgeAbi,
 } from '@commonxyz/common-protocol-abis';
+import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
