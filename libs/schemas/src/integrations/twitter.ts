@@ -69,3 +69,29 @@ export const TwitterUser = z.object({
     username: z.string(),
   }),
 });
+
+export const TweetsWithMetrics = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      public_metrics: z.object({
+        retweet_count: z.number(),
+        reply_count: z.number(),
+        like_count: z.number(),
+        quote_count: z.number(),
+        impression_count: z.number(),
+        bookmark_count: z.number(),
+      }),
+    }),
+  ),
+  errors: z
+    .array(
+      z.object({
+        title: z.string(),
+        type: z.string(),
+        detail: z.string().optional(),
+        status: z.number().optional(),
+      }),
+    )
+    .optional(),
+});
