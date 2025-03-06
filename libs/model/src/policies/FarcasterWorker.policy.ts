@@ -161,10 +161,9 @@ export function FarcasterWorker(): Policy<typeof inputs> {
       },
       FarcasterVoteCreated: async ({ payload }) => {
         const { parent_hash, hash } = payload.cast;
-        const content_url = buildFarcasterContentUrl(
+        const contentUrlWithoutFid = buildFarcasterContentUrl(
           parent_hash!,
           hash,
-          payload.interactor.fid,
         );
 
         const contestManager = await models.ContestManager.findOne({
@@ -185,9 +184,13 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           where: {
             contest_address: contestManager.contest_address,
             action: 'added',
-            content_url,
+            content_url: {
+              // check prefix because fid may be attached as query param
+              [Op.like]: `${contentUrlWithoutFid}%`,
+            },
           },
         });
+        mustExist('Contest Actions', contestActions?.[0]);
 
         const community = await models.Community.findByPk(
           contestManager.community_id,
@@ -202,10 +205,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
-        log.error(
-          `[FarcasterVoteCreated] CHAIN NODE: ${community.ChainNode.id!}`,
-        );
-
         const contestManagers = contestActions.map((ca) => ({
           url: getChainNodeUrl(community.ChainNode!),
           contest_address: contestManager.contest_address,
@@ -215,7 +214,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         await createOnchainContestVote({
           contestManagers,
           author_address: payload.verified_address,
-          content_url,
+          content_url: contestActions[0].content_url!,
         });
       },
       FarcasterContestBotMentioned: async ({ payload }) => {
