@@ -19,6 +19,7 @@ export const QuestEvents = {
   SSOLinked: events.SSOLinked,
   CommonDiscordServerJoined: events.CommonDiscordServerJoined,
   XpChainEventCreated: events.XpChainEventCreated,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
 
 export enum QuestParticipationLimit {

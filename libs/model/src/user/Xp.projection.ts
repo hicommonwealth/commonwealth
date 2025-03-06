@@ -5,7 +5,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { isWithinPeriod } from '@hicommonwealth/shared';
+import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
@@ -401,6 +401,26 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(
           payload.user_id,
+          payload.created_at,
+          action_metas,
+        );
+      },
+      TwitterCommonMentioned: async ({ payload }) => {
+        const address = await models.Address.findOne({
+          where: {
+            oauth_provider: WalletSsoSource.Twitter,
+            oauth_username: payload.username,
+          },
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'TwitterCommonMentioned',
+          // TODO: create system quest?
+          undefined,
+        );
+        await recordXpsForQuest(
+          address.user_id!,
           payload.created_at,
           action_metas,
         );
