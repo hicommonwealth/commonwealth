@@ -1,4 +1,4 @@
-import { command, logger, Policy } from '@hicommonwealth/core';
+import { command, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import {
   buildFarcasterContestFrameUrl,
@@ -20,8 +20,6 @@ import {
   createOnchainContestContent,
   createOnchainContestVote,
 } from './utils/contest-utils';
-
-const log = logger(import.meta);
 
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
