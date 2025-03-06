@@ -24,7 +24,6 @@ import { DeltaStatic } from 'quill';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
 import { ReactQuillEditor } from '../components/react_quill_editor';
-import { createDeltaFromText } from '../components/react_quill_editor/utils';
 import './edit_topic_modal.scss';
 
 type EditTopicModalProps = {
@@ -50,9 +49,7 @@ export const EditTopicModal = ({
   const { mutateAsync: archiveTopic } = useToggleArchiveTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [description, setDescription] = useState<DeltaStatic>(
-    createDeltaFromText(descriptionProp),
-  );
+  const [description, setDescription] = useState<string>(descriptionProp);
   const [newPostTemplate, setNewPostTemplate] = useState<DeltaStatic>(
     topic?.default_offchain_template
       ? JSON.parse(decodeURIComponent(topic?.default_offchain_template))
@@ -73,6 +70,7 @@ export const EditTopicModal = ({
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
+      if (typeof delta === 'string' && delta.length) return delta.length;
       return 0;
     }
     return delta.ops.reduce((count, op) => {
@@ -90,7 +88,7 @@ export const EditTopicModal = ({
   }, [description]);
 
   useEffect(() => {
-    if ((description?.ops || [])?.[0]?.insert?.length > 250) {
+    if (description?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);
@@ -219,17 +217,20 @@ export const EditTopicModal = ({
             return ['success', 'Valid topic name'];
           }}
         />
-        <ReactQuillEditor
-          className="editor"
-          placeholder="Enter a description (Limit of 250 characters)"
-          contentDelta={description}
-          setContentDelta={setDescription}
-          fromManageTopic
-          {...(topic.archived_at && {
-            tooltipLabel: 'Cannot modify an archived topic',
-          })}
-          isDisabled={!!topic.archived_at}
+
+        <CWTextInput
+          label="Description"
+          placeholder="description"
+          name="description"
+          value={description}
+          onInput={(e) => {
+            setDescription(e.target.value);
+          }}
+          // @ts-expect-error <StrictNullChecks/>
+          customError={descErrorMsg}
+          disabled={!!topic.archived_at}
         />
+
         <div className="char-error-row">
           <CWText type="caption">Character count: {characterCount}/250</CWText>
           <MessageRow
