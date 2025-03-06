@@ -16,6 +16,10 @@ export function UpdateContestManagerFrameHashes(): Command<
     ...schemas.UpdateContestManagerFrameHashes,
     auth: [],
     body: async ({ payload }) => {
+      // skip deletes for now
+      if (payload.frames_to_remove?.length) {
+        return;
+      }
       await neynarMutex.runExclusive(async () => {
         const contestManager = await models.ContestManager.findOne({
           where: {
