@@ -187,7 +187,6 @@ async function recordXpsForQuest(
     }
   });
 }
-const TwitterCommonMentionedReward = 5;
 
 export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
