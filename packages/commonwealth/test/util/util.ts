@@ -1,9 +1,11 @@
 import {
+  CommunityStakeAbi,
+  NamespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
+import {
   ChildContractNames,
   EvmEventSignatures,
   commonProtocol,
-  communityStakesAbi,
-  namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import {
   EvmEventSourceInstance,
@@ -56,7 +58,7 @@ export const singleEventSource = {
       [commonProtocol.factoryContracts[
         commonProtocol.ValidChains.SepoliaBase
       ].communityStake.toLowerCase()]: {
-        abi: communityStakesAbi,
+        abi: CommunityStakeAbi,
         sources: [
           {
             eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
@@ -71,7 +73,7 @@ export const singleEventSource = {
       [commonProtocol.factoryContracts[
         commonProtocol.ValidChains.SepoliaBase
       ].factory.toLowerCase()]: {
-        abi: namespaceFactoryAbi as unknown as AbiType,
+        abi: NamespaceFactoryAbi as unknown as AbiType,
         sources: [
           {
             eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
@@ -97,7 +99,7 @@ export const multipleEventSource = {
       [commonProtocol.factoryContracts[
         commonProtocol.ValidChains.Base
       ].communityStake.toLowerCase()]: {
-        abi: communityStakesAbi,
+        abi: CommunityStakeAbi,
         sources: [
           {
             eth_chain_id: commonProtocol.ValidChains.Base,
@@ -112,7 +114,7 @@ export const multipleEventSource = {
       [commonProtocol.factoryContracts[
         commonProtocol.ValidChains.Base
       ].factory.toLowerCase()]: {
-        abi: namespaceFactoryAbi,
+        abi: NamespaceFactoryAbi,
         sources: [
           {
             eth_chain_id: commonProtocol.ValidChains.Base,
