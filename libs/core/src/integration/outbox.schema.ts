@@ -26,6 +26,7 @@ export const outboxEvents: Events[] = [
   'DiscordThreadCreated',
   'DiscordThreadDeleted',
   'DiscordThreadTitleUpdated',
+  'CommonDiscordServerJoined',
   'FarcasterCastCreated',
   'FarcasterCastDeleted',
   'FarcasterReplyCastCreated',
@@ -54,6 +55,7 @@ export const outboxEvents: Events[] = [
   'ReferralFeeDistributed',
   'WalletLinked',
   'SSOLinked',
+  'XpChainEventCreated',
 ] as const;
 
 export const Outbox = z.union(

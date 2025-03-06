@@ -1,4 +1,5 @@
 import { Projection } from '@hicommonwealth/core';
+import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
@@ -58,7 +59,8 @@ async function getQuestActionMetas(
   return metas.flatMap((q) => q.get({ plain: true }).action_metas);
 }
 
-async function addPointsToUsers(
+async function accumulatePoints(
+  quest_id: number,
   user_id: number,
   xp_points: number,
   transaction: Transaction,
@@ -79,6 +81,19 @@ async function addPointsToUsers(
       { where: { id: creator_user_id }, transaction },
     );
   }
+  // update xp_awarded and end quest if max_xp_to_end is reached
+  await models.Quest.update(
+    {
+      xp_awarded: sequelize.literal(`xp_awarded + ${xp_points}`),
+      end_date: sequelize.literal(`
+        CASE WHEN (xp_awarded + ${xp_points}) >= max_xp_to_end
+        THEN NOW()
+        ELSE end_date
+        END
+      `),
+    },
+    { where: { id: quest_id }, transaction },
+  );
 }
 
 async function recordXpsForQuest(
@@ -161,7 +176,8 @@ async function recordXpsForQuest(
       });
 
       if (created)
-        await addPointsToUsers(
+        await accumulatePoints(
+          action_meta.quest_id,
           user_id,
           xp_points,
           transaction,
@@ -409,6 +425,42 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at,
           action_metas,
         );
+      },
+      CommonDiscordServerJoined: async ({ payload }) => {
+        if (payload.user_id) {
+          const action_metas = await getQuestActionMetas(
+            { created_at: payload.joined_date },
+            'CommonDiscordServerJoined',
+          );
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.joined_date,
+            action_metas,
+          );
+        }
+      },
+      XpChainEventCreated: async ({ payload }) => {
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
+          where: {
+            eth_chain_id: payload.eth_chain_id,
+          },
+        });
+        if (!chainNode) return;
+        const { tx } = await getTransaction({
+          rpc: chainNode.private_url || chainNode.url,
+          txHash: payload.transaction_hash,
+        });
+        const user_id = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user_id) return;
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
       },
     },
   };
