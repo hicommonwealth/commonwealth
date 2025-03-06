@@ -94,6 +94,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
+        console.log(
+          `[FarcasterVoteCreated] CHAIN NODE: ${JSON.stringify(community.ChainNode)}`,
+        );
+
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
           payload.hash,
@@ -195,6 +199,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         );
         mustExist('Community with Chain Node', community?.ChainNode);
+
+        console.log(
+          `[FarcasterVoteCreated] CHAIN NODE: ${JSON.stringify(community.ChainNode)}`,
+        );
 
         const contestManagers = contestActions.map((ca) => ({
           url: getChainNodeUrl(community.ChainNode!),
