@@ -38,7 +38,6 @@ const featureFlags = {
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
   xp: buildFlag(process.env.FLAG_XP),
   growl: buildFlag(process.env.FLAG_GROWL),
-  communityHome: buildFlag(process.env.FLAG_COMMUNITY_HOME),
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
 };
