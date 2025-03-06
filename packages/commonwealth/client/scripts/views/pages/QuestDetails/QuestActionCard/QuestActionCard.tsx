@@ -14,17 +14,16 @@ import './QuestActionCard.scss';
 // TODO: fix types with schemas.Events keys
 const actionCopies = {
   title: {
-    ['SignUpFlowCompleted']: 'Signup on Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
     ['ThreadUpvoted']: 'Upvote a thread',
     ['CommentCreated']: 'Create a comment',
     ['CommentUpvoted']: 'Upvote a comment',
-    ['UserMentioned']: 'Mention a user',
+    ['WalletLinked']: 'Link a Web3 wallet with your account',
+    ['SSOLinked']: 'Link an SSO method with your account',
   },
   shares: {
-    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: 'referrer',
     ['CommunityJoined']: 'referrer',
     ['ThreadCreated']: '',

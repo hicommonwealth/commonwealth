@@ -7,7 +7,7 @@ import {
 } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
@@ -65,6 +65,7 @@ type CardProps = AdminActionsProps & {
   maxChars?: number;
   cutoffLines?: number;
   showOnlyThreadActionIcons?: boolean;
+  communityHomeLayout?: boolean;
 };
 
 export const ThreadCard = ({
@@ -109,6 +110,7 @@ export const ThreadCard = ({
   maxChars,
   cutoffLines,
   showOnlyThreadActionIcons = false,
+  communityHomeLayout = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -118,12 +120,6 @@ export const ThreadCard = ({
     useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
-
-  useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
-      document.getElementsByTagName('html')[0].classList.add('invert');
-    }
-  }, []);
 
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
@@ -203,6 +199,7 @@ export const ThreadCard = ({
               hidePublishDate={hidePublishDate}
               hideSpamTag={hideSpamTag}
               hideTrendingTag={hideTrendingTag}
+              communityHomeLayout={communityHomeLayout}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

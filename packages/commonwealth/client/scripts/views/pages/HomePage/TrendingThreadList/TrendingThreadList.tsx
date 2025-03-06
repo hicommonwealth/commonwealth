@@ -12,19 +12,20 @@ import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
 import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
+import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchCustomDomainQuery } from 'client/scripts/state/api/configuration';
 import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'client/scripts/state/api/feeds/fetchUserActivity';
+import { useFetchThreadsQuery } from 'client/scripts/state/api/threads';
 import useUserStore from 'client/scripts/state/ui/user';
 import { VirtuosoGrid } from 'react-virtuoso';
 import Permissions from 'utils/Permissions';
 import { z } from 'zod';
 import { PageNotFound } from '../../404';
 import { ThreadCard } from '../../discussions/ThreadCard';
-import { UserDashboardRowSkeleton } from '../../user_dashboard/user_dashboard_row';
 import './TrendingThreadList.scss';
 
 const DEFAULT_COUNT = 3;
@@ -131,6 +132,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hidePublishDate
       hideTrendingTag
       showOnlyThreadActionIcons
+      communityHomeLayout
     />
   );
 };
@@ -214,36 +216,62 @@ const TrendingThreadList = ({
   customScrollParent,
   communityIdFilter,
 }: TrendingThreadListProps) => {
-  const { data: feed, isLoading, isError } = query({ limit: 3 });
+  const communityId = app.activeChainId() || '';
 
-  if (isLoading) {
-    return (
-      <div className="Feed">
-        <VirtuosoGrid
-          customScrollParent={customScrollParent}
-          totalCount={4}
-          style={{ height: '100%' }}
-          itemContent={(i) => <UserDashboardRowSkeleton key={i} />}
-        />
-      </div>
-    );
-  }
+  const {
+    data: feed,
+    isLoading: feedIsLoading,
+    isError: feedIsError,
+  } = query({ limit: 3 });
+
+  const {
+    data: communityThreads,
+    loading: communitythreadsLoading,
+    isError: threadsError,
+  } = useFetchThreadsQuery({
+    queryType: 'active',
+    communityId,
+    limit: 3,
+    apiEnabled: !!communityId,
+  });
+
+  const isLoading = communityIdFilter ? communitythreadsLoading : feedIsLoading;
+  const isError = communityIdFilter ? threadsError : feedIsError;
 
   if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
-  let allThreads = feed?.pages
-    ? feed.pages.flatMap((page) => page.results || [])
-    : [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let allThreads;
 
   if (communityIdFilter) {
-    allThreads = allThreads.filter(
-      (thread) => thread.community_id === communityIdFilter,
-    );
+    allThreads = Array.isArray(communityThreads)
+      ? communityThreads.slice(0, 3)
+      : [];
+  } else if (feed?.pages) {
+    allThreads = feed.pages.flatMap((page) => page.results || []);
   }
 
   if (!allThreads?.length) {
-    return <></>;
+    return (
+      <div className="TrendingThreadList">
+        <div className="heading-container">
+          <CWText type="h2">Trending Threads</CWText>
+          <Link to="/explore">
+            <div className="link-right">
+              <CWText className="link">See all threads</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
+          </Link>
+        </div>
+        <>
+          <CWText type="h2" className="empty-thread">
+            No threads found
+          </CWText>
+        </>
+      </div>
+    );
   }
 
   return (
@@ -281,7 +309,7 @@ const TrendingThreadList = ({
               itemContent={(i, thread) => (
                 <FeedThread
                   key={i}
-                  thread={mapThread(thread)}
+                  thread={communityIdFilter ? thread : mapThread(thread)}
                   onClick={() => {}}
                 />
               )}

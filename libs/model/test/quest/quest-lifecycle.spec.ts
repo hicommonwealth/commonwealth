@@ -410,7 +410,6 @@ describe('Quest lifecycle', () => {
       // insert actions
       await models.XpLog.create({
         user_id: superadmin.user.id!,
-        event_name: updated!.action_metas!.at(0)!.event_name,
         event_created_at: new Date(),
         xp_points: 100,
         action_meta_id: updated!.action_metas!.at(0)!.id!,

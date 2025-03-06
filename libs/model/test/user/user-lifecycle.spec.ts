@@ -43,7 +43,7 @@ describe('User lifecycle', () => {
       const quest = await command(CreateQuest(), {
         actor: superadmin,
         payload: {
-          name: chance.name(),
+          name: 'xp quest 1',
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
@@ -101,14 +101,14 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
-          body: 'Comment body 1',
+          body: 'Comment body 1.1',
         },
       });
       await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
-          body: 'Comment body 1',
+          body: 'Comment body 1.2',
         },
       });
       await command(CreateCommentReaction(), {
@@ -146,7 +146,6 @@ describe('User lifecycle', () => {
       expect(logs.length).to.equal(4);
       expect(logs.map((l) => l.toJSON())).to.deep.equal([
         {
-          event_name: 'ThreadCreated',
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -156,7 +155,6 @@ describe('User lifecycle', () => {
           created_at: logs[0].created_at,
         },
         {
-          event_name: 'CommentCreated',
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -166,7 +164,6 @@ describe('User lifecycle', () => {
           created_at: logs[1].created_at,
         },
         {
-          event_name: 'CommentCreated',
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -176,7 +173,6 @@ describe('User lifecycle', () => {
           created_at: logs[2].created_at,
         },
         {
-          event_name: 'CommentUpvoted',
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -186,6 +182,12 @@ describe('User lifecycle', () => {
           created_at: logs[3].created_at,
         },
       ]);
+
+      // hack end date to make it inactive
+      await models.Quest.update(
+        { end_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
     });
 
     it('should project xp points with participation limits in a global quest', async () => {
@@ -193,7 +195,7 @@ describe('User lifecycle', () => {
       const quest = await command(CreateQuest(), {
         actor: superadmin,
         payload: {
-          name: chance.name(),
+          name: 'xp quest 2',
           description: chance.sentence(),
           image_url: chance.url(),
           start_date: moment().add(2, 'day').toDate(),
@@ -240,6 +242,8 @@ describe('User lifecycle', () => {
         { where: { id: quest!.id } },
       );
 
+      const watermark = new Date();
+
       // act on community, triggering quest rewards
       const thread = await command(CreateThread(), {
         actor: member,
@@ -257,14 +261,15 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
-          body: 'Comment body 1',
+          body: 'Comment body 2.1',
         },
       });
+      // not awarded the second time per limits
       await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
-          body: 'Comment body 1',
+          body: 'Comment body 2.2',
         },
       });
       await command(CreateCommentReaction(), {
@@ -274,6 +279,61 @@ describe('User lifecycle', () => {
           reaction: 'like',
         },
       });
+
+      // seed system quest and action metas
+      await models.sequelize.query(`
+        -- create "artificial" system quest to award xp points on referral and address linking events
+        INSERT INTO "Quests" (
+          "id",
+          "name",
+          "description",
+          "image_url",
+          "start_date",
+          "end_date",
+          "created_at",
+          "updated_at")
+        VALUES (
+          -1,
+          'System Quest',
+          'Referrals and address linking system-level quest',
+          '',
+          NOW(), NOW(), NOW(), NOW());
+
+        -- create "artificial" system quest action metas for quest above
+        INSERT INTO "QuestActionMetas" (
+          "id",
+          "quest_id",
+          "event_name",
+          "reward_amount",
+          "creator_reward_weight",
+          "participation_limit",
+          "created_at",
+          "updated_at")
+        VALUES (-1, -1, 'SignUpFlowCompleted', 20, .2, 
+        'once_per_quest', NOW(), NOW());
+        INSERT INTO "QuestActionMetas" (
+          "id",
+          "quest_id",
+          "event_name",
+          "reward_amount",
+          "creator_reward_weight",
+          "participation_limit",
+          "created_at",
+          "updated_at")
+        VALUES (-2, -1, 'WalletLinked', 10, 0, 
+        'once_per_quest', NOW(), NOW());
+        INSERT INTO "QuestActionMetas" (
+          "id",
+          "quest_id",
+          "event_name",
+          "reward_amount",
+          "creator_reward_weight",
+          "participation_limit",
+          "created_at",
+          "updated_at")
+        VALUES (-3, -1, 'SSOLinked', 10, 0,
+        'once_per_quest', NOW(), NOW());
+        `);
 
       // user signs in a referral link, creating a new user and address
       const new_address = await signIn(community_id, member.address);
@@ -307,6 +367,7 @@ describe('User lifecycle', () => {
           'SignUpFlowCompleted',
         ],
         Xp,
+        watermark,
       );
 
       // expect xp points awarded to admin who created two comments
@@ -357,7 +418,6 @@ describe('User lifecycle', () => {
       const last = logs.slice(-5); // last 5 event logs
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
-          event_name: 'ThreadCreated',
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -367,7 +427,6 @@ describe('User lifecycle', () => {
           created_at: last[0].created_at,
         },
         {
-          event_name: 'CommentCreated',
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -377,7 +436,6 @@ describe('User lifecycle', () => {
           created_at: last[1].created_at,
         },
         {
-          event_name: 'CommentUpvoted',
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -387,7 +445,6 @@ describe('User lifecycle', () => {
           created_at: last[2].created_at,
         },
         {
-          event_name: 'CommunityJoined',
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
@@ -397,30 +454,33 @@ describe('User lifecycle', () => {
           created_at: last[3].created_at,
         },
         {
-          event_name: 'SignUpFlowCompleted',
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
-          action_meta_id: null, // this is a site event and not a quest action
+          action_meta_id: -1, // this is system quest action
           creator_user_id: member.user.id,
           creator_xp_points: 4,
           created_at: last[4].created_at,
         },
       ]);
+
+      // hack end date to make it inactive
+      await models.Quest.update(
+        { end_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events
+      // 9 events
       const xps1 = await query(GetXps(), {
         actor: admin,
         payload: {},
       });
-      expect(xps1!.length).to.equal(8);
+      expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
-        if (xp.event_name !== 'SignUpFlowCompleted') {
-          expect(xp.quest_id).to.be.a('number');
-          expect(xp.quest_action_meta_id).to.be.a('number');
-        }
+        expect(xp.quest_id).to.be.a('number');
+        expect(xp.quest_action_meta_id).to.be.a('number');
       });
 
       // 2 CommentUpvoted events (by event name)
@@ -433,12 +493,12 @@ describe('User lifecycle', () => {
         expect(xp.event_name).to.equal('CommentUpvoted');
       });
 
-      // 4 events after first CommentUpvoted
+      // 5 events after first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
         payload: { from: xps2!.at(-1)!.created_at },
       });
-      expect(xps3!.length).to.equal(4);
+      expect(xps3!.length).to.equal(5);
 
       // 4 events for member (ThreadCreated and CommentUpvoted)
       const xps4 = await query(GetXps(), {
@@ -451,12 +511,12 @@ describe('User lifecycle', () => {
           .be.true;
       });
 
-      // 1 event for new actor (joining and sign up flow completed)
+      // 2 events for new actor (joining and sign up flow completed)
       const xps5 = await query(GetXps(), {
         actor: admin,
         payload: { user_id: new_actor.user.id },
       });
-      expect(xps5!.length).to.equal(1);
+      expect(xps5!.length).to.equal(2);
       xps5?.forEach((xp) => {
         expect(
           ['SignUpFlowCompleted', 'CommunityJoined'].includes(xp.event_name),
@@ -472,6 +532,94 @@ describe('User lifecycle', () => {
       xps6?.forEach((xp) => {
         expect(xp.event_name).to.equal('CommentCreated');
       });
+    });
+
+    it('should project xp points on same action with multiple active quests', async () => {
+      // setup quests
+      const quest1 = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp concurrent 1',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          community_id,
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+        },
+      });
+      const quest2 = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp concurrent 2',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          community_id,
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+        },
+      });
+
+      // setup quest actions
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest1!.id!,
+          action_metas: [
+            {
+              event_name: 'ThreadCreated',
+              reward_amount: 10,
+              creator_reward_weight: 0,
+            },
+          ],
+        },
+      });
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest2!.id!,
+          action_metas: [
+            {
+              event_name: 'ThreadCreated',
+              reward_amount: 10,
+              creator_reward_weight: 0,
+            },
+          ],
+        },
+      });
+
+      // hack start date to make it active
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest1!.id } },
+      );
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest2!.id } },
+      );
+
+      // act on community, triggering quest rewards
+      await command(CreateThread(), {
+        actor: member,
+        payload: {
+          community_id,
+          topic_id,
+          title: 'double xp',
+          body: 'Thread body',
+          kind: 'discussion',
+          stage: '',
+          read_only: false,
+        },
+      });
+
+      // drain the outbox
+      await drainOutbox(['ThreadCreated'], Xp);
+
+      // expect 20 (double xp) points awarded to member who created the thread
+      const member_profile = await query(GetUserProfile(), {
+        actor: member,
+        payload: {},
+      });
+      expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4 + 20);
     });
   });
 });

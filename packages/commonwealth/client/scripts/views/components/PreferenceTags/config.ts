@@ -15,5 +15,8 @@ export const ICONS = {
   Governance: '⚖️',
   Marketplace: '🛍️',
   DeSci: '🔬',
+  DataDAO: '💾',
+  RWA: '🖼️',
+  Launchpad: '🚀',
   '🔛  Swaps': '🔛',
 };
