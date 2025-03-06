@@ -29,7 +29,7 @@ export const CommonEntriesList = ({
   if (isLoading) {
     return (
       <>
-        <Skeleton height={300} width="100%" />
+        <Skeleton height={300} width="100%" style={{ marginBottom: 16 }} />
         <Skeleton height={300} width="100%" />
       </>
     );

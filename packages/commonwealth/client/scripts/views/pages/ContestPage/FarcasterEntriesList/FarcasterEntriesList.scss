@@ -11,5 +11,9 @@
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 16px;
+
+    .farcaster-embed-container {
+      flex: 1;
+    }
   }
 }
