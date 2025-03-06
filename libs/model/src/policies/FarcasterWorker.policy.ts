@@ -96,10 +96,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
-        log.error(
-          `[FarcasterReplyCastCreated] CHAIN NODE: ${community.ChainNode.id}`,
-        );
-
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
           payload.hash,
