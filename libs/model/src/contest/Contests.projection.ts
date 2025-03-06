@@ -168,7 +168,7 @@ async function getContestDetails(
 
   return {
     ...result,
-    url: getChainNodeUrl({ url: result.url }),
+    url: getChainNodeUrl(result),
   };
 }
 
