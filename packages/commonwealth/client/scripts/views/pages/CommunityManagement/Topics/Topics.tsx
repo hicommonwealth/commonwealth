@@ -34,6 +34,7 @@ interface TopicFormRegular {
 export interface TopicFormERC20 {
   tokenAddress?: string;
   tokenSymbol?: string;
+  tokenDecimals?: number;
   voteWeightMultiplier?: number;
   chainNodeId?: number;
   weightedVoting?: TopicWeightedVoting | null;
@@ -103,6 +104,7 @@ export const Topics = () => {
           ? {
               token_address: erc20.tokenAddress,
               token_symbol: erc20.tokenSymbol,
+              token_decimals: erc20.tokenDecimals,
               vote_weight_multiplier: erc20.voteWeightMultiplier,
               chain_node_id: erc20.chainNodeId,
               weighted_voting: erc20.weightedVoting,

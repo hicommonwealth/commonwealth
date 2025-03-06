@@ -65,22 +65,44 @@ export async function getMentions({
       queryParams: {
         start_time: startTime,
         end_time: endTime,
+        'tweet.fields': 'text,created_at',
+        expansions: 'author_id',
+        'user.fields': 'username',
+        ...(paginationToken ? { pagination_token: paginationToken } : {}),
       },
     });
     const parsedRes = TwitterMentionsTimeline.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;
 
-    for (const error of parsedRes.errors) {
-      log.error(
-        'Error occurred polling for Twitter mentions',
-        new Error(JSON.stringify(error)),
-        {
-          botName: twitterBotConfig.name,
-        },
-      );
+    if (parsedRes.errors) {
+      for (const error of parsedRes.errors) {
+        log.error(
+          'Error occurred polling for Twitter mentions',
+          new Error(JSON.stringify(error)),
+          {
+            botName: twitterBotConfig.name,
+          },
+        );
+      }
     }
-    allMentions.push(...parsedRes.data);
+
+    const newTweetMentions =
+      parsedRes?.data?.map((t) => {
+        const authorUsername = parsedRes?.includes?.users.find(
+          (u) => u.id === t.author_id,
+        )?.username;
+        if (!authorUsername) throw new Error('Author username not found');
+        return {
+          id: t.id,
+          author_id: t.author_id,
+          username: authorUsername,
+          text: t.text,
+          created_at: new Date(t.created_at),
+        };
+      }) || [];
+
+    allMentions.push(...newTweetMentions);
   } while (paginationToken && requestsRemaining > 0);
 
   if (paginationToken && requestsRemaining === 0 && allMentions.length > 0) {

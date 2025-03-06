@@ -38,6 +38,7 @@ export type Contest = {
     score_updated_at?: Date;
     start_time?: Date;
     end_time?: Date;
+    contest_balance?: string;
   }[];
 };
 
@@ -92,7 +93,7 @@ const ContestsList = ({
 
             if (!displayAllRecurringContests) {
               // only last contest is relevant
-              const { end_time, score } =
+              const { end_time, score, contest_balance } =
                 sortedContests[sortedContests.length - 1] || {};
 
               return (
@@ -118,6 +119,7 @@ const ContestsList = ({
                   }
                   score={score || []}
                   community={community}
+                  contestBalance={parseInt(contest_balance || '0', 10)}
                 />
               );
             } else {
@@ -146,6 +148,7 @@ const ContestsList = ({
                   }
                   score={sc?.score || []}
                   community={community}
+                  contestBalance={parseInt(sc.contest_balance || '0', 10)}
                 />
               ));
             }
