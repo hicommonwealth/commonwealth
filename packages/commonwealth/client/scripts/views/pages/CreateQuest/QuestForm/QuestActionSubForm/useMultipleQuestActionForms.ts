@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
-  doesActionRequireContentId,
-  doesActionRequireCreatorReward,
+  doesActionAllowContentId,
+  doesActionRequireRewardShare,
 } from './helpers';
 import {
   QuestAction,
@@ -58,7 +58,7 @@ const useQuestActionMultiFormsState = ({
   };
 
   const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
-    if (config?.requires_comment_id || config?.requires_thread_id) {
+    if (config?.with_optional_comment_id || config?.with_optional_thread_id) {
       if (config?.requires_creator_points) {
         return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
       }
@@ -126,17 +126,16 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
-      const requiresCreatorPoints =
-        doesActionRequireCreatorReward(chosenAction);
-      const requiresContentId = doesActionRequireContentId(chosenAction);
+      const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
+      const allowsContentId = doesActionAllowContentId(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
-        requires_comment_id:
-          requiresContentId && chosenAction === 'CommentUpvoted',
-        requires_thread_id:
-          requiresContentId &&
+        with_optional_comment_id:
+          allowsContentId && chosenAction === 'CommentUpvoted',
+        with_optional_thread_id:
+          allowsContentId &&
           (chosenAction === 'CommentCreated' ||
             chosenAction === 'ThreadUpvoted'),
       };
@@ -151,7 +150,7 @@ const useQuestActionMultiFormsState = ({
       }
 
       // reset errors/values if action doesn't require content link
-      if (!requiresContentId) {
+      if (!allowsContentId) {
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,

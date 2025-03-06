@@ -69,14 +69,6 @@ export const ContestManager = z
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
-    neynar_webhook_id: z
-      .string()
-      .nullish()
-      .describe('Neynar ID of the ReplyCastCreated webhook'),
-    neynar_webhook_secret: z
-      .string()
-      .nullish()
-      .describe('Neynar secret for the ReplyCastCreated webhook'),
     topic_id: PG_INT.nullish(),
     topics: z.array(Topic).nullish(),
     is_farcaster_contest: z.boolean(),
