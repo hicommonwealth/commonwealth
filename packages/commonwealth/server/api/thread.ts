@@ -1,10 +1,8 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedData } from '../federation';
-
-const log = logger(import.meta);
 
 export const trpcRouter = trpc.router({
   createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
