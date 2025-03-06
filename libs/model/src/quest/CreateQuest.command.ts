@@ -17,6 +17,7 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         image_url,
         start_date,
         end_date,
+        max_xp_to_end,
       } = payload;
 
       const existingName = await models.Quest.findOne({
@@ -36,6 +37,8 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         image_url,
         start_date,
         end_date,
+        max_xp_to_end,
+        xp_awarded: 0,
         community_id: community_id ?? null,
       });
       return quest.toJSON();
