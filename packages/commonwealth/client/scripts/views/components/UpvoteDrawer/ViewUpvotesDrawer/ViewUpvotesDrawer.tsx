@@ -26,6 +26,7 @@ type ViewUpvotesDrawerProps = {
   publishDate: moment.Moment;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined;
 };
 
@@ -66,6 +67,7 @@ export const ViewUpvotesDrawer = ({
   publishDate,
   isOpen,
   setIsOpen,
+  tokenDecimals,
   topicWeight,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
@@ -73,6 +75,7 @@ export const ViewUpvotesDrawer = ({
       c.key === 'voteWeight'
         ? {
             ...c,
+            tokenDecimals,
             weightedVoting: topicWeight,
           }
         : c,
@@ -192,6 +195,7 @@ export const ViewUpvotesDrawer = ({
                   <CWText type="b2">
                     {prettyVoteWeight(
                       getVoteWeightTotal(reactorData).toString(),
+                      tokenDecimals,
                       topicWeight,
                       1,
                       6,

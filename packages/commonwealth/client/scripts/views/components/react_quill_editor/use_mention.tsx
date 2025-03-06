@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
-import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
+import { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
@@ -25,13 +25,13 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
-  const mentionTerm = useRef('');
+  const [mentionTerm, setMentionTerm] = useState('');
 
   const { refetch } = useSearchProfilesQuery({
-    searchTerm: mentionTerm.current,
+    searchTerm: mentionTerm,
     communityId: app.activeChainId() || '',
     limit: 50,
-    enabled: mentionTerm.current.length >= 3 && !!app.activeChainId(),
+    enabled: mentionTerm.length >= 3 && !!app.activeChainId(),
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
   });
@@ -88,7 +88,7 @@ export const useMention = ({
           if (mentionChar !== '@') return;
 
           let formattedMatches = [];
-          if (searchTerm.length === 0) {
+          if (searchTerm.length < 3) {
             const node = document.createElement('div');
             const tip = document.createElement('span');
             tip.innerText = 'Type to tag a member';
@@ -102,7 +102,7 @@ export const useMention = ({
               },
             ];
           } else {
-            mentionTerm.current = searchTerm;
+            setMentionTerm(searchTerm);
 
             const { data } = await refetch();
 
