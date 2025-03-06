@@ -1,0 +1,28 @@
+@import '../../../../../styles/shared.scss';
+
+.GovernanceMemberCard {
+  width: 250px;
+  padding: 1.5rem;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background-color: $white;
+  font-family: Arial, sans-serif;
+
+  .member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .link {
+    font-size: 1rem;
+    color: $primary-600;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
