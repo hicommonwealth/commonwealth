@@ -36,6 +36,7 @@ export const ExternalLinksModule = () => {
     telegrams,
     tiktoks,
     twitters,
+    warpcasts,
   } = categorizeSocialLinks(
     (community.social_links || [])
       .filter((link) => link)
@@ -97,6 +98,14 @@ export const ExternalLinksModule = () => {
             onClick={() => setSelectedLink(link)}
           />
         </React.Fragment>
+      ))}
+      {warpcasts.map((link) => (
+        <CWIcon
+          key={link}
+          iconName="warpcast"
+          className="warpcast-link"
+          onClick={() => window.open(link)}
+        />
       ))}
       {[...remainingLinks, ...slacks].map((link) => (
         <React.Fragment key={link}>
