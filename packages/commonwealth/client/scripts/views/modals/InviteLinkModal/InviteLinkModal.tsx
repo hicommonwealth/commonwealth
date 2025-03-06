@@ -63,8 +63,9 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
         <div className="content">
           <CWText>
             {communityId
-              ? 'Get more voting power in your communities when people join with your referral link.'
-              : `For every referral, you'll soon get offchain and onchain rewards, like fees from trades, swaps, and transactions they make on Common.`}
+              ? 'Share your referral link and earn rewards when your community engages.'
+              : `For every referral, you'll soon get offchain and onchain rewards, like fees from 
+              trades, swaps, and transactions they make on Common.`}
           </CWText>
           <CWText type="b2">
             Fees are Base only for now, more networks coming soon!
