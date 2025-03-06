@@ -1,6 +1,8 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { config } from '../config';
 
 const log = logger(import.meta);
 
@@ -9,6 +11,13 @@ main().catch((error) => {
 });
 
 export async function main() {
+  config.CACHE.REDIS_URL &&
+    cache({
+      adapter: new RedisCache(config.CACHE.REDIS_URL),
+    });
+
+  await cache().ready();
+
   try {
     await processViewCounts();
   } catch (error) {
@@ -153,29 +162,20 @@ async function processViewCounts() {
     cursor: number;
     keys: string[];
   };
-  const ids = result?.keys?.map((key) =>
-    parseInt(key.substring(key.indexOf('_') + 1), 10),
-  );
+
+  const namespaceLength = CacheNamespaces.Thread_View_Count.length;
+  const ids = result?.keys?.map((key) => {
+    return key.substring(namespaceLength + 1);
+  });
   if (!ids) {
     return;
   }
-  const values = await cache().getKeys(
-    CacheNamespaces.Thread_View_Count,
-    result.keys,
-  );
-  const idToCount = ids
-    .map((id, index) => [id, parseInt(values[index]!, 10)])
-    .filter(([_, count]) => !isNaN(count));
 
-  for (const key of result.keys) {
-    const id = parseInt(key.substring(key.indexOf('_') + 1), 10);
-    const count = parseInt(
-      (await cache().getKey(CacheNamespaces.Thread_View_Count, key))!,
-      10,
-    );
-
-    idToCount.push([id, count]);
-  }
+  const values = await cache().getKeys(CacheNamespaces.Thread_View_Count, ids);
+  const idToCount = Object.entries(values).map(([key, value]) => [
+    key.substring(namespaceLength + 1),
+    parseInt(value, 10),
+  ]);
 
   // convert idToCount into a bulk update sql statement
   if (idToCount.length > 0) {

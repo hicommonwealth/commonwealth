@@ -137,12 +137,12 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
         });
       });
 
-      parsedThreadIds.forEach(async (t) => {
+      for (const t of parsedThreadIds) {
         await cache().incrementKey(
           CacheNamespaces.Thread_View_Count,
           t.toString(),
         );
-      });
+      }
 
       return threads!.map(
         (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
