@@ -52,6 +52,7 @@ const EntriesTab = ({
     topicId,
     orderBy: threadSort,
     apiEnabled: !isFarcasterContest,
+    contestAddress,
   });
 
   const handleSortChange = (sort: SortType) => {
