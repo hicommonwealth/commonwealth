@@ -96,6 +96,17 @@ export const SocialAccounts = ({ profile }: SocialAccountsProps) => {
               onModalClose={handleModalClose}
             />
           );
+        } else if (social.includes('warpcast')) {
+          return (
+            <SocialAccount
+              link={social}
+              iconName="warpcast"
+              key={i}
+              isSelected={selectedLink === social}
+              onSelect={setSelectedLink}
+              onModalClose={handleModalClose}
+            />
+          );
         } else {
           return (
             <SocialAccount
