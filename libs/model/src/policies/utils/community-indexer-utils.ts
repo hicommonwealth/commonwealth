@@ -248,7 +248,7 @@ export async function createCommunityFromClankerToken(
       directory_page_enabled: false,
       tags: ['Clanker'],
       chain_node_id: chainNode!.id!,
-      indexer: 'clanker',
+      community_indexer_id: 'clanker',
       token_address: payload.contract_address,
       token_created_at: moment(payload.created_at).toDate(),
     };

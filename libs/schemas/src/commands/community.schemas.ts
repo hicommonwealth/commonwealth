@@ -50,7 +50,7 @@ export const CreateCommunity = {
     // hidden optional params
     token_name: z.string().optional(),
     referrer_address: z.string().optional(),
-    indexer: z.string().optional(),
+    community_indexer_id: z.string().optional(),
     token_address: z.string().optional(),
     token_created_at: z.coerce.date().optional(),
     website: z.string().url().optional(),
