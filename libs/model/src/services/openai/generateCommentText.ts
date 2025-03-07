@@ -54,7 +54,7 @@ const generateCommentText = async function* ({
 
   try {
     const createCompletionConfig: any = {
-      model: useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'openai/o3-mini',
+      model: useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'gpt-4o',
       messages: [
         {
           role: 'user',
