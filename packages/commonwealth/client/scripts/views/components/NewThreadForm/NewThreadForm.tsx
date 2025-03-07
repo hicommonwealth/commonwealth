@@ -10,5 +10,11 @@ export const NewThreadForm = () => {
     return <NewThreadFormModern />;
   }
 
-  return <NewThreadFormLegacy aiCommentsToggleEnabled={false} setAICommentsToggleEnabled={() => {}} onAiGenerate={() => Promise.resolve('')} />;
+  return (
+    <NewThreadFormLegacy
+      aiCommentsToggleEnabled={false}
+      setAICommentsToggleEnabled={() => {}}
+      onAiGenerate={() => Promise.resolve('')}
+    />
+  );
 };

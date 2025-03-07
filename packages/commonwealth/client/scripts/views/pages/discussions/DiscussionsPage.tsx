@@ -446,6 +446,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               }}
               overscan={50}
               components={{
+                // eslint-disable-next-line react/no-multi-comp
                 EmptyPlaceholder: () => (
                   <EmptyThreadsPlaceholder
                     isInitialLoading={isInitialLoading}
@@ -485,16 +486,29 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             customScrollParent={containerRef.current || undefined}
             components={
               {
-                List: forwardRef<HTMLDivElement, ListContainerProps>(
-                  ({ children, ...props }, ref) => (
+                List: (() => {
+                  // eslint-disable-next-line react/no-multi-comp
+                  const VirtuosoGridList = forwardRef<
+                    HTMLDivElement,
+                    ListContainerProps
+                  >(({ children, ...props }, ref) => (
                     <div ref={ref} {...props}>
                       {children}
                     </div>
-                  ),
-                ),
-                Item: ({ children, ...props }) => (
-                  <div {...props}>{children}</div>
-                ),
+                  ));
+                  VirtuosoGridList.displayName = 'VirtuosoGridList';
+                  return VirtuosoGridList;
+                })(),
+                Item: (() => {
+                  // eslint-disable-next-line react/no-multi-comp
+                  const VirtuosoGridItem = ({
+                    children,
+                    ...props
+                  }: {
+                    children: React.ReactNode;
+                  }) => <div {...props}>{children}</div>;
+                  return VirtuosoGridItem;
+                })(),
               } as GridComponents
             }
             itemContent={(_, thread) => (

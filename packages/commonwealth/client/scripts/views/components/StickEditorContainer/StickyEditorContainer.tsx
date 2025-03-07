@@ -1,13 +1,14 @@
+import { ContentType } from '@hicommonwealth/shared';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
+import type { Topic } from 'models/Topic';
 import React from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { DesktopStickyInput } from 'views/components/StickEditorContainer/DesktopStickyInput';
 import { MobileStickyInput } from 'views/components/StickEditorContainer/MobileStickyInput';
+
 import './StickyEditorContainer.scss';
-import type { Topic } from 'models/Topic';
-import { ContentType } from '@hicommonwealth/shared';
 
 interface StickyEditorContainerProps extends CommentEditorProps {
   topic?: Topic;

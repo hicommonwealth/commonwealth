@@ -415,7 +415,6 @@ const EditProfile = () => {
                           )
                         }
                         icon="sparkle"
-                        size="xs"
                         iconColor="#757575"
                       />
                     </div>

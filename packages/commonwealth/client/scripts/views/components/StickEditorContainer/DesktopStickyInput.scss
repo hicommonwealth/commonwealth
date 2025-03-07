@@ -4,6 +4,7 @@
   position: sticky;
   bottom: 0;
   display: flex;
+  border-radius: 8px;
   z-index: 70;
   background: $white;
   width: 100%;
@@ -62,5 +63,13 @@
     border-radius: 8px;
     border: 1px solid #e5e5e5;
     padding: 16px;
+
+    .PageLayout {
+      padding: 0;
+
+      .layout-container {
+        padding: 0;
+      }
+    }
   }
 }

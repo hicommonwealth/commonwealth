@@ -45,6 +45,7 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -234,7 +235,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
-  const handleNewThreadCreation = async () => {
+  const handleNewThreadCreation = useCallback(async () => {
     console.log('NewThreadForm: handleNewThreadCreation started');
     console.log('NewThreadForm: Community context:', {
       selectedCommunityId,
@@ -389,7 +390,28 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
         });
       }
     }
-  };
+  }, [
+    aiCommentsToggleEnabled,
+    community,
+    createThread,
+    isInsideCommunity,
+    isRestrictedMembership,
+    isDiscussion,
+    threadUrl,
+    threadTopic,
+    threadKind,
+    threadContentDelta,
+    threadTitle,
+    setIsSaving,
+    setThreadContentDelta,
+    clearDraft,
+    navigate,
+    selectedCommunityId,
+    userSelectedAddress,
+    hasTopics,
+    checkForSessionKeyRevalidationErrors,
+    user,
+  ]);
 
   const handleCancel = () => {
     console.log('NewThreadForm: invoking onCancel');
@@ -677,7 +699,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                       setAICommentsToggleEnabled(!aiCommentsToggleEnabled)
                     }
                     icon="sparkle"
-                    size="xs"
                     iconColor="#757575"
                   />
                   <span className="label">AI</span>
