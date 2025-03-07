@@ -1,6 +1,7 @@
 import { Task } from 'graphile-worker';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { archiveOutboxTask } from './tasks/archive-outbox';
+import { sitemapTask } from './tasks/sitemap-runner';
 import { GraphileTask, GraphileTasks, GraphileTasksObj } from './types';
 
 export function taskFactory<
@@ -15,4 +16,5 @@ export function taskFactory<
 
 export const graphileTasks: GraphileTasksObj = {
   [GraphileTasks.ArchiveOutbox]: archiveOutboxTask,
+  [GraphileTasks.UpdateSitemap]: sitemapTask,
 };

@@ -1,20 +1,26 @@
-import { CronItem } from 'graphile-worker';
-import { GraphileQueues, GraphileTasks } from './types';
-
-type CustomCronItem = CronItem & {
-  task: GraphileTasks;
-};
+import { CustomCronItem, GraphileQueues, GraphileTasks } from './types';
 
 const archiveOutboxCronItem: CustomCronItem = {
   task: GraphileTasks.ArchiveOutbox,
-  match: (timestampDigest) => {
-    return timestampDigest.min === 33;
-  },
+  match: '0 10 * * *', // 10 AM everyday
   options: {
     backfillPeriod: 0,
-    maxAttempts: 1,
+    maxAttempts: 3,
     queueName: GraphileQueues.ArchiveOutbox,
   },
 };
 
-export const cronItems: Array<CustomCronItem> = [archiveOutboxCronItem];
+const updateSitemapCronItem: CustomCronItem = {
+  task: GraphileTasks.UpdateSitemap,
+  match: '0 * * * *', // every hour
+  options: {
+    backfillPeriod: 0,
+    maxAttempts: 3,
+    queueName: GraphileQueues.UpdateSitemap,
+  },
+};
+
+export const cronItems: Array<CustomCronItem> = [
+  archiveOutboxCronItem,
+  updateSitemapCronItem,
+];

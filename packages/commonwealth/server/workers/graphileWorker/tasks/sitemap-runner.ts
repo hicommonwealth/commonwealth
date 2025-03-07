@@ -1,21 +1,16 @@
-import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
-import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
-import { config } from '../server/config';
+import { z } from 'zod';
+import { config } from '../../../config';
+import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
-blobStorage({
-  adapter: S3BlobStorage(),
-});
-stats({
-  adapter: HotShotsStats(),
-});
 
-async function doExec() {
+const updateSitemaps = async () => {
   if (!['production', 'local'].includes(config.APP_ENV)) {
     throw new Error('Must be in production or local environment');
   }
@@ -40,15 +35,9 @@ async function doExec() {
   ).exec();
 
   log.info('Sitemap written to: ' + index.location);
-}
+};
 
-doExec()
-  .then(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    dispose()('EXIT', true);
-  })
-  .catch((err) => {
-    log.fatal('Unable to process sitemaps: ', err);
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    dispose()('ERROR', true);
-  });
+export const sitemapTask: GraphileTask = {
+  input: z.undefined(),
+  fn: updateSitemaps,
+};

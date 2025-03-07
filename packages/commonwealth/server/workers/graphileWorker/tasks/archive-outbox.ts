@@ -1,4 +1,3 @@
-import { S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
@@ -10,9 +9,6 @@ import { z } from 'zod';
 import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
-const _blobStorage = blobStorage({
-  adapter: S3BlobStorage(),
-});
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
   const databaseUrl = config.DB.URI;
@@ -55,7 +51,7 @@ function compressFile(inputFile: string, outputFile: string): Promise<void> {
 async function uploadToS3(filePath: string): Promise<boolean> {
   try {
     const fileStream = createReadStream(filePath);
-    const { url } = await _blobStorage.upload({
+    const { url } = await blobStorage().upload({
       key: filePath,
       bucket: 'archives',
       content: fileStream,
@@ -104,7 +100,7 @@ async function getTablesToBackup(): Promise<string[]> {
     tablesInPg.map(async (t) => {
       const objectKey = getCompressedDumpName(getDumpName(t));
       log.info(`Searching for ${objectKey} in archives...`);
-      return await _blobStorage.exists({
+      return await blobStorage().exists({
         key: objectKey,
         bucket: 'archives',
       });

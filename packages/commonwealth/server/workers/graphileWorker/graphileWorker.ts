@@ -1,4 +1,5 @@
-import { dispose, logger } from '@hicommonwealth/core';
+import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { cronItems } from './cronJobs';
 import { preset } from './graphile.config';
@@ -6,7 +7,19 @@ import { graphileTasks, taskFactory } from './tasks';
 
 const log = logger(import.meta);
 
+blobStorage({
+  adapter: S3BlobStorage(),
+});
+stats({
+  adapter: HotShotsStats(),
+});
+
 async function startGraphileWorker() {
+  for (const cronJob of cronItems) {
+    if (!graphileTasks[cronJob.task])
+      throw new Error(`Cron job task not found: ${cronJob.task}`);
+  }
+
   await run({
     parsedCronItems: parseCronItems(cronItems),
     preset,
