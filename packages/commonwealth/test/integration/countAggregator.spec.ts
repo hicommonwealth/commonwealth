@@ -13,7 +13,7 @@ import { main } from '../../server/util/countAggregator';
 
 chai.use(chaiHttp);
 
-describe('DatabaseCleaner Tests', () => {
+describe('Count Aggregator Tests', () => {
   let models: DB;
 
   beforeAll(async () => {

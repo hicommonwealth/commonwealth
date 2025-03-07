@@ -1,8 +1,10 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedData } from '../federation';
+
+const log = logger(import.meta);
 
 export const trpcRouter = trpc.router({
   createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
@@ -56,5 +58,21 @@ export const trpcRouter = trpc.router({
     }),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
-  getThreadsByIds: trpc.query(Thread.GetThreadsByIds, trpc.Tag.Thread),
+  getThreadsByIds: trpc.query(
+    Thread.GetThreadsByIds,
+    trpc.Tag.Thread,
+    undefined,
+    [
+      trpc.fireAndForget(async (input) => {
+        log.trace('incrementing thread view count', { ids: input.thread_ids });
+        const ids = input.thread_ids.split(',').map((x) => parseInt(x, 10));
+        for (const t of ids) {
+          await cache().incrementKey(
+            CacheNamespaces.Thread_View_Count,
+            t.toString(),
+          );
+        }
+      }),
+    ],
+  ),
 });

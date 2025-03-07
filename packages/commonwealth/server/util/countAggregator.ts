@@ -45,15 +45,25 @@ export async function main() {
 }
 
 async function getUpdateSignal(namespace: CacheNamespaces) {
-  const result = (await cache().scan(namespace, 0, 10000)) as {
-    cursor: number;
-    keys: string[];
-  };
-
+  let cursor = 0;
+  const allKeys: string[] = [];
   const namespaceLength = namespace.length;
-  const ids = result?.keys?.map((key) => {
-    return key.substring(namespaceLength + 1);
-  });
+
+  do {
+    const result = (await cache().scan(namespace, cursor, 10000)) as {
+      cursor: number;
+      keys: string[];
+    };
+
+    if (!result) {
+      return;
+    }
+
+    cursor = result.cursor;
+    allKeys.push(...result.keys);
+  } while (cursor !== 0);
+
+  const ids = allKeys.map((key) => key.substring(namespaceLength + 1));
 
   return ids;
 }
@@ -101,8 +111,8 @@ async function processProfileCounts() {
   await models.sequelize.query(
     `
         WITH profile_count AS (SELECT community_id, COUNT(*) AS count
-            FROM "Users"
-            WHERE "community_id" IN (:communityIds)
+            FROM "Addresses" A
+            WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
             GROUP BY "community_id"
         )
         UPDATE "Communities"
@@ -155,17 +165,29 @@ async function processReactionCounts() {
 // 2. Updates DB
 // 3. Clears thread view count namespace
 async function processViewCounts() {
-  const result = (await cache().scan(
-    CacheNamespaces.Thread_View_Count,
-    0,
-    10000,
-  )) as {
-    cursor: number;
-    keys: string[];
-  };
+  let cursor = 0;
+  const allKeys: string[] = [];
+
+  do {
+    const result = (await cache().scan(
+      CacheNamespaces.Thread_View_Count,
+      cursor,
+      10000,
+    )) as {
+      cursor: number;
+      keys: string[];
+    };
+
+    if (!result) {
+      return;
+    }
+
+    cursor = result.cursor;
+    allKeys.push(...result.keys);
+  } while (cursor !== 0);
 
   const namespaceLength = CacheNamespaces.Thread_View_Count.length;
-  const ids = result?.keys?.map((key) => {
+  const ids = allKeys?.map((key) => {
     return key.substring(namespaceLength + 1);
   });
   if (!ids?.length) {

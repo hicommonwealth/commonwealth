@@ -1,9 +1,4 @@
-import {
-  cache,
-  CacheNamespaces,
-  InvalidInput,
-  Query,
-} from '@hicommonwealth/core';
+import { InvalidInput, Query } from '@hicommonwealth/core';
 import { ThreadInstance } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
@@ -136,13 +131,6 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
           transaction,
         });
       });
-
-      for (const t of parsedThreadIds) {
-        await cache().incrementKey(
-          CacheNamespaces.Thread_View_Count,
-          t.toString(),
-        );
-      }
 
       return threads!.map(
         (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
