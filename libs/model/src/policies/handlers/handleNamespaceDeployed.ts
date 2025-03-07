@@ -1,12 +1,19 @@
-import { EventHandler, logger } from '@hicommonwealth/core';
+import { command, EventHandler } from '@hicommonwealth/core';
 import { ZodUndefined } from 'zod';
-
-const log = logger(import.meta);
+import { CreateNamespaceAdminGroup } from '../../community/CreateNamespaceAdminGroup.command';
+import { systemActor } from '../../middleware';
 
 export const handleNamespaceDeployed: EventHandler<
   'NamespaceDeployed',
   ZodUndefined
   // eslint-disable-next-line @typescript-eslint/require-await
-> = async ({ payload: _ }) => {
-  log.info('NamespaceDeployed event implementation not defined');
+> = async ({ payload }) => {
+  const { nameSpaceAddress } = payload.parsedArgs;
+
+  await command(CreateNamespaceAdminGroup(), {
+    actor: systemActor({}),
+    payload: {
+      namespace_address: nameSpaceAddress,
+    },
+  });
 };

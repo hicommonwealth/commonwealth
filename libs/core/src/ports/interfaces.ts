@@ -15,6 +15,9 @@ import {
   ContestEndedNotification,
   ContestNotification,
   QuestStartedNotification,
+  ReferrerCommunityCreatedNotification,
+  ReferrerCommunityJoinedNotification,
+  ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -282,6 +285,10 @@ export enum WorkflowKeys {
   ContestEnded = 'contest-ended',
   // Quest events
   QuestStarted = 'quest-started',
+  // Referral events
+  ReferrerSignedUp = 'referrer-signed-up',
+  ReferrerCommunityJoined = 'referrer-community-joined',
+  ReferrerCommunityCreated = 'referrer-community-created',
 }
 
 export enum KnockChannelIds {
@@ -367,6 +374,18 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof AddressOwnershipTransferredNotification>;
             key: WorkflowKeys.AddressOwnershipTransferred;
+          }
+        | {
+            data: z.infer<typeof ReferrerSignedUpNotification>;
+            key: WorkflowKeys.ReferrerSignedUp;
+          }
+        | {
+            data: z.infer<typeof ReferrerCommunityJoinedNotification>;
+            key: WorkflowKeys.ReferrerCommunityJoined;
+          }
+        | {
+            data: z.infer<typeof ReferrerCommunityCreatedNotification>;
+            key: WorkflowKeys.ReferrerCommunityCreated;
           }
       ))
   | WebhookProviderOptions;

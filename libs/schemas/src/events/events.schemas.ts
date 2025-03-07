@@ -1,3 +1,4 @@
+import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -5,23 +6,9 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
-import { Tweet } from '../integrations';
+import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
-
-const DiscordEventBase = z.object({
-  user: z.object({
-    id: z.string(),
-    username: z.string(),
-  }),
-  title: z.string(),
-  content: z.string(),
-  message_id: z.string(),
-  channel_id: z.string(),
-  parent_channel_id: z.string(),
-  guild_id: z.string(),
-  imageUrls: z.array(z.string()),
-});
 
 const ChainEventBase = z.object({
   eventSource: z.object({
@@ -136,6 +123,8 @@ export const events = {
   CommunityJoined: z.object({
     community_id: z.string(),
     user_id: z.number(),
+    oauth_provider: z.string().nullish(),
+    referrer_address: z.string().nullish(),
     created_at: z.coerce.date(),
   }),
 
@@ -206,6 +195,12 @@ export const events = {
   DiscordThreadDeleted: DiscordEventBase.pick({
     message_id: true,
     parent_channel_id: true,
+  }),
+
+  CommonDiscordServerJoined: z.object({
+    user_id: z.number().nullish(),
+    discord_username: z.string(),
+    joined_date: z.coerce.date(),
   }),
 
   // on-chain contest manager events
@@ -295,12 +290,20 @@ export const events = {
   }).merge(SubscriptionPreference.pick({ user_id: true })),
 
   FarcasterCastCreated: FarcasterCast.describe(
-    'When a farcaster contest cast has been posted',
+    'When a farcaster contest frame cast has been posted',
+  ),
+
+  FarcasterCastDeleted: FarcasterCast.describe(
+    'When a farcaster contest frame cast has been deleted',
   ),
 
   FarcasterReplyCastCreated: FarcasterCast.extend({
     verified_address: z.string(),
-  }).describe('When a reply is posted to a farcaster contest cast'),
+  }).describe('When cast is created as a reply to a contest frame'),
+
+  FarcasterReplyCastDeleted: FarcasterCast.extend({
+    verified_address: z.string(),
+  }).describe('When cast is deleted on a contest frame cast'),
 
   FarcasterContestBotMentioned: FarcasterCast.extend({
     verified_address: z.string(),
@@ -314,6 +317,7 @@ export const events = {
   SignUpFlowCompleted: z.object({
     user_id: z.number(),
     address: z.string(),
+    referred_by_address: z.string().nullish(),
     created_at: z.coerce.date(),
   }),
 
@@ -329,6 +333,9 @@ export const events = {
 
   TwitterMomBotMentioned: Tweet,
   TwitterContestBotMentioned: Tweet,
+  TwitterCommonMentioned: Tweet.describe(
+    'Emitted when a Twitter/X user mentions @commondotxyz',
+  ),
 
   // Events mapped from ChainEvents
   CommunityStakeTrade: ChainEventBase.extend({
@@ -340,7 +347,7 @@ export const events = {
       ethAmount: z.coerce.bigint(),
       protocolEthAmount: z.coerce.bigint(),
       nameSpaceEthAmount: z.coerce.bigint(),
-      supply: z.bigint(),
+      supply: z.coerce.bigint(),
       exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
@@ -393,5 +400,28 @@ export const events = {
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
+  }),
+
+  WalletLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    wallet_id: z.nativeEnum(WalletId),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  SSOLinked: z.object({
+    user_id: z.number(),
+    new_user: z.boolean(),
+    oauth_provider: z.nativeEnum(WalletSsoSource),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  XpChainEventCreated: z.object({
+    eth_chain_id: z.number(),
+    quest_action_meta_id: z.number(),
+    transaction_hash: z.string(),
+    created_at: z.coerce.date(),
   }),
 } as const;

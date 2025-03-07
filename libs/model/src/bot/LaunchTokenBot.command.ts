@@ -1,3 +1,4 @@
+import { LaunchpadAbi } from '@commonxyz/common-protocol-abis';
 import {
   AppError,
   InvalidState,
@@ -9,7 +10,6 @@ import {
   commonProtocol as cp,
   getErc20TokenInfo,
   getLaunchpadTokenCreatedTransaction,
-  launchpadFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -57,7 +57,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       });
       const launchpadContract = new web3.eth.Contract(
-        launchpadFactoryAbi,
+        LaunchpadAbi,
         cp.factoryContracts[
           eth_chain_id as cp.ValidChains.SepoliaBase
         ].launchpad,

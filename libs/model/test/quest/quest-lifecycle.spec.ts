@@ -51,6 +51,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       expect(quest?.name).toBe('test quest');
@@ -65,6 +66,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       expect(quest?.name).toBe('test quest global');
@@ -83,6 +85,7 @@ describe('Quest lifecycle', () => {
               new Date().getTime() + 1000 * 60 * 60 * 24 * 3,
             ),
             end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 5),
+            max_xp_to_end: 100,
           },
         }),
       ).rejects.toThrowError(
@@ -102,6 +105,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
@@ -157,6 +161,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       await expect(
@@ -164,6 +169,7 @@ describe('Quest lifecycle', () => {
           actor: superadmin,
           payload: {
             quest_id: quest!.id!,
+            community_id,
             name,
             description: 'updated description',
           },
@@ -183,6 +189,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       // hack to update the start_date
@@ -204,6 +211,42 @@ describe('Quest lifecycle', () => {
         `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
       );
     });
+
+    it('should not update a quest with invalid content_id', async () => {
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          name: chance.name() + Math.random(),
+          description: 'test description',
+          image_url: chance.url(),
+          start_date,
+          end_date,
+          max_xp_to_end: 100,
+        },
+      });
+      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
+        [
+          {
+            event_name: 'CommentUpvoted',
+            reward_amount: 200,
+            participation_limit: QuestParticipationLimit.OncePerPeriod,
+            participation_period: QuestParticipationPeriod.Monthly,
+            participation_times_per_period: 3,
+            creator_reward_weight: 0.1,
+            content_id: 'comment:1000',
+          },
+        ];
+      await expect(
+        command(UpdateQuest(), {
+          actor: superadmin,
+          payload: {
+            quest_id: quest!.id!,
+            action_metas,
+          },
+        }),
+      ).rejects.toThrowError(`Comment with id "1000" must exist`);
+    });
   });
 
   describe('query', () => {
@@ -217,6 +260,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       const retrieved = await query(GetQuest(), {
@@ -258,6 +302,7 @@ describe('Quest lifecycle', () => {
               image_url: chance.url(),
               start_date,
               end_date,
+              max_xp_to_end: 100,
             },
           }),
         ),
@@ -273,7 +318,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(8);
+      expect(retrieved?.results?.length).toBe(9);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
@@ -293,6 +338,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       const deleted = await command(DeleteQuest(), {
@@ -318,6 +364,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       // hack to update the start_date
@@ -343,6 +390,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
@@ -374,7 +422,6 @@ describe('Quest lifecycle', () => {
       // insert actions
       await models.XpLog.create({
         user_id: superadmin.user.id!,
-        event_name: updated!.action_metas!.at(0)!.event_name,
         event_created_at: new Date(),
         xp_points: 100,
         action_meta_id: updated!.action_metas!.at(0)!.id!,
@@ -403,6 +450,7 @@ describe('Quest lifecycle', () => {
           image_url: chance.url(),
           start_date,
           end_date,
+          max_xp_to_end: 100,
         },
       });
       const cancelled = await command(CancelQuest(), {

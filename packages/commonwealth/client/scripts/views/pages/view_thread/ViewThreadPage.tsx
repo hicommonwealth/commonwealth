@@ -765,7 +765,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-
                       {!stickyEditor && (
                         <CreateComment
                           rootThread={thread}

@@ -2,6 +2,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
@@ -49,6 +50,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const { generateComment } = useGenerateCommentText();
   const stickyCommentReset = useActiveStickCommentReset();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
+  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
 
   // --- Thread creation hooks ---
   const communityId = app.activeChainId() || '';
@@ -232,7 +234,7 @@ export const MobileInput = (props: MobileInputProps) => {
             className="input"
           />
           <div className="ai-toggle-row">
-            {aiCommentsFeatureEnabled && (
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
               <div className="ai-toggle">
                 <div className="ai-toggle-container">
                   <CWToggle

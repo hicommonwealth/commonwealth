@@ -1,13 +1,13 @@
 import {
-  communityStakesAbi,
-  launchpadFactoryAbi,
-  lpBondingCurveAbi,
-  namespaceFactoryAbi,
-  singleContestAbi,
-  tokenCommunityManagerAbi,
-} from '../abis';
-import { recurringContestAbi } from '../abis/recurringContestAbi';
-import { referralFeeManager } from '../abis/referralFeeManager';
+  CommunityStakeAbi,
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+  LPBondingCurveAbi,
+  LaunchpadAbi,
+  NamespaceFactoryAbi,
+  ReferralFeeManagerAbi,
+  TokenCommunityManagerAbi,
+} from '@commonxyz/common-protocol-abis';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -64,7 +64,7 @@ export type EventRegistryType = {
 };
 
 const namespaceFactorySource = {
-  abi: namespaceFactoryAbi,
+  abi: NamespaceFactoryAbi,
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
@@ -72,7 +72,7 @@ const namespaceFactorySource = {
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
-      abi: recurringContestAbi,
+      abi: ContestGovernorAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.RecurringContestStarted,
@@ -80,7 +80,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.SingleContest]: {
-      abi: singleContestAbi,
+      abi: ContestGovernorSingleAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.SingleContestStarted,
@@ -91,27 +91,27 @@ const namespaceFactorySource = {
 } satisfies ContractSource;
 
 const communityStakesSource = {
-  abi: communityStakesAbi,
+  abi: CommunityStakeAbi,
   eventSignatures: [EvmEventSignatures.CommunityStake.Trade],
 } satisfies ContractSource;
 
 const launchpadSource: ContractSource = {
-  abi: launchpadFactoryAbi,
+  abi: LaunchpadAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.TokenLaunched],
 } satisfies ContractSource;
 
 const lpBondingCurveSource: ContractSource = {
-  abi: lpBondingCurveAbi,
+  abi: LPBondingCurveAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.Trade],
 } satisfies ContractSource;
 
 const tokenCommunityManagerSource: ContractSource = {
-  abi: tokenCommunityManagerAbi,
+  abi: TokenCommunityManagerAbi,
   eventSignatures: [],
 } satisfies ContractSource;
 
 const referralFeeManagerSource: ContractSource = {
-  abi: referralFeeManager,
+  abi: ReferralFeeManagerAbi,
   eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
@@ -123,6 +123,12 @@ export const EventRegistry = {
   [ValidChains.Base]: {
     [factoryContracts[ValidChains.Base].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Base].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Base].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Base].lpBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Base].tokenCommunityManager]:
+      tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.Base].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {
     [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,

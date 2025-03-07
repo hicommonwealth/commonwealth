@@ -1,12 +1,13 @@
-import { BigNumber } from '@ethersproject/bignumber';
+import {
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+  FeeManagerAbi,
+  INamespaceAbi,
+  NamespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
-import { feeManagerAbi } from '../../abis/feeManagerAbi';
-import { namespaceAbi } from '../../abis/namespaceAbi';
-import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
-import { recurringContestAbi } from '../../abis/recurringContestAbi';
-import { singleContestAbi } from '../../abis/singleContestAbi';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
   createPrivateEvmClient,
@@ -18,7 +19,8 @@ import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
   contestContract: Contract<
-    Readonly<typeof singleContestAbi> | Readonly<typeof recurringContestAbi>
+    | Readonly<typeof ContestGovernorSingleAbi>
+    | Readonly<typeof ContestGovernorAbi>
   >,
   contestAddress: string,
   web3: Web3,
@@ -35,7 +37,7 @@ export const getTotalContestBalance = async (
   const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
-    const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
+    const feeManager = new web3.eth.Contract(FeeManagerAbi, String(results[1]));
     balancePromises.push(
       feeManager.methods
         .getBeneficiaryBalance(contestAddress, results[0])
@@ -68,10 +70,10 @@ export const getTotalContestBalance = async (
 
   const balance =
     balanceResults.length === 2
-      ? BigNumber.from(balanceResults[0]).add(balanceResults[1])
-      : BigNumber.from(balanceResults[0]);
+      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
+      : BigInt(balanceResults[0]);
 
-  return BigNumber.from(balance).toString();
+  return balance.toString();
 };
 
 /**
@@ -93,7 +95,7 @@ export const getContestStatus = async (
 }> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -129,7 +131,7 @@ export const getContestBalance = async (
   const web3 = new Web3(rpcNodeUrl);
 
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -145,7 +147,7 @@ export const getContestBalance = async (
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing equal indexed content ids, addresses, and votes
+ * @returns Contest balance and ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
@@ -154,10 +156,18 @@ export const getContestScore = async (
   payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-) => {
+): Promise<{
+  contestBalance: string | null;
+  scores: {
+    content_id: string;
+    creator_address: string;
+    votes: string;
+    prize: string;
+  }[];
+}> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    oneOff ? singleContestAbi : recurringContestAbi,
+    oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     contest,
   );
 
@@ -169,11 +179,13 @@ export const getContestScore = async (
   ]);
 
   const winnerIds: string[] = contestData[0] as string[];
+  const contestBalance = contestData[1];
 
   if (winnerIds.length == 0) {
-    throw new Error(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
+    console.warn(
+      `getContestScore WARN: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
     );
+    return { contestBalance, scores: [] };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,21 +203,24 @@ export const getContestScore = async (
       voteCount: contentMeta[i]['cumulativeVotes'],
     };
   });
-  const contestBalance = contestData[1];
 
-  let prizePool = BigNumber.from(contestBalance)
-    .mul(oneOff ? 100 : prizePercentage)
-    .div(100);
-  prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
-  return scores.map((s, i) => ({
-    content_id: s.winningContent.toString(),
-    creator_address: s.winningAddress,
-    votes: BigNumber.from(s.voteCount).toString(),
-    prize:
-      i < Number(payoutStructure.length)
-        ? BigNumber.from(prizePool).mul(payoutStructure[i]).div(100).toString()
-        : '0',
-  }));
+  let prizePool =
+    (BigInt(contestBalance) *
+      (oneOff ? BigInt(100) : BigInt(prizePercentage))) /
+    BigInt(100);
+  prizePool = (prizePool * BigInt(100 - CONTEST_FEE_PERCENT)) / BigInt(100); // deduct contest fee from prize pool
+  return {
+    contestBalance,
+    scores: scores.map((s, i) => ({
+      content_id: s.winningContent.toString(),
+      creator_address: s.winningAddress,
+      votes: BigInt(s.voteCount).toString(),
+      prize:
+        i < Number(payoutStructure.length)
+          ? ((prizePool * BigInt(payoutStructure[i])) / BigInt(100)).toString()
+          : '0',
+    })),
+  };
 };
 
 export type AddContentResponse = {
@@ -229,7 +244,10 @@ export const addContent = async (
   web3: Web3,
   nonce?: number,
 ): Promise<AddContentResponse> => {
-  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+  const contestInstance = new web3.eth.Contract(
+    ContestGovernorSingleAbi,
+    contest,
+  );
 
   const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt: TransactionReceipt;
@@ -283,7 +301,10 @@ export const voteContent = async (
   web3: Web3,
   nonce?: number,
 ): Promise<TransactionReceipt> => {
-  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+  const contestInstance = new web3.eth.Contract(
+    ContestGovernorSingleAbi,
+    contest,
+  );
 
   const maxFeePerGasEst = await estimateGas(web3);
   let txReceipt;
@@ -404,7 +425,7 @@ export const rollOverContest = async ({
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
     const contestInstance = new web3.eth.Contract(
-      oneOff ? singleContestAbi : recurringContestAbi,
+      oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
       contest,
     );
 
@@ -478,7 +499,7 @@ export const deployERC20Contest = async ({
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
     const contract = new web3.eth.Contract(
-      namespaceFactoryAbi,
+      NamespaceFactoryAbi,
       namespaceFactory,
     );
     const maxFeePerGasEst = await estimateGas(web3);
@@ -530,7 +551,7 @@ export const deployNamespace = async (
   if (namespaceCheck === ZERO_ADDRESS) {
     throw new Error('Namespace already reserved');
   }
-  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+  const contract = new web3.eth.Contract(NamespaceFactoryAbi, namespaceFactory);
 
   const maxFeePerGasEst = await estimateGas(web3);
 
@@ -551,7 +572,7 @@ export const deployNamespace = async (
     namespaceFactory,
   );
   const namespaceContract = new web3.eth.Contract(
-    namespaceAbi,
+    INamespaceAbi,
     namespaceAddress,
   );
 

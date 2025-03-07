@@ -14,13 +14,14 @@ import {
 } from '@hicommonwealth/evm-testing';
 import {
   ChainNodeInstance,
+  EvmChainSource,
   LastProcessedEvmBlockInstance,
   Log,
   createEventRegistryChainNodes,
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
-import { EventPair } from '@hicommonwealth/schemas';
+import { EventPair, events as eventSchemas } from '@hicommonwealth/schemas';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';
 import {
@@ -40,7 +41,6 @@ import {
   parseLogs,
 } from '../../../server/workers/evmChainEvents/logProcessing';
 import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvmPolling';
-import { EvmSource } from '../../../server/workers/evmChainEvents/types';
 
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
@@ -189,7 +189,7 @@ describe('EVM Chain Events Devnet Tests', () => {
 
   describe('parsing logs', () => {
     test('should only parse logs with a matching signature', async () => {
-      const evmSource: EvmSource = {
+      const evmSource: EvmChainSource = {
         rpc: localRpc,
         maxBlockRange: 500,
         contracts: {
@@ -199,8 +199,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                 EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
-              created_at_block: 1,
-              events_migrated: true,
+              meta: {
+                events_migrated: true,
+              },
             },
           ],
         },
@@ -239,7 +240,7 @@ describe('EVM Chain Events Devnet Tests', () => {
 
   describe('get and migrate events', () => {
     test('should return all fetched and parsed logs', async () => {
-      const evmSource: EvmSource = {
+      const evmSource: EvmChainSource = {
         rpc: localRpc,
         maxBlockRange: -1,
         contracts: {
@@ -249,8 +250,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                 EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
-              created_at_block: 1,
-              events_migrated: true,
+              meta: {
+                events_migrated: true,
+              },
             },
           ],
           [communityStakeAddress]: [
@@ -258,8 +260,9 @@ describe('EVM Chain Events Devnet Tests', () => {
               event_signature: EvmEventSignatures.CommunityStake.Trade,
               eth_chain_id: 1,
               contract_address: communityStakeAddress,
-              created_at_block: 1,
-              events_migrated: true,
+              meta: {
+                events_migrated: true,
+              },
             },
           ],
         },
@@ -312,7 +315,7 @@ describe('EVM Chain Events Devnet Tests', () => {
     });
 
     test('should migrate events', async () => {
-      const evmSource: EvmSource = {
+      const evmSource: EvmChainSource = {
         rpc: localRpc,
         maxBlockRange: -1,
         contracts: {
@@ -322,8 +325,10 @@ describe('EVM Chain Events Devnet Tests', () => {
                 EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
-              created_at_block: namespaceDeployedBlock,
-              events_migrated: false,
+              meta: {
+                created_at_block: namespaceDeployedBlock,
+                events_migrated: false,
+              },
             },
           ],
         },
@@ -393,8 +398,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                       contract_address: namespaceFactoryAddress,
                       event_signature:
                         EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                      created_at_block: namespaceDeployedBlock,
-                      events_migrated: true,
+                      meta: {
+                        events_migrated: true,
+                      },
                     },
                   ],
                   [stakeAddress]: [
@@ -402,12 +408,13 @@ describe('EVM Chain Events Devnet Tests', () => {
                       eth_chain_id: sepoliaBaseChainId,
                       contract_address: stakeAddress,
                       event_signature: EvmEventSignatures.CommunityStake.Trade,
-                      created_at_block: 1,
-                      events_migrated: true,
+                      meta: {
+                        events_migrated: true,
+                      },
                     },
                   ],
                 },
-              },
+              } as EvmChainSource,
             }),
         );
 
@@ -456,14 +463,17 @@ describe('EVM Chain Events Devnet Tests', () => {
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
         });
+        eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
         expect(events[1].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
         });
+        eventSchemas.CommunityStakeTrade.parse(events[1].event_payload);
         expect(events[2].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
         });
+        eventSchemas.CommunityStakeTrade.parse(events[2].event_payload);
       },
     );
 
@@ -506,12 +516,14 @@ describe('EVM Chain Events Devnet Tests', () => {
                     contract_address: namespaceFactoryAddress,
                     event_signature:
                       EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                    created_at_block: namespaceDeployedBlock,
-                    events_migrated: false,
+                    meta: {
+                      created_at_block: namespaceDeployedBlock,
+                      events_migrated: false,
+                    },
                   },
                 ],
               },
-            },
+            } as EvmChainSource,
           }),
       );
 
@@ -569,6 +581,7 @@ describe('EVM Chain Events Devnet Tests', () => {
         ethChainId: chainNode.eth_chain_id!,
         eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
       });
+      eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
 
       await evmEventSource.reload();
       expect(evmEventSource.events_migrated).to.be.true;
@@ -657,12 +670,14 @@ describe('EVM Chain Events Devnet Tests', () => {
                       contract_address: namespaceFactoryAddress,
                       event_signature:
                         EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                      created_at_block: latestBlockNum - 5,
-                      events_migrated: false,
+                      meta: {
+                        created_at_block: latestBlockNum - 5,
+                        events_migrated: false,
+                      },
                     },
                   ],
                 },
-              },
+              } as EvmChainSource,
             }),
         );
 

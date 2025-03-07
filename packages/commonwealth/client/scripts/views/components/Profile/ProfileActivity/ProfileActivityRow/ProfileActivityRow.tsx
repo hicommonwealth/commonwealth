@@ -23,6 +23,16 @@ import './ProfileActivityRow.scss';
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
+const shortFromNow = (date) => {
+  const duration = moment.duration(moment().diff(moment(date)));
+
+  if (duration.asMinutes() < 1) return 'Just now';
+  if (duration.asHours() < 1) return `${Math.floor(duration.asMinutes())}m`;
+  if (duration.asDays() < 1) return `${Math.floor(duration.asHours())}h`;
+  if (duration.asWeeks() < 1) return `${Math.floor(duration.asDays())}d`;
+  if (duration.asMonths() < 1) return `${Math.floor(duration.asWeeks())}w`;
+  return moment(date).fromNow(true);
+};
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const isThread = !!(activity as Thread).kind;
@@ -82,7 +92,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             </CWText>
           </div>
           <CWText className="created_at">
-            {moment(comment.createdAt).fromNow(true)}
+            {shortFromNow(comment.createdAt)}
           </CWText>
         </div>
         <div className="title">
@@ -99,7 +109,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         </div>
         <div className="footer">
           <CWThreadAction
-            label={pluralize(comment.thread.numberOfComments, 'Comment')}
+            label={pluralize(comment?.thread?.numberOfComments || 0, 'Comment')}
             action="comment"
             disabled={false}
             onClick={(e) => {

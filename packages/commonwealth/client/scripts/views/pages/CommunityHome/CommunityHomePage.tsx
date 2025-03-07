@@ -1,4 +1,5 @@
 import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
@@ -18,9 +19,14 @@ import TokenPerformance from './TokenPerformance/TokenPerformance';
 
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const communityHomeEnabled = useFlag('communityHome');
   const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
+
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -34,21 +40,18 @@ const CommunityHome = () => {
       <div className="CommunityHome">
         <div className="header-section">
           <div className="description">
-            <CWText
-              type="h1"
-              {...(communityHomeEnabled && { fontWeight: 'semiBold' })}
-            >
+            <CWText type="h1" fontWeight="semiBold">
               Community Home
             </CWText>
             <TokenDetails
-              communityId={chain}
+              communityDescription={community?.description || ''}
               communityMemberCount={app.chain.meta.profile_count || 0}
-              communityThreadCount={app.chain.meta.numVotingThreads || 0}
+              communityThreadCount={community?.lifetime_thread_count || 0}
             />
           </div>
         </div>
         <TokenPerformance />
-        <ActiveContestList />
+        <ActiveContestList isCommunityHomePage />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList

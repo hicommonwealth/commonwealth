@@ -130,3 +130,30 @@
     text-decoration-color: $neutral-600;
   }
 }
+
+.AuthorAndPublishInfo.community-home-layout {
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 5px;
+  gap: 8px !important;
+
+  > * {
+    height: 100% !important;
+    line-height: 100% !important;
+  }
+
+  .User {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .user-avatar {
+      margin-right: 0 !important;
+    }
+
+    .username {
+      font-size: medium;
+      font-weight: bold;
+    }
+  }
+}

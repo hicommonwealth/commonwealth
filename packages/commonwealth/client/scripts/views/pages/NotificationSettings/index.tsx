@@ -13,6 +13,7 @@ import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { PushNotificationsToggleMaster } from 'views/pages/NotificationSettings/PushNotificationsToggleMaster';
 import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactNativeAboutSection';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
@@ -127,7 +128,7 @@ const NotificationSettings = () => {
                   </div>
 
                   <div className="setting-container-right">
-                    <PushNotificationsToggle pref="mobile_push_notifications_enabled" />
+                    <PushNotificationsToggleMaster />
                   </div>
                 </div>
 

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -12,7 +11,19 @@ const includeContestManagersQuery = `
                                                 '{content}', -- Set the 'content' key in the resulting JSONB
                                                 coalesce(
                                                     -- Aggregates the filtered actions into content
-                                                        (SELECT jsonb_agg(ca)
+                                                        (SELECT jsonb_agg(json_build_object(
+                                                          'contest_address', ca.contest_address,
+                                                          'contest_id', ca.contest_id,
+                                                          'content_id', ca.content_id,
+                                                          'actor_address', ca.actor_address,
+                                                          'action', ca.action,
+                                                          'content_url', ca.content_url,
+                                                          'voting_power', ca.voting_power::text,
+                                                          'created_at', ca.created_at,
+                                                          'thread_id', ca.thread_id,
+                                                          'calculated_voting_weight', ca.calculated_voting_weight,
+                                                          'cast_deleted_at', ca.cast_deleted_at
+                                                        ))
                                                          FROM "ContestActions" ca
                                                          WHERE ca.contest_address = cm.contest_address
                                                            AND ca.action = 'added'
@@ -74,6 +85,7 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
                                      t.token_symbol,
                                      t.vote_weight_multiplier,
                                      t.token_address,
+                                     t.token_decimals,
                                      cn.url as chain_node_url,
                                      cn.eth_chain_id as eth_chain_id,
                                      t.created_at::text           AS created_at,
@@ -102,11 +114,6 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
       });
 
       results.forEach((r) => {
-        r.active_contest_managers?.forEach((cm) => {
-          cm.content.forEach((c) => {
-            c.voting_power = BigNumber.from(c.voting_power).toString();
-          });
-        });
         if (r.chain_node_url) {
           r.chain_node_url = buildChainNodeUrl(r.chain_node_url, 'public');
         }
