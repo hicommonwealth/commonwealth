@@ -1,6 +1,4 @@
-import { models } from '@hicommonwealth/model';
-import { z } from 'zod';
-import { GraphileTask } from '../types';
+import { GraphileTask, TaskPayloads, models } from '@hicommonwealth/model';
 
 const runDbMaintenance = async () => {
   await models.sequelize.query(`
@@ -9,6 +7,6 @@ const runDbMaintenance = async () => {
 };
 
 export const runDbMaintenanceTask: GraphileTask = {
-  input: z.undefined(),
+  input: TaskPayloads.RunDbMaintenance,
   fn: runDbMaintenance,
 };

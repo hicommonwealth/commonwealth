@@ -34,7 +34,7 @@ export const preset: GraphileConfig.Preset = {
     maxPoolSize: 10,
     pollInterval: 2_000,
     preparedStatements: true,
-    schema: 'GraphileWorker',
+    schema: 'graphile_worker',
     concurrentJobs: 5,
     logger: graphileLogger,
   },

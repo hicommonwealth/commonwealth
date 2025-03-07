@@ -1,12 +1,11 @@
 import { logger, stats } from '@hicommonwealth/core';
+import { GraphileTask, TaskPayloads } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
-import { z } from 'zod';
 import { config } from '../../../config';
-import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
 
@@ -38,6 +37,6 @@ const updateSitemaps = async () => {
 };
 
 export const sitemapTask: GraphileTask = {
-  input: z.undefined(),
+  input: TaskPayloads.UpdateSitemap,
   fn: updateSitemaps,
 };

@@ -1,8 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { GraphileTask, models, TaskPayloads } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
-import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
 
@@ -76,6 +74,6 @@ export const cleanSubscriptions = async () => {
 };
 
 export const cleanSubscriptionsTask: GraphileTask = {
-  input: z.undefined(),
+  input: TaskPayloads.CleanSubscriptions,
   fn: cleanSubscriptions,
 };

@@ -1,7 +1,11 @@
-import { CustomCronItem, GraphileQueues, GraphileTasks } from './types';
+import {
+  CustomCronItem,
+  GraphileQueues,
+  GraphileTaskNames,
+} from '@hicommonwealth/model';
 
 const cleanSubscriptionsCronItem: CustomCronItem = {
-  task: GraphileTasks.CleanSubscriptions,
+  task: GraphileTaskNames.CleanSubscriptions,
   match: '0 8 * * *', // 8 AM everyday
   options: {
     backfillPeriod: 0,
@@ -11,7 +15,7 @@ const cleanSubscriptionsCronItem: CustomCronItem = {
 };
 
 const cleanChainEventXpSourcesCronItem: CustomCronItem = {
-  task: GraphileTasks.CleanChainEventXpSources,
+  task: GraphileTaskNames.CleanChainEventXpSources,
   match: '0 9 * * *', // 9 AM everyday
   options: {
     backfillPeriod: 0,
@@ -21,7 +25,7 @@ const cleanChainEventXpSourcesCronItem: CustomCronItem = {
 };
 
 const archiveOutboxCronItem: CustomCronItem = {
-  task: GraphileTasks.ArchiveOutbox,
+  task: GraphileTaskNames.ArchiveOutbox,
   match: '0 10 * * *', // 10 AM everyday
   options: {
     backfillPeriod: 0,
@@ -31,7 +35,7 @@ const archiveOutboxCronItem: CustomCronItem = {
 };
 
 const runDbMaintenanceCronItem: CustomCronItem = {
-  task: GraphileTasks.RunDbMaintenance,
+  task: GraphileTaskNames.RunDbMaintenance,
   match: '0 11 * * *', // 11 AM everyday
   options: {
     backfillPeriod: 0,
@@ -41,7 +45,7 @@ const runDbMaintenanceCronItem: CustomCronItem = {
 };
 
 const updateSitemapCronItem: CustomCronItem = {
-  task: GraphileTasks.UpdateSitemap,
+  task: GraphileTaskNames.UpdateSitemap,
   match: '0 * * * *', // every hour
   options: {
     backfillPeriod: 0,

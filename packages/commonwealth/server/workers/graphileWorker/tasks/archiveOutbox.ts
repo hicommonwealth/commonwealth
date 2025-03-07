@@ -1,12 +1,10 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
+import { GraphileTask, TaskPayloads, config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { Task } from 'graphile-worker';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
-import { z } from 'zod';
-import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
 
@@ -178,6 +176,6 @@ const archiveOutbox: Task = async () => {
 };
 
 export const archiveOutboxTask: GraphileTask = {
-  input: z.undefined(),
+  input: TaskPayloads.ArchiveOutbox,
   fn: archiveOutbox,
 };

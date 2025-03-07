@@ -1,8 +1,8 @@
 import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import { preset } from '@hicommonwealth/model';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { cronItems } from './cronJobs';
-import { preset } from './graphile.config';
 import { graphileTasks, taskFactory } from './tasks';
 
 const log = logger(import.meta);
@@ -20,7 +20,7 @@ async function startGraphileWorker() {
       throw new Error(`Cron job task not found: ${cronJob.task}`);
   }
 
-  await run({
+  const r = await run({
     parsedCronItems: parseCronItems(cronItems),
     preset,
     taskList: Object.entries(graphileTasks).reduce(
@@ -32,6 +32,7 @@ async function startGraphileWorker() {
     ),
   });
   log.info('Graphile Worker started');
+  r.addJob;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
