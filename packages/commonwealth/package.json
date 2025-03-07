@@ -196,6 +196,7 @@
     "feed": "^4.2.2",
     "firebase": "^10.12.1",
     "frames.js": "^0.19.3",
+    "graphile-worker": "^0.16.6",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
     "handlebars": "^4.7.8",

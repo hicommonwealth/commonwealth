@@ -1,10 +1,13 @@
-import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
-import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import { S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, logger } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
+import { Task } from 'graphile-worker';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
+import { z } from 'zod';
+import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
 const _blobStorage = blobStorage({
@@ -139,7 +142,7 @@ function getCompressedDumpName(dumpName: string): string {
   return `${dumpName}.gz`;
 }
 
-async function main() {
+const archiveOutbox: Task = async () => {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
   log.info(`Found ${tables.length} to archive`, {
@@ -176,20 +179,9 @@ async function main() {
   } else {
     log.info('No tables needed to be archived');
   }
-}
+};
 
-if (import.meta.url.endsWith(process.argv[1])) {
-  stats({
-    adapter: HotShotsStats(),
-  });
-  main()
-    .then(async () => {
-      stats().on('cw.scheduler.archive-outbox');
-      await dispose()('EXIT', true);
-    })
-    .catch(async (err) => {
-      stats().off('cw.scheduler.archive-outbox');
-      log.fatal('Failed to archive outbox child partitions to S3', err);
-      await dispose()('ERROR', true);
-    });
-}
+export const archiveOutboxTask: GraphileTask = {
+  input: z.undefined(),
+  fn: archiveOutbox,
+};
