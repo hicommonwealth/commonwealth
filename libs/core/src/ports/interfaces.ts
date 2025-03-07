@@ -306,13 +306,6 @@ export type NotificationsProviderRecipient =
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
-  actor?: {
-    id: string;
-    profile_name: string;
-    profile_url: string;
-    email?: string;
-    profile_avatar_url?: string;
-  };
 };
 
 export type NotificationUser = {
