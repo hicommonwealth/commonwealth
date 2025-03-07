@@ -4,11 +4,17 @@ import { ZodSchema, ZodUndefined, z } from 'zod';
 export enum GraphileTasks {
   ArchiveOutbox = 'ArchiveOutbox',
   UpdateSitemap = 'UpdateSitemap',
+  CleanSubscriptions = 'CleanSubscriptions',
+  CleanChainEventXpSources = 'CleanChainEventXpSources',
+  RunDbMaintenance = 'RunDbMaintenance',
 }
 
 export enum GraphileQueues {
   ArchiveOutbox = 'ArchiveOutbox',
   UpdateSitemap = 'UpdateSitemap',
+  CleanSubscriptions = 'CleanSubscriptions',
+  CleanChainEventXpSources = 'CleanChainEventXpSources',
+  RunDbMaintenance = 'RunDbMaintenance',
 }
 
 export type GraphileTask<
