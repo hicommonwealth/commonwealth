@@ -109,6 +109,8 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             entries={farcasterCasts || []}
             selectedSort={selectedSort}
             onSortChange={(sort) => setSelectedSort(sort)}
+            contestDecimals={contest?.decimals || 0}
+            voteWeightMultiplier={contest?.vote_weight_multiplier || 0}
           />
         </div>
       </div>

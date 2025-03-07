@@ -340,6 +340,7 @@ describe('Contests projection lifecycle', () => {
         topic_id: topic_id,
         topics: [{ id: topic_id, name: 'test-topic' }],
         is_farcaster_contest: true,
+        vote_weight_multiplier: null,
         contests: [
           {
             contest_id,
