@@ -1,8 +1,6 @@
-import {
-  commonProtocol,
-  contestAbi,
-  erc20Abi,
-} from '@hicommonwealth/evm-protocols';
+import { ContestGovernorAbi } from '@commonxyz/common-protocol-abis';
+import { commonProtocol, erc20Abi } from '@hicommonwealth/evm-protocols';
+
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -15,7 +13,7 @@ class Contest extends ContractBase {
   namespaceFactory: NamespaceFactory;
 
   constructor(contractAddress: string, factoryAddress: string, rpc: string) {
-    super(contractAddress, contestAbi, rpc);
+    super(contractAddress, ContestGovernorAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
   }
 

@@ -1,9 +1,11 @@
-import { config, dispose, handleEvent } from '@hicommonwealth/core';
+import { config, dispose, handleEvent, query } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { emitEvent, models } from '../../src';
+import { GetTopics } from '../../src/community';
 import { Contests } from '../../src/contest';
+import { systemActor } from '../../src/middleware';
 import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils/outbox-drain';
@@ -179,6 +181,15 @@ describe('Contest Worker Policy Lifecycle', () => {
     ]);
 
     await drainOutbox(['ThreadUpvoted'], ContestWorker);
+
+    const topics = await query(GetTopics(), {
+      actor: systemActor({}),
+      payload: {
+        community_id: communityId,
+        with_contest_managers: true,
+      },
+    });
+    expect(topics).to.have.length(1);
 
     expect(voteContentStub).toHaveBeenCalled();
 

@@ -38,7 +38,7 @@ export function UpdateContestManagerFrameHashes(): Command<
         mustExist('Neynar Webhook', existingCastWebhook);
 
         // remove and add hashes to subscription
-        const parent_hashes = _.uniq([
+        const allParentHashes = _.uniq([
           ...(existingCastWebhook?.subscription?.filters['cast.created']
             ?.parent_hashes || []),
           ...(existingCastWebhook?.subscription?.filters['cast.deleted']
@@ -55,13 +55,13 @@ export function UpdateContestManagerFrameHashes(): Command<
           'cast.created': {
             ...(existingCastWebhook.subscription?.filters['cast.created'] ||
               {}),
-            parent_hashes,
+            parent_hashes: allParentHashes,
           },
           // reply cast deleted on parent
           'cast.deleted': {
             ...(existingCastWebhook.subscription?.filters['cast.deleted'] ||
               {}),
-            parent_hashes,
+            parent_hashes: allParentHashes,
           },
         };
 
@@ -76,7 +76,13 @@ export function UpdateContestManagerFrameHashes(): Command<
 
         if (!payload.webhooks_only) {
           // update contest manager frame hashes
-          contestManager.farcaster_frame_hashes = parent_hashes;
+          contestManager.farcaster_frame_hashes = (
+            contestManager.farcaster_frame_hashes || []
+          )
+            .filter((hash) => {
+              return !(payload.frames_to_remove || []).includes(hash);
+            })
+            .concat(payload.frames_to_add || []);
           await contestManager.save();
         }
       });

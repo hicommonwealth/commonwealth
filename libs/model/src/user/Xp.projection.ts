@@ -1,10 +1,11 @@
 import { Projection } from '@hicommonwealth/core';
+import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { isWithinPeriod } from '@hicommonwealth/shared';
+import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
@@ -404,6 +405,26 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
         );
       },
+      TwitterCommonMentioned: async ({ payload }) => {
+        const address = await models.Address.findOne({
+          where: {
+            oauth_provider: WalletSsoSource.Twitter,
+            oauth_username: payload.username,
+          },
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'TwitterCommonMentioned',
+          // TODO: create system quest?
+          undefined,
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+        );
+      },
       CommonDiscordServerJoined: async ({ payload }) => {
         if (payload.user_id) {
           const action_metas = await getQuestActionMetas(
@@ -416,6 +437,29 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             action_metas,
           );
         }
+      },
+      XpChainEventCreated: async ({ payload }) => {
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
+          where: {
+            eth_chain_id: payload.eth_chain_id,
+          },
+        });
+        if (!chainNode) return;
+        const { tx } = await getTransaction({
+          rpc: chainNode.private_url || chainNode.url,
+          txHash: payload.transaction_hash,
+        });
+        const user_id = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user_id) return;
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
       },
     },
   };

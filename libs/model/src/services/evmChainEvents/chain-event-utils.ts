@@ -1,59 +1,24 @@
 import {
-  communityStakesAbi,
-  decodeLog,
+  CommunityStakeAbi,
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+  LPBondingCurveAbi,
+  NamespaceFactoryAbi,
+  ReferralFeeManagerAbi,
+} from '@commonxyz/common-protocol-abis';
+import {
   EvmEventSignatures,
+  decodeLog,
   getEvmAddress,
-  lpBondingCurveAbi,
-  namespaceFactoryAbi,
-  recurringContestAbi,
-  referralFeeManager,
-  singleContestAbi,
 } from '@hicommonwealth/evm-protocols';
-import { EventPair, Events } from '@hicommonwealth/schemas';
-
-export type EvmBlockDetails = {
-  number: bigint;
-  hash: string;
-  logsBloom: string;
-  nonce?: string;
-  parentHash: string;
-  timestamp: bigint;
-  miner: string;
-  gasLimit: bigint;
-};
-
-export type Log = {
-  blockNumber: bigint;
-  blockHash: string;
-  transactionIndex: number;
-
-  removed: boolean;
-
-  address: string;
-  data: string;
-
-  topics: Array<string>;
-
-  transactionHash: string;
-  logIndex: number;
-};
-
-export type EvmEvent = {
-  eventSource: {
-    ethChainId: number;
-    eventSignature: string;
-  };
-  rawLog: Log;
-  block: EvmBlockDetails;
-};
-
-type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
+import { Events } from '@hicommonwealth/schemas';
+import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof communityStakesAbi, 'Trade'>({
-    abi: communityStakesAbi,
+  const decoded = decodeLog<typeof CommunityStakeAbi, 'Trade'>({
+    abi: CommunityStakeAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -69,8 +34,8 @@ const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
 const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof namespaceFactoryAbi, 'DeployedNamespace'>({
-    abi: namespaceFactoryAbi,
+  const decoded = decodeLog<typeof NamespaceFactoryAbi, 'DeployedNamespace'>({
+    abi: NamespaceFactoryAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -87,10 +52,10 @@ const referralNamespaceDeployedMapper: EvmMapper<
   'NamespaceDeployedWithReferral'
 > = (event: EvmEvent) => {
   const decoded = decodeLog<
-    typeof namespaceFactoryAbi,
+    typeof NamespaceFactoryAbi,
     'DeployedNamespaceWithReferral'
   >({
-    abi: namespaceFactoryAbi,
+    abi: NamespaceFactoryAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -119,8 +84,8 @@ const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
 const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof lpBondingCurveAbi, 'Trade'>({
-    abi: lpBondingCurveAbi,
+  const decoded = decodeLog<typeof LPBondingCurveAbi, 'Trade'>({
+    abi: LPBondingCurveAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -130,11 +95,11 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
       block_timestamp: event.block.timestamp,
       transaction_hash: event.rawLog.transactionHash,
       trader_address: decoded.args.trader,
-      token_address: decoded.args.namespace,
+      token_address: decoded.args.tokenAddress,
       is_buy: decoded.args.isBuy,
       eth_chain_id: event.eventSource.ethChainId,
       eth_amount: decoded.args.ethAmount,
-      community_token_amount: decoded.args.communityTokenAmount,
+      community_token_amount: decoded.args.tokenAmount,
       floating_supply: decoded.args.floatingSupply,
     },
   };
@@ -143,8 +108,8 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
 const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof referralFeeManager, 'FeesDistributed'>({
-    abi: referralFeeManager,
+  const decoded = decodeLog<typeof ReferralFeeManagerAbi, 'FeesDistributed'>({
+    abi: ReferralFeeManagerAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -160,8 +125,8 @@ const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
 const contestManagerDeployedMapper: EvmMapper<
   'RecurringContestManagerDeployed' | 'OneOffContestManagerDeployed'
 > = (event: EvmEvent) => {
-  const decoded = decodeLog<typeof namespaceFactoryAbi, 'NewContest'>({
-    abi: namespaceFactoryAbi,
+  const decoded = decodeLog<typeof NamespaceFactoryAbi, 'NewContest'>({
+    abi: NamespaceFactoryAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -195,10 +160,10 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
   event: EvmEvent,
 ) => {
   const decoded = decodeLog<
-    typeof recurringContestAbi,
+    typeof ContestGovernorAbi,
     'NewRecurringContestStarted'
   >({
-    abi: recurringContestAbi,
+    abi: ContestGovernorAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -217,13 +182,14 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
 const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof singleContestAbi, 'NewSingleContestStarted'>(
-    {
-      abi: singleContestAbi,
-      data: event.rawLog.data,
-      topics: event.rawLog.topics,
-    },
-  );
+  const decoded = decodeLog<
+    typeof ContestGovernorSingleAbi,
+    'NewSingleContestStarted'
+  >({
+    abi: ContestGovernorSingleAbi,
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
   return {
     event_name: 'ContestStarted',
     event_payload: {
@@ -239,8 +205,8 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
 const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof recurringContestAbi, 'ContentAdded'>({
-    abi: recurringContestAbi,
+  const decoded = decodeLog<typeof ContestGovernorAbi, 'ContentAdded'>({
+    abi: ContestGovernorAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -258,8 +224,8 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
 const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof recurringContestAbi, 'VoterVoted'>({
-    abi: recurringContestAbi,
+  const decoded = decodeLog<typeof ContestGovernorAbi, 'VoterVoted'>({
+    abi: ContestGovernorAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -284,8 +250,8 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
 const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof singleContestAbi, 'VoterVoted'>({
-    abi: singleContestAbi,
+  const decoded = decodeLog<typeof ContestGovernorSingleAbi, 'VoterVoted'>({
+    abi: ContestGovernorSingleAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
@@ -298,6 +264,27 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
       content_id: Number(contentId),
       voter_address,
       voting_power: votingPower.toString(),
+    },
+  };
+};
+
+const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
+  event: EvmEvent,
+) => {
+  if (
+    !('quest_action_meta_id' in event.meta) ||
+    !event.meta.quest_action_meta_id
+  ) {
+    throw new Error('Custom XP chain event is missing quest action meta id');
+  }
+
+  return {
+    event_name: 'XpChainEventCreated',
+    event_payload: {
+      eth_chain_id: event.eventSource.ethChainId,
+      quest_action_meta_id: event.meta.quest_action_meta_id,
+      transaction_hash: event.rawLog.transactionHash,
+      created_at: new Date(Number(event.block.timestamp)),
     },
   };
 };
@@ -331,4 +318,7 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // User defined events (no hardcoded event signatures)
+  XpChainEventCreated: xpChainEventCreatedMapper,
 };
