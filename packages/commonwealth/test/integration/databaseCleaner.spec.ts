@@ -9,7 +9,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { DatabaseCleaner } from '../../server/util/databaseCleaner';
+import { cleanSubscriptions } from '../../server/workers/graphileWorker/tasks/cleanSubscriptions';
 
 chai.use(chaiHttp);
 
@@ -143,9 +143,7 @@ describe('DatabaseCleaner Tests', async () => {
         community_id: 'ethereum',
       });
 
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.init(models);
-      await dbCleaner.executeQueries();
+      await cleanSubscriptions();
 
       const newThreadSubRes = await models.ThreadSubscription.findOne({
         where: {

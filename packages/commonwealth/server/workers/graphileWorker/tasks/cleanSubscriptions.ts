@@ -6,7 +6,7 @@ import { GraphileTask } from '../types';
 
 const log = logger(import.meta);
 
-const cleanSubscriptions = async () => {
+export const cleanSubscriptions = async () => {
   let subsDeleted = 0;
   await models.sequelize.transaction(async (t) => {
     // user has no addresses at all, and user was last updated before a year ago
