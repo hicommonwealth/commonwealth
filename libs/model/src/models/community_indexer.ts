@@ -3,7 +3,9 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type CommunityIndexerAttributes = z.infer<typeof CommunityIndexer>;
+export type CommunityIndexerAttributes = z.infer<typeof CommunityIndexer> & {
+  // associations
+};
 
 export type CommunityIndexerInstance =
   ModelInstance<CommunityIndexerAttributes>;
