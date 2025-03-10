@@ -69,7 +69,9 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
         for (const indexer of idleIndexers) {
           try {
             if (!indexer.last_checked) {
-              log.warn(`${indexer.id} indexer must be backfilled`);
+              log.warn(
+                `${indexer.id} indexer must be backfilled via "pnpm backfill-clanker-tokens"`,
+              );
               continue;
             }
 
