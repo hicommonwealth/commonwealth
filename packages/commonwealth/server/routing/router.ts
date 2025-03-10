@@ -65,6 +65,7 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
+import adminTagsRouter from '../api/admin-tags';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
@@ -332,6 +333,13 @@ function setupRouter(
     'get',
     '/tags',
     getTagsHandler.bind(this, serverControllers),
+  );
+
+  // admin tags management
+  router.use(
+    '/api/v1/admin',
+    passport.authenticate('jwt', { session: false }),
+    adminTagsRouter,
   );
 
   // roles
