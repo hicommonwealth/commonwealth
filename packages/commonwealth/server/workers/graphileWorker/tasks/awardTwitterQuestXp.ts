@@ -7,6 +7,7 @@ import { z } from 'zod';
 const awardTwitterQuestX = async (
   payload: z.infer<typeof TaskPayloads.AwardTwitterQuestXp>,
 ) => {
+  await Promise.resolve();
   console.log(payload);
 };
 
