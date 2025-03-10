@@ -1,25 +1,26 @@
 import { OpenAI } from 'openai';
 import { config } from '../../config';
 
-const COMMENT_AI_PROMPTS_CONFIG = {
-  comment: (userText?: string) => `
-      Please generate a thoughtful comment to add to the thread${userText ? ': ' + userText : ''}. 
-      The comment should be insightful, friendly, and a bit humorous. Please provide the comment text only.
+const THREAD_AI_PROMPTS_CONFIG = {
+  thread: (userText?: string) => `
+      Please generate a thoughtful thread${userText ? ' about: ' + userText : ''}. 
+      The thread should be insightful, well-structured, and engaging. It should present a clear topic and invite discussion.
+      Please provide the thread text only.
     `,
 };
 
-const CommentErrors = {
+const ThreadErrors = {
   OpenAINotConfigured: 'OpenAI key not configured',
   OpenAIInitFailed: 'OpenAI initialization failed',
-  RequestFailed: 'failed to generate comment',
+  RequestFailed: 'failed to generate thread',
 };
 
-const generateCommentText = async function* ({
+const generateThreadText = async function* ({
   userText,
 }: {
   userText?: string;
 }): AsyncGenerator<
-  string | { error: (typeof CommentErrors)[keyof typeof CommentErrors] },
+  string | { error: (typeof ThreadErrors)[keyof typeof ThreadErrors] },
   void,
   unknown
 > {
@@ -29,7 +30,7 @@ const generateCommentText = async function* ({
     : config.OPENAI.API_KEY;
 
   if (!apiKey) {
-    yield { error: CommentErrors.OpenAINotConfigured };
+    yield { error: ThreadErrors.OpenAINotConfigured };
     return;
   }
 
@@ -49,7 +50,7 @@ const generateCommentText = async function* ({
     openai = new OpenAI(openAIConfig);
   } catch (error) {
     console.error('Failed to initialize OpenAI:', error);
-    yield { error: CommentErrors.OpenAIInitFailed };
+    yield { error: ThreadErrors.OpenAIInitFailed };
     return;
   }
 
@@ -60,7 +61,7 @@ const generateCommentText = async function* ({
       messages: [
         {
           role: 'user',
-          content: COMMENT_AI_PROMPTS_CONFIG.comment(userText),
+          content: THREAD_AI_PROMPTS_CONFIG.thread(userText),
         },
       ],
       stream: true,
@@ -95,8 +96,8 @@ const generateCommentText = async function* ({
     }
   } catch (e) {
     console.error('Error in OpenAI stream:', e);
-    yield { error: CommentErrors.RequestFailed };
+    yield { error: ThreadErrors.RequestFailed };
   }
 };
 
-export { generateCommentText };
+export { generateThreadText };

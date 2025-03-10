@@ -6,6 +6,7 @@ import {
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
@@ -16,7 +17,10 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { useCreateThreadMutation } from 'state/api/threads';
+import {
+  useCreateThreadMutation,
+  useGenerateThreadText,
+} from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
@@ -39,7 +43,6 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
-import { useFlag } from 'hooks/useFlag';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -124,6 +127,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   } = useNewThreadForm(selectedCommunityId, topicsForSelector);
 
   const { generateComment } = useGenerateCommentText();
+  const { generateThread } = useGenerateThreadText();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const hasTopicOngoingContest =
@@ -362,7 +366,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     bodyAccumulatedRef.current = '';
 
     try {
-      const bodyPromise = generateComment(
+      const bodyPromise = generateThread(
         'Generate a detailed discussion thread body',
         (chunk: string) => {
           bodyAccumulatedRef.current += chunk;
