@@ -312,9 +312,10 @@ export function mapToAbiRes<
       (item): item is abiFunction =>
         item.type === 'function' && item.name === functionName,
     )!
-    .outputs.reduce((acc, output, index) => {
-      acc[(output.name as keyof args) || index] = args[index];
+    .outputs.reduce((acc, o, index) => {
+      acc[(o.name as keyof args) || index] = args[index];
       return acc;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as any);
   return output;
 }
