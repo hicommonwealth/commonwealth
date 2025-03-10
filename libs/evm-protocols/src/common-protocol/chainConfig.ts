@@ -36,6 +36,7 @@ type factoryContractsType = {
     lpBondingCurve?: string;
     tokenCommunityManager?: string;
     referralFeeManager?: string;
+    veBridge?: string;
     chainId: number;
   };
 };
@@ -55,6 +56,7 @@ export const factoryContracts = {
     lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
     tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
+    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -107,6 +109,7 @@ export const factoryContracts = {
     launchpad: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
     lpBondingCurve: '0xc5a5C42992dECbae36851359345FE25997F5C42d',
     tokenCommunityManager: '0x851356ae760d987E095750cCeb3bC6014560891C',
+    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE', // TODO: Double check this address
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;

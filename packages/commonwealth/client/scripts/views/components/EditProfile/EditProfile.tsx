@@ -263,7 +263,8 @@ const EditProfile = () => {
             <CWDivider />
             <ProfileSection
               title="General Info"
-              description="Let your community and others get to know you by sharing a bit about yourself."
+              description="Let your community and others get to know you by sharing a bit about yourself. These
+               will be publicly displayed on your profile"
               className="input-controls"
             >
               <div className="profile-image-section">

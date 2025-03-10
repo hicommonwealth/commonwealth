@@ -424,4 +424,57 @@ export const events = {
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),
+
+  // TokenStaking - TODO: review mapping rules with @timolegros
+  TokenLocked: ChainEventBase.extend({
+    parsedArgs: z.object({
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      amount: z.coerce.bigint().describe('Locked amount'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      duration: z.coerce.bigint().describe('Duration (in seconds)'),
+      isPermanent: z.boolean().describe('Is permanent'),
+    }),
+  }),
+  TokenLockDurationIncreased: ChainEventBase.extend({
+    parsedArgs: z.object({
+      tokenId: z.coerce.bigint().describe('Token id'),
+      newDuration: z.coerce.bigint().describe('New duration (in seconds)'),
+    }),
+  }),
+  TokenUnlocked: ChainEventBase.extend({
+    parsedArgs: z.object({
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      amount: z.coerce.bigint().describe('Locked amount'),
+    }),
+  }),
+  TokenPermanentConverted: ChainEventBase.extend({
+    parsedArgs: z.object({
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+      amount: z.coerce.bigint().describe('Locked amount'),
+      duration: z.coerce.bigint().describe('Duration (in seconds)'),
+    }),
+  }),
+  TokenDelegated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      fromuser: EVM_ADDRESS_STRICT.describe('From user address'),
+      touser: EVM_ADDRESS_STRICT.describe('To user address'),
+      tokenId: z.coerce.bigint().describe('Token id'),
+    }),
+  }),
+  TokenUndelegated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      tokenId: z.coerce.bigint().describe('Token id'),
+    }),
+  }),
+  TokenMerged: ChainEventBase.extend({
+    parsedArgs: z.object({
+      address: EVM_ADDRESS_STRICT.describe('User address'),
+      fromTokenId: z.coerce.bigint().describe('From token id'),
+      toTokenId: z.coerce.bigint().describe('To token id'),
+      newAmount: z.coerce.bigint().describe('New amount'),
+      newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
+    }),
+  }),
 } as const;
