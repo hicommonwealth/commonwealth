@@ -3,9 +3,9 @@ import { config } from '../../config';
 
 const THREAD_AI_PROMPTS_CONFIG = {
   thread: (userText?: string) => `
-      Please generate a thoughtful thread${userText ? ' about: ' + userText : ''}. 
+      Please generate a thoughtful thread${userText ? ' based on the following context: ' + userText : ''}. 
       The thread should be insightful, well-structured, and engaging. It should present a clear topic and invite discussion.
-      Please provide the thread text only.
+      Please provide the thread text only. Do not summarize the context, rather use it as a starting point for the thread.
     `,
 };
 
@@ -24,6 +24,7 @@ const generateThreadText = async function* ({
   void,
   unknown
 > {
+  console.log('generateThreadText', userText);
   const useOpenRouter = config.OPENAI.USE_OPENROUTER === 'true';
   const apiKey = useOpenRouter
     ? config.OPENAI.OPENROUTER_API_KEY

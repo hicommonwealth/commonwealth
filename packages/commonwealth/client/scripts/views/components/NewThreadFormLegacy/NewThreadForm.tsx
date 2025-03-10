@@ -22,6 +22,7 @@ import {
   useGenerateThreadText,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
@@ -125,6 +126,16 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     canShowTopicPermissionBanner,
     setCanShowTopicPermissionBanner,
   } = useNewThreadForm(selectedCommunityId, topicsForSelector);
+
+  const { data: recentThreads } = useFetchThreadsQuery({
+    queryType: 'bulk',
+    limit: 3,
+    communityId: selectedCommunityId,
+    apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
+    topicId: threadTopic?.id,
+  });
+
+  console.log('recentThreads', recentThreads);
 
   const { generateComment } = useGenerateCommentText();
   const { generateThread } = useGenerateThreadText();
@@ -365,9 +376,13 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
 
+    const context = recentThreads?.map((thread) => {
+      return `Title: ${thread.title}\nBody: ${thread.body}`;
+    });
+
     try {
-      const bodyPromise = generateThread(
-        'Generate a detailed discussion thread body',
+      const body = await generateThread(
+        `Context: ${context.join('\n')}`,
         (chunk: string) => {
           bodyAccumulatedRef.current += chunk;
           setThreadContentDelta(
@@ -376,8 +391,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         },
       );
 
-      const titlePromise = generateComment(
-        'Generate a single-line, concise title (max 100 characters) without quotes or punctuation at the end',
+      await generateComment(
+        `Generate a single-line, concise title (max 100 characters) 
+        without quotes or punctuation at the end based on the body: ${body}`,
         (chunk: string) => {
           const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
           setThreadTitle((prev) =>
@@ -385,8 +401,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           );
         },
       );
-
-      await Promise.all([bodyPromise, titlePromise]);
     } catch (error) {
       console.error('Error generating AI thread:', error);
     } finally {
