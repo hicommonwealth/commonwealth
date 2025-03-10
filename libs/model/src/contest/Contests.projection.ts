@@ -9,22 +9,13 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import {
-  buildContestLeaderboardUrl,
-  getBaseUrl,
-  getDefaultContestImage,
-} from '@hicommonwealth/shared';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import { getWeightedNumTokens } from '../services/stakeHelper';
-import {
-  decodeThreadContentUrl,
-  getChainNodeUrl,
-  parseFarcasterContentUrl,
-  publishCast,
-} from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -48,10 +39,9 @@ const inputs = {
 };
 
 /**
- * Makes sure contest manager (off-chain metadata) record exists
- * - Alerts when not found and inserts default record to patch distributed transaction
+ * Creates initial contest projection and adds EVM event sources
  */
-async function updateOrCreateWithAlert(
+async function createInitialContest(
   namespace: string,
   contest_address: string,
   interval: number,
@@ -92,7 +82,7 @@ async function updateOrCreateWithAlert(
   );
 
   await models.sequelize.transaction(async (transaction) => {
-    const [updated] = await models.ContestManager.update(
+    const [contestManager] = await models.ContestManager.update(
       {
         interval,
         ticker,
@@ -100,33 +90,7 @@ async function updateOrCreateWithAlert(
       },
       { where: { contest_address }, returning: true, transaction },
     );
-    if (!updated) {
-      // when contest manager metadata is not found, it means it failed creation or was deleted
-      // here we are alerting admins and creating a default entry
-      const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
-      log.error(
-        msg,
-        new MissingContestManager(msg, namespace, contest_address),
-      );
-      mustExist(`Community with namespace: ${namespace}`, community);
-
-      await models.ContestManager.create(
-        {
-          contest_address,
-          community_id: community.id!,
-          interval,
-          ticker,
-          decimals,
-          created_at: new Date(),
-          name: community.name,
-          image_url: getDefaultContestImage(),
-          payout_structure: [],
-          is_farcaster_contest: false,
-          environment: config.APP_ENV,
-        },
-        { transaction },
-      );
-    }
+    mustExist('Contest Manager', contestManager);
 
     // create first contest instance
     await models.Contest.create(
@@ -204,7 +168,7 @@ async function getContestDetails(
 
   return {
     ...result,
-    url: getChainNodeUrl({ url: result.url }),
+    url: getChainNodeUrl(result),
   };
 }
 
@@ -219,7 +183,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const score = await getContestScore(
+    const { scores, contestBalance } = await getContestScore(
       details.url,
       contest_address,
       details.prize_percentage,
@@ -228,7 +192,11 @@ export async function updateScore(contest_address: string, contest_id: number) {
       details.interval === 0,
     );
     await models.Contest.update(
-      { score, score_updated_at: new Date() },
+      {
+        score: scores,
+        score_updated_at: new Date(),
+        contest_balance: contestBalance,
+      },
       { where: { contest_address: contest_address, contest_id } },
     );
   } catch (err) {
@@ -244,7 +212,7 @@ export function Contests(): Projection<typeof inputs> {
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           payload.interval,
@@ -255,7 +223,7 @@ export function Contests(): Projection<typeof inputs> {
 
       OneOffContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           0,
@@ -272,9 +240,23 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId, isFarcaster } = decodeThreadContentUrl(
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            contest_address: payload.contest_address,
+            environment: config.APP_ENV,
+          },
+        });
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
+        const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
+
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -287,20 +269,14 @@ export function Contests(): Projection<typeof inputs> {
         });
 
         // post confirmation via FC bot
-        if (isFarcaster) {
-          const contestManager = await models.ContestManager.findByPk(
-            payload.contest_address,
-          );
+        if (farcasterInfo) {
           const leaderboardUrl = buildContestLeaderboardUrl(
             getBaseUrl(config.APP_ENV),
             contestManager!.community_id,
             contestManager!.contest_address,
           );
-          const { replyCastHash } = parseFarcasterContentUrl(
-            payload.content_url,
-          );
           await publishCast(
-            replyCastHash,
+            farcasterInfo.replyCastHash,
             ({ username }) =>
               `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
           );

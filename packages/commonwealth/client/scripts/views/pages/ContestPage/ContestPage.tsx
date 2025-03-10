@@ -1,39 +1,21 @@
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
-import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import 'react-farcaster-embed/dist/styles.css';
 import useFetchFarcasterCastsQuery from 'state/api/contests/getFarcasterCasts';
 import ContestCard from 'views/components/ContestCard';
-import { Select } from 'views/components/Select';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import FarcasterEntriesList from './FarcasterEntriesList';
 import NewContestPage from './NewContestPage';
+import { SortType, sortOptions } from './types';
 
+import { trpc } from 'client/scripts/utils/trpcClient';
 import './ContestPage.scss';
-
-export enum SortType {
-  Upvotes = 'upvotes',
-  Recent = 'recent',
-}
-
-const sortOptions = [
-  {
-    value: SortType.Upvotes,
-    label: 'Most Upvoted',
-  },
-  {
-    value: SortType.Recent,
-    label: 'Most Recent',
-  },
-];
 
 export enum MobileTabType {
   Entries = 'Entries',
@@ -49,6 +31,20 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const newContestPageEnabled = useFlag('newContestPage');
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
+
+  const [{ data: communityData }] = trpc.useQueries((t) =>
+    [contest!.community_id].map((id) =>
+      t.community.getCommunity({ id: id!, include_node_info: true }),
+    ),
+  );
+
+  const community = {
+    name: communityData?.name || '',
+    iconUrl: communityData?.icon_url || '',
+    chainNodeUrl: communityData?.ChainNode?.url || '',
+    ethChainId: communityData?.ChainNode?.eth_chain_id || 0,
+    id: communityData?.id || '',
+  };
 
   const [fundDrawerContest, setFundDrawerContest] = useState<
     typeof contest | null
@@ -99,61 +95,23 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
             onFund={() => setFundDrawerContest(contest)}
+            community={community}
+            contestBalance={parseInt(
+              contest?.contests?.[0]?.contest_balance || '0',
+              10,
+            )}
           />
         )}
 
         <div className="leaderboard-list">
-          {isFarcasterCastsLoading ? (
-            <>
-              <Skeleton height={300} width="100%" />
-              <Skeleton height={300} width="100%" />
-            </>
-          ) : !farcasterCasts?.length ? (
-            <CWText>No entries for the contest yet</CWText>
-          ) : (
-            <>
-              <div className="filter-section">
-                <CWText type="b2" fontWeight="medium">
-                  Sort
-                </CWText>
-                <Select
-                  selected={selectedSort}
-                  onSelect={(v: { value: string; label: string }) =>
-                    setSelectedSort(v.value as SortType)
-                  }
-                  options={sortOptions}
-                />
-              </div>
-
-              {farcasterCasts.map((entry) => {
-                return (
-                  <div key={entry.hash} className="cast-container">
-                    <CWUpvote
-                      disabled
-                      voteCount={entry.calculated_vote_weight || '0'}
-                    />
-
-                    <div className="upvote-small">
-                      <CWUpvoteSmall
-                        voteCount={entry.calculated_vote_weight || '0'}
-                        disabled
-                        selected={false}
-                        onClick={() => undefined}
-                        popoverContent={<></>}
-                        tooltipText="Farcaster Upvotes"
-                      />
-                    </div>
-
-                    <FarcasterEmbed
-                      key={entry.hash}
-                      hash={entry.hash}
-                      username={entry.author.username}
-                    />
-                  </div>
-                );
-              })}
-            </>
-          )}
+          <FarcasterEntriesList
+            isLoading={isFarcasterCastsLoading}
+            entries={farcasterCasts || []}
+            selectedSort={selectedSort}
+            onSortChange={(sort) => setSelectedSort(sort)}
+            contestDecimals={contest?.decimals || 0}
+            voteWeightMultiplier={contest?.vote_weight_multiplier || 0}
+          />
         </div>
       </div>
       <FundContestDrawer

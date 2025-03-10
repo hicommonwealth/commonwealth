@@ -1,6 +1,7 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
 import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import React from 'react';
+import useUserStore from 'state/ui/user';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -8,29 +9,31 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
 import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
-import { doesActionRequireCreatorReward } from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
+import {
+  doesActionRequireRewardShare,
+  doesActionRewardShareForReferrer,
+} from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
 import './QuestActionCard.scss';
 
 // TODO: fix types with schemas.Events keys
 const actionCopies = {
   title: {
-    ['SignUpFlowCompleted']: 'Signup on Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
     ['ThreadUpvoted']: 'Upvote a thread',
     ['CommentCreated']: 'Create a comment',
     ['CommentUpvoted']: 'Upvote a comment',
-    ['UserMentioned']: 'Mention a user',
+    ['WalletLinked']: 'Link a Web3 wallet with your account',
+    ['SSOLinked']: 'Link an SSO method with your account',
   },
   shares: {
-    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: 'referrer',
     ['CommunityJoined']: 'referrer',
     ['ThreadCreated']: '',
     ['ThreadUpvoted']: '',
     ['CommentCreated']: '',
-    ['CommentUpvoted']: 'comment owner',
+    ['CommentUpvoted']: 'comment creator',
     ['UserMentioned']: '',
   },
 };
@@ -64,6 +67,11 @@ const QuestActionCard = ({
     value: questAction.creator_reward_weight * questAction.reward_amount,
   };
 
+  const user = useUserStore();
+  const isUserReferred = !!user.referredByAddress;
+  const hideShareSplit =
+    doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
+
   return (
     <div className="QuestActionCard">
       <div className="counter">
@@ -76,7 +84,8 @@ const QuestActionCard = ({
           <CWText type="b1" fontWeight="semiBold">
             {actionCopies.title[questAction.event_name]}
           </CWText>
-          {doesActionRequireCreatorReward(questAction.event_name) &&
+          {!hideShareSplit &&
+            doesActionRequireRewardShare(questAction.event_name) &&
             creatorXP.percentage > 0 && (
               <CWText type="caption" className="xp-shares">
                 <span className="creator-share">

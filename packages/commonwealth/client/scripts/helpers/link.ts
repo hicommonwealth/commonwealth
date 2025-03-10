@@ -9,6 +9,7 @@ export type LinkType =
   | 'tiktok'
   | 'github'
   | 'matrix'
+  | 'warpcast'
   | '';
 
 export const getLinkType = (link: string): LinkType => {
@@ -23,6 +24,7 @@ export const getLinkType = (link: string): LinkType => {
     return 'x (twitter)';
   if (link.includes('github.com')) return 'github';
   if (link.includes('matrix.to')) return 'matrix';
+  if (link.includes('warpcast.com')) return 'warpcast';
   return '';
 };
 
@@ -34,6 +36,7 @@ export type CategorizedSocialLinks = {
   twitters: string[];
   elements: string[];
   slacks: string[];
+  warpcasts: string[];
   remainingLinks: string[];
 };
 
@@ -48,6 +51,7 @@ export const categorizeSocialLinks = (
     twitters: [],
     elements: [],
     slacks: [],
+    warpcasts: [],
     remainingLinks: [],
   };
 
@@ -74,6 +78,9 @@ export const categorizeSocialLinks = (
         break;
       case 'matrix':
         categorized.elements.push(link);
+        break;
+      case 'warpcast':
+        categorized.warpcasts.push(link);
         break;
       default:
         categorized.remainingLinks.push(link);

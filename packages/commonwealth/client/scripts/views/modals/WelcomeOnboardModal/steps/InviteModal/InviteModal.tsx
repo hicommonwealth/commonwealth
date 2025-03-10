@@ -1,24 +1,28 @@
 import referralImage from 'assets/img/referral-background-mobile.png';
+import messagesImg from 'assets/img/share/messages.png';
+import telegramImg from 'assets/img/share/telegram.png';
+import twitterImg from 'assets/img/share/x.png';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
 import React from 'react';
+
 import './InviteModal.scss';
+
 type InviteModalProps = {
   onComplete: () => void;
 };
+
 type ReferralShare = {
   id: number;
   title: string;
-  icon: IconName;
-  iconStyle: {
-    backgroundColor: string;
-  };
+  imgSrc: string;
   onClick: () => void;
 };
+
 const InviteModal = ({ onComplete }: InviteModalProps) => {
   const user = useUserStore();
   const currentUrl = window.location.origin;
@@ -35,19 +39,20 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     return `${message} \n${link}`;
   };
 
-  const handleDiscordShare = () => {
-    window.open(`https://discord.com/channels/@me`, '_blank');
-    navigator.clipboard
-      .writeText(`Check this out: ${generatePermalink(inviteLink)}`)
-      .catch(console.error);
-  };
-
-  const referrals_Share: ReferralShare[] = [
+  const referralsShare: ReferralShare[] = [
     {
       id: 1,
-      title: 'Share On X',
-      icon: 'xTwitter',
-      iconStyle: { backgroundColor: '#000000' },
+      title: 'Messages',
+      imgSrc: messagesImg,
+      onClick: () =>
+        window.open(
+          `sms:?&body=${encodeURIComponent(generatePermalink(inviteLink))}`,
+        ),
+    },
+    {
+      id: 2,
+      title: 'X',
+      imgSrc: twitterImg,
       onClick: () =>
         window.open(
           `https://twitter.com/intent/tweet?url=${encodeURIComponent(
@@ -56,18 +61,15 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
         ),
     },
     {
-      id: 2,
-      title: 'Share On Discord',
-      icon: 'discordLogo',
-      iconStyle: { backgroundColor: '#9555AC' },
-      onClick: handleDiscordShare,
-    },
-    {
       id: 3,
-      title: 'Copy Link',
-      icon: 'linkPhosphor',
-      iconStyle: { backgroundColor: '#0079CC' },
-      onClick: handleCopy,
+      title: 'Telegram',
+      imgSrc: telegramImg,
+      onClick: () =>
+        window.open(
+          `https://t.me/share/url?url=${encodeURIComponent(
+            generatePermalink(inviteLink),
+          )}`,
+        ),
     },
   ];
 
@@ -78,28 +80,39 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
       <CWText type="h2" className="title" isCentered>
         Get a referral bonus for inviting friends to common!{' '}
       </CWText>
-      <div className="share_container">
-        {referrals_Share.map((referral: ReferralShare, index: number) => {
-          return (
-            <div
-              className="share_content"
-              key={index.toString()}
-              onClick={referral.onClick}
-            >
-              <div className="icon_container" style={referral.iconStyle}>
-                <CWIcon iconSize="large" iconName={referral?.icon} />
+
+      <div className="share-section">
+        <CWText fontWeight="bold">Share to</CWText>
+        <div className="share-options">
+          {referralsShare.map((referral: ReferralShare, index: number) => {
+            return (
+              <div
+                className="share-option"
+                key={index.toString()}
+                onClick={referral.onClick}
+              >
+                <img
+                  src={referral.imgSrc}
+                  alt={referral.title}
+                  className="icon"
+                />
+                <CWText type="caption">{referral.title}</CWText>
               </div>
-              <CWText type="h5" className="label">
-                {referral.title}
-              </CWText>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-      <div className="address_container">
-        <CWText className="label">{inviteLink}</CWText>
-        <CWIcon iconSize="large" iconName="linkPhosphor" />
-      </div>
+
+      <CWTextInput
+        inputClassName="invite-link-input"
+        fullWidth
+        type="text"
+        value={inviteLink}
+        readOnly
+        onClick={handleCopy}
+        iconRight={<CWIcon iconName="copy" />}
+      />
+
       <div className="buttons_container">
         <CWButton
           label="Skip"

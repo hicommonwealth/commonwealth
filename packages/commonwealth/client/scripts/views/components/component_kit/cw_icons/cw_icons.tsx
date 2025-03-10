@@ -1368,6 +1368,42 @@ export const CWDiscord = (props: IconProps) => {
 };
 
 // eslint-disable-next-line react/no-multi-comp
+export const CWWarpcast = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType,
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      style={{ fill: 'white' }}
+      {...otherProps}
+    >
+      <path
+        d="M24.0698 31.9902H7.92028C3.55304 31.9902 0 28.4374 0 24.07V7.92064C0 3.5533 3.55304 0.000244141 7.92028 0.000244141H24.0698C28.4371 0.000244141 31.9901 3.5533 31.9901 7.92064V24.07C31.9901 28.4374 28.4371 31.9902 24.0698 31.9902Z"
+        fill="#472A91"
+      />
+      <path
+        d="M20.9908 10.124L19.4134 16.048L17.8309 10.124H14.1891L12.5915 16.0916L10.999 10.124H6.85114L10.7055 23.2219H14.2839L15.9951 17.1397L17.7062 23.2219H21.2924L25.1382 10.124H20.9908Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+
+// eslint-disable-next-line react/no-multi-comp
 export const CWDiscordLogin = (props: IconProps) => {
   const {
     className,

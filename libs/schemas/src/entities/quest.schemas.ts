@@ -17,6 +17,9 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
+  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  XpChainEventCreated: events.XpChainEventCreated,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
 
 export enum QuestParticipationLimit {
@@ -74,6 +77,8 @@ export const Quest = z
     image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
+    xp_awarded: z.number().default(0),
+    max_xp_to_end: z.number().default(0),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
     community_id: z
@@ -87,11 +92,3 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
-
-export const QuestAction = z
-  .object({
-    user_id: PG_INT.describe('The user who took the action'),
-    quest_action_meta_id: PG_INT.describe('The action metadata for the action'),
-    created_at: z.coerce.date().optional(),
-  })
-  .describe('Records user actions in a quest');

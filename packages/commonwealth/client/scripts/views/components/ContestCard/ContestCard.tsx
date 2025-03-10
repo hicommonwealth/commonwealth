@@ -9,7 +9,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { useGetContestBalanceQuery } from 'state/api/contests';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
@@ -31,6 +30,8 @@ import {
 } from '../../pages/CommunityManagement/Contests/utils';
 import ContestAlert from './ContestAlert';
 
+import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
+import { useFlag } from 'hooks/useFlag';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
@@ -73,6 +74,7 @@ interface ContestCardProps {
     chainNodeUrl: string;
   };
   hideWhenNoPrizes?: boolean;
+  contestBalance?: number;
 }
 
 const ContestCard = ({
@@ -95,11 +97,14 @@ const ContestCard = ({
   score = [],
   community,
   hideWhenNoPrizes = false,
+  contestBalance = 0,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+
+  const newContestPage = useFlag('newContestPage');
 
   const isActive = isContestActive({
     contest: {
@@ -112,16 +117,16 @@ const ContestCard = ({
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
-  const { data: contestBalance, isLoading: isLoadingContestBalance } =
-    useGetContestBalanceQuery({
-      contestAddress: address,
-      chainRpc: community?.chainNodeUrl || '',
-      ethChainId: community?.ethChainId || 0,
-      isOneOff: !isRecurring,
-    });
+  const { data: onchainContestBalance } = useGetContestBalanceQuery({
+    contestAddress: address,
+    chainRpc: community?.chainNodeUrl || '',
+    ethChainId: community?.ethChainId || 0,
+    isOneOff: !isRecurring,
+  });
 
   const prizes = buildContestPrizes(
-    Number(contestBalance),
+    // if onchain balance is zero, use projected balance
+    Number(onchainContestBalance || contestBalance),
     payoutStructure,
     decimals,
   );
@@ -165,7 +170,7 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    isFarcaster
+    newContestPage
       ? navigate(`/contests/${address}`, {}, community?.id)
       : navigate(
           `/discussions?featured=mostLikes&contest=${address}`,
@@ -182,11 +187,7 @@ const ContestCard = ({
     copyFarcasterContestFrameUrl(address).catch(console.log);
   };
 
-  const showNoFundsInfo =
-    isAdmin &&
-    isActive &&
-    !isLoadingContestBalance &&
-    (contestBalance || 0) <= 0;
+  const showNoFundsInfo = isAdmin && isActive && (contestBalance || 0) <= 0;
 
   const isLessThan24HoursLeft =
     moment(finishDate).diff(moment(), 'hours') <= 24;

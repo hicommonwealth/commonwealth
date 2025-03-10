@@ -30,6 +30,7 @@ select
   cm.cancelled,
   cm.topic_id,
   cm.is_farcaster_contest,
+  cm.vote_weight_multiplier,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
     from "ContestManagers" cm2
@@ -46,7 +47,8 @@ from
       'start_time', c.start_time,
       'end_time', c.end_time,
       'score_updated_at', c.score_updated_at,
-      'score', c.score --,
+      'score', c.score,
+      'contest_balance', c.contest_balance::text --,
 --      'actions', coalesce(ca.actions, '[]'::jsonb)
 		) order by c.contest_id desc) as contests
 	from "Contests" c

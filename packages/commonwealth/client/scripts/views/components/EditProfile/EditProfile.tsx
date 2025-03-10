@@ -263,7 +263,8 @@ const EditProfile = () => {
             <CWDivider />
             <ProfileSection
               title="General Info"
-              description="Let your community and others get to know you by sharing a bit about yourself."
+              description="Let your community and others get to know you by sharing a bit about yourself. These
+               will be publicly displayed on your profile"
               className="input-controls"
             >
               <div className="profile-image-section">
@@ -399,7 +400,7 @@ const EditProfile = () => {
               title="Beta Features"
               description="Enable experimental features and help us test new functionality."
             >
-              {aiCommentsFeatureEnabled && (
+              {aiCommentsFeatureEnabled ? (
                 <div className="beta-features-section">
                   <div className="beta-feature-item">
                     <div className="beta-feature-header">
@@ -426,6 +427,12 @@ const EditProfile = () => {
                       time.
                     </CWText>
                   </div>
+                </div>
+              ) : (
+                <div className="beta-features-section">
+                  <CWText type="b1">
+                    No beta features are available for your community.
+                  </CWText>
                 </div>
               )}
             </ProfileSection>
