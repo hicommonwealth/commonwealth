@@ -23,7 +23,7 @@ export const questSubFormValidationSchema = z.object({
   // these 2 below are only used for initial values validation and not for
   // internal state validation, that is handled by a custom function
   participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
-  participationTimesPerPeriod: z.number().optional(),
+  participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
 export const questSubFormValidationSchemaWithContentLink =

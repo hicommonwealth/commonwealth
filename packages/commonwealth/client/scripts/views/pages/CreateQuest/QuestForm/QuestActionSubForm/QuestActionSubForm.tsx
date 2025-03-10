@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CWRepetitionCycleRadioButton, {
   useCWRepetitionCycleRadioButton,
 } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
@@ -175,6 +175,31 @@ const QuestActionSubForm = ({
     },
     shouldRun: true,
   });
+
+  const participationTimesPerPeriod =
+    repetitionCycleRadioProps.repetitionCycleInputProps.value;
+  useEffect(() => {
+    if (
+      participationTimesPerPeriod === defaultValues?.participationTimesPerPeriod
+    )
+      return;
+    onChange?.({
+      participationTimesPerPeriod: participationTimesPerPeriod,
+    });
+  }, [
+    participationTimesPerPeriod,
+    defaultValues?.participationTimesPerPeriod,
+    onChange,
+  ]);
+
+  const participationPeriod = repetitionCycleRadioProps
+    .repetitionCycleSelectListProps.selected?.value as QuestParticipationPeriod;
+  useEffect(() => {
+    if (participationPeriod === defaultValues?.participationPeriod) return;
+    onChange?.({
+      participationPeriod: participationPeriod,
+    });
+  }, [participationPeriod, defaultValues?.participationPeriod, onChange]);
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
