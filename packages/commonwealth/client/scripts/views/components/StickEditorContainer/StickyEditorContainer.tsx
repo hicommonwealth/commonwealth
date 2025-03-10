@@ -15,7 +15,9 @@ interface StickyEditorContainerProps extends CommentEditorProps {
   parentType: ContentType;
 }
 
-export const StickyEditorContainer = (props: StickyEditorContainerProps) => {
+export const StickyEditorContainer = ({
+  ...props
+}: StickyEditorContainerProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   const stickEditor = useFlag('stickyEditor');
 

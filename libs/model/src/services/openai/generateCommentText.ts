@@ -75,14 +75,21 @@ const generateCommentText = async function* ({
 
     const stream = await openai.chat.completions.create(createCompletionConfig);
 
-    for await (const chunk of stream) {
-      try {
-        const content = chunk.choices[0]?.delta?.content || '';
-        if (content) {
-          yield content;
+    if (stream.choices) {
+      const content = stream.choices[0]?.message?.content || '';
+      if (content) {
+        yield content;
+      }
+    } else {
+      for await (const chunk of stream as any) {
+        try {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            yield content;
+          }
+        } catch (chunkError) {
+          console.error('Error processing chunk:', chunkError);
         }
-      } catch (chunkError) {
-        console.error('Error processing chunk:', chunkError);
       }
     }
   } catch (e) {

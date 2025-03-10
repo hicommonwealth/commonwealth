@@ -27,7 +27,6 @@ import React, {
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import { useCreateCommentMutation } from 'state/api/comments';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -168,11 +167,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
-  const { mutateAsync: createComment } = useCreateCommentMutation({
-    communityId,
-    threadId: +threadId,
-    existingNumberOfComments: thread?.numberOfComments || 0,
-  });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId,
@@ -185,7 +179,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleGenerateAIComment = useCallback(
-    async (threadId: number): Promise<void> => {
+    async (mainThreadId: number): Promise<void> => {
       if (!aiCommentsToggleEnabled || !user.activeAccount) {
         return;
       }
@@ -195,9 +189,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
 
-      setStreamingReplyIds([threadId]);
+      setStreamingReplyIds([mainThreadId]);
     },
-    [aiCommentsToggleEnabled, user.activeAccount, thread, streamingReplyIds],
+    [aiCommentsToggleEnabled, user.activeAccount, thread],
   );
 
   useEffect(() => {
@@ -354,6 +348,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     user.activeAccount,
     generateComment,
     editThread,
+    isGeneratingTitle,
   ]);
 
   // Add effect to trigger title generation when thread is loaded without a title
@@ -363,7 +358,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread.id && thread.canvasMsgId && thread.body) {
       void generateTitleFromBody();
     }
-  }, [thread]); // Only run when thread changes
+  }, [thread, isGeneratingTitle, generateTitleFromBody]); // Only run when thread changes
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;

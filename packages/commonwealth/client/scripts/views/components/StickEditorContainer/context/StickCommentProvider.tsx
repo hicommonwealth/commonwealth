@@ -1,4 +1,10 @@
-import React, { memo, ReactNode, useState, createContext, useContext } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  memo,
+  useContext,
+  useState,
+} from 'react';
 import { ActivatorContext } from './ActivatorContext';
 
 export type EditorMode = 'thread' | 'comment';

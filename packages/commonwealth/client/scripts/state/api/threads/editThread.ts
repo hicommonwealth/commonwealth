@@ -68,17 +68,13 @@ export const buildUpdateThreadInput = async ({
 }: EditThreadProps) => {
   let canvasSignedData;
   if ((newBody || newTitle) && threadMsgId) {
-    try {
-      canvasSignedData = await signUpdateThread(address, {
-        thread_id: threadMsgId,
-        title: newTitle,
-        body: newBody,
-        link: url,
-        topic: topicId,
-      });
-    } catch (err) {
-      throw err;
-    }
+    canvasSignedData = await signUpdateThread(address, {
+      thread_id: threadMsgId,
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: topicId,
+    });
   }
 
   return {
