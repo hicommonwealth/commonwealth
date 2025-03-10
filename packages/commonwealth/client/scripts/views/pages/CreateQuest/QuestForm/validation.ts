@@ -7,7 +7,7 @@ import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
 // update in future if required
-export const MAX_XP_TO_END_UPPER_LIMIT = 100_000;
+export const MAX_XP_TO_END_UPPER_LIMIT = 10_000_000;
 
 export const questFormValidationSchema = z
   .object({
