@@ -44,7 +44,7 @@ const useTransactionHistory = ({
                 } ETH`,
           etherscanLink: buildEtherscanLink(
             t.transaction_hash,
-            t.community?.chain_node_id || 0,
+            t.community.chain_node_id || 0,
           ),
         };
       });
