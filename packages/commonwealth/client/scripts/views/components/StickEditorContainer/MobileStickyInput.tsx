@@ -15,8 +15,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
   const { mode } = useContext(StickCommentContext);
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const menuVisible = useSidebarStore((state) => state.menuVisible);
 
@@ -93,7 +92,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
               shouldFocus={true}
               onCancel={handleCancel}
               aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-              setAICommentsToggleEnabled={setAICommentsToggleEnabled}
               handleSubmitComment={customHandleSubmitComment}
               onAiReply={handleAiReply}
               streamingReplyIds={streamingReplyIds}
@@ -110,7 +108,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
         {...props}
         onFocus={handleFocused}
         aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-        setAICommentsToggleEnabled={setAICommentsToggleEnabled}
       />
     </div>,
     parent,

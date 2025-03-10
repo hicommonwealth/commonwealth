@@ -1,8 +1,13 @@
-import { useFlag } from 'hooks/useFlag';
+import { notifyError } from 'controllers/app/notifications';
+import { ThreadKind, ThreadStage } from 'models/types';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import app from 'state';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useCreateThreadMutation } from 'state/api/threads';
+import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
-import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
@@ -12,22 +17,10 @@ import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
-// --- Thread creation imports ---
-import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from 'models/types';
-import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
-import { useCreateThreadMutation } from 'state/api/threads';
-import { buildCreateThreadInput } from 'state/api/threads/createThread';
-
-// NEW: Import topics query to allow searching for a default topic
-import { useFetchTopicsQuery } from 'state/api/topics';
-
 export type MobileInputProps = CommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
-  setAICommentsToggleEnabled: (value: boolean) => void;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -40,7 +33,6 @@ export const MobileInput = (props: MobileInputProps) => {
     onCancel,
     onAiReply,
     aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
   } = props;
 
   const { mode } = useContext(StickCommentContext);
@@ -48,17 +40,13 @@ export const MobileInput = (props: MobileInputProps) => {
   const user = useUserStore();
   const { generateComment } = useGenerateCommentText();
   const stickyCommentReset = useActiveStickCommentReset();
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
 
-  // --- Thread creation hooks ---
   const communityId = app.activeChainId() || '';
   const { mutateAsync: createThreadMutation } = useCreateThreadMutation({
     communityId,
   });
   const navigate = useCommonNavigate();
 
-  // NEW: Fetch topics for default selection (similar to NewThreadForm)
   const { data: fetchedTopics = [] } = useFetchTopicsQuery({
     communityId,
     includeContestData: true,
@@ -87,10 +75,6 @@ export const MobileInput = (props: MobileInputProps) => {
     },
     [setContentDelta],
   );
-
-  const handleAiToggle = useCallback(() => {
-    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-  }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     // When AI mode is enabled or there is some text, allow submission on Enter.

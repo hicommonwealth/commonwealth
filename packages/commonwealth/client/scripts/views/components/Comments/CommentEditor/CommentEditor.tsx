@@ -32,7 +32,6 @@ export type CommentEditorProps = {
   tooltipText?: string;
   isReplying?: boolean;
   aiCommentsToggleEnabled?: boolean;
-  setAICommentsToggleEnabled?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   replyingToAuthor?: string;
