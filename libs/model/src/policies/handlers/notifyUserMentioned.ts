@@ -67,24 +67,20 @@ export const notifyUserMentioned: EventHandler<
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
-      author_address_id: payload.authorAddressId,
-      author_user_id: payload.authorUserId,
-      author_address: payload.authorAddress,
       community_id: payload.communityId,
       community_name: community.name,
-      author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
           ? safeTruncateBody(getDecodedString(payload.thread!.body || ''), 255)
           : safeTruncateBody(getDecodedString(payload.comment!.body), 255),
       object_url,
-    },
-    actor: {
-      id: String(user.id),
-      profile_name: user.profile.name || payload.authorAddress.substring(0, 8),
-      profile_url: getProfileUrl(user.id!, community.custom_domain),
-      email: user.profile.email ?? undefined,
-      profile_avatar_url: user.profile.avatar_url ?? undefined,
+      author: user.profile.name || payload.authorAddress.substring(0, 8),
+      author_address_id: payload.authorAddressId,
+      author_address: payload.authorAddress,
+      author_user_id: payload.authorUserId.toString(),
+      author_profile_url: getProfileUrl(user.id!, community.custom_domain),
+      author_email: user.profile.email ?? undefined,
+      author_avatar_url: user.profile.avatar_url ?? undefined,
     },
   });
 

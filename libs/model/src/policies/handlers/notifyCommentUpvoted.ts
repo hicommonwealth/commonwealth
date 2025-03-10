@@ -100,18 +100,18 @@ export const notifyCommentUpvoted: EventHandler<
         payload.comment_id,
         thread.Community.custom_domain,
       ),
-    },
-    actor: {
-      id: String(commentAndAuthor.Address.User!.id),
-      profile_name:
+      author:
         commentAndAuthor.Address.User!.profile.name ||
         commentAndAuthor.Address.address.substring(0, 8),
-      profile_url: getProfileUrl(
+      author_address_id: commentAndAuthor.Address.id!,
+      author_address: commentAndAuthor.Address.address,
+      author_user_id: String(commentAndAuthor.Address.User!.id),
+      author_profile_url: getProfileUrl(
         commentAndAuthor.Address.User!.id!,
         thread.Community.custom_domain,
       ),
-      email: commentAndAuthor.Address.User!.profile.email ?? undefined,
-      profile_avatar_url:
+      author_email: commentAndAuthor.Address.User!.profile.email ?? undefined,
+      author_avatar_url:
         commentAndAuthor.Address.User!.profile.avatar_url ?? undefined,
     },
   });

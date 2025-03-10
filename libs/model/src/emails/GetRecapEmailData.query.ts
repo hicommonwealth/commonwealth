@@ -170,7 +170,7 @@ async function enrichDiscussionNotifications(
           ? discussionAvatars[0]?.user_avatars[
               notif.comment_created_event.address_id
             ]
-          : discussionAvatars[0]?.user_avatars[notif.author_address_id],
+          : discussionAvatars[0]?.user_avatars[notif.author_address_id || 0],
     });
   }
 

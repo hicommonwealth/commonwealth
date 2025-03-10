@@ -54,7 +54,9 @@ describe('CommentCreated Event Handler', () => {
       },
       { mock: false },
     );
-    [author] = await tester.seed('User', {});
+    [author] = await tester.seed('User', {
+      profile: { name: 'Author', email: 'author@example.com' },
+    });
     [subscriber] = await tester.seed('User', {});
     [mentionedUser] = await tester.seed('User', {});
 
@@ -199,7 +201,6 @@ describe('CommentCreated Event Handler', () => {
       key: WorkflowKeys.CommentCreation,
       users: [{ id: String(subscriber!.id) }],
       data: {
-        author: author?.profile.name,
         comment_parent_name: 'thread',
         community_name: community?.name,
         comment_body: rootComment?.body.substring(0, 255),
@@ -209,13 +210,13 @@ describe('CommentCreated Event Handler', () => {
           ...rootComment,
           community_id: community!.id,
         },
-      },
-      actor: {
-        id: String(author!.id),
-        email: author!.profile.email,
-        profile_name: author!.profile.name,
-        profile_url: getProfileUrl(author!.id!, customDomain),
-        profile_avatar_url: author!.profile.avatar_url,
+        author: author?.profile.name,
+        author_address_id: community!.Addresses![0].id,
+        author_address: community!.Addresses![0].address,
+        author_user_id: String(author!.id),
+        author_email: author!.profile.email,
+        author_profile_url: getProfileUrl(author!.id!, customDomain),
+        author_avatar_url: author!.profile.avatar_url,
       },
     });
   });
@@ -247,7 +248,6 @@ describe('CommentCreated Event Handler', () => {
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
       data: {
-        author: author?.profile.name,
         comment_parent_name: 'comment',
         community_name: community?.name,
         comment_body: replyComment?.body.substring(0, 255),
@@ -261,13 +261,13 @@ describe('CommentCreated Event Handler', () => {
           ...replyComment,
           community_id: community!.id,
         },
-      },
-      actor: {
-        id: String(author!.id),
-        email: author!.profile.email,
-        profile_name: author!.profile.name,
-        profile_url: getProfileUrl(author!.id!, customDomain),
-        profile_avatar_url: author!.profile.avatar_url,
+        author: author?.profile.name,
+        author_address_id: community!.Addresses![0].id,
+        author_address: community!.Addresses![0].address,
+        author_user_id: String(author!.id),
+        author_profile_url: getProfileUrl(author!.id!, customDomain),
+        author_email: author!.profile.email,
+        author_avatar_url: author!.profile.avatar_url,
       },
     });
   });
@@ -327,7 +327,6 @@ describe('CommentCreated Event Handler', () => {
       key: WorkflowKeys.CommentCreation,
       users: [{ id: String(subscriber!.id) }],
       data: {
-        author: author?.profile.name,
         comment_parent_name: 'comment',
         community_name: community?.name,
         comment_body: mentionedComment?.body.substring(0, 255),
@@ -342,13 +341,13 @@ describe('CommentCreated Event Handler', () => {
           users_mentioned: [mentionedUser!.id!],
           community_id: community!.id,
         },
-      },
-      actor: {
-        id: String(author!.id),
-        email: author!.profile.email,
-        profile_name: author!.profile.name,
-        profile_url: getProfileUrl(author!.id!, customDomain),
-        profile_avatar_url: author!.profile.avatar_url,
+        author: author?.profile.name,
+        author_address_id: community!.Addresses![0].id,
+        author_address: community!.Addresses![0].address,
+        author_user_id: String(author!.id),
+        author_email: author!.profile.email,
+        author_profile_url: getProfileUrl(author!.id!, customDomain),
+        author_avatar_url: author!.profile.avatar_url,
       },
     });
   });

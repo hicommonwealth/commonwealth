@@ -81,18 +81,18 @@ export const notifyThreadUpvoted: EventHandler<
         payload.thread_id,
         community.custom_domain,
       ),
-    },
-    actor: {
-      id: String(threadAndAuthor.Address.User!.id),
-      profile_name:
+      author:
         threadAndAuthor.Address.User!.profile.name ||
         threadAndAuthor.Address.address.substring(0, 8),
-      profile_url: getProfileUrl(
+      author_address_id: threadAndAuthor.Address.id!,
+      author_address: threadAndAuthor.Address.address,
+      author_user_id: String(threadAndAuthor.Address.User!.id),
+      author_profile_url: getProfileUrl(
         threadAndAuthor.Address.User!.id!,
         community.custom_domain,
       ),
-      email: threadAndAuthor.Address.User!.profile.email ?? undefined,
-      profile_avatar_url:
+      author_email: threadAndAuthor.Address.User!.profile.email ?? undefined,
+      author_avatar_url:
         threadAndAuthor.Address.User!.profile.avatar_url ?? undefined,
     },
   });
