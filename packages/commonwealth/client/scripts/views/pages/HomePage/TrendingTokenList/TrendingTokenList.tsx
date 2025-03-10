@@ -8,6 +8,7 @@ import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { HashLink } from 'react-router-hash-link';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
@@ -114,12 +115,12 @@ const TrendingTokensList = ({
     <div className="TokensList">
       <div className="heading-container">
         <CWText type="h2">Tokens</CWText>
-        <Link to="/explore">
+        <HashLink smooth to="/explore#tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
-        </Link>
+        </HashLink>
       </div>
       {isInitialLoading || isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />

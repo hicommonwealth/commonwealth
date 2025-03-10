@@ -2,7 +2,7 @@ import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/c
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { HashLink } from 'react-router-hash-link';
 import { trpc } from 'utils/trpcClient';
 import ContestCard from 'views/components/ContestCard';
 import { Skeleton } from 'views/components/Skeleton';
@@ -63,12 +63,12 @@ const ActiveContestList = ({
     <div className="ActiveContestList">
       <div className="heading-container">
         <CWText type="h2">Contests</CWText>
-        <Link to="/explore">
+        <HashLink smooth to="/explore#contests">
           <div className="link-right">
             <CWText className="link">See all contests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
-        </Link>
+        </HashLink>
       </div>
       {isSuggestedMode && <CWText type="h5">Suggested</CWText>}
       <>

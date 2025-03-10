@@ -2,13 +2,12 @@ import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { HashLink } from 'react-router-hash-link';
+import app from 'state';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-
-import app from 'state';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';
 
@@ -41,18 +40,22 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     navigate('/leaderboard', {}, null);
   };
 
+  const redirectPath = app.activeChainId()
+    ? `/${app.activeChainId()}/quests`
+    : '/explore#quests';
+
   if (!xpEnabled) return <></>;
 
   return (
     <div className="XpQuestList">
       <div className="heading-container">
         <CWText type="h2">XP Quests</CWText>
-        <Link to={`/${app.activeChainId()}/quests`}>
+        <HashLink smooth to={redirectPath}>
           <div className="link-right">
             <CWText className="link">See all quests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
-        </Link>
+        </HashLink>
       </div>
       <>
         {!isInitialLoading && quests.length === 0 && (
