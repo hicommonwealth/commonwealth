@@ -1,7 +1,7 @@
 import {
-  communityStakesAbi,
-  namespaceFactoryAbi,
-} from '@hicommonwealth/evm-protocols';
+  CommunityStakeAbi,
+  NamespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import dex_abi from './abi/dex';
@@ -27,14 +27,14 @@ export const erc_1155 = (address: string, provider: Web3) => {
 
 export const namespace_factory = (address: string, provider: Web3) => {
   return new provider.eth.Contract(
-    namespaceFactoryAbi as unknown as AbiItem[],
+    NamespaceFactoryAbi as unknown as AbiItem[],
     address,
   );
 };
 
 export const community_stake = (address: string, provider: Web3) => {
   return new provider.eth.Contract(
-    communityStakesAbi as unknown as AbiItem[],
+    CommunityStakeAbi as unknown as AbiItem[],
     address,
   );
 };

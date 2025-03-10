@@ -1,8 +1,8 @@
 import {
-  namespaceAbi,
-  namespaceFactoryAbi,
-  reservationHookAbi,
-} from '@hicommonwealth/evm-protocols';
+  INamespaceAbi,
+  INamespaceResHookAbi,
+  NamespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -18,7 +18,7 @@ class NamespaceFactory extends ContractBase {
    * @param factoryAddress the address of the active factory to use
    */
   constructor(factoryAddress: string, rpc: string) {
-    super(factoryAddress, namespaceFactoryAbi, rpc);
+    super(factoryAddress, NamespaceFactoryAbi, rpc);
   }
 
   /**
@@ -33,7 +33,7 @@ class NamespaceFactory extends ContractBase {
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
-        reservationHookAbi,
+        INamespaceResHookAbi,
         addr,
       );
     }
@@ -300,6 +300,72 @@ class NamespaceFactory extends ContractBase {
     return txReceipt;
   }
 
+  async newJudgedSingleContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .newSingleJudgedContest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
+  async configureNominations(
+    namespaceName: string,
+    creatorOnly: boolean,
+    walletAddress: string,
+    maxNominations?: number,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .configureNominationStrategy(
+          namespaceName,
+          maxNominations ?? 0,
+          !creatorOnly,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
   async getFeeManagerBalance(
     namespace: string,
     token?: string,
@@ -369,7 +435,7 @@ class NamespaceFactory extends ContractBase {
     }
     const namespaceAddr = await this.getNamespaceAddress(namespace);
     const namespaceContract = new this.web3.eth.Contract(
-      namespaceAbi,
+      INamespaceAbi,
       namespaceAddr,
     );
     const balance = await namespaceContract.methods

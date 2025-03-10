@@ -1,21 +1,17 @@
 // Copyright (c) 2022 ECO Stake
-import { ETH } from '@tharsis/address-converter';
-import { bech32 } from 'bech32';
-
-import * as BytesUtils from '@ethersproject/bytes';
-import { keccak256 } from '@ethersproject/keccak256';
 import { encodeSecp256k1Signature } from '@cosmjs/amino';
 import { makeSignBytes } from '@cosmjs/proto-signing';
+import { ETH } from '@tharsis/address-converter';
+import { bech32 } from 'bech32';
+import { concat, keccak256, parseSignature, toBytes } from 'viem';
 
 function EthSigner(signer, ethSigner, prefix) {
   async function signDirect(_address, signDoc) {
     const signature = await ethSigner
       ._signingKey()
       .signDigest(keccak256(makeSignBytes(signDoc)));
-    const splitSignature = BytesUtils.splitSignature(signature);
-    const result = BytesUtils.arrayify(
-      BytesUtils.concat([splitSignature.r, splitSignature.s])
-    );
+    const { r, s } = parseSignature(signature);
+    const result = toBytes(concat([r, s]));
     const pubkey = (await getAccounts())[0].pubkey;
     return {
       signed: signDoc,

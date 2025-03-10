@@ -4,6 +4,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -24,6 +25,10 @@ const HomePage = () => {
   } = useManageCommunityStakeModalStore();
 
   const [selectedCommunityId] = useState<string>();
+
+  if (!homePageEnabled) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">

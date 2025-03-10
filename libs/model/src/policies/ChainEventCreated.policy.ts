@@ -1,68 +1,33 @@
-import { EventHandler, Policy, command, logger } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
-import { models } from '../database';
-import { systemActor } from '../middleware';
-import { CreateToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
-import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
+import { handleNamespaceDeployed } from './handlers/handleNamespaceDeployed';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
-
-const log = logger(import.meta);
-
-export const processChainEventCreated: EventHandler<
-  'ChainEventCreated',
-  ZodUndefined
-> = async ({ payload }) => {
-  switch (payload.eventSource.eventSignature) {
-    case EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral:
-      await handleNamespaceDeployedWithReferral(payload);
-      break;
-
-    case EvmEventSignatures.CommunityStake.Trade:
-      await handleCommunityStakeTrades(payload);
-      break;
-
-    case EvmEventSignatures.Launchpad.TokenLaunched: {
-      const chainNode = await models.ChainNode.findOne({
-        where: {
-          eth_chain_id: payload.eventSource.ethChainId,
-        },
-      });
-      await command(CreateToken(), {
-        actor: systemActor({}),
-        payload: {
-          chain_node_id: chainNode!.id!,
-          community_id: '', // not required for system actors
-          transaction_hash: payload.rawLog.transactionHash,
-        },
-      });
-      break;
-    }
-
-    case EvmEventSignatures.Launchpad.Trade:
-      await handleLaunchpadTrade(payload);
-      break;
-
-    case EvmEventSignatures.Referrals.ReferralSet:
-      // await handleReferralSet(payload);
-      break;
-
-    case EvmEventSignatures.Referrals.FeeDistributed:
-      await handleReferralFeeDistributed(payload);
-      break;
-
-    default:
-      log.warn('Unsupported chain-event', {
-        event: payload.eventSource.eventSignature,
-      });
-  }
-};
+import {
+  handleTokenDelegated,
+  handleTokenLockDurationIncreased,
+  handleTokenLocked,
+  handleTokenMerged,
+  handleTokenPermanentConverted,
+  handleTokenUndelegated,
+  handleTokenUnlocked,
+} from './handlers/handleTokenStaking';
 
 const chainEventInputs = {
-  ChainEventCreated: events.ChainEventCreated,
+  CommunityStakeTrade: events.CommunityStakeTrade,
+  NamespaceDeployed: events.NamespaceDeployed,
+  NamespaceDeployedWithReferral: events.NamespaceDeployedWithReferral,
+  ReferralFeeDistributed: events.ReferralFeeDistributed,
+  // TokenStaking
+  TokenLocked: events.TokenLocked,
+  TokenLockDurationIncreased: events.TokenLockDurationIncreased,
+  TokenUnlocked: events.TokenUnlocked,
+  TokenPermanentConverted: events.TokenPermanentConverted,
+  TokenDelegated: events.TokenDelegated,
+  TokenUndelegated: events.TokenUndelegated,
+  TokenMerged: events.TokenMerged,
 };
 
 export function ChainEventPolicy(): Policy<
@@ -72,7 +37,18 @@ export function ChainEventPolicy(): Policy<
   return {
     inputs: chainEventInputs,
     body: {
-      ChainEventCreated: processChainEventCreated,
+      CommunityStakeTrade: handleCommunityStakeTrades,
+      NamespaceDeployed: handleNamespaceDeployed,
+      NamespaceDeployedWithReferral: handleNamespaceDeployedWithReferral,
+      ReferralFeeDistributed: handleReferralFeeDistributed,
+      // TokenStaking
+      TokenLocked: handleTokenLocked,
+      TokenLockDurationIncreased: handleTokenLockDurationIncreased,
+      TokenUnlocked: handleTokenUnlocked,
+      TokenPermanentConverted: handleTokenPermanentConverted,
+      TokenDelegated: handleTokenDelegated,
+      TokenUndelegated: handleTokenUndelegated,
+      TokenMerged: handleTokenMerged,
     },
   };
 }

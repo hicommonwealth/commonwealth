@@ -1,6 +1,6 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
+  config,
   DeepPartial,
   dispose,
   handleEvent,
@@ -30,7 +30,6 @@ chai.use(chaiAsPromised);
 
 const { commonProtocol } = evm;
 
-// TODO: re-enable test
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
@@ -110,6 +109,7 @@ describe('Contests projection lifecycle', () => {
               cancelled,
               topic_id,
               is_farcaster_contest: true,
+              environment: config.APP_ENV,
             },
             {
               contest_address: oneoff,
@@ -124,6 +124,7 @@ describe('Contests projection lifecycle', () => {
               cancelled,
               topics: [],
               is_farcaster_contest: false,
+              environment: config.APP_ENV,
             },
           ],
         },
@@ -184,20 +185,23 @@ describe('Contests projection lifecycle', () => {
       },
     ];
     getTokenAttributes.mockResolvedValue({ ticker, decimals });
-    getContestScore.mockResolvedValue([
-      {
-        creator_address: creator1,
-        content_id: content_id.toString(),
-        votes: '1',
-        prize: '972000000',
-      },
-      {
-        creator_address: creator2,
-        content_id: content_id.toString(),
-        votes: '2',
-        prize: '108000000',
-      },
-    ]);
+    getContestScore.mockResolvedValue({
+      contestBalance: '0',
+      scores: [
+        {
+          creator_address: creator1,
+          content_id: content_id.toString(),
+          votes: '1',
+          prize: '972000000',
+        },
+        {
+          creator_address: creator2,
+          content_id: content_id.toString(),
+          votes: '2',
+          prize: '108000000',
+        },
+      ],
+    });
     getContestStatus.mockResolvedValue({
       startTime: 1,
       endTime: 100,
@@ -339,6 +343,7 @@ describe('Contests projection lifecycle', () => {
         topic_id: topic_id,
         topics: [{ id: topic_id, name: 'test-topic' }],
         is_farcaster_contest: true,
+        vote_weight_multiplier: null,
         contests: [
           {
             contest_id,
@@ -348,8 +353,9 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
-              votes: BigNumber.from(s.votes).toString(),
+              votes: BigInt(s.votes).toString(),
             })),
+            contest_balance: '0',
             // actions: [
             //   {
             //     action: 'added',

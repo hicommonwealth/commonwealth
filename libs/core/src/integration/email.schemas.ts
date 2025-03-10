@@ -115,3 +115,20 @@ export const GetDigestEmailData = {
     unsubscribe_link: z.string(),
   }),
 };
+
+export const GetWeeklyReferralFeesEarned = {
+  input: z.object({
+    user_id: z.string(),
+  }),
+  output: z.object({
+    fees: z
+      .object({
+        transaction_date: z.string(),
+        referrer_address: z.string(),
+        referee_address: z.string(),
+        received_amount: z.string(),
+      })
+      .array(),
+    unsubscribe_link: z.string(),
+  }),
+};

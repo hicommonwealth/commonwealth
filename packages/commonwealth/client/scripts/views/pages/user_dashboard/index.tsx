@@ -11,6 +11,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import HomePage from 'views/pages/HomePage/HomePage';
 import {
   MixpanelPWAEvent,
   MixpanelPageViewEvent,
@@ -36,14 +37,19 @@ type UserDashboardProps = {
   type?: string;
 };
 const UserDashboard = ({ type }: UserDashboardProps) => {
+  const homePageEnabled = useFlag('homePage');
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
   const location = useLocation();
-
+  const [containerReady, setContainerReady] = React.useState(false);
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
   );
-
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerReady(true);
+    }
+  }, []);
   const { isAddedToHomeScreen } = useAppStatus();
 
   const launchpadEnabled = useFlag('launchpad');
@@ -91,6 +97,10 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
     }
   }, [activePage, subpage]);
 
+  if (homePageEnabled) {
+    return <HomePage />;
+  }
+
   return (
     <CWPageLayout ref={containerRef} className="UserDashboard">
       <UserTrainingSlider />
@@ -124,7 +134,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 />
               </CWTabsRow>
             </div>
-            {activePage === DashboardViews.Global ? (
+            {containerReady && activePage === DashboardViews.Global ? (
               <Feed
                 query={useFetchGlobalActivityQuery}
                 // @ts-expect-error <StrictNullChecks/>

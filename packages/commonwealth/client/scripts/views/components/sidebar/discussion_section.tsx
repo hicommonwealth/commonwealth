@@ -1,4 +1,3 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -49,8 +48,6 @@ interface DiscussionSectionProps {
 export const DiscussionSection = ({
   topicIdsIncludedInContest,
 }: DiscussionSectionProps) => {
-  const communityHomeEnabled = useFlag('communityHome');
-
   const navigate = useCommonNavigate();
   const location = useLocation();
   const matchesDiscussionsRoute = matchRoutes(
@@ -132,36 +129,32 @@ export const DiscussionSection = ({
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
   const discussionsGroupData: SectionGroupAttrs[] = [
-    ...(communityHomeEnabled
-      ? [
-          {
-            title: 'Community Home',
-            containsChildren: false,
-            hasDefaultToggle: false,
-            isVisible: true,
-            isUpdated: true,
-            isActive: !!matchesCommunityHomeRoute,
-            onClick: (e, toggle: boolean) => {
-              e.preventDefault();
-              resetSidebarState();
-              handleRedirectClicks(
-                navigate,
-                e,
-                `/community-home`,
-                communityId,
-                () => {
-                  setDiscussionsToggleTree(
-                    `children.CommunityHome.toggledState`,
-                    toggle,
-                  );
-                },
-              );
-            },
-            displayData: null,
-            leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+    {
+      title: 'Community Home',
+      containsChildren: false,
+      hasDefaultToggle: false,
+      isVisible: true,
+      isUpdated: true,
+      isActive: !!matchesCommunityHomeRoute,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        resetSidebarState();
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/community-home`,
+          communityId,
+          () => {
+            setDiscussionsToggleTree(
+              `children.CommunityHome.toggledState`,
+              toggle,
+            );
           },
-        ]
-      : []),
+        );
+      },
+      displayData: null,
+      leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+    },
     {
       title: 'All',
       containsChildren: false,

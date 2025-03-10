@@ -1,4 +1,5 @@
 export * as commonProtocol from './commonProtocol';
+export * from './evmChainEvents';
 export * from './openai';
 export * from './snapshot';
 export * as stakeHelper from './stakeHelper';

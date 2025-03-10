@@ -49,12 +49,12 @@ import {
   MixpanelLoginPayload,
 } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import { setDarkMode } from '../../../helpers/darkMode';
 import { getAddressFromWallet } from '../../../helpers/wallet';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
+import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -147,6 +147,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     isNew?: boolean,
     isUserFromWebView?: boolean,
   ) => {
+    removeLocalStorageItem(LocalStorageKeys.ReferralCode);
     await props?.onSuccess?.(authAddress, isNew, isUserFromWebView);
   };
 
@@ -182,6 +183,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         phoneNumber: tempSMSToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -214,6 +216,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         email: tempEmailToUse,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -238,6 +241,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         provider,
         isCosmos,
         chain: app.chain?.id,
+        referrer_address: refcode,
       });
       setIsMagicLoading(false);
 
@@ -272,8 +276,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } else {
       // log in as the new user
       await initAppState(false);
-      if (localStorage.getItem('user-dark-mode-state') === 'on') {
-        setDarkMode(true);
+      const darkMode = darkModeStore.getState();
+      if (!darkMode.isDarkMode) {
+        darkMode.setDarkMode(true);
       }
       if (app.chain) {
         await updateActiveAddresses(app.activeChainId() || '');

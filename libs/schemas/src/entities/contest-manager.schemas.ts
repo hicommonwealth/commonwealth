@@ -5,9 +5,27 @@ import { Contest } from '../projections';
 import { PG_INT } from '../utils';
 import { Topic } from './topic.schemas';
 
+const ContestManagerEnvironments = [
+  'local',
+  'CI',
+  'frick',
+  'frack',
+  'beta',
+  'demo',
+  'production',
+] as const;
+type ContestManagerEnvironments = (typeof ContestManagerEnvironments)[number];
+export const ContestManagerEnvironmentsSchema = z
+  .enum(ContestManagerEnvironments)
+  .describe('The environment that created the contest manager');
+
 export const ContestManager = z
   .object({
     contest_address: z.string().describe('On-Chain contest manager address'),
+    creator_address: z
+      .string()
+      .nullish()
+      .describe('Creator of the contest manager'),
     community_id: z.string(),
     name: z.string(),
     description: z.string().nullish(),
@@ -51,14 +69,6 @@ export const ContestManager = z
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
-    neynar_webhook_id: z
-      .string()
-      .nullish()
-      .describe('Neynar ID of the ReplyCastCreated webhook'),
-    neynar_webhook_secret: z
-      .string()
-      .nullish()
-      .describe('Neynar secret for the ReplyCastCreated webhook'),
     topic_id: PG_INT.nullish(),
     topics: z.array(Topic).nullish(),
     is_farcaster_contest: z.boolean(),
@@ -73,5 +83,6 @@ export const ContestManager = z
       .describe(
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
+    environment: ContestManagerEnvironmentsSchema.optional(),
   })
   .describe('On-Chain Contest Manager');

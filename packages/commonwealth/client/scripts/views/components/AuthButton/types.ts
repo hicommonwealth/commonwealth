@@ -11,7 +11,12 @@ export type AuthSSOs =
   | 'apple'
   | 'email'
   | 'farcaster'
-  | 'SMS';
+  | 'SMS'
+  | 'telegram'
+  | 'tiktok'
+  | 'warpcast'
+  | 'element'
+  | 'website';
 export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom';

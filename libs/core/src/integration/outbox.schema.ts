@@ -9,10 +9,10 @@ export const BaseOutboxProperties = z.object({
 });
 
 export const outboxEvents: Events[] = [
-  'ChainEventCreated',
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',
+  'CommunityJoined',
   'ContestContentAdded',
   'ContestContentUpvoted',
   'ContestStarted',
@@ -26,8 +26,11 @@ export const outboxEvents: Events[] = [
   'DiscordThreadCreated',
   'DiscordThreadDeleted',
   'DiscordThreadTitleUpdated',
+  'CommonDiscordServerJoined',
   'FarcasterCastCreated',
+  'FarcasterCastDeleted',
   'FarcasterReplyCastCreated',
+  'FarcasterReplyCastDeleted',
   'FarcasterVoteCreated',
   'FarcasterContestBotMentioned',
   'GroupCreated',
@@ -43,6 +46,16 @@ export const outboxEvents: Events[] = [
   'AddressOwnershipTransferred',
   'TwitterMomBotMentioned',
   'TwitterContestBotMentioned',
+  'TwitterCommonMentioned',
+  'CommunityStakeTrade',
+  'NamespaceDeployed',
+  'NamespaceDeployedWithReferral',
+  'LaunchpadTokenCreated',
+  'LaunchpadTokenTraded',
+  'ReferralFeeDistributed',
+  'WalletLinked',
+  'SSOLinked',
+  'XpChainEventCreated',
 ] as const;
 
 export const Outbox = z.union(

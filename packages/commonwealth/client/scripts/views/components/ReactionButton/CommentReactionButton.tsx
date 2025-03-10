@@ -4,7 +4,6 @@ import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/commen
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
@@ -24,6 +23,7 @@ type CommentReactionButtonProps = {
   tooltipText?: string;
   onReaction?: () => void;
   weightType?: TopicWeightedVoting | null;
+  tokenNumDecimals?: number;
 };
 
 export const CommentReactionButton = ({
@@ -32,6 +32,7 @@ export const CommentReactionButton = ({
   tooltipText = '',
   onReaction,
   weightType,
+  tokenNumDecimals,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
@@ -49,8 +50,8 @@ export const CommentReactionButton = ({
     (x) => x?.address === activeAddress,
   );
   const reactionWeightsSum = (comment.reactions || []).reduce(
-    (acc, reaction) => acc.add(reaction.calculated_voting_weight || 1),
-    BigNumber.from(0),
+    (acc, reaction) => acc + BigInt(reaction.calculated_voting_weight || 1),
+    BigInt(0),
   );
 
   const handleVoteClick = async (e) => {
@@ -114,7 +115,10 @@ export const CommentReactionButton = ({
   };
 
   const formattedVoteCount = prettyVoteWeight(
-    reactionWeightsSum.toString(),
+    weightType
+      ? reactionWeightsSum.toString()
+      : comment.reaction_count.toString(),
+    tokenNumDecimals,
     weightType,
     1,
     6,

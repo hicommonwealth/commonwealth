@@ -81,6 +81,12 @@ export class DatabaseCleaner {
     }
 
     try {
+      await this.cleanChainEventXpSources();
+    } catch (e) {
+      this.log.error('Failed to clean chain event XP sources', e);
+    }
+
+    try {
       await this.runMaintenance();
     } catch (e) {
       this.log.error('Failed to run pg_partman maintenance', e);
@@ -159,6 +165,26 @@ export class DatabaseCleaner {
     });
 
     this.log.info(`Deleted ${subsDeleted} subscriptions`);
+  }
+
+  /**
+   * Deactivates ChainEventXpSources (EVM CE sources) for quests that have ended
+   */
+  public async cleanChainEventXpSources() {
+    const res = await this._models.sequelize.query(
+      `
+        UPDATE "ChainEventXpSources" CE
+        SET active = false
+        FROM "QuestActionMetas" QAM,
+             "Quests" Q
+        WHERE QAM.id = CE.quest_action_meta_id
+          AND QAM.quest_id = Q.id
+          AND Q.end_date < NOW()
+          AND CE.active = true;
+    `,
+      { type: QueryTypes.BULKDELETE },
+    );
+    this.log.info(`Deactivated ${res} chain event XP sources`);
   }
 
   /**

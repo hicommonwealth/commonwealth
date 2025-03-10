@@ -30,6 +30,8 @@ export const SocialAccounts = (props: SocialAccountsProps) => {
           return <SocialAccount link={social} iconName="github" key={i} />;
         } else if (social.includes('tiktok')) {
           return <SocialAccount link={social} iconName="tiktok" key={i} />;
+        } else if (social.includes('warpcast')) {
+          return <SocialAccount link={social} iconName="warpcast" key={i} />;
         } else {
           return <SocialAccount link={social} iconName="website" key={i} />;
         }

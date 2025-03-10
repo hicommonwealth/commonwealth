@@ -43,6 +43,7 @@ const AdminContestsPage = () => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const chainNodeUrl = app?.chain?.meta?.ChainNode?.url || '';
 
   const communityId = app.activeChainId() || '';
 
@@ -148,6 +149,13 @@ const AdminContestsPage = () => {
                 isLoading={isContestDataLoading}
                 isContestAvailable={isContestAvailable}
                 onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                  ethChainId,
+                  chainNodeUrl,
+                }}
               />
             )}
 
@@ -155,7 +163,7 @@ const AdminContestsPage = () => {
             <CWText type="h3" className="mb-12">
               Previous Contests
             </CWText>
-            {isContestAvailable && !contestsData.active.length ? (
+            {isContestAvailable && contestsData.finished.length === 0 ? (
               <CWText>No previous contests available</CWText>
             ) : (
               <ContestsList
@@ -165,6 +173,13 @@ const AdminContestsPage = () => {
                 isContestAvailable={isContestAvailable}
                 displayAllRecurringContests
                 onSetContestView={setContestView}
+                community={{
+                  id: community?.id || '',
+                  name: community?.name || '',
+                  iconUrl: community?.icon_url || '',
+                  ethChainId,
+                  chainNodeUrl,
+                }}
               />
             )}
           </>
