@@ -10,7 +10,15 @@ export function GetXps(): Query<typeof schemas.GetXps> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { user_id, community_id, quest_id, from, to, event_name } = payload;
+      const {
+        user_id,
+        user_or_creator_id,
+        community_id,
+        quest_id,
+        from,
+        to,
+        event_name,
+      } = payload;
 
       const include: FindOptions['include'] = [
         {
@@ -46,6 +54,12 @@ export function GetXps(): Query<typeof schemas.GetXps> {
 
       const where: WhereOptions<XpLogInstance> = {};
       user_id && (where.user_id = user_id);
+      if (user_or_creator_id) {
+        where[Op.or as any] = [
+          { user_id: user_or_creator_id },
+          { creator_user_id: user_or_creator_id },
+        ];
+      }
       from && (where.created_at = { [Op.gt]: from });
       to && (where.created_at = { [Op.lte]: to });
 
