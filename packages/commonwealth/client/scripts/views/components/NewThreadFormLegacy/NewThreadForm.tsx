@@ -221,6 +221,9 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   const hasInput =
     threadTitle.trim().length > 0 ||
     getTextFromDelta(threadContentDelta).trim().length > 0;
+
+  console.log('isDisabled', isDisabled);
+
   const buttonDisabled =
     !user.activeAccount ||
     !userSelectedAddress ||
@@ -229,7 +232,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     (selectedCommunityId && !!disabledActionsTooltipText) ||
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
-    (aiCommentsToggleEnabled ? !hasInput : isDisabled);
+    isDisabled;
 
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
@@ -563,7 +566,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                 </div>
               </div>
 
-              {!!hasTopics && (
+              {!!hasTopics && !!threadTopic && (
                 <CWSelectList
                   className="topic-select"
                   components={{
@@ -596,6 +599,10 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                     label: topic?.name,
                     value: `${topic?.id}`,
                   }))}
+                  defaultValue={{
+                    label: threadTopic?.name,
+                    value: `${threadTopic?.id}`,
+                  }}
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
