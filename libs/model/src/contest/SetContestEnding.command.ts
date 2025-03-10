@@ -2,6 +2,7 @@ import { Command, logger } from '@hicommonwealth/core';
 import {
   createPrivateEvmClient,
   getContestScore,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { config } from '../config';
@@ -44,6 +45,9 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
       );
       mustExist('Contest Manager', contestManager);
 
+      const eth_chain_id = contestManager.Community!.ChainNode!.eth_chain_id;
+      mustBeProtocolChainId(eth_chain_id);
+
       // add onchain vote to the first content when no upvotes found in the last hour
 
       // NOTE: on dev environments where contests last 1 hour, this may cause issues
@@ -61,6 +65,7 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
             contestManagers: [
               {
                 url: chain_url,
+                eth_chain_id,
                 contest_address,
                 content_id: firstContent!.content_id,
               },
@@ -78,7 +83,7 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
           contestManager.Community!.ChainNode?.url,
       });
       const { contestBalance, scores } = await getContestScore(
-        rpc,
+        { rpc, eth_chain_id },
         contestManager.contest_address,
         contestManager.prize_percentage || 0,
         contestManager.payout_structure,

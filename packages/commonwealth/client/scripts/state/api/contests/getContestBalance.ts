@@ -17,6 +17,7 @@ const getContestBalance = async ({
     contestAddress,
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
+    ethChainId,
   );
 
   return await contest.getContestBalance(isOneOff);
