@@ -1,44 +1,34 @@
-import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import './DesktopStickyInput.scss';
+import { useStickComment } from './context/StickCommentProvider';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
-  const [focused, setFocused] = useState(false);
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const {
-    aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
-    aiInteractionsToggleEnabled,
-  } = useLocalAISettingsStore();
+  const { mode, isExpanded, setIsExpanded } = useStickComment();
+  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+    useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
-    setFocused(true);
-  }, []);
+    setIsExpanded(true);
+  }, [setIsExpanded]);
 
   const handleCancel = useCallback(
-    (event: React.MouseEvent) => {
-      setFocused(false);
-      onCancel(event);
+    (event: React.MouseEvent | undefined) => {
+      setIsExpanded(false);
+      onCancel?.(event);
     },
-    [onCancel],
+    [onCancel, setIsExpanded],
   );
-
-  const handleAiToggle = useCallback(() => {
-    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-  }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
-      console.log('DesktopStickyInput - Starting AI reply for:', commentId);
       if (streamingReplyIds.includes(commentId)) {
-        console.log('Already streaming for this comment');
         return;
       }
       setStreamingReplyIds((prev) => [...prev, commentId]);
@@ -46,13 +36,9 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     [streamingReplyIds],
   );
 
-  const handleEnhancedSubmit = useCallback(async () => {
-    console.log(
-      'DesktopStickyInput - Submitting comment with AI mode:',
-      aiCommentsToggleEnabled,
-    );
+  const handleEnhancedSubmit = useCallback(async (): Promise<number> => {
+    setIsExpanded(false);
 
-    // Post the comment and get its ID
     const commentId = await handleSubmitComment();
 
     if (typeof commentId !== 'number' || isNaN(commentId)) {
@@ -60,7 +46,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       throw new Error('Invalid comment ID');
     }
 
-    // If AI mode is enabled, trigger the streaming reply
     if (aiCommentsToggleEnabled) {
       handleAiReply(commentId);
     }
@@ -68,16 +53,12 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     const attemptJump = () => {
       const commentElement = document.querySelector(`.comment-${commentId}`);
       if (commentElement) {
-        console.log(
-          `DesktopStickyInput - Found comment element for ID ${commentId}, scrolling...`,
-        );
         jumpHighlightComment(commentId);
         return true;
       }
       return false;
     };
 
-    // Attempt jump after delays to allow the DOM to update
     await new Promise((resolve) => setTimeout(resolve, 500));
     attemptJump();
 
@@ -93,11 +74,15 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     }, 2000);
 
     return commentId;
-  }, [handleSubmitComment, aiCommentsToggleEnabled, handleAiReply]);
+  }, [
+    handleSubmitComment,
+    aiCommentsToggleEnabled,
+    handleAiReply,
+    setIsExpanded,
+  ]);
 
-  const useExpandedEditor = focused || isReplying;
+  const useExpandedEditor = isExpanded || isReplying;
 
-  // Create a new props object with our local state
   const editorProps = {
     ...props,
     shouldFocus: true,
@@ -118,30 +103,23 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
               type="text"
               className="form-control"
               placeholder={
-                replyingToAuthor
-                  ? `Reply to ${replyingToAuthor}...`
-                  : 'Write a comment...'
+                mode === 'thread'
+                  ? 'Create a thread...'
+                  : replyingToAuthor
+                    ? `Reply to ${replyingToAuthor}...`
+                    : 'Write a comment...'
               }
               onClick={handleFocused}
             />
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-              <div className="ai-comments-toggle-container">
-                <CWToggle
-                  className="ai-toggle"
-                  checked={aiCommentsToggleEnabled}
-                  onChange={handleAiToggle}
-                  icon="sparkle"
-                  size="xs"
-                  iconColor="#757575"
-                />
-                <span className="label">AI</span>
-              </div>
-            )}
           </div>
         </div>
       ) : (
         <div className="DesktopStickyInputExpanded">
-          <CommentEditor {...editorProps} />
+          {mode === 'thread' ? (
+            <NewThreadForm onCancel={handleCancel} />
+          ) : (
+            <CommentEditor {...editorProps} />
+          )}
         </div>
       )}
     </div>

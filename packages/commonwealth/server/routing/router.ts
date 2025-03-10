@@ -39,7 +39,7 @@ import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 
-import { type DB } from '@hicommonwealth/model';
+import { generateThreadText, type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import { generateCommentText, generateTokenIdea } from '@hicommonwealth/model';
@@ -471,6 +471,40 @@ function setupRouter(
       const ideaGenerator = generateTokenIdea({ ideaPrompt });
 
       for await (const chunk of ideaGenerator) {
+        if ((chunk as { error?: string }).error) {
+          return res.end(
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
+          );
+        }
+
+        res.write(chunk);
+        res.flush();
+      }
+
+      return res.end();
+    },
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/generateThreadText',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateThreadText',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+      const userText =
+        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
+      const threadGenerator = generateThreadText({ userText });
+
+      for await (const chunk of threadGenerator) {
         if ((chunk as { error?: string }).error) {
           return res.end(
             JSON.stringify({

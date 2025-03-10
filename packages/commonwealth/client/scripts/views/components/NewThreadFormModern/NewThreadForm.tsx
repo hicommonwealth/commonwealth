@@ -4,7 +4,6 @@ import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
-import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
@@ -12,7 +11,6 @@ import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
@@ -40,8 +38,6 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
 export const NewThreadForm = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const navigate = useCommonNavigate();
   const location = useLocation();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
@@ -72,8 +68,6 @@ export const NewThreadForm = () => {
     setEditorText,
     setIsSaving,
     isDisabled,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
     canShowTopicPermissionBanner,
@@ -84,8 +78,6 @@ export const NewThreadForm = () => {
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.active_contest_managers?.length
     ? threadTopic?.active_contest_managers

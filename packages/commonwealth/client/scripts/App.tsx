@@ -17,7 +17,6 @@ import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import FarcasterFrameProvider from './views/components/FarcasterProvider';
-import { Mava } from './views/components/Mava';
 import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
 OpenFeature.setProvider(openFeatureProvider);
@@ -40,7 +39,6 @@ const App = () => {
                 ) : (
                   <>
                     <OnBoardingWrapperForMobile>
-                      <Mava />
                       <ReactNativeBridgeUser />
                       <ReactNativeLogForwarder />
                       <RouterProvider router={router()} />
