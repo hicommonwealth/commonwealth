@@ -1,11 +1,10 @@
-import { Actor, dispose, query } from '@hicommonwealth/core';
+import { dispose, query } from '@hicommonwealth/core';
 import { GetCommunities, GetCommunity } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { systemActor } from '../../src/middleware';
 import { seed } from '../../src/tester';
 
 describe('Tags', () => {
-  let actor: Actor;
   let tag1Id: number;
   let tag2Id: number;
   let community2id: string;
