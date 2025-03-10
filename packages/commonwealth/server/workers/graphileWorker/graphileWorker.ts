@@ -20,8 +20,7 @@ async function startGraphileWorker() {
       throw new Error(`Cron job task not found: ${cronJob.task}`);
   }
 
-  // TODO: backfill job exection to account for dyno downtime?
-  const r = await run({
+  await run({
     parsedCronItems: parseCronItems(cronItems),
     preset,
     taskList: Object.entries(graphileTasks).reduce(
