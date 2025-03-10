@@ -8,14 +8,14 @@ export const ChannelQuestEvents = {
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
 // Channel quest action types that are not event related
-export const ChannelQuestBatches = ['TwitterMetrics'] as const;
+export const ChannelBatchActions = ['TwitterMetrics'] as const;
 
 export const AllChannelQuestActionNames = [
   ...(Object.keys(ChannelQuestEvents) as [
     keyof typeof ChannelQuestEvents,
     ...Array<keyof typeof ChannelQuestEvents>,
   ]),
-  ...ChannelQuestBatches,
+  ...ChannelBatchActions,
 ] as const;
 
 export const QuestEvents = {
@@ -35,6 +35,14 @@ export const QuestEvents = {
   SSOLinked: events.SSOLinked,
   ...ChannelQuestEvents,
 } as const;
+
+export const QuestActionNames = [
+  ...(Object.keys(QuestEvents) as [
+    keyof typeof QuestEvents,
+    ...Array<keyof typeof QuestEvents>,
+  ]),
+  ...ChannelBatchActions,
+];
 
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
@@ -57,7 +65,7 @@ export const QuestActionMeta = z
         keyof typeof QuestEvents,
         ...Array<keyof typeof QuestEvents>,
       ]),
-      ...ChannelQuestBatches,
+      ...ChannelBatchActions,
     ]),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
