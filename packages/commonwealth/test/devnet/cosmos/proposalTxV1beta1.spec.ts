@@ -96,7 +96,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
     const activeProposals = await getActiveVotingProposals();
     assert.isAtLeast(activeProposals.length, 1);
     const proposal = activeProposals[activeProposals.length - 1];
-    // @ts-expect-error Long issues in Cosmos SDK
     const msg = encodeMsgVote(signer, proposal.proposalId, voteOption);
 
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
