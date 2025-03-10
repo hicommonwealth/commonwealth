@@ -1,3 +1,3 @@
 export * from './graphile.config';
-export * from './scheduleTask';
 export * from './types';
+export * from './utils';

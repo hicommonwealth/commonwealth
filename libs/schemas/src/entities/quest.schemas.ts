@@ -93,6 +93,7 @@ export const Quest = z
       .nullish()
       .describe('Links the quest to a single community'),
     quest_type: z.enum(['channel', 'common']),
+    scheduled_job_id: z.string().nullish(),
 
     // associations
     action_metas: z.array(QuestActionMeta).optional(),

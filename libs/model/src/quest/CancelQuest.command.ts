@@ -1,4 +1,5 @@
 import { Command } from '@hicommonwealth/core';
+import { removeJob } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models, sequelize } from '../database';
 import { isSuperAdmin } from '../middleware';
@@ -12,17 +13,28 @@ export function CancelQuest(): Command<typeof schemas.CancelQuest> {
     body: async ({ payload }) => {
       const { quest_id } = payload;
 
-      const quest = await models.Quest.findOne({
+      const quest = await models.Quest.scope('withPrivateData').findOne({
         where: { id: quest_id },
         attributes: ['start_date'],
       });
       mustExist(`Quest "${quest_id}"`, quest);
 
-      const [rows] = await models.Quest.update(
-        { end_date: sequelize.literal('NOW()') },
-        { where: { id: quest_id } },
-      );
-      return rows > 0;
+      let rows: [number] | undefined;
+      await models.sequelize.transaction(async (transaction) => {
+        if (quest.scheduled_job_id) {
+          await removeJob({
+            jobId: quest.scheduled_job_id,
+            transaction,
+          });
+        }
+
+        rows = await models.Quest.update(
+          { end_date: sequelize.literal('NOW()') },
+          { where: { id: quest_id } },
+        );
+      });
+
+      return rows ? rows[0] > 0 : false;
     },
   };
 }

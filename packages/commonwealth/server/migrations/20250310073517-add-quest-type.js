@@ -28,6 +28,16 @@ module.exports = {
         },
         { transaction },
       );
+
+      await queryInterface.addColumn(
+        'Quests',
+        'scheduled_job_id',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
     });
   },
 

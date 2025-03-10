@@ -1,9 +1,70 @@
 import { models } from '@hicommonwealth/model';
-import { Job, TaskSpec } from 'graphile-worker';
+import { DbJob, Job, TaskSpec } from 'graphile-worker';
 import { QueryTypes, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { preset } from './graphile.config';
 import { GraphileTaskNames, TaskPayloads } from './types';
+
+export async function rescheduleJobs({
+  jobIds,
+  options,
+  transaction,
+}: {
+  jobIds: string[];
+  options: {
+    runAt?: string | Date;
+    priority?: number;
+    attempts?: number;
+    maxAttempts?: number;
+  };
+  transaction?: Transaction;
+}): Promise<DbJob[]> {
+  return await models.sequelize.query<DbJob>(
+    `
+        SELECT *
+        FROM ${preset.worker!.schema!}.reschedule_jobs(
+                (:jobIds)::bigint[],
+                run_at := :runAt::timestamptz,
+                priority := :priority::int,
+                attempts := :attempts::int,
+                max_attempts := :maxAttempts::int
+             )
+    `,
+    {
+      replacements: {
+        jobIds,
+        runAt: options.runAt || null,
+        priority: options.priority || null,
+        attempts: options.attempts || null,
+        maxAttempts: options.maxAttempts || null,
+      },
+      type: QueryTypes.SELECT,
+      transaction,
+    },
+  );
+}
+
+export async function removeJob({
+  jobId,
+  transaction,
+}: {
+  jobId: string;
+  transaction?: Transaction;
+}): Promise<DbJob> {
+  const res = await models.sequelize.query<DbJob>(
+    `
+    SELECT ${preset.worker!.schema!}.remove_job(:job_id::text);
+  `,
+    {
+      replacements: {
+        job_id: jobId,
+      },
+      type: QueryTypes.SELECT,
+      transaction,
+    },
+  );
+  return res[0];
+}
 
 export async function scheduleTask<Name extends GraphileTaskNames>(
   taskName: Name,
