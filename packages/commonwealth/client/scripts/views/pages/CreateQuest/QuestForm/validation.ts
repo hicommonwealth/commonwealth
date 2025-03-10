@@ -1,13 +1,9 @@
-import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
 export const questFormValidationSchema = z
   .object({
-    participation_limit: z.nativeEnum(QuestParticipationLimit, {
-      invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-    }),
     start_date: z
       .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

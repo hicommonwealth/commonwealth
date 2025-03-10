@@ -1,4 +1,8 @@
 import {
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
+import {
   linkValidationSchema,
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
@@ -13,6 +17,13 @@ export const questSubFormValidationSchema = z.object({
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   rewardAmount: numberNonDecimalGTZeroValidationSchema,
   instructionsLink: linkValidationSchema.optional,
+  participationLimit: z.nativeEnum(QuestParticipationLimit, {
+    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
+  // these 2 below are only used for initial values validation and not for
+  // internal state validation, that is handled by a custom function
+  participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
+  participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
 export const questSubFormValidationSchemaWithContentLink =
