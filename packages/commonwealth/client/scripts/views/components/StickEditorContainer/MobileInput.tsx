@@ -241,7 +241,6 @@ export const MobileInput = (props: MobileInputProps) => {
                     checked={aiCommentsToggleEnabled}
                     onChange={handleAiToggle}
                     icon="sparkle"
-                    size="xs"
                     iconColor="#757575"
                   />
                   <span className="label">AI</span>

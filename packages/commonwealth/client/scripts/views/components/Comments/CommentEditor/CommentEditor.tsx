@@ -200,7 +200,6 @@ const CommentEditor = ({
                 checked={effectiveAiStreaming === true}
                 onChange={handleAiToggle}
                 icon="sparkle"
-                size="xs"
                 iconColor="#757575"
               />
               <span className="label">AI</span>

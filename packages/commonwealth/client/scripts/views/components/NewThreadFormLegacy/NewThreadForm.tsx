@@ -10,13 +10,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -26,7 +20,7 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore from 'state/ui/user';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -45,13 +39,13 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
+import { useFlag } from 'hooks/useFlag';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
-import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -62,26 +56,20 @@ import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-
-interface NewThreadFormProps {
-  onCancel?: (event?: React.MouseEvent) => void;
-  aiCommentsToggleEnabled: boolean;
-  setAICommentsToggleEnabled: (enabled: boolean) => void;
-  onAiGenerate: (text: string) => Promise<string>;
-}
-
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
-export const NewThreadForm: React.FC<NewThreadFormProps> = ({
-  onCancel = () => {},
-  aiCommentsToggleEnabled,
-  setAICommentsToggleEnabled,
-  onAiGenerate,
-}) => {
+interface NewThreadFormProps {
+  onCancel?: () => void;
+}
+
+export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
   const user = useUserStore();
+
+  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   useAppStatus();
 
@@ -187,10 +175,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const isPopulated = useMemo(() => {
-    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
-  }, [threadContentDelta, threadTitle]);
-
   const gatedGroupNames = groups
     .filter((group) =>
       group.topics.find((topic) => topic.id === threadTopic?.id),
@@ -218,12 +202,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
         : undefined,
   });
 
-  const hasInput =
-    threadTitle.trim().length > 0 ||
-    getTextFromDelta(threadContentDelta).trim().length > 0;
-
-  console.log('isDisabled', isDisabled);
-
   const buttonDisabled =
     !user.activeAccount ||
     !userSelectedAddress ||
@@ -232,7 +210,8 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     (selectedCommunityId && !!disabledActionsTooltipText) ||
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
-    isDisabled;
+    isDisabled ||
+    isGenerating;
 
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
@@ -248,8 +227,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
       communityBase: community?.base,
       hasUserAddress: !!userSelectedAddress,
     });
-
-    const isAIMode = aiCommentsToggleEnabled;
 
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       console.log('NewThreadForm: Invalid form state:', {
@@ -274,17 +251,17 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     }
 
     // In AI mode, provide default values so the backend validation is not broken.
-    const effectiveTitle = aiCommentsToggleEnabled
+    const effectiveTitle = aiInteractionsToggleEnabled
       ? threadTitle.trim() || DEFAULT_THREAD_TITLE
       : threadTitle;
 
-    const effectiveBody = aiCommentsToggleEnabled
+    const effectiveBody = aiInteractionsToggleEnabled
       ? getTextFromDelta(threadContentDelta).trim()
         ? serializeDelta(threadContentDelta)
         : DEFAULT_THREAD_BODY
       : serializeDelta(threadContentDelta);
 
-    if (!isAIMode) {
+    if (!aiInteractionsToggleEnabled) {
       console.log('NewThreadForm: Checking thread errors');
       const deltaString = JSON.stringify(threadContentDelta);
       checkNewThreadErrors(
@@ -394,7 +371,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
       }
     }
   }, [
-    aiCommentsToggleEnabled,
     community,
     createThread,
     isInsideCommunity,
@@ -414,6 +390,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     hasTopics,
     checkForSessionKeyRevalidationErrors,
     user,
+    aiInteractionsToggleEnabled,
   ]);
 
   const handleCancel = () => {
@@ -422,7 +399,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
     console.log('NewThreadForm: invoking forreal onCancel');
-    onCancel();
+    onCancel?.() || navigate('/discussions');
   };
 
   const showBanner =
@@ -689,27 +666,17 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                   containerClassName="no-pad"
                 />
 
-                <CWThreadAction
-                  action="ai-reply"
-                  label="Draft with AI"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log('Draft with AI button clicked');
-                    handleGenerateAIThread();
-                  }}
-                />
-
-                <div className="ai-toggle-container">
-                  <CWToggle
-                    checked={aiCommentsToggleEnabled}
-                    onChange={() =>
-                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled)
-                    }
-                    icon="sparkle"
-                    iconColor="#757575"
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <CWThreadAction
+                    action="ai-reply"
+                    label="Draft with AI"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      console.log('Draft with AI button clicked');
+                      handleGenerateAIThread();
+                    }}
                   />
-                  <span className="label">AI</span>
-                </div>
+                )}
 
                 <CWButton
                   label="Create"
