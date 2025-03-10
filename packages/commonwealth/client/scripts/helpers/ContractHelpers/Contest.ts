@@ -300,7 +300,9 @@ class Contest extends ContractBase {
       createPublicClient({
         chain: ViemChains[this.ethChainId],
         transport: http(this.rpc),
-        batch: true,
+        batch: {
+          multicall: true,
+        },
       }),
       oneOff,
     );
