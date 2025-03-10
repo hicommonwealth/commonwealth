@@ -220,7 +220,7 @@ const QuestActionSubForm = ({
           {...repetitionCycleRadio.props}
           className="radio-btn mt-8"
           value={QuestParticipationLimit.OncePerPeriod}
-          groupName="participationLimit"
+          groupName={`participationLimit-${defaultValues?.action}`}
           {...(defaultValues?.participationLimit ===
             QuestParticipationLimit.OncePerPeriod && {
             checked: true,
@@ -236,7 +236,7 @@ const QuestActionSubForm = ({
           className="radio-btn"
           value={QuestParticipationLimit.OncePerQuest}
           label="One time only"
-          groupName="participationLimit"
+          groupName={`participationLimit-${defaultValues?.action}`}
           {...(defaultValues?.participationLimit ===
             QuestParticipationLimit.OncePerQuest && {
             checked: true,
