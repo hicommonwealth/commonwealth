@@ -3,7 +3,6 @@ import {
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -260,13 +259,6 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
   const isDeletionAllowed = !isStarted || isEnded;
 
-  const isRepeatableQuest =
-    quest.action_metas?.[0]?.participation_limit ===
-    QuestParticipationLimit.OncePerPeriod;
-  const questRepeatitionCycle = quest.action_metas?.[0]?.participation_period;
-  const questParticipationLimitPerCycle =
-    quest.action_metas?.[0]?.participation_times_per_period || 0;
-
   const isSiteAdmin = Permissions.isSiteAdmin();
 
   return (
@@ -311,25 +303,6 @@ const QuestDetails = ({ id }: { id: number }) => {
                   true,
                 )}
               </CWText>
-              {isRepeatableQuest && (
-                <CWText className="timeline">
-                  Users can participate&ensp;
-                  <CWTag
-                    type="group"
-                    label={`${questParticipationLimitPerCycle}`}
-                  />
-                  &ensp;time{questParticipationLimitPerCycle > 1 ? 's' : ''}{' '}
-                  every&ensp;
-                  <CWTag
-                    type="group"
-                    label={
-                      questParticipationPeriodToCopyMap[
-                        questRepeatitionCycle || ''
-                      ]
-                    }
-                  />
-                </CWText>
-              )}
               {isSiteAdmin && (
                 <>
                   <CWDivider />
@@ -387,8 +360,21 @@ const QuestDetails = ({ id }: { id: number }) => {
                   onActionStart={handleActionStart}
                   questAction={action as z.infer<typeof QuestActionMeta>}
                   isActionCompleted={
-                    !!xpProgressions.find((p) => p.action_meta_id === action.id)
+                    action?.participation_limit ===
+                    QuestParticipationLimit.OncePerQuest
+                      ? !!xpProgressions.find(
+                          (p) => p.action_meta_id === action.id,
+                        )
+                      : xpProgressions.filter(
+                          (p) => p.action_meta_id === action.id,
+                        ).length === action.participation_times_per_period
                   }
+                  xpLogsForActions={xpProgressions
+                    .filter((log) => log.action_meta_id === action.id)
+                    .map((log) => ({
+                      id: log.action_meta_id,
+                      createdAt: new Date(log.event_created_at),
+                    }))}
                   canStartAction={isStarted && !isEnded}
                   {...((!isStarted || isEnded) && {
                     actionStartBlockedReason: !isStarted
