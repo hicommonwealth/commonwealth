@@ -409,7 +409,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   };
 
   useEffect(() => {
-    refreshTopics().catch(console.error);
+    void refreshTopics();
   }, [refreshTopics]);
 
   const handleKeyDown = useCallback(
@@ -629,7 +629,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     label="Draft with AI"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleGenerateAIThread();
+                      void handleGenerateAIThread();
                     }}
                   />
                 )}
@@ -637,7 +637,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 <CWButton
                   label="Create"
                   disabled={buttonDisabled}
-                  onClick={handleNewThreadCreation}
+                  onClick={() => void handleNewThreadCreation()}
                   tabIndex={4}
                   containerClassName="no-pad"
                 />
@@ -645,8 +645,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
               {showBanner && (
                 <JoinCommunityBanner
-                  onClose={handleCloseBanner}
-                  onJoin={handleJoinCommunity}
+                  onClose={() => handleCloseBanner()}
+                  onJoin={() => void handleJoinCommunity()}
                 />
               )}
 
