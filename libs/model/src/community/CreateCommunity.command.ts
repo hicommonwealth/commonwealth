@@ -203,21 +203,24 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           { transaction },
         );
 
-        await emitEvent(
-          models.Outbox,
-          [
-            {
-              event_name: 'CommunityCreated',
-              event_payload: {
-                community_id: id,
-                user_id: user.id!,
-                referrer_address: user.referred_by_address ?? undefined,
-                created_at: created.created_at!,
+        // Only emit the event if the community was not created by an indexer
+        if (!payload.community_indexer_id) {
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'CommunityCreated',
+                event_payload: {
+                  community_id: id,
+                  user_id: user.id!,
+                  referrer_address: user.referred_by_address ?? undefined,
+                  created_at: created.created_at!,
+                },
               },
-            },
-          ],
-          transaction,
-        );
+            ],
+            transaction,
+          );
+        }
       });
       // == end of command transaction boundary ==
 
