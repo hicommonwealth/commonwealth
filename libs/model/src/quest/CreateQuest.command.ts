@@ -44,7 +44,9 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         quest_type,
       });
 
-      return quest.toJSON();
+      const jsonQuest = quest.toJSON();
+      delete jsonQuest.scheduled_job_id;
+      return jsonQuest;
     },
   };
 }
