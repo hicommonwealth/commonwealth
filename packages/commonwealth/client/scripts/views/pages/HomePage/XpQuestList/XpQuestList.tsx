@@ -21,9 +21,10 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const xpEnabled = useFlag('xp');
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+    community_id: communityIdFilter,
     cursor: 1,
     limit: 3,
-    start_after: moment().startOf('day').toDate(),
+    end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
 

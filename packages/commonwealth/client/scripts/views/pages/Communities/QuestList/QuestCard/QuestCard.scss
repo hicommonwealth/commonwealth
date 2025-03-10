@@ -24,6 +24,11 @@
     cursor: initial;
   }
 
+  .max-h-24 {
+    max-height: 24px;
+    overflow: hidden;
+  }
+
   .quest-scope {
     display: flex;
     justify-content: space-between;
