@@ -24,7 +24,6 @@ const generateThreadText = async function* ({
   void,
   unknown
 > {
-  console.log('generateThreadText', userText);
   const useOpenRouter = config.OPENAI.USE_OPENROUTER === 'true';
   const apiKey = useOpenRouter
     ? config.OPENAI.OPENROUTER_API_KEY
