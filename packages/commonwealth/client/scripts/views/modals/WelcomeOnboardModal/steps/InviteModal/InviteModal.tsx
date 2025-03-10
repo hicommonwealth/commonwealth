@@ -35,7 +35,7 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     saveToClipboard(inviteLink, true).catch(console.error);
   };
   const generatePermalink = (link: string) => {
-    const message = 'Hey, check out Common!';
+    const message = 'Join me on Common using my link!';
     return `${message} \n${link}`;
   };
 
