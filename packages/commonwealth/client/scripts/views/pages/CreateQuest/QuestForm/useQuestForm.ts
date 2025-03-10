@@ -244,6 +244,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
+      quest_type: 'common',
     });
 
     if (quest && quest.id) {
