@@ -20,7 +20,7 @@ export const cleanSubscriptions = async () => {
             END
           ) = 0
         `;
-    await this._models.sequelize.query(
+    await models.sequelize.query(
       `
           CREATE TEMPORARY TABLE user_ids_to_delete as (
             SELECT U.id
