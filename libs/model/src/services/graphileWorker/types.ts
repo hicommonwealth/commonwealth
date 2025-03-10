@@ -10,14 +10,6 @@ export enum GraphileTaskNames {
   AwardTwitterQuestXp = 'AwardTwitterQuestXp',
 }
 
-export enum GraphileQueues {
-  ArchiveOutbox = 'ArchiveOutbox',
-  UpdateSitemap = 'UpdateSitemap',
-  CleanSubscriptions = 'CleanSubscriptions',
-  CleanChainEventXpSources = 'CleanChainEventXpSources',
-  RunDbMaintenance = 'RunDbMaintenance',
-}
-
 export type GraphileTask<
   Input extends ZodSchema | ZodUndefined = ZodUndefined,
 > = {
