@@ -11,13 +11,13 @@ const log = logger(import.meta);
 const logFactory: LogFunctionFactory = (scope) => {
   return (level, message, meta) => {
     if (level === 'error') {
-      log.error(message, undefined, meta);
+      log.error(message, undefined, { meta, scope });
     } else if (level === 'warning') {
-      log.warn(message, meta);
+      log.warn(message, { meta, scope });
     } else if (level === 'info') {
-      log.info(message, meta);
+      log.info(message, { meta, scope });
     } else {
-      log.debug(message, meta);
+      log.debug(message, { meta, scope });
     }
   };
 };
