@@ -1,3 +1,4 @@
+import { OpenFeature } from '@openfeature/web-sdk';
 import CustomDomainRoutes from 'navigation/CustomDomainRoutes';
 import React from 'react';
 import {
@@ -11,13 +12,26 @@ import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
+export type RouteFeatureFlags = {
+  governancePageEnabled: boolean;
+};
+
 const Router = () => {
+  const client = OpenFeature.getClient();
+
+  const governancePageEnabled = client.getBooleanValue('governancePage', false);
+  const flags = {
+    governancePageEnabled,
+  };
+
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
 
   return createBrowserRouter(
     createRoutesFromElements([
       ...GeneralRoutes(),
-      ...(isCustomDomain ? CustomDomainRoutes() : CommonDomainRoutes()),
+      ...(isCustomDomain
+        ? CustomDomainRoutes(flags)
+        : CommonDomainRoutes(flags)),
       <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
