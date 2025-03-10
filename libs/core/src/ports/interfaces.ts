@@ -83,6 +83,10 @@ export enum CacheNamespaces {
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
+  Thread_View_Count = 'thread_view_count',
+  Community_Thread_Count_Changed = 'community_thread_count_changed',
+  Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
+  Community_Profile_Count_Changed = 'community_profile_count_changed',
 }
 
 /**
@@ -107,6 +111,12 @@ export interface Cache extends Disposable {
     namespace: CacheNamespaces,
     keys: string[],
   ): Promise<false | Record<string, unknown>>;
+
+  scan(
+    namespace: CacheNamespaces,
+    cursor: number,
+    count: number,
+  ): Promise<{ cursor: number; keys: string[] } | null>;
 
   setKeys(
     namespace: CacheNamespaces,
