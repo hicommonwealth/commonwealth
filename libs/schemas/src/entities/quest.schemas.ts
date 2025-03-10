@@ -53,7 +53,7 @@ export const QuestActionMeta = z
     participation_times_per_period: z.number().optional(),
     content_id: z
       .string()
-      .regex(/(thread:\d+)|(comment:\d+)/)
+      .regex(/(topic:\d+)|(thread:\d+)|(comment:\d+)/)
       .optional()
       .nullish(),
     created_at: z.coerce.date().optional(),
