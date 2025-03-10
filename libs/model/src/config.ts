@@ -169,6 +169,9 @@ export const config = configure(
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
+    COMMUNITY_INDEXER: {
+      CRON: COMMUNITY_INDEXER_CRON,
+    },
   },
   z.object({
     DB: z.object({
