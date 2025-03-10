@@ -1,6 +1,7 @@
 import type { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
 
 export function GetTransactions(): Query<typeof schemas.GetTransactions> {
@@ -16,7 +17,9 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
           ? [addresses]
           : [];
 
-      return (await models.sequelize.query(
+      return await models.sequelize.query<
+        z.infer<(typeof schemas.GetTransactions)['output']>[number]
+      >(
         `
         (
           SELECT
@@ -36,8 +39,8 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
               'chain_node_name', cn.name
             ) AS community
           FROM "StakeTransactions" AS t
-          LEFT JOIN "Communities" AS c ON c.id = t.community_id
-          LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
+          JOIN "Communities" AS c ON c.id = t.community_id
+          JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
           ${addressesList.length > 0 ? 'WHERE t.address IN (:addresses)' : ''}
         )
 
@@ -64,9 +67,9 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
               'chain_node_name', cn.name
             ) AS community
           FROM "LaunchpadTrades" lts
-          LEFT JOIN "LaunchpadTokens" AS tkns ON tkns.token_address = lts.token_address
-          LEFT JOIN "Communities" AS c ON c.namespace = tkns.namespace
-          LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
+          JOIN "LaunchpadTokens" AS tkns ON tkns.token_address = lts.token_address
+          JOIN "Communities" AS c ON c.namespace = tkns.namespace
+          JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
           ${addressesList.length > 0 ? 'WHERE lts.trader_address IN (:addresses)' : ''}
         )
 
@@ -78,8 +81,7 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
             addresses: addressesList.length > 0 ? addressesList : null,
           },
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      )) as any;
+      );
     },
   };
 }
