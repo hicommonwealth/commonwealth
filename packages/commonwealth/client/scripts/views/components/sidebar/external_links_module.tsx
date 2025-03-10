@@ -100,12 +100,14 @@ export const ExternalLinksModule = () => {
         </React.Fragment>
       ))}
       {warpcasts.map((link) => (
-        <CWIcon
-          key={link}
-          iconName="warpcast"
-          className="warpcast-link"
-          onClick={() => window.open(link)}
-        />
+        <React.Fragment key={link}>
+          <CWIcon
+            key={link}
+            iconName="warpcast"
+            className="warpcast-link"
+            onClick={() => setSelectedLink(link)}
+          />
+        </React.Fragment>
       ))}
       {[...remainingLinks, ...slacks].map((link) => (
         <React.Fragment key={link}>
