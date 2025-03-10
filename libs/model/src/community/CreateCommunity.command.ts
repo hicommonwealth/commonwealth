@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -63,6 +63,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         token_name,
         chain_node_id,
+        community_indexer_id,
+        token_address,
+        token_created_at,
+        tags,
       } = payload;
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -136,9 +140,33 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             directory_page_enabled: false,
             snapshot_spaces: [],
             stages_enabled: true,
+            community_indexer_id,
+            token_address,
+            token_created_at,
           },
           { transaction },
         );
+
+        // add tag associations
+        if (tags.length > 0) {
+          const existingTags = await models.Tags.findAll({
+            where: {
+              name: tags,
+            },
+          });
+          if (existingTags.length !== tags.length) {
+            throw new InvalidState('Invalid tags');
+          }
+          for (const t of existingTags) {
+            await models.CommunityTags.create(
+              {
+                community_id: id,
+                tag_id: t.id!,
+              },
+              { transaction },
+            );
+          }
+        }
 
         await models.Topic.create(
           {

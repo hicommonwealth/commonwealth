@@ -112,10 +112,12 @@ const start = async () => {
           bootstrapBindings,
           bootstrapRelayer,
           bootstrapContestRolloverLoop,
+          bootstrapCommunityIndexerLoop,
         } = await import('./server/bindings/bootstrap');
         await bootstrapBindings();
         await bootstrapRelayer();
         bootstrapContestRolloverLoop();
+        bootstrapCommunityIndexerLoop();
       }
     })
     .catch((e) => log.error(e.message, e));

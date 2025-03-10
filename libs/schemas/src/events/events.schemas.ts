@@ -2,6 +2,7 @@ import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
+import { ClankerToken } from '../entities/community-indexer.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
@@ -477,4 +478,8 @@ export const events = {
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
+  ClankerTokenFound: ClankerToken,
+  CommunityIndexerTimerTicked: z
+    .object({})
+    .describe('Polling event that triggers community indexer loop'),
 } as const;

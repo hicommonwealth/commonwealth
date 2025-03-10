@@ -45,13 +45,17 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
+    default_symbol: z.string().max(100),
 
     // hidden optional params
     token_name: z.string().optional(),
+    referrer_address: z.string().optional(),
+    community_indexer_id: z.string().optional(),
+    token_address: z.string().optional(),
+    token_created_at: z.coerce.date().optional(),
+    website: z.string().url().optional(),
 
     // deprecated params to be removed
-    default_symbol: z.string().max(9),
-    website: z.string().url().optional(),
     github: z.string().url().startsWith('https://github.com/').optional(),
     telegram: z.string().url().startsWith('https://t.me/').optional(),
     element: z.string().url().startsWith('https://matrix.to/').optional(),
