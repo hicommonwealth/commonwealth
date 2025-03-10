@@ -48,5 +48,8 @@ export const calculateUnreadCount = (
   items: FeedItem[],
 ) =>
   items.filter(
-    (item) => !item.seen_at && item?.data?.community_name === communityName,
+    (item) =>
+      !item.read_at &&
+      !item.seen_at &&
+      item?.data?.community_name === communityName,
   ).length;

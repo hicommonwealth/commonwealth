@@ -35,8 +35,12 @@ export const SidebarQuickSwitcher = ({
 
   const markCommunityNotificationsAsRead = async (communityName) => {
     const unreadNotifications = items.filter(
-      (item) => !item.seen_at && item?.data?.community_name === communityName,
+      (item) =>
+        !item.seen_at &&
+        !item.read_at &&
+        item?.data?.community_name === communityName,
     );
+    console.log({ unreadNotifications });
     if (unreadNotifications.length === 0) return;
     try {
       await feedClient.markAsRead(unreadNotifications).catch(console.error);
