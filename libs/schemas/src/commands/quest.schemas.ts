@@ -12,6 +12,7 @@ export const CreateQuest = {
     end_date: z.coerce.date(),
     max_xp_to_end: z.number().default(0),
     community_id: z.string().nullish(),
+    quest_type: z.enum(['channel', 'common']),
   }),
   output: Quest,
   context: AuthContext,

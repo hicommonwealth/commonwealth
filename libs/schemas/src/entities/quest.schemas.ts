@@ -2,6 +2,14 @@ import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
 
+export const ChannelQuestEvents = {
+  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  XpChainEventCreated: events.XpChainEventCreated,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
+} as const;
+// Channel quest action types that are not event related
+export const ChannelQuestBatches = ['TwitterMetrics'] as const;
+
 export const QuestEvents = {
   SignUpFlowCompleted: events.SignUpFlowCompleted,
   CommunityCreated: events.CommunityCreated,
@@ -17,9 +25,7 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
-  XpChainEventCreated: events.XpChainEventCreated,
-  TwitterCommonMentioned: events.TwitterCommonMentioned,
+  ...ChannelQuestEvents,
 } as const;
 
 export enum QuestParticipationLimit {
@@ -38,12 +44,13 @@ export const QuestActionMeta = z
     id: PG_INT.nullish(),
     quest_id: PG_INT,
     //event names instead of enums for flexibility when adding new events
-    event_name: z.enum(
-      Object.keys(QuestEvents) as [
+    event_name: z.enum([
+      ...(Object.keys(QuestEvents) as [
         keyof typeof QuestEvents,
         ...Array<keyof typeof QuestEvents>,
-      ],
-    ),
+      ]),
+      ...ChannelQuestBatches,
+    ]),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     amount_multiplier: z.number().min(0).optional(),
@@ -85,6 +92,7 @@ export const Quest = z
       .string()
       .nullish()
       .describe('Links the quest to a single community'),
+    quest_type: z.enum(['channel', 'common']),
 
     // associations
     action_metas: z.array(QuestActionMeta).optional(),

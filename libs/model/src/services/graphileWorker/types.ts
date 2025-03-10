@@ -28,8 +28,6 @@ export type GraphileTask<
   ) => PromiseOrDirect<void | unknown[]>;
 };
 
-export type GraphileTasksObj = Record<GraphileTaskNames, GraphileTask>;
-
 export type CustomCronItem = CronItem & {
   task: GraphileTaskNames;
 };

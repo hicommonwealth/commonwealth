@@ -1,6 +1,6 @@
 import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
-import { preset } from '@hicommonwealth/model';
+import { GraphileTaskNames, preset } from '@hicommonwealth/model';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { cronItems } from './cronJobs';
 import { graphileTasks, taskFactory } from './tasks';
@@ -26,13 +26,12 @@ async function startGraphileWorker() {
     taskList: Object.entries(graphileTasks).reduce(
       (acc, [taskName, task]) => ({
         ...acc,
-        [taskName]: taskFactory(task),
+        [taskName]: taskFactory<typeof task.input>(task),
       }),
-      {} as Record<string, Task>,
+      {} as Record<GraphileTaskNames, Task>,
     ),
   });
   log.info('Graphile Worker started');
-  r.addJob;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

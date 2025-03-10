@@ -1,5 +1,7 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, InvalidInput } from '@hicommonwealth/core';
+import { GraphileTaskNames, scheduleTask } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import z from 'zod';
 import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
 import {
@@ -48,7 +50,19 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         end_date ?? quest.end_date,
       );
 
+      let channelActionMeta:
+        | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>
+        | undefined;
       if (action_metas) {
+        if (quest.quest_type === 'channel') {
+          if (action_metas.length > 1) {
+            throw new InvalidInput(
+              'Cannot have more than one action per channel quest',
+            );
+          }
+          channelActionMeta = action_metas[0];
+        }
+
         const c_id = community_id || quest.community_id;
         await Promise.all(
           action_metas.map(async (action_meta) => {
@@ -82,6 +96,25 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       }
 
       await models.sequelize.transaction(async (transaction) => {
+        // TODO: schedule task if adding TwitterMetrics action
+        // TODO: reschedule task if updating quest end_date
+        // TODO: remove task if removing TwitterMetrics action
+        if (
+          quest.quest_type === 'channel' &&
+          channelActionMeta?.event_name === 'TwitterMetrics'
+        ) {
+          await scheduleTask(
+            GraphileTaskNames.AwardTwitterQuestXp,
+            {
+              quest_id: quest.id!,
+              quest_end_date: quest.end_date,
+            },
+            {
+              transaction,
+            },
+          );
+        }
+
         if (action_metas?.length) {
           // clean existing action_metas
           await models.QuestActionMeta.destroy({

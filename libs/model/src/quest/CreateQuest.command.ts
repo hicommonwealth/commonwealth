@@ -1,5 +1,4 @@
 import { Command } from '@hicommonwealth/core';
-import { GraphileTaskNames, scheduleTask } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
@@ -20,6 +19,7 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         start_date,
         end_date,
         max_xp_to_end,
+        quest_type,
       } = payload;
 
       const existingName = await models.Quest.findOne({
@@ -45,22 +45,10 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
             max_xp_to_end,
             xp_awarded: 0,
             community_id: community_id ?? null,
+            quest_type,
           },
           { transaction },
         );
-        // TODO: schedule if Channel quest
-        if (true) {
-          await scheduleTask(
-            GraphileTaskNames.AwardTwitterQuestXp,
-            {
-              quest_id: quest.id!,
-              quest_end_date: end_date,
-            },
-            {
-              transaction,
-            },
-          );
-        }
       });
 
       if (!quest) throw new Error('Quest not created');

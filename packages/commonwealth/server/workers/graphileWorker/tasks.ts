@@ -12,9 +12,10 @@ import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
 
-export function taskFactory<
-  Input extends ZodSchema | ZodUndefined = ZodUndefined,
->({ input, fn }: GraphileTask) {
+export function taskFactory<Input extends ZodSchema | ZodUndefined>({
+  input,
+  fn,
+}: GraphileTask<Input>) {
   const task: Task = async (payload, helpers) => {
     const parsedPayload: z.infer<Input> = input.parse(payload);
     await fn(parsedPayload, helpers);

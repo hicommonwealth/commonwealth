@@ -21,6 +21,7 @@ export const Quest = (
       xp_awarded: { type: Sequelize.INTEGER, allowNull: false },
       max_xp_to_end: { type: Sequelize.INTEGER, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: true },
+      quest_type: { type: Sequelize.STRING, allowNull: false },
     },
     {
       timestamps: true,
