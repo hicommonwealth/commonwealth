@@ -21,7 +21,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   }, [setIsExpanded]);
 
   const handleCancel = useCallback(
-    (event: React.MouseEvent) => {
+    (event: React.MouseEvent | undefined) => {
       console.log('DesktopStickyInput: handleCancel triggered');
       setIsExpanded(false);
       onCancel?.(event);

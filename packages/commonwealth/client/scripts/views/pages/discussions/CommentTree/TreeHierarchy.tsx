@@ -87,7 +87,7 @@ export const TreeHierarchy = ({
       setStreamingReplyIds((prev) => [...prev, commentId]);
       return Promise.resolve();
     },
-    [allComments, streamingReplyIds],
+    [allComments, streamingReplyIds, setStreamingReplyIds],
   );
 
   useEffect(() => {
@@ -114,9 +114,12 @@ export const TreeHierarchy = ({
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const triggerStreamingForNewComment = useCallback((commentId: number) => {
-    setStreamingReplyIds((prev) => [...prev, commentId]);
-  }, []);
+  const triggerStreamingForNewComment = useCallback(
+    (commentId: number) => {
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+    },
+    [setStreamingReplyIds],
+  );
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;

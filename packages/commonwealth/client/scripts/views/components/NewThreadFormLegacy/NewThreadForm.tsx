@@ -59,7 +59,7 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 interface NewThreadFormProps {
-  onCancel?: () => void;
+  onCancel?: (e: React.MouseEvent | undefined) => void;
 }
 
 export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
@@ -393,13 +393,13 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     aiInteractionsToggleEnabled,
   ]);
 
-  const handleCancel = () => {
+  const handleCancel = (e: React.MouseEvent | undefined) => {
     console.log('NewThreadForm: invoking onCancel');
     setThreadTitle('');
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
     console.log('NewThreadForm: invoking forreal onCancel');
-    onCancel?.() || navigate('/discussions');
+    onCancel?.(e) || navigate('/discussions');
   };
 
   const showBanner =

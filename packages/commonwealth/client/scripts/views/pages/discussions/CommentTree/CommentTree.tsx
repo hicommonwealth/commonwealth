@@ -66,6 +66,7 @@ export const CommentTree = ({
     user.activeAccount,
     hasTriggeredAIComment,
     streamingReplyIds,
+    thread,
   ]);
 
   // Reset trigger state if thread changes or comments are added

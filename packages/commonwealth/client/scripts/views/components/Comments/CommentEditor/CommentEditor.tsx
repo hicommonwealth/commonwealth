@@ -5,7 +5,7 @@ import { isCommandClick } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
@@ -14,7 +14,6 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
-import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
@@ -26,7 +25,7 @@ export type CommentEditorProps = {
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
   disabled: boolean;
-  onCancel: (e: React.MouseEvent) => void;
+  onCancel: (e: React.MouseEvent | undefined) => void;
   author: Account;
   editorValue: string;
   shouldFocus?: boolean;
@@ -54,26 +53,15 @@ const CommentEditor = ({
   tooltipText,
   isReplying,
   aiCommentsToggleEnabled: initialAiStreaming,
-  setAICommentsToggleEnabled: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const {
-    aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
-    aiInteractionsToggleEnabled,
-  } = useLocalAISettingsStore();
+  const { aiCommentsToggleEnabled, aiInteractionsToggleEnabled } =
+    useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
-  const effectiveSetAiStreaming =
-    onAiStreamingChange ?? setAICommentsToggleEnabled;
 
-  const handleAiToggle = useCallback(() => {
-    if (effectiveSetAiStreaming) {
-      effectiveSetAiStreaming(!effectiveAiStreaming);
-    }
-  }, [effectiveAiStreaming, effectiveSetAiStreaming]);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const { generateComment } = useGenerateCommentText();
@@ -193,20 +181,8 @@ const CommentEditor = ({
           </CWText>
         </div>
         <div className="attribution-right-content">
-          {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-            <div className="ai-toggle-wrapper">
-              <CWToggle
-                className="ai-toggle"
-                checked={effectiveAiStreaming === true}
-                onChange={handleAiToggle}
-                icon="sparkle"
-                iconColor="#757575"
-              />
-              <span className="label">AI</span>
-            </div>
-          )}
           <div className="ml-auto">
-            {effectiveAiStreaming && (
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
               <CWThreadAction
                 action="ai-reply"
                 label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}

@@ -8,7 +8,6 @@ import type { CommentEditorProps } from 'views/components/Comments/CommentEditor
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
@@ -234,19 +233,6 @@ export const MobileInput = (props: MobileInputProps) => {
             className="input"
           />
           <div className="ai-toggle-row">
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-              <div className="ai-toggle">
-                <div className="ai-toggle-container">
-                  <CWToggle
-                    checked={aiCommentsToggleEnabled}
-                    onChange={handleAiToggle}
-                    icon="sparkle"
-                    iconColor="#757575"
-                  />
-                  <span className="label">AI</span>
-                </div>
-              </div>
-            )}
             <div className="RightButton">
               {isReplying && (
                 <CWIconButton iconName="close" onClick={handleClose} />
