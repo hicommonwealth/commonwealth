@@ -50,6 +50,7 @@ describe('User lifecycle', () => {
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // setup quest actions
@@ -202,6 +203,7 @@ describe('User lifecycle', () => {
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // setup quest actions
@@ -549,6 +551,7 @@ describe('User lifecycle', () => {
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const quest2 = await command(CreateQuest(), {
@@ -561,6 +564,7 @@ describe('User lifecycle', () => {
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
 
@@ -639,6 +643,7 @@ describe('User lifecycle', () => {
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
           max_xp_to_end: 20,
+          quest_type: 'common',
         },
       });
       // setup quest actions
