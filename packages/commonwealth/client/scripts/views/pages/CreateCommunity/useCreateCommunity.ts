@@ -1,4 +1,3 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
@@ -42,8 +41,8 @@ const useCreateCommunity = () => {
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
 
-  const isSupportedChainSelected = chainIdsWithStakeEnabled.includes(
-    parseInt(selectedChainId || '') as cp.ValidChains,
+  const isSupportedChainSelected = chainIdsWithStakeEnabled.some(
+    (chainId) => chainId === parseInt(selectedChainId || ''),
   );
 
   const showCommunityStakeStep =
