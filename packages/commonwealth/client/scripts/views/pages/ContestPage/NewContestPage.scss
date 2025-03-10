@@ -8,6 +8,14 @@
 
     .ContestCard {
       max-width: 100%;
+
+      .contest-image {
+        min-height: 275px;
+
+        @include extraSmall {
+          min-height: 195px;
+        }
+      }
     }
 
     .navigation-buttons {
