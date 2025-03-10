@@ -241,6 +241,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       end_date: new Date(values.end_date),
       start_date: new Date(values.start_date),
       image_url: values.image || getDefaultContestImage(),
+      max_xp_to_end: parseInt(values.max_xp_to_end),
       ...(values?.community && {
         community_id: values.community.value,
       }),
@@ -299,6 +300,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(initialValues.start_date !== values.start_date && {
         start_date: new Date(values.start_date),
       }),
+      max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || undefined,
       action_metas: questActionSubForms.map((subForm) => ({

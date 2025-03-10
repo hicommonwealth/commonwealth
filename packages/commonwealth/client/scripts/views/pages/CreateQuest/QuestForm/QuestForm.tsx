@@ -64,6 +64,7 @@ const QuestForm = (props: QuestFormProps) => {
               end_date: initialValues.end_date,
               community: initialValues.community,
               participation_limit: initialValues.participation_limit,
+              max_xp_to_end: initialValues.max_xp_to_end,
             },
           }
         : {
@@ -116,7 +117,7 @@ const QuestForm = (props: QuestFormProps) => {
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
-            Quests timeline
+            Quest timeline
           </CWText>
           <CWRepetitionCycleRadioButton
             customError={repetitionCycleRadio.error}
@@ -151,6 +152,23 @@ const QuestForm = (props: QuestFormProps) => {
           minDate={minEndDate}
           selected={null}
           showTimeInput
+        />
+      </div>
+
+      <CWDivider />
+
+      <div className="xp-configuration-section">
+        <CWText type="b1" fontWeight="semiBold">
+          XP Configuration
+        </CWText>
+
+        <CWTextInput
+          label="XP limit"
+          placeholder="XP limit"
+          fullWidth
+          name="max_xp_to_end"
+          hookToForm
+          instructionalMessage="Maximum XP that will be awarded for this quest before marking it as complete"
         />
       </div>
 
