@@ -5,13 +5,16 @@ import { userStore } from '../../ui/user';
 
 interface GenerateImageProps {
   prompt: string;
+  size?: '1024x1024' | '512x512' | '256x256';
 }
 
 export const generateImage = async ({
   prompt,
+  size,
 }: GenerateImageProps): Promise<string> => {
   const res = await axios.post(`${SERVER_URL}/${ApiEndpoints.GENERATE_IMAGE}`, {
     description: prompt,
+    size: size,
     jwt: userStore.getState().jwt,
   });
 
