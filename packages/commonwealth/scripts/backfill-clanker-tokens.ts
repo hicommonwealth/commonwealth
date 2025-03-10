@@ -31,7 +31,11 @@ class BatchProcessor extends Transform {
     this.batchSize = batchSize;
   }
 
-  async _transform(chunk: any, _encoding: string, callback: Function) {
+  async _transform(
+    chunk: Record<string, string>,
+    _encoding: string,
+    callback: Function,
+  ) {
     try {
       const token: z.infer<typeof ClankerToken> = {
         id: parseInt(chunk.id),
