@@ -218,34 +218,17 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
   const handleNewThreadCreation = useCallback(async () => {
-    console.log('NewThreadForm: handleNewThreadCreation started');
-    console.log('NewThreadForm: Community context:', {
-      selectedCommunityId,
-      isInsideCommunity,
-      currentLocation: window.location.pathname,
-      hasCommunity: !!community,
-      communityBase: community?.base,
-      hasUserAddress: !!userSelectedAddress,
-    });
-
     if (!community || !userSelectedAddress || !selectedCommunityId) {
-      console.log('NewThreadForm: Invalid form state:', {
-        hasCommunity: !!community,
-        hasAddress: !!userSelectedAddress,
-        hasCommunityId: !!selectedCommunityId,
-      });
       notifyError('Invalid form state!');
       return;
     }
 
     if (isRestrictedMembership) {
-      console.log('NewThreadForm: Topic is gated');
       notifyError('Topic is gated!');
       return;
     }
 
     if (!isDiscussion && !detectURL(threadUrl)) {
-      console.log('NewThreadForm: Invalid URL for non-discussion thread');
       notifyError('Must provide a valid URL.');
       return;
     }
@@ -262,7 +245,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       : serializeDelta(threadContentDelta);
 
     if (!aiInteractionsToggleEnabled) {
-      console.log('NewThreadForm: Checking thread errors');
       const deltaString = JSON.stringify(threadContentDelta);
       checkNewThreadErrors(
         { threadKind, threadUrl, threadTitle, threadTopic },
@@ -274,15 +256,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setIsSaving(true);
 
     try {
-      console.log('NewThreadForm: Building thread input with topic:', {
-        topicId: threadTopic?.id,
-        topicName: threadTopic?.name,
-        hasThreadUrl: !!threadUrl,
-        threadKind,
-        effectiveTitle,
-        hasEffectiveBody: !!effectiveBody,
-      });
-
       if (!threadTopic) {
         console.error('NewThreadForm: No topic selected');
         notifyError('Please select a topic');
@@ -306,22 +279,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         }),
       });
 
-      console.log('NewThreadForm: Thread input built successfully:', {
-        address: userSelectedAddress,
-        communityId: selectedCommunityId,
-        title: effectiveTitle,
-        topicId: threadTopic.id,
-      });
-
-      console.log('NewThreadForm: Creating thread with input:', input);
       const thread = await createThread(input);
-      console.log('NewThreadForm: Thread created successfully:', {
-        id: thread.id,
-        title: thread.title,
-        community_id: thread.community_id,
-      });
 
-      console.log('NewThreadForm: Clearing form state');
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
@@ -330,20 +289,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         ? ''
         : `/${selectedCommunityId}`;
       const navigationUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
-      console.log('NewThreadForm: Navigation details:', {
-        isInsideCommunity,
-        communityPrefix,
-        threadId: thread.id,
-        threadTitle: thread.title,
-        fullUrl: navigationUrl,
-        currentPath: window.location.pathname,
-      });
 
-      console.log('NewThreadForm: Attempting navigation to:', navigationUrl);
       navigate(navigationUrl);
-      console.log('NewThreadForm: Navigation function called');
     } catch (err) {
-      console.error('NewThreadForm: Error occurred:', err);
       if (err instanceof SessionKeyError) {
         console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
@@ -361,10 +309,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
     } finally {
-      console.log('NewThreadForm: Cleanup in finally block');
       setIsSaving(false);
       if (!isInsideCommunity) {
-        console.log('NewThreadForm: Clearing address selector');
         user.setData({
           addressSelectorSelectedAddress: undefined,
         });
@@ -394,11 +340,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
-    console.log('NewThreadForm: invoking onCancel');
     setThreadTitle('');
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
-    console.log('NewThreadForm: invoking forreal onCancel');
     onCancel?.(e) || navigate('/discussions');
   };
 
@@ -412,7 +356,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isContestAvailable && hasTopicOngoingContest;
 
   const handleGenerateAIThread = async () => {
-    console.log('Draft thread with AI initiated');
     setIsGenerating(true);
     setThreadTitle('');
     setThreadContentDelta(createDeltaFromText(''));
@@ -422,7 +365,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const bodyPromise = generateComment(
         'Generate a detailed discussion thread body',
         (chunk: string) => {
-          console.log('Body stream update:', chunk);
           bodyAccumulatedRef.current += chunk;
           setThreadContentDelta(
             createDeltaFromText(bodyAccumulatedRef.current),
@@ -433,7 +375,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const titlePromise = generateComment(
         'Generate a single-line, concise title (max 100 characters) without quotes or punctuation at the end',
         (chunk: string) => {
-          console.log('Title stream update:', chunk);
           const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
           setThreadTitle((prev) =>
             prev === '' ? cleanChunk : prev + cleanChunk,
@@ -442,7 +383,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       );
 
       await Promise.all([bodyPromise, titlePromise]);
-      console.log('Draft thread complete');
     } catch (error) {
       console.error('Error generating AI thread:', error);
     } finally {
@@ -458,7 +398,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
-        console.log('NewThreadForm: Command+Enter pressed, submitting thread.');
         void handleNewThreadCreation();
       }
     },
@@ -672,7 +611,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     label="Draft with AI"
                     onClick={(e) => {
                       e.preventDefault();
-                      console.log('Draft with AI button clicked');
                       handleGenerateAIThread();
                     }}
                   />

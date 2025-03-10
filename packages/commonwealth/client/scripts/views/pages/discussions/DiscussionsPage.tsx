@@ -278,33 +278,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const handleCreateThread = async (): Promise<number> => {
-    console.log('DiscussionsPage: handleCreateThread started');
-    console.log('DiscussionsPage: Current communityId:', communityId);
-    console.log('DiscussionsPage: Current location:', window.location.pathname);
-
     if (!user.activeAccount) {
-      console.log('DiscussionsPage: No active account found');
       notifyError('You must be logged in to create a thread');
       throw new Error('Not logged in');
     }
 
     if (!topicObj) {
-      console.log('DiscussionsPage: No topic object found');
       notifyError('You must select a topic to create a thread');
       throw new Error('No topic selected');
     }
 
     if (!user.activeAccount.community?.base) {
-      console.log('DiscussionsPage: No community base found');
       notifyError('Invalid community configuration');
       throw new Error('Invalid community configuration');
     }
 
     try {
-      console.log(
-        'DiscussionsPage: Building thread input with topic:',
-        topicObj,
-      );
       const input = await buildCreateThreadInput({
         address: user.activeAccount.address,
         kind: 'discussion',
@@ -316,41 +305,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         body: getTextFromDelta(threadContentDelta),
       });
 
-      console.log('DiscussionsPage: Creating thread with input:', input);
       const thread = await createThread(input);
 
       if (!thread?.id) {
-        console.log('DiscussionsPage: No thread ID returned');
         throw new Error('Failed to create thread - no ID returned');
       }
-      console.log('DiscussionsPage: Thread created successfully:', {
-        id: thread.id,
-        title: thread.title,
-        community_id: thread.community_id,
-      });
 
-      // Clear the editor content
-      console.log('DiscussionsPage: Clearing editor content');
       setThreadContentDelta(createDeltaFromText(''));
 
       // Construct the correct navigation path
       const communityPrefix = communityId ? `/${communityId}` : '';
       const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
-      console.log('DiscussionsPage: Navigation details:', {
-        communityPrefix,
-        threadId: thread.id,
-        threadTitle: thread.title,
-        fullUrl: threadUrl,
-        currentPath: window.location.pathname,
-      });
 
-      console.log('DiscussionsPage: Attempting navigation to:', threadUrl);
       navigate(threadUrl);
 
-      console.log('DiscussionsPage: Navigation function called');
       return thread.id;
     } catch (error) {
-      console.error('DiscussionsPage: Error creating thread:', error);
       notifyError('Failed to create thread');
       throw error;
     }

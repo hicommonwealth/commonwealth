@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -14,7 +13,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
-  const { generateComment } = useGenerateCommentText();
 
   const handleFocused = useCallback(() => {
     setIsExpanded(true);
@@ -22,7 +20,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
 
   const handleCancel = useCallback(
     (event: React.MouseEvent | undefined) => {
-      console.log('DesktopStickyInput: handleCancel triggered');
       setIsExpanded(false);
       onCancel?.(event);
     },
@@ -37,21 +34,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       setStreamingReplyIds((prev) => [...prev, commentId]);
     },
     [streamingReplyIds],
-  );
-
-  const handleAiGenerate = useCallback(
-    async (text: string) => {
-      try {
-        const generatedText = await generateComment(text, (update) => {
-          console.log('AI generation update:', update);
-        });
-        return generatedText;
-      } catch (error) {
-        console.error('Failed to generate AI text:', error);
-        return '';
-      }
-    },
-    [generateComment],
   );
 
   const handleEnhancedSubmit = useCallback(async (): Promise<number> => {
@@ -134,12 +116,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       ) : (
         <div className="DesktopStickyInputExpanded">
           {mode === 'thread' ? (
-            <NewThreadForm
-              onCancel={handleCancel}
-              aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-              setAICommentsToggleEnabled={setAICommentsToggleEnabled}
-              onAiGenerate={handleAiGenerate}
-            />
+            <NewThreadForm onCancel={handleCancel} />
           ) : (
             <CommentEditor {...editorProps} />
           )}

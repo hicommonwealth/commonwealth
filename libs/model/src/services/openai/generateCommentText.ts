@@ -71,8 +71,6 @@ const generateCommentText = async function* ({
       };
     }
 
-    console.log('dziala tu?');
-
     const stream = await openai.chat.completions.create(createCompletionConfig);
 
     if (stream.choices) {
