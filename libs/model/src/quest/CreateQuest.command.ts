@@ -18,6 +18,7 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         start_date,
         end_date,
         max_xp_to_end,
+        quest_type,
       } = payload;
 
       const existingName = await models.Quest.findOne({
@@ -40,8 +41,12 @@ export function CreateQuest(): Command<typeof schemas.CreateQuest> {
         max_xp_to_end,
         xp_awarded: 0,
         community_id: community_id ?? null,
+        quest_type,
       });
-      return quest.toJSON();
+
+      const jsonQuest = quest.toJSON();
+      delete jsonQuest.scheduled_job_id;
+      return jsonQuest;
     },
   };
 }

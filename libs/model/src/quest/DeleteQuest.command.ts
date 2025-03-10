@@ -1,4 +1,5 @@
 import { Command } from '@hicommonwealth/core';
+import { removeJob } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
@@ -12,7 +13,7 @@ export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
     body: async ({ payload }) => {
       const { quest_id } = payload;
 
-      const quest = await models.Quest.findOne({
+      const quest = await models.Quest.scope('withPrivateData').findOne({
         where: { id: quest_id },
         attributes: ['start_date'],
       });
@@ -32,8 +33,21 @@ export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
           `Cannot delete quest "${quest_id}" because it has actions`,
         );
 
-      const rows = await models.Quest.destroy({ where: { id: quest_id } });
-      return rows > 0;
+      let rows: number | undefined;
+      await models.sequelize.transaction(async (transaction) => {
+        if (quest.scheduled_job_id) {
+          await removeJob({
+            jobId: quest.scheduled_job_id,
+            transaction,
+          });
+        }
+        rows = await models.Quest.destroy({
+          where: { id: quest_id },
+          transaction,
+        });
+      });
+
+      return rows ? rows > 0 : false;
     },
   };
 }

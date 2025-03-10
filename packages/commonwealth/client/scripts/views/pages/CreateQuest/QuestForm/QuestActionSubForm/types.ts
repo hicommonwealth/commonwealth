@@ -1,6 +1,6 @@
-import { QuestEvents } from '@hicommonwealth/schemas';
+import { QuestActionNames } from '@hicommonwealth/schemas';
 
-export type QuestAction = keyof typeof QuestEvents;
+export type QuestAction = (typeof QuestActionNames)[number];
 
 export type QuestActionSubFormErrors = {
   action?: string;
