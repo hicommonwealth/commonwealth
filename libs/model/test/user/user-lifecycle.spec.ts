@@ -285,62 +285,44 @@ describe('User lifecycle', () => {
       });
 
       // seed system quest and action metas
-      await models.sequelize.query(`
-        -- create "artificial" system quest to award xp points on referral and address linking events
-        INSERT INTO "Quests" (
-          "id",
-          "name",
-          "description",
-          "image_url",
-          "xp_awarded",
-          "max_xp_to_end",
-          "start_date",
-          "end_date",
-          "created_at",
-          "updated_at")
-        VALUES (
-          -1,
-          'System Quest',
-          'Referrals and address linking system-level quest',
-          '',
-          0, 100,
-          NOW(), NOW(), NOW(), NOW());
+      await models.Quest.create({
+        id: -1,
+        name: 'System Quest',
+        description: 'Referrals and address linking system-level quest',
+        image_url: '',
+        xp_awarded: 0,
+        max_xp_to_end: 100,
+        start_date: new Date(),
+        end_date: new Date(),
+        quest_type: 'common',
+      });
 
-        -- create "artificial" system quest action metas for quest above
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-1, -1, 'SignUpFlowCompleted', 20, .2, 
-        'once_per_quest', NOW(), NOW());
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-2, -1, 'WalletLinked', 10, 0, 
-        'once_per_quest', NOW(), NOW());
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-3, -1, 'SSOLinked', 10, 0,
-        'once_per_quest', NOW(), NOW());
-        `);
+      await models.QuestActionMeta.bulkCreate([
+        {
+          id: -1,
+          quest_id: -1,
+          event_name: 'SignUpFlowCompleted',
+          reward_amount: 20,
+          creator_reward_weight: 0.2,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -2,
+          quest_id: -1,
+          event_name: 'WalletLinked',
+          reward_amount: 10,
+          creator_reward_weight: 0,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -3,
+          quest_id: -1,
+          event_name: 'SSOLinked',
+          reward_amount: 10,
+          creator_reward_weight: 0,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+      ]);
 
       // user signs in a referral link, creating a new user and address
       const new_address = await signIn(community_id, member.address);
