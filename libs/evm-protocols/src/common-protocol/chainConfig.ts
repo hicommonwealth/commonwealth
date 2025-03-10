@@ -23,9 +23,9 @@ export function isValidChain(chainId: number): chainId is ValidChains {
 }
 
 export function mustBeProtocolChainId(
-  ethChainId: number,
+  ethChainId?: number | null | undefined,
 ): asserts ethChainId is ValidChains {
-  if (!Object.values(ValidChains).includes(ethChainId)) {
+  if (!ethChainId || !Object.values(ValidChains).includes(ethChainId)) {
     throw new Error(`${ethChainId} is not a valid protocol eth chain id`);
   }
 }

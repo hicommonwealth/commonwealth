@@ -48,8 +48,8 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
       );
 
       await rollOverContest({
+        chain: { rpc, eth_chain_id },
         privateKey: config.WEB3.PRIVATE_KEY,
-        rpc,
         contest: contest_address,
         oneOff: is_one_off,
       });
