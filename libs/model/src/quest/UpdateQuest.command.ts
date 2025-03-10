@@ -1,5 +1,6 @@
 import { Command, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { AllChannelQuestActionNames } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
@@ -68,6 +69,17 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
             );
           }
           channelActionMeta = action_metas[0];
+
+          if (
+            channelActionMeta &&
+            !AllChannelQuestActionNames.some(
+              (e) => e === channelActionMeta!.event_name,
+            )
+          ) {
+            throw new InvalidInput(
+              `Invalid action "${channelActionMeta.event_name}" for channel quest`,
+            );
+          }
         }
 
         const c_id = community_id || quest.community_id;
@@ -103,9 +115,6 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       }
 
       await models.sequelize.transaction(async (transaction) => {
-        // TODO: schedule task if adding TwitterMetrics action
-        // TODO: reschedule task if updating quest end_date
-        // TODO: remove task if removing TwitterMetrics action
         // Add scheduled job for new TwitterMetrics action
         if (
           quest.quest_type === 'channel' &&

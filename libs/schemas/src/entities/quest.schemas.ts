@@ -10,6 +10,14 @@ export const ChannelQuestEvents = {
 // Channel quest action types that are not event related
 export const ChannelQuestBatches = ['TwitterMetrics'] as const;
 
+export const AllChannelQuestActionNames = [
+  ...(Object.keys(ChannelQuestEvents) as [
+    keyof typeof ChannelQuestEvents,
+    ...Array<keyof typeof ChannelQuestEvents>,
+  ]),
+  ...ChannelQuestBatches,
+] as const;
+
 export const QuestEvents = {
   SignUpFlowCompleted: events.SignUpFlowCompleted,
   CommunityCreated: events.CommunityCreated,
