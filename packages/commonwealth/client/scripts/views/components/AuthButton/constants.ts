@@ -166,4 +166,39 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Farcaster',
   },
+  telegram: {
+    icon: {
+      name: 'telegram',
+      isCustom: false,
+    },
+    label: 'Telegram',
+  },
+  tiktok: {
+    icon: {
+      name: 'tiktok',
+      isCustom: false,
+    },
+    label: 'TikTok',
+  },
+  warpcast: {
+    icon: {
+      name: 'warpcast',
+      isCustom: false,
+    },
+    label: 'Warpcast',
+  },
+  element: {
+    icon: {
+      name: 'element',
+      isCustom: false,
+    },
+    label: 'Element',
+  },
+  website: {
+    icon: {
+      name: 'website',
+      isCustom: false,
+    },
+    label: 'Website',
+  },
 };

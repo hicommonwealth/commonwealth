@@ -8,6 +8,7 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
+import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -33,6 +34,11 @@ type ContractAddresses = {
     | (key extends keyof typeof factoryContracts
         ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['referralFeeManager']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'veBridge' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['veBridge']
           : never
         : never);
 };
@@ -115,6 +121,19 @@ const referralFeeManagerSource: ContractSource = {
   eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
+const tokenStakingSource: ContractSource = {
+  abi: veBridgeAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenStaking.TokenLocked,
+    EvmEventSignatures.TokenStaking.TokenLockDurationIncreased,
+    EvmEventSignatures.TokenStaking.TokenUnlocked,
+    EvmEventSignatures.TokenStaking.TokenPermanentConverted,
+    EvmEventSignatures.TokenStaking.TokenDelegated,
+    EvmEventSignatures.TokenStaking.TokenUndelegated,
+    EvmEventSignatures.TokenStaking.TokenMerged,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -123,6 +142,12 @@ export const EventRegistry = {
   [ValidChains.Base]: {
     [factoryContracts[ValidChains.Base].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Base].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Base].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Base].lpBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Base].tokenCommunityManager]:
+      tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.Base].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {
     [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,
@@ -135,6 +160,7 @@ export const EventRegistry = {
       tokenCommunityManagerSource,
     [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
       referralFeeManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].veBridge]: tokenStakingSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
@@ -180,5 +206,6 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
     [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.Anvil].veBridge]: tokenStakingSource,
   },
 } as const satisfies EventRegistryType;

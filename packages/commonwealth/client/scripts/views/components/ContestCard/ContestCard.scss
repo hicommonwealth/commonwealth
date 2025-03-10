@@ -6,6 +6,10 @@
   padding: 0;
   position: relative;
 
+  @include smallInclusive {
+    min-width: 350px;
+  }
+
   &.isHorizontal {
     flex-direction: row;
     max-width: unset;
