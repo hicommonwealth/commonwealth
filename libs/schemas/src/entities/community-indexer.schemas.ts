@@ -12,7 +12,7 @@ export const CommunityIndexer = z.object({
 });
 
 export const ClankerToken = z.object({
-  id: z.number().nullish(),
+  id: z.number(),
   created_at: z.coerce.date().nullish(),
   tx_hash: z.string().nullish(),
   contract_address: z.string(),

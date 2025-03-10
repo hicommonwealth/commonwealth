@@ -13,7 +13,7 @@
     "async-migrate-thread-version-history": "tsx ./scripts/async-migrate-thread-version-history.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
-    "backfill-clanker-tokens": "tsx ./scripts/backfill-clanker-tokens.ts",
+    "backfill-clanker-tokens": "tsx --max-old-space-size=4096 ./scripts/backfill-clanker-tokens.ts",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
     "bundle": "NODE_OPTIONS=--max_old_space_size=8192 vite -c ./client/vite.config.ts build",

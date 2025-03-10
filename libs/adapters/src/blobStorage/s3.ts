@@ -10,11 +10,13 @@ const s3Buckets: Partial<Record<BlobBucket, string>> =
         assets: 'local.assets',
         archives: 'local.outbox-event-stream-archive',
         sitemap: 'local.sitemap',
+        dumps: 'common-dumps1',
       }
     : {
         assets: S3_ASSET_BUCKET_CDN,
         archives: 'outbox-event-stream-archive',
         sitemap: `sitemap.${PRODUCTION_DOMAIN}`,
+        dumps: 'common-dumps1',
       };
 
 function formatS3Url(

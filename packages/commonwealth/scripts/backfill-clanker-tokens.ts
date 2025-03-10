@@ -1,15 +1,12 @@
-// backfills all clanker tokens
-
 import { S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, logger } from '@hicommonwealth/core';
-import {
-  config,
-  createCommunityFromClankerToken,
-  models,
-  paginateClankerTokens,
-} from '@hicommonwealth/model';
+import { emitEvent, models } from '@hicommonwealth/model';
+import { ClankerToken, EventPairs } from '@hicommonwealth/schemas';
+import csv from 'csv-parser';
+import fetch from 'node-fetch';
 import { exit } from 'process';
-import { Op } from 'sequelize';
+import { Transform } from 'stream';
+import { z } from 'zod';
 
 const log = logger(import.meta);
 
@@ -18,55 +15,101 @@ blobStorage({
 });
 
 /*
-  This script fetches *all* tokens from the clanker API and
-  directly creates a community for each, skipping the outbox.
-  It starts from oldest token to newest so that the suffix
-  numbers for duplicate names will increment properly.
+  This script reads clanker tokens from an S3 CSV dump and
+  emits ClankerTokenFound events for each token.
+  The events will be processed by the CommunityIndexerWorker
+  to create communities.
 */
-async function main() {
-  let numTokensFound = 0;
-  let numCommunitiesCreated = 0;
 
-  for await (const tokens of paginateClankerTokens({
-    cutoffDate: new Date(0),
-    desc: false,
-  })) {
-    numTokensFound += tokens.length;
+// Custom transform stream to handle backpressure
+class BatchProcessor extends Transform {
+  private buffer: EventPairs[] = [];
+  private readonly batchSize: number;
 
-    const existingCommunities = await models.Community.findAll({
-      where: {
-        token_address: {
-          [Op.in]: tokens.map((t) => t.contract_address),
-        },
-      },
-    });
+  constructor(batchSize: number) {
+    super({ objectMode: true });
+    this.batchSize = batchSize;
+  }
 
-    for (const token of tokens) {
-      const existingCommunity = existingCommunities.find(
-        (c) => c.token_address === token.contract_address,
-      );
-      if (existingCommunity) {
-        log.warn(
-          `token already has community: ${token.contract_address}="${existingCommunity.name}"`,
-        );
-      } else {
-        await createCommunityFromClankerToken(token);
-        numCommunitiesCreated++;
+  async _transform(chunk: any, _encoding: string, callback: Function) {
+    try {
+      const token: z.infer<typeof ClankerToken> = {
+        id: parseInt(chunk.id),
+        created_at: new Date(chunk.created_at),
+        tx_hash: chunk.tx_hash,
+        contract_address: chunk.contract_address,
+        requestor_fid: parseInt(chunk.requestor_fid),
+        name: chunk.name,
+        symbol: chunk.symbol,
+        img_url: chunk.img_url,
+        pool_address: chunk.pool_address,
+        cast_hash: chunk.cast_hash,
+        type: chunk.type,
+        pair: chunk.pair,
+        presale_id: chunk.presale_id,
+      };
+
+      this.buffer.push({
+        event_name: 'ClankerTokenFound',
+        event_payload: token,
+      });
+
+      if (this.buffer.length >= this.batchSize) {
+        await this.flushBuffer();
       }
-    }
-
-    const max = config.COMMUNITY_INDEXER.MAX_CLANKER_BACKFILL!;
-    if (max > 0 && numTokensFound >= max) {
-      log.info(`reached limit of ${max} clanker communities created`);
-      break;
+      callback();
+    } catch (err) {
+      callback(err);
     }
   }
 
-  log.info(`found ${numTokensFound} tokens`);
-  log.info(`created ${numCommunitiesCreated} clanker communities`);
+  async _flush(callback: Function) {
+    try {
+      if (this.buffer.length > 0) {
+        await this.flushBuffer();
+      }
+      callback();
+    } catch (err) {
+      callback(err);
+    }
+  }
 
-  // since tokens are fetched ascending, then assume
-  // we've fetched all the latest tokens
+  private async flushBuffer() {
+    if (this.buffer.length === 0) return;
+    await emitEvent(models.Outbox, this.buffer);
+    this.buffer = [];
+    // delay to prevent clogging outbox
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+}
+
+async function main() {
+  let numTokensFound = 0;
+  const BATCH_SIZE = 50;
+
+  // copied from https://github.com/clanker-devco/deployed_clankers
+  const csvUrl =
+    'https://common-dumps1.s3.us-east-1.amazonaws.com/deployed_clankers_feb12_2025.csv';
+  const response = await fetch(csvUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch CSV: ${response.statusText}`);
+  }
+
+  await new Promise((resolve, reject) => {
+    const batchProcessor = new BatchProcessor(BATCH_SIZE);
+
+    response.body
+      .pipe(csv())
+      .pipe(batchProcessor)
+      .on('data', () => {
+        numTokensFound++;
+      })
+      .on('end', resolve)
+      .on('error', reject);
+  });
+
+  log.info(`Found and processed ${numTokensFound} tokens`);
+
   await models.CommunityIndexer.update(
     {
       last_checked: new Date(),
