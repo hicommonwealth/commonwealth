@@ -1,7 +1,7 @@
 import {
   GraphileTask,
   GraphileTaskNames,
-  GraphileTasksObj,
+  TaskPayloads,
 } from '@hicommonwealth/model';
 import { Task } from 'graphile-worker';
 import { ZodSchema, ZodUndefined, z } from 'zod';
@@ -22,7 +22,9 @@ export function taskFactory<
   return task;
 }
 
-export const graphileTasks: GraphileTasksObj = {
+export const graphileTasks: {
+  [K in GraphileTaskNames]: GraphileTask<(typeof TaskPayloads)[K]>;
+} = {
   [GraphileTaskNames.ArchiveOutbox]: archiveOutboxTask,
   [GraphileTaskNames.UpdateSitemap]: sitemapTask,
   [GraphileTaskNames.CleanSubscriptions]: cleanSubscriptionsTask,

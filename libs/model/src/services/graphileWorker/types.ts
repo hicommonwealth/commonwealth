@@ -1,5 +1,14 @@
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { z, ZodSchema, ZodUndefined } from 'zod';
+import { ZodSchema, ZodUndefined, z } from 'zod';
+
+export enum GraphileTaskNames {
+  ArchiveOutbox = 'ArchiveOutbox',
+  UpdateSitemap = 'UpdateSitemap',
+  CleanSubscriptions = 'CleanSubscriptions',
+  CleanChainEventXpSources = 'CleanChainEventXpSources',
+  RunDbMaintenance = 'RunDbMaintenance',
+  AwardTwitterQuestXp = 'AwardTwitterQuestXp',
+}
 
 export enum GraphileQueues {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -24,15 +33,6 @@ export type GraphileTasksObj = Record<GraphileTaskNames, GraphileTask>;
 export type CustomCronItem = CronItem & {
   task: GraphileTaskNames;
 };
-
-export enum GraphileTaskNames {
-  ArchiveOutbox = 'ArchiveOutbox',
-  UpdateSitemap = 'UpdateSitemap',
-  CleanSubscriptions = 'CleanSubscriptions',
-  CleanChainEventXpSources = 'CleanChainEventXpSources',
-  RunDbMaintenance = 'RunDbMaintenance',
-  AwardTwitterQuestXp = 'AwardTwitterQuestXp',
-}
 
 export const TaskPayloads = {
   ArchiveOutbox: z.undefined(),
