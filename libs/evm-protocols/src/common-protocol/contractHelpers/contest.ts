@@ -217,7 +217,7 @@ export const getContestScore = async (
     address: `0x${string}`;
     abi: typeof ContestGovernorAbi;
     functionName: 'content';
-    args: [BigInt];
+    args: [bigint];
   }[] = winnerIds.map((w) => ({
     ...contract,
     args: [w],
