@@ -19,6 +19,7 @@ const log = logger(import.meta);
 const inputs = {
   CommunityIndexerTimerTicked: events.CommunityIndexerTimerTicked,
   ClankerTokenFound: events.ClankerTokenFound,
+  CommunityCreated: events.CommunityCreated,
 };
 
 type CommunityIndexerStatus = z.infer<typeof CommunityIndexerSchema>['status'];
@@ -141,6 +142,9 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
         } else {
           await createCommunityFromClankerToken(payload);
         }
+      },
+      CommunityCreated: async () => {
+        // no-op, required because createCommunityFromClankerToken emits CommunityCreated?
       },
     },
   };

@@ -49,7 +49,6 @@ const {
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
   COMMUNITY_INDEXER_CRON,
-  MAX_CLANKER_BACKFILL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -62,7 +61,6 @@ const DEFAULTS = {
   DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
-  MAX_CLANKER_BACKFILL: '0',
 };
 
 export const config = configure(
@@ -170,13 +168,6 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
-    },
-    COMMUNITY_INDEXER: {
-      CRON: COMMUNITY_INDEXER_CRON,
-      MAX_CLANKER_BACKFILL: parseInt(
-        MAX_CLANKER_BACKFILL ?? DEFAULTS.MAX_CLANKER_BACKFILL,
-        10,
-      ),
     },
   },
   z.object({
@@ -384,7 +375,6 @@ export const config = configure(
     }),
     COMMUNITY_INDEXER: z.object({
       CRON: z.coerce.string().optional(),
-      MAX_CLANKER_BACKFILL: z.coerce.number().optional(),
     }),
   }),
 );
