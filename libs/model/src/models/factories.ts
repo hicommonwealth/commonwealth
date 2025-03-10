@@ -29,6 +29,7 @@ import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
 import { Quest, QuestActionMeta } from './quest';
+import QuestTweets from './quest_tweets';
 import Reaction from './reaction';
 import { Referral } from './referral';
 import { ReferralFee } from './referral_fee';
@@ -79,6 +80,7 @@ export const Factories = {
   ProfileTags,
   Quest,
   QuestActionMeta,
+  QuestTweets,
   Reaction,
   Referral,
   ReferralFee,
