@@ -1,9 +1,13 @@
+@import '../../../styles/shared';
 .MobileInput {
-  .conatiner {
+  .container {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-right: auto;
     width: 100%;
+    cursor: pointer;
 
     .input-container {
       flex: 1;
@@ -12,7 +16,6 @@
       background: #ffffff;
       border-radius: 8px;
       padding: 8px 12px;
-      border: 1px solid #e5e5e5;
 
       .input {
         flex: 1;
@@ -20,6 +23,10 @@
         outline: none;
         background: transparent;
         text-overflow: ellipsis;
+        &:focus-visible {
+          border: 1px solid $primary-300;
+          outline: none;
+        }
       }
     }
 
@@ -49,7 +56,7 @@
   .AvatarBox {
     margin-top: auto;
     margin-bottom: auto;
-    margin-left: 8px;
+    margin-left: 2px;
   }
 
   .InputBox {
