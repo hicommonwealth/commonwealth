@@ -24,7 +24,7 @@ export const SidebarQuickSwitcher = ({
   const { setMenu } = useSidebarStore();
   const user = useUserStore();
 
-  const { items } = useFetchNotifications();
+  const { items, feedClient } = useFetchNotifications();
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -32,6 +32,18 @@ export const SidebarQuickSwitcher = ({
 
   const starredCommunities = user.communities.filter((x) => x.isStarred);
   const unstarredCommunities = user.communities.filter((x) => !x.isStarred);
+
+  const markCommunityNotificationsAsRead = async (communityName) => {
+    const unreadNotifications = items.filter(
+      (item) => !item.read_at && item?.data?.community_name === communityName,
+    );
+    if (unreadNotifications.length === 0) return;
+    try {
+      await feedClient.markAsRead(unreadNotifications).catch(console.error);
+    } catch (error) {
+      console.error('Failed to mark notifications as read:');
+    }
+  };
 
   return (
     <div
@@ -77,13 +89,15 @@ export const SidebarQuickSwitcher = ({
                     iconUrl: community.iconUrl,
                     name: community.name,
                   }}
-                  onClick={() =>
+                  onClick={() => {
+                    void markCommunityNotificationsAsRead(community.name);
+
                     navigateToCommunity({
                       navigate,
                       path: '',
                       chain: community.id,
-                    })
-                  }
+                    });
+                  }}
                 />
                 <SideBarNotificationIcon
                   unreadCount={calculateUnreadCount(community.name, items)}
@@ -107,13 +121,14 @@ export const SidebarQuickSwitcher = ({
                 iconUrl: community.iconUrl,
                 name: community.name,
               }}
-              onClick={() =>
+              onClick={() => {
+                void markCommunityNotificationsAsRead(community.name);
                 navigateToCommunity({
                   navigate,
                   path: '',
                   chain: community.id,
-                })
-              }
+                });
+              }}
             />
             <SideBarNotificationIcon
               unreadCount={calculateUnreadCount(community.name, items)}
