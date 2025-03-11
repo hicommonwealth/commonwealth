@@ -3,6 +3,7 @@ import {
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { calculateTotalXPForQuestActions } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -111,16 +112,15 @@ const QuestDetails = ({ id }: { id: number }) => {
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
+  const isUserReferred = !!user.referredByAddress;
   // this only includes end user xp gain, creator/referrer xp is not included in this
-  const totalUserXP =
-    (quest.action_metas || [])
-      ?.map(
-        (action) =>
-          action.reward_amount -
-          action.creator_reward_weight * action.reward_amount,
-      )
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
-    0;
+  const totalUserXP = calculateTotalXPForQuestActions({
+    isUserReferred,
+    questStartDate: new Date(quest.start_date),
+    questEndDate: new Date(quest.end_date),
+    questActions:
+      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+  });
 
   const isCompleted = gainedXP === totalUserXP;
 

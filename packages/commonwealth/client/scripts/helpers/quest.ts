@@ -1,5 +1,14 @@
-import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
+import {
+  QuestActionMeta,
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { z } from 'zod';
+import {
+  doesActionRequireRewardShare,
+  doesActionRewardShareForReferrer,
+} from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/helpers';
 
 export const calculateQuestTimelineLabel = ({
   startDate,
@@ -35,6 +44,72 @@ export const calculateQuestTimelineLabel = ({
       ? `${startHoursRemaining} hour${startHoursRemaining > 1 ? 's' : ''}`
       : `${startDaysRemaining} day${startDaysRemaining > 1 ? 's' : ''}`
   }`;
+};
+
+export const calculateTotalXPForQuestActions = ({
+  isUserReferred,
+  questStartDate,
+  questEndDate,
+  questActions,
+}: {
+  isUserReferred: boolean;
+  questStartDate: Date;
+  questEndDate: Date;
+  questActions: z.infer<typeof QuestActionMeta>[];
+}) => {
+  return (
+    questActions
+      ?.map((action) => {
+        // calc repetition
+        const isRepeateable =
+          action.participation_limit === QuestParticipationLimit.OncePerPeriod;
+        const isRepeateableDaily =
+          action.participation_period === QuestParticipationPeriod.Daily;
+        const isRepeateableWeekly =
+          action.participation_period === QuestParticipationPeriod.Weekly;
+        const isRepeateableMonthly =
+          action.participation_period === QuestParticipationPeriod.Monthly;
+
+        // calc reward per attempt with option creator share
+        const userRewardPerAttempt = action.reward_amount;
+        const creatorRewardPerAttempt =
+          !isUserReferred && doesActionRewardShareForReferrer(action.event_name)
+            ? 0
+            : doesActionRequireRewardShare(action.event_name)
+              ? action.creator_reward_weight * action.reward_amount
+              : 0;
+        const finalRewardPerAttempt =
+          userRewardPerAttempt - creatorRewardPerAttempt;
+
+        // calc total attempts per repetition
+        const totalAttemptsPerSession = isRepeateable
+          ? action.participation_times_per_period || 1
+          : 1;
+
+        // calc no of rewards that can be assigned per repetition schedule
+        const startDate = moment(questStartDate);
+        const endDate = moment(questEndDate);
+        const noOfDays = endDate.diff(startDate, 'days') || 1;
+        const noOfWeeks = Math.ceil(
+          endDate.diff(startDate, 'weeks', true) || 1,
+        );
+        const noOfMonths = Math.ceil(
+          endDate.diff(startDate, 'months', true) || 1,
+        );
+        const repititionSessions = isRepeateableDaily
+          ? noOfDays
+          : isRepeateableWeekly
+            ? noOfWeeks
+            : isRepeateableMonthly
+              ? noOfMonths
+              : 1;
+        const totalSessions = isRepeateable ? repititionSessions : 1;
+
+        // calc final reward for action
+        return finalRewardPerAttempt * totalAttemptsPerSession * totalSessions;
+      })
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) || 0
+  );
 };
 
 export const questParticipationPeriodToCopyMap = {
