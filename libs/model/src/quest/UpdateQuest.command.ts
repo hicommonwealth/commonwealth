@@ -90,7 +90,12 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
             if (action_meta.content_id) {
               // make sure content_id exists
               const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
-              if (content === 'thread') {
+              if (content === 'topic') {
+                const topic = await models.Topic.findOne({
+                  where: c_id ? { id: +id, community_id: c_id } : { id: +id },
+                });
+                mustExist(`Topic with id "${id}"`, topic);
+              } else if (content === 'thread') {
                 const thread = await models.Thread.findOne({
                   where: c_id ? { id: +id, community_id: c_id } : { id: +id },
                 });

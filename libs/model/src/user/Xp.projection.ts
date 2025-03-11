@@ -101,7 +101,7 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
-  content_id?: number, // thread or comment id
+  content?: { topic_id: number; thread_id: number; comment_id?: number },
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -112,8 +112,19 @@ async function recordXpsForQuest(
       if (!action_meta?.id) continue;
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
-        if (parts.length !== 2) continue;
-        if (parts[1] !== content_id?.toString()) continue;
+        if (parts.length !== 2) continue; // this shouldn't happen, but just in case
+        if (parts[0] === 'topic' && parts[1] !== content?.topic_id.toString())
+          continue;
+        else if (
+          parts[0] === 'thread' &&
+          parts[1] !== content?.thread_id.toString()
+        )
+          continue;
+        else if (
+          parts[0] === 'comment' &&
+          parts[1] !== content?.comment_id?.toString()
+        )
+          continue;
       }
 
       // get logged actions for this user and action meta
@@ -246,7 +257,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'ThreadCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: payload.topic_id,
+            thread_id: payload.id!,
+          },
+        );
       },
       ThreadUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -262,6 +282,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
@@ -271,17 +292,30 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           thread!.Address!.address,
-          thread!.id,
+          { topic_id: thread.topic_id, thread_id: thread.id! },
         );
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const thread = await models.Thread.findOne({
+          where: { id: payload.thread_id },
+        });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'CommentCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: thread.topic_id,
+            thread_id: thread.id!,
+          },
+        );
       },
       CommentUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -291,7 +325,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           include: [
             {
               model: models.Thread,
-              attributes: ['community_id'],
+              attributes: ['community_id', 'topic_id'],
               required: true,
             },
             {
@@ -302,6 +336,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!comment) return;
         const action_metas = await getQuestActionMetas(
           {
             community_id: comment!.Thread!.community_id,
@@ -314,7 +349,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           comment!.Address!.address,
-          comment!.id,
+          {
+            topic_id: comment.Thread!.topic_id,
+            thread_id: comment.Thread!.id!,
+            comment_id: comment.id,
+          },
         );
       },
       UserMentioned: async () => {
