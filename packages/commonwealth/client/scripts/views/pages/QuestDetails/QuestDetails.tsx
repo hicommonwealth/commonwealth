@@ -131,11 +131,11 @@ const QuestDetails = ({ id }: { id: number }) => {
   ) => {
     switch (actionName) {
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'CommunityCreated': {
@@ -143,11 +143,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
-        navigate(
-          `/new/discussion`,
-          {},
-          quest?.community_id || randomResourceId?.community_id,
-        );
+        navigate(`/new/discussion`, {}, quest?.community_id || null);
         break;
       }
       case 'CommunityJoined': {
@@ -160,31 +156,45 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'ThreadUpvoted':
       case 'CommentCreated': {
-        navigate(
-          actionContentId
-            ? buildURLFromContentId(
-                actionContentId.split(':')[1],
-                'thread',
-              ).split(window.location.origin)[1]
-            : `/discussion/${`${randomResourceId?.thread_id}`}`,
-          {},
-          null,
-        );
+        if (actionContentId) {
+          navigate(
+            buildURLFromContentId(
+              actionContentId.split(':')[1],
+              'thread',
+            ).split(window.location.origin)[1],
+            {},
+            null,
+          );
+          return;
+        }
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/dashboard/for-you`, {}, null);
         break;
       }
       case 'CommentUpvoted': {
-        navigate(
-          actionContentId
-            ? buildURLFromContentId(
-                actionContentId.split(':')[1],
-                'comment',
-              ).split(window.location.origin)[1]
-            : `/discussion/${
-                randomResourceId?.thread_id
-              }?comment=${randomResourceId?.comment_id}`,
-          {},
-          null,
-        );
+        if (actionContentId) {
+          navigate(
+            actionContentId
+              ? buildURLFromContentId(
+                  actionContentId.split(':')[1],
+                  'comment',
+                ).split(window.location.origin)[1]
+              : `/discussion/${
+                  randomResourceId?.thread_id
+                }?comment=${randomResourceId?.comment_id}`,
+            {},
+            null,
+          );
+          return;
+        }
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/dashboard/for-you`, {}, null);
         break;
       }
       case 'UserMentioned': {

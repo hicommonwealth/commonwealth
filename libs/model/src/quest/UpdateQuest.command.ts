@@ -185,6 +185,10 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
           end_date,
           max_xp_to_end,
         });
+        delta.community_id =
+          !!community_id || community_id === null
+            ? community_id
+            : quest.community_id;
         if (Object.keys(delta).length) {
           await models.Quest.update(delta, {
             where: { id: quest_id },
