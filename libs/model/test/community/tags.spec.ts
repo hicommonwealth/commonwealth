@@ -1,10 +1,10 @@
-import { Actor, dispose, query } from '@hicommonwealth/core';
+import { dispose, query } from '@hicommonwealth/core';
 import { GetCommunities, GetCommunity } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { systemActor } from '../../src/middleware';
 import { seed } from '../../src/tester';
 
 describe('Tags', () => {
-  let actor: Actor;
   let tag1Id: number;
   let tag2Id: number;
   let community2id: string;
@@ -55,7 +55,7 @@ describe('Tags', () => {
 
   test('should query all communities when no tag passed', async () => {
     const communityResults = await query(GetCommunities(), {
-      actor,
+      actor: systemActor({}),
       payload: {} as any,
     });
     expect(communityResults?.results).to.have.length(3);
@@ -63,7 +63,7 @@ describe('Tags', () => {
 
   test('should query both tagged communities with tag 1 provided', async () => {
     const communityResults = await query(GetCommunities(), {
-      actor,
+      actor: systemActor({}),
       payload: { tag_ids: [tag1Id].join(',') } as any,
     });
     expect(communityResults?.results).to.have.length(2);
@@ -71,13 +71,13 @@ describe('Tags', () => {
 
   test('should query single community with tag 1 and 2 provided', async () => {
     const communityResults = await query(GetCommunities(), {
-      actor,
+      actor: systemActor({}),
       payload: { tag_ids: [tag1Id, tag2Id].join(',') } as any,
     });
     expect(communityResults?.results).to.have.length(1);
 
     const singleCommunityResults = await query(GetCommunity(), {
-      actor,
+      actor: systemActor({}),
       payload: { id: community2id },
     });
     expect(
@@ -88,7 +88,7 @@ describe('Tags', () => {
   test('should fail on invalid tag string', async () => {
     try {
       await query(GetCommunities(), {
-        actor,
+        actor: systemActor({}),
         payload: { tag_ids: 'abkjdgkjsagj,daskgjdsakgjsdg' } as any,
       });
     } catch (e) {

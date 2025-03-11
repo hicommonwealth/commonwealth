@@ -18,6 +18,8 @@ import {
 } from '../services/graphileWorker';
 import { getDelta } from '../utils';
 
+// TODO: use `tweetExists` util to check if `twitter_url` is valid
+//  once it is added on the client
 export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
   return {
     ...schemas.UpdateQuest,
