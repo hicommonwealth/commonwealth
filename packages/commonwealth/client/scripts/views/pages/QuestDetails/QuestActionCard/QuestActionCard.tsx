@@ -126,6 +126,7 @@ const QuestActionCard = ({
                   &nbsp; shared with{' '}
                   {actionCopies.shares[questAction.event_name]}. Your share ={' '}
                   {Math.abs(questAction.reward_amount - creatorXP.value)} XP
+                  {isRepeatableQuest ? ` / attempt` : ''}
                 </CWText>
               )}
             <div className="points-row">
@@ -136,7 +137,10 @@ const QuestActionCard = ({
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
                 attemptsLeft !== questParticipationLimitPerCycle && (
-                  <CWTag type="group" label={`${attemptsLeft}x left`} />
+                  <CWTag
+                    type="group"
+                    label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
+                  />
                 )}
               {questAction.instructions_link && (
                 <a
