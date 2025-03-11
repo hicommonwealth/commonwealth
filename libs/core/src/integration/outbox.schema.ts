@@ -18,6 +18,7 @@ export const outboxEvents: Events[] = [
   'ContestStarted',
   'ContestEnded',
   'ContestEnding',
+  'ClankerTokenFound',
   'DiscordMessageCreated',
   'DiscordThreadBodyUpdated',
   'DiscordThreadCommentCreated',
