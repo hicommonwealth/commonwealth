@@ -1,15 +1,12 @@
-import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
-import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
+import { blobStorage, logger } from '@hicommonwealth/core';
+import { GraphileTask, TaskPayloads, config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
+import { Task } from 'graphile-worker';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
 
 const log = logger(import.meta);
-const _blobStorage = blobStorage({
-  adapter: S3BlobStorage(),
-});
 
 function dumpTablesSync(table: string, outputFile: string): boolean {
   const databaseUrl = config.DB.URI;
@@ -52,7 +49,7 @@ function compressFile(inputFile: string, outputFile: string): Promise<void> {
 async function uploadToS3(filePath: string): Promise<boolean> {
   try {
     const fileStream = createReadStream(filePath);
-    const { url } = await _blobStorage.upload({
+    const { url } = await blobStorage().upload({
       key: filePath,
       bucket: 'archives',
       content: fileStream,
@@ -101,7 +98,7 @@ async function getTablesToBackup(): Promise<string[]> {
     tablesInPg.map(async (t) => {
       const objectKey = getCompressedDumpName(getDumpName(t));
       log.info(`Searching for ${objectKey} in archives...`);
-      return await _blobStorage.exists({
+      return await blobStorage().exists({
         key: objectKey,
         bucket: 'archives',
       });
@@ -139,7 +136,7 @@ function getCompressedDumpName(dumpName: string): string {
   return `${dumpName}.gz`;
 }
 
-async function main() {
+const archiveOutbox: Task = async () => {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
   log.info(`Found ${tables.length} to archive`, {
@@ -176,20 +173,9 @@ async function main() {
   } else {
     log.info('No tables needed to be archived');
   }
-}
+};
 
-if (import.meta.url.endsWith(process.argv[1])) {
-  stats({
-    adapter: HotShotsStats(),
-  });
-  main()
-    .then(async () => {
-      stats().on('cw.scheduler.archive-outbox');
-      await dispose()('EXIT', true);
-    })
-    .catch(async (err) => {
-      stats().off('cw.scheduler.archive-outbox');
-      log.fatal('Failed to archive outbox child partitions to S3', err);
-      await dispose()('ERROR', true);
-    });
-}
+export const archiveOutboxTask: GraphileTask = {
+  input: TaskPayloads.ArchiveOutbox,
+  fn: archiveOutbox,
+};

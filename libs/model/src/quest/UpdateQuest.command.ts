@@ -1,5 +1,7 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { AllChannelQuestActionNames } from '@hicommonwealth/schemas';
+import z from 'zod';
 import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
 import {
@@ -8,6 +10,12 @@ import {
   mustNotBeStarted,
   mustNotExist,
 } from '../middleware/guards';
+import {
+  GraphileTaskNames,
+  removeJob,
+  rescheduleJobs,
+  scheduleTask,
+} from '../services/graphileWorker';
 import { getDelta } from '../utils';
 
 // TODO: use `tweetExists` util to check if `twitter_url` is valid
@@ -30,7 +38,9 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         action_metas,
       } = payload;
 
-      const quest = await models.Quest.findOne({ where: { id: quest_id } });
+      const quest = await models.Quest.scope('withPrivateData').findOne({
+        where: { id: quest_id },
+      });
       mustExist(`Quest with id "${quest_id}`, quest);
 
       if (name) {
@@ -50,7 +60,30 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         end_date ?? quest.end_date,
       );
 
+      let channelActionMeta:
+        | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>
+        | undefined;
       if (action_metas) {
+        if (quest.quest_type === 'channel') {
+          if (action_metas.length > 1) {
+            throw new InvalidInput(
+              'Cannot have more than one action per channel quest',
+            );
+          }
+          channelActionMeta = action_metas[0];
+
+          if (
+            channelActionMeta &&
+            !AllChannelQuestActionNames.some(
+              (e) => e === channelActionMeta!.event_name,
+            )
+          ) {
+            throw new InvalidInput(
+              `Invalid action "${channelActionMeta.event_name}" for channel quest`,
+            );
+          }
+        }
+
         const c_id = community_id || quest.community_id;
         await Promise.all(
           action_metas.map(async (action_meta) => {
@@ -84,7 +117,46 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       }
 
       await models.sequelize.transaction(async (transaction) => {
+        // Add scheduled job for new TwitterMetrics action
+        if (
+          quest.quest_type === 'channel' &&
+          channelActionMeta?.event_name === 'TwitterMetrics'
+        ) {
+          const job = await scheduleTask(
+            GraphileTaskNames.AwardTwitterQuestXp,
+            {
+              quest_id: quest.id!,
+              quest_end_date: quest.end_date,
+            },
+            {
+              transaction,
+            },
+          );
+
+          quest.scheduled_job_id = job.id;
+          await quest.save({ transaction });
+        }
+
         if (action_metas?.length) {
+          const existingTwitterMetricsAction =
+            await models.QuestActionMeta.findOne({
+              where: {
+                quest_id,
+                event_name: 'TwitterMetrics',
+              },
+              transaction,
+            });
+          if (
+            existingTwitterMetricsAction &&
+            !channelActionMeta &&
+            quest.scheduled_job_id
+          ) {
+            await removeJob({
+              jobId: quest.scheduled_job_id,
+              transaction,
+            });
+          }
+
           // clean existing action_metas
           await models.QuestActionMeta.destroy({
             where: { quest_id },
@@ -108,11 +180,29 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
           end_date,
           max_xp_to_end,
         });
-        if (Object.keys(delta).length)
+        if (Object.keys(delta).length) {
           await models.Quest.update(delta, {
             where: { id: quest_id },
             transaction,
           });
+
+          // reschedule the quest job if end date is updated on a TwitterMetrics quest
+          if (
+            delta.end_date &&
+            delta.end_date > quest.end_date &&
+            quest.quest_type === 'channel' &&
+            channelActionMeta?.event_name === 'TwitterMetrics' &&
+            quest.scheduled_job_id
+          ) {
+            await rescheduleJobs({
+              jobIds: [quest.scheduled_job_id],
+              options: {
+                runAt: delta.end_date,
+              },
+              transaction,
+            });
+          }
+        }
       });
 
       const updated = await models.Quest.findOne({
