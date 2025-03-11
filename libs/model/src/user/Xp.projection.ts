@@ -101,7 +101,12 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
-  content?: { topic_id: number; thread_id: number; comment_id?: number },
+  scope?: {
+    chain_id?: number;
+    topic_id?: number;
+    thread_id?: number;
+    comment_id?: number;
+  },
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -111,18 +116,13 @@ async function recordXpsForQuest(
     for (const action_meta of action_metas) {
       if (!action_meta?.id) continue;
       if (action_meta.content_id) {
-        const parts = action_meta.content_id.split(':');
-        if (parts.length !== 2) continue; // this shouldn't happen, but just in case
-        if (parts[0] === 'topic' && parts[1] !== content?.topic_id?.toString())
-          continue;
-        else if (
-          parts[0] === 'thread' &&
-          parts[1] !== content?.thread_id?.toString()
-        )
-          continue;
-        else if (
-          parts[0] === 'comment' &&
-          parts[1] !== content?.comment_id?.toString()
+        const [scoped, id] = action_meta.content_id.split(':');
+        if (!scoped || !id) continue; // this shouldn't happen, but just in case
+        if (
+          (scoped === 'chain' && +id !== scope?.chain_id) ||
+          (scoped === 'topic' && +id !== scope?.topic_id) ||
+          (scoped === 'thread' && +id !== scope?.thread_id) ||
+          (scoped === 'comment' && +id !== scope?.comment_id)
         )
           continue;
       }
@@ -220,6 +220,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
       },
       CommunityCreated: async ({ payload }) => {
+        const community = await models.Community.findOne({
+          where: { id: payload.community_id },
+        });
+        if (!community) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'CommunityCreated',
@@ -230,6 +234,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             payload.created_at!,
             action_metas,
             payload.referrer_address,
+            { chain_id: community.chain_node_id || undefined },
           );
         }
       },
