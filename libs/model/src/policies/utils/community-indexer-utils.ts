@@ -8,6 +8,7 @@ import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
 import moment from 'moment';
+import { Op } from 'sequelize';
 import { uuidV4 } from 'web3-utils';
 import { z } from 'zod';
 import { CreateCommunity } from '../../community';
@@ -123,6 +124,7 @@ export async function generateUniqueId(
   | { id: null; name: null; error: string }
 > {
   const communityName = formatCommunityName(name.trim());
+
   if (communityName.length <= 3) {
     return {
       id: null,
@@ -130,41 +132,76 @@ export async function generateUniqueId(
       error: `formatted community name too short: original="${name}" formatted="${communityName}"`,
     };
   }
-  const baseId = lo.kebabCase(communityName);
-  let idCandidate = baseId;
 
-  const existingBase = await models.Community.findOne({
-    where: { id: idCandidate },
-  });
-  if (!existingBase) {
+  const baseId = lo.kebabCase(communityName);
+  if (baseId.length === 0) {
     return {
-      id: idCandidate,
+      id: null,
+      name: null,
+      error: `generated ID has zero length: original="${name}" formatted="${communityName}"`,
+    };
+  }
+
+  // Find all communities that start with this base ID
+  const existingCommunities = await models.Community.findAll({
+    where: {
+      id: {
+        [Op.like]: `${baseId}%`,
+      },
+    },
+    attributes: ['id'],
+    order: [['created_at', 'ASC']],
+  });
+
+  // If no communities exist with this base ID, use it
+  if (existingCommunities.length === 0) {
+    return {
+      id: baseId,
       name: communityName,
       error: null,
     };
   }
 
-  let counter = 2;
-  while (counter < 100) {
-    idCandidate = `${baseId}-${counter}`;
-    const existing = await models.Community.findOne({
-      where: { id: idCandidate },
-    });
-    if (!existing) {
-      break;
-    }
-    counter++;
+  // Check if the base ID exists without a number suffix
+  const baseIdExists = existingCommunities.some(
+    (community) => community.id === baseId,
+  );
+
+  if (!baseIdExists) {
+    return {
+      id: baseId,
+      name: communityName,
+      error: null,
+    };
   }
-  if (counter >= 100) {
+
+  // Find the maximum number suffix used
+  const maxNumber = existingCommunities.reduce((max, community) => {
+    const match = community.id.match(new RegExp(`^${baseId}-([0-9]+)$`));
+    if (match) {
+      const num = parseInt(match[1], 10);
+      return num > max ? num : max;
+    }
+    return max;
+  }, 1); // Start with 1 as the minimum
+
+  // Use the maximum number + 1
+  const nextNumber = maxNumber + 1;
+
+  if (nextNumber > 10) {
     return {
       id: null,
       name: null,
-      error: `too many conflicting community IDs for: ${baseId} (found ${counter})`,
+      error: `too many conflicting community IDs for: ${baseId} (checked first 10)`,
     };
   }
+
+  const newId = `${baseId}-${nextNumber}`;
+  const newName = `${communityName} (${nextNumber})`;
+
   return {
-    id: idCandidate,
-    name: `${communityName} (${counter})`,
+    id: newId,
+    name: newName,
     error: null,
   };
 }
@@ -190,7 +227,7 @@ async function uploadTokenImage(
     return url;
   } catch (err) {
     log.error(
-      `failed to download cranker token image: ${(err as Error).message}`,
+      `failed to download clanker token image: ${(err as Error).message}`,
     );
     return null;
   }
