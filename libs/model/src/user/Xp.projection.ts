@@ -330,7 +330,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           include: [
             {
               model: models.Thread,
-              attributes: ['community_id', 'topic_id'],
+              attributes: ['id', 'community_id', 'topic_id'],
               required: true,
             },
             {
