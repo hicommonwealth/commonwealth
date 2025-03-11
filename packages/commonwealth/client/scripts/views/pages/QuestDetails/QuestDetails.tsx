@@ -1,9 +1,11 @@
-import {
-  QuestActionMeta,
-  QuestParticipationLimit,
-} from '@hicommonwealth/schemas';
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { calculateTotalXPForQuestActions } from 'helpers/quest';
+import {
+  QuestAction as QuestActionType,
+  XPLog,
+  calculateTotalXPForQuestActions,
+  isQuestActionComplete,
+} from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -358,17 +360,11 @@ const QuestDetails = ({ id }: { id: number }) => {
                   key={action.id}
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
-                  questAction={action as z.infer<typeof QuestActionMeta>}
-                  isActionCompleted={
-                    action?.participation_limit ===
-                    QuestParticipationLimit.OncePerQuest
-                      ? !!xpProgressions.find(
-                          (p) => p.action_meta_id === action.id,
-                        )
-                      : xpProgressions.filter(
-                          (p) => p.action_meta_id === action.id,
-                        ).length === action.participation_times_per_period
-                  }
+                  questAction={action as QuestActionType}
+                  isActionCompleted={isQuestActionComplete(
+                    action as QuestActionType,
+                    xpProgressions as unknown as XPLog[],
+                  )}
                   xpLogsForActions={xpProgressions
                     .filter((log) => log.action_meta_id === action.id)
                     .map((log) => ({
@@ -391,8 +387,6 @@ const QuestDetails = ({ id }: { id: number }) => {
             <CWText type="h3">Suggested Quests</CWText>
             <div className="list">
               {pendingWeeklyQuests.activeWeeklyQuests.slice(0, 3).map((q) => {
-                const actionMetaIds = (q.action_metas || []).map((a) => a.id);
-
                 return (
                   <QuestCard
                     key={q.id}
@@ -403,9 +397,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     xpPoints={totalUserXP}
                     tasks={{
                       total: q.action_metas?.length || 0,
-                      completed: xpProgressions.filter((p) =>
-                        actionMetaIds.includes(p.quest_action_meta_id),
-                      ).length,
+                      completed: (quest.action_metas || [])
+                        .map((action) =>
+                          isQuestActionComplete(
+                            action as QuestActionType,
+                            xpProgressions as unknown as XPLog[],
+                          ),
+                        )
+                        .filter(Boolean).length,
                     }}
                     startDate={new Date(q.start_date)}
                     endDate={new Date(q.end_date)}

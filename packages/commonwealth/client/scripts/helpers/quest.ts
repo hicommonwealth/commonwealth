@@ -2,6 +2,7 @@ import {
   QuestActionMeta,
   QuestParticipationLimit,
   QuestParticipationPeriod,
+  XpLogView,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { z } from 'zod';
@@ -9,6 +10,9 @@ import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
 } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/helpers';
+
+export type QuestAction = z.infer<typeof QuestActionMeta>;
+export type XPLog = z.infer<typeof XpLogView>;
 
 export const calculateQuestTimelineLabel = ({
   startDate,
@@ -55,7 +59,7 @@ export const calculateTotalXPForQuestActions = ({
   isUserReferred: boolean;
   questStartDate: Date;
   questEndDate: Date;
-  questActions: z.infer<typeof QuestActionMeta>[];
+  questActions: QuestAction[];
 }) => {
   return (
     questActions
@@ -110,6 +114,18 @@ export const calculateTotalXPForQuestActions = ({
       })
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) || 0
   );
+};
+
+export const isQuestActionComplete = (
+  questAction: QuestAction,
+  xpLogs: XPLog[],
+) => {
+  // if action repeats, then its only labeled as completed if all the repeatitions are complete
+  return questAction.participation_limit ===
+    QuestParticipationLimit.OncePerQuest
+    ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
+    : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
+        questAction.participation_times_per_period;
 };
 
 export const questParticipationPeriodToCopyMap = {

@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { isQuestActionComplete, QuestAction, XPLog } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -92,7 +93,6 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
                   (accumulator, currentValue) => accumulator + currentValue,
                   0,
                 ) || 0;
-            const actionMetaIds = (quest.action_metas || []).map((a) => a.id);
 
             return (
               <QuestCard
@@ -104,9 +104,14 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
                 xpPoints={totalUserXP}
                 tasks={{
                   total: quest.action_metas?.length || 0,
-                  completed: xpProgressions.filter((p) =>
-                    actionMetaIds.includes(p.quest_action_meta_id),
-                  ).length,
+                  completed: (quest.action_metas || [])
+                    .map((action) =>
+                      isQuestActionComplete(
+                        action as QuestAction,
+                        xpProgressions as unknown as XPLog[],
+                      ),
+                    )
+                    .filter(Boolean).length,
                 }}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
