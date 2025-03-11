@@ -175,6 +175,7 @@ export const ManageOnchainModal = ({
         <CWButton
           label="Confirm & Mint"
           buttonType="secondary"
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={handleUpdate}
           buttonHeight="sm"
           disabled={loading || !hasChanges}
