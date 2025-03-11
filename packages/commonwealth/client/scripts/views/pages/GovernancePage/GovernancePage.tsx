@@ -13,7 +13,7 @@ const GovernancePage = () => {
   if (!governancePageEnabled) return <PageNotFound />;
 
   return (
-    <CWPageLayout ref={containerRef}>
+    <CWPageLayout>
       <div className="GovernancePage">
         <GovernanceHeader />
       </div>
