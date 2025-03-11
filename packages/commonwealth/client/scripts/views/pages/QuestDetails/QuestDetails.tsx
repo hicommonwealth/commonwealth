@@ -226,7 +226,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           {isDeletionAllowed
             ? 'Deletion would remove this quest and its sub-tasks entirely for every user.'
             : // eslint-disable-next-line max-len
-              `With cancelation, users who earned XP for this quest will retain that XP. However new submissions to this quest won't be allowed and won't reward any XP to users.`}
+              `With cancellation, users who earned any aura for this quest will retain that aura. However new submissions to this quest won't be allowed and won't reward any aura to users.`}
         </>
       ),
       buttons: [
@@ -371,10 +371,10 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Complete tasks to earn XP
+                Create action to earn aura
               </CWText>
               <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} XP`}
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
                 type="proposal"
               />
             </div>

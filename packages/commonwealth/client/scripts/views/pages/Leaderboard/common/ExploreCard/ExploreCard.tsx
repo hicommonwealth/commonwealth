@@ -79,7 +79,7 @@ const ExploreCard = ({
           </CWText>
           <div className="row">
             <CWTag
-              label={`${xpPoints} XP`}
+              label={`${xpPoints} Aura`}
               type="proposal"
               classNames="xp-points"
             />

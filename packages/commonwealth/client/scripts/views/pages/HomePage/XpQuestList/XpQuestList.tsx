@@ -46,7 +46,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   return (
     <div className="XpQuestList">
       <div className="heading-container">
-        <CWText type="h2">XP Quests</CWText>
+        <CWText type="h2">Quests</CWText>
         <Link to={`/${app.activeChainId()}/quests`}>
           <div className="link-right">
             <CWText className="link">See all quests</CWText>
