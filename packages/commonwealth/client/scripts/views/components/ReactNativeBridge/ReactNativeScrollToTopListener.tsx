@@ -1,6 +1,5 @@
 import type { ReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -23,19 +22,14 @@ function isScrollToTop(data: object): data is ScrollToTop {
  * react-native
  */
 export const ReactNativeScrollToTopListener = () => {
-  const navigate = useNavigate();
-
-  const handleMessage = useCallback(
-    (message: MessageEvent) => {
-      const obj = messageToObject(message.data);
-      if (obj && typeof message.data === 'object') {
-        if (isScrollToTop(obj)) {
-          smoothScrollAllToTop();
-        }
+  const handleMessage = useCallback((message: MessageEvent) => {
+    const obj = messageToObject(message.data);
+    if (obj && typeof message.data === 'object') {
+      if (isScrollToTop(obj)) {
+        smoothScrollAllToTop();
       }
-    },
-    [navigate],
-  );
+    }
+  }, []);
 
   useEffect(() => {
     window.addEventListener('message', handleMessage);
