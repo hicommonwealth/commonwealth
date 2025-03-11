@@ -28,29 +28,24 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         {
           model: models.QuestActionMeta,
           as: 'quest_action_meta',
-          include: community_id
-            ? [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                  where: { community_id, ...(quest_id && { id: quest_id }) },
-                },
-              ]
-            : [
-                {
-                  model: models.Quest,
-                  required: true,
-                  attributes: ['id', 'name'],
-                  ...(quest_id && { where: { id: quest_id } }),
-                },
-              ],
+          required: true,
+          where: event_name ? { event_name } : {},
+          include: [
+            {
+              model: models.Quest,
+              required: true,
+              attributes: ['id', 'name'],
+              where: {
+                ...(community_id && { community_id }),
+                ...(quest_id ? { id: quest_id } : { id: { [Op.gt]: 0 } }),
+              },
+            },
+          ],
         },
       ];
 
       const where: WhereOptions<XpLogInstance> = {};
       user_id && (where.user_id = user_id);
-      event_name && (where.event_name = event_name);
       from && (where.created_at = { [Op.gt]: from });
       to && (where.created_at = { [Op.lte]: to });
 
@@ -66,9 +61,10 @@ export function GetXps(): Query<typeof schemas.GetXps> {
           return {
             ...rest,
             user_profile: user!.profile,
+            quest_id: quest_action_meta!.quest_id,
+            quest_action_meta_id: quest_action_meta!.id!,
+            event_name: quest_action_meta!.event_name,
             creator_profile: creator?.profile,
-            quest_id: quest_action_meta?.quest_id,
-            quest_action_meta_id: quest_action_meta?.id,
           };
         })
         .filter((x) => x.quest_id);

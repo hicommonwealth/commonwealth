@@ -234,7 +234,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     isTopicWeighted && voteBalance
       ? prettyVoteWeight(
           formatDecimalToWei(voteBalance),
+          topicObj!.token_decimals,
           topicObj!.weighted_voting,
+          topicObj!.vote_weight_multiplier || 1,
         )
       : '';
 
@@ -345,7 +347,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             }}
           />
         ) : selectedView === VIEWS[1].value ? (
-          <OverviewPage />
+          <OverviewPage
+            topicId={topicId}
+            featuredFilter={featuredFilter}
+            timelineFilter={dateCursor}
+          />
         ) : (
           <VirtuosoGrid
             data={isInitialLoading ? [] : filteredThreads}

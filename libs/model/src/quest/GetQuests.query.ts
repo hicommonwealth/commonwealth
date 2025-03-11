@@ -62,7 +62,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'quest_id', QAS.quest_id,
                 'event_name', QAS.event_name,
                 'reward_amount', QAS.reward_amount,
-                'action_link', QAS.action_link,
+                'instructions_link', QAS.instructions_link,
                 'creator_reward_weight', QAS.creator_reward_weight,
                 'participation_limit', QAS.participation_limit,
                 'participation_period', QAS.participation_period,
@@ -75,7 +75,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         FROM 
           "Quests" as Q
         LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
-        ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
+        ${filterConditions.length > 0 ? `WHERE Q.id > 0 AND ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset

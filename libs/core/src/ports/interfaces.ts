@@ -15,6 +15,9 @@ import {
   ContestEndedNotification,
   ContestNotification,
   QuestStartedNotification,
+  ReferrerCommunityCreatedNotification,
+  ReferrerCommunityJoinedNotification,
+  ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -75,7 +78,6 @@ export enum CacheNamespaces {
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Test_Redis = 'test_redis',
-  Database_Cleaner = 'database_cleaner',
   Token_Balance = 'token_balance',
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
@@ -282,6 +284,10 @@ export enum WorkflowKeys {
   ContestEnded = 'contest-ended',
   // Quest events
   QuestStarted = 'quest-started',
+  // Referral events
+  ReferrerSignedUp = 'referrer-signed-up',
+  ReferrerCommunityJoined = 'referrer-community-joined',
+  ReferrerCommunityCreated = 'referrer-community-created',
 }
 
 export enum KnockChannelIds {
@@ -299,13 +305,6 @@ export type NotificationsProviderRecipient =
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
-  actor?: {
-    id: string;
-    profile_name: string;
-    profile_url: string;
-    email?: string;
-    profile_avatar_url?: string;
-  };
 };
 
 export type NotificationUser = {
@@ -367,6 +366,18 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof AddressOwnershipTransferredNotification>;
             key: WorkflowKeys.AddressOwnershipTransferred;
+          }
+        | {
+            data: z.infer<typeof ReferrerSignedUpNotification>;
+            key: WorkflowKeys.ReferrerSignedUp;
+          }
+        | {
+            data: z.infer<typeof ReferrerCommunityJoinedNotification>;
+            key: WorkflowKeys.ReferrerCommunityJoined;
+          }
+        | {
+            data: z.infer<typeof ReferrerCommunityCreatedNotification>;
+            key: WorkflowKeys.ReferrerCommunityCreated;
           }
       ))
   | WebhookProviderOptions;

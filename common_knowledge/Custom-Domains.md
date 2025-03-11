@@ -11,7 +11,7 @@
 
 ## Local Testing
 
-Configure a `Chain` in the database to use a custom domain (via the `custom_domain` column) at `whateveryouwant.com`.
+Configure a community in `Communities` in the database to use a custom domain (via the `custom_domain` column) at `whateveryouwant.com`.
 
 Add an entry to /etc/hosts:
 
@@ -19,7 +19,13 @@ Add an entry to /etc/hosts:
 127.0.0.1 whateveryouwant.com
 ```
 
-Run a local SSL proxy:
+run: `sudo sh -c 'echo "127.0.0.1 whateveryouwant.com" >> /etc/hosts'`
+
+run a local server:
+
+`pnpm start`
+
+In a separate terminal window run a local SSL proxy:
 
 ```bash
 npm install -g local-ssl-proxy

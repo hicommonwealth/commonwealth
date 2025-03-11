@@ -1,13 +1,15 @@
 import { Projection } from '@hicommonwealth/core';
+import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { isWithinPeriod } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
+import { QuestInstance } from '../models/quest';
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -33,26 +35,32 @@ async function getUserByAddress(address: string) {
 async function getQuestActionMetas(
   event_payload: { community_id?: string; created_at?: Date },
   event_name: keyof typeof schemas.QuestEvents,
+  quest_id?: number, // to get system quest action metas
 ) {
+  const where: WhereOptions<QuestInstance> = quest_id
+    ? { id: quest_id }
+    : {
+        community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
+        start_date: { [Op.lte]: event_payload.created_at },
+        end_date: { [Op.gte]: event_payload.created_at },
+      };
   // make sure quest was active when event was created
-  const quests = await models.Quest.findAll({
-    where: {
-      community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
-      start_date: { [Op.lte]: event_payload.created_at },
-      end_date: { [Op.gte]: event_payload.created_at },
-    },
+  const metas = await models.Quest.findAll({
+    where,
     include: [
-      { required: true, model: models.QuestActionMeta, as: 'action_metas' },
+      {
+        required: true,
+        model: models.QuestActionMeta,
+        as: 'action_metas',
+        where: { event_name },
+      },
     ],
   });
-  return quests.flatMap((q) =>
-    q
-      .get({ plain: true })
-      .action_metas!.find((a) => a.event_name === event_name),
-  );
+  return metas.flatMap((q) => q.get({ plain: true }).action_metas);
 }
 
-async function addPointsToUsers(
+async function accumulatePoints(
+  quest_id: number,
   user_id: number,
   xp_points: number,
   transaction: Transaction,
@@ -73,6 +81,19 @@ async function addPointsToUsers(
       { where: { id: creator_user_id }, transaction },
     );
   }
+  // update xp_awarded and end quest if max_xp_to_end is reached
+  await models.Quest.update(
+    {
+      xp_awarded: sequelize.literal(`xp_awarded + ${xp_points}`),
+      end_date: sequelize.literal(`
+        CASE WHEN (xp_awarded + ${xp_points}) >= max_xp_to_end
+        THEN NOW()
+        ELSE end_date
+        END
+      `),
+    },
+    { where: { id: quest_id }, transaction },
+  );
 }
 
 async function recordXpsForQuest(
@@ -80,7 +101,7 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
-  content_id?: number, // thread or comment id
+  content?: { topic_id: number; thread_id: number; comment_id?: number },
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -88,20 +109,27 @@ async function recordXpsForQuest(
       : undefined;
 
     for (const action_meta of action_metas) {
-      if (!action_meta) continue;
+      if (!action_meta?.id) continue;
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
-        if (parts.length !== 2) continue;
-        if (parts[1] !== content_id?.toString()) continue;
+        if (parts.length !== 2) continue; // this shouldn't happen, but just in case
+        if (parts[0] === 'topic' && parts[1] !== content?.topic_id.toString())
+          continue;
+        else if (
+          parts[0] === 'thread' &&
+          parts[1] !== content?.thread_id.toString()
+        )
+          continue;
+        else if (
+          parts[0] === 'comment' &&
+          parts[1] !== content?.comment_id?.toString()
+        )
+          continue;
       }
 
       // get logged actions for this user and action meta
       const log = await models.XpLog.findAll({
-        where: {
-          user_id,
-          event_name: action_meta.event_name,
-          action_meta_id: action_meta.id,
-        },
+        where: { user_id, action_meta_id: action_meta.id },
       });
 
       // validate action participation
@@ -130,9 +158,11 @@ async function recordXpsForQuest(
       }
 
       // calculate xp points and log it
-      const reward_amount = Math.round(
-        action_meta.reward_amount * (action_meta.amount_multiplier ?? 1),
-      );
+      const x =
+        (action_meta.amount_multiplier ?? 0) > 0
+          ? action_meta.amount_multiplier!
+          : 1;
+      const reward_amount = Math.round(action_meta.reward_amount * x);
       const creator_xp_points = creator_user_id
         ? Math.round(reward_amount * action_meta.creator_reward_weight)
         : undefined;
@@ -141,15 +171,14 @@ async function recordXpsForQuest(
       const [, created] = await models.XpLog.findOrCreate({
         where: {
           user_id,
-          event_name: action_meta.event_name,
+          action_meta_id: action_meta.id,
           event_created_at,
         },
         defaults: {
-          event_name: action_meta.event_name,
-          event_created_at,
           user_id,
-          xp_points,
           action_meta_id: action_meta.id,
+          event_created_at,
+          xp_points,
           creator_user_id,
           creator_xp_points,
           created_at: new Date(),
@@ -158,7 +187,8 @@ async function recordXpsForQuest(
       });
 
       if (created)
-        await addPointsToUsers(
+        await accumulatePoints(
+          action_meta.quest_id,
           user_id,
           xp_points,
           transaction,
@@ -169,78 +199,25 @@ async function recordXpsForQuest(
   });
 }
 
-async function recordXpsForEvent(
-  user_id: number,
-  event_name: keyof typeof schemas.QuestEvents,
-  event_created_at: Date,
-  reward_amount: number,
-  creator_address?: string, // referrer address
-  creator_reward_weight?: number, // referrer reward weight
-) {
-  await sequelize.transaction(async (transaction) => {
-    const creator_user_id = creator_address
-      ? await getUserByAddress(creator_address)
-      : undefined;
-
-    // get logged actions for this user and event
-    const log = await models.XpLog.findAll({
-      where: { user_id, event_name },
-    });
-    if (log.length > 0) return; // already recorded
-
-    // calculate xp points and log it
-    const creator_xp_points = creator_user_id
-      ? Math.round(reward_amount * (creator_reward_weight ?? 0))
-      : undefined;
-    const xp_points = reward_amount - (creator_xp_points ?? 0);
-
-    const [, created] = await models.XpLog.findOrCreate({
-      where: { user_id, event_name, event_created_at },
-      defaults: {
-        event_name,
-        event_created_at,
-        user_id,
-        xp_points,
-        creator_user_id,
-        creator_xp_points,
-        created_at: new Date(),
-      },
-      transaction,
-    });
-
-    if (created)
-      await addPointsToUsers(
-        user_id,
-        xp_points,
-        transaction,
-        creator_user_id,
-        creator_xp_points,
-      );
-  });
-}
-
 export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
     inputs: schemas.QuestEvents,
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
-        // TODO: softcode reward amount and reward weight in some way similar to quests
-        const reward_amount = 20;
-        const creator_reward_weight = 0.2;
-
         const referee_address = await models.User.findOne({
           where: { id: payload.user_id },
         });
-        referee_address &&
-          referee_address.referred_by_address &&
-          (await recordXpsForEvent(
-            payload.user_id,
-            'SignUpFlowCompleted',
-            payload.created_at!,
-            reward_amount,
-            referee_address.referred_by_address,
-            creator_reward_weight,
-          ));
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'SignUpFlowCompleted',
+          -1,
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.created_at!,
+          action_metas,
+          referee_address?.referred_by_address || undefined,
+        );
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -280,7 +257,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'ThreadCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: payload.topic_id,
+            thread_id: payload.id!,
+          },
+        );
       },
       ThreadUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -289,11 +275,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           where: { id: payload.thread_id },
           include: [
             {
-              model: models.Thread,
-              attributes: ['community_id'],
-              required: true,
-            },
-            {
               model: models.Address,
               as: 'Address',
               attributes: ['address'],
@@ -301,6 +282,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
@@ -310,17 +292,30 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           thread!.Address!.address,
-          thread!.id,
+          { topic_id: thread.topic_id, thread_id: thread.id! },
         );
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const thread = await models.Thread.findOne({
+          where: { id: payload.thread_id },
+        });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'CommentCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: thread.topic_id,
+            thread_id: thread.id!,
+          },
+        );
       },
       CommentUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -330,7 +325,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           include: [
             {
               model: models.Thread,
-              attributes: ['community_id'],
+              attributes: ['community_id', 'topic_id'],
               required: true,
             },
             {
@@ -341,6 +336,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!comment) return;
         const action_metas = await getQuestActionMetas(
           {
             community_id: comment!.Thread!.community_id,
@@ -353,7 +349,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           comment!.Address!.address,
-          comment!.id,
+          {
+            topic_id: comment.Thread!.topic_id,
+            thread_id: comment.Thread!.id!,
+            comment_id: comment.id,
+          },
         );
       },
       UserMentioned: async () => {
@@ -419,6 +419,86 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
+      },
+      WalletLinked: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'WalletLinked',
+          payload.new_user ? -1 : undefined, // first user linking is system quest
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.created_at,
+          action_metas,
+        );
+      },
+      SSOLinked: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'WalletLinked',
+          payload.new_user ? -1 : undefined, // first user linking is system quest
+        );
+        await recordXpsForQuest(
+          payload.user_id,
+          payload.created_at,
+          action_metas,
+        );
+      },
+      TwitterCommonMentioned: async ({ payload }) => {
+        const address = await models.Address.findOne({
+          where: {
+            oauth_provider: WalletSsoSource.Twitter,
+            oauth_username: payload.username,
+          },
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'TwitterCommonMentioned',
+          // TODO: create system quest?
+          undefined,
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+        );
+      },
+      CommonDiscordServerJoined: async ({ payload }) => {
+        if (payload.user_id) {
+          const action_metas = await getQuestActionMetas(
+            { created_at: payload.joined_date },
+            'CommonDiscordServerJoined',
+          );
+          await recordXpsForQuest(
+            payload.user_id,
+            payload.joined_date,
+            action_metas,
+          );
+        }
+      },
+      XpChainEventCreated: async ({ payload }) => {
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
+          where: {
+            eth_chain_id: payload.eth_chain_id,
+          },
+        });
+        if (!chainNode) return;
+        const { tx } = await getTransaction({
+          rpc: chainNode.private_url || chainNode.url,
+          txHash: payload.transaction_hash,
+        });
+        const user_id = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user_id) return;
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
       },
     },
   };

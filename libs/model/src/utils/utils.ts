@@ -19,6 +19,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
+import { parseFarcasterContentUrl } from './farcasterUtils';
 
 const log = logger(import.meta);
 
@@ -80,13 +81,17 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 export function decodeThreadContentUrl(contentUrl: string): {
   communityId: string | null;
   threadId: number | null;
-  isFarcaster: boolean;
+  farcasterInfo: {
+    parentCastHash: string;
+    replyCastHash: string;
+    fid: number | null;
+  } | null;
 } {
   if (contentUrl.startsWith('/farcaster/')) {
     return {
       communityId: null,
       threadId: null,
-      isFarcaster: true,
+      farcasterInfo: parseFarcasterContentUrl(contentUrl),
     };
   }
   if (!contentUrl.includes('/discussion/')) {
@@ -98,7 +103,7 @@ export function decodeThreadContentUrl(contentUrl: string): {
   return {
     communityId,
     threadId: parseInt(threadId, 10),
-    isFarcaster: false,
+    farcasterInfo: null,
   };
 }
 
@@ -284,4 +289,26 @@ export async function publishCast(
   } catch (err) {
     log.error(`Failed to post as FC bot`, err as Error);
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function tweetExists(tweetId: string, bearerToken: string) {
+  try {
+    const response = await fetch(`https://api.x.com/2/tweets/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to get tweet ${tweetId}: ${data.message}`);
+    }
+
+    if (!data.data?.id) return false;
+  } catch (err) {
+    log.error(`Failed to get tweet ${tweetId}`, err as Error);
+    return false;
+  }
+
+  return true;
 }

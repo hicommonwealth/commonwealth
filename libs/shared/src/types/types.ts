@@ -76,4 +76,5 @@ export type Link = {
 export enum TwitterBotName {
   MomBot = 'MomBot',
   ContestBot = 'ContestBot',
+  Common = 'Common',
 }

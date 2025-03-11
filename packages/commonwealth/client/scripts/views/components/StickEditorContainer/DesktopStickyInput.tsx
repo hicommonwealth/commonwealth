@@ -11,8 +11,11 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    aiInteractionsToggleEnabled,
+  } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
@@ -121,7 +124,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
               }
               onClick={handleFocused}
             />
-            {aiCommentsFeatureEnabled && (
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
               <div className="ai-comments-toggle-container">
                 <CWToggle
                   className="ai-toggle"

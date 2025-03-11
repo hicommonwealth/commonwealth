@@ -9,19 +9,18 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import {
+  buildContestLeaderboardUrl,
+  buildFarcasterContestFrameUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
+import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
 import { getWeightedNumTokens } from '../services/stakeHelper';
-import {
-  decodeThreadContentUrl,
-  getChainNodeUrl,
-  getDefaultContestImage,
-  parseFarcasterContentUrl,
-  publishCast,
-} from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -45,10 +44,9 @@ const inputs = {
 };
 
 /**
- * Makes sure contest manager (off-chain metadata) record exists
- * - Alerts when not found and inserts default record to patch distributed transaction
+ * Creates initial contest projection and adds EVM event sources
  */
-async function updateOrCreateWithAlert(
+async function createInitialContest(
   namespace: string,
   contest_address: string,
   interval: number,
@@ -89,7 +87,7 @@ async function updateOrCreateWithAlert(
   );
 
   await models.sequelize.transaction(async (transaction) => {
-    const [updated] = await models.ContestManager.update(
+    const [contestManager] = await models.ContestManager.update(
       {
         interval,
         ticker,
@@ -97,32 +95,7 @@ async function updateOrCreateWithAlert(
       },
       { where: { contest_address }, returning: true, transaction },
     );
-    if (!updated) {
-      // when contest manager metadata is not found, it means it failed creation or was deleted
-      // here we are alerting admins and creating a default entry
-      const msg = `Missing contest manager [${contest_address}] on namespace [${namespace}]`;
-      log.error(
-        msg,
-        new MissingContestManager(msg, namespace, contest_address),
-      );
-      mustExist(`Community with namespace: ${namespace}`, community);
-
-      await models.ContestManager.create(
-        {
-          contest_address,
-          community_id: community.id!,
-          interval,
-          ticker,
-          decimals,
-          created_at: new Date(),
-          name: community.name,
-          image_url: getDefaultContestImage(),
-          payout_structure: [],
-          is_farcaster_contest: false,
-        },
-        { transaction },
-      );
-    }
+    mustExist('Contest Manager', contestManager);
 
     // create first contest instance
     await models.Contest.create(
@@ -200,7 +173,7 @@ async function getContestDetails(
 
   return {
     ...result,
-    url: getChainNodeUrl({ url: result.url }),
+    url: getChainNodeUrl(result),
   };
 }
 
@@ -215,7 +188,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const score = await getContestScore(
+    const { scores, contestBalance } = await getContestScore(
       details.url,
       contest_address,
       details.prize_percentage,
@@ -224,7 +197,11 @@ export async function updateScore(contest_address: string, contest_id: number) {
       details.interval === 0,
     );
     await models.Contest.update(
-      { score, score_updated_at: new Date() },
+      {
+        score: scores,
+        score_updated_at: new Date(),
+        contest_balance: contestBalance,
+      },
       { where: { contest_address: contest_address, contest_id } },
     );
   } catch (err) {
@@ -240,7 +217,7 @@ export function Contests(): Projection<typeof inputs> {
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           payload.interval,
@@ -251,28 +228,65 @@ export function Contests(): Projection<typeof inputs> {
 
       OneOffContestManagerDeployed: async ({ payload }) => {
         // on-chain genesis event
-        await updateOrCreateWithAlert(
+        await createInitialContest(
           payload.namespace,
           payload.contest_address,
           0,
           true,
           payload.block_number,
         );
+
+        // if bot-created farcaster contest, notify author
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            contest_address: payload.contest_address,
+          },
+        });
+        mustExist('Contest Manager', contestManager);
+
+        if (contestManager.farcaster_author_cast_hash) {
+          await publishCast(
+            contestManager.farcaster_author_cast_hash,
+            ({ username }) => {
+              const {
+                payoutStructure: [winner1, winner2, winner3],
+                voterShare,
+              } = DEFAULT_CONTEST_BOT_PARAMS;
+              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
+            },
+            {
+              // eslint-disable-next-line max-len
+              embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(payload.contest_address)}`,
+            },
+          );
+        }
       },
 
-      // This happens for each recurring contest _after_ the initial contest
       ContestStarted: async ({ payload }) => {
-        const contest_id = payload.contest_id!;
-        await models.Contest.create({
-          ...payload,
-          contest_id,
-        });
+        // ignore ContestStarted events from OneOff/Single contests
+        if (payload.contest_id !== 0) {
+          await models.Contest.create(payload);
+        }
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId, isFarcaster } = decodeThreadContentUrl(
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            contest_address: payload.contest_address,
+            environment: config.APP_ENV,
+          },
+        });
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
+        const { threadId, farcasterInfo } = decodeThreadContentUrl(
           payload.content_url,
         );
+
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -285,20 +299,14 @@ export function Contests(): Projection<typeof inputs> {
         });
 
         // post confirmation via FC bot
-        if (isFarcaster) {
-          const contestManager = await models.ContestManager.findByPk(
-            payload.contest_address,
-          );
+        if (farcasterInfo) {
           const leaderboardUrl = buildContestLeaderboardUrl(
             getBaseUrl(config.APP_ENV),
             contestManager!.community_id,
             contestManager!.contest_address,
           );
-          const { replyCastHash } = parseFarcasterContentUrl(
-            payload.content_url,
-          );
           await publishCast(
-            replyCastHash,
+            farcasterInfo.replyCastHash,
             ({ username }) =>
               `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
           );

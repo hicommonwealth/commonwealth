@@ -101,7 +101,7 @@ export const query = <
   tag: Tag,
   options?: {
     forceSecure?: boolean;
-    ttlSecs?: number;
+    ttlSecs?: number | ((input: z.infer<Input>) => number | undefined);
   },
   outMiddlewares?: Array<OutputMiddleware<Input, Output>>,
 ) => {
@@ -115,17 +115,30 @@ export const query = <
     forceSecure: options?.forceSecure,
   }).query(async ({ ctx, input }) => {
     try {
-      const cacheKey = options?.ttlSecs
+      const cacheTTL =
+        typeof options?.ttlSecs === 'function'
+          ? options.ttlSecs(input)
+          : options?.ttlSecs;
+
+      const cacheKey = cacheTTL
         ? `${factory.name}_${JSON.stringify(input)}`
         : undefined;
       if (cacheKey) {
-        const cachedReponse = await cache().getKey(
-          CacheNamespaces.Query_Response,
-          cacheKey,
-        );
-        if (cachedReponse) {
-          log.info(`Returning cached response for ${cacheKey}`);
-          return JSON.parse(cachedReponse);
+        // best effort return from cache (if cache goes down keep serving requests)
+        try {
+          const cachedResponse = await cache().getKey(
+            CacheNamespaces.Query_Response,
+            cacheKey,
+          );
+          if (cachedResponse) {
+            log.info(`Returning cached response for ${cacheKey}`);
+            return JSON.parse(cachedResponse);
+          }
+        } catch (e) {
+          log.error(
+            `Failed to return cached response for ${cacheKey}`,
+            e instanceof Error ? e : new Error(JSON.stringify(e)),
+          );
         }
       }
       const response = await coreQuery(
@@ -137,14 +150,20 @@ export const query = <
         false,
       );
       if (cacheKey) {
-        void cache()
+        cache()
           .setKey(
             CacheNamespaces.Query_Response,
             cacheKey,
             JSON.stringify(response),
-            options?.ttlSecs,
+            cacheTTL,
           )
-          .then(() => log.info(`Cached response for ${cacheKey}`));
+          .then(() => log.info(`Cached response for ${cacheKey}`))
+          .catch((e) => {
+            log.error(
+              `Failed to cache response for ${cacheKey}`,
+              e instanceof Error ? e : new Error(JSON.stringify(e)),
+            );
+          });
       }
       return response;
     } catch (error) {
