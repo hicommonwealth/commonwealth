@@ -3,7 +3,6 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
-import { RouteFeatureFlags } from './Router';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -134,7 +133,7 @@ const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
-const CommonDomainRoutes = ({ governancePageEnabled }: RouteFeatureFlags) => [
+const CommonDomainRoutes = () => [
   <Route
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
@@ -374,17 +373,13 @@ const CommonDomainRoutes = ({ governancePageEnabled }: RouteFeatureFlags) => [
       <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
     }
   />,
-  ...(governancePageEnabled
-    ? [
-        <Route
-          key="/:scope/governance"
-          path="/:scope/governance"
-          element={withLayout(GovernancePage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/governance"
+    path="/:scope/governance"
+    element={withLayout(GovernancePage, {
+      scoped: true,
+    })}
+  />,
   // GOVERNANCE END
 
   // DISCUSSIONS

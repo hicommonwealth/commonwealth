@@ -2,7 +2,6 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
-import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
@@ -115,7 +114,7 @@ const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
 
-const CustomDomainRoutes = ({ governancePageEnabled }: RouteFeatureFlags) => {
+const CustomDomainRoutes = () => {
   return [
     <Route
       key="/"
@@ -287,17 +286,13 @@ const CustomDomainRoutes = ({ governancePageEnabled }: RouteFeatureFlags) => {
         scoped: true,
       })}
     />,
-    ...(governancePageEnabled
-      ? [
-          <Route
-            key="/:scope/governance"
-            path="/:scope/governance"
-            element={withLayout(GovernancePage, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/:scope/governance"
+      path="/:scope/governance"
+      element={withLayout(GovernancePage, {
+        scoped: true,
+      })}
+    />,
     // GOVERNANCE END
 
     // DISCUSSIONS
