@@ -3,7 +3,11 @@ import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ClankerToken } from '@hicommonwealth/schemas';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import {
+  COMMUNITY_NAME_REGEX,
+  ChainBase,
+  ChainType,
+} from '@hicommonwealth/shared';
 import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
@@ -99,13 +103,15 @@ export async function* paginateClankerTokens({
 }
 
 function formatCommunityName(input: string) {
-  return (
-    input
-      // eslint-disable-next-line no-useless-escape
-      .replace(/[^a-zA-Z0-9!@#&():_$\/\\|.\- ]+/g, '') // Keep only allowed characters
-      .replace(/\s+/g, ' ') // Replace multiple spaces with one
-      .trim()
-  ); // Trim leading and trailing spaces
+  const formatted = input
+    // eslint-disable-next-line no-useless-escape
+    .replace(/[^a-zA-Z0-9!@#&():_$\/\\|.\- ]+/g, '') // Keep only allowed characters
+    .replace(/\s+/g, ' ') // Replace multiple spaces with one
+    .trim(); // Trim leading and trailing spaces
+  if (!COMMUNITY_NAME_REGEX.test(formatted)) {
+    return '';
+  }
+  return formatted;
 }
 
 /**
@@ -129,7 +135,7 @@ export async function generateUniqueId(
     return {
       id: null,
       name: null,
-      error: `formatted community name too short: original="${name}" formatted="${communityName}"`,
+      error: `formatted community name invalid or too short: original="${name}" formatted="${communityName}"`,
     };
   }
 

@@ -27,14 +27,14 @@ describe('generateUniqueId', () => {
   it('should handle invalid input names', async () => {
     const shortName = await generateUniqueId('ab');
     expect(shortName.error).toContain(
-      'formatted community name too short: original="ab"',
+      'formatted community name invalid or too short: original="ab"',
     );
     expect(shortName.id).toBeNull();
     expect(shortName.name).toBeNull();
 
     const emptyName = await generateUniqueId('   ');
     expect(emptyName.error).toContain(
-      'formatted community name too short: original="   "',
+      'formatted community name invalid or too short: original="   "',
     );
     expect(emptyName.id).toBeNull();
     expect(emptyName.name).toBeNull();
