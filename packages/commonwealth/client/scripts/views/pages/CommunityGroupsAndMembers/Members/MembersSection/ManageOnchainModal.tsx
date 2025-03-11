@@ -93,31 +93,40 @@ export const ManageOnchainModal = ({
   };
 
   const mintPermission = async () => {
-    const walletAddress = userData.activeAccount?.address;
-    if (!walletAddress) throw new Error('Wallet Address Not Found');
+    try {
+      const walletAddress = userData.activeAccount?.address;
+      if (!walletAddress) {
+        notifyError('Wallet Address Not Found');
+        throw new Error('Wallet Address Not Found');
+      }
 
-    // Filter the updates to only those that are admin changes
-    const adminUpdates = (userRole || []).filter(
-      (user, index) =>
-        user.role !== Addresses?.[index]?.role && user.role === 'admin',
-    );
-
-    if (adminUpdates.length > 0) {
-      await Promise.all(
-        adminUpdates.map(async (update) => {
-          await mintAdminTokenMutation.mutateAsync({
-            namespace,
-            walletAddress,
-            adminAddress: update.address,
-            chainRpc,
-            ethChainId,
-            chainId,
-          });
-          notifySuccess(
-            `Admin token minted for ${formatAddressShort(update.address)}`,
-          );
-        }),
+      // Filter the updates to only those that are admin changes
+      const adminUpdates = (userRole || []).filter(
+        (user, index) =>
+          user.role !== Addresses?.[index]?.role && user.role === 'admin',
       );
+
+      if (adminUpdates.length > 0) {
+        await Promise.all(
+          adminUpdates.map(async (update) => {
+            await mintAdminTokenMutation.mutateAsync({
+              namespace,
+              walletAddress,
+              adminAddress: update.address,
+              chainRpc,
+              ethChainId,
+              chainId,
+            });
+            notifySuccess(
+              `Admin token minted for ${formatAddressShort(update.address)}`,
+            );
+          }),
+        );
+      }
+    } catch (error) {
+      console.error('Error minting permissions:', error);
+      notifyError(error?.response?.data?.error || error.message);
+      throw new Error(error);
     }
   };
 
