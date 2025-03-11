@@ -92,38 +92,44 @@ export const ManageOnchainModal = ({
     }
   };
 
-  const updateAndMint = async () => {
-    try {
-      const walletAddress = userData.activeAccount?.address;
-      if (!walletAddress) throw Error('Wallet Address Not Found');
+  const mintPermission = async () => {
+    const walletAddress = userData.activeAccount?.address;
+    if (!walletAddress) throw new Error('Wallet Address Not Found');
 
-      await updateRolesOnServer();
+    // Filter the updates to only those that are admin changes
+    const adminUpdates = (userRole || []).filter(
+      (user, index) =>
+        user.role !== Addresses?.[index]?.role && user.role === 'admin',
+    );
 
-      const adminUpdates = (userRole || []).filter(
-        (user, index) =>
-          user.role !== Addresses?.[index]?.role && user.role === 'admin',
+    if (adminUpdates.length > 0) {
+      await Promise.all(
+        adminUpdates.map(async (update) => {
+          await mintAdminTokenMutation.mutateAsync({
+            namespace,
+            walletAddress,
+            adminAddress: update.address,
+            chainRpc,
+            ethChainId,
+            chainId,
+          });
+          notifySuccess(
+            `Admin token minted for ${formatAddressShort(update.address)}`,
+          );
+        }),
       );
+    }
+  };
 
-      if (adminUpdates.length > 0) {
-        await Promise.all(
-          adminUpdates.map(async (update) => {
-            await mintAdminTokenMutation.mutateAsync({
-              namespace,
-              walletAddress,
-              adminAddress: update.address,
-              chainRpc,
-              ethChainId,
-              chainId,
-            });
-            notifySuccess(
-              `Admin token minted for ${formatAddressShort(update.address)}`,
-            );
-          }),
-        );
-      }
+  const handleUpdate = async () => {
+    try {
+      await mintPermission();
+      await updateRolesOnServer();
     } catch (err) {
       console.error(err);
-      notifyError('An error occurred while updating roles and minting tokens.');
+      notifyError('Minting failed, permissions were not updated.');
+    } finally {
+      onClose();
     }
   };
 
@@ -154,13 +160,6 @@ export const ManageOnchainModal = ({
                   onChange={() => handleRoleChange(address.id, 'admin')}
                 />
                 <CWRadioButton
-                  label="Moderator"
-                  name={`role-${address.id}`}
-                  value="moderator"
-                  checked={address.role === 'moderator'}
-                  onChange={() => handleRoleChange(address.id, 'moderator')}
-                />
-                <CWRadioButton
                   label="Member"
                   name={`role-${address.id}`}
                   value="member"
@@ -176,8 +175,7 @@ export const ManageOnchainModal = ({
         <CWButton
           label="Confirm & Mint"
           buttonType="secondary"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={updateAndMint}
+          onClick={handleUpdate}
           buttonHeight="sm"
           disabled={loading || !hasChanges}
         />
