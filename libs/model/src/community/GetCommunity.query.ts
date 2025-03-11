@@ -26,6 +26,11 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
             },
           ],
         },
+        {
+          model: models.Group,
+          as: 'groups',
+          required: false,
+        },
       ];
 
       if (payload.include_node_info) {

@@ -54,6 +54,7 @@ type MembersSectionProps = {
   handleCheckboxChange?: (address: string) => void;
   refetch?: () => void;
   extraColumns?: (member: Member) => object;
+  canManagePermissions?: boolean;
 };
 
 const MembersSection = ({
@@ -65,6 +66,7 @@ const MembersSection = ({
   handleCheckboxChange,
   refetch,
   extraColumns,
+  canManagePermissions = false,
 }: MembersSectionProps) => {
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
@@ -177,15 +179,21 @@ const MembersSection = ({
               </div>
             ),
           },
-          actions: {
-            customElement: (
-              <CWButton
-                label="Manage On Chain Role Privileges"
-                buttonType="secondary"
-                onClick={() => handleManageOnchainClick(member?.addresses)}
-              />
-            ),
-          },
+          ...(canManagePermissions
+            ? {
+                actions: {
+                  customElement: (
+                    <CWButton
+                      label="Manage On Chain Role Privileges"
+                      buttonType="secondary"
+                      onClick={() =>
+                        handleManageOnchainClick(member?.addresses)
+                      }
+                    />
+                  ),
+                },
+              }
+            : {}),
           // @ts-expect-error <StrictNullChecks/>
           ...extraColumns(member),
         }))}
