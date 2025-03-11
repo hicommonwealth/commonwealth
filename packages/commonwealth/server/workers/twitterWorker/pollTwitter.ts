@@ -1,5 +1,9 @@
 import { logger } from '@hicommonwealth/core';
-import { Tweet, TwitterMentionsTimeline } from '@hicommonwealth/schemas';
+import {
+  Tweet,
+  TweetsWithMetrics,
+  TwitterMentionsTimeline,
+} from '@hicommonwealth/schemas';
 import fetch from 'node-fetch';
 import z from 'zod';
 import { TwitterBotConfig } from './utils';
@@ -65,22 +69,44 @@ export async function getMentions({
       queryParams: {
         start_time: startTime,
         end_time: endTime,
+        'tweet.fields': 'text,created_at',
+        expansions: 'author_id',
+        'user.fields': 'username',
+        ...(paginationToken ? { pagination_token: paginationToken } : {}),
       },
     });
     const parsedRes = TwitterMentionsTimeline.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;
 
-    for (const error of parsedRes.errors) {
-      log.error(
-        'Error occurred polling for Twitter mentions',
-        new Error(JSON.stringify(error)),
-        {
-          botName: twitterBotConfig.name,
-        },
-      );
+    if (parsedRes.errors) {
+      for (const error of parsedRes.errors) {
+        log.error(
+          'Error occurred polling for Twitter mentions',
+          new Error(JSON.stringify(error)),
+          {
+            botName: twitterBotConfig.name,
+          },
+        );
+      }
     }
-    allMentions.push(...parsedRes.data);
+
+    const newTweetMentions =
+      parsedRes?.data?.map((t) => {
+        const authorUsername = parsedRes?.includes?.users.find(
+          (u) => u.id === t.author_id,
+        )?.username;
+        if (!authorUsername) throw new Error('Author username not found');
+        return {
+          id: t.id,
+          author_id: t.author_id,
+          username: authorUsername,
+          text: t.text,
+          created_at: new Date(t.created_at),
+        };
+      }) || [];
+
+    allMentions.push(...newTweetMentions);
   } while (paginationToken && requestsRemaining > 0);
 
   if (paginationToken && requestsRemaining === 0 && allMentions.length > 0) {
@@ -91,4 +117,55 @@ export async function getMentions({
   }
 
   return { mentions: allMentions, endTime };
+}
+
+export async function getTweets({
+  twitterBotConfig,
+  tweetIds,
+}: {
+  twitterBotConfig: TwitterBotConfig;
+  tweetIds: string[];
+}): Promise<z.infer<typeof TweetsWithMetrics>['data']> {
+  const allTweets: z.infer<typeof TweetsWithMetrics>['data'] = [];
+
+  // Process ids in chunks of 100
+  for (let i = 0; i < tweetIds.length; i += 100) {
+    const idChunk = tweetIds.slice(i, i + 100);
+
+    const res = await getFromTwitter({
+      twitterBotConfig,
+      url: 'https://api.x.com/2/tweets',
+      queryParams: {
+        'tweet.fields': 'public_metrics',
+        ids: idChunk.join(','),
+      },
+    });
+
+    const parsedRes = TweetsWithMetrics.parse(res.jsonBody);
+
+    if (parsedRes.errors) {
+      for (const error of parsedRes.errors) {
+        log.error(
+          'Error occurred fetching tweet metrics',
+          new Error(JSON.stringify(error)),
+          {
+            botName: twitterBotConfig.name,
+          },
+        );
+      }
+    }
+
+    allTweets.push(...(parsedRes.data || []));
+
+    // If we've hit the rate limit, return what we have so far
+    if (res.requestsRemaining === 0) {
+      log.warn('Hit rate limit while fetching tweet metrics', {
+        processedIds: allTweets.length,
+        totalIds: tweetIds.length,
+      });
+      break;
+    }
+  }
+
+  return allTweets;
 }

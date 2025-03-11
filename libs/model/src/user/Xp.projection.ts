@@ -1,10 +1,11 @@
 import { Projection } from '@hicommonwealth/core';
+import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { isWithinPeriod } from '@hicommonwealth/shared';
+import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
@@ -58,7 +59,8 @@ async function getQuestActionMetas(
   return metas.flatMap((q) => q.get({ plain: true }).action_metas);
 }
 
-async function addPointsToUsers(
+async function accumulatePoints(
+  quest_id: number,
   user_id: number,
   xp_points: number,
   transaction: Transaction,
@@ -79,6 +81,19 @@ async function addPointsToUsers(
       { where: { id: creator_user_id }, transaction },
     );
   }
+  // update xp_awarded and end quest if max_xp_to_end is reached
+  await models.Quest.update(
+    {
+      xp_awarded: sequelize.literal(`xp_awarded + ${xp_points}`),
+      end_date: sequelize.literal(`
+        CASE WHEN (xp_awarded + ${xp_points}) >= max_xp_to_end
+        THEN NOW()
+        ELSE end_date
+        END
+      `),
+    },
+    { where: { id: quest_id }, transaction },
+  );
 }
 
 async function recordXpsForQuest(
@@ -86,7 +101,7 @@ async function recordXpsForQuest(
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_address?: string | null,
-  content_id?: number, // thread or comment id
+  content?: { topic_id: number; thread_id: number; comment_id?: number },
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = creator_address
@@ -97,8 +112,19 @@ async function recordXpsForQuest(
       if (!action_meta?.id) continue;
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
-        if (parts.length !== 2) continue;
-        if (parts[1] !== content_id?.toString()) continue;
+        if (parts.length !== 2) continue; // this shouldn't happen, but just in case
+        if (parts[0] === 'topic' && parts[1] !== content?.topic_id.toString())
+          continue;
+        else if (
+          parts[0] === 'thread' &&
+          parts[1] !== content?.thread_id.toString()
+        )
+          continue;
+        else if (
+          parts[0] === 'comment' &&
+          parts[1] !== content?.comment_id?.toString()
+        )
+          continue;
       }
 
       // get logged actions for this user and action meta
@@ -161,7 +187,8 @@ async function recordXpsForQuest(
       });
 
       if (created)
-        await addPointsToUsers(
+        await accumulatePoints(
+          action_meta.quest_id,
           user_id,
           xp_points,
           transaction,
@@ -230,7 +257,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'ThreadCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: payload.topic_id,
+            thread_id: payload.id!,
+          },
+        );
       },
       ThreadUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -246,6 +282,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
@@ -255,17 +292,30 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           thread!.Address!.address,
-          thread!.id,
+          { topic_id: thread.topic_id, thread_id: thread.id! },
         );
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const thread = await models.Thread.findOne({
+          where: { id: payload.thread_id },
+        });
+        if (!thread) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'CommentCreated',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          null,
+          {
+            topic_id: thread.topic_id,
+            thread_id: thread.id!,
+          },
+        );
       },
       CommentUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
@@ -275,7 +325,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           include: [
             {
               model: models.Thread,
-              attributes: ['community_id'],
+              attributes: ['community_id', 'topic_id'],
               required: true,
             },
             {
@@ -286,6 +336,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             },
           ],
         });
+        if (!comment) return;
         const action_metas = await getQuestActionMetas(
           {
             community_id: comment!.Thread!.community_id,
@@ -298,7 +349,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           comment!.Address!.address,
-          comment!.id,
+          {
+            topic_id: comment.Thread!.topic_id,
+            thread_id: comment.Thread!.id!,
+            comment_id: comment.id,
+          },
         );
       },
       UserMentioned: async () => {
@@ -389,6 +444,26 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
         );
       },
+      TwitterCommonMentioned: async ({ payload }) => {
+        const address = await models.Address.findOne({
+          where: {
+            oauth_provider: WalletSsoSource.Twitter,
+            oauth_username: payload.username,
+          },
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'TwitterCommonMentioned',
+          // TODO: create system quest?
+          undefined,
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+        );
+      },
       CommonDiscordServerJoined: async ({ payload }) => {
         if (payload.user_id) {
           const action_metas = await getQuestActionMetas(
@@ -401,6 +476,29 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             action_metas,
           );
         }
+      },
+      XpChainEventCreated: async ({ payload }) => {
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
+          where: {
+            eth_chain_id: payload.eth_chain_id,
+          },
+        });
+        if (!chainNode) return;
+        const { tx } = await getTransaction({
+          rpc: chainNode.private_url || chainNode.url,
+          txHash: payload.transaction_hash,
+        });
+        const user_id = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user_id) return;
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
       },
     },
   };

@@ -49,6 +49,8 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // setup quest actions
@@ -200,6 +202,8 @@ describe('User lifecycle', () => {
           image_url: chance.url(),
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // setup quest actions
@@ -281,59 +285,44 @@ describe('User lifecycle', () => {
       });
 
       // seed system quest and action metas
-      await models.sequelize.query(`
-        -- create "artificial" system quest to award xp points on referral and address linking events
-        INSERT INTO "Quests" (
-          "id",
-          "name",
-          "description",
-          "image_url",
-          "start_date",
-          "end_date",
-          "created_at",
-          "updated_at")
-        VALUES (
-          -1,
-          'System Quest',
-          'Referrals and address linking system-level quest',
-          '',
-          NOW(), NOW(), NOW(), NOW());
+      await models.Quest.create({
+        id: -1,
+        name: 'System Quest',
+        description: 'Referrals and address linking system-level quest',
+        image_url: '',
+        xp_awarded: 0,
+        max_xp_to_end: 100,
+        start_date: new Date(),
+        end_date: new Date(),
+        quest_type: 'common',
+      });
 
-        -- create "artificial" system quest action metas for quest above
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-1, -1, 'SignUpFlowCompleted', 20, .2, 
-        'once_per_quest', NOW(), NOW());
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-2, -1, 'WalletLinked', 10, 0, 
-        'once_per_quest', NOW(), NOW());
-        INSERT INTO "QuestActionMetas" (
-          "id",
-          "quest_id",
-          "event_name",
-          "reward_amount",
-          "creator_reward_weight",
-          "participation_limit",
-          "created_at",
-          "updated_at")
-        VALUES (-3, -1, 'SSOLinked', 10, 0,
-        'once_per_quest', NOW(), NOW());
-        `);
+      await models.QuestActionMeta.bulkCreate([
+        {
+          id: -1,
+          quest_id: -1,
+          event_name: 'SignUpFlowCompleted',
+          reward_amount: 20,
+          creator_reward_weight: 0.2,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -2,
+          quest_id: -1,
+          event_name: 'WalletLinked',
+          reward_amount: 10,
+          creator_reward_weight: 0,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -3,
+          quest_id: -1,
+          event_name: 'SSOLinked',
+          reward_amount: 10,
+          creator_reward_weight: 0,
+          participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+      ]);
 
       // user signs in a referral link, creating a new user and address
       const new_address = await signIn(community_id, member.address);
@@ -543,6 +532,8 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const quest2 = await command(CreateQuest(), {
@@ -554,6 +545,8 @@ describe('User lifecycle', () => {
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
 
@@ -618,6 +611,81 @@ describe('User lifecycle', () => {
         payload: {},
       });
       expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4 + 20);
+    });
+
+    it('should end quest when max_xp_to_end is reached', async () => {
+      // setup quest
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp quest with low cap',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          community_id,
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 20,
+          quest_type: 'common',
+        },
+      });
+      // setup quest actions
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest!.id!,
+          action_metas: [
+            {
+              event_name: 'ThreadCreated',
+              reward_amount: 12,
+              creator_reward_weight: 0,
+            },
+            {
+              event_name: 'CommentCreated',
+              reward_amount: 25,
+              creator_reward_weight: 0,
+              participation_limit: QuestParticipationLimit.OncePerPeriod,
+              participation_period: QuestParticipationPeriod.Daily,
+            },
+          ],
+        },
+      });
+      // hack start date to make it active
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
+
+      const watermark = new Date();
+
+      // act on community, triggering quest rewards
+      const thread = await command(CreateThread(), {
+        actor: member,
+        payload: {
+          community_id,
+          topic_id,
+          title: 'Thread title 3',
+          body: 'Thread body',
+          kind: 'discussion',
+          stage: '',
+          read_only: false,
+        },
+      });
+      await command(CreateComment(), {
+        actor: member,
+        payload: {
+          thread_id: thread!.id!,
+          body: 'Comment body 3',
+        },
+      });
+
+      // drain the outbox
+      await drainOutbox(['ThreadCreated', 'CommentCreated'], Xp, watermark);
+
+      const final = await models.Quest.findOne({
+        where: { id: quest!.id },
+      });
+      expect(final!.end_date < new Date()).toBe(true);
+      expect(final!.xp_awarded).toBe(37);
     });
   });
 });

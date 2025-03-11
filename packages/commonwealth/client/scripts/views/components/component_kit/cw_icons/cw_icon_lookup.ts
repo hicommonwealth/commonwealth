@@ -130,6 +130,7 @@ export const iconLookup = {
   image: withPhosphorIcon(Image),
   clipboard: withPhosphorIcon(Clipboard),
   cloudArrowUp: withPhosphorIcon(CloudArrowUp),
+  element: Icons.CWElement,
   archiveTrayFilled: Icons.CWArchiveTrayFilled,
   arrowDownBlue500: Icons.CWArrowDownBlue500,
   arrowFatUp: Icons.CWArrowFatUp,
@@ -211,7 +212,6 @@ export const iconLookup = {
   dotsHorizontal: Icons.CWDotsHorizontal,
   downvote: withPhosphorIcon(ArrowFatDown),
   edgeware: Icons.CWEdgeware,
-  element: Icons.CWElement,
   envelope: Icons.CWEnvelope,
   ethereum: Icons.CWEthereum,
   etherscan: Icons.CWEtherscan,
@@ -321,6 +321,7 @@ export const iconLookup = {
   kanban: withPhosphorIcon(Kanban),
   xTwitter: withPhosphorIcon(XLogo),
   discordLogo: withPhosphorIcon(DiscordLogo),
+  warpcast: Icons.CWWarpcast,
 };
 
 export const customIconLookup = {
