@@ -20,7 +20,7 @@ const TelegramBotExplorer = () => {
       </div>
       <ExploreCard
         label="Tap-to-Earn"
-        description="Earn XP in our new TG Mini App!"
+        description="Earn Aura in our new TG Mini App!"
         xpPoints={100}
         featuredIconName="telegram"
         onExploreClick={() => {}}

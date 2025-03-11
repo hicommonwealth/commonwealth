@@ -15,7 +15,7 @@ import './ReferralCard.scss';
 
 enum ReferralTabs {
   Total = 'Total',
-  XP = 'XP',
+  XP = 'Aura',
 }
 
 interface ReferralCardProps {
@@ -76,7 +76,7 @@ const ReferralCard = ({
           {currentTab === ReferralTabs.XP && (
             <div className="xp-body">
               <CWText fontWeight="bold" type="h4">
-                {123456} XP
+                {123456} Aura
               </CWText>
               {!isLoading && (trendValue || trendValue === 0) && (
                 <Trend value={trendValue} />
