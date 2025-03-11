@@ -68,14 +68,21 @@ describe('Count Aggregator Tests', () => {
         'true',
       );
       await cache().setKey(
+        CacheNamespaces.Thread_Reaction_Count_Changed,
+        '1',
+        'true',
+      );
+      await cache().setKey(
         CacheNamespaces.Thread_View_Count,
         thread!.id!.toString(),
         '5',
       );
-      await main();
+      await main(); // calling count aggregtor here
       const community = await models.Community.findOne({
         where: { id: 'ethereum' },
       });
+
+      await createReaction(models);
 
       expect(community?.lifetime_thread_count).to.equal(1);
       expect(community?.profile_count).to.equal(2); // these 2 come from seedDB
@@ -83,6 +90,15 @@ describe('Count Aggregator Tests', () => {
         where: { community_id: 'ethereum' },
       });
       expect(thread!.view_count).to.equal(5);
+      expect(thread!.reaction_count).to.equal(1);
     });
   });
 });
+
+async function createReaction(models: DB) {
+  await models.Reaction.create({
+    thread_id: 1,
+    reaction: 'like',
+    address_id: 1,
+  });
+}
