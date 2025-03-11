@@ -113,11 +113,11 @@ async function recordXpsForQuest(
       if (action_meta.content_id) {
         const parts = action_meta.content_id.split(':');
         if (parts.length !== 2) continue; // this shouldn't happen, but just in case
-        if (parts[0] === 'topic' && parts[1] !== content?.topic_id.toString())
+        if (parts[0] === 'topic' && parts[1] !== content?.topic_id?.toString())
           continue;
         else if (
           parts[0] === 'thread' &&
-          parts[1] !== content?.thread_id.toString()
+          parts[1] !== content?.thread_id?.toString()
         )
           continue;
         else if (
@@ -325,7 +325,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           include: [
             {
               model: models.Thread,
-              attributes: ['community_id', 'topic_id'],
+              attributes: ['id', 'community_id', 'topic_id'],
               required: true,
             },
             {
