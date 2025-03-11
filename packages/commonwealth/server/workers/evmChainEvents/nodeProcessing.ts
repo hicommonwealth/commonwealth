@@ -1,12 +1,11 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
+import { EvmChainSource, emitEvent, models } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
 import { getEventSources } from './getEventSources';
 import { getEvents, migrateEvents } from './logProcessing';
-import { EvmSource } from './types';
 import { updateMigratedEvmEventSources } from './utils';
 
 const log = logger(import.meta);
@@ -18,7 +17,7 @@ const log = logger(import.meta);
  */
 export async function processChainNode(
   ethChainId: number,
-  evmSource: EvmSource,
+  evmSource: EvmChainSource,
 ): Promise<void> {
   try {
     config.WORKERS.EVM_CE_TRACE &&
@@ -144,7 +143,7 @@ export async function processChainNode(
  */
 export async function scheduleNodeProcessing(
   interval: number,
-  processFn: (chainNodeId: number, sources: EvmSource) => Promise<void>,
+  processFn: (chainNodeId: number, sources: EvmChainSource) => Promise<void>,
 ) {
   const evmSources = await getEventSources();
 

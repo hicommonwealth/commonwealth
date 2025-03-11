@@ -132,6 +132,7 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
             decimals: tokenMetadata.decimals,
             contest_address: contestAddress,
             environment: config.APP_ENV,
+            farcaster_author_cast_hash: payload.castHash,
           },
           { transaction },
         );

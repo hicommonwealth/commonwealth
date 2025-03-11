@@ -13,7 +13,17 @@ const SocialLinks = () => {
 
   if (!app.chain || !community) return;
 
-  const { discords, githubs, twitters } = categorizeSocialLinks(
+  const {
+    discords,
+    githubs,
+    twitters,
+    telegrams,
+    warpcasts,
+    remainingLinks,
+    tiktoks,
+    elements,
+    slacks,
+  } = categorizeSocialLinks(
     (community.social_links || [])
       .filter((link) => link)
       .map((link) => link || ''),
@@ -42,6 +52,46 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="github"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {telegrams.map((link) => (
+        <AuthButton
+          className="autoWidth"
+          key={link}
+          type="telegram"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {warpcasts.map((link) => (
+        <AuthButton
+          className="autoWidth"
+          key={link}
+          type="warpcast"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {tiktoks.map((link) => (
+        <AuthButton
+          className="autoWidth"
+          key={link}
+          type="tiktok"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {elements.map((link) => (
+        <AuthButton
+          className="autoWidth"
+          key={link}
+          type="element"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {[...remainingLinks, ...slacks].map((link) => (
+        <AuthButton
+          className="autoWidth"
+          key={link}
+          type="website"
           onClick={() => window.open(link)}
         />
       ))}

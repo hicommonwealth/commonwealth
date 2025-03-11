@@ -19,7 +19,6 @@ import {
 import { R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import express from 'express';
 import { config } from './server/config';
-import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
@@ -83,13 +82,6 @@ const start = async () => {
   })
     .then(async () => {
       isServiceHealthy = true;
-      // database clean-up jobs (should be run after the API so, we don't affect start-up time
-      // TODO: evaluate other options for maintenance jobs
-      if (typeof config.DB.CLEAN_HOUR !== 'undefined') {
-        const databaseCleaner = new DatabaseCleaner();
-        databaseCleaner.initLoop(models, config.DB.CLEAN_HOUR);
-      }
-
       // checking the DYNO env var ensures this only runs on one dyno
       if (
         config.APP_ENV === 'production' &&

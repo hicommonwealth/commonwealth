@@ -1,5 +1,6 @@
-export * from './chain-event-utils';
 export * as commonProtocol from './commonProtocol';
+export * from './evmChainEvents';
+export * from './graphileWorker';
 export * from './openai';
 export * from './snapshot';
 export * as stakeHelper from './stakeHelper';

@@ -3,6 +3,8 @@ import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
 import { PG_INT } from '../utils';
 
+const QuestView = Quest.omit({ scheduled_job_id: true });
+
 export const CreateQuest = {
   input: z.object({
     name: z.string(),
@@ -10,9 +12,11 @@ export const CreateQuest = {
     image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
+    max_xp_to_end: z.number().default(0),
     community_id: z.string().nullish(),
+    quest_type: z.enum(['channel', 'common']),
   }),
-  output: Quest,
+  output: QuestView,
   context: AuthContext,
 };
 
@@ -25,9 +29,10 @@ export const UpdateQuest = {
     image_url: z.string().optional(),
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
+    max_xp_to_end: z.number().optional(),
     action_metas: z.array(QuestActionMeta.omit({ quest_id: true })).optional(),
   }),
-  output: Quest,
+  output: QuestView,
   context: AuthContext,
 };
 

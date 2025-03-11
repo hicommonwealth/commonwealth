@@ -6,6 +6,10 @@ import { z } from 'zod';
 import { models } from '../database';
 import { buildChainNodeUrl } from '../utils/utils';
 
+function iQ(conditional: unknown, query: string) {
+  return conditional ? query : '';
+}
+
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
     ...schemas.GetCommunities,
@@ -17,7 +21,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         base,
         network,
         include_node_info,
-        include_last_30_day_thread_count,
+        include_last_30_day_thread_count: threadFilter,
         stake_enabled,
         has_groups,
         tag_ids,
@@ -51,7 +55,14 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       const date30DaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
       const communityCTE = `
-        WITH "community_CTE" AS (
+      WITH thread_counts AS (
+                      SELECT community_id, COUNT(id)::int as thread_count
+                      FROM "Threads"
+                      WHERE created_at > '${date30DaysAgo.toISOString()}'
+                        AND deleted_at IS NULL
+                      GROUP BY community_id
+                  ),
+        "community_CTE" AS (
           SELECT  "Community"."id",
                   "Community"."chain_node_id",
                   "Community"."name",
@@ -90,65 +101,37 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
                   "Community"."include_in_digest_email"
-                  ${
-                    include_last_30_day_thread_count
-                      ? // eslint-disable-next-line max-len
-                        `,(SELECT COUNT("Threads".id)::int FROM "Threads" WHERE "Threads".community_id = "Community".id AND "Threads".created_at > '${date30DaysAgo.toISOString()}' AND "Threads".deleted_at IS NULL) as last_30_day_thread_count`
-                      : ''
-                  }
+                  ${iQ(threadFilter, `, COALESCE(tc.thread_count, 0) as last_30_day_thread_count`)}
           FROM    "Communities" AS "Community"
+          ${iQ(threadFilter, 'LEFT JOIN thread_counts tc ON tc.community_id = "Community".id')}
           WHERE  "Community"."active" = true
-                      ${
-                        relevance_by === 'membership'
-                          ? `
-                        AND name NOT LIKE '%<%'
-                        AND name NOT LIKE '%>%'
-                        AND name NOT LIKE '%\`%'
-                        AND name NOT LIKE '%"%'
-                        AND name NOT LIKE '%''%'
-                        `
-                          : ''
-                      }
-                        ${
-                          base
-                            ? `
-                          AND "Community"."base" = '${base}'
-                        `
-                            : ''
-                        }${
-                          network
-                            ? `
-                          AND "Community"."network" = '${network}'
-                        `
-                            : ''
-                        }
-                        ${
-                          community_type
-                            ? `
+              ${iQ(base, `AND "Community"."base" = '${base}'`)}
+              ${iQ(network, `AND "Community"."network" = '${network}'`)}
+              ${iQ(
+                community_type,
+                `
                            AND (
-                            SELECT "community_id"
+                            SELECT 1
                             FROM   "LaunchpadTokens" AS "LaunchpadTokens"
-                            WHERE  ( "LaunchpadTokens"."community_id" = "Community"."id" )
+                            WHERE  ( "LaunchpadTokens"."namespace" = "Community"."namespace_address" )
                             LIMIT  1
                           ) IS ${community_type === CommunityType.Launchpad ? 'NOT' : ''} NULL
-                          `
-                            : ''
-                        }
-                        ${
-                          has_groups
-                            ? `
+                          `,
+              )}
+              ${iQ(
+                has_groups,
+                `
                           AND (
                             SELECT "community_id"
                             FROM   "Groups" AS "Groups"
                             WHERE  ( "Groups"."community_id" = "Community"."id" )
                             LIMIT  1
                           ) IS NOT NULL
-                        `
-                            : ''
-                        }
-                        ${
-                          stake_enabled
-                            ? `
+                        `,
+              )}
+              ${iQ(
+                stake_enabled,
+                `
                           AND (
                             SELECT "community_id"
                             FROM   "CommunityStakes" AS "CommunityStakes"
@@ -158,12 +141,11 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             )
                             LIMIT  1
                           ) IS NOT NULL
-                        `
-                            : ''
-                        }
-                        ${
-                          filtering_tags && relevance_by !== 'tag_ids'
-                            ? `
+                        `,
+              )}
+                        ${iQ(
+                          filtering_tags && relevance_by !== 'tag_ids',
+                          `
                           AND (
                             SELECT COUNT  ( DISTINCT "CommunityTags"."tag_id" )
                             FROM  "CommunityTags" AS "CommunityTags"
@@ -171,13 +153,13 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                               "CommunityTags"."community_id" = "Community"."id" AND
                               "CommunityTags"."tag_id" IN (:tag_ids)
                             )
-                          ) = ${tag_ids.length}
-                        `
-                            : ''
-                        }
+                          ) = ${tag_ids?.length}
+                        `,
+                        )}
         )
-      `,
-        communityTagsCTE = `
+      `;
+
+      const communityTagsCTE = `
         , "CommunityTags_CTE" AS (
           SELECT "community_id",
                 json_agg(json_build_object(
@@ -190,8 +172,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           WHERE "CommunityTags"."community_id" IN (SELECT "id" FROM "community_CTE")
           GROUP BY "community_id"
         )
-      `,
-        communityStakesCTE = `
+      `;
+      const communityStakesCTE = `
         , "CommunityStakes_CTE" AS (
           SELECT "community_id",
                 json_agg(json_build_object(
@@ -207,9 +189,11 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           WHERE "CommunityStakes"."community_id" IN (SELECT "id" FROM "community_CTE")
           GROUP BY "community_id"
         )
-      `,
-        groupsCTE = has_groups
-          ? `
+      `;
+
+      const groupsCTE = iQ(
+        has_groups,
+        `
         , "Groups_CTE" AS (
           SELECT "community_id",
                 json_agg(json_build_object(
@@ -225,8 +209,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           WHERE "Groups"."community_id" IN (SELECT "id" FROM "community_CTE")
           GROUP BY "community_id"
         )
-        `
-          : '';
+        `,
+      );
 
       const sql = `
         ${communityCTE}
@@ -238,10 +222,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             count(*) OVER() AS total,
             "CommunityTags_CTE"."CommunityTags" as "CommunityTags",
             "CommunityStakes_CTE"."CommunityStakes" as "CommunityStakes"
-            ${has_groups ? `, "Groups_CTE"."Groups" as "groups"` : ''}
-            ${
-              include_node_info
-                ? `
+            ${iQ(has_groups, `, "Groups_CTE"."Groups" as "groups"`)}
+            ${iQ(
+              include_node_info,
+              `
               , "ChainNode"."id"                  AS "ChainNode.id",
                 "ChainNode"."url"                 AS "ChainNode.url",
                 "ChainNode"."eth_chain_id"        AS "ChainNode.eth_chain_id",
@@ -258,39 +242,29 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                 "ChainNode"."slip44"              AS "ChainNode.slip44",
                 "ChainNode"."created_at"          AS "ChainNode.created_at",
                 "ChainNode"."updated_at"          AS "ChainNode.updated_at"
-              `
-                : ''
-            }
+            `,
+            )}
         FROM "community_CTE"
         LEFT OUTER JOIN "CommunityTags_CTE" ON "community_CTE"."id" = "CommunityTags_CTE"."community_id"
         LEFT OUTER JOIN "CommunityStakes_CTE" ON "community_CTE"."id" = "CommunityStakes_CTE"."community_id"
-        ${
-          relevance_by === 'membership' && replacements.user_id
-            ? // eslint-disable-next-line max-len
-              `LEFT OUTER JOIN 
-              (SELECT DISTINCT ON (community_id) * FROM "Addresses" WHERE user_id = :user_id) authUserAddresses 
-              ON "community_CTE"."id" = authUserAddresses.community_id 
-              AND authUserAddresses.user_id = :user_id`
-            : ``
-        }
-        ${
-          has_groups
-            ? 'LEFT OUTER JOIN "Groups_CTE" ON "community_CTE"."id" = "Groups_CTE"."community_id"'
-            : ''
-        }
-        ${
-          include_node_info || eth_chain_id || cosmos_chain_id
-            ? `
-                LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"
-                ${eth_chain_id && !cosmos_chain_id ? `WHERE "ChainNode".eth_chain_id = :eth_chain_id` : ''}
-                ${cosmos_chain_id && !eth_chain_id ? `WHERE "ChainNode".cosmos_chain_id = :cosmos_chain_id` : ''}
-              `
-            : ''
-        }
-        ORDER BY 
-          ${
-            filtering_tags && relevance_by === 'tag_ids'
-              ? `CASE 
+        ${iQ(
+          relevance_by === 'membership' && replacements.user_id,
+          `LEFT OUTER JOIN 
+            (SELECT DISTINCT ON (community_id) * FROM "Addresses" WHERE user_id = :user_id) authUserAddresses 
+            ON "community_CTE"."id" = authUserAddresses.community_id 
+            AND authUserAddresses.user_id = :user_id`,
+        )}
+        ${iQ(has_groups, 'LEFT OUTER JOIN "Groups_CTE" ON "community_CTE"."id" = "Groups_CTE"."community_id"')}
+        ${iQ(
+          include_node_info || eth_chain_id || cosmos_chain_id,
+          `LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"
+            ${iQ(eth_chain_id && !cosmos_chain_id, `WHERE "ChainNode".eth_chain_id = :eth_chain_id`)}
+            ${iQ(cosmos_chain_id && !eth_chain_id, `WHERE "ChainNode".cosmos_chain_id = :cosmos_chain_id`)}`,
+        )}
+        ORDER BY
+          ${iQ(
+            filtering_tags && relevance_by === 'tag_ids',
+            `CASE 
               WHEN jsonb_array_length("CommunityTags_CTE"."CommunityTags"::jsonb) = 0 IS NULL THEN 2
 				      WHEN EXISTS (
                 SELECT 1
@@ -299,17 +273,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 			        ) THEN 0
               ELSE 1
             END,
-            "CommunityTags_CTE"."CommunityTags"::jsonb,`
-              : ''
-          }
-          ${
-            relevance_by === 'membership' && replacements.user_id
-              ? `CASE
+            "CommunityTags_CTE"."CommunityTags"::jsonb,`,
+          )}
+          ${iQ(
+            relevance_by === 'membership' && replacements.user_id,
+            `
+            CASE
                 WHEN authUserAddresses.user_id IS NOT NULL THEN 1
                 ELSE 0
-            END DESC,`
-              : ''
-          }
+            END DESC,
+          `,
+          )}
           "community_CTE"."${order_col}" ${direction}
           LIMIT ${limit} 
           OFFSET ${offset};

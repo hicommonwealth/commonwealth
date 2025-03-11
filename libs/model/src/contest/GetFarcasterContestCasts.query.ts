@@ -40,7 +40,7 @@ export function GetFarcasterContestCasts(): Query<
             ca1.actor_address,
             ca1.action AS added_action,
             ca1.content_url,
-            (FLOOR(SUM(ca2.voting_power / 10^cm.decimals))) AS voting_weights_sum
+            FLOOR(SUM(ca2.voting_power)) AS voting_weights_sum
         FROM
             "ContestActions" ca1
         LEFT JOIN

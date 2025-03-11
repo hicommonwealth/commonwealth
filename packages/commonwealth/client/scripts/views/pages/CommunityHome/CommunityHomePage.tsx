@@ -6,7 +6,6 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -20,7 +19,6 @@ import TokenPerformance from './TokenPerformance/TokenPerformance';
 
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const communityHomeEnabled = useFlag('communityHome');
   const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
@@ -37,19 +35,12 @@ const CommunityHome = () => {
 
   const [selectedCommunityId] = useState<string>();
 
-  if (!communityHomeEnabled) {
-    return <PageNotFound />;
-  }
-
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="CommunityHome">
         <div className="header-section">
           <div className="description">
-            <CWText
-              type="h1"
-              {...(communityHomeEnabled && { fontWeight: 'semiBold' })}
-            >
+            <CWText type="h1" fontWeight="semiBold">
               Community Home
             </CWText>
             <TokenDetails
