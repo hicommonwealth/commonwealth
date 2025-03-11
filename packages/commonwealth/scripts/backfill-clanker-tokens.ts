@@ -2,6 +2,7 @@ import { S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { ClankerToken, EventPairs } from '@hicommonwealth/schemas';
+import { delay } from '@hicommonwealth/shared';
 import csv from 'csv-parser';
 import fetch from 'node-fetch';
 import { exit } from 'process';
@@ -83,7 +84,7 @@ class BatchProcessor extends Transform {
     await emitEvent(models.Outbox, this.buffer);
     this.buffer = [];
     // delay to prevent clogging outbox
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await delay(5000);
   }
 }
 
