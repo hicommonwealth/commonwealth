@@ -4,8 +4,8 @@ import telegramImg from 'assets/img/share/telegram.png';
 import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 
-const inviteCommunityMessage = 'Hey, check out my community on Common!';
-const inviteCommonMessage = 'Hey, check out Common!';
+const inviteCommunityMessage = 'Join my Community on Common using my link!';
+const inviteCommonMessage = 'Join me on Common using my link!';
 
 const generatePermalink = (isInsideCommunity: boolean, inviteLink: string) => {
   const message = isInsideCommunity
