@@ -1,6 +1,6 @@
 import { command, EventHandler } from '@hicommonwealth/core';
 import { ZodUndefined } from 'zod';
-import { CreateNamespaceAdminGroup } from '../../community/CreateNamespaceAdminGroup.command';
+import { CreateNamespaceAdminGroup } from '../../commands-&-queries/community/CreateNamespaceAdminGroup.command';
 import { systemActor } from '../../middleware';
 
 export const handleNamespaceDeployed: EventHandler<

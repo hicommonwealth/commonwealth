@@ -4,7 +4,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { models, tester } from '../../src';
-import { CreateSnapshotProposal } from '../../src/snapshot';
+import { CreateSnapshotProposal } from '../../src/commands-&-queries/snapshot';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {

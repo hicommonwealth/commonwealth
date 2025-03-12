@@ -1,9 +1,12 @@
 import { Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
+import {
+  CreateToken,
+  ProjectLaunchpadTrade,
+} from '../commands-&-queries/token';
 import { models } from '../database';
 import { systemActor } from '../middleware';
-import { CreateToken, ProjectLaunchpadTrade } from '../token';
 
 const inputs = {
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,

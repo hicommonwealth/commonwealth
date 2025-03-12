@@ -38,11 +38,8 @@ import {
   DeleteComment,
   GetComments,
   UpdateComment,
-} from '../../src/comment';
-import { models } from '../../src/database';
-import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
-import { DeleteReaction } from '../../src/reaction';
-import { seed, seedRecord } from '../../src/tester';
+} from '../../src/commands-&-queries/comment';
+import { DeleteReaction } from '../../src/commands-&-queries/reaction';
 import {
   CreateThread,
   CreateThreadReaction,
@@ -51,7 +48,10 @@ import {
   GetThreads,
   UpdateThread,
   UpdateThreadErrors,
-} from '../../src/thread';
+} from '../../src/commands-&-queries/thread';
+import { models } from '../../src/database';
+import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
+import { seed, seedRecord } from '../../src/tester';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 import { getSignersInfo, signCreateThread } from '../utils/canvas-signers';
 

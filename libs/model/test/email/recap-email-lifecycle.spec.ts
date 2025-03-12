@@ -19,7 +19,7 @@ import {
   vi,
 } from 'vitest';
 import { z } from 'zod';
-import { GetRecapEmailDataQuery } from '../../src/emails';
+import { GetRecapEmailDataQuery } from '../../src/commands-&-queries/emails';
 import { seed } from '../../src/tester';
 import {
   ProviderError,

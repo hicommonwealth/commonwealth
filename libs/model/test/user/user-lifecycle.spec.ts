@@ -7,11 +7,19 @@ import Chance from 'chance';
 import { seed } from 'model/src/tester';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CreateComment, CreateCommentReaction } from '../../src/comment';
+import {
+  CreateComment,
+  CreateCommentReaction,
+} from '../../src/commands-&-queries/comment';
+import { CreateQuest, UpdateQuest } from '../../src/commands-&-queries/quest';
+import { CreateThread } from '../../src/commands-&-queries/thread';
+import {
+  GetUserProfile,
+  GetXps,
+  UpdateUser,
+  Xp,
+} from '../../src/commands-&-queries/user';
 import { models } from '../../src/database';
-import { CreateQuest, UpdateQuest } from '../../src/quest';
-import { CreateThread } from '../../src/thread';
-import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { signIn } from '../utils/sign-in';

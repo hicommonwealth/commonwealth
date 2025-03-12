@@ -12,10 +12,13 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
+import {
+  getPreviewImageUrl,
+  getRenderedTitle,
+} from '../../commands-&-queries/webhook/util';
 import { config } from '../../config';
 import { models } from '../../database';
 import { CommentInstance, WebhookInstance } from '../../models';
-import { getPreviewImageUrl, getRenderedTitle } from '../../webhook/util';
 import { getCommentUrl, getProfileUrl } from '../utils/utils';
 
 const log = logger(import.meta);

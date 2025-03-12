@@ -1,7 +1,7 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
-import { Contests } from 'model/src/contest';
+import { Contests } from 'model/src/commands-&-queries/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { seed } from '../../src/tester';

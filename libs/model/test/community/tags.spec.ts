@@ -1,5 +1,8 @@
 import { dispose, query } from '@hicommonwealth/core';
-import { GetCommunities, GetCommunity } from 'model/src/community';
+import {
+  GetCommunities,
+  GetCommunity,
+} from 'model/src/commands-&-queries/community';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { systemActor } from '../../src/middleware';
 import { seed } from '../../src/tester';

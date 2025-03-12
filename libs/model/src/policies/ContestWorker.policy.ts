@@ -9,9 +9,9 @@ import { events } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
-import { GetActiveContestManagers } from '../contest';
-import { SetContestEnded } from '../contest/SetContestEnded.command';
-import { SetContestEnding } from '../contest/SetContestEnding.command';
+import { GetActiveContestManagers } from '../commands-&-queries/contest';
+import { SetContestEnded } from '../commands-&-queries/contest/SetContestEnded.command';
+import { SetContestEnding } from '../commands-&-queries/contest/SetContestEnding.command';
 import { systemActor } from '../middleware';
 import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {

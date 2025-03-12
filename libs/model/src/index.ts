@@ -1,24 +1,24 @@
 // Core Domain
-export * as Bot from './bot';
-export * as ChainEvents from './chain-events';
-export * as Comment from './comment';
-export * as Community from './community';
-export * as Contest from './contest';
-export * as DiscordBot from './discordBot';
-export * as Email from './emails';
-export * as Feed from './feed';
-export * as LoadTest from './load-testing';
-export * as Poll from './poll';
-export * as Quest from './quest';
-export * as Reaction from './reaction';
-export * as Snapshot from './snapshot';
-export * as Subscription from './subscription';
-export * as SuperAdmin from './super-admin';
-export * as Thread from './thread';
-export * as Token from './token';
-export * as User from './user';
-export * as Wallet from './wallet';
-export * as Webhook from './webhook';
+export * as Bot from './commands-&-queries/bot';
+export * as ChainEvents from './commands-&-queries/chain-events';
+export * as Comment from './commands-&-queries/comment';
+export * as Community from './commands-&-queries/community';
+export * as Contest from './commands-&-queries/contest';
+export * as DiscordBot from './commands-&-queries/discordBot';
+export * as Email from './commands-&-queries/emails';
+export * as Feed from './commands-&-queries/feed';
+export * as LoadTest from './commands-&-queries/load-testing';
+export * as Poll from './commands-&-queries/poll';
+export * as Quest from './commands-&-queries/quest';
+export * as Reaction from './commands-&-queries/reaction';
+export * as Snapshot from './commands-&-queries/snapshot';
+export * as Subscription from './commands-&-queries/subscription';
+export * as SuperAdmin from './commands-&-queries/super-admin';
+export * as Thread from './commands-&-queries/thread';
+export * as Token from './commands-&-queries/token';
+export * as User from './commands-&-queries/user';
+export * as Wallet from './commands-&-queries/wallet';
+export * as Webhook from './commands-&-queries/webhook';
 
 // Core Services
 export * from './services';

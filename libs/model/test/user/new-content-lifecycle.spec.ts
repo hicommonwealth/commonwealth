@@ -1,7 +1,7 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { GetNewContent } from 'model/src/user';
+import { GetNewContent } from 'model/src/commands-&-queries/user';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { seed } from '../../src/tester';

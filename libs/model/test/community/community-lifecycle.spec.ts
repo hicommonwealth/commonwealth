@@ -10,8 +10,6 @@ import {
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { CreateTopic } from 'model/src/community/CreateTopic.command';
-import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   BanAddress,
@@ -30,7 +28,9 @@ import {
   ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
-} from '../../src/community';
+} from '../../src/commands-&-queries/community';
+import { CreateTopic } from '../../src/commands-&-queries/community/CreateTopic.command';
+import { UpdateTopic } from '../../src/commands-&-queries/community/UpdateTopic.command';
 import { models } from '../../src/database';
 import { systemActor } from '../../src/middleware';
 import type {
