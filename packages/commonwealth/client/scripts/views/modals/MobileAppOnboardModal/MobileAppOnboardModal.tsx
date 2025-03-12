@@ -4,7 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { NotificationModal } from 'views/modals/MobileAppOnboard/NotificationModal';
+import { NotificationModal } from 'views/modals/MobileAppOnboardModal/NotificationModal';
 import './MobileAppOnboardModal.scss';
 
 type Props = {
