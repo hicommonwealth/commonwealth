@@ -171,6 +171,11 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             last_active: new Date(),
             ghost_address: false,
             is_banned: false,
+            oauth_provider: admin_address.oauth_provider,
+            oauth_username: admin_address.oauth_username,
+            oauth_email: admin_address.oauth_email,
+            oauth_email_verified: admin_address.oauth_email_verified,
+            oauth_phone_number: admin_address.oauth_phone_number,
           },
           { transaction },
         );
