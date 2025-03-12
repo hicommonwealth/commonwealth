@@ -17,7 +17,7 @@ import {
   getBaseUrl,
 } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import { z, ZodUndefined } from 'zod';
+import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { buildThreadContentUrl } from '../utils';
@@ -153,7 +153,7 @@ const getFeed = async (): Promise<FeedItem<keyof typeof FeedSchemas>[]> => {
   }
 };
 
-const setFeed = async (feed: FeedItem[]) => {
+const setFeed = async (feed: FeedItem<keyof typeof FeedSchemas>[]) => {
   try {
     await cache().setKey(
       CacheNamespaces.Function_Response,
@@ -167,7 +167,9 @@ const setFeed = async (feed: FeedItem[]) => {
 
 const feedMutex = new Mutex();
 
-const addToHomeFeed = async (eventToAdd: FeedItem) => {
+const addToHomeFeed = async (
+  eventToAdd: FeedItem<keyof typeof FeedSchemas>,
+) => {
   await feedMutex.runExclusive(async () => {
     const oldFeed = await getFeed();
     const newFeed = [...oldFeed, eventToAdd];
@@ -179,10 +181,9 @@ const addToHomeFeed = async (eventToAdd: FeedItem) => {
   });
 };
 
-export function HomeFeedPolicy(): Policy<
-  { [K in keyof typeof FeedSchemas]: (typeof FeedSchemas)[K]['input'] },
-  ZodUndefined
-> {
+export function HomeFeedPolicy(): Policy<{
+  [K in keyof typeof FeedSchemas]: (typeof FeedSchemas)[K]['input'];
+}> {
   return {
     inputs: {
       ContestStarted: FeedSchemas.ContestStarted.input,
