@@ -11,7 +11,7 @@ import { CWTooltip } from 'client/scripts/views/components/component_kit/new_des
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import React from 'react';
-import { formatAddressShort } from 'shared/utils';
+import { formatAddressShort, smartTrim } from 'shared/utils';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { formatTokenSupply } from '../utils';
 import './GovernanceHeader.scss';
@@ -46,7 +46,7 @@ const GovernanceHeader = () => {
     <div className="GovernanceHeader">
       <div className="header">
         <CWText type="h3" fontWeight="semiBold">
-          {community?.name} Governance
+          {smartTrim(community?.name, 17)}
         </CWText>
         {snapShotAvailable && <CWTag label="Snapshot" type="proposal" />}
         {address && (
@@ -76,11 +76,20 @@ const GovernanceHeader = () => {
             />
           </div>
         )}
-        {communityToken && tokenSupply && (
-          <CWText fontWeight="semiBold">
-            {formatTokenSupply(tokenSupply, communityToken.symbol)}
+        {communityToken ? (
+          tokenSupply && (
+            <CWText fontWeight="semiBold">
+              {formatTokenSupply(tokenSupply, communityToken.symbol)}
+            </CWText>
+          )
+        ) : (
+          <CWText fontStyle="italic" fontWeight="medium">
+            No treassury supply found
           </CWText>
         )}
+        <CWText fontStyle="italic" fontWeight="medium">
+          No quorum requirment linked
+        </CWText>
       </div>
     </div>
   );

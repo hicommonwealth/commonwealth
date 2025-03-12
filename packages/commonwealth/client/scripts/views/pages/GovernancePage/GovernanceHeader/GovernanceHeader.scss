@@ -1,9 +1,12 @@
 @import '../../../../styles/shared.scss';
 
 .GovernanceHeader {
+  width: 100%;
   .header {
+    width: 100%;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 20px;
 
     .address-details {
