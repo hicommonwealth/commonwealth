@@ -4,9 +4,9 @@ import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import React, { Fragment, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Virtuoso } from 'react-virtuoso';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
@@ -15,16 +15,18 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
-import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
+import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import { XPEarningsTable } from '../../pages/RewardsPage/tables/XPEarningsTable/XPEarningsTable';
+import AllTabContent from './AllTabContent';
 import './Communities.scss';
+import CommunitiesTabContent from './CommunitiesTabContent';
 import ExploreContestList from './ExploreContestList';
 import {
   CommunityFilters,
@@ -46,9 +48,26 @@ type ExtendedCommunitySliceType = [
   ExtendedCommunityType,
 ];
 
+// Define available tab views
+const TAB_VIEWS = [
+  { value: 'all', label: 'All' },
+  { value: 'communities', label: 'Communities' },
+  // { value: 'threads', label: 'Threads' },
+  { value: 'users', label: 'Users' },
+  { value: 'quests', label: 'Quests' },
+  { value: 'contests', label: 'Contests' },
+  // { value: 'transactions', label: 'Transactions' },
+  { value: 'tokens', label: 'Tokens' },
+];
+
 const CommunitiesPage = () => {
   const containerRef = useRef();
   const launchpadEnabled = useFlag('launchpad');
+  const navigate = useCommonNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Add state for tracking active tab
+  const activeTab = searchParams.get('tab') || 'all';
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -219,6 +238,13 @@ const CommunitiesPage = () => {
     </CWText>
   );
 
+  // Function to handle tab switching
+  const handleTabClick = (tabValue: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tabValue);
+    navigate(`/explore?${params.toString()}`);
+  };
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
@@ -231,6 +257,7 @@ const CommunitiesPage = () => {
             >
               Explore {launchpadEnabled ? '' : 'Communities'}
             </CWText>
+
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
               {!isWindowSmallInclusive ? communitiesCount : <></>}
@@ -243,6 +270,9 @@ const CommunitiesPage = () => {
               <CreateCommunityButton buttonHeight="med" withIcon />
             </div>
           </div>
+
+          <IdeaLaunchpad />
+
           <div
             className={clsx('filters', {
               hasAppliedFilter:
@@ -321,97 +351,125 @@ const CommunitiesPage = () => {
             />
           </div>
 
-          <IdeaLaunchpad />
+          {/* Tab Navigation */}
+          <CWTabsRow className="explore-tabs-row">
+            {TAB_VIEWS.map((tab) => (
+              <CWTab
+                key={tab.value}
+                label={tab.label}
+                isSelected={activeTab === tab.value}
+                onClick={() => handleTabClick(tab.value)}
+              />
+            ))}
+          </CWTabsRow>
         </div>
-        <TokensList filters={filters} />
-        <QuestList />
-        <ExploreContestList />
-        {launchpadEnabled && <CWText type="h2">Communities</CWText>}
-        {isLoading && communitiesList.length === 0 ? (
-          <CWCircleMultiplySpinner />
-        ) : (
-          <Virtuoso
-            key={Object.values(filters)
-              .map((v) => `${v}`)
-              .join('-')}
-            className="communities-list"
-            style={{ height: '100%', width: '100%' }}
-            data={isInitialCommunitiesLoading ? [] : communitiesList}
-            customScrollParent={containerRef.current}
-            itemContent={(listIndex, slicedCommunities) => {
-              return slicedCommunities.map((community, sliceIndex) => {
-                const canBuyStake = !!user.addresses.find?.(
-                  (address) => address?.community?.base === community?.base,
-                );
 
-                const historicalPriceMap: Map<string, string> = new Map(
-                  Object.entries(
-                    (historicalPrices || [])?.reduce(
-                      (acc, { community_id, old_price }) => {
-                        acc[community_id] = old_price;
-                        return acc;
-                      },
-                      {},
-                    ),
-                  ),
-                );
+        {/* Conditionally render content based on active tab */}
+        {activeTab === 'tokens' && <TokensList filters={filters} />}
+        {activeTab === 'quests' && <QuestList />}
+        {activeTab === 'contests' && <ExploreContestList />}
+        {activeTab === 'users' && (
+          <div className="users-tab">
+            <div className="tab-header">
+              <CWText type="h2">Users</CWText>
+            </div>
+            <div className="users-xp-table">
+              <XPEarningsTable />
+            </div>
+          </div>
+        )}
 
-                return (
-                  <Fragment key={community.id}>
-                    <CWRelatedCommunityCard
-                      community={community}
-                      memberCount={community.profile_count || 0}
-                      threadCount={community.lifetime_thread_count || 0}
-                      canBuyStake={canBuyStake}
-                      onStakeBtnClick={() =>
-                        setSelectedCommunityId(community?.id || '')
-                      }
-                      ethUsdRate={ethUsdRate}
-                      {...(historicalPriceMap &&
-                        community.id && {
-                          historicalPrice: historicalPriceMap?.get(
-                            community.id,
-                          ),
-                        })}
-                      onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
-                    />
-                    {listIndex === communitiesList.length - 1 &&
-                      sliceIndex === slicedCommunities.length - 1 && (
-                        <NewCommunityCard />
-                      )}
-                  </Fragment>
-                );
-              });
-            }}
-            endReached={() => {
-              hasNextPage && fetchMoreCommunities().catch(console.error);
-            }}
-            overscan={50}
-            components={{
-              // eslint-disable-next-line react/no-multi-comp
-              EmptyPlaceholder: () => (
-                <section
-                  className={clsx('empty-placeholder', {
-                    'my-16': launchpadEnabled,
-                  })}
-                >
-                  <CWText type="h2">
-                    No communities found
-                    {filters.withCommunityEcosystem ||
-                    filters.withNetwork ||
-                    filters.withStakeEnabled ||
-                    filters.withTagsIds
-                      ? ` for the applied filters.`
-                      : '.'}
-                    <br />
-                    Create a new community{' '}
-                    <Link to="/createCommunity">here</Link>.
-                  </CWText>
-                </section>
-              ),
-            }}
+        {/* All tab - show all content types */}
+        {activeTab === 'all' && (
+          <>
+            {/* Tokens section */}
+            <div className="section-container">
+              <CWText type="h2" className="section-header">
+                Tokens
+              </CWText>
+              <TokensList filters={filters} />
+            </div>
+
+            {/* Quests section */}
+            <div className="section-container">
+              <CWText type="h2" className="section-header">
+                Quests
+              </CWText>
+              <QuestList />
+            </div>
+
+            {/* Contests section */}
+            <div className="section-container">
+              <CWText type="h2" className="section-header">
+                Contests
+              </CWText>
+              <ExploreContestList />
+            </div>
+
+            {/* Users section */}
+            <div className="section-container">
+              <CWText type="h2" className="section-header">
+                Users
+              </CWText>
+              <div className="users-xp-table">
+                <XPEarningsTable />
+              </div>
+            </div>
+
+            {/* Communities section */}
+            <div className="section-container">
+              <CWText type="h2" className="section-header">
+                Communities
+              </CWText>
+              <AllTabContent
+                isLoading={isLoading}
+                isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+                communitiesList={communitiesList}
+                containerRef={containerRef}
+                filters={filters}
+                historicalPrices={historicalPrices}
+                ethUsdRate={Number(ethUsdRate)}
+                setSelectedCommunityId={setSelectedCommunityId}
+                hasNextPage={hasNextPage}
+                fetchMoreCommunities={fetchMoreCommunities}
+                hideHeader={true}
+              />
+            </div>
+          </>
+        )}
+
+        {/* Communities Tab Content */}
+        {activeTab === 'communities' && (
+          <CommunitiesTabContent
+            isLoading={isLoading}
+            isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+            communitiesList={communitiesList}
+            containerRef={containerRef}
+            filters={filters}
+            historicalPrices={historicalPrices}
+            ethUsdRate={Number(ethUsdRate)}
+            setSelectedCommunityId={setSelectedCommunityId}
+            hasNextPage={hasNextPage}
+            fetchMoreCommunities={fetchMoreCommunities}
           />
         )}
+
+        {/* Default fallback if tab is not recognized */}
+        {!TAB_VIEWS.find((tab) => tab.value === activeTab) && (
+          <CommunitiesTabContent
+            isLoading={isLoading}
+            isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+            communitiesList={communitiesList}
+            containerRef={containerRef}
+            filters={filters}
+            historicalPrices={historicalPrices}
+            ethUsdRate={Number(ethUsdRate)}
+            setSelectedCommunityId={setSelectedCommunityId}
+            hasNextPage={hasNextPage}
+            fetchMoreCommunities={fetchMoreCommunities}
+          />
+        )}
+
         <CWModal
           size="small"
           content={
