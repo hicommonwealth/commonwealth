@@ -21,7 +21,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const referralsEnabled = useFlag('referrals');
 
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
-    WelcomeOnboardModalSteps.OptionalWalletModal,
+    WelcomeOnboardModalSteps.TermsOfServices,
   );
   const user = useUserStore();
 
