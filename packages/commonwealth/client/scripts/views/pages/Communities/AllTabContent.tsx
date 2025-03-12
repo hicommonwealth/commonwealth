@@ -72,9 +72,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
 
       {/* Users section */}
       <div className="section-container">
-        <CWText type="h2" className="section-header">
-          Users
-        </CWText>
+        <CWText type="h2">Users</CWText>
         <div className="users-xp-table">
           <XPEarningsTable />
         </div>
