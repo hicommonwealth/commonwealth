@@ -200,12 +200,12 @@ const PersonalInformationStep = ({
               disabled={isUserNameChangeDisabled}
             />
             <CWButton
-              label="Make a custom username"
+              label="Generate new username"
               buttonType="tertiary"
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
-              onClick={() => setIsUserNameChangeDisabled(false)}
+              onClick={handleGenerateUsername}
             />
           </div>
 
