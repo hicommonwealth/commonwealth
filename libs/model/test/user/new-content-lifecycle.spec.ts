@@ -1,9 +1,9 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { GetNewContent } from 'model/src/user';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
+import { GetNewContent } from '../../src/aggregates/user';
 import { seed } from '../../src/tester';
 
 describe('New Content lifecycle', () => {
