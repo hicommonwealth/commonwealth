@@ -261,95 +261,11 @@ const CommunitiesPage = () => {
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
               {!isWindowSmallInclusive ? communitiesCount : <></>}
-              <CWButton
-                label="Filters"
-                iconRight="funnelSimple"
-                buttonType="secondary"
-                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-              />
               <CreateCommunityButton buttonHeight="med" withIcon />
             </div>
           </div>
 
           <IdeaLaunchpad />
-
-          <div
-            className={clsx('filters', {
-              hasAppliedFilter:
-                Object.values(filters).filter(Boolean).length === 1
-                  ? !filters.withCommunitySortOrder
-                  : Object.values(filters).filter(Boolean).length > 0,
-            })}
-          >
-            {filters.withCommunitySortBy && (
-              <CWTag
-                label={`${filters.withCommunitySortBy}${
-                  filters.withCommunitySortOrder &&
-                  filters.withCommunitySortBy !==
-                    CommunitySortOptions.MostRecent
-                    ? ` : ${filters.withCommunitySortOrder}`
-                    : ''
-                }
-                `}
-                type="filter"
-                onCloseClick={removeCommunitySortByFilter}
-              />
-            )}
-            {filters.withCommunityType && (
-              <CWTag
-                label={filters.withCommunityType}
-                type="filter"
-                onCloseClick={removeCommunityTypeFilter}
-              />
-            )}
-            {filters.withNetwork && (
-              <CWTag
-                label={filters.withNetwork}
-                type="filter"
-                onCloseClick={removeChainNetworkFilter}
-              />
-            )}
-            {filters.withCommunityEcosystem && (
-              <CWTag
-                label={filters.withCommunityEcosystem}
-                type="filter"
-                onCloseClick={removeCommunityEcosystemFilter}
-              />
-            )}
-            {filters.withEcosystemChainId && (
-              <CWTag
-                label={
-                  Object.entries(communityChains).find(
-                    ([_, v]) => filters.withEcosystemChainId === v,
-                  )?.[0] as string
-                }
-                type="filter"
-                onCloseClick={removeEcosystemChainIdFilter}
-              />
-            )}
-            {filters.withStakeEnabled && (
-              <CWTag
-                label="Stake"
-                type="filter"
-                onCloseClick={removeStakeFilter}
-              />
-            )}
-            {filters.withTagsIds &&
-              filters.withTagsIds.map((id) => (
-                <CWTag
-                  key={id}
-                  type="filter"
-                  label={(tags || []).find((t) => t.id === id)?.name || ''}
-                  onCloseClick={() => removeTagFilter(id)}
-                />
-              ))}
-            <FiltersDrawer
-              isOpen={isFilterDrawerOpen}
-              onClose={() => setIsFilterDrawerOpen(false)}
-              filters={filters}
-              onFiltersChange={(newFilters) => setFilters(newFilters)}
-            />
-          </div>
 
           {/* Tab Navigation */}
           <CWTabsRow className="explore-tabs-row">
@@ -382,45 +298,8 @@ const CommunitiesPage = () => {
         {/* All tab - show all content types */}
         {activeTab === 'all' && (
           <>
-            {/* Tokens section */}
-            <div className="section-container">
-              <CWText type="h2" className="section-header">
-                Tokens
-              </CWText>
-              <TokensList filters={filters} />
-            </div>
-
-            {/* Quests section */}
-            <div className="section-container">
-              <CWText type="h2" className="section-header">
-                Quests
-              </CWText>
-              <QuestList />
-            </div>
-
-            {/* Contests section */}
-            <div className="section-container">
-              <CWText type="h2" className="section-header">
-                Contests
-              </CWText>
-              <ExploreContestList />
-            </div>
-
-            {/* Users section */}
-            <div className="section-container">
-              <CWText type="h2" className="section-header">
-                Users
-              </CWText>
-              <div className="users-xp-table">
-                <XPEarningsTable />
-              </div>
-            </div>
-
             {/* Communities section */}
             <div className="section-container">
-              <CWText type="h2" className="section-header">
-                Communities
-              </CWText>
               <AllTabContent
                 isLoading={isLoading}
                 isInitialCommunitiesLoading={isInitialCommunitiesLoading}
@@ -432,7 +311,7 @@ const CommunitiesPage = () => {
                 setSelectedCommunityId={setSelectedCommunityId}
                 hasNextPage={hasNextPage}
                 fetchMoreCommunities={fetchMoreCommunities}
-                hideHeader={true}
+                hideHeader={false}
               />
             </div>
           </>
@@ -440,34 +319,204 @@ const CommunitiesPage = () => {
 
         {/* Communities Tab Content */}
         {activeTab === 'communities' && (
-          <CommunitiesTabContent
-            isLoading={isLoading}
-            isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-            communitiesList={communitiesList}
-            containerRef={containerRef}
-            filters={filters}
-            historicalPrices={historicalPrices}
-            ethUsdRate={Number(ethUsdRate)}
-            setSelectedCommunityId={setSelectedCommunityId}
-            hasNextPage={hasNextPage}
-            fetchMoreCommunities={fetchMoreCommunities}
-          />
+          <>
+            <div
+              className={clsx('filters', {
+                hasAppliedFilter:
+                  Object.values(filters).filter(Boolean).length === 1
+                    ? !filters.withCommunitySortOrder
+                    : Object.values(filters).filter(Boolean).length > 0,
+              })}
+            >
+              <CWButton
+                label="Filters"
+                iconRight="funnelSimple"
+                buttonType="secondary"
+                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+              />
+              {filters.withCommunitySortBy && (
+                <CWTag
+                  label={`${filters.withCommunitySortBy}${
+                    filters.withCommunitySortOrder &&
+                    filters.withCommunitySortBy !==
+                      CommunitySortOptions.MostRecent
+                      ? ` : ${filters.withCommunitySortOrder}`
+                      : ''
+                  }
+                  `}
+                  type="filter"
+                  onCloseClick={removeCommunitySortByFilter}
+                />
+              )}
+              {filters.withCommunityType && (
+                <CWTag
+                  label={filters.withCommunityType}
+                  type="filter"
+                  onCloseClick={removeCommunityTypeFilter}
+                />
+              )}
+              {filters.withNetwork && (
+                <CWTag
+                  label={filters.withNetwork}
+                  type="filter"
+                  onCloseClick={removeChainNetworkFilter}
+                />
+              )}
+              {filters.withCommunityEcosystem && (
+                <CWTag
+                  label={filters.withCommunityEcosystem}
+                  type="filter"
+                  onCloseClick={removeCommunityEcosystemFilter}
+                />
+              )}
+              {filters.withEcosystemChainId && (
+                <CWTag
+                  label={
+                    Object.entries(communityChains).find(
+                      ([_, v]) => filters.withEcosystemChainId === v,
+                    )?.[0] as string
+                  }
+                  type="filter"
+                  onCloseClick={removeEcosystemChainIdFilter}
+                />
+              )}
+              {filters.withStakeEnabled && (
+                <CWTag
+                  label="Stake"
+                  type="filter"
+                  onCloseClick={removeStakeFilter}
+                />
+              )}
+              {filters.withTagsIds &&
+                filters.withTagsIds.map((id) => (
+                  <CWTag
+                    key={id}
+                    type="filter"
+                    label={(tags || []).find((t) => t.id === id)?.name || ''}
+                    onCloseClick={() => removeTagFilter(id)}
+                  />
+                ))}
+              <FiltersDrawer
+                isOpen={isFilterDrawerOpen}
+                onClose={() => setIsFilterDrawerOpen(false)}
+                filters={filters}
+                onFiltersChange={(newFilters) => setFilters(newFilters)}
+              />
+            </div>
+            <CommunitiesTabContent
+              isLoading={isLoading}
+              isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+              communitiesList={communitiesList}
+              containerRef={containerRef}
+              filters={filters}
+              historicalPrices={historicalPrices}
+              ethUsdRate={Number(ethUsdRate)}
+              setSelectedCommunityId={setSelectedCommunityId}
+              hasNextPage={hasNextPage}
+              fetchMoreCommunities={fetchMoreCommunities}
+            />
+          </>
         )}
 
         {/* Default fallback if tab is not recognized */}
         {!TAB_VIEWS.find((tab) => tab.value === activeTab) && (
-          <CommunitiesTabContent
-            isLoading={isLoading}
-            isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-            communitiesList={communitiesList}
-            containerRef={containerRef}
-            filters={filters}
-            historicalPrices={historicalPrices}
-            ethUsdRate={Number(ethUsdRate)}
-            setSelectedCommunityId={setSelectedCommunityId}
-            hasNextPage={hasNextPage}
-            fetchMoreCommunities={fetchMoreCommunities}
-          />
+          <>
+            <div
+              className={clsx('filters', {
+                hasAppliedFilter:
+                  Object.values(filters).filter(Boolean).length === 1
+                    ? !filters.withCommunitySortOrder
+                    : Object.values(filters).filter(Boolean).length > 0,
+              })}
+            >
+              <CWButton
+                label="Filters"
+                iconRight="funnelSimple"
+                buttonType="secondary"
+                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+              />
+              {filters.withCommunitySortBy && (
+                <CWTag
+                  label={`${filters.withCommunitySortBy}${
+                    filters.withCommunitySortOrder &&
+                    filters.withCommunitySortBy !==
+                      CommunitySortOptions.MostRecent
+                      ? ` : ${filters.withCommunitySortOrder}`
+                      : ''
+                  }
+                  `}
+                  type="filter"
+                  onCloseClick={removeCommunitySortByFilter}
+                />
+              )}
+              {filters.withCommunityType && (
+                <CWTag
+                  label={filters.withCommunityType}
+                  type="filter"
+                  onCloseClick={removeCommunityTypeFilter}
+                />
+              )}
+              {filters.withNetwork && (
+                <CWTag
+                  label={filters.withNetwork}
+                  type="filter"
+                  onCloseClick={removeChainNetworkFilter}
+                />
+              )}
+              {filters.withCommunityEcosystem && (
+                <CWTag
+                  label={filters.withCommunityEcosystem}
+                  type="filter"
+                  onCloseClick={removeCommunityEcosystemFilter}
+                />
+              )}
+              {filters.withEcosystemChainId && (
+                <CWTag
+                  label={
+                    Object.entries(communityChains).find(
+                      ([_, v]) => filters.withEcosystemChainId === v,
+                    )?.[0] as string
+                  }
+                  type="filter"
+                  onCloseClick={removeEcosystemChainIdFilter}
+                />
+              )}
+              {filters.withStakeEnabled && (
+                <CWTag
+                  label="Stake"
+                  type="filter"
+                  onCloseClick={removeStakeFilter}
+                />
+              )}
+              {filters.withTagsIds &&
+                filters.withTagsIds.map((id) => (
+                  <CWTag
+                    key={id}
+                    type="filter"
+                    label={(tags || []).find((t) => t.id === id)?.name || ''}
+                    onCloseClick={() => removeTagFilter(id)}
+                  />
+                ))}
+              <FiltersDrawer
+                isOpen={isFilterDrawerOpen}
+                onClose={() => setIsFilterDrawerOpen(false)}
+                filters={filters}
+                onFiltersChange={(newFilters) => setFilters(newFilters)}
+              />
+            </div>
+            <CommunitiesTabContent
+              isLoading={isLoading}
+              isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+              communitiesList={communitiesList}
+              containerRef={containerRef}
+              filters={filters}
+              historicalPrices={historicalPrices}
+              ethUsdRate={Number(ethUsdRate)}
+              setSelectedCommunityId={setSelectedCommunityId}
+              hasNextPage={hasNextPage}
+              fetchMoreCommunities={fetchMoreCommunities}
+            />
+          </>
         )}
 
         <CWModal

@@ -10,7 +10,11 @@ import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import { XPEarningsTable } from '../RewardsPage/tables/XPEarningsTable';
+import ExploreContestList from './ExploreContestList';
 import { CommunityFilters } from './FiltersDrawer';
+import QuestList from './QuestList';
+import TokensList from './TokensList';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
@@ -50,6 +54,39 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
 
   return (
     <>
+      {/* Tokens section */}
+      <div className="section-container">
+        <CWText type="h2" className="section-header">
+          Tokens
+        </CWText>
+        <TokensList filters={filters} />
+      </div>
+
+      {/* Quests section */}
+      <div className="section-container">
+        <CWText type="h2" className="section-header">
+          Quests
+        </CWText>
+        <QuestList />
+      </div>
+
+      {/* Contests section */}
+      <div className="section-container">
+        <CWText type="h2" className="section-header">
+          Contests
+        </CWText>
+        <ExploreContestList />
+      </div>
+
+      {/* Users section */}
+      <div className="section-container">
+        <CWText type="h2" className="section-header">
+          Users
+        </CWText>
+        <div className="users-xp-table">
+          <XPEarningsTable />
+        </div>
+      </div>
       {launchpadEnabled && !hideHeader && (
         <CWText type="h2">Communities</CWText>
       )}
