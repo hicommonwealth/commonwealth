@@ -286,9 +286,6 @@ const CommunitiesPage = () => {
         {activeTab === 'contests' && <ExploreContestList />}
         {activeTab === 'users' && (
           <div className="users-tab">
-            <div className="tab-header">
-              <CWText type="h2">Users</CWText>
-            </div>
             <div className="users-xp-table">
               <XPEarningsTable />
             </div>
