@@ -26,13 +26,13 @@ interface AllTabContentProps {
   isLoading: boolean;
   isInitialCommunitiesLoading: boolean;
   communitiesList: ExtendedCommunitySliceType[];
-  containerRef: MutableRefObject<any>;
+  containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices: any;
+  historicalPrices: Record<string, number>;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: () => Promise<any>;
+  fetchMoreCommunities?: () => Promise<void>;
   hideHeader?: boolean;
 }
 

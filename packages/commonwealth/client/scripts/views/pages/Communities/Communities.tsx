@@ -10,7 +10,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
@@ -87,7 +86,6 @@ const CommunitiesPage = () => {
 
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
 
-  const user = useUserStore();
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
