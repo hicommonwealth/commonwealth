@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CommentFilters } from './CommentFilters';
 import './CommentTree.scss';
@@ -16,8 +16,13 @@ export const CommentTree = ({
   canReply = true,
   canComment,
   disabledActionsTooltipText,
+  onThreadCreated,
+  aiCommentsToggleEnabled,
+  streamingReplyIds,
+  setStreamingReplyIds,
 }: CommentsTreeProps) => {
   const user = useUserStore();
+  const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
 
   const {
     commentFilters,
@@ -38,6 +43,39 @@ export const CommentTree = ({
     setIsGloballyEditing,
   });
 
+  useEffect(() => {
+    const shouldGenerateAIComment =
+      thread &&
+      aiCommentsToggleEnabled &&
+      onThreadCreated &&
+      (!thread.numberOfComments || thread.numberOfComments === 0) &&
+      !hasTriggeredAIComment &&
+      streamingReplyIds.length === 0;
+
+    if (shouldGenerateAIComment) {
+      setHasTriggeredAIComment(true);
+      onThreadCreated(thread.id).catch(() => {
+        setHasTriggeredAIComment(false); // Reset if there was an error
+      });
+    }
+  }, [
+    thread?.id,
+    thread?.numberOfComments,
+    aiCommentsToggleEnabled,
+    onThreadCreated,
+    user.activeAccount,
+    hasTriggeredAIComment,
+    streamingReplyIds,
+    thread,
+  ]);
+
+  // Reset trigger state if thread changes or comments are added
+  useEffect(() => {
+    if (thread?.numberOfComments > 0) {
+      setHasTriggeredAIComment(false);
+    }
+  }, [thread?.id, thread?.numberOfComments]);
+
   return (
     <>
       {thread?.numberOfComments > 0 && (
@@ -48,9 +86,11 @@ export const CommentTree = ({
         />
       )}
       <TreeHierarchy
-        commentFilters={commentFilters}
+        pageRef={pageRef}
+        thread={thread}
+        isThreadLocked={!!thread.lockedAt}
         isThreadArchived={!!thread.archivedAt}
-        isThreadLocked={isLocked}
+        isReplyingToCommentId={parentCommentId}
         isReplyButtonVisible={
           !!(!isLocked && !fromDiscordBot && user.isLoggedIn)
         }
@@ -59,13 +99,10 @@ export const CommentTree = ({
         onEditConfirm={handleEditConfirm}
         onEditCancel={handleEditCancel}
         onSpamToggle={handleFlagMarkAsSpam}
-        pageRef={pageRef}
-        isReplyingToCommentId={parentCommentId}
         onCommentReplyStart={handleCommentReplyStart}
         onCommentReplyEnd={handleIsReplying}
         commentEdits={edits}
         canComment={canComment}
-        thread={thread}
         disabledActionsTooltipText={disabledActionsTooltipText}
         canReact={
           !thread.archivedAt && (!!user.activeAccount || isAdmin) && canReact
@@ -76,6 +113,9 @@ export const CommentTree = ({
           !thread.lockedAt &&
           canReply
         }
+        commentFilters={commentFilters}
+        streamingReplyIds={streamingReplyIds}
+        setStreamingReplyIds={setStreamingReplyIds}
       />
     </>
   );
