@@ -10,6 +10,7 @@ import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import useDeleteContestMutation from 'state/api/contests/deleteContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
@@ -103,6 +104,7 @@ const ContestCard = ({
   const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+  const { mutateAsync: deleteContest } = useDeleteContestMutation();
 
   const newContestPage = useFlag('newContestPage');
 
@@ -140,6 +142,15 @@ const ContestCard = ({
     });
   };
 
+  const handleDelete = () => {
+    deleteContest({
+      contest_address: address,
+      community_id: app.activeChainId() || '',
+    }).catch((error) => {
+      console.error('Failed to delete contest: ', error);
+    });
+  };
+
   const handleCancelContest = () => {
     openConfirmation({
       title: 'You are about to end your contest',
@@ -156,6 +167,27 @@ const ContestCard = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: handleCancel,
+        },
+      ],
+    });
+  };
+
+  const handleDeleteContest = () => {
+    openConfirmation({
+      title: 'You are about to delete your contest',
+      description:
+        'Are you sure you want to delete your contest? This action cannot be undone.',
+      buttons: [
+        {
+          label: 'Keep contest',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Delete contest',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: handleDelete,
         },
       ],
     });
@@ -365,6 +397,14 @@ const ContestCard = ({
         <div className="contest-footer">
           <CWDivider />
           <div className="buttons">
+            {!isActive && (
+              <CWButton
+                containerClassName="cta-btn"
+                label="Delete contest"
+                buttonType="destructive"
+                onClick={handleDeleteContest}
+              />
+            )}
             <CWButton
               containerClassName="cta-btn"
               label="Cancel contest"
