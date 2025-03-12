@@ -94,7 +94,6 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         type: QueryTypes.SELECT,
         nest: true,
       });
-      console.log('quests => ', quests);
 
       return schemas.buildPaginatedResponse(
         quests,
