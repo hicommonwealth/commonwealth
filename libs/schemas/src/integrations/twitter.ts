@@ -23,7 +23,24 @@ export const Tweet = z.object({
     .optional(),
 });
 
-export const TwitterMentionsTimelineResponse = z.object({
+const GetResponseBase = z.object({
+  data: z.any(),
+  errors: z
+    .array(
+      z.object({
+        detail: z.string(),
+        title: z.string(),
+        type: z.string(),
+      }),
+    )
+    .optional(),
+  meta: z.object({
+    result_count: z.number(),
+    next_token: z.string().optional(),
+  }),
+});
+
+export const GetTwitterMentionsTimelineResponse = GetResponseBase.extend({
   data: z
     .array(
       z.object({
@@ -45,24 +62,9 @@ export const TwitterMentionsTimelineResponse = z.object({
       ),
     })
     .optional(),
-  errors: z
-    .array(
-      z.object({
-        title: z.string(),
-        type: z.string(),
-        detail: z.string().optional(),
-        status: z.number().optional(),
-      }),
-    )
-    .optional(),
-  meta: z
-    .object({
-      next_token: z.string().optional(),
-    })
-    .optional(),
 });
 
-export const TwitterUserResponse = z.object({
+export const GetTwitterUserResponse = GetResponseBase.extend({
   data: z.object({
     id: z.string(),
     name: z.string(),
@@ -70,7 +72,7 @@ export const TwitterUserResponse = z.object({
   }),
 });
 
-export const TweetsWithMetricsResponse = z.object({
+export const GetTweetsWithMetricsResponse = GetResponseBase.extend({
   data: z.array(
     z.object({
       id: z.string(),
@@ -84,21 +86,9 @@ export const TweetsWithMetricsResponse = z.object({
       }),
     }),
   ),
-  errors: z
-    .array(
-      z.object({
-        title: z.string(),
-        type: z.string(),
-        detail: z.string().optional(),
-        status: z.number().optional(),
-      }),
-    )
-    .optional(),
 });
 
-// TODO: simplify
-
-export const LikingUsersResponse = z.object({
+const GenericUsersResponse = GetResponseBase.extend({
   data: z
     .array(
       z.object({
@@ -107,50 +97,13 @@ export const LikingUsersResponse = z.object({
       }),
     )
     .optional(),
-  meta: z
-    .object({
-      result_count: z.number(),
-      next_token: z.string().optional(),
-    })
-    .optional(),
-  errors: z
-    .array(
-      z.object({
-        detail: z.string(),
-        title: z.string(),
-        type: z.string(),
-      }),
-    )
-    .optional(),
 });
 
-export const RetweetsResponse = z.object({
-  data: z
-    .array(
-      z.object({
-        id: z.string(),
-        username: z.string(),
-      }),
-    )
-    .optional(),
-  meta: z
-    .object({
-      result_count: z.number(),
-      next_token: z.string().optional(),
-    })
-    .optional(),
-  errors: z
-    .array(
-      z.object({
-        detail: z.string(),
-        title: z.string(),
-        type: z.string(),
-      }),
-    )
-    .optional(),
-});
+export const GetLikingUsersResponse = GenericUsersResponse;
 
-export const RepliesResponse = z.object({
+export const GetRetweetsResponse = GenericUsersResponse;
+
+export const GetRepliesResponse = GetResponseBase.extend({
   data: z
     .array(
       z.object({
@@ -161,21 +114,13 @@ export const RepliesResponse = z.object({
       }),
     )
     .optional(),
-  meta: z
-    .object({
-      newest_id: z.string(),
-      oldest_id: z.string(),
-      result_count: z.number(),
-      next_token: z.string().optional(),
-    })
-    .optional(),
-  errors: z
-    .array(
-      z.object({
-        detail: z.string(),
-        title: z.string(),
-        type: z.string(),
-      }),
-    )
-    .optional(),
 });
+
+export const TwitterApiResponses = {
+  GetLikingUsersResponse,
+  GetRetweetsResponse,
+  GetRepliesResponse,
+  GetTweetsWithMetricsResponse,
+  GetTwitterMentionsTimelineResponse,
+  GetTwitterUserResponse,
+} as const;

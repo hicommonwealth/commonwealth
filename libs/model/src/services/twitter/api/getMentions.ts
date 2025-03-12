@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import {
+  GetTwitterMentionsTimelineResponse,
   Tweet,
-  TwitterMentionsTimelineResponse,
 } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { TwitterBotConfig } from '../types';
@@ -38,7 +38,7 @@ export async function getMentions({
         ...(paginationToken ? { pagination_token: paginationToken } : {}),
       },
     });
-    const parsedRes = TwitterMentionsTimelineResponse.parse(res.jsonBody);
+    const parsedRes = GetTwitterMentionsTimelineResponse.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;
 

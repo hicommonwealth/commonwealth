@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { TweetsWithMetricsResponse } from '@hicommonwealth/schemas';
+import { GetTweetsWithMetricsResponse } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { TwitterBotConfig } from '../types';
 import { getFromTwitter } from '../utils';
@@ -13,8 +13,8 @@ export async function getTweets({
 }: {
   twitterBotConfig: TwitterBotConfig;
   tweetIds: string[];
-}): Promise<z.infer<typeof TweetsWithMetricsResponse>['data']> {
-  const allTweets: z.infer<typeof TweetsWithMetricsResponse>['data'] = [];
+}): Promise<z.infer<typeof GetTweetsWithMetricsResponse>['data']> {
+  const allTweets: z.infer<typeof GetTweetsWithMetricsResponse>['data'] = [];
 
   // Process ids in chunks of 100
   for (let i = 0; i < tweetIds.length; i += 100) {
@@ -29,7 +29,7 @@ export async function getTweets({
       },
     });
 
-    const parsedRes = TweetsWithMetricsResponse.parse(res.jsonBody);
+    const parsedRes = GetTweetsWithMetricsResponse.parse(res.jsonBody);
 
     if (parsedRes.errors) {
       for (const error of parsedRes.errors) {

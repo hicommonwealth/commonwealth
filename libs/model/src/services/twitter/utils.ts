@@ -1,6 +1,12 @@
+import { logger } from '@hicommonwealth/core';
+import { TwitterApiResponses } from '@hicommonwealth/schemas';
+import { delay } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import z from 'zod';
 import { RequiredTwitterBotConfig, TwitterBotConfig } from './types';
+
+const log = logger(import.meta);
 
 function mustHaveAuth(
   config: TwitterBotConfig,
@@ -168,4 +174,96 @@ export async function getFromTwitter({
     jsonBody: await response.json(),
     requestsRemaining: Number(response.headers.get('x-rate-limit-remaining')),
   };
+}
+
+export async function getFromTwitterWrapper<
+  Schema extends (typeof TwitterApiResponses)[keyof typeof TwitterApiResponses],
+>({
+  twitterBotConfig,
+  url,
+  queryParams,
+  responseSchema,
+  oauthMethod = 'oauth2',
+  paginate = true,
+  retryOnRateLimit = true,
+}: {
+  twitterBotConfig: TwitterBotConfig;
+  url: string;
+  queryParams: Record<string, string | Date | number>;
+  responseSchema: Schema;
+  oauthMethod?: 'oauth1' | 'oauth2';
+  paginate?: boolean;
+  retryOnRateLimit?: boolean;
+}): Promise<NonNullable<z.infer<Schema>['data']> | []> {
+  let paginationToken: string | undefined;
+  let requestsRemaining: number;
+  const maxResults = 100;
+  let numResults = 0;
+  let shouldContinueLoop = false;
+  let waitTime = 60_000;
+  // Max wait time is 16 minutes which would occur after 5 retries
+  const maxWaitTime = 960_000;
+
+  const results: NonNullable<z.infer<Schema>['data']> = [];
+
+  do {
+    const res = await getFromTwitter({
+      twitterBotConfig,
+      url,
+      queryParams: {
+        max_results: maxResults,
+        ...queryParams,
+        ...(paginationToken ? { pagination_token: paginationToken } : {}),
+      },
+      oauthMethod,
+    });
+
+    const parsedRes = responseSchema.parse(res.jsonBody);
+    paginationToken = parsedRes.meta?.next_token;
+    requestsRemaining = res.requestsRemaining;
+
+    if (parsedRes.errors) {
+      for (const error of parsedRes.errors) {
+        log.error('Error occurred fetching', new Error(JSON.stringify(error)), {
+          botName: twitterBotConfig.name,
+          url,
+          queryParams,
+          oauthMethod,
+        });
+      }
+    }
+
+    if (parsedRes.data) {
+      const data: z.infer<Schema>['data'] = parsedRes.data;
+      if (Array.isArray(data)) {
+        numResults = data.length;
+        results.push(...data);
+      } else return parsedRes.data;
+    }
+
+    shouldContinueLoop =
+      paginate && !!paginationToken && numResults === maxResults;
+
+    if (requestsRemaining === 0 && shouldContinueLoop && retryOnRateLimit) {
+      if (waitTime > maxWaitTime) {
+        log.error('Exponential backoff retry strategy failed', undefined, {
+          botName: twitterBotConfig.name,
+          url,
+          queryParams,
+        });
+        break;
+      }
+
+      await delay(waitTime);
+      waitTime *= 2;
+    } else if (
+      requestsRemaining === 0 &&
+      shouldContinueLoop &&
+      !retryOnRateLimit
+    ) {
+      break;
+    }
+  } while (shouldContinueLoop);
+
+  return results;
 }
