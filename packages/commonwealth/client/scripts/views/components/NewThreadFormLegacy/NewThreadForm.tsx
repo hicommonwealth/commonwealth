@@ -627,7 +627,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     label="Draft with AI"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleGenerateAIThread();
+                      handleGenerateAIThread().catch(console.error);
                     }}
                   />
                 )}
@@ -635,7 +635,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 <CWButton
                   label="Create"
                   disabled={buttonDisabled}
-                  onClick={handleNewThreadCreation}
+                  onClick={() => {
+                    handleNewThreadCreation().catch(console.error);
+                  }}
                   tabIndex={4}
                   containerClassName="no-pad"
                 />
@@ -644,7 +646,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
-                  onJoin={handleJoinCommunity}
+                  onJoin={() => {
+                    handleJoinCommunity().catch(console.error);
+                  }}
                 />
               )}
 
