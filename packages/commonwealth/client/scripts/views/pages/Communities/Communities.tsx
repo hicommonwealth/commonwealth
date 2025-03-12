@@ -323,9 +323,15 @@ const CommunitiesPage = () => {
 
           <IdeaLaunchpad />
         </div>
-        <TokensList filters={filters} />
-        <QuestList />
-        <ExploreContestList />
+        <div id="tokens">
+          <TokensList filters={filters} />
+        </div>
+        <div id="quests">
+          <QuestList />
+        </div>
+        <div id="contests">
+          <ExploreContestList />
+        </div>
         {launchpadEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
