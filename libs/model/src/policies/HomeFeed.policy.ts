@@ -1,9 +1,11 @@
-import { Policy } from '@hicommonwealth/core';
+import { cache, CacheNamespaces, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Mutex } from 'async-mutex';
 import { z, ZodUndefined } from 'zod';
 
 const FEED_WINDOW_SIZE = 50;
+const HOME_FEED_KEY = 'HOME_FEED';
+const log = logger(import.meta);
 
 const homeFeedInputs = {
   ContestStarted: events.ContestStarted,
@@ -65,10 +67,32 @@ const feedMappers: FeedMappers = {
 };
 
 const getFeed = async (): Promise<FeedItem[]> => {
-  return [];
+  try {
+    const cachedFeed = await cache().getKey(
+      CacheNamespaces.Function_Response,
+      HOME_FEED_KEY,
+    );
+    if (cachedFeed) {
+      return JSON.parse(cachedFeed);
+    }
+    return [];
+  } catch (err) {
+    log.error(`Error getting home feed from cache`, err as Error);
+    return [];
+  }
 };
 
-const setFeed = async (feed: FeedItem[]) => {};
+const setFeed = async (feed: FeedItem[]) => {
+  try {
+    await cache().setKey(
+      CacheNamespaces.Function_Response,
+      HOME_FEED_KEY,
+      JSON.stringify(feed),
+    );
+  } catch (err) {
+    log.error(`Error getting home feed from cache`, err as Error);
+  }
+};
 
 const feedMutex = new Mutex();
 
