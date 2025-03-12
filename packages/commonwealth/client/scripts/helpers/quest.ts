@@ -5,6 +5,8 @@ import {
 import moment from 'moment';
 import { z } from 'zod';
 
+export type QuestAction = z.infer<typeof QuestActionMeta>;
+
 export const calculateQuestTimelineLabel = ({
   startDate,
   endDate,
@@ -47,7 +49,7 @@ export const calculateQuestTimelineLabel = ({
 };
 
 export const calculateTotalXPForQuestActions = (
-  questActions: z.infer<typeof QuestActionMeta>[],
+  questActions: QuestAction[],
 ) => {
   return (
     questActions

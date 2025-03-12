@@ -3,7 +3,7 @@ import { AuthContext } from '../context';
 import { Quest } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
-export const QuestView = Quest.extend({
+export const QuestView = Quest.omit({ scheduled_job_id: true }).extend({
   id: z.number(),
   start_date: z.coerce.date().or(z.string()),
   end_date: z.coerce.date().or(z.string()),

@@ -4,12 +4,18 @@ import { EventPair, EventSchemas } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { CreateCommunity, UpdateCommunity } from '../../src/community';
+import {
+  CreateCommunity,
+  UpdateCommunity,
+} from '../../src/aggregates/community';
+import {
+  GetUserReferralFees,
+  GetUserReferrals,
+} from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
-import { GetUserReferralFees, GetUserReferrals } from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
 function chainEvent<

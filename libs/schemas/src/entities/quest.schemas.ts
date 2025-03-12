@@ -2,6 +2,22 @@ import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
 
+export const ChannelQuestEvents = {
+  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  XpChainEventCreated: events.XpChainEventCreated,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
+} as const;
+// Channel quest action types that are not event related
+export const ChannelBatchActions = ['TwitterMetrics'] as const;
+
+export const AllChannelQuestActionNames = [
+  ...(Object.keys(ChannelQuestEvents) as [
+    keyof typeof ChannelQuestEvents,
+    ...Array<keyof typeof ChannelQuestEvents>,
+  ]),
+  ...ChannelBatchActions,
+] as const;
+
 export const QuestEvents = {
   SignUpFlowCompleted: events.SignUpFlowCompleted,
   CommunityCreated: events.CommunityCreated,
@@ -17,10 +33,16 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
-  XpChainEventCreated: events.XpChainEventCreated,
-  TwitterCommonMentioned: events.TwitterCommonMentioned,
+  ...ChannelQuestEvents,
 } as const;
+
+export const QuestActionNames = [
+  ...(Object.keys(QuestEvents) as [
+    keyof typeof QuestEvents,
+    ...Array<keyof typeof QuestEvents>,
+  ]),
+  ...ChannelBatchActions,
+];
 
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
@@ -38,12 +60,13 @@ export const QuestActionMeta = z
     id: z.number().nullish(),
     quest_id: z.number(),
     //event names instead of enums for flexibility when adding new events
-    event_name: z.enum(
-      Object.keys(QuestEvents) as [
+    event_name: z.enum([
+      ...(Object.keys(QuestEvents) as [
         keyof typeof QuestEvents,
         ...Array<keyof typeof QuestEvents>,
-      ],
-    ),
+      ]),
+      ...ChannelBatchActions,
+    ]),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     amount_multiplier: z.number().min(0).optional(),
@@ -53,7 +76,7 @@ export const QuestActionMeta = z
     participation_times_per_period: z.number().optional(),
     content_id: z
       .string()
-      .regex(/(thread:\d+)|(comment:\d+)/)
+      .regex(/(chain:d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)/)
       .optional()
       .nullish(),
     created_at: z.coerce.date().optional(),
@@ -85,6 +108,8 @@ export const Quest = z
       .string()
       .nullish()
       .describe('Links the quest to a single community'),
+    quest_type: z.enum(['channel', 'common']),
+    scheduled_job_id: z.string().nullish(),
 
     // associations
     action_metas: z.array(QuestActionMeta).optional(),

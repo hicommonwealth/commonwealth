@@ -1,4 +1,4 @@
-import { calculateTotalXPForQuestActions } from 'helpers/quest';
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
@@ -43,7 +43,7 @@ const useXPProgress = () => {
           ) || 0;
 
       const totalUserXP = calculateTotalXPForQuestActions(
-        quest.action_metas || [],
+        (quest.action_metas as QuestAction[]) || [],
       );
       return {
         ...quest,

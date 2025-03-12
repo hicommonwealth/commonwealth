@@ -1,4 +1,4 @@
-import { calculateTotalXPForQuestActions } from 'helpers/quest';
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -52,7 +52,7 @@ const QuestsExplorer = () => {
           </div>
           {quests.map((quest) => {
             const totalUserXP = calculateTotalXPForQuestActions(
-              quest.action_metas || [],
+              (quest.action_metas as QuestAction[]) || [],
             );
 
             return (

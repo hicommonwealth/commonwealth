@@ -8,7 +8,7 @@ import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import { calculateTotalXPForQuestActions } from 'helpers/quest';
+import { QuestAction, calculateTotalXPForQuestActions } from 'helpers/quest';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
@@ -24,11 +24,12 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const user = useUserStore();
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+    community_id: communityIdFilter,
     cursor: 1,
     limit: 3,
-    start_after: moment().startOf('day').toDate(),
     // dont show system quests in quest lists for communities
     include_system_quests: communityIdFilter ? false : !user.isLoggedIn,
+    end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
 
@@ -76,7 +77,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
           <div className="content">
             {quests.map((quest) => {
               const totalUserXP = calculateTotalXPForQuestActions(
-                quest.action_metas || [],
+                (quest.action_metas as QuestAction[]) || [],
               );
               return (
                 <XpQuestCard

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { calculateTotalXPForQuestActions } from 'helpers/quest';
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -85,7 +85,7 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
         <div className="list">
           {(quests || []).map((quest) => {
             const totalUserXP = calculateTotalXPForQuestActions(
-              quest.action_metas || [],
+              (quest.action_metas as QuestAction[]) || [],
             );
             const actionMetaIds = (quest.action_metas || []).map((a) => a.id);
 
