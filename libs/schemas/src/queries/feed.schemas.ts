@@ -74,3 +74,17 @@ export const ChainFeed = {
   input: z.object({}),
   output: z.array(ChainFeedRecord),
 };
+
+export const HomeFeedItemSchema = z.object({
+  type: z.string(),
+  data: z.any(),
+  url: z.string(),
+});
+
+// Define the schema for the home feed
+export const HomeFeed = {
+  input: z.object({}),
+  output: z.object({
+    items: z.array(HomeFeedItemSchema),
+  }),
+};

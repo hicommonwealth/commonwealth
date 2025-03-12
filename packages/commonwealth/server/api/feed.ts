@@ -7,4 +7,5 @@ export const trpcRouter = trpc.router({
     ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
   }),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User),
+  getHomeFeed: trpc.query(Feed.GetHomeFeed, trpc.Tag.User),
 });
