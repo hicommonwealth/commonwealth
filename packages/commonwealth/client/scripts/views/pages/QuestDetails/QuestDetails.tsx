@@ -2,6 +2,7 @@ import {
   QuestActionMeta,
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
+import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
@@ -20,10 +21,14 @@ import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModalType } from 'views/modals/AuthModal';
@@ -92,6 +97,8 @@ const QuestDetails = ({ id }: { id: number }) => {
   });
 
   const { pendingWeeklyQuests } = useXPProgress();
+
+  const popoverProps = usePopover();
 
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
@@ -279,6 +286,8 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isSiteAdmin = Permissions.isSiteAdmin();
 
+  const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -321,6 +330,44 @@ const QuestDetails = ({ id }: { id: number }) => {
                   true,
                 )}
               </CWText>
+
+              <div className="progress">
+                <div className="progress-label">
+                  <CWText type="caption">
+                    Rewarded {xpAwarded} / Max {quest.max_xp_to_end}
+                  </CWText>
+                  <CWPopover
+                    body={
+                      <div>
+                        <CWText type="b2">
+                          Indicates the maximum xp allocation before this quest
+                          is considered complete.
+                        </CWText>
+                        <br />
+
+                        <CWText type="b2">
+                          The quest automatically transitions to completed
+                          status, if max XP is alloted before quest end date.
+                        </CWText>
+                      </div>
+                    }
+                    placement="top-start"
+                    {...popoverProps}
+                  />
+                  <CWIconButton
+                    iconName="question"
+                    iconSize="small"
+                    onMouseEnter={popoverProps.handleInteraction}
+                    onMouseLeave={popoverProps.handleInteraction}
+                  />
+                </div>
+
+                <progress
+                  className={clsx('progress-bar', { isEnded })}
+                  value={xpAwarded}
+                  max={quest.max_xp_to_end}
+                />
+              </div>
               {isRepeatableQuest && (
                 <CWText className="timeline">
                   Users can participate&ensp;
@@ -340,43 +387,41 @@ const QuestDetails = ({ id }: { id: number }) => {
                   />
                 </CWText>
               )}
-              {isSiteAdmin && (
-                <>
-                  <CWDivider />
-                  <div className="manage-options">
-                    <div className="w-fit">
-                      {withTooltip(
-                        <CWButton
-                          label="Update"
-                          onClick={() => navigate(`/quests/${quest.id}/update`)}
-                          buttonType="primary"
-                          iconLeft="notePencil"
-                          disabled={isStarted || isEnded || isPendingAction}
-                        />,
-                        'Updates only allowed in pre-live stage',
-                        isStarted || isEnded,
-                      )}
-                    </div>
-                    <div className="w-fit">
-                      {withTooltip(
-                        <CWButton
-                          label={isDeletionAllowed ? 'Delete' : 'Cancel'}
-                          onClick={handleQuestAbort}
-                          buttonType="destructive"
-                          iconLeft="trash"
-                          disabled={isEnded || isPendingAction}
-                        />,
-                        isEnded
-                          ? 'Deletion not allowed for non-active quests'
-                          : '',
-                        isEnded,
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
           </div>
+          {isSiteAdmin && (
+            <>
+              <CWDivider />
+              <div className="manage-options">
+                <div className="w-fit">
+                  {withTooltip(
+                    <CWButton
+                      label="Update"
+                      onClick={() => navigate(`/quests/${quest.id}/update`)}
+                      buttonType="primary"
+                      iconLeft="notePencil"
+                      disabled={isStarted || isEnded || isPendingAction}
+                    />,
+                    'Updates only allowed in pre-live stage',
+                    isStarted || isEnded,
+                  )}
+                </div>
+                <div className="w-fit">
+                  {withTooltip(
+                    <CWButton
+                      label={isDeletionAllowed ? 'Delete' : 'Cancel'}
+                      onClick={handleQuestAbort}
+                      buttonType="destructive"
+                      iconLeft="trash"
+                      disabled={isEnded || isPendingAction}
+                    />,
+                    isEnded ? 'Deletion not allowed for non-active quests' : '',
+                    isEnded,
+                  )}
+                </div>
+              </div>
+            </>
+          )}
           <CWDivider />
           <div className="quest-actions">
             <div className="header">
