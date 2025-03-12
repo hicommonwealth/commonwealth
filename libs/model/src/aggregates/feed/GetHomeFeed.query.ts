@@ -1,6 +1,6 @@
 import { cache, CacheNamespaces, logger, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { HOME_FEED_KEY } from 'model/src/policies/HomeFeed.policy';
+import { HOME_FEED_KEY } from '../../policies/HomeFeed.policy';
 
 const log = logger(import.meta);
 
