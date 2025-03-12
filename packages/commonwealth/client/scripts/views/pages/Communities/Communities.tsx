@@ -5,7 +5,7 @@ import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
@@ -94,7 +94,7 @@ const CommunitiesPage = () => {
 
   const {
     data: communities,
-    fetchNextPage: fetchMoreCommunities,
+    fetchNextPage: fetchMoreCommunitiesOriginal,
     hasNextPage,
     isInitialLoading: isInitialCommunitiesLoading,
   } = useFetchCommunitiesQuery({
@@ -141,6 +141,11 @@ const CommunitiesPage = () => {
       ? CommunityType[filters.withCommunityType]
       : undefined,
   });
+
+  // Wrap fetchMoreCommunities to return Promise<void>
+  const fetchMoreCommunities = useCallback(async () => {
+    await fetchMoreCommunitiesOriginal();
+  }, [fetchMoreCommunitiesOriginal]);
 
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({

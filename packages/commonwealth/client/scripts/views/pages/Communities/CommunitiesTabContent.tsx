@@ -24,7 +24,9 @@ interface CommunitiesTabContentProps {
   communitiesList: ExtendedCommunitySliceType[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices: Record<string, number>;
+  historicalPrices:
+    | { community_id: string; old_price?: string | null }[]
+    | undefined;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
@@ -65,17 +67,21 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                 (address) => address?.community?.base === community?.base,
               );
 
-              const historicalPriceMap: Map<string, string> = new Map(
-                Object.entries(
-                  (historicalPrices || [])?.reduce(
-                    (acc, { community_id, old_price }) => {
-                      acc[community_id] = old_price;
-                      return acc;
-                    },
-                    {},
+              const historicalPriceMap: Map<string, string | undefined> =
+                new Map(
+                  Object.entries(
+                    (historicalPrices || [])?.reduce(
+                      (
+                        acc: Record<string, string | undefined>,
+                        { community_id, old_price },
+                      ) => {
+                        acc[community_id] = old_price || undefined;
+                        return acc;
+                      },
+                      {},
+                    ),
                   ),
-                ),
-              );
+                );
 
               return (
                 <Fragment key={community.id}>
