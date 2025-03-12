@@ -261,7 +261,7 @@ const ReactQuillEditor = ({
   }, []);
 
   const showTooltip = isDisabled && isHovering;
-  const handleAddLink = async () => {
+  const handleAddLink = () => {
     if (linkText === '' || linkUrl === '') {
       return;
     }
