@@ -390,3 +390,8 @@ export const UnpinToken = {
   output: z.object({}),
   context: AuthContext,
 };
+
+export const IndexCommunities = {
+  input: z.object({}),
+  output: z.object({}),
+};

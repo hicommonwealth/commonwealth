@@ -479,7 +479,4 @@ export const events = {
     }),
   }),
   ClankerTokenFound: ClankerToken,
-  CommunityIndexerTimerTicked: z
-    .object({})
-    .describe('Polling event that triggers community indexer loop'),
 } as const;
