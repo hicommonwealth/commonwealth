@@ -1,5 +1,5 @@
 import { configure, config as target } from '@hicommonwealth/core';
-import { S3_ASSET_BUCKET_CDN, TwitterBotName } from '@hicommonwealth/shared';
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
@@ -47,8 +47,6 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
-  TWITTER_WORKER_POLL_INTERVAL,
-  TWITTER_ENABLED_BOTS,
   TWITTER_APP_BEARER_TOKEN,
 } = process.env;
 
@@ -62,12 +60,10 @@ const DEFAULTS = {
   DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
-  // 16 minutes -> 15 minute rate limit window + 1 minute buffer to account for func execution time
-  TWITTER_WORKER_POLL_INTERVAL: 16 * 60 * 1000,
 };
 
 export const config = configure(
-  target,
+  [target],
   {
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
@@ -170,15 +166,7 @@ export const config = configure(
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
     TWITTER: {
-      WORKER_POLL_INTERVAL: (() => {
-        if (TWITTER_WORKER_POLL_INTERVAL)
-          return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
-        else if (target.APP_ENV === 'local')
-          return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
-        else return 0;
-      })(),
-      ENABLED_BOTS:
-        (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
+      APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
     },
   },
   z.object({
@@ -383,14 +371,8 @@ export const config = configure(
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
         ),
     }),
-    TWITTER: z
-      .object({
-        APP_BEARER_TOKEN: z.string().optional(),
-        WORKER_POLL_INTERVAL: z.number().int().gte(0),
-        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
-      })
-      .refine(
-        (data) => !(data.ENABLED_BOTS.length > 0 && !data.APP_BEARER_TOKEN),
-      ),
+    TWITTER: z.object({
+      APP_BEARER_TOKEN: z.string().optional(),
+    }),
   }),
 );

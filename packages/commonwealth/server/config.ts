@@ -1,7 +1,7 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
-import { configure } from '@hicommonwealth/core';
+import { configure, config as target } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
@@ -30,6 +30,8 @@ const {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
+  TWITTER_WORKER_POLL_INTERVAL,
+  TWITTER_ENABLED_BOTS,
 } = process.env;
 
 const DEFAULTS = {
@@ -49,7 +51,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  { ...model_config, ...adapters_config },
+  [model_config, adapters_config],
   {
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
@@ -127,6 +129,17 @@ export const config = configure(
       GET_COMMUNITIES_JOIN_COMMUNITY: CACHE_GET_COMMUNITIES_JOIN_COMMUNITY
         ? parseInt(CACHE_GET_COMMUNITIES_JOIN_COMMUNITY, 10)
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
+    },
+    TWITTER: {
+      WORKER_POLL_INTERVAL: (() => {
+        if (TWITTER_WORKER_POLL_INTERVAL)
+          return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
+        else if (target.APP_ENV === 'local')
+          return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
+        else return 0;
+      })(),
+      ENABLED_BOTS:
+        (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
     },
   },
   z.object({
@@ -217,5 +230,17 @@ export const config = configure(
       GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
       GET_COMMUNITIES_JOIN_COMMUNITY: z.number(),
     }),
+    TWITTER: z
+      .object({
+        WORKER_POLL_INTERVAL: z.number().int().gte(0),
+        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
+      })
+      .refine(
+        (data) =>
+          !(
+            data.ENABLED_BOTS.length > 0 &&
+            !model_config.TWITTER.APP_BEARER_TOKEN
+          ),
+      ),
   }),
 );

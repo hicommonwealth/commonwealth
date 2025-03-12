@@ -36,7 +36,7 @@ const {
 } = process.env;
 
 export const config = configure(
-  target,
+  [target],
   {
     CACHE: {
       // if a tls redis url is provided then that takes priority over everything else

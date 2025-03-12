@@ -22,20 +22,50 @@ const AppEnvironments = [
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];
 
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
+
+// Merge function that throws on key value conflict
+function customMerge(objValue: unknown, srcValue: unknown, key: unknown) {
+  // If both values are plain objects, let mergeWith handle merging recursively.
+  if (_.isPlainObject(objValue) && _.isPlainObject(srcValue)) {
+    return undefined; // Use default merge behavior.
+  }
+  // If the key exists and the values differ, throw an error.
+  if (objValue !== undefined && objValue !== srcValue) {
+    throw new Error(`Conflict detected at key "${key}"`);
+  }
+  // Otherwise, use the source value.
+  return srcValue;
+}
+
 /**
  * Extends target config with payload after validating schema
  *
- * @param target target payload
+ * @param targets array of parsed payloads to include in the extended config
  * @param extend extended payload
  * @param schema extended schema
  * @returns extended config
  */
-export const configure = <T, E extends Record<string, unknown>>(
-  target: Readonly<T>,
+export const configure = <
+  T extends Record<string, unknown>[],
+  E extends Record<string, unknown>,
+>(
+  targets: [...Readonly<T>],
   extend: Readonly<E>,
   schema: ZodType<E>,
-): Readonly<T & E> =>
-  _.merge(target || {}, schema.parse(extend)) as Readonly<T & E>;
+): Readonly<UnionToIntersection<T[number]> & E> => {
+  // First merge all target objects together
+  const mergedTargets = _.merge({}, ...targets);
+  // Then validate extend with schema and merge it with the merged targets
+  const validatedExtend = schema.parse(extend);
+  return _.mergeWith(mergedTargets, validatedExtend, customMerge) as Readonly<
+    UnionToIntersection<T[number]> & E
+  >;
+};
 
 const {
   APP_ENV,
@@ -65,7 +95,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  {},
+  [{}],
   {
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
