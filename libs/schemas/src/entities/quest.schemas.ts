@@ -35,8 +35,8 @@ export enum QuestParticipationPeriod {
 
 export const QuestActionMeta = z
   .object({
-    id: PG_INT.nullish(),
-    quest_id: PG_INT,
+    id: z.number().nullish(),
+    quest_id: z.number(),
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum(
       Object.keys(QuestEvents) as [
@@ -71,7 +71,7 @@ export const QuestScore = z
 
 export const Quest = z
   .object({
-    id: PG_INT.nullish(),
+    id: z.number().nullish(),
     name: z.string().max(255),
     description: z.string().max(1000),
     image_url: z.string(),

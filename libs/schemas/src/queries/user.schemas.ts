@@ -141,8 +141,8 @@ export const GetUserReferralFees = {
 
 export const XpLogView = XpLog.extend({
   user_profile: UserProfile,
-  quest_id: PG_INT,
-  quest_action_meta_id: PG_INT,
+  quest_id: z.number(),
+  quest_action_meta_id: z.number(),
   event_name: z.string(),
   creator_profile: UserProfile.nullish(),
 });

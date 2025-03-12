@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
-import { PG_INT } from '../utils';
 
 export const CreateQuest = {
   input: z.object({
@@ -19,7 +18,7 @@ export const CreateQuest = {
 
 export const UpdateQuest = {
   input: z.object({
-    quest_id: PG_INT,
+    quest_id: z.number(),
     name: z.string().optional(),
     description: z.string().optional(),
     community_id: z.string().optional(),
@@ -34,13 +33,13 @@ export const UpdateQuest = {
 };
 
 export const DeleteQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };
 
 export const CancelQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };
