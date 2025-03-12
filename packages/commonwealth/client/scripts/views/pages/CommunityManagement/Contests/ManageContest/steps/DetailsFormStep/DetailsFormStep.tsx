@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useUpdateContestMutation from 'state/api/contests/updateContest';
@@ -66,7 +65,6 @@ const DetailsFormStep = ({
   isFarcasterContest,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
-  const farcasterContestEnabled = useFlag('farcasterContest');
 
   const [payoutStructure, setPayoutStructure] = useState<
     ContestFormData['payoutStructure']
@@ -185,19 +183,17 @@ const DetailsFormStep = ({
     const selectedTopic = (weightedTopics || []).find(
       (t) => t.value === values?.contestTopic?.value,
     );
-    const feeType =
-      farcasterContestEnabled && isFarcasterContest
+    const feeType = isFarcasterContest
+      ? ContestFeeType.DirectDeposit
+      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
         ? ContestFeeType.DirectDeposit
-        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
-          ? ContestFeeType.DirectDeposit
-          : ContestFeeType.CommunityStake;
+        : ContestFeeType.CommunityStake;
 
-    const contestRecurring =
-      farcasterContestEnabled && isFarcasterContest
+    const contestRecurring = isFarcasterContest
+      ? ContestRecurringType.No
+      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
         ? ContestRecurringType.No
-        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
-          ? ContestRecurringType.No
-          : ContestRecurringType.Yes;
+        : ContestRecurringType.Yes;
 
     const formData: ContestFormData = {
       contestName: values.contestName,
@@ -343,7 +339,7 @@ const DetailsFormStep = ({
                 />
               </div>
 
-              {farcasterContestEnabled && isFarcasterContest && (
+              {isFarcasterContest && (
                 <div className="contest-section contest-section-description">
                   <CWText type="h4">
                     Describe your contest<CWText type="b1"> (optional)</CWText>

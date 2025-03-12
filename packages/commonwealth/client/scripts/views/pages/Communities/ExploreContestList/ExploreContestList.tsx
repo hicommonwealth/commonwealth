@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React from 'react';
 import { trpc } from 'utils/trpcClient';
@@ -10,8 +9,6 @@ import useCommunityContests from '../../CommunityManagement/Contests/useCommunit
 import './ExploreContestList.scss';
 
 const ExploreContestList = () => {
-  const farcasterContestEnabled = useFlag('farcasterContest');
-
   const {
     contestsData: { active: activeContests },
     isContestDataLoading,
@@ -84,9 +81,7 @@ const ExploreContestList = () => {
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
                   score={score || []}
-                  isFarcaster={
-                    farcasterContestEnabled && contest.is_farcaster_contest
-                  }
+                  isFarcaster={contest.is_farcaster_contest}
                   community={community[contest.community_id as string]}
                   hideWhenNoPrizes={true}
                 />

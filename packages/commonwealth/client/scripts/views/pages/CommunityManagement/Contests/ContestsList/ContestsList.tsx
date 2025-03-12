@@ -1,7 +1,6 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
-import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
 import ContestCard from 'views/components/ContestCard';
@@ -67,8 +66,7 @@ const ContestsList = ({
   displayAllRecurringContests = false,
   community,
 }: ContestsListProps) => {
-  const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const [fundDrawerContest, setFundDrawerContest] = useState<Contest | null>();
 
   if (isLoading) {
     return (
@@ -78,6 +76,10 @@ const ContestsList = ({
         ))}
       </div>
     );
+  }
+
+  if (!contests || contests.length === 0) {
+    return <EmptyContestsList />;
   }
 
   return (
@@ -114,9 +116,7 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
-                  isFarcaster={
-                    farcasterContestEnabled && contest.is_farcaster_contest
-                  }
+                  isFarcaster={contest.is_farcaster_contest}
                   score={score || []}
                   community={community}
                   contestBalance={parseInt(contest_balance || '0', 10)}
@@ -143,9 +143,7 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
-                  isFarcaster={
-                    farcasterContestEnabled && contest.is_farcaster_contest
-                  }
+                  isFarcaster={contest.is_farcaster_contest}
                   score={sc?.score || []}
                   community={community}
                   contestBalance={parseInt(sc.contest_balance || '0', 10)}
