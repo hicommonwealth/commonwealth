@@ -12,6 +12,8 @@ export type ModalBaseTabs = {
   options: AuthWallets[] | AuthSSOs[];
 };
 
+export type AuthOptionTypes = 'wallets' | 'sso';
+
 export type ModalVariantProps = {
   onClose: () => any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +25,7 @@ export type ModalVariantProps = {
     | ChainBase.Substrate;
 
   showAuthOptionFor?: AuthWallets | AuthSSOs;
+  showAuthOptionTypesFor?: AuthOptionTypes[];
   onSignInClick?: () => void;
   triggerOpenEVMWalletsSubModal?: boolean;
   isUserFromWebView?: boolean;
@@ -30,7 +33,6 @@ export type ModalVariantProps = {
 
 export type ModalBaseProps = {
   layoutType: AuthModalType;
-  showAuthOptionTypesFor?: ('wallets' | 'sso')[];
   bodyClassName?: string;
 } & ModalVariantProps;
 
@@ -47,6 +49,7 @@ export type AuthModalProps = Pick<
   | 'onClose'
   | 'onSuccess'
   | 'showWalletsFor'
+  | 'showAuthOptionTypesFor'
   | 'triggerOpenEVMWalletsSubModal'
   | 'isUserFromWebView'
 >;
