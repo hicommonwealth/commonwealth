@@ -1,5 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import { Tweet, TwitterMentionsTimeline } from '@hicommonwealth/schemas';
+import {
+  Tweet,
+  TwitterMentionsTimelineResponse,
+} from '@hicommonwealth/schemas';
 import z from 'zod';
 import { TwitterBotConfig } from '../types';
 import { getFromTwitter } from '../utils';
@@ -19,11 +22,14 @@ export async function getMentions({
   const allMentions: z.infer<typeof Tweet>[] = [];
   let paginationToken: string | undefined;
   let requestsRemaining: number;
+  const maxResults = 100;
+  let numResults = 0;
   do {
     const res = await getFromTwitter({
       twitterBotConfig,
       url: `https://api.x.com/2/users/${twitterBotConfig.twitterUserId}/mentions`,
       queryParams: {
+        max_results: maxResults,
         start_time: startTime,
         end_time: endTime,
         'tweet.fields': 'text,created_at',
@@ -32,7 +38,7 @@ export async function getMentions({
         ...(paginationToken ? { pagination_token: paginationToken } : {}),
       },
     });
-    const parsedRes = TwitterMentionsTimeline.parse(res.jsonBody);
+    const parsedRes = TwitterMentionsTimelineResponse.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;
 
@@ -64,7 +70,12 @@ export async function getMentions({
       }) || [];
 
     allMentions.push(...newTweetMentions);
-  } while (paginationToken && requestsRemaining > 0);
+    numResults = newTweetMentions.length;
+  } while (
+    paginationToken &&
+    numResults === maxResults &&
+    requestsRemaining > 0
+  );
 
   if (paginationToken && requestsRemaining === 0 && allMentions.length > 0) {
     return {

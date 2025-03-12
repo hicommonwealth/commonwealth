@@ -23,7 +23,7 @@ export const Tweet = z.object({
     .optional(),
 });
 
-export const TwitterMentionsTimeline = z.object({
+export const TwitterMentionsTimelineResponse = z.object({
   data: z
     .array(
       z.object({
@@ -62,7 +62,7 @@ export const TwitterMentionsTimeline = z.object({
     .optional(),
 });
 
-export const TwitterUser = z.object({
+export const TwitterUserResponse = z.object({
   data: z.object({
     id: z.string(),
     name: z.string(),
@@ -70,7 +70,7 @@ export const TwitterUser = z.object({
   }),
 });
 
-export const TweetsWithMetrics = z.object({
+export const TweetsWithMetricsResponse = z.object({
   data: z.array(
     z.object({
       id: z.string(),
@@ -91,6 +91,90 @@ export const TweetsWithMetrics = z.object({
         type: z.string(),
         detail: z.string().optional(),
         status: z.number().optional(),
+      }),
+    )
+    .optional(),
+});
+
+// TODO: simplify
+
+export const LikingUsersResponse = z.object({
+  data: z
+    .array(
+      z.object({
+        id: z.string(),
+        username: z.string(),
+      }),
+    )
+    .optional(),
+  meta: z
+    .object({
+      result_count: z.number(),
+      next_token: z.string().optional(),
+    })
+    .optional(),
+  errors: z
+    .array(
+      z.object({
+        detail: z.string(),
+        title: z.string(),
+        type: z.string(),
+      }),
+    )
+    .optional(),
+});
+
+export const RetweetsResponse = z.object({
+  data: z
+    .array(
+      z.object({
+        id: z.string(),
+        username: z.string(),
+      }),
+    )
+    .optional(),
+  meta: z
+    .object({
+      result_count: z.number(),
+      next_token: z.string().optional(),
+    })
+    .optional(),
+  errors: z
+    .array(
+      z.object({
+        detail: z.string(),
+        title: z.string(),
+        type: z.string(),
+      }),
+    )
+    .optional(),
+});
+
+export const RepliesResponse = z.object({
+  data: z
+    .array(
+      z.object({
+        id: z.string(),
+        author_id: z.string(),
+        created_at: z.string(),
+        conversation_id: z.string(),
+      }),
+    )
+    .optional(),
+  meta: z
+    .object({
+      newest_id: z.string(),
+      oldest_id: z.string(),
+      result_count: z.number(),
+      next_token: z.string().optional(),
+    })
+    .optional(),
+  errors: z
+    .array(
+      z.object({
+        detail: z.string(),
+        title: z.string(),
+        type: z.string(),
       }),
     )
     .optional(),

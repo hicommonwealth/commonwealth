@@ -48,6 +48,10 @@ const {
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
   TWITTER_APP_BEARER_TOKEN,
+  TWITTER_CONSUMER_KEY,
+  TWITTER_CONSUMER_SECRET,
+  TWITTER_ACCESS_TOKEN,
+  TWITTER_ACCESS_TOKEN_SECRET,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -167,6 +171,10 @@ export const config = configure(
     },
     TWITTER: {
       APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
+      CONSUMER_KEY: TWITTER_CONSUMER_KEY,
+      CONSUMER_SECRET: TWITTER_CONSUMER_SECRET,
+      ACCESS_TOKEN: TWITTER_ACCESS_TOKEN,
+      ACCESS_TOKEN_SECRET: TWITTER_ACCESS_TOKEN_SECRET,
     },
   },
   z.object({
@@ -373,6 +381,10 @@ export const config = configure(
     }),
     TWITTER: z.object({
       APP_BEARER_TOKEN: z.string().optional(),
+      CONSUMER_KEY: z.string().optional(),
+      CONSUMER_SECRET: z.string().optional(),
+      ACCESS_TOKEN: z.string().optional(),
+      ACCESS_TOKEN_SECRET: z.string().optional(),
     }),
   }),
 );

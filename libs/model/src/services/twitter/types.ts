@@ -18,3 +18,13 @@ export type twitterMentions =
       event_name: 'TwitterCommonMentioned';
       event_payload: z.infer<typeof events.TwitterCommonMentioned>;
     }>;
+
+type AllKeys<T> = T extends any ? keyof T : never;
+
+type RequiredFromUnion<T> = {
+  [P in AllKeys<T>]-?: NonNullable<
+    T extends any ? (P extends keyof T ? T[P] : never) : never
+  >;
+};
+
+export type RequiredTwitterBotConfig = RequiredFromUnion<TwitterBotConfig>;
