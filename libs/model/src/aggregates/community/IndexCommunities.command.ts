@@ -33,7 +33,7 @@ export function IndexCommunities(): Command<typeof schemas.IndexCommunities> {
         try {
           if (!indexer.last_checked) {
             log.warn(
-              `${indexer.id} indexer must be backfilled via "pnpm backfill-clanker-tokens"`,
+              `${indexer.id} indexer must be backfilled via "pnpm backfill-${indexer.id}-tokens"`,
             );
             continue;
           }
@@ -44,48 +44,21 @@ export function IndexCommunities(): Command<typeof schemas.IndexCommunities> {
 
           const startedAt = new Date();
 
-          if (indexer.id === 'clanker') {
-            const cutoffDate = moment(indexer.last_checked).toDate();
-
-            // Fetch pages descending and add to buffer
-            // so they can be inserted in ascending order.
-            // Order is important because duplicate token
-            // names are enumerated e.g. "Token", "Token (1)",
-            // "Token (2)", etc.
-            const tokensBuffer: Array<z.infer<typeof ClankerToken>> = [];
-
-            for await (const tokens of paginateClankerTokens({
-              cutoffDate,
-              desc: true,
-            })) {
-              tokensBuffer.push(...tokens);
-            }
-
-            // Sort from oldest to newest,
-            // id reflects clanker's sorting better than created timestamp.
-            tokensBuffer.sort(
-              (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
-            );
-
-            const eventsBuffer: Array<EventPairs> = tokensBuffer.map(
-              (token) => ({
-                event_name: 'ClankerTokenFound',
-                event_payload: token,
-              }),
-            );
-
-            await emitEvent(models.Outbox, eventsBuffer);
-
-            // After all fetching is done, save watermark for next run.
-            await setIndexerStatus(indexer.id, {
-              status: 'idle',
-              last_checked: startedAt,
-            });
-          } else {
-            throw new Error(`indexer not implemented: ${indexer.id}`);
+          switch (indexer.id) {
+            case 'clanker':
+              await indexClankerTokens(indexer);
+              break;
+            default:
+              throw new Error(`indexer not implemented: ${indexer.id}`);
           }
+
+          // when finished, set indexer to idle
+          await setIndexerStatus(indexer.id, {
+            status: 'idle',
+            last_checked: startedAt,
+          });
         } catch (err) {
-          // await setIndexerStatus(indexer.id, { status: 'error' });
+          await setIndexerStatus(indexer.id, { status: 'error' });
           log.error(`failed to index for ${indexer.id}`, err as Error);
           throw err;
         }
@@ -94,7 +67,40 @@ export function IndexCommunities(): Command<typeof schemas.IndexCommunities> {
   };
 }
 
-// ----
+const indexClankerTokens = async (
+  indexer: z.infer<typeof CommunityIndexerSchema>,
+) => {
+  const cutoffDate = moment(indexer.last_checked).toDate();
+
+  // Fetch pages descending and add to buffer
+  // so they can be inserted in ascending order.
+  // Order is important because duplicate token
+  // names are enumerated e.g. "Token", "Token (1)",
+  // "Token (2)", etc.
+  const tokensBuffer: Array<z.infer<typeof ClankerToken>> = [];
+
+  for await (const tokens of paginateClankerTokens({
+    cutoffDate,
+    desc: true,
+  })) {
+    tokensBuffer.push(...tokens);
+  }
+
+  // Sort from oldest to newest,
+  // id reflects clanker's sorting better than created timestamp.
+  tokensBuffer.sort(
+    (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
+  );
+
+  const eventsBuffer: Array<EventPairs> = tokensBuffer.map((token) => ({
+    event_name: 'ClankerTokenFound',
+    event_payload: token,
+  }));
+
+  await emitEvent(models.Outbox, eventsBuffer);
+};
+
+// ---
 
 type CommunityIndexerStatus = z.infer<typeof CommunityIndexerSchema>['status'];
 type CommunityIndexerOptions = {
