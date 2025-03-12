@@ -11,6 +11,7 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
+import CommunityIndexer from './community_indexer';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -62,6 +63,7 @@ export const Factories = {
   CommunityAlert,
   CommunityStake,
   CommunityTags,
+  CommunityIndexer,
   Contest,
   ContestAction,
   ContestManager,
