@@ -253,11 +253,22 @@ export const CreateGroup = {
   context: AuthContext,
 };
 
-export const CreateNamespaceAdminGroup = {
+export const NamespaceReferral = z.object({
+  referrer_address: z.string(),
+  referee_address: z.string(),
+  timestamp: z.bigint(),
+  eth_chain_id: z.number(),
+  transaction_hash: z.string(),
+});
+
+export const LinkNamespace = {
   input: z.object({
     namespace_address: z.string(),
+    deployer_address: z.string(),
+    log_removed: z.boolean(),
+    referral: NamespaceReferral.optional(),
   }),
-  output: Group,
+  output: z.boolean(),
 };
 
 export const UpdateGroup = {

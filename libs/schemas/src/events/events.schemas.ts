@@ -1,5 +1,6 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { NamespaceReferral } from '../commands';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
@@ -476,5 +477,13 @@ export const events = {
       newAmount: z.coerce.bigint().describe('New amount'),
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
+  }),
+
+  NamespaceLinked: z.object({
+    namespace_address: z.string(),
+    deployer_address: z.string(),
+    community_id: z.string(),
+    referral: NamespaceReferral.optional(),
+    created_at: z.coerce.date(),
   }),
 } as const;
