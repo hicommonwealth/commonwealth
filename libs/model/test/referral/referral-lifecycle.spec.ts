@@ -7,11 +7,11 @@ import { z } from 'zod';
 import {
   CreateCommunity,
   UpdateCommunity,
-} from '../../src/commands-&-queries/community';
+} from '../../src/aggregates/community';
 import {
   GetUserReferralFees,
   GetUserReferrals,
-} from '../../src/commands-&-queries/user';
+} from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { commonProtocol } from '../../src/services';

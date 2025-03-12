@@ -4,7 +4,7 @@ import { Community, User } from '@hicommonwealth/schemas';
 
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
-import { GetDigestEmailDataQuery } from '../../src/commands-&-queries/emails';
+import { GetDigestEmailDataQuery } from '../../src/aggregates/emails';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';
 describe('Digest email lifecycle', () => {

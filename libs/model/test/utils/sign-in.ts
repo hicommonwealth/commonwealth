@@ -5,7 +5,7 @@ import {
   getSessionSigners,
   serializeCanvas,
 } from '@hicommonwealth/shared';
-import { SignIn } from '../../src/commands-&-queries/user';
+import { SignIn } from '../../src/aggregates/user';
 import { verifyAddress } from '../../src/services/session';
 
 export async function signIn(community_id: string, referrer_address?: string) {

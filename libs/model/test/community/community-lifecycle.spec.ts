@@ -28,9 +28,9 @@ import {
   ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
-} from '../../src/commands-&-queries/community';
-import { CreateTopic } from '../../src/commands-&-queries/community/CreateTopic.command';
-import { UpdateTopic } from '../../src/commands-&-queries/community/UpdateTopic.command';
+} from '../../src/aggregates/community';
+import { CreateTopic } from '../../src/aggregates/community/CreateTopic.command';
+import { UpdateTopic } from '../../src/aggregates/community/UpdateTopic.command';
 import { models } from '../../src/database';
 import { systemActor } from '../../src/middleware';
 import type {

@@ -38,8 +38,8 @@ import {
   DeleteComment,
   GetComments,
   UpdateComment,
-} from '../../src/commands-&-queries/comment';
-import { DeleteReaction } from '../../src/commands-&-queries/reaction';
+} from '../../src/aggregates/comment';
+import { DeleteReaction } from '../../src/aggregates/reaction';
 import {
   CreateThread,
   CreateThreadReaction,
@@ -48,7 +48,7 @@ import {
   GetThreads,
   UpdateThread,
   UpdateThreadErrors,
-} from '../../src/commands-&-queries/thread';
+} from '../../src/aggregates/thread';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
 import { seed, seedRecord } from '../../src/tester';

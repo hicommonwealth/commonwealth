@@ -10,15 +10,15 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateComment,
   CreateCommentReaction,
-} from '../../src/commands-&-queries/comment';
-import { CreateQuest, UpdateQuest } from '../../src/commands-&-queries/quest';
-import { CreateThread } from '../../src/commands-&-queries/thread';
+} from '../../src/aggregates/comment';
+import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { CreateThread } from '../../src/aggregates/thread';
 import {
   GetUserProfile,
   GetXps,
   UpdateUser,
   Xp,
-} from '../../src/commands-&-queries/user';
+} from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';

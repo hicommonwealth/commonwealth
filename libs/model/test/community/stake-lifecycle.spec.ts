@@ -14,7 +14,7 @@ import {
   GetCommunities,
   GetCommunityStake,
   SetCommunityStake,
-} from '../../src/commands-&-queries/community';
+} from '../../src/aggregates/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
 

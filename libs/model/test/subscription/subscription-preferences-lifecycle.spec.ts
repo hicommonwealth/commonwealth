@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import {
   GetSubscriptionPreferences,
   UpdateSubscriptionPreferences,
-} from '../../src/commands-&-queries/subscription';
+} from '../../src/aggregates/subscription';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 

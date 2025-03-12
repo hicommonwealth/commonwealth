@@ -15,7 +15,7 @@ import z from 'zod';
 import {
   getPreviewImageUrl,
   getRenderedTitle,
-} from '../../commands-&-queries/webhook/util';
+} from '../../aggregates/webhook/util';
 import { config } from '../../config';
 import { models } from '../../database';
 import { CommentInstance, WebhookInstance } from '../../models';

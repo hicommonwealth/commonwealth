@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   CreateStakeTransaction,
   GetTransactions,
-} from '../../src/commands-&-queries/community';
+} from '../../src/aggregates/community';
 
 chai.use(chaiAsPromised);
 

@@ -6,12 +6,8 @@ import {
   CreateComment,
   DeleteComment,
   UpdateComment,
-} from '../commands-&-queries/comment';
-import {
-  CreateThread,
-  DeleteThread,
-  UpdateThread,
-} from '../commands-&-queries/thread';
+} from '../aggregates/comment';
+import { CreateThread, DeleteThread, UpdateThread } from '../aggregates/thread';
 import { models } from '../database';
 
 const ThreadEventInputs = {

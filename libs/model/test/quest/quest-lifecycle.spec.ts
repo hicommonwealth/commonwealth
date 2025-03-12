@@ -15,7 +15,7 @@ import {
   GetQuest,
   GetQuests,
   UpdateQuest,
-} from '../../src/commands-&-queries/quest';
+} from '../../src/aggregates/quest';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
