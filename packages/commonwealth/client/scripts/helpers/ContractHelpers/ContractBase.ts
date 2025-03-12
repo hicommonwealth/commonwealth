@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
+import { distributeSkale } from 'utils/skaleUtils';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -47,6 +48,8 @@ abstract class ContractBase {
           this.contractAddress,
         );
         this.initialized = true;
+
+        await distributeSkale(this.web3, chainId);
       } catch (error) {
         throw new Error('Failed to initialize contract: ' + error);
       }

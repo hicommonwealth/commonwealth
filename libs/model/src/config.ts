@@ -47,6 +47,7 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  SKALE_API_URL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -163,6 +164,9 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
+    SKALE: {
+      API_URL: SKALE_API_URL || '',
     },
   },
   z.object({
@@ -365,6 +369,15 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
+    }),
+    SKALE: z.object({
+      API_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SKALE_API_URL must be set to a non-default value in production.',
         ),
     }),
   }),

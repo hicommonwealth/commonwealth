@@ -4,8 +4,10 @@ import {
   DecodeEventLogParameters,
   DecodeEventLogReturnType,
   Hex,
+  createPublicClient,
   decodeEventLog,
   getAddress,
+  http,
 } from 'viem';
 import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
@@ -222,3 +224,18 @@ export const createEvmSigner = (
       account.signMessage({ message }),
   };
 };
+
+export async function getBalance(address: `0x${string}`, rpc_url: string) {
+  let balance;
+  try {
+    const client = createPublicClient({
+      transport: http(rpc_url), // Replace with your provider
+    });
+
+    balance = await client.getBalance({ address });
+  } catch (error) {
+    throw new Error('Error fetching balance:', error!);
+  }
+
+  return balance;
+}
