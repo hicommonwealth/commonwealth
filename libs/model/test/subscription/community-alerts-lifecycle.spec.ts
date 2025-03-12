@@ -4,12 +4,12 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
-import { models } from '../../src/database';
 import {
   CreateCommunityAlert,
   DeleteCommunityAlerts,
   GetCommunityAlerts,
-} from '../../src/subscription';
+} from '../../src/aggregates/subscription';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 
 describe('Community alerts lifecycle', () => {

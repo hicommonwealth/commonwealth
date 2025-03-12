@@ -54,7 +54,8 @@ export const questFormValidationSchema = z
           invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
         },
       )
-      .optional(),
+      .optional()
+      .nullish(),
   })
   .refine(
     (data) => {

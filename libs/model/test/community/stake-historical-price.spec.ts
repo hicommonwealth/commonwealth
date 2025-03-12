@@ -4,7 +4,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
+import { GetStakeHistoricalPrice } from '../../src/aggregates/community/GetStakeHistoricalPrice.query';
 
 chai.use(chaiAsPromised);
 

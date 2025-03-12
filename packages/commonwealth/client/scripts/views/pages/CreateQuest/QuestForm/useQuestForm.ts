@@ -245,6 +245,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
+      quest_type: 'common',
     });
 
     if (quest && quest.id) {
@@ -302,7 +303,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       }),
       max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
-      community_id: values?.community?.value || undefined,
+      community_id: values?.community?.value || null, // send null to remove community association
       action_metas: questActionSubForms.map((subForm) => ({
         event_name: subForm.values.action as QuestAction,
         reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
@@ -358,7 +359,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'update') {
           await handleUpdateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate(`/quests/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
+          // redirect to quest details page after update
+          navigate(`/quests/${questId}`, {}, values?.community?.value || null);
         }
       } catch (e) {
         console.error(e);

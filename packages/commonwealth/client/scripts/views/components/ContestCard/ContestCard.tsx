@@ -304,7 +304,7 @@ const ContestCard = ({
                       <CWText fontWeight="bold">
                         <FractionalValue
                           fontWeight="bold"
-                          value={parseFloat(prize.replace(',', ''))}
+                          value={Number(prize.replace(/,/g, ''))}
                         />
                         &nbsp;{ticker}
                       </CWText>
@@ -338,7 +338,6 @@ const ContestCard = ({
               )}
             />
           )}
-
           {onFund && isActive && user.isLoggedIn && (
             <CWThreadAction
               label="Fund"
