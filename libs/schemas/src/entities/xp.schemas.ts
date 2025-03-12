@@ -4,7 +4,7 @@ import { QuestActionMeta } from './quest.schemas';
 import { User } from './user.schemas';
 
 export const XpLog = z.object({
-  action_meta_id: PG_INT,
+  action_meta_id: z.number(),
   user_id: PG_INT,
   event_created_at: z.coerce.date(),
   xp_points: PG_INT,

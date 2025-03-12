@@ -105,6 +105,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
               image: quest.image_url,
               name: quest.name,
               start_date: quest.start_date,
+              max_xp_to_end: `${quest.max_xp_to_end}`,
               ...(quest.community_id &&
                 community && {
                   community: {

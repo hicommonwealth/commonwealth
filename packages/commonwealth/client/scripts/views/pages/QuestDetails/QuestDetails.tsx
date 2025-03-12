@@ -1,4 +1,5 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
+import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   QuestAction as QuestActionType,
@@ -22,10 +23,14 @@ import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModalType } from 'views/modals/AuthModal';
@@ -95,6 +100,8 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const { pendingWeeklyQuests } = useXPProgress();
 
+  const popoverProps = usePopover();
+
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
   }
@@ -132,11 +139,11 @@ const QuestDetails = ({ id }: { id: number }) => {
   ) => {
     switch (actionName) {
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.CreateAccount);
+        setAuthModalType(AuthModalType.SignIn);
         break;
       }
       case 'CommunityCreated': {
@@ -144,11 +151,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
-        navigate(
-          `/new/discussion`,
-          {},
-          quest?.community_id || randomResourceId?.community_id,
-        );
+        navigate(`/new/discussion`, {}, quest?.community_id || null);
         break;
       }
       case 'CommunityJoined': {
@@ -161,31 +164,45 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'ThreadUpvoted':
       case 'CommentCreated': {
-        navigate(
-          actionContentId
-            ? buildURLFromContentId(
-                actionContentId.split(':')[1],
-                'thread',
-              ).split(window.location.origin)[1]
-            : `/discussion/${`${randomResourceId?.thread_id}`}`,
-          {},
-          null,
-        );
+        if (actionContentId) {
+          navigate(
+            buildURLFromContentId(
+              actionContentId.split(':')[1],
+              'thread',
+            ).split(window.location.origin)[1],
+            {},
+            null,
+          );
+          return;
+        }
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/dashboard/for-you`, {}, null);
         break;
       }
       case 'CommentUpvoted': {
-        navigate(
-          actionContentId
-            ? buildURLFromContentId(
-                actionContentId.split(':')[1],
-                'comment',
-              ).split(window.location.origin)[1]
-            : `/discussion/${
-                randomResourceId?.thread_id
-              }?comment=${randomResourceId?.comment_id}`,
-          {},
-          null,
-        );
+        if (actionContentId) {
+          navigate(
+            actionContentId
+              ? buildURLFromContentId(
+                  actionContentId.split(':')[1],
+                  'comment',
+                ).split(window.location.origin)[1]
+              : `/discussion/${
+                  randomResourceId?.thread_id
+                }?comment=${randomResourceId?.comment_id}`,
+            {},
+            null,
+          );
+          return;
+        }
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/dashboard/for-you`, {}, null);
         break;
       }
       case 'UserMentioned': {
@@ -263,6 +280,8 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isSiteAdmin = Permissions.isSiteAdmin();
 
+  const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -305,6 +324,43 @@ const QuestDetails = ({ id }: { id: number }) => {
                   true,
                 )}
               </CWText>
+              <div className="progress">
+                <div className="progress-label">
+                  <CWText type="caption">
+                    Rewarded {xpAwarded} / Max {quest.max_xp_to_end}
+                  </CWText>
+                  <CWPopover
+                    body={
+                      <div>
+                        <CWText type="b2">
+                          Indicates the maximum xp allocation before this quest
+                          is considered complete.
+                        </CWText>
+                        <br />
+
+                        <CWText type="b2">
+                          The quest automatically transitions to completed
+                          status, if max XP is alloted before quest end date.
+                        </CWText>
+                      </div>
+                    }
+                    placement="top-start"
+                    {...popoverProps}
+                  />
+                  <CWIconButton
+                    iconName="question"
+                    iconSize="small"
+                    onMouseEnter={popoverProps.handleInteraction}
+                    onMouseLeave={popoverProps.handleInteraction}
+                  />
+                </div>
+
+                <progress
+                  className={clsx('progress-bar', { isEnded })}
+                  value={xpAwarded}
+                  max={quest.max_xp_to_end}
+                />
+              </div>
               {isSiteAdmin && (
                 <>
                   <CWDivider />

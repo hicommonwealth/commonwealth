@@ -28,8 +28,8 @@ const actionCopies = {
     ['ThreadUpvoted']: 'Upvote a thread',
     ['CommentCreated']: 'Create a comment',
     ['CommentUpvoted']: 'Upvote a comment',
-    ['WalletLinked']: 'Link a Web3 wallet with your account',
-    ['SSOLinked']: 'Link an SSO method with your account',
+    ['WalletLinked']: 'Link a new wallet',
+    ['SSOLinked']: 'Link a new social (SSO)',
   },
   shares: {
     ['CommunityCreated']: 'referrer',

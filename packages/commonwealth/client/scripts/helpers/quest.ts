@@ -27,10 +27,15 @@ export const calculateQuestTimelineLabel = ({
   const startDaysRemaining = moment(startDate).diff(moment(), 'days');
   const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
   const endDaysRemaining = moment(endDate).diff(moment(), 'days');
+  const endYearsRemaining = moment(endDate).diff(moment(), 'years');
 
   if (isEnded) {
     return `Ended
     ${moment(endDate).format('DD/MM/YYYY')}`;
+  }
+
+  if (endYearsRemaining > 10) {
+    return `Ongoing`;
   }
 
   if (isStarted) {
@@ -126,10 +131,4 @@ export const isQuestActionComplete = (
     ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
     : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
         questAction.participation_times_per_period;
-};
-
-export const questParticipationPeriodToCopyMap = {
-  [QuestParticipationPeriod.Daily]: 'day',
-  [QuestParticipationPeriod.Weekly]: 'week',
-  [QuestParticipationPeriod.Monthly]: 'month',
 };
