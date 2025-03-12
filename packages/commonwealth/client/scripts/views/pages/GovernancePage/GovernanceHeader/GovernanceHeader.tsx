@@ -76,9 +76,9 @@ const GovernanceHeader = () => {
             />
           </div>
         )}
-        {tokenSupply && (
+        {communityToken && tokenSupply && (
           <CWText fontWeight="semiBold">
-            {formatTokenSupply(tokenSupply)}
+            {formatTokenSupply(tokenSupply, communityToken.symbol)}
           </CWText>
         )}
       </div>

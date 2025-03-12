@@ -1,14 +1,14 @@
 /**
  * Converts a numeric or string token supply into a comma-separated format,
- * and appends "INCH" at the end.
+ * and appends token Symbol at the end.
  *
  * @param supply - The token supply (number or string).
- * @param ticker - The token ticker to display (defaults to "INCH").
+ * @param tokenSymbol - The token Symbol to display.
  * @returns Formatted supply, e.g. "22,168,885,198 INCH"
  */
 export function formatTokenSupply(
   supply: number | string,
-  ticker: string = 'INCH',
+  tokenSymbol: string,
 ): string {
   const parsedSupply = typeof supply === 'number' ? supply : parseFloat(supply);
 
@@ -18,5 +18,5 @@ export function formatTokenSupply(
 
   const formattedSupply = parsedSupply.toLocaleString();
 
-  return `${formattedSupply} ${ticker}`;
+  return `${formattedSupply} ${tokenSymbol}`;
 }
