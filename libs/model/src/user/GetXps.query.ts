@@ -54,17 +54,19 @@ export function GetXps(): Query<typeof schemas.GetXps> {
 
       const where: WhereOptions<XpLogInstance> = {};
       user_id && (where.user_id = user_id);
-      if (user_or_creator_id) {
-        where[Op.or as any] = [
-          { user_id: user_or_creator_id },
-          { creator_user_id: user_or_creator_id },
-        ];
-      }
       from && (where.created_at = { [Op.gt]: from });
       to && (where.created_at = { [Op.lte]: to });
 
       const xps = await models.XpLog.findAll({
-        where,
+        where: {
+          ...where,
+          ...(user_or_creator_id && {
+            [Op.or]: [
+              { user_id: user_or_creator_id },
+              { creator_user_id: user_or_creator_id },
+            ],
+          }),
+        },
         include,
         order: [['created_at', 'DESC']],
       });
