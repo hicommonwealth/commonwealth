@@ -25,7 +25,7 @@ import { buildThreadContentUrl } from '../utils';
 const log = logger(import.meta);
 
 const FEED_WINDOW_SIZE = 50;
-const HOME_FEED_KEY = 'HOME_FEED';
+export const HOME_FEED_KEY = 'HOME_FEED';
 
 const FeedSchemas = {
   ContestStarted: {

@@ -1,10 +1,8 @@
 import { cache, CacheNamespaces, logger, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { HOME_FEED_KEY } from 'model/src/policies/HomeFeed.policy';
 
 const log = logger(import.meta);
-
-// Home feed key used in the policy
-const HOME_FEED_KEY = 'HOME_FEED';
 
 export function GetHomeFeed(): Query<typeof schemas.HomeFeed> {
   return {
