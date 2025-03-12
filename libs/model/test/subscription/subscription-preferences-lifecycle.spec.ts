@@ -1,11 +1,11 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
-import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
   UpdateSubscriptionPreferences,
-} from '../../src/subscription';
+} from '../../src/aggregates/subscription';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {

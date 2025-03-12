@@ -1,5 +1,9 @@
 import { logger } from '@hicommonwealth/core';
-import { Tweet, TwitterMentionsTimeline } from '@hicommonwealth/schemas';
+import {
+  Tweet,
+  TweetsWithMetrics,
+  TwitterMentionsTimeline,
+} from '@hicommonwealth/schemas';
 import fetch from 'node-fetch';
 import z from 'zod';
 import { TwitterBotConfig } from './utils';
@@ -113,4 +117,55 @@ export async function getMentions({
   }
 
   return { mentions: allMentions, endTime };
+}
+
+export async function getTweets({
+  twitterBotConfig,
+  tweetIds,
+}: {
+  twitterBotConfig: TwitterBotConfig;
+  tweetIds: string[];
+}): Promise<z.infer<typeof TweetsWithMetrics>['data']> {
+  const allTweets: z.infer<typeof TweetsWithMetrics>['data'] = [];
+
+  // Process ids in chunks of 100
+  for (let i = 0; i < tweetIds.length; i += 100) {
+    const idChunk = tweetIds.slice(i, i + 100);
+
+    const res = await getFromTwitter({
+      twitterBotConfig,
+      url: 'https://api.x.com/2/tweets',
+      queryParams: {
+        'tweet.fields': 'public_metrics',
+        ids: idChunk.join(','),
+      },
+    });
+
+    const parsedRes = TweetsWithMetrics.parse(res.jsonBody);
+
+    if (parsedRes.errors) {
+      for (const error of parsedRes.errors) {
+        log.error(
+          'Error occurred fetching tweet metrics',
+          new Error(JSON.stringify(error)),
+          {
+            botName: twitterBotConfig.name,
+          },
+        );
+      }
+    }
+
+    allTweets.push(...(parsedRes.data || []));
+
+    // If we've hit the rate limit, return what we have so far
+    if (res.requestsRemaining === 0) {
+      log.warn('Hit rate limit while fetching tweet metrics', {
+        processedIds: allTweets.length,
+        totalIds: tweetIds.length,
+      });
+      break;
+    }
+  }
+
+  return allTweets;
 }

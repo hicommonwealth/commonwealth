@@ -4,6 +4,7 @@ import {
   CommunityIndexerWorker,
   Contest,
   ContestWorker,
+  CreateUnverifiedUser,
   DiscordBotPolicy,
   FarcasterWorker,
   NotificationsPolicy,
@@ -18,6 +19,7 @@ export const rascalConsumerMap = [
   FarcasterWorker,
   NotificationsSettingsPolicy,
   CommunityIndexerWorker,
+  CreateUnverifiedUser,
   {
     consumer: ContestWorker,
     overrides: {

@@ -1,9 +1,9 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
-import { Contests } from 'model/src/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import { Contests } from '../../src/aggregates/contest';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 

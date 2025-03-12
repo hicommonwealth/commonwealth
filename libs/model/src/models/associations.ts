@@ -33,11 +33,17 @@ export const buildAssociations = (db: DB) => {
   db.QuestActionMeta.withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
-  }).withMany(db.ChainEventXpSource, {
-    foreignKey: 'quest_action_meta_id',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  });
+  })
+    .withMany(db.ChainEventXpSource, {
+      foreignKey: 'quest_action_meta_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    })
+    .withMany(db.QuestTweets, {
+      foreignKey: 'quest_action_meta_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',

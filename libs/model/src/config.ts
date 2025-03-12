@@ -4,7 +4,6 @@ import { z } from 'zod';
 
 const {
   DATABASE_URL,
-  DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
   DISCORD_CLIENT_ID,
@@ -70,9 +69,6 @@ export const config = configure(
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
-      CLEAN_HOUR: DATABASE_CLEAN_HOUR
-        ? parseInt(DATABASE_CLEAN_HOUR, 10)
-        : undefined,
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
@@ -165,6 +161,8 @@ export const config = configure(
     OPENAI: {
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
@@ -188,7 +186,6 @@ export const config = configure(
         ),
       NAME: z.string(),
       NO_SSL: z.boolean(),
-      CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
@@ -366,6 +363,8 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+      USE_OPENROUTER: z.string().optional(),
+      OPENROUTER_API_KEY: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z
