@@ -15,9 +15,14 @@ import './QuestList.scss';
 type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
+  hideHeader?: boolean;
 };
 
-const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
+const QuestList = ({
+  minQuests = 8,
+  questsForCommunityId,
+  hideHeader,
+}: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
@@ -65,7 +70,7 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
 
   return (
     <div className="QuestList">
-      <CWText type="h2">Quests</CWText>
+      {!hideHeader && <CWText type="h2">Quests</CWText>}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (

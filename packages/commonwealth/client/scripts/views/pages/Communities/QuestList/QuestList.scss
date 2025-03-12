@@ -25,3 +25,19 @@
     }
   }
 }
+
+// Special style for when this component is inside a horizontal-scroll-container
+.horizontal-scroll-container .QuestList {
+  .list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    grid-template-columns: unset !important;
+    overflow-x: visible; // Let the parent handle scrolling
+
+    & > div {
+      flex: 0 0 auto;
+      min-width: 300px;
+      max-width: 350px;
+    }
+  }
+}
