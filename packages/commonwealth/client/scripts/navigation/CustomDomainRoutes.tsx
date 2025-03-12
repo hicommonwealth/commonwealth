@@ -287,8 +287,8 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
-      key="/:scope/governance"
-      path="/:scope/governance"
+      key="/governance"
+      path="/governance"
       element={withLayout(GovernancePage, {
         scoped: true,
       })}
