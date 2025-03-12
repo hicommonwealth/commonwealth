@@ -1,13 +1,11 @@
-import {
-  QuestActionMeta,
-  QuestParticipationLimit,
-} from '@hicommonwealth/schemas';
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   QuestAction as QuestActionType,
+  XPLog,
   calculateTotalXPForQuestActions,
-  questParticipationPeriodToCopyMap,
+  isQuestActionComplete,
 } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -123,10 +121,15 @@ const QuestDetails = ({ id }: { id: number }) => {
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
+  const isUserReferred = !!user.referredByAddress;
   // this only includes end user xp gain, creator/referrer xp is not included in this
-  const totalUserXP = calculateTotalXPForQuestActions(
-    (quest.action_metas || []) as QuestActionType[],
-  );
+  const totalUserXP = calculateTotalXPForQuestActions({
+    isUserReferred,
+    questStartDate: new Date(quest.start_date),
+    questEndDate: new Date(quest.end_date),
+    questActions:
+      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+  });
 
   const isCompleted = gainedXP === totalUserXP;
 
@@ -275,13 +278,6 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
   const isDeletionAllowed = !isStarted || isEnded;
 
-  const isRepeatableQuest =
-    quest.action_metas?.[0]?.participation_limit ===
-    QuestParticipationLimit.OncePerPeriod;
-  const questRepeatitionCycle = quest.action_metas?.[0]?.participation_period;
-  const questParticipationLimitPerCycle =
-    quest.action_metas?.[0]?.participation_times_per_period || 0;
-
   const isSiteAdmin = Permissions.isSiteAdmin();
 
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
@@ -328,7 +324,6 @@ const QuestDetails = ({ id }: { id: number }) => {
                   true,
                 )}
               </CWText>
-
               <div className="progress">
                 <div className="progress-label">
                   <CWText type="caption">
@@ -366,60 +361,43 @@ const QuestDetails = ({ id }: { id: number }) => {
                   max={quest.max_xp_to_end}
                 />
               </div>
-              {isRepeatableQuest && (
-                <CWText className="timeline">
-                  Users can participate&ensp;
-                  <CWTag
-                    type="group"
-                    label={`${questParticipationLimitPerCycle}`}
-                  />
-                  &ensp;time{questParticipationLimitPerCycle > 1 ? 's' : ''}{' '}
-                  every&ensp;
-                  <CWTag
-                    type="group"
-                    label={
-                      questParticipationPeriodToCopyMap[
-                        questRepeatitionCycle || ''
-                      ]
-                    }
-                  />
-                </CWText>
+              {isSiteAdmin && (
+                <>
+                  <CWDivider />
+                  <div className="manage-options">
+                    <div className="w-fit">
+                      {withTooltip(
+                        <CWButton
+                          label="Update"
+                          onClick={() => navigate(`/quests/${quest.id}/update`)}
+                          buttonType="primary"
+                          iconLeft="notePencil"
+                          disabled={isStarted || isEnded || isPendingAction}
+                        />,
+                        'Updates only allowed in pre-live stage',
+                        isStarted || isEnded,
+                      )}
+                    </div>
+                    <div className="w-fit">
+                      {withTooltip(
+                        <CWButton
+                          label={isDeletionAllowed ? 'Delete' : 'Cancel'}
+                          onClick={handleQuestAbort}
+                          buttonType="destructive"
+                          iconLeft="trash"
+                          disabled={isEnded || isPendingAction}
+                        />,
+                        isEnded
+                          ? 'Deletion not allowed for non-active quests'
+                          : '',
+                        isEnded,
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>
-          {isSiteAdmin && (
-            <>
-              <CWDivider />
-              <div className="manage-options">
-                <div className="w-fit">
-                  {withTooltip(
-                    <CWButton
-                      label="Update"
-                      onClick={() => navigate(`/quests/${quest.id}/update`)}
-                      buttonType="primary"
-                      iconLeft="notePencil"
-                      disabled={isStarted || isEnded || isPendingAction}
-                    />,
-                    'Updates only allowed in pre-live stage',
-                    isStarted || isEnded,
-                  )}
-                </div>
-                <div className="w-fit">
-                  {withTooltip(
-                    <CWButton
-                      label={isDeletionAllowed ? 'Delete' : 'Cancel'}
-                      onClick={handleQuestAbort}
-                      buttonType="destructive"
-                      iconLeft="trash"
-                      disabled={isEnded || isPendingAction}
-                    />,
-                    isEnded ? 'Deletion not allowed for non-active quests' : '',
-                    isEnded,
-                  )}
-                </div>
-              </div>
-            </>
-          )}
           <CWDivider />
           <div className="quest-actions">
             <div className="header">
@@ -438,10 +416,17 @@ const QuestDetails = ({ id }: { id: number }) => {
                   key={action.id}
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
-                  questAction={action as z.infer<typeof QuestActionMeta>}
-                  isActionCompleted={
-                    !!xpProgressions.find((p) => p.action_meta_id === action.id)
-                  }
+                  questAction={action as QuestActionType}
+                  isActionCompleted={isQuestActionComplete(
+                    action as QuestActionType,
+                    xpProgressions as unknown as XPLog[],
+                  )}
+                  xpLogsForActions={xpProgressions
+                    .filter((log) => log.action_meta_id === action.id)
+                    .map((log) => ({
+                      id: log.action_meta_id,
+                      createdAt: new Date(log.event_created_at),
+                    }))}
                   canStartAction={isStarted && !isEnded}
                   {...((!isStarted || isEnded) && {
                     actionStartBlockedReason: !isStarted
@@ -458,8 +443,6 @@ const QuestDetails = ({ id }: { id: number }) => {
             <CWText type="h3">Suggested Quests</CWText>
             <div className="list">
               {pendingWeeklyQuests.activeWeeklyQuests.slice(0, 3).map((q) => {
-                const actionMetaIds = (q.action_metas || []).map((a) => a.id);
-
                 return (
                   <QuestCard
                     key={q.id}
@@ -470,9 +453,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     xpPoints={totalUserXP}
                     tasks={{
                       total: q.action_metas?.length || 0,
-                      completed: xpProgressions.filter((p) =>
-                        actionMetaIds.includes(p.quest_action_meta_id),
-                      ).length,
+                      completed: (quest.action_metas || [])
+                        .map((action) =>
+                          isQuestActionComplete(
+                            action as QuestActionType,
+                            xpProgressions as unknown as XPLog[],
+                          ),
+                        )
+                        .filter(Boolean).length,
                     }}
                     startDate={new Date(q.start_date)}
                     endDate={new Date(q.end_date)}

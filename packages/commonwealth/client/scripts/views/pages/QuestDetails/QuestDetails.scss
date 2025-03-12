@@ -34,12 +34,6 @@
           color: $neutral-700;
         }
 
-        .timeline {
-          margin-top: 6px;
-          font-size: 14px;
-          color: $neutral-700;
-        }
-
         .progress {
           cursor: default;
 
@@ -80,7 +74,7 @@
       display: flex;
       gap: 4;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
 
     .featured-img {

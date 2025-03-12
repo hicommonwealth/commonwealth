@@ -1,11 +1,6 @@
-import {
-  QuestEvents,
-  QuestParticipationLimit,
-  QuestParticipationPeriod,
-} from '@hicommonwealth/schemas';
+import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -15,8 +10,6 @@ import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
-import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
-import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
@@ -37,12 +30,6 @@ import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
 const MAX_ACTIONS_LIMIT = Object.values(QuestEvents).length; // = 8 max actions
-// these restrictions are only on client side, update per future requirements
-const MAX_REPETITION_COUNTS = {
-  PER_DAY: 4,
-  PER_WEEK: 28,
-  PER_MONTH: 120,
-};
 
 const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const {
@@ -60,24 +47,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   useRunOnceOnCondition({
     callback: () => {
       if (initialValues) {
-        if (
-          initialValues.participation_limit !==
-          QuestParticipationLimit.OncePerQuest
-        ) {
-          initialValues.participation_times_per_period &&
-            repetitionCycleRadioProps.repetitionCycleInputProps.onChange(
-              initialValues.participation_times_per_period,
-            );
-          initialValues.participation_period &&
-            repetitionCycleRadioProps.repetitionCycleSelectListProps.onChange({
-              value: initialValues.participation_period,
-              label:
-                Object.entries(QuestParticipationPeriod).find(
-                  ([_, v]) => v === initialValues.participation_period,
-                )?.[0] || '',
-            });
-        }
-
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
@@ -99,6 +68,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                       subForm as QuestActionSubFormValuesWithCreatorPoints
                     ).creatorRewardAmount,
                   }),
+                  participationLimit: subForm.participationLimit,
+                  participationPeriod: subForm.participationPeriod,
+                  participationTimesPerPeriod:
+                    subForm.participationTimesPerPeriod,
                 },
                 errors: {},
                 config: {
@@ -134,79 +107,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const navigate = useCommonNavigate();
 
   const formMethodsRef = useRef<CWFormRef>(null);
-  const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
-    (k) => ({
-      label: k,
-      value: QuestParticipationPeriod[k],
-    }),
-  );
-
-  const repetitionCycleValidatorFn = (props: ValidationFnProps) => {
-    const participation_limit = formMethodsRef.current?.getValues(
-      'participation_limit',
-    );
-    const { input, selectList } = props.values;
-
-    // clear errors if participation timeline is not a repeatable
-    if (participation_limit !== QuestParticipationLimit.OncePerPeriod) {
-      return { error: undefined };
-    }
-
-    // validate repetition cycle value
-    if (
-      !Object.values(QuestParticipationPeriod).includes(
-        selectList?.value as QuestParticipationPeriod,
-      )
-    ) {
-      return { error: 'Invalid value for reptition cycle' };
-    }
-
-    // validate repetition count value
-    try {
-      numberNonDecimalGTZeroValidationSchema.parse(`${input}`);
-
-      const count = parseInt(`${input}`);
-
-      // verify repetition counts fall within a certain range
-      if (
-        (selectList?.value === QuestParticipationPeriod.Daily &&
-          count > MAX_REPETITION_COUNTS.PER_DAY) ||
-        (selectList?.value === QuestParticipationPeriod.Weekly &&
-          count > MAX_REPETITION_COUNTS.PER_WEEK) ||
-        (selectList?.value === QuestParticipationPeriod.Monthly &&
-          count > MAX_REPETITION_COUNTS.PER_MONTH)
-      ) {
-        const allowedCount =
-          selectList?.value === QuestParticipationPeriod.Daily
-            ? MAX_REPETITION_COUNTS.PER_DAY
-            : selectList?.value === QuestParticipationPeriod.Weekly
-              ? MAX_REPETITION_COUNTS.PER_WEEK
-              : MAX_REPETITION_COUNTS.PER_MONTH;
-        return {
-          error: `Cannot repeat more than ${allowedCount} times ${selectList?.value}`,
-        };
-      }
-    } catch {
-      return { error: 'Invalid value for repetition count' };
-    }
-
-    return { error: undefined };
-  };
-
-  const {
-    error: repetitionCycleRadioError,
-    triggerValidation: triggerRepetitionCycleRadioValidation,
-    ...repetitionCycleRadioProps
-  } = useCWRepetitionCycleRadioButton({
-    validatorFn: repetitionCycleValidatorFn,
-    repetitionCycleInputProps: {
-      value: 1,
-    },
-    repetitionCycleSelectListProps: {
-      options: repetitionCycleOptions,
-      selected: repetitionCycleOptions[0],
-    },
-  });
 
   const handleQuestMutateConfirmation = async (hours: number) => {
     return new Promise((resolve, reject) => {
@@ -268,12 +168,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
               ),
             }),
-          participation_limit: values.participation_limit,
-          participation_period: repetitionCycleRadioProps
-            .repetitionCycleSelectListProps.selected
-            ?.value as QuestParticipationPeriod,
+          participation_limit: subForm.values.participationLimit,
+          participation_period: subForm.values
+            .participationPeriod as QuestParticipationPeriod,
           participation_times_per_period: parseInt(
-            `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+            `${subForm.values.participationTimesPerPeriod}`,
           ),
           ...(subForm.values.instructionsLink && {
             instructions_link: subForm.values.instructionsLink.trim(),
@@ -321,12 +220,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
             ),
           }),
-        participation_limit: values.participation_limit,
-        participation_period: repetitionCycleRadioProps
-          .repetitionCycleSelectListProps.selected
-          ?.value as QuestParticipationPeriod,
+        participation_limit: subForm.values.participationLimit,
+        participation_period: subForm.values
+          .participationPeriod as QuestParticipationPeriod,
         participation_times_per_period: parseInt(
-          `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+          `${subForm.values.participationTimesPerPeriod}`,
         ),
         ...(subForm.values.instructionsLink && {
           instructions_link: subForm.values.instructionsLink.trim(),
@@ -338,14 +236,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const subFormErrors = validateSubForms();
-    const repetitionCycleRadioBtnError =
-      triggerRepetitionCycleRadioValidation();
 
-    if (
-      subFormErrors ||
-      repetitionCycleRadioBtnError ||
-      (mode === 'update' ? !questId : false)
-    ) {
+    if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
 
@@ -449,19 +341,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     minStartDate,
     idealStartDate,
     minEndDate,
-    // custom radio button props
-    repetitionCycleRadio: {
-      error: repetitionCycleRadioError,
-      triggerValidation: triggerRepetitionCycleRadioValidation,
-      props: {
-        repetitionCycleInputProps: {
-          ...repetitionCycleRadioProps.repetitionCycleInputProps,
-        },
-        repetitionCycleSelectListProps: {
-          ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
-        },
-      },
-    },
     formMethodsRef,
   };
 };

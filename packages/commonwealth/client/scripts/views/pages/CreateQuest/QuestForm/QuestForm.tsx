@@ -7,7 +7,6 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
-import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,7 +18,6 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import './QuestForm.scss';
 import { QuestFormProps } from './types';
@@ -42,7 +40,6 @@ const QuestForm = (props: QuestFormProps) => {
     minStartDate,
     idealStartDate,
     minEndDate,
-    repetitionCycleRadio,
     formMethodsRef,
   } = useQuestForm(props);
 
@@ -63,7 +60,6 @@ const QuestForm = (props: QuestFormProps) => {
               start_date: initialValues.start_date,
               end_date: initialValues.end_date,
               community: initialValues.community,
-              participation_limit: initialValues.participation_limit,
               max_xp_to_end: initialValues.max_xp_to_end,
             },
           }
@@ -119,28 +115,9 @@ const QuestForm = (props: QuestFormProps) => {
           <CWDivider />
 
           <div className="quest-period-section">
-            <div className="repeatition-selector">
-              <CWText type="b1" fontWeight="semiBold">
-                Quest timeline
-              </CWText>
-              <CWRepetitionCycleRadioButton
-                customError={repetitionCycleRadio.error}
-                {...repetitionCycleRadio.props}
-                className="radio-btn"
-                value={QuestParticipationLimit.OncePerPeriod}
-                groupName="participation_limit"
-                name="participation_limit"
-                hookToForm
-              />
-              <CWRadioButton
-                className="radio-btn"
-                value={QuestParticipationLimit.OncePerQuest}
-                label="One time only"
-                groupName="participation_limit"
-                name="participation_limit"
-                hookToForm
-              />
-            </div>
+            <CWText type="b1" fontWeight="semiBold">
+              Quest timeline
+            </CWText>
             <CWDateTimeInput
               label="Start Date"
               hookToForm
@@ -233,6 +210,7 @@ const QuestForm = (props: QuestFormProps) => {
                     .filter((form) => !!form.values.action)
                     .map((form) => form.values.action) as QuestAction[]
                 }
+                internalRefs={subForm.refs}
               />
             ))}
 

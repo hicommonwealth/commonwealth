@@ -1,4 +1,3 @@
-import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
   linkValidationSchema,
   numberNonDecimalGTZeroValidationSchema,
@@ -11,9 +10,6 @@ export const MAX_XP_TO_END_UPPER_LIMIT = 10_000_000;
 
 export const questFormValidationSchema = z
   .object({
-    participation_limit: z.nativeEnum(QuestParticipationLimit, {
-      invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-    }),
     start_date: z
       .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

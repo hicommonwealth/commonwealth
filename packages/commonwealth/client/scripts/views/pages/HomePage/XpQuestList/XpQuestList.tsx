@@ -76,9 +76,12 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
         ) : (
           <div className="content">
             {quests.map((quest) => {
-              const totalUserXP = calculateTotalXPForQuestActions(
-                (quest.action_metas as QuestAction[]) || [],
-              );
+              const totalUserXP = calculateTotalXPForQuestActions({
+                questActions: (quest.action_metas as QuestAction[]) || [],
+                isUserReferred: !!user.referredByAddress,
+                questStartDate: new Date(quest.start_date),
+                questEndDate: new Date(quest.end_date),
+              });
               return (
                 <XpQuestCard
                   key={quest.name}

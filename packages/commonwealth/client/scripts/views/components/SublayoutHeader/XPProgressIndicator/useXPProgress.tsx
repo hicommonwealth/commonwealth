@@ -42,9 +42,12 @@ const useXPProgress = () => {
             0,
           ) || 0;
 
-      const totalUserXP = calculateTotalXPForQuestActions(
-        (quest.action_metas as QuestAction[]) || [],
-      );
+      const totalUserXP = calculateTotalXPForQuestActions({
+        questActions: (quest.action_metas as QuestAction[]) || [],
+        isUserReferred: !!user.referredByAddress,
+        questStartDate: new Date(quest.start_date),
+        questEndDate: new Date(quest.end_date),
+      });
       return {
         ...quest,
         gainedXP,
