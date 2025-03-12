@@ -15,7 +15,6 @@ import moment from 'moment';
 import { Op } from 'sequelize';
 import { uuidV4 } from 'web3-utils';
 import { z } from 'zod';
-import { CreateCommunity } from '../../community';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
@@ -299,7 +298,7 @@ export async function createCommunityFromClankerToken(
     createCommunityPayload.icon_url = uploadedImageUrl;
   }
 
-  await command(CreateCommunity(), {
+  await command(schemas.CreateCommunity(), {
     actor: systemActor({
       id: adminAddress.user_id!,
       address: adminAddress.address,

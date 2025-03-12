@@ -6,9 +6,10 @@ import {
   EventPairs,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import { models } from '../database';
-import { paginateClankerTokens } from '../policies';
-import { emitEvent } from '../utils';
+import { z } from 'zod';
+import { models } from '../../database';
+import { paginateClankerTokens } from '../../policies/utils/community-indexer-utils';
+import { emitEvent } from '../../utils/utils';
 
 const log = logger(import.meta);
 

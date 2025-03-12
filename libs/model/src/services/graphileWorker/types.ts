@@ -1,4 +1,4 @@
-import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
+import type { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 
 export enum GraphileTaskNames {
@@ -8,6 +8,7 @@ export enum GraphileTaskNames {
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
   AwardTwitterQuestXp = 'AwardTwitterQuestXp',
+  IndexCommunities = 'IndexCommunities',
 }
 
 export type GraphileTask<
@@ -34,4 +35,5 @@ export const TaskPayloads = {
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
   }),
+  IndexCommunities: z.undefined(),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;

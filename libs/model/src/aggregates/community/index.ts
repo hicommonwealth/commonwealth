@@ -17,6 +17,7 @@ export * from './GetPinnedTokens.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetTopics.query';
 export * from './GetTransactions.query';
+export * from './IndexCommunities.command';
 export * from './JoinCommunity.command';
 export * from './PinToken.command';
 export * from './RefreshCommunityMemberships.command';

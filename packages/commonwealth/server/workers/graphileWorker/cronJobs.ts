@@ -1,4 +1,5 @@
 import { CustomCronItem, GraphileTaskNames } from '@hicommonwealth/model';
+import { config } from 'server/config';
 
 function buildCustomCronItem({
   task,
@@ -38,5 +39,9 @@ export const cronItems: Array<CustomCronItem> = [
   buildCustomCronItem({
     task: GraphileTaskNames.UpdateSitemap,
     match: '0 * * * *', // every hour
+  }),
+  buildCustomCronItem({
+    task: GraphileTaskNames.IndexCommunities,
+    match: config.COMMUNITY_INDEXER.CRON!,
   }),
 ];

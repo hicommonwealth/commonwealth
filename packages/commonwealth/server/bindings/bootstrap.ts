@@ -157,28 +157,3 @@ export function bootstrapContestRolloverLoop() {
     start: true,
   });
 }
-
-export function bootstrapCommunityIndexerLoop() {
-  const cronFrequency = config.COMMUNITY_INDEXER.CRON!;
-  if (!cronFrequency) {
-    log.warn('Skipping community indexer cron job');
-    return;
-  }
-
-  log.info(`Starting community cron job (${cronFrequency})`);
-
-  CronJob.from({
-    cronTime: cronFrequency,
-    onTick: async () => {
-      try {
-        await handleEvent(CommunityIndexerWorker(), {
-          name: 'CommunityIndexerTimerTicked',
-          payload: {},
-        });
-      } catch (err) {
-        log.error(err);
-      }
-    },
-    start: true,
-  });
-}
