@@ -1,10 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
-
-const client = OpenFeature.getClient();
 
 export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
   return z.object({
