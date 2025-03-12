@@ -21,7 +21,6 @@ import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { useQuillPasteText } from './useQuillPasteText';
 
-import axios from 'axios';
 import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -275,38 +274,16 @@ const ReactQuillEditor = ({
     if (!selection) {
       return;
     }
-    let linkMarkdown;
-    try {
-      //check that the copied link is valid based off of axios response. This is for security purposes
-      const response = await axios.get(linkUrl);
-      const contentType = response.headers['content-type'];
-      if (contentType && contentType.includes('text/html')) {
-        // Format the link to ensure it has 'https://'
-        let newLink = linkUrl;
-        if (!linkUrl.startsWith('https://')) {
-          if (linkUrl.startsWith('http://')) {
-            newLink = `https://${linkUrl.substring('http://'.length)}`;
-          } else {
-            newLink = `https://${linkUrl}`;
-          }
-        }
-        linkMarkdown = `[${linkText}](${newLink})`;
+    // Format the link to ensure it has 'https://'
+    let newLink = linkUrl;
+    if (!linkUrl.startsWith('https://')) {
+      if (linkUrl.startsWith('http://')) {
+        newLink = `https://${linkUrl.substring('http://'.length)}`;
+      } else {
+        newLink = `https://${linkUrl}`;
       }
-      console.log('ALL GOOD IN THE HOOD');
-    } catch (error) {
-      console.log('error:::', error);
-      return;
     }
-    // // Format the link to ensure it has 'https://'
-    // let newLink = linkUrl;
-    // if (!linkUrl.startsWith('https://')) {
-    //   if (linkUrl.startsWith('http://')) {
-    //     newLink = `https://${linkUrl.substring('http://'.length)}`;
-    //   } else {
-    //     newLink = `https://${linkUrl}`;
-    //   }
-    // }
-    // const linkMarkdown = `[${linkText}](${newLink})`;
+    const linkMarkdown = `[${linkText}](${newLink})`;
 
     editor.deleteText(selection.index, selection.length);
     editor.insertText(selection.index, linkMarkdown);
