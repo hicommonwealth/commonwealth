@@ -1,3 +1,4 @@
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -17,6 +18,8 @@ const QuestsExplorer = () => {
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
+    // dont show system quests in quest lists for communities
+    include_system_quests: true,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -48,17 +51,9 @@ const QuestsExplorer = () => {
             />
           </div>
           {quests.map((quest) => {
-            const totalUserXP =
-              (quest.action_metas || [])
-                ?.map(
-                  (action) =>
-                    action.reward_amount -
-                    action.creator_reward_weight * action.reward_amount,
-                )
-                .reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                ) || 0;
+            const totalUserXP = calculateTotalXPForQuestActions(
+              (quest.action_metas as QuestAction[]) || [],
+            );
 
             return (
               <ExploreCard

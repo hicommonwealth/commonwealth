@@ -20,6 +20,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         end_after,
         start_before,
         start_after,
+        include_system_quests,
       } = payload;
 
       const direction = order_direction || 'DESC';
@@ -37,6 +38,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         end_after: end_after ? new Date(end_after) : null,
       };
       const filterConditions = [
+        include_system_quests ? '' : 'Q.id > 0',
         community_id ? `Q.community_id = :community_id` : '',
         start_after ? `Q.start_date > :start_after` : '',
         start_before ? `Q.start_date <= :start_before` : '',
@@ -75,7 +77,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         FROM 
           "Quests" as Q
         LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
-        ${filterConditions.length > 0 ? `WHERE Q.id > 0 AND ${filterConditions.join(' AND ')}` : ''}
+        ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset

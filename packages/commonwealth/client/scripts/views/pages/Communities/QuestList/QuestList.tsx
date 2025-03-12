@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -35,6 +36,8 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
     cursor: 1,
     limit: minQuests,
     end_after: moment().startOf('week').toDate(),
+    // dont show system quests in quest lists for communities
+    include_system_quests: questsForCommunityId ? false : !user.isLoggedIn,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -61,7 +64,7 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
     navigate('/leaderboard');
   };
 
-  if (!xpEnabled || isLoadingXPProgression) return <></>;
+  if (!xpEnabled || (isLoadingXPProgression && user.isLoggedIn)) return <></>;
 
   return (
     <div className="QuestList">
@@ -81,17 +84,9 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
       ) : (
         <div className="list">
           {(quests || []).map((quest) => {
-            const totalUserXP =
-              (quest.action_metas || [])
-                ?.map(
-                  (action) =>
-                    action.reward_amount -
-                    action.creator_reward_weight * action.reward_amount,
-                )
-                .reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                ) || 0;
+            const totalUserXP = calculateTotalXPForQuestActions(
+              (quest.action_metas as QuestAction[]) || [],
+            );
             const actionMetaIds = (quest.action_metas || []).map((a) => a.id);
 
             return (
