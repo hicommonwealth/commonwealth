@@ -56,26 +56,17 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
     <>
       {launchpadEnabled && (
         <div className="section-container">
-          <CWText type="h2" className="section-header">
-            Tokens
-          </CWText>
           <TokensList filters={filters} />
         </div>
       )}
 
       {/* Quests section */}
       <div className="section-container">
-        <CWText type="h2" className="section-header">
-          Quests
-        </CWText>
         <QuestList />
       </div>
 
       {/* Contests section */}
       <div className="section-container">
-        <CWText type="h2" className="section-header">
-          Contests
-        </CWText>
         <ExploreContestList />
       </div>
 
