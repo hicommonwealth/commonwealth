@@ -261,7 +261,9 @@ const CommunitiesPage = () => {
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
               {!isWindowSmallInclusive ? communitiesCount : <></>}
-              <CreateCommunityButton buttonHeight="med" withIcon />
+              {!launchpadEnabled && (
+                <CreateCommunityButton buttonHeight="med" withIcon />
+              )}
             </div>
           </div>
 
