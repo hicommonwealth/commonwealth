@@ -22,21 +22,36 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
+  ContentType,
   ZERO_ADDRESS,
   formatDecimalToWei,
   splitAndDecodeURL,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
+import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
+import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import useCreateThreadMutation, {
+  buildCreateThreadInput,
+} from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+// eslint-disable-next-line max-len
+import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+} from 'views/components/react_quill_editor';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
@@ -49,6 +64,7 @@ import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
+
 type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
   selectedView?: string;
@@ -67,6 +83,7 @@ const VIEWS = [
 ];
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [selectedView, setSelectedView] = useState<string>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -93,7 +110,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const contestStatus = searchParams.get('status');
   const tabStatus = searchParams.get('tab');
 
-  const containerRef = useRef();
   useLayoutEffect(() => {
     if (tabStatus === 'overview') {
       setSelectedView(VIEWS[1].value);
@@ -200,6 +216,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicNameFromURL !== 'overview' &&
       tabStatus !== 'overview'
     ) {
+      // Don't redirect if we're on a discussion page
+      if (location.pathname.includes('/discussion/')) {
+        return;
+      }
+
       const validTopics = topics?.some(
         (topic) => topic?.name === topicNameFromURL,
       );
@@ -234,6 +255,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     isTopicWeighted && voteBalance
       ? prettyVoteWeight(
           formatDecimalToWei(voteBalance),
+          topicObj!.token_decimals,
           topicObj!.weighted_voting,
           topicObj!.vote_weight_multiplier || 1,
         )
@@ -246,13 +268,71 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     setSelectedView(activeTab);
   };
 
+  // Add sticky editor state
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
+    createDeltaFromText(''),
+  );
+
+  const { mutateAsync: createThread } = useCreateThreadMutation({
+    communityId: communityId,
+  });
+
+  const handleCreateThread = async (): Promise<number> => {
+    if (!user.activeAccount) {
+      notifyError('You must be logged in to create a thread');
+      throw new Error('Not logged in');
+    }
+
+    if (!topicObj) {
+      notifyError('You must select a topic to create a thread');
+      throw new Error('No topic selected');
+    }
+
+    if (!user.activeAccount.community?.base) {
+      notifyError('Invalid community configuration');
+      throw new Error('Invalid community configuration');
+    }
+
+    try {
+      const input = await buildCreateThreadInput({
+        address: user.activeAccount.address,
+        kind: 'discussion',
+        stage: 'Discussion',
+        communityId: communityId,
+        communityBase: user.activeAccount.community.base,
+        title: 'New Thread',
+        topic: topicObj,
+        body: getTextFromDelta(threadContentDelta),
+      });
+
+      const thread = await createThread(input);
+
+      if (!thread?.id) {
+        throw new Error('Failed to create thread - no ID returned');
+      }
+
+      setThreadContentDelta(createDeltaFromText(''));
+
+      // Construct the correct navigation path
+      const communityPrefix = communityId ? `/${communityId}` : '';
+      const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+
+      navigate(threadUrl);
+
+      return thread.id;
+    } catch (error) {
+      notifyError('Failed to create thread');
+      throw error;
+    }
+  };
+
+  const handleCancel = () => {
+    setThreadContentDelta(createDeltaFromText(''));
+  };
+
   return (
-    <>
-      <CWPageLayout
-        // @ts-expect-error <StrictNullChecks/>
-        ref={containerRef}
-        className="DiscussionsPageLayout"
-      >
+    <StickCommentProvider mode="thread">
+      <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
         <DiscussionsFeedDiscovery
           orderBy={featuredFilter}
           community={communityId}
@@ -317,54 +397,89 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           setSelectedView={updateSelectedView}
         />
         {selectedView === VIEWS[0].value ? (
-          <Virtuoso
-            className="thread-list"
-            style={{ height: '100%', width: '100%' }}
-            data={isInitialLoading ? [] : filteredThreads}
-            customScrollParent={containerRef.current}
-            itemContent={(_, thread) => (
-              <RenderThreadCard
-                thread={thread}
-                communityId={communityId}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
-                contestsData={contestsData}
-              />
-            )}
-            endReached={() => {
-              hasNextPage && fetchNextPage();
-            }}
-            overscan={50}
-            components={{
-              // eslint-disable-next-line react/no-multi-comp
-              EmptyPlaceholder: () => (
-                <EmptyThreadsPlaceholder
-                  isInitialLoading={isInitialLoading}
-                  isOnArchivePage={isOnArchivePage}
+          <>
+            <Virtuoso
+              className="thread-list"
+              style={{ height: '100%', width: '100%' }}
+              data={isInitialLoading ? [] : filteredThreads}
+              customScrollParent={containerRef.current || undefined}
+              itemContent={(_, thread) => (
+                <RenderThreadCard
+                  thread={thread}
+                  communityId={communityId}
+                  memberships={memberships}
+                  topicPermissions={topicPermissions}
+                  contestsData={contestsData}
                 />
-              ),
-            }}
-          />
+              )}
+              endReached={() => {
+                hasNextPage && fetchNextPage();
+              }}
+              overscan={50}
+              components={{
+                // eslint-disable-next-line react/no-multi-comp
+                EmptyPlaceholder: () => (
+                  <EmptyThreadsPlaceholder
+                    isInitialLoading={isInitialLoading}
+                    isOnArchivePage={isOnArchivePage}
+                  />
+                ),
+              }}
+            />
+            <WithDefaultStickyComment>
+              {user.isLoggedIn && user.activeAccount && (
+                <StickyEditorContainer
+                  parentType={ContentType.Thread}
+                  canComment={true}
+                  handleSubmitComment={handleCreateThread}
+                  errorMsg=""
+                  contentDelta={threadContentDelta}
+                  setContentDelta={setThreadContentDelta}
+                  disabled={false}
+                  onCancel={handleCancel}
+                  author={user.activeAccount}
+                  editorValue={getTextFromDelta(threadContentDelta)}
+                  tooltipText=""
+                  topic={topicObj}
+                />
+              )}
+            </WithDefaultStickyComment>
+          </>
         ) : selectedView === VIEWS[1].value ? (
-          <OverviewPage />
+          <OverviewPage
+            topicId={topicId}
+            featuredFilter={featuredFilter}
+            timelineFilter={dateCursor}
+          />
         ) : (
           <VirtuosoGrid
             data={isInitialLoading ? [] : filteredThreads}
-            customScrollParent={containerRef.current}
+            customScrollParent={containerRef.current || undefined}
             components={
               {
-                // eslint-disable-next-line  react/display-name,, react/no-multi-comp
-                List: forwardRef<HTMLDivElement, ListContainerProps>(
-                  ({ children, ...props }, ref) => (
+                List: (() => {
+                  // eslint-disable-next-line react/no-multi-comp
+                  const VirtuosoGridList = forwardRef<
+                    HTMLDivElement,
+                    ListContainerProps
+                  >(({ children, ...props }, ref) => (
                     <div ref={ref} {...props}>
                       {children}
                     </div>
-                  ),
-                ),
-                // eslint-disable-next-line , react/prop-types, react/no-multi-comp
-                Item: ({ children, ...props }) => (
-                  <div {...props}>{children}</div>
-                ),
+                  ));
+                  VirtuosoGridList.displayName = 'VirtuosoGridList';
+                  return VirtuosoGridList;
+                })(),
+                Item: (() => {
+                  // eslint-disable-next-line react/no-multi-comp
+                  const VirtuosoGridItem = ({
+                    children,
+                    ...props
+                  }: {
+                    children: React.ReactNode;
+                  }) => <div {...props}>{children}</div>;
+                  return VirtuosoGridItem;
+                })(),
               } as GridComponents
             }
             itemContent={(_, thread) => (
@@ -387,8 +502,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             overscan={50}
           />
         )}
+
+        <StickyCommentElementSelector />
       </CWPageLayout>
-    </>
+    </StickCommentProvider>
   );
 };
 export default DiscussionsPage;

@@ -3,6 +3,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import useUserStore from 'state/ui/user';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWTab,
@@ -23,6 +24,7 @@ const QuestSummaryCard = () => {
     QuestTimeline.Active,
   );
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   const {
     data: onGoingQuestsList,
@@ -31,6 +33,8 @@ const QuestSummaryCard = () => {
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
+    // only show system quests in non-auth state
+    include_system_quests: !user.isLoggedIn,
     enabled: xpEnabled,
   });
 
@@ -41,6 +45,8 @@ const QuestSummaryCard = () => {
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
+    // only show system quests in non-auth state
+    include_system_quests: !user.isLoggedIn,
     enabled: xpEnabled,
   });
 

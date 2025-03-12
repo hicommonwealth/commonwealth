@@ -210,8 +210,6 @@ const useUserMenuItems = ({
     };
   });
 
-  console.log('darkMode', darkMode);
-
   const uniqueChainAddressOptions: PopoverMenuItem[] = uniqueChainAddresses.map(
     (address) => {
       const signed = true;

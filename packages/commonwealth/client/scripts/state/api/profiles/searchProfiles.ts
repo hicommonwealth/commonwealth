@@ -12,10 +12,8 @@ interface SearchProfilesProps {
   limit: number;
   orderBy?: APIOrderBy;
   orderDirection?: APIOrderDirection;
-  includeMembershipTypes?: 'in-group' | `in-group:${string}` | 'not-in-group';
-  includeGroupIds?: boolean;
-  includeCount?: boolean;
   enabled?: boolean;
+  exactMatch?: boolean;
 }
 
 const useSearchProfilesQuery = ({
@@ -24,6 +22,7 @@ const useSearchProfilesQuery = ({
   limit,
   orderBy,
   orderDirection,
+  exactMatch = false,
   enabled = true,
 }: SearchProfilesProps) => {
   return trpc.user.searchUserProfiles.useInfiniteQuery(
@@ -33,6 +32,7 @@ const useSearchProfilesQuery = ({
       limit,
       order_by: orderBy,
       order_direction: orderDirection,
+      exact_match: exactMatch,
     },
     {
       getNextPageParam: (lastPage) => {

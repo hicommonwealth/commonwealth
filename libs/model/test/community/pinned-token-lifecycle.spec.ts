@@ -18,7 +18,7 @@ import {
   PinTokenErrors,
   UnpinToken,
   UnpinTokenErrors,
-} from '../../src/community';
+} from '../../src/aggregates/community';
 import { seed } from '../../src/tester';
 
 const adminAddress = '0x0b84092914abaA89dDCb9C788Ace0B1fD6Ea7d90';

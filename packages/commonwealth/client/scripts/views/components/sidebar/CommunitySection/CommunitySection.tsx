@@ -27,6 +27,7 @@ import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
 import CreateCommunityButton from '../CreateCommunityButton';
 import DirectoryMenuItem from '../DirectoryMenuItem';
+import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
@@ -134,6 +135,9 @@ export const CommunitySection = ({
   return (
     <>
       <div className="community-menu">
+        {!user.isLoggedIn && isInsideCommunity && (
+          <SidebarSignInButton isInsideCommunity />
+        )}
         {user.isLoggedIn && <ProfileCard />}
         {user.isLoggedIn && (
           <>

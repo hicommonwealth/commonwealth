@@ -8,17 +8,8 @@ import {
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from 'vitest';
-import { DatabaseCleaner } from '../../server/util/databaseCleaner';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import { cleanSubscriptions } from '../../server/workers/graphileWorker/tasks/cleanSubscriptions';
 
 chai.use(chaiHttp);
 
@@ -31,90 +22,6 @@ describe('DatabaseCleaner Tests', async () => {
 
   afterAll(async () => {
     await dispose()();
-  });
-
-  describe('Tests when the cleaner runs', () => {
-    beforeEach(function () {
-      const now = new Date();
-      now.setUTCHours(8);
-      now.setUTCMinutes(0);
-      now.setUTCMilliseconds(0);
-
-      // set clock to 8 AM UTC current year, month, and day
-      vi.useFakeTimers({
-        now,
-      });
-    });
-
-    afterEach(() => {
-      vi.restoreAllMocks();
-      vi.useRealTimers();
-    });
-
-    test('should not run if started before the correct hour', () => {
-      const now = new Date();
-      // set cleaner to run at 10 AM UTC
-      console.log('input time to run', now.toString(), now.getUTCHours() + 4);
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours() + 4);
-
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
-      clearTimeout(dbCleaner.timeoutID);
-      expect(dbCleaner.timeToRun.getTime()).to.be.equal(
-        now.getTime() + 14400000,
-      );
-      expect(dbCleaner.completed).to.be.false;
-    });
-
-    test('should run exactly once (immediately) if started in the correct hour', () => {
-      const now = new Date();
-      now.setUTCMinutes(0);
-      now.setUTCMilliseconds(0);
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours());
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
-      clearTimeout(dbCleaner.timeoutID);
-      expect(dbCleaner.timeToRun.getUTCHours()).to.be.equal(now.getUTCHours());
-      expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
-    });
-
-    test('should not run if started after the correct hour', () => {
-      const now = new Date();
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, now.getUTCHours() - 4);
-      expect(dbCleaner.timeoutID).to.not.be.undefined;
-      clearTimeout(dbCleaner.timeoutID);
-      now.setUTCDate(now.getUTCDate() + 1);
-      now.setUTCHours(now.getUTCHours() - 4);
-      now.setUTCMinutes(0);
-      now.setUTCMilliseconds(0);
-      expect(dbCleaner.timeToRun.getTime()).to.be.equal(now.getTime());
-      expect(dbCleaner.completed).to.be.false;
-    });
-
-    test('should not run if an hour to run is not provided', () => {
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, NaN);
-      expect(dbCleaner.timeToRun).to.be.undefined;
-      expect(dbCleaner.timeoutID).to.be.undefined;
-    });
-
-    test('should not run if the hour provided is invalid', () => {
-      let dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 24);
-      expect(dbCleaner.timeToRun).to.be.undefined;
-      expect(dbCleaner.timeoutID).to.be.undefined;
-
-      dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, 25);
-      expect(dbCleaner.timeToRun).to.be.undefined;
-      expect(dbCleaner.timeoutID).to.be.undefined;
-
-      dbCleaner = new DatabaseCleaner();
-      dbCleaner.initLoop(models, -1);
-      expect(dbCleaner.timeToRun).to.be.undefined;
-      expect(dbCleaner.timeoutID).to.be.undefined;
-    });
   });
 
   describe('Tests what the cleaner cleans', () => {
@@ -236,9 +143,7 @@ describe('DatabaseCleaner Tests', async () => {
         community_id: 'ethereum',
       });
 
-      const dbCleaner = new DatabaseCleaner();
-      dbCleaner.init(models);
-      await dbCleaner.executeQueries();
+      await cleanSubscriptions();
 
       const newThreadSubRes = await models.ThreadSubscription.findOne({
         where: {

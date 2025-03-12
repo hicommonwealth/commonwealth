@@ -15,7 +15,6 @@ export const DiscordEventBase = z.object({
 });
 
 export const DiscordUser = z.object({
-  provider: z.literal('discord'),
   id: z.string(),
   email: z.string(),
   username: z.string(),

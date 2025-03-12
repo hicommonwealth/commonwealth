@@ -5,8 +5,8 @@ import {
   getSessionSigners,
   serializeCanvas,
 } from '@hicommonwealth/shared';
+import { SignIn } from '../../src/aggregates/user';
 import { verifyAddress } from '../../src/services/session';
-import { SignIn } from '../../src/user';
 
 export async function signIn(community_id: string, referrer_address?: string) {
   const [evmSigner] = await getSessionSigners();

@@ -57,9 +57,11 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
     'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
-    'process.env.FLAG_COMMUNITY_HOME': JSON.stringify(env.FLAG_COMMUNITY_HOME),
     'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
     'process.env.FLAG_AI_COMMENTS': JSON.stringify(env.FLAG_AI_COMMENTS),
+    'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
+      env.FLAG_NEW_GOVERNANCE_PAGE,
+    ),
   };
 
   const config = {

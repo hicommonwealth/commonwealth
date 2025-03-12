@@ -5,7 +5,10 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { CreateStakeTransaction, GetTransactions } from '../../src/community';
+import {
+  CreateStakeTransaction,
+  GetTransactions,
+} from '../../src/aggregates/community';
 
 chai.use(chaiAsPromised);
 
