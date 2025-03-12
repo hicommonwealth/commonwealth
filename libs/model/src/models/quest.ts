@@ -18,7 +18,11 @@ export const Quest = (
       image_url: { type: Sequelize.STRING, allowNull: false },
       start_date: { type: Sequelize.DATE, allowNull: false },
       end_date: { type: Sequelize.DATE, allowNull: false },
+      xp_awarded: { type: Sequelize.INTEGER, allowNull: false },
+      max_xp_to_end: { type: Sequelize.INTEGER, allowNull: false },
       community_id: { type: Sequelize.STRING, allowNull: true },
+      quest_type: { type: Sequelize.STRING, allowNull: false },
+      scheduled_job_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -26,6 +30,12 @@ export const Quest = (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Quests',
+      defaultScope: {
+        attributes: { exclude: ['scheduled_job_id'] },
+      },
+      scopes: {
+        withPrivateData: {},
+      },
       indexes: [
         {
           name: 'Quests_community_id_name_key',

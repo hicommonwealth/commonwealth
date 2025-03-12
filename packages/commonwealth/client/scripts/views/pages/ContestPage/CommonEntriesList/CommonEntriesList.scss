@@ -1,0 +1,12 @@
+.CommonEntriesList {
+  .filter-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  > div + div {
+    margin-top: 16px;
+  }
+}

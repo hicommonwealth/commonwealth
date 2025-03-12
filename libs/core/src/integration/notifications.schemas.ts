@@ -7,11 +7,25 @@ import { z } from 'zod';
  * data is available to them in a notifications workflow (e.g. Knock).
  */
 
-// TODO: make this stricter by adding max/min character length
-export const CommentCreatedNotification = z.object({
-  author: z
+const NotificationAuthor = z.object({
+  author: z.string(),
+  author_address_id: z
+    .number()
+    .describe("The id of the author's address")
+    .optional(),
+  author_address: z
     .string()
-    .describe('The profile name or first 8 characters of a users address'),
+    .max(255)
+    .describe('The address of the author')
+    .optional(),
+  author_user_id: z.string().optional(),
+  author_profile_url: z.string().optional(),
+  author_email: z.string().optional(),
+  author_avatar_url: z.string().optional(),
+});
+
+// TODO: make this stricter by adding max/min character length
+export const CommentCreatedNotification = NotificationAuthor.extend({
   comment_parent_name: z
     .union([z.literal('thread'), z.literal('comment')])
     .describe(
@@ -46,18 +60,12 @@ export const SnapshotProposalCreatedNotification = z.object({
     .describe('The url to the snapshot proposal on Common'),
 });
 
-export const UserMentionedNotification = z.object({
-  author_address_id: z.number().describe("The id of the author's address"),
-  author_user_id: z.number().describe("The id of the author's user record"),
-  author_address: z.string().max(255).describe('The address of the author'),
+export const UserMentionedNotification = NotificationAuthor.extend({
   community_id: z.string().max(255).describe('The id of the community'),
   community_name: z
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
-  author: z
-    .string()
-    .describe('The profile name or first 8 characters of a users address'),
   object_body: z
     .string()
     .max(255)
@@ -94,7 +102,7 @@ export const ChainProposalsNotification = z.object({
     .describe('The url to the snapshot proposal on Common'),
 });
 
-export const BaseUpvoteNotification = z.object({
+export const BaseUpvoteNotification = NotificationAuthor.extend({
   community_id: z
     .string()
     .max(255)
@@ -212,6 +220,15 @@ export const ReferrerSignedUpNotification = z.object({
 });
 
 export const ReferrerCommunityJoinedNotification = z.object({
+  community_id: z.string(),
+  community_name: z.string(),
+  community_icon_url: z.string(),
+  referee_user_id: z.number(),
+  referee_profile_name: z.string(),
+  referee_profile_avatar_url: z.string(),
+});
+
+export const ReferrerCommunityCreatedNotification = z.object({
   community_id: z.string(),
   community_name: z.string(),
   community_icon_url: z.string(),

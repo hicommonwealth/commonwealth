@@ -14,7 +14,6 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import {
   ReactQuillEditor,
   createDeltaFromText,
-  getTextFromDelta,
 } from 'views/components/react_quill_editor';
 import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
 import z from 'zod';
@@ -52,8 +51,8 @@ export const CreateTopicSection = ({
     topicFormData?.featuredInNewPost || false,
   );
   const [name, setName] = useState<string>(topicFormData?.name || '');
-  const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
-    createDeltaFromText(topicFormData?.description || ''),
+  const [descriptionDelta, setDescriptionDelta] = useState<string>(
+    topicFormData?.description || '',
   );
   const [newPostTemplate, setNewPostTemplate] = useState<DeltaStatic>(
     createDeltaFromText(topicFormData?.newPostTemplate || ''),
@@ -64,6 +63,7 @@ export const CreateTopicSection = ({
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
+      if (typeof delta === 'string' && delta.length) return delta.length;
       return 0;
     }
     return delta.ops.reduce((count, op) => {
@@ -96,7 +96,7 @@ export const CreateTopicSection = ({
   };
 
   useEffect(() => {
-    if ((descriptionDelta?.ops || [])?.[0]?.insert?.length > 250) {
+    if (descriptionDelta?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
       setDescErrorMsg(null);
@@ -119,7 +119,7 @@ export const CreateTopicSection = ({
   ) => {
     onSetTopicFormData({
       name: values.topicName,
-      description: getTextFromDelta(descriptionDelta),
+      description: descriptionDelta,
       featuredInSidebar,
       featuredInNewPost,
       newPostTemplate:
@@ -152,10 +152,17 @@ export const CreateTopicSection = ({
             autoFocus
           />
 
-          <ReactQuillEditor
-            placeholder="Enter a description (Limit of 250 characters)"
-            contentDelta={descriptionDelta}
-            setContentDelta={setDescriptionDelta}
+          <CWTextInput
+            hookToForm
+            label="Description"
+            placeholder="description"
+            name="description"
+            value={descriptionDelta}
+            onInput={(e) => {
+              setDescriptionDelta(e.target.value);
+            }}
+            // @ts-expect-error <StrictNullChecks/>
+            customError={descErrorMsg}
           />
           <div className="description-char-count">
             <CWText type="caption">

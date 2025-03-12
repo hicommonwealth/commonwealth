@@ -10,6 +10,7 @@ import { CommunitySection } from './CommunitySection';
 
 import useSidebarSwipe from 'client/scripts/hooks/useSidebarSwipe';
 import { SidebarProfileSection } from './SidebarProfileSection';
+import SidebarSignInButton from './SidebarSignInButton/SidebarSignInButton';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import './index.scss';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
@@ -58,14 +59,12 @@ export const Sidebar = ({
           />
         </div>
       ) : (
-        user.isLoggedIn && (
-          <div className="sidebar-header-wrapper">
-            <SidebarHeader
-              isInsideCommunity={isInsideCommunity}
-              onMobile={onMobile}
-            />
-          </div>
-        )
+        <div className="sidebar-header-wrapper">
+          <SidebarHeader
+            isInsideCommunity={isInsideCommunity}
+            onMobile={onMobile}
+          />
+        </div>
       )}
       <div className="sidebar-default-menu">
         <KnockFeedWrapper>
@@ -86,6 +85,10 @@ export const Sidebar = ({
               isInsideCommunity={isInsideCommunity}
             />
           )
+        )}
+
+        {!user.isLoggedIn && !isInsideCommunity && (
+          <SidebarSignInButton isInsideCommunity={isInsideCommunity} />
         )}
         {menuName === 'createContent' && (
           <CreateContentSidebar isInsideCommunity={isInsideCommunity} />

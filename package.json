@@ -43,6 +43,7 @@
     "resolve": "^1.20.0"
   },
   "dependencies": {
+    "@commonxyz/common-protocol-abis": "1.4.7",
     "extensionless": "^1.9.6",
     "sharp": "^0.33.5"
   },
@@ -132,7 +133,7 @@
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tslint": "^5.13.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.8.2",
     "vite": "^5.4.11",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-html": "^3.2.2",

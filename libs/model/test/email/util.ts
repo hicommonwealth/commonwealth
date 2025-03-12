@@ -53,7 +53,7 @@ export function generateDiscussionData(
     author: authorUser.profile.name!,
     author_address: authorAddress.address,
     author_address_id: authorAddress.id!,
-    author_user_id: authorUser.id!,
+    author_user_id: authorUser.id!.toString(),
     community_id: community.id!,
     community_name: community.name,
     object_body: 'Testing',
