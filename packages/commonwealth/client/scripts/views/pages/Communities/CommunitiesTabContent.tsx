@@ -24,11 +24,13 @@ interface CommunitiesTabContentProps {
   communitiesList: ExtendedCommunitySliceType[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices: Record<string, number>;
+  historicalPrices:
+    | { community_id: string; old_price?: string | null }[]
+    | undefined;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: () => Promise<void>;
+  fetchMoreCommunities?: any; // Using any here to handle the complex function type
 }
 
 const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({

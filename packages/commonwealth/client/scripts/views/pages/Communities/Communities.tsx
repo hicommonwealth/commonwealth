@@ -13,6 +13,7 @@ import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
+import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -20,6 +21,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import { Feed } from '../../components/feed';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import { XPEarningsTable } from '../../pages/RewardsPage/tables/XPEarningsTable/XPEarningsTable';
@@ -51,7 +53,7 @@ type ExtendedCommunitySliceType = [
 const TAB_VIEWS = [
   { value: 'all', label: 'All' },
   { value: 'communities', label: 'Communities' },
-  // { value: 'threads', label: 'Threads' },
+  { value: 'threads', label: 'Threads' },
   { value: 'users', label: 'Users' },
   { value: 'quests', label: 'Quests' },
   { value: 'contests', label: 'Contests' },
@@ -282,6 +284,14 @@ const CommunitiesPage = () => {
         {activeTab === 'tokens' && <TokensList filters={filters} />}
         {activeTab === 'quests' && <QuestList />}
         {activeTab === 'contests' && <ExploreContestList />}
+        {activeTab === 'threads' && (
+          <div className="threads-tab">
+            <Feed
+              query={useFetchGlobalActivityQuery}
+              customScrollParent={containerRef.current}
+            />
+          </div>
+        )}
         {activeTab === 'users' && (
           <div className="users-tab">
             <div className="users-xp-table">

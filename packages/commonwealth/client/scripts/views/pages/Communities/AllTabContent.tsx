@@ -1,4 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, MutableRefObject } from 'react';
@@ -10,6 +11,7 @@ import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
+import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import { XPEarningsTable } from '../RewardsPage/tables/XPEarningsTable';
 import ExploreContestList from './ExploreContestList';
 import { CommunityFilters } from './FiltersDrawer';
@@ -28,11 +30,13 @@ interface AllTabContentProps {
   communitiesList: ExtendedCommunitySliceType[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices: Record<string, number>;
+  historicalPrices:
+    | { community_id: string; old_price?: string | null }[]
+    | undefined;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: () => Promise<void>;
+  fetchMoreCommunities?: any;
   hideHeader?: boolean;
 }
 
@@ -68,6 +72,14 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       {/* Contests section */}
       <div className="section-container">
         <ExploreContestList />
+      </div>
+
+      {/* Trending Threads section */}
+      <div className="section-container">
+        <TrendingThreadList
+          query={useFetchGlobalActivityQuery}
+          customScrollParent={containerRef.current}
+        />
       </div>
 
       {/* Users section */}

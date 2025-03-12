@@ -148,6 +148,23 @@
     padding: 0 8px;
   }
 
+  // Specific styles for the Threads tab
+  .threads-tab {
+    width: 100%;
+
+    .Feed {
+      width: 100%;
+      min-height: 400px;
+
+      .no-feed-message {
+        text-align: center;
+        padding: 32px;
+        font-size: 16px;
+        color: $neutral-600;
+      }
+    }
+  }
+
   // Specific styles for the Users tab
   .users-tab {
     .users-xp-table {
