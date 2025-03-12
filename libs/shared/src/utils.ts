@@ -445,6 +445,10 @@ export const buildContestLeaderboardUrl = (
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
 };
 
+export const buildCommunityUrl = (baseUrl: string, communityId: string) => {
+  return `${baseUrl}/${communityId}`;
+};
+
 export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
   notation: 'standard',
   maximumFractionDigits: 20, // Allow up to 22 decimal places for small numbers
