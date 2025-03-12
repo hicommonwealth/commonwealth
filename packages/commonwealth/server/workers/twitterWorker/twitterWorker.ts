@@ -4,17 +4,18 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
+import {
+  emitEvent,
+  getMentions,
+  getTweets,
+  models,
+  TwitterBotConfig,
+  TwitterBotConfigs,
+} from '@hicommonwealth/model';
 import { Op } from 'node_modules/sequelize/types';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
-import { getMentions, getTweets } from './pollTwitter';
-import {
-  TwitterBotConfig,
-  TwitterBotConfigs,
-  createMentionEvents,
-  pgMultiRowUpdate,
-} from './utils';
+import { createMentionEvents, pgMultiRowUpdate } from './utils';
 
 const log = logger(import.meta);
 
