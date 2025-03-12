@@ -5,7 +5,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
-import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
+import { CreateLaunchpadTrade, CreateToken } from '../../src/aggregates/token';
 
 const CREATE_TOKEN_TXN_HASH =
   '0x735a6ec2a5d1b71634e74183f2436f4b76855e613e97fc008f2df486d9eb73db';

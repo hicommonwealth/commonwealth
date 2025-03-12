@@ -2,9 +2,13 @@ import { Actor, Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CreateComment, DeleteComment, UpdateComment } from '../comment';
+import {
+  CreateComment,
+  DeleteComment,
+  UpdateComment,
+} from '../aggregates/comment';
+import { CreateThread, DeleteThread, UpdateThread } from '../aggregates/thread';
 import { models } from '../database';
-import { CreateThread, DeleteThread, UpdateThread } from '../thread';
 
 const ThreadEventInputs = {
   DiscordThreadBodyUpdated: events.DiscordThreadBodyUpdated,

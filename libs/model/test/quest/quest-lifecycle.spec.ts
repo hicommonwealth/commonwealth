@@ -8,7 +8,6 @@ import { Chance } from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { models } from '../../src/database';
 import {
   CancelQuest,
   CreateQuest,
@@ -16,7 +15,8 @@ import {
   GetQuest,
   GetQuests,
   UpdateQuest,
-} from '../../src/quest';
+} from '../../src/aggregates/quest';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
 
