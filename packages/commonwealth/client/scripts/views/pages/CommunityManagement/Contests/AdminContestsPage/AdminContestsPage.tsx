@@ -208,17 +208,31 @@ const AdminContestsPage = () => {
               />
             )}
 
-            <EmptyCard
-              img={farcasterUrl}
-              title="Launch on Farcaster"
-              subtitle="Share your contest on Farcastr platform"
-              button={{
-                label: 'Launch Farcaster contest',
-                handler: () => {
-                  goToLaunchFarcasterContest();
-                },
-              }}
-            />
+            {community?.namespace ? (
+              <EmptyCard
+                img={farcasterUrl}
+                title="Launch on Farcaster"
+                subtitle="Share your contest on Farcaster"
+                button={{
+                  label: 'Launch Farcaster contest',
+                  handler: () => {
+                    goToLaunchFarcasterContest();
+                  },
+                }}
+              />
+            ) : (
+              <EmptyCard
+                img={farcasterUrl}
+                title="You must have namespace reserved for your community to run farcaster contests"
+                subtitle="Share your contest on Farcaster platform"
+                button={{
+                  label: 'Create a namespace',
+                  handler: () => {
+                    setContestView(ContestView.NamespaceEnablemenement);
+                  },
+                }}
+              />
+            )}
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
           <CommunityStakeStep
