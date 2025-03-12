@@ -259,7 +259,10 @@ const TrendingThreadList = ({
       <div className="TrendingThreadList">
         <div className="heading-container">
           <CWText type="h2">Trending Threads</CWText>
-          <div className="link-right" onClick={() => navigate(redirectPath)}>
+          <div
+            className="link-right see-all-link"
+            onClick={() => navigate(redirectPath)}
+          >
             <CWText className="link">See all threads</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
@@ -277,7 +280,10 @@ const TrendingThreadList = ({
     <div className="TrendingThreadList">
       <div className="heading-container">
         <CWText type="h2">Trending Threads</CWText>
-        <div className="link-right" onClick={() => navigate(redirectPath)}>
+        <div
+          className="link-right see-all-link"
+          onClick={() => navigate(redirectPath)}
+        >
           <CWText className="link">See all threads</CWText>
           <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
         </div>

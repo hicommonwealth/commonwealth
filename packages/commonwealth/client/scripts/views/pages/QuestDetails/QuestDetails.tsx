@@ -1,4 +1,5 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
@@ -11,14 +12,14 @@ import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
+import app from 'state';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
-import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -33,7 +34,8 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { AuthModalType } from 'views/modals/AuthModal';
+import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
+import { AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
@@ -68,7 +70,13 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const { setAuthModalType } = useAuthModalStore();
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    type: AuthModalType | undefined;
+    options: AuthOptionTypes[] | undefined;
+  }>({
+    type: undefined,
+    options: undefined,
+  });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
     useDeleteQuestMutation();
@@ -139,11 +147,14 @@ const QuestDetails = ({ id }: { id: number }) => {
   ) => {
     switch (actionName) {
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['wallets'],
+        });
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
         break;
       }
       case 'CommunityCreated': {
@@ -475,6 +486,17 @@ const QuestDetails = ({ id }: { id: number }) => {
           </div>
         )}
       </section>
+      <AuthModal
+        type={authModalConfig.type}
+        onClose={() =>
+          setAuthModalConfig({ type: undefined, options: undefined })
+        }
+        showWalletsFor={
+          (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
+        }
+        showAuthOptionTypesFor={authModalConfig.options}
+        isOpen={!!(authModalConfig.type && authModalConfig.options)}
+      />
     </CWPageLayout>
   );
 };
