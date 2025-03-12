@@ -106,6 +106,7 @@ async function recordXpsForQuest(
     topic_id?: number;
     thread_id?: number;
     comment_id?: number;
+    amount?: number; // overrides reward_amount if present, used with trades x multiplier
   },
 ) {
   await sequelize.transaction(async (transaction) => {
@@ -162,7 +163,9 @@ async function recordXpsForQuest(
         (action_meta.amount_multiplier ?? 0) > 0
           ? action_meta.amount_multiplier!
           : 1;
-      const reward_amount = Math.round(action_meta.reward_amount * x);
+      const reward_amount = Math.round(
+        (scope?.amount || action_meta.reward_amount) * x,
+      );
       const creator_xp_points = creator_user_id
         ? Math.round(reward_amount * action_meta.creator_reward_weight)
         : undefined;
@@ -423,7 +426,9 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenTraded',
         );
-        await recordXpsForQuest(user_id, created_at, action_metas);
+        await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
+          amount: Number(payload.eth_amount),
+        });
       },
       WalletLinked: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
