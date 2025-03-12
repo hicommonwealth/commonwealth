@@ -1,8 +1,10 @@
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -12,11 +14,14 @@ import './QuestsExplorer.scss';
 const QuestsExplorer = () => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
+    // dont show system quests in quest lists for communities
+    include_system_quests: true,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -48,17 +53,12 @@ const QuestsExplorer = () => {
             />
           </div>
           {quests.map((quest) => {
-            const totalUserXP =
-              (quest.action_metas || [])
-                ?.map(
-                  (action) =>
-                    action.reward_amount -
-                    action.creator_reward_weight * action.reward_amount,
-                )
-                .reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                ) || 0;
+            const totalUserXP = calculateTotalXPForQuestActions({
+              questActions: (quest.action_metas as QuestAction[]) || [],
+              isUserReferred: !!user.referredByAddress,
+              questStartDate: new Date(quest.start_date),
+              questEndDate: new Date(quest.end_date),
+            });
 
             return (
               <ExploreCard

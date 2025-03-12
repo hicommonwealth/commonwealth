@@ -7,7 +7,13 @@ import { trpc } from 'client/scripts/utils/trpcClient';
 import { z } from 'zod';
 
 export function useSignIn() {
+  const utils = trpc.useUtils();
+
   const mutation = trpc.user.signIn.useMutation({
+    onSuccess: () => {
+      utils.quest.getQuest.invalidate().catch(console.error);
+      utils.quest.getQuests.invalidate().catch(console.error);
+    },
     onError: (error) => {
       notifyError(error.message);
     },

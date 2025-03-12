@@ -1,17 +1,12 @@
 import { command, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import {
-  buildFarcasterContestFrameUrl,
-  getBaseUrl,
-} from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { config, models } from '..';
-import { CreateBotContest } from '../bot/CreateBotContest.command';
-import { UpdateContestManagerFrameHashes } from '../contest/UpdateContestManagerFrameHashes.command';
+import { models } from '..';
+import { CreateBotContest } from '../aggregates/bot/CreateBotContest.command';
+import { UpdateContestManagerFrameHashes } from '../aggregates/contest/UpdateContestManagerFrameHashes.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
-import { buildFarcasterContentUrl, publishCast } from '../utils';
+import { buildFarcasterContentUrl, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -83,7 +78,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             include: [
               {
                 model: models.ChainNode.scope('withPrivateData'),
-                required: false,
+                required: true,
               },
             ],
           },
@@ -99,7 +94,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         // create onchain content from reply cast
         const contestManagers = [
           {
-            url: community.ChainNode!.private_url! || community.ChainNode!.url!,
+            url: getChainNodeUrl(community.ChainNode!),
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -151,10 +146,9 @@ export function FarcasterWorker(): Policy<typeof inputs> {
       },
       FarcasterVoteCreated: async ({ payload }) => {
         const { parent_hash, hash } = payload.cast;
-        const content_url = buildFarcasterContentUrl(
+        const contentUrlWithoutFid = buildFarcasterContentUrl(
           parent_hash!,
           hash,
-          payload.interactor.fid,
         );
 
         const contestManager = await models.ContestManager.findOne({
@@ -175,9 +169,13 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           where: {
             contest_address: contestManager.contest_address,
             action: 'added',
-            content_url,
+            content_url: {
+              // check prefix because fid may be attached as query param
+              [Op.like]: `${contentUrlWithoutFid}%`,
+            },
           },
         });
+        mustExist('Contest Actions', contestActions?.[0]);
 
         const community = await models.Community.findByPk(
           contestManager.community_id,
@@ -193,7 +191,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Community with Chain Node', community?.ChainNode);
 
         const contestManagers = contestActions.map((ca) => ({
-          url: community.ChainNode!.private_url! || community.ChainNode!.url!,
+          url: getChainNodeUrl(community.ChainNode!),
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));
@@ -201,34 +199,17 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         await createOnchainContestVote({
           contestManagers,
           author_address: payload.verified_address,
-          content_url,
+          content_url: contestActions[0].content_url!,
         });
       },
       FarcasterContestBotMentioned: async ({ payload }) => {
-        const contestAddress = await command(CreateBotContest(), {
+        await command(CreateBotContest(), {
           actor: systemActor({}),
           payload: {
             castHash: payload.hash!,
             prompt: payload.text,
           },
         });
-        if (contestAddress) {
-          await publishCast(
-            payload.hash,
-            ({ username }) => {
-              const {
-                payoutStructure: [winner1, winner2, winner3],
-                voterShare,
-              } = DEFAULT_CONTEST_BOT_PARAMS;
-              // eslint-disable-next-line max-len
-              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
-            },
-            {
-              // eslint-disable-next-line max-len
-              embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(contestAddress)}`,
-            },
-          );
-        }
       },
     },
   };

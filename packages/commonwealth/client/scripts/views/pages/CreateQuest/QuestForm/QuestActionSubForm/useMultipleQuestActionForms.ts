@@ -1,16 +1,18 @@
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
   doesActionAllowContentId,
-  doesActionRequireCreatorReward,
+  doesActionRequireRewardShare,
 } from './helpers';
 import {
   QuestAction,
   QuestActionSubFormConfig,
   QuestActionSubFormErrors,
   QuestActionSubFormFields,
+  QuestActionSubFormInternalRefs,
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
 } from './types';
@@ -39,7 +41,12 @@ const useQuestActionMultiFormsState = ({
       if (minSubForms) {
         setQuestActionSubForms(
           Array.from({ length: minSubForms }, (_, index) => ({
-            values: {},
+            values: {
+              participationLimit: QuestParticipationLimit.OncePerQuest,
+            },
+            refs: {
+              runParticipationLimitValidator: () => {},
+            },
             id: index + 1,
           })),
         );
@@ -53,7 +60,11 @@ const useQuestActionMultiFormsState = ({
 
     setQuestActionSubForms((a) => [
       ...a,
-      { values: {}, id: questActionSubForms.length + 1 },
+      {
+        values: { participationLimit: QuestParticipationLimit.OncePerQuest },
+        refs: { runParticipationLimitValidator: () => {} },
+        id: questActionSubForms.length + 1,
+      },
     ]);
   };
 
@@ -75,9 +86,12 @@ const useQuestActionMultiFormsState = ({
 
   const validateFormValues = (
     values: QuestActionSubFormFields,
+    refs?: QuestActionSubFormInternalRefs,
     config?: QuestActionSubFormConfig,
   ) => {
     let errors: QuestActionSubFormErrors = {};
+
+    // validate via zod
     try {
       const schema = buildValidationSchema(config);
       schema.parse(values);
@@ -90,6 +104,11 @@ const useQuestActionMultiFormsState = ({
         };
       });
     }
+
+    // validate via custom validators
+    const error = refs?.runParticipationLimitValidator?.();
+    if (!errors.participationLimit && error) errors.participationLimit = error;
+
     return errors;
   };
 
@@ -97,6 +116,7 @@ const useQuestActionMultiFormsState = ({
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms[index].errors = validateFormValues(
       updatedSubForms[index].values,
+      updatedSubForms[index].refs,
       updatedSubForms[index].config,
     );
     setQuestActionSubForms([...updatedSubForms]);
@@ -105,7 +125,7 @@ const useQuestActionMultiFormsState = ({
   const validateSubForms = (): boolean => {
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms.map((form) => {
-      form.errors = validateFormValues(form.values, form.config);
+      form.errors = validateFormValues(form.values, form.refs, form.config);
     });
     setQuestActionSubForms([...updatedSubForms]);
     const hasErrors = updatedSubForms.find(
@@ -126,8 +146,7 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
-      const requiresCreatorPoints =
-        doesActionRequireCreatorReward(chosenAction);
+      const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
 
       // update config based on chosen action

@@ -178,6 +178,7 @@ export const CreateTopic = {
         weighted_voting: true,
         token_address: true,
         token_symbol: true,
+        token_decimals: true,
         vote_weight_multiplier: true,
         chain_node_id: true,
       }),
@@ -250,6 +251,13 @@ export const CreateGroup = {
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
   context: AuthContext,
+};
+
+export const CreateNamespaceAdminGroup = {
+  input: z.object({
+    namespace_address: z.string(),
+  }),
+  output: Group,
 };
 
 export const UpdateGroup = {

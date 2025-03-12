@@ -1,11 +1,10 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest } from '../entities';
-import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
-export const QuestView = Quest.extend({
-  id: PG_INT,
+export const QuestView = Quest.omit({ scheduled_job_id: true }).extend({
+  id: z.number(),
   start_date: z.coerce.date().or(z.string()),
   end_date: z.coerce.date().or(z.string()),
   created_at: z.coerce.date().or(z.string()),
@@ -13,7 +12,7 @@ export const QuestView = Quest.extend({
 });
 
 export const GetQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: QuestView.optional(),
   context: AuthContext,
 };
@@ -25,6 +24,7 @@ export const GetQuests = {
     start_before: z.coerce.date().optional(),
     end_after: z.coerce.date().optional(),
     end_before: z.coerce.date().optional(),
+    include_system_quests: z.boolean().default(false).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(QuestView),

@@ -12,6 +12,7 @@ const useGetXPs = ({
   from,
   to,
   user_id,
+  user_or_creator_id,
   quest_id,
   enabled = true,
 }: UseGetXPsProps) => {
@@ -22,6 +23,7 @@ const useGetXPs = ({
       from,
       to,
       user_id,
+      user_or_creator_id,
       quest_id,
     },
     {

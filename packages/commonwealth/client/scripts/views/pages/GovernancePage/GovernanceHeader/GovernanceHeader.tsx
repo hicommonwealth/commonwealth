@@ -11,7 +11,7 @@ import { CWTooltip } from 'client/scripts/views/components/component_kit/new_des
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import React from 'react';
-import { formatAddressShort } from 'shared/utils';
+import { formatAddressShort, smartTrim } from 'shared/utils';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { formatTokenSupply } from '../utils';
 import './GovernanceHeader.scss';
@@ -45,42 +45,53 @@ const GovernanceHeader = () => {
   return (
     <div className="GovernanceHeader">
       <div className="header">
-        <CWText type="h3" fontWeight="semiBold">
-          {community?.name} Governance
-        </CWText>
-        {snapShotAvailable && <CWTag label="Snapshot" type="proposal" />}
-        {address && (
-          <div className="address-details">
-            <div className="address">
-              <CWIcon iconName="ethereum" iconSize="small" />
-              <CWIdentificationTag address={formatAddressShort(address)} />
-            </div>
-            <CWTooltip
-              placement="top"
-              content="Address copied!"
-              renderTrigger={(handleInteraction, isTooltipOpen) => (
-                <CWIconButton
-                  iconName="copySimple"
-                  onClick={(event) => {
-                    saveToClipboard(address).catch(console.error);
-                    handleInteraction(event);
-                  }}
-                  onMouseLeave={(e) => {
-                    if (isTooltipOpen) {
-                      handleInteraction(e);
-                    }
-                  }}
-                  className="copy-icon"
-                />
-              )}
-            />
-          </div>
-        )}
-        {tokenSupply && (
-          <CWText fontWeight="semiBold">
-            {formatTokenSupply(tokenSupply)}
+        <div className="token-data">
+          <CWText type="h3" fontWeight="semiBold">
+            {smartTrim(community?.name, 17)}
           </CWText>
-        )}
+          {snapShotAvailable && <CWTag label="Snapshot" type="proposal" />}
+          {address && (
+            <div className="address-details">
+              <div className="address">
+                <CWIcon iconName="ethereum" iconSize="small" />
+                <CWIdentificationTag address={formatAddressShort(address)} />
+              </div>
+              <CWTooltip
+                placement="top"
+                content="Address copied!"
+                renderTrigger={(handleInteraction, isTooltipOpen) => (
+                  <CWIconButton
+                    iconName="copySimple"
+                    onClick={(event) => {
+                      saveToClipboard(address).catch(console.error);
+                      handleInteraction(event);
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isTooltipOpen) {
+                        handleInteraction(e);
+                      }
+                    }}
+                    className="copy-icon"
+                  />
+                )}
+              />
+            </div>
+          )}
+          {communityToken ? (
+            tokenSupply && (
+              <CWText fontWeight="semiBold">
+                {formatTokenSupply(tokenSupply, communityToken.symbol)}
+              </CWText>
+            )
+          ) : (
+            <CWText fontStyle="italic" fontWeight="medium">
+              No treassury supply found
+            </CWText>
+          )}
+        </div>
+        <CWText fontStyle="italic" fontWeight="medium">
+          No quorum requirment linked
+        </CWText>
       </div>
     </div>
   );

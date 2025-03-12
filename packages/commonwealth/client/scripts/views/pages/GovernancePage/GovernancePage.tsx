@@ -1,19 +1,29 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import React, { useRef } from 'react';
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import React from 'react';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
-import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
-
+import { PageNotFound } from '../404';
 import GovernanceCards from './GovernanceCards';
+import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
 import './GovernancePage.scss';
 
 const GovernancePage = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const governancePageEnabled = useFlag('governancePage');
 
-  if (!governancePageEnabled) return;
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
+  if (!governancePageEnabled || community?.base !== ChainBase.Ethereum) {
+    return <PageNotFound />;
+  }
 
   return (
-    <CWPageLayout ref={containerRef}>
+    <CWPageLayout>
       <div className="GovernancePage">
         <GovernanceHeader />
         <GovernanceCards />
