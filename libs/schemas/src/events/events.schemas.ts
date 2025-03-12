@@ -1,6 +1,6 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { NamespaceReferral } from '../commands';
+import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
