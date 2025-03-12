@@ -1,6 +1,7 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import { generateUsername } from 'unique-username-generator';
 import { ZodUndefined } from 'zod';
 import { models } from '../database';
 
@@ -16,7 +17,13 @@ export function CreateUnverifiedUser(): Policy<typeof inputs, ZodUndefined> {
     inputs,
     body: {
       TokenLocked: async ({ payload }) => {
-        const { address } = payload.parsedArgs;
+        const { address, tokenId } = payload.parsedArgs;
+
+        // TODO: find community linked to this token, this is just a placeholder
+        const community = await models.Community.findOne({
+          where: { token_name: tokenId.toString() },
+        });
+        if (!community) return;
 
         await models.sequelize.transaction(async (transaction) => {
           // address already linked to a user
@@ -31,7 +38,7 @@ export function CreateUnverifiedUser(): Policy<typeof inputs, ZodUndefined> {
             {
               email: null,
               profile: {
-                name: address.substring(0, 8), // TODO: unclaimed name
+                name: generateUsername('', 2),
                 avatar_url: null, // TODO: random avatar
               },
             },
@@ -40,7 +47,7 @@ export function CreateUnverifiedUser(): Policy<typeof inputs, ZodUndefined> {
 
           await models.Address.create(
             {
-              community_id: 'base', // TODO: how to choose a community from payload?
+              community_id: community.id,
               address,
               user_id: user.id!,
               last_active: new Date(),
