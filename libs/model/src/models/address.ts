@@ -106,6 +106,9 @@ export default (
           ) {
             const e = new Error('Missing oauth provider');
             log.error(`Stack trace: ${e.stack}`, e, {
+              user_id: instance.user_id,
+              community_id: instance.community_id,
+              address: instance.address,
               stack: e.stack,
             });
           }
