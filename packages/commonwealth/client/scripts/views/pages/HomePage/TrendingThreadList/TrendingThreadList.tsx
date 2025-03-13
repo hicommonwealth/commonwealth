@@ -34,6 +34,7 @@ type TrendingThreadListProps = {
   defaultCount?: number;
   customScrollParent?: HTMLElement;
   communityIdFilter?: string;
+  hideHeader?: boolean;
 };
 
 type FeedThreadProps = {
@@ -214,6 +215,7 @@ const TrendingThreadList = ({
   query,
   customScrollParent,
   communityIdFilter,
+  hideHeader,
 }: TrendingThreadListProps) => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -252,21 +254,20 @@ const TrendingThreadList = ({
   } else if (feed?.pages) {
     allThreads = feed.pages.flatMap((page) => page.results || []);
   }
-  const redirectPath = communityId ? '/discussions' : '/explore';
+  const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 
   if (!allThreads?.length) {
     return (
       <div className="TrendingThreadList">
-        <div className="heading-container">
-          <CWText type="h2">Trending Threads</CWText>
-          <div
-            className="link-right see-all-link"
-            onClick={() => navigate(redirectPath)}
-          >
-            <CWText className="link">See all threads</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+        {!hideHeader && (
+          <div className="heading-container">
+            <CWText type="h2">Trending Threads</CWText>
+            <div className="link-right" onClick={() => navigate(redirectPath)}>
+              <CWText className="link">See all threads</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
           </div>
-        </div>
+        )}
         <>
           <CWText type="h2" className="empty-thread">
             No threads found
@@ -278,16 +279,15 @@ const TrendingThreadList = ({
 
   return (
     <div className="TrendingThreadList">
-      <div className="heading-container">
-        <CWText type="h2">Trending Threads</CWText>
-        <div
-          className="link-right see-all-link"
-          onClick={() => navigate(redirectPath)}
-        >
-          <CWText className="link">See all threads</CWText>
-          <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+      {!hideHeader && (
+        <div className="heading-container">
+          <CWText type="h2">Trending Threads</CWText>
+          <div className="link-right" onClick={() => navigate(redirectPath)}>
+            <CWText className="link">See all threads</CWText>
+            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+          </div>
         </div>
-      </div>
+      )}
       <>
         {!isLoading && !feed && (
           <CWText type="h2" className="empty-thread">

@@ -13,6 +13,7 @@ import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
+import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -20,9 +21,10 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import { Feed } from '../../components/feed';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { XPEarningsTable } from '../../pages/RewardsPage/tables/XPEarningsTable/XPEarningsTable';
+import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import './Communities.scss';
 import CommunitiesTabContent from './CommunitiesTabContent';
@@ -60,6 +62,7 @@ const CommunitiesPage = () => {
     { value: 'communities', label: 'Communities' },
     { value: 'users', label: 'Users' },
     { value: 'contests', label: 'Contests' },
+    { value: 'threads', label: 'Threads' },
     ...(questsEnabled ? [{ value: 'quests', label: 'Quests' }] : []),
     ...(launchpadEnabled ? [{ value: 'tokens', label: 'Tokens' }] : []),
   ];
@@ -263,7 +266,9 @@ const CommunitiesPage = () => {
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
               {!isWindowSmallInclusive ? communitiesCount : <></>}
-              <CreateCommunityButton buttonHeight="med" withIcon />
+              {!launchpadEnabled && (
+                <CreateCommunityButton buttonHeight="med" withIcon />
+              )}
             </div>
           </div>
 
@@ -284,14 +289,26 @@ const CommunitiesPage = () => {
 
         {/* Conditionally render content based on active tab */}
         {launchpadEnabled
-          ? activeTab === 'tokens' && <TokensList filters={filters} />
+          ? activeTab === 'tokens' && (
+              <TokensList filters={filters} hideHeader />
+            )
           : null}
-        {questsEnabled ? activeTab === 'quests' && <QuestList /> : null}
-        {activeTab === 'contests' && <ExploreContestList />}
+        {questsEnabled
+          ? activeTab === 'quests' && <QuestList hideHeader />
+          : null}
+        {activeTab === 'contests' && <ExploreContestList hideHeader />}
+        {activeTab === 'threads' && (
+          <div className="threads-tab">
+            <Feed
+              query={useFetchGlobalActivityQuery}
+              customScrollParent={containerRef.current}
+            />
+          </div>
+        )}
         {activeTab === 'users' && (
           <div className="users-tab">
             <div className="users-xp-table">
-              <XPEarningsTable />
+              <XPTable />
             </div>
           </div>
         )}

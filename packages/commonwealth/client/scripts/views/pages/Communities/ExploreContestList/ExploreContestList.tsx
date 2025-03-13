@@ -8,7 +8,11 @@ import useCommunityContests from '../../CommunityManagement/Contests/useCommunit
 
 import './ExploreContestList.scss';
 
-const ExploreContestList = () => {
+type ExploreContestListProps = {
+  hideHeader?: boolean;
+};
+
+const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
   const {
     contestsData: { active: activeContests },
     isContestDataLoading,
@@ -42,7 +46,7 @@ const ExploreContestList = () => {
 
   return (
     <div className="ExploreContestList">
-      <CWText type="h2">Contests</CWText>
+      {!hideHeader && <CWText type="h2">Contests</CWText>}
       <>
         {!isContestDataLoading && activeContests.length === 0 && (
           <CWText type="h2" className="empty-contests">

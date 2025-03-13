@@ -60,7 +60,7 @@ const ActiveContestList = ({
     <div className="ActiveContestList">
       <div className="heading-container">
         <CWText type="h2">Contests</CWText>
-        <Link to="/explore" className="see-all-link">
+        <Link to="/explore?tab=contests">
           <div className="link-right">
             <CWText className="link">See all contests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
