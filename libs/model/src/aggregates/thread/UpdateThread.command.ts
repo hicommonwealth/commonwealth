@@ -224,6 +224,9 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                 ),
               }
             : {};
+        const tokenAddress = payload.token_address && {
+          token_address: payload.token_address,
+        };
         await thread.update(
           {
             // TODO: body should be set to truncatedBody once client renders content_url
@@ -232,6 +235,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
             ...ownerPatch,
             last_edited: new Date(),
             ...searchUpdate,
+            ...tokenAddress,
             content_url: contentUrl,
           },
           { transaction },

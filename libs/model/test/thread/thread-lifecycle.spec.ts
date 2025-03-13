@@ -476,6 +476,20 @@ describe('Thread lifecycle', () => {
       expect(updated?.marked_as_spam_at).toBeDefined;
     });
 
+    test('should update token_address', async () => {
+      const body = {
+        token_address: '0x0',
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.token_address).to.eq('0x0');
+    });
+
     test('should fail when collaborator actor non admin/moderator', async () => {
       await expect(
         command(UpdateThread(), {

@@ -20,9 +20,17 @@ export const GetTokens = {
 };
 
 export const GetToken = {
-  input: z.object({
-    community_id: z.string(),
-    with_stats: z.boolean().optional(),
-  }),
+  input: z
+    .object({
+      community_id: z.string().optional(),
+      thread_id: z.string().optional(),
+      with_stats: z.boolean().optional(),
+    })
+    .refine(
+      (data) => data.community_id !== undefined || data.thread_id !== undefined,
+      {
+        message: 'Either community_id or thread_id must be provided',
+      },
+    ),
   output: z.union([TokenView, z.null()]),
 };

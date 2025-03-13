@@ -47,6 +47,7 @@ export const UpdateThread = {
       .optional(),
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
+    token_address: z.string().optional(),
   }),
   output: Thread,
   context: ThreadContext,

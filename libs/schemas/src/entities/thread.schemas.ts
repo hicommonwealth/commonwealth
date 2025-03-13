@@ -63,6 +63,7 @@ export const Thread = z.object({
   profile_name: z.string().nullish(),
 
   search: z.union([z.string(), z.record(z.any())]),
+  token_address: z.string().nullish(),
 
   // associations
   Address: Address.nullish(),

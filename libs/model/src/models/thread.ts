@@ -103,6 +103,7 @@ export default (
         allowNull: false,
       },
       content_url: { type: Sequelize.STRING, allowNull: true },
+      token_address: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
