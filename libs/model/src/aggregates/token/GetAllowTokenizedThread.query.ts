@@ -12,26 +12,28 @@ export function GetAllowTokenizedThreads(): Query<
     body: async ({ payload }) => {
       const { community_id, topic_id } = payload;
 
-      const communityAllowed = await models.Community.findOne({
+      const result = await models.Community.findOne({
         where: { id: community_id },
         attributes: ['allow_tokenized_threads'],
+        include: [
+          {
+            model: models.Topic,
+            as: 'topics',
+            where: { id: topic_id },
+            attributes: ['allow_tokenized_threads'],
+            required: true,
+          },
+        ],
       });
 
-      mustExist('Community', communityAllowed);
+      mustExist('Community', result);
+      mustExist('Topics', result!.topics![0]);
 
-      const topicAllowed = await models.Topic.findOne({
-        where: { id: topic_id },
-        attributes: ['allow_tokenized_threads'],
-      });
+      const communityAllowed = result!.allow_tokenized_threads;
+      const topicAllowed = result!.topics![0].allow_tokenized_threads ?? false;
 
-      mustExist('Topic', topicAllowed);
-
-      // CommunityAllowed takes precedence. If not allowed,
-      // check if specific topic is allowed
       return {
-        tokenized_threads_enabled: communityAllowed.allow_tokenized_threads
-          ? true
-          : topicAllowed.allow_tokenized_threads,
+        tokenized_threads_enabled: communityAllowed || topicAllowed,
       };
     },
   };
