@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
+import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
@@ -41,6 +42,7 @@ const App = () => {
                     <OnBoardingWrapperForMobile>
                       <ReactNativeBridgeUser />
                       <ReactNativeLogForwarder />
+                      <ReactNativeScrollToTopListener />
                       <RouterProvider router={router()} />
                       {isAddedToHomeScreen || isMarketingPage ? null : (
                         <AddToHomeScreenPrompt
