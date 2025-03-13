@@ -20,7 +20,6 @@ const {
   KNOCK_SIGNING_KEY,
   KNOCK_IN_APP_FEED_ID,
   KNOCK_PUBLIC_API_KEY,
-  FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   KNOCK_FCM_CHANNEL_ID,
   KNOCK_APNS_CHANNEL_ID,
   KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
@@ -69,8 +68,6 @@ export const config = configure(
       MIXPANEL_DEV_TOKEN,
     },
     PUSH_NOTIFICATIONS: {
-      FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED:
-        FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED === 'true',
       KNOCK_FCM_CHANNEL_ID,
       KNOCK_APNS_CHANNEL_ID,
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY,
@@ -219,13 +216,6 @@ export const config = configure(
       ),
     PUSH_NOTIFICATIONS: z
       .object({
-        FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED: z
-          .boolean()
-          .optional()
-          .default(false)
-          .describe(
-            'A flag indicating whether the Knock push notifications is enabled or disabled',
-          ),
         KNOCK_FCM_CHANNEL_ID: z
           .string()
           .optional()
@@ -260,19 +250,16 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (data.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED) {
-            return (
-              data.KNOCK_FCM_CHANNEL_ID &&
-              data.KNOCK_APNS_CHANNEL_ID &&
-              data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
-              data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
-            );
-          }
-          return true;
+          return (
+            data.KNOCK_FCM_CHANNEL_ID &&
+            data.KNOCK_APNS_CHANNEL_ID &&
+            data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
+            data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
+          );
         },
         {
           message:
-            'FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED requires additional properties.  See paths.',
+            'Knock notifications require additional properties.  See paths.',
           path: [
             'KNOCK_FCM_CHANNEL_ID',
             'KNOCK_APNS_CHANNEL_ID',
