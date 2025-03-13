@@ -153,6 +153,7 @@ const useEditThreadMutation = ({
       return updatedThread;
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
+    mutationFn: (input) => trpc.thread.updateThread.mutate({ input }),
   });
 };
 
