@@ -65,6 +65,8 @@ async function awardBatchTweetEngagementXp({
   );
 }
 
+// TODO: 1. add created_at to each metric type
+//  2. sort by created_at and splice according to the cap if cap was reached or according to quest end date
 const awardTweetEngagementXp = async (
   payload: z.infer<typeof TaskPayloads.AwardTweetEngagementXp>,
 ) => {
