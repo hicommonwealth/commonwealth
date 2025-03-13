@@ -123,6 +123,29 @@ export const generateOAuthHeader = ({
   );
 };
 
+export class HttpError extends Error {
+  statusCode: number;
+
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.name = 'HttpError';
+    this.statusCode = statusCode;
+
+    // This is necessary in TypeScript to ensure prototype chain works correctly
+    Object.setPrototypeOf(this, HttpError.prototype);
+  }
+
+  toJSON() {
+    return {
+      error: {
+        name: this.name,
+        message: this.message,
+        statusCode: this.statusCode,
+      },
+    };
+  }
+}
+
 export async function getFromTwitter({
   twitterBotConfig,
   url,
@@ -165,8 +188,9 @@ export async function getFromTwitter({
   });
 
   if (!response.ok) {
-    throw new Error(
+    throw new HttpError(
       `Request failed with status ${response.status}: ${response.statusText}`,
+      response.status,
     );
   }
 
@@ -199,25 +223,55 @@ export async function getFromTwitterWrapper<
   let requestsRemaining: number;
   const maxResults = 100;
   let numResults = 0;
-  let shouldContinueLoop = false;
+  let shouldContinueLoop = true;
   let waitTime = 60_000;
   // Max wait time is 16 minutes which would occur after 5 retries
   const maxWaitTime = 960_000;
 
   const results: NonNullable<z.infer<Schema>['data']> = [];
 
+  const logContext = {
+    botName: twitterBotConfig.name,
+    url,
+    queryParams,
+    oauthMethod,
+    waitTime,
+    maxWaitTime,
+  };
+
   do {
-    // TODO: handle 429 errors (edge case) by retrying according to below strategy
-    const res = await getFromTwitter({
-      twitterBotConfig,
-      url,
-      queryParams: {
-        max_results: maxResults,
-        ...queryParams,
-        ...(paginationToken ? { pagination_token: paginationToken } : {}),
-      },
-      oauthMethod,
-    });
+    let res: Awaited<ReturnType<typeof getFromTwitter>>;
+    try {
+      res = await getFromTwitter({
+        twitterBotConfig,
+        url,
+        queryParams: {
+          max_results: maxResults,
+          ...queryParams,
+          ...(paginationToken ? { pagination_token: paginationToken } : {}),
+        },
+        oauthMethod,
+      });
+    } catch (e) {
+      if (e instanceof HttpError && e.statusCode === 429) {
+        if (retryOnRateLimit && waitTime < maxWaitTime) {
+          log.debug(
+            `Rate limited. Retrying in ${waitTime / 1000} seconds.`,
+            logContext,
+          );
+          await delay(waitTime);
+          waitTime *= 2;
+          continue;
+        } else if (retryOnRateLimit && waitTime > maxWaitTime) {
+          log.error(
+            'Rate limited. Max wait time exceeded. Exiting...',
+            undefined,
+            logContext,
+          );
+        }
+      }
+      throw e;
+    }
 
     const parsedRes = responseSchema.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
@@ -225,12 +279,11 @@ export async function getFromTwitterWrapper<
 
     if (parsedRes.errors) {
       for (const error of parsedRes.errors) {
-        log.error('Error occurred fetching', new Error(JSON.stringify(error)), {
-          botName: twitterBotConfig.name,
-          url,
-          queryParams,
-          oauthMethod,
-        });
+        log.error(
+          'Error occurred fetching',
+          new Error(JSON.stringify(error)),
+          logContext,
+        );
       }
     }
 
@@ -247,11 +300,14 @@ export async function getFromTwitterWrapper<
 
     if (requestsRemaining === 0 && shouldContinueLoop && retryOnRateLimit) {
       if (waitTime > maxWaitTime) {
-        log.error('Exponential backoff retry strategy failed', undefined, {
-          botName: twitterBotConfig.name,
-          url,
-          queryParams,
-        });
+        log.error(
+          'Rate limit exceeded and exponential backoff failed. Returning data already fetched',
+          undefined,
+          {
+            ...logContext,
+            numResultsBeforeRateLimit: results.length,
+          },
+        );
         break;
       }
 
@@ -262,6 +318,14 @@ export async function getFromTwitterWrapper<
       shouldContinueLoop &&
       !retryOnRateLimit
     ) {
+      log.error(
+        'Ran out of requests. Returning data already fetched.',
+        undefined,
+        {
+          ...logContext,
+          numResultsBeforeRateLimit: results.length,
+        },
+      );
       break;
     }
   } while (shouldContinueLoop);
