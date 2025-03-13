@@ -136,10 +136,10 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       }
 
       await models.sequelize.transaction(async (transaction) => {
-        // Add scheduled job for new TwitterMetrics action
+        // Add scheduled job for new TweetEngagement action
         if (
           quest.quest_type === 'channel' &&
-          channelActionMeta?.event_name === 'TwitterMetrics'
+          channelActionMeta?.event_name === 'TweetEngagement'
         ) {
           const job = await scheduleTask(
             GraphileTaskNames.AwardTwitterQuestXp,
@@ -157,16 +157,16 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         }
 
         if (action_metas?.length) {
-          const existingTwitterMetricsAction =
+          const existingTweetEngagementAction =
             await models.QuestActionMeta.findOne({
               where: {
                 quest_id,
-                event_name: 'TwitterMetrics',
+                event_name: 'TwitterEngagement',
               },
               transaction,
             });
           if (
-            existingTwitterMetricsAction &&
+            existingTweetEngagementAction &&
             !channelActionMeta &&
             quest.scheduled_job_id
           ) {
@@ -209,12 +209,12 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
             transaction,
           });
 
-          // reschedule the quest job if end date is updated on a TwitterMetrics quest
+          // reschedule the quest job if end date is updated on a TwitterEngagement quest
           if (
             delta.end_date &&
             delta.end_date > quest.end_date &&
             quest.quest_type === 'channel' &&
-            channelActionMeta?.event_name === 'TwitterMetrics' &&
+            channelActionMeta?.event_name === 'TweetEngagement' &&
             quest.scheduled_job_id
           ) {
             await rescheduleJobs({

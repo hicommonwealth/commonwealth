@@ -54,23 +54,8 @@ export async function getMentions({
       }
     }
 
-    const newTweetMentions =
-      parsedRes?.data?.map((t) => {
-        const authorUsername = parsedRes?.includes?.users.find(
-          (u) => u.id === t.author_id,
-        )?.username;
-        if (!authorUsername) throw new Error('Author username not found');
-        return {
-          id: t.id,
-          author_id: t.author_id,
-          username: authorUsername,
-          text: t.text,
-          created_at: new Date(t.created_at),
-        };
-      }) || [];
-
-    allMentions.push(...newTweetMentions);
-    numResults = newTweetMentions.length;
+    allMentions.push(...(parsedRes.data || []));
+    numResults = (parsedRes.data || []).length;
   } while (
     paginationToken &&
     numResults === maxResults &&

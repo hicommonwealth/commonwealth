@@ -46,9 +46,20 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         defaultValue: 0,
       },
-      ended_at: {
-        type: Sequelize.DATE,
-        allowNull: true,
+      like_xp_awarded: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      reply_xp_awarded: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      retweet_xp_awarded: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         type: Sequelize.DATE,

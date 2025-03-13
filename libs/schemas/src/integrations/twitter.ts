@@ -46,7 +46,7 @@ export const GetTwitterMentionsTimelineResponse = GetResponseBase.extend({
       z.object({
         text: z.string(),
         id: z.string(),
-        created_at: z.string(),
+        created_at: z.coerce.date(),
         author_id: z.string(),
       }),
     )
@@ -62,6 +62,26 @@ export const GetTwitterMentionsTimelineResponse = GetResponseBase.extend({
       ),
     })
     .optional(),
+}).transform((org) => {
+  if (!org.data || !org.includes)
+    return org as {
+      data: undefined;
+      includes: undefined;
+      errors: z.infer<typeof GetResponseBase>['errors'];
+      meta: z.infer<typeof GetResponseBase>['meta'];
+    };
+
+  const userMap = new Map(org.includes.users.map((user) => [user.id, user]));
+
+  const enrichedData = org.data.map((reply) => ({
+    ...reply,
+    username: userMap.get(reply.author_id)?.username!,
+  }));
+
+  return {
+    ...org,
+    data: enrichedData,
+  };
 });
 
 export const GetTwitterUserResponse = GetResponseBase.extend({
@@ -114,6 +134,37 @@ export const GetRepliesResponse = GetResponseBase.extend({
       }),
     )
     .optional(),
+  includes: z
+    .object({
+      users: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          username: z.string(),
+        }),
+      ),
+    })
+    .optional(),
+}).transform((org) => {
+  if (!org.data || !org.includes)
+    return org as {
+      data: undefined;
+      includes: undefined;
+      errors: z.infer<typeof GetResponseBase>['errors'];
+      meta: z.infer<typeof GetResponseBase>['meta'];
+    };
+
+  const userMap = new Map(org.includes.users.map((user) => [user.id, user]));
+
+  const enrichedData = org.data.map((reply) => ({
+    ...reply,
+    username: userMap.get(reply.author_id)?.username!,
+  }));
+
+  return {
+    ...org,
+    data: enrichedData,
+  };
 });
 
 export const TwitterApiResponses = {

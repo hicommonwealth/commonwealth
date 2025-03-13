@@ -8,7 +8,7 @@ export const ChannelQuestEvents = {
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
 // Channel quest action types that are not event related
-export const ChannelBatchActions = ['TwitterMetrics'] as const;
+export const ChannelBatchActions = ['TweetEngagement'] as const;
 
 export const AllChannelQuestActionNames = [
   ...(Object.keys(ChannelQuestEvents) as [
@@ -55,6 +55,24 @@ export enum QuestParticipationPeriod {
   Monthly = 'monthly',
 }
 
+export const QuestTweet = z
+  .object({
+    tweet_id: z.string(),
+    quest_action_meta_id: z.number().optional(),
+    retweet_cap: z.number().optional(),
+    like_cap: z.number().optional(),
+    replies_cap: z.number().optional(),
+    num_likes: z.number().optional().default(0),
+    num_retweets: z.number().optional().default(0),
+    num_replies: z.number().optional().default(0),
+    like_xp_awarded: z.boolean().optional().default(false),
+    reply_xp_awarded: z.boolean().optional().default(false),
+    retweet_xp_awarded: z.boolean().optional().default(false),
+    created_at: z.coerce.date(),
+    updated_at: z.coerce.date(),
+  })
+  .describe('A tweet associated to a quest from which XP can be earned');
+
 export const QuestActionMeta = z
   .object({
     id: PG_INT.nullish(),
@@ -81,6 +99,9 @@ export const QuestActionMeta = z
       .nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
+
+    // associations
+    QuestTweet: QuestTweet.optional(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
@@ -117,21 +138,3 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
-
-export const QuestTweet = z
-  .object({
-    tweet_id: z.string(),
-    quest_action_meta_id: z.number().optional(),
-    retweet_cap: z.number().optional(),
-    like_cap: z.number().optional(),
-    replies_cap: z.number().optional(),
-    num_likes: z.number().optional().default(0),
-    num_retweets: z.number().optional().default(0),
-    num_replies: z.number().optional().default(0),
-    ended_at: z.coerce.date().nullish(),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
-
-    QuestActionMeta: QuestActionMeta.optional(),
-  })
-  .describe('A tweet associated to a quest from which XP can be earned');

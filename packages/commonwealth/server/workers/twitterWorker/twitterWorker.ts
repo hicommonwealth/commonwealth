@@ -9,13 +9,14 @@ import {
   getMentions,
   getTweets,
   models,
+  pgMultiRowUpdate,
   TwitterBotConfig,
   TwitterBotConfigs,
 } from '@hicommonwealth/model';
-import { Op } from 'node_modules/sequelize/types';
+import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
-import { createMentionEvents, pgMultiRowUpdate } from './utils';
+import { createMentionEvents } from './utils';
 
 const log = logger(import.meta);
 

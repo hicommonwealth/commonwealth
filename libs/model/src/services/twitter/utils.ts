@@ -200,6 +200,7 @@ export async function getFromTwitter({
   };
 }
 
+// TODO: add overall max results (i.e. cap)
 export async function getFromTwitterWrapper<
   Schema extends (typeof TwitterApiResponses)[keyof typeof TwitterApiResponses],
 >({
@@ -218,7 +219,7 @@ export async function getFromTwitterWrapper<
   oauthMethod?: 'oauth1' | 'oauth2';
   paginate?: boolean;
   retryOnRateLimit?: boolean;
-}): Promise<NonNullable<z.infer<Schema>['data']> | []> {
+}): Promise<NonNullable<z.infer<Schema>['data']> | readonly []> {
   let paginationToken: string | undefined;
   let requestsRemaining: number;
   const maxResults = 100;
@@ -273,6 +274,7 @@ export async function getFromTwitterWrapper<
       throw e;
     }
 
+    console.log('res.jsonBody', res.jsonBody);
     const parsedRes = responseSchema.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;
