@@ -8,7 +8,7 @@ export const distributeSkale = async (
 ) => {
   if (
     (chainId && parseInt(chainId) === cp.ValidChains.SKALE_TEST) ||
-    parseInt(chainId) === cp.ValidChains.SKALE
+    parseInt(chainId!) === cp.ValidChains.SKALE
   ) {
     const payload = {
       '0': {
