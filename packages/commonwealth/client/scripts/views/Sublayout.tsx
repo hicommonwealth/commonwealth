@@ -105,6 +105,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     isWelcomeOnboardModalOpen,
     setIsWelcomeOnboardModalOpen,
     user.isLoggedIn,
+    user.isWelcomeOnboardFlowComplete,
   ]);
 
   useHandleInviteLink({ isInsideCommunity, handleJoinCommunity });
