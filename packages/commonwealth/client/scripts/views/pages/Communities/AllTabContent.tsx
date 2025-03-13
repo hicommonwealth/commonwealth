@@ -1,10 +1,7 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
-import useUserStore from 'state/ui/user';
-import { z } from 'zod';
 import CWSectionHeader from '../../components/component_kit/new_designs/CWSectionHeader';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XPTable from '../Leaderboard/XPTable/XPTable';
@@ -16,44 +13,17 @@ import TokensList from './TokensList';
 
 import './AllTabContent.scss';
 
-type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
-type ExtendedCommunitySliceType = [
-  ExtendedCommunityType,
-  ExtendedCommunityType,
-];
-
 interface AllTabContentProps {
-  isLoading: boolean;
-  isInitialCommunitiesLoading: boolean;
-  communitiesList: ExtendedCommunitySliceType[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices:
-    | { community_id: string; old_price?: string | null }[]
-    | undefined;
-  ethUsdRate: number;
-  setSelectedCommunityId: (id: string) => void;
-  hasNextPage?: boolean;
-  fetchMoreCommunities?: () => Promise<void>;
-  hideHeader?: boolean;
 }
 
 const AllTabContent: React.FC<AllTabContentProps> = ({
-  isLoading,
-  isInitialCommunitiesLoading,
-  communitiesList,
   containerRef,
   filters,
-  historicalPrices,
-  ethUsdRate,
-  setSelectedCommunityId,
-  hasNextPage,
-  fetchMoreCommunities,
-  hideHeader = false,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
-  const user = useUserStore();
   const navigate = useCommonNavigate();
 
   return (
