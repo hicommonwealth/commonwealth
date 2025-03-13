@@ -114,7 +114,9 @@ const QuestCard = ({
             isNameTrimmed,
           )}
           {withTooltip(
-            <CWText className="text-light">{trimmedDescription}</CWText>,
+            <CWText className="text-light max-h-24">
+              {trimmedDescription}
+            </CWText>,
             description,
             isDescriptionTrimmed,
           )}

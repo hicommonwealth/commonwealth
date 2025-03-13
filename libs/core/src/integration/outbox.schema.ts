@@ -56,6 +56,14 @@ export const outboxEvents: Events[] = [
   'WalletLinked',
   'SSOLinked',
   'XpChainEventCreated',
+  'TokenLocked',
+  'TokenUnlocked',
+  'TokenMerged',
+  'TokenDelegated',
+  'TokenUndelegated',
+  'TokenPermanentConverted',
+  'TokenLockDurationIncreased',
+  'NamespaceLinked',
 ] as const;
 
 export const Outbox = z.union(

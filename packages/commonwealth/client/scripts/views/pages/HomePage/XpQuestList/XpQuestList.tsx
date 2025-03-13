@@ -8,7 +8,9 @@ import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 
+import { QuestAction, calculateTotalXPForQuestActions } from 'helpers/quest';
 import app from 'state';
+import useUserStore from 'state/ui/user';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';
 
@@ -19,11 +21,15 @@ interface XpQuestListProps {
 const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+    community_id: communityIdFilter,
     cursor: 1,
     limit: 3,
-    start_after: moment().startOf('day').toDate(),
+    // dont show system quests in quest lists for communities
+    include_system_quests: communityIdFilter ? false : !user.isLoggedIn,
+    end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
 
@@ -47,7 +53,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     <div className="XpQuestList">
       <div className="heading-container">
         <CWText type="h2">XP Quests</CWText>
-        <Link to={`/${app.activeChainId()}/quests`}>
+        <Link to={`/${app.activeChainId()}/quests`} className="see-all-link">
           <div className="link-right">
             <CWText className="link">See all quests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
@@ -70,18 +76,12 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
         ) : (
           <div className="content">
             {quests.map((quest) => {
-              const totalUserXP =
-                (quest.action_metas || [])
-                  ?.map(
-                    (action) =>
-                      action.reward_amount -
-                      action.creator_reward_weight * action.reward_amount,
-                  )
-                  .reduce(
-                    (accumulator, currentValue) => accumulator + currentValue,
-                    0,
-                  ) || 0;
-
+              const totalUserXP = calculateTotalXPForQuestActions({
+                questActions: (quest.action_metas as QuestAction[]) || [],
+                isUserReferred: !!user.referredByAddress,
+                questStartDate: new Date(quest.start_date),
+                questEndDate: new Date(quest.end_date),
+              });
               return (
                 <XpQuestCard
                   key={quest.name}

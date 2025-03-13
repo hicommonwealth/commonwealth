@@ -22,8 +22,8 @@ import {
   vi,
 } from 'vitest';
 import { z } from 'zod';
-import { Contests } from '../../src/contest/Contests.projection';
-import { GetAllContests } from '../../src/contest/GetAllContests.query';
+import { Contests } from '../../src/aggregates/contest/Contests.projection';
+import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
 import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -343,6 +343,7 @@ describe('Contests projection lifecycle', () => {
         topic_id: topic_id,
         topics: [{ id: topic_id, name: 'test-topic' }],
         is_farcaster_contest: true,
+        vote_weight_multiplier: null,
         contests: [
           {
             contest_id,

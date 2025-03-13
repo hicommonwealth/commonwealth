@@ -54,6 +54,8 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 }
 
 export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
+  const governancePageEnabled = useFlag('governancePage');
+
   const navigate = useCommonNavigate();
   const location = useLocation();
   const xpEnabled = useFlag('xp');
@@ -86,6 +88,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     toggledState: false,
     children: {
       Members: {
+        toggledState: false,
+        children: {},
+      },
+      Governance: {
         toggledState: false,
         children: {},
       },
@@ -147,6 +153,11 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     [{ path: '/quests' }, { path: ':scope/quests' }],
     location,
   );
+  const matchesGovernanceRoute = matchRoutes(
+    [{ path: '/governance' }, { path: ':scope/governance' }],
+    location,
+  );
+
   // ---------- Build Section Props ---------- //
 
   // Members
@@ -239,7 +250,27 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
   };
 
-  //Contests
+  // Governance
+  const governanceData: SectionGroupAttrs = {
+    title: 'Governance',
+    containsChildren: false,
+    hasDefaultToggle: toggleTreeState['children']['Governance']
+      ? toggleTreeState['children']['Governance']['toggledState']
+      : false,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, '/governance', communityId, () => {
+        setGovernanceToggleTree('children.Governance.toggledState', toggle);
+      });
+    },
+    isVisible: true,
+    isUpdated: true,
+    isActive: !!matchesGovernanceRoute,
+    displayData: null,
+  };
+
+  // Contests
   const contestData: SectionGroupAttrs = {
     title: 'Contests',
     containsChildren: false,
@@ -278,13 +309,15 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     membersData,
     snapshotData,
     proposalsData,
-    contestData,
     questsData,
   ];
 
   if (!hasProposals) governanceGroupData = [membersData, questsData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
+  }
+  if (governancePageEnabled) {
+    governanceGroupData.push(governanceData);
   }
 
   const sidebarSectionData: SidebarSectionAttrs = {

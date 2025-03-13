@@ -67,14 +67,17 @@ const MobileNavigation = () => {
         ]
       : []),
   ];
+
   const isNewThreadPage =
     ['/new/discussion', '/profile', ''].some((path) =>
       window.location?.pathname?.includes(path),
     ) || /^\/[^/]+\/discussion\/[^/]+$/.test(window.location?.pathname);
+  const isDiscussionsPage = window.location?.pathname?.includes('/discussion');
+  const shouldHideQuickPost = isNewThreadPage || isDiscussionsPage;
 
   return (
     <>
-      {newMobileNav && !isNewThreadPage && <QuickPostButton />}
+      {newMobileNav && !shouldHideQuickPost && <QuickPostButton />}
       <div className="MobileNavigation">
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}

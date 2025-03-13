@@ -47,9 +47,12 @@ const CustomNotificationCell = ({ item }: NotificationCellProps) => {
     <Link to={url} className="CustomNotificationCell container">
       <div className="container">
         {item?.data?.author && (
-          <div className="avatar">
-            <Avatar name={item?.data?.author} />
-          </div>
+          <Link className="avatar" to={item?.data?.author_profile_url}>
+            <Avatar
+              name={item?.data?.author}
+              src={item?.data?.author_avatar_url}
+            />
+          </Link>
         )}
         <div className="content">
           {isRenderableBlock(contentBlock) && (

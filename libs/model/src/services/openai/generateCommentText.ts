@@ -23,17 +23,30 @@ const generateCommentText = async function* ({
   void,
   unknown
 > {
-  if (!config.OPENAI.API_KEY) {
+  const useOpenRouter = config.OPENAI.USE_OPENROUTER === 'true';
+  const apiKey = useOpenRouter
+    ? config.OPENAI.OPENROUTER_API_KEY
+    : config.OPENAI.API_KEY;
+
+  if (!apiKey) {
     yield { error: CommentErrors.OpenAINotConfigured };
     return;
   }
 
   let openai: OpenAI;
   try {
-    openai = new OpenAI({
-      organization: config.OPENAI.ORGANIZATION,
-      apiKey: config.OPENAI.API_KEY,
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const openAIConfig: any = {
+      apiKey,
+    };
+
+    if (useOpenRouter) {
+      openAIConfig.baseURL = 'https://openrouter.ai/api/v1';
+    } else if (config.OPENAI.ORGANIZATION) {
+      openAIConfig.organization = config.OPENAI.ORGANIZATION;
+    }
+
+    openai = new OpenAI(openAIConfig);
   } catch (error) {
     console.error('Failed to initialize OpenAI:', error);
     yield { error: CommentErrors.OpenAIInitFailed };
@@ -41,8 +54,9 @@ const generateCommentText = async function* ({
   }
 
   try {
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createCompletionConfig: any = {
+      model: useOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'gpt-4o',
       messages: [
         {
           role: 'user',
@@ -50,16 +64,33 @@ const generateCommentText = async function* ({
         },
       ],
       stream: true,
-    });
+    };
 
-    for await (const chunk of stream) {
-      try {
-        const content = chunk.choices[0]?.delta?.content || '';
-        if (content) {
-          yield content;
+    if (useOpenRouter) {
+      createCompletionConfig.extra_headers = {
+        'HTTP-Referer': 'https://common.xyz',
+        'X-Title': 'Common',
+      };
+    }
+
+    const stream = await openai.chat.completions.create(createCompletionConfig);
+
+    if (stream.choices) {
+      const content = stream.choices[0]?.message?.content || '';
+      if (content) {
+        yield content;
+      }
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for await (const chunk of stream as any) {
+        try {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            yield content;
+          }
+        } catch (chunkError) {
+          console.error('Error processing chunk:', chunkError);
         }
-      } catch (chunkError) {
-        console.error('Error processing chunk:', chunkError);
       }
     }
   } catch (e) {
