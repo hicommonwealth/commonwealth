@@ -9,6 +9,9 @@ export const getNamespaceMetadata = async (
 ) => {
   //stake_id will be a 32 byte hex string, convert to number
   const decodedId = parseInt(req.params.stake_id, 16);
+  if (isNaN(decodedId)) {
+    throw new AppError('Invalid stake_id');
+  }
   const metadata = await models.Community.findOne({
     where: {
       namespace: req.params.namespace,
