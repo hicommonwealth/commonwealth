@@ -50,54 +50,64 @@ const EventStreamSchemas = {
   },
 } as const;
 
+const getContestManagerUrl = (
+  contestManager: z.infer<typeof ContestManager>,
+) => {
+  if (contestManager.is_farcaster_contest) {
+    return buildContestLeaderboardUrl(
+      getBaseUrl(config.APP_ENV),
+      contestManager.community_id,
+      contestManager.contest_address,
+    );
+  }
+  return (
+    getBaseUrl(config.APP_ENV) +
+    `/common/discussions?featured=mostLikes&contest=${contestManager.contest_address}`
+  );
+};
+
 // maps events to event stream items
 const eventStreamMappers: EventStreamMappers = {
   ContestStarted: async (payload) => {
-    const contestManager = await models.ContestManager.findByPk(
-      payload.contest_address,
-    );
+    const contestManager = await models.ContestManager.findOne({
+      where: {
+        contest_address: payload.contest_address,
+        environment: config.APP_ENV,
+      },
+    });
     mustExist('ContestManager', contestManager);
-    const leaderboardUrl = buildContestLeaderboardUrl(
-      getBaseUrl(config.APP_ENV),
-      contestManager.community_id,
-      contestManager.contest_address,
-    );
     return {
       type: 'ContestStarted',
       data: contestManager.get({ plain: true }),
-      url: leaderboardUrl,
+      url: getContestManagerUrl(contestManager),
     };
   },
   ContestEnding: async (payload) => {
-    const contestManager = await models.ContestManager.findByPk(
-      payload.contest_address,
-    );
+    const contestManager = await models.ContestManager.findOne({
+      where: {
+        contest_address: payload.contest_address,
+        environment: config.APP_ENV,
+      },
+    });
     mustExist('ContestManager', contestManager);
-    const leaderboardUrl = buildContestLeaderboardUrl(
-      getBaseUrl(config.APP_ENV),
-      contestManager.community_id,
-      contestManager.contest_address,
-    );
     return {
       type: 'ContestEnding',
       data: contestManager.get({ plain: true }),
-      url: leaderboardUrl,
+      url: getContestManagerUrl(contestManager),
     };
   },
   ContestEnded: async (payload) => {
-    const contestManager = await models.ContestManager.findByPk(
-      payload.contest_address,
-    );
+    const contestManager = await models.ContestManager.findOne({
+      where: {
+        contest_address: payload.contest_address,
+        environment: config.APP_ENV,
+      },
+    });
     mustExist('ContestManager', contestManager);
-    const leaderboardUrl = buildContestLeaderboardUrl(
-      getBaseUrl(config.APP_ENV),
-      contestManager.community_id,
-      contestManager.contest_address,
-    );
     return {
       type: 'ContestEnded',
       data: contestManager.get({ plain: true }),
-      url: leaderboardUrl,
+      url: getContestManagerUrl(contestManager),
     };
   },
   CommunityCreated: async (payload) => {
@@ -116,7 +126,9 @@ const eventStreamMappers: EventStreamMappers = {
   ThreadCreated: async (payload) => {
     const thread = await models.Thread.findByPk(payload.id);
     mustExist('Thread', thread);
-    const threadUrl = buildThreadContentUrl(thread.community_id, thread.id!);
+    const threadUrl =
+      getBaseUrl(config.APP_ENV) +
+      buildThreadContentUrl(thread.community_id, thread.id!);
     return {
       type: 'ThreadCreated',
       data: thread.get({ plain: true }),

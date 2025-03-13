@@ -1,4 +1,4 @@
-import { CacheNamespaces, dispose } from '@hicommonwealth/core';
+import { CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { ContestManager, events } from '@hicommonwealth/schemas';
 import {
@@ -20,6 +20,20 @@ import {
 import { drainOutbox } from '../utils/outbox-drain';
 
 const inMemoryStore = new Map<string, any>();
+
+const isValidUrl = (urlString: string): boolean => {
+  try {
+    // Check if URL starts with http or https
+    if (!urlString.startsWith('http')) {
+      return false;
+    }
+    // Check if it's a valid URL
+    new URL(urlString);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
 
 const mockCache = {
   getKey: vi.fn().mockImplementation(async (namespace, key) => {
@@ -61,6 +75,7 @@ describe('EventStream Policy Integration Tests', () => {
           cancelled: false,
           ended: false,
           interval: 0,
+          environment: config.APP_ENV,
         })),
       ],
       topics: [
@@ -129,6 +144,7 @@ describe('EventStream Policy Integration Tests', () => {
     expect(eventStreamItems[0].url).toContain(
       communityCreatedEvent.community_id,
     );
+    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
   });
 
   test('should add ThreadCreated event to the event stream', async () => {
@@ -159,6 +175,7 @@ describe('EventStream Policy Integration Tests', () => {
     expect(eventStreamItems[0].url).toContain(
       threadCreatedEvent.id!.toString(),
     );
+    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
   });
 
   test('should add ContestStarted event to the event stream', async () => {
@@ -190,6 +207,7 @@ describe('EventStream Policy Integration Tests', () => {
     expect(eventStreamItems[0].url).toContain(
       contestStartedEvent.contest_address,
     );
+    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
   });
 
   test('should append events to an existing event stream', async () => {
@@ -228,11 +246,13 @@ describe('EventStream Policy Integration Tests', () => {
 
     const firstItemData = eventStreamItems[0].data as any;
     expect(firstItemData.id).toBe(existingEvent.data.id);
+    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
 
     expect(eventStreamItems[1].type).toBe('ThreadCreated');
 
     const secondItemData = eventStreamItems[1].data as any;
     expect(secondItemData.id).toBe(threadCreatedEvent.id!);
+    expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
   });
 
   test('should process multiple events of different types through the outbox', async () => {
@@ -282,8 +302,11 @@ describe('EventStream Policy Integration Tests', () => {
 
     expect(eventStreamItems).toHaveLength(3);
     expect(eventStreamItems[0].type).toBe(outboxEvents[0].event_name);
+    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
     expect(eventStreamItems[1].type).toBe(outboxEvents[1].event_name);
+    expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
     expect(eventStreamItems[2].type).toBe(outboxEvents[2].event_name);
+    expect(isValidUrl(eventStreamItems[2].url)).toBe(true);
   });
 
   test('should only keep the most recent events when exceeding the window size', async () => {
@@ -307,6 +330,10 @@ describe('EventStream Policy Integration Tests', () => {
 
     // event stream length should be max
     expect(eventStreamItems).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+    // verify all URLs are valid with http prefix
+    eventStreamItems.forEach((item) => {
+      expect(isValidUrl(item.url)).toBe(true);
+    });
 
     // add 1 more event to the stream
     await models.Outbox.create({
@@ -326,6 +353,10 @@ describe('EventStream Policy Integration Tests', () => {
 
     // event stream length should still be max
     expect(eventStreamItemsAfter).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+    // verify all URLs are valid with http prefix
+    eventStreamItemsAfter.forEach((item) => {
+      expect(isValidUrl(item.url)).toBe(true);
+    });
 
     // oldest event should be removed
     const oldestEvent = eventStreamItemsAfter[0].data as z.infer<
