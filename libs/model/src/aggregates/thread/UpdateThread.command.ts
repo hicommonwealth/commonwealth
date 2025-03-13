@@ -237,6 +237,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
             ...searchUpdate,
             ...tokenAddress,
             content_url: contentUrl,
+            is_linking_token: payload.is_linking_token,
           },
           { transaction },
         );

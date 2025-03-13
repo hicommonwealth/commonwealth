@@ -213,6 +213,8 @@ export class Thread implements IUniqueId {
   > | null;
   public readonly latestActivity?: Moment;
   public contentUrl?: string | null;
+  public isLinkingToken?: boolean;
+  public tokenAddress?: string | null;
 
   public readonly profile: UserProfile;
 
@@ -320,6 +322,9 @@ export class Thread implements IUniqueId {
       t.ContestActions,
     );
     this.contentUrl = t.content_url;
+    this.isLinkingToken = t.is_linking_token;
+    this.tokenAddress = t.token_address;
+
     this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>
         new Comment({
