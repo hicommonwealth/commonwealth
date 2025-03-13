@@ -52,6 +52,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   hideHeader = false,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
+  const questsEnabled = useFlag('xp');
   const user = useUserStore();
 
   return (
@@ -63,9 +64,11 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       )}
 
       {/* Quests section */}
-      <div className="section-container">
-        <QuestList />
-      </div>
+      {questsEnabled && (
+        <div className="section-container">
+          <QuestList />
+        </div>
+      )}
 
       {/* Contests section */}
       <div className="section-container">
