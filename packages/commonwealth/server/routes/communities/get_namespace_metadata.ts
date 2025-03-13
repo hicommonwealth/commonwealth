@@ -18,7 +18,7 @@ export const getNamespaceMetadata = async (
   }
 
   //stake_id will be a 32 byte hex string, convert to number
-  const decodedId = parseInt('0x' + req.params.stake_id, 16);
+  const decodedId = parseInt(req.params.stake_id, 16);
   if (isNaN(decodedId)) {
     throw new AppError('Invalid id');
   }
