@@ -87,6 +87,7 @@ describe('Update Community/Chain Tests', () => {
       directory_page_enabled: false,
       tags: [],
       social_links: [],
+      allow_tokenized_threads: false,
     };
 
     const created = await server.seeder.createCommunity(
