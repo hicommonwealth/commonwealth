@@ -199,10 +199,6 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
       communityStakesSource,
   },
-  [ValidChains.SKALE]: {
-    [factoryContracts[ValidChains.SKALE].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.SKALE].communityStake]: communityStakesSource,
-  },
   [ValidChains.Anvil]: {
     [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,

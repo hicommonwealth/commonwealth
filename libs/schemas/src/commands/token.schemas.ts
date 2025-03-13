@@ -46,13 +46,9 @@ export const DistributeSkale = {
     address: z.string(),
     eth_chain_id: z
       .number()
-      .refine(
-        (data) =>
-          data == cp.ValidChains.SKALE || data === cp.ValidChains.SKALE_TEST,
-        {
-          message: `eth_chain_id must be a Skale chain Id`,
-        },
-      ),
+      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
+        message: `eth_chain_id must be a Skale chain Id`,
+      }),
   }),
   output: z.object({}),
 };
