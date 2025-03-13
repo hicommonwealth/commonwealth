@@ -214,60 +214,39 @@ export const config = configure(
           ],
         },
       ),
-    PUSH_NOTIFICATIONS: z
-      .object({
-        KNOCK_FCM_CHANNEL_ID: z
-          .string()
-          .optional()
-          .describe(
-            'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
-          ),
-        KNOCK_APNS_CHANNEL_ID: z
-          .string()
-          .optional()
-          .describe('The Apple channel identifier for Safari/iOS users.'),
-        KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY: z
-          .string()
-          .optional()
-          .describe('The Firebase VAPID key.'),
-        KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG: z
-          .string()
-          .refine(
-            (data) => {
-              try {
-                JSON.parse(data);
-                return true;
-              } catch {
-                return false;
-              }
-            },
-            {
-              message: 'Invalid JSON string',
-            },
-          )
-          .optional()
-          .describe('The public firebase config for FCM'),
-      })
-      .refine(
-        (data) => {
-          return (
-            data.KNOCK_FCM_CHANNEL_ID &&
-            data.KNOCK_APNS_CHANNEL_ID &&
-            data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY &&
-            data.KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG
-          );
-        },
-        {
-          message:
-            'Knock notifications require additional properties.  See paths.',
-          path: [
-            'KNOCK_FCM_CHANNEL_ID',
-            'KNOCK_APNS_CHANNEL_ID',
-            'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY',
-            'KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG',
-          ],
-        },
-      ),
+    PUSH_NOTIFICATIONS: z.object({
+      KNOCK_FCM_CHANNEL_ID: z
+        .string()
+        .optional()
+        .describe(
+          'The Firebase Cloud Messaging (FCM) channel identifier for sending to Android users.',
+        ),
+      KNOCK_APNS_CHANNEL_ID: z
+        .string()
+        .optional()
+        .describe('The Apple channel identifier for Safari/iOS users.'),
+      KNOCK_PUSH_NOTIFICATIONS_PUBLIC_VAPID_KEY: z
+        .string()
+        .optional()
+        .describe('The Firebase VAPID key.'),
+      KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG: z
+        .string()
+        .refine(
+          (data) => {
+            try {
+              JSON.parse(data);
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          {
+            message: 'Invalid JSON string',
+          },
+        )
+        .optional()
+        .describe('The public firebase config for FCM'),
+    }),
     ANALYTICS: z.object({
       MIXPANEL_PROD_TOKEN: z
         .string()
