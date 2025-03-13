@@ -113,6 +113,7 @@ describe('Community lifecycle', () => {
       active: true,
       lifetime_thread_count: 0,
       profile_count: 1,
+      allow_tokenized_threads: true,
       Addresses: [
         {
           role: 'member',
@@ -255,7 +256,7 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: ethNode.id!,
-          allow_tokenized_threads: false,
+          allow_tokenized_threads: true,
         },
       });
       expect(eth_result?.community?.id).toBe(eth_name);
