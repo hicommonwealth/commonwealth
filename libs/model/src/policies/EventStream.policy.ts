@@ -24,11 +24,11 @@ import { buildThreadContentUrl } from '../utils';
 
 const log = logger(import.meta);
 
-const FEED_WINDOW_SIZE = 50;
-export const HOME_FEED_KEY = 'HOME_FEED';
+const EVENT_STREAM_WINDOW_SIZE = 50;
+export const EVENT_STREAM_KEY = 'EVENT_STREAM';
 
-// lists all the events that can be added to the home feed
-const FeedSchemas = {
+// lists all the events that can be added to the event stream
+const EventStreamSchemas = {
   ContestStarted: {
     input: events.ContestStarted,
     output: ContestManager.extend({}),
@@ -51,8 +51,8 @@ const FeedSchemas = {
   },
 } as const;
 
-// maps events to feed items
-const feedMappers: FeedMappers = {
+// maps events to event stream items
+const eventStreamMappers: EventStreamMappers = {
   ContestStarted: async (payload) => {
     const contestManager = await models.ContestManager.findByPk(
       payload.contest_address,
@@ -126,32 +126,36 @@ const feedMappers: FeedMappers = {
   },
 };
 
-export function HomeFeedPolicy(): Policy<{
-  [K in keyof typeof FeedSchemas]: (typeof FeedSchemas)[K]['input'];
+export function EventStreamPolicy(): Policy<{
+  [K in keyof typeof EventStreamSchemas]: (typeof EventStreamSchemas)[K]['input'];
 }> {
   return {
     inputs: {
-      ContestStarted: FeedSchemas.ContestStarted.input,
-      ContestEnding: FeedSchemas.ContestEnding.input,
-      ContestEnded: FeedSchemas.ContestEnded.input,
-      CommunityCreated: FeedSchemas.CommunityCreated.input,
-      ThreadCreated: FeedSchemas.ThreadCreated.input,
+      ContestStarted: EventStreamSchemas.ContestStarted.input,
+      ContestEnding: EventStreamSchemas.ContestEnding.input,
+      ContestEnded: EventStreamSchemas.ContestEnded.input,
+      CommunityCreated: EventStreamSchemas.CommunityCreated.input,
+      ThreadCreated: EventStreamSchemas.ThreadCreated.input,
     },
     body: {
       ContestStarted: async ({ payload }) => {
-        await addToHomeFeed(await feedMappers.ContestStarted(payload));
+        await addToEventStream(
+          await eventStreamMappers.ContestStarted(payload),
+        );
       },
       ContestEnding: async ({ payload }) => {
-        await addToHomeFeed(await feedMappers.ContestEnding(payload));
+        await addToEventStream(await eventStreamMappers.ContestEnding(payload));
       },
       ContestEnded: async ({ payload }) => {
-        await addToHomeFeed(await feedMappers.ContestEnded(payload));
+        await addToEventStream(await eventStreamMappers.ContestEnded(payload));
       },
       CommunityCreated: async ({ payload }) => {
-        await addToHomeFeed(await feedMappers.CommunityCreated(payload));
+        await addToEventStream(
+          await eventStreamMappers.CommunityCreated(payload),
+        );
       },
       ThreadCreated: async ({ payload }) => {
-        await addToHomeFeed(await feedMappers.ThreadCreated(payload));
+        await addToEventStream(await eventStreamMappers.ThreadCreated(payload));
       },
     },
   };
@@ -159,58 +163,64 @@ export function HomeFeedPolicy(): Policy<{
 
 // ---
 
-export type FeedItem<T extends keyof typeof FeedSchemas> = {
+export type EventStreamItem<T extends keyof typeof EventStreamSchemas> = {
   type: T;
-  data: z.infer<(typeof FeedSchemas)[T]['output']>;
+  data: z.infer<(typeof EventStreamSchemas)[T]['output']>;
   url: string;
 };
 
-export type FeedMappers = {
-  [K in keyof typeof FeedSchemas]: (
-    payload: z.infer<(typeof FeedSchemas)[K]['input']>,
-  ) => Promise<FeedItem<K>>;
+export type EventStreamMappers = {
+  [K in keyof typeof EventStreamSchemas]: (
+    payload: z.infer<(typeof EventStreamSchemas)[K]['input']>,
+  ) => Promise<EventStreamItem<K>>;
 };
 
-const feedMutex = new Mutex();
+const eventStreamMutex = new Mutex();
 
-const addToHomeFeed = async (
-  eventToAdd: FeedItem<keyof typeof FeedSchemas>,
+const addToEventStream = async (
+  eventToAdd: EventStreamItem<keyof typeof EventStreamSchemas>,
 ) => {
-  await feedMutex.runExclusive(async () => {
-    const oldFeed = await getFeed();
-    const newFeed = [...oldFeed, eventToAdd];
-    // if the feed exceeds the window size, remove the oldest items
-    if (newFeed.length > FEED_WINDOW_SIZE) {
-      return newFeed.slice(newFeed.length - FEED_WINDOW_SIZE);
+  await eventStreamMutex.runExclusive(async () => {
+    const oldEventStream = await getEventStream();
+    const newEventStream = [...oldEventStream, eventToAdd];
+    // if the event stream exceeds the window size, remove the oldest items
+    if (newEventStream.length > EVENT_STREAM_WINDOW_SIZE) {
+      return newEventStream.slice(
+        newEventStream.length - EVENT_STREAM_WINDOW_SIZE,
+      );
     }
-    await setFeed(newFeed);
+    await setEventStream(newEventStream);
   });
 };
 
-const getFeed = async (): Promise<FeedItem<keyof typeof FeedSchemas>[]> => {
+const getEventStream = async (): Promise<
+  EventStreamItem<keyof typeof EventStreamSchemas>[]
+> => {
   try {
-    const cachedFeed = await cache().getKey(
+    const cachedEventStream = await cache().getKey(
       CacheNamespaces.Function_Response,
-      HOME_FEED_KEY,
+      EVENT_STREAM_KEY,
     );
-    if (cachedFeed) {
-      return JSON.parse(cachedFeed);
+    if (cachedEventStream) {
+      return JSON.parse(cachedEventStream);
     }
     return [];
   } catch (err) {
-    log.error(`Error getting home feed from cache`, err as Error);
+    log.error(`Error getting event stream from cache`, err as Error);
     return [];
   }
 };
 
-const setFeed = async (feed: FeedItem<keyof typeof FeedSchemas>[]) => {
+const setEventStream = async (
+  eventStream: EventStreamItem<keyof typeof EventStreamSchemas>[],
+) => {
   try {
     await cache().setKey(
       CacheNamespaces.Function_Response,
-      HOME_FEED_KEY,
-      JSON.stringify(feed),
+      EVENT_STREAM_KEY,
+      JSON.stringify(eventStream),
     );
   } catch (err) {
-    log.error(`Error getting home feed from cache`, err as Error);
+    log.error(`Error setting event stream in cache`, err as Error);
   }
 };
