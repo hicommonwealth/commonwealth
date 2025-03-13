@@ -1,0 +1,130 @@
+---
+description: Rules for components in Commonwealth with focus on the component_kit structure
+globs: '**/component_kit/**/*.tsx, **/new_designs/**/*.tsx'
+---
+
+# Component Kit Guidelines
+
+## Overview
+
+The Commonwealth Component Kit provides reusable UI building blocks following a design system. Figma is the single source of truth for UI design, and engineering should implement the components according to the design specs.
+
+## Component Organization
+
+### Naming Conventions
+
+- Use `CW` prefix for components in the component kit (e.g., `CWButton`, `CWTag`)
+- Use PascalCase for component names
+- For component files, match the name with the component (e.g., `CWButton.tsx`)
+- For SCSS files, use the same name as the component (e.g., `CWButton.scss`)
+
+### Directory Structure
+
+- Place components in the `component_kit` directory
+- For new designs, use the `new_designs` subdirectory
+- Group related components in subdirectories when needed
+- Include an `index.ts` file to export components
+
+## Component Implementation
+
+### TypeScript Types
+
+- Use TypeScript interfaces for component props
+- Define component-specific types at the top of the file
+- Use the `ComponentType` enum for component identification
+
+```typescript
+// Example of component props and types
+type TagType = 
+  | 'passed'
+  | 'failed'
+  | 'active'
+  | 'poll'
+  // ... other types
+
+export type TagProps = {
+  iconName?: IconName;
+  label: string;
+  type: TagType;
+  onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  // ... other props
+};
+```
+
+### Component Structure
+
+- Export components as named exports
+- Use functional components with destructured props
+- Implement component logic above the return statement
+- Use helper functions for complex rendering logic
+- Apply consistent class naming using the `getClasses` utility
+
+```typescript
+export const CWTag = ({
+  iconName,
+  label,
+  type,
+  onClick,
+  // ... other props
+}: TagProps) => {
+  const displayLabel = () => {
+    // ... logic for displaying label
+  };
+
+  return (
+    <div
+      className={`${getClasses<{ type?: TagType }>(
+        { type },
+        ComponentType.Tag,
+      )} ${classNames || ''}`}
+      onClick={onClick}
+    >
+      {/* Component JSX */}
+    </div>
+  );
+};
+```
+
+### Styling
+
+- Place component styles in a matching SCSS file next to the component
+- Use BEM-like naming convention for CSS classes
+- Use the `getClasses` helper to apply consistent class names
+- Use the `ComponentType` enum to ensure consistent class prefixes
+- Keep styles scoped to the component to prevent leaking
+
+## Component Variants
+
+- Implement variants as props rather than separate components when possible
+- Use TypeScript union types to define allowed variants
+- Document each variant's purpose and appearance
+- Ensure all variants follow the design system specs
+
+## Component Composition
+
+- Compose complex components from simpler ones
+- Use appropriate subcomponents for repeated patterns
+- Keep components focused on a single responsibility
+- Use composition over inheritance for component relationships
+
+## Component Documentation
+
+- Document component props and their purpose
+- Add usage examples for different variants and prop combinations
+- Include component in the Components Showcase page for visibility
+- Update documentation when changes are made to the component API
+
+## Component Showcase
+
+- To add a component to the showcase page, run `pnpm add-component-showcase`
+- Categorize components as either "Foundations" or "Components"
+- In showcase files, use React Fragment as the wrapper
+- Use minimal custom styling in showcases, relying on utility classes
+- Use the standard layout classes (`flex-column` and `flex-row`) for organization
+
+## Testing Components
+
+- Create unit tests for components with complex logic
+- Test different component states and prop combinations
+- Ensure component follows accessibility guidelines
+- Verify component behavior matches design specifications 

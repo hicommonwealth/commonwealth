@@ -1,4 +1,5 @@
 import Thread from 'client/scripts/models/Thread';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
@@ -8,7 +9,6 @@ import { RenderThreadCard } from 'views/pages/discussions/RenderThreadCard';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from '../../CommunityManagement/Contests/utils';
 import { SortType, sortOptions } from '../types';
-
 import './CommonEntriesList.scss';
 
 interface CommonEntriesListProps {
@@ -29,6 +29,7 @@ export const CommonEntriesList = ({
   contestAddress,
 }: CommonEntriesListProps) => {
   const { contestsData, getContestByAddress } = useCommunityContests();
+  const navigate = useCommonNavigate();
 
   const contest = getContestByAddress(contestAddress);
 
@@ -73,6 +74,11 @@ export const CommonEntriesList = ({
             label="Submit entry"
             iconLeft="plus"
             disabled={!isActive}
+            onClick={() => {
+              navigate(
+                `/new/discussion?topic=${contest?.topic_id}&cancel=${contestAddress}`,
+              );
+            }}
           />
         ) : null}
       </div>

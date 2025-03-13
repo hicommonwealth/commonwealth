@@ -1,0 +1,104 @@
+---
+description: Rules for environment variables and feature flags in Commonwealth
+globs: '**/vite.config.ts, **/feature-flags.ts, **/.env*, **/*.env.js'
+---
+
+# Environment Variables and Feature Flags Guidelines
+
+## Environment Variables
+
+### General Principles
+
+- Store environment variables in `.env` files at the project root
+- Use environment-specific files like `.env.development` or `.env.production` when needed
+- Do not commit sensitive environment variables to the repository
+- Document all environment variables in `Environment-Variables.md`
+- Prefix frontend environment variables with `process.env.` in the code
+
+### Vite Configuration
+
+- Environment variables for the frontend are defined in `vite.config.ts`
+- Access environment variables using the `loadEnv` function from Vite
+- Define environment variables as string literals using `JSON.stringify`
+- Group related environment variables together in the configuration
+
+```typescript
+// Example from vite.config.ts
+const unleashConfig = {
+  'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
+    env.UNLEASH_FRONTEND_SERVER_URL,
+  ),
+  'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
+    env.UNLEASH_FRONTEND_API_TOKEN,
+  ),
+  'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
+};
+```
+
+### Access Patterns
+
+- Use environment variables directly with `process.env.VARIABLE_NAME`
+- For non-critical environment variables, provide fallback values
+- Validate environment variables at application startup when possible
+- Use TypeScript to ensure type safety when working with environment variables
+
+## Feature Flags
+
+### Feature Flag Structure
+
+- Define feature flags in the `feature-flags.ts` file
+- Use the `buildFlag` helper function to create feature flag objects
+- Structure feature flags with variants, disabled state, and default variant
+- Export feature flag names as a TypeScript type for type checking
+
+```typescript
+// Example of feature flag definition
+const featureFlags = {
+  newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
+  contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
+  knockPushNotifications: buildFlag(
+    process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
+  ),
+  // Other feature flags
+};
+
+export type AvailableFeatureFlag = keyof typeof featureFlags;
+```
+
+### Feature Flag Naming Conventions
+
+- Use camelCase for feature flag names
+- Prefix environment variables for feature flags with `FLAG_`
+- Use descriptive names that clearly indicate the feature's purpose
+- For temporary feature flags, consider adding a date or version suffix
+
+### Local vs Remote Feature Flags
+
+- Local feature flags are defined in `vite.config.ts` for development
+- Remote feature flags are managed through Unleash for production environments
+- Define feature flags consistently across environments
+- Comment feature flags appropriately to indicate their purpose and scope
+
+```typescript
+// Example of feature flags in vite.config.ts
+const featureFlags = {
+  'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
+  'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
+  // Other feature flags
+};
+```
+
+### Using Feature Flags
+
+- Use the OpenFeature provider to access feature flags in the code
+- Check feature flags before rendering or enabling functionality
+- Provide fallback behavior when a feature flag is disabled
+- Remove feature flags and their related code once a feature is fully released
+
+### Feature Flag Best Practices
+
+- Use feature flags for gradual rollouts of new features
+- Implement A/B testing using feature flags when appropriate
+- Clean up unused feature flags regularly
+- Document the purpose and expected lifecycle of each feature flag
+- Use feature flags for temporary workarounds, but plan for permanent solutions 

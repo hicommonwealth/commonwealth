@@ -1,0 +1,107 @@
+---
+description: Rules for React development in Commonwealth
+globs: '**/*.tsx, **/*.jsx'
+---
+
+# React Development Guidelines
+
+## Key Principles
+
+- Use functional components, avoiding class components
+- Apply TypeScript throughout the codebase
+- Follow clear directory structure patterns
+- Use proper component file composition
+- Enable React StrictMode for better development checks
+
+## Directory Structure
+
+### Components
+
+- All reusable components should be kept in the `/components` folder
+- Each component should be housed in a separate component-scoped folder named in PascalCase
+- Create an `index.ts` file in each component folder that exports components
+- Component `.scss` files should be placed next to component files with matching names
+
+Example structure:
+```
+└── components
+    ├── Button
+    │   ├── index.ts
+    │   ├── Button.tsx
+    │   └── Button.scss
+    └── Sidebar
+        ├── index.ts
+        ├── Sidebar.tsx
+        ├── SidebarSkeleton.tsx
+        ├── Sidebar.scss
+        └── QuickSwitcher
+            ├── index.ts
+            ├── QuickSwitcher.tsx
+            ├── QuickSwitcherSkeleton.tsx
+            └── QuickSwitcher.scss
+```
+
+### Pages
+
+- Only components serving as entry points for routes should be in the `/pages` directory
+- Each folder should represent a separate route
+- Use either `PascalCase` or `kebab-case` for folder naming, not `snake_case`
+- The central component of a route folder should be defined in its own file (e.g., `Component.tsx`)
+
+## Component File Composition
+
+- Component name should match the file name
+- Files should house only a single component
+- Define props interface immediately above the component definition using the naming pattern `ComponentProps` (e.g., `AvatarUploadProps`)
+- Destructure props within the component definition
+- Extract business logic to custom hooks and utility functions
+- Place hooks at the top level of the component, following React's hooks rules
+- Minimize logic within the component's `return` statement
+- Define event handlers in the component body, not inline in JSX
+
+### Example Component Structure
+
+```tsx
+interface ComponentProps = {
+  title: string;
+  id: number;
+}
+
+const Component = ({ title, id }: ComponentProps) => {
+  const { items, loadItems } = useComponent();
+
+  const handleClick = () => {
+    loadItems();
+    // more logic
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>Click</button>
+      {items.map((item) => (
+        <Item key={item.id} title={item.title} id={item.id} />
+      ))}
+    </div>
+  );
+};
+
+export default Component;
+```
+
+## Skeleton Components
+
+- Create skeleton components in separate files, named after the component they represent (e.g., `ComponentSkeleton.tsx`)
+- Use skeleton components for loading states
+- Return skeleton components via conditional rendering: `if (loading) return <ComponentSkeleton />`
+
+## React Hooks
+
+- Use hooks at the top level of components, never inside conditionals or loops
+- Prefer using destructured imports: `import { useState, useEffect } from 'react'` instead of `React.useState`
+- Provide proper dependencies to hooks like `useEffect` and avoid disabling the exhaustive-deps linting rule
+- If a dependency causes infinite loops, consider using `useMemo` or `useCallback`
+
+## StrictMode
+
+- Enable StrictMode to help identify potential problems in the application
+- StrictMode identifies components with unsafe lifecycle methods, legacy string refs, deprecated findDOMNode usage, and unexpected side effects 
