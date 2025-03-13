@@ -24,7 +24,7 @@ import { buildThreadContentUrl } from '../utils';
 
 const log = logger(import.meta);
 
-const EVENT_STREAM_WINDOW_SIZE = 50;
+export const EVENT_STREAM_WINDOW_SIZE = 50;
 
 // lists all the events that can be added to the event stream
 const EventStreamSchemas = {
@@ -182,11 +182,8 @@ const addToEventStream = async (
   await eventStreamMutex.runExclusive(async () => {
     const oldEventStream = await getEventStream();
     const newEventStream = [...oldEventStream, eventToAdd];
-    // if the event stream exceeds the window size, remove the oldest items
     if (newEventStream.length > EVENT_STREAM_WINDOW_SIZE) {
-      return newEventStream.slice(
-        newEventStream.length - EVENT_STREAM_WINDOW_SIZE,
-      );
+      newEventStream.shift();
     }
     await setEventStream(newEventStream);
   });

@@ -1,6 +1,6 @@
 import { CacheNamespaces, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
-import { events } from '@hicommonwealth/schemas';
+import { ContestManager, events } from '@hicommonwealth/schemas';
 import {
   afterAll,
   afterEach,
@@ -13,6 +13,7 @@ import {
 import { z } from 'zod';
 import {
   EVENT_STREAM_FN_CACHE_KEY,
+  EVENT_STREAM_WINDOW_SIZE,
   EventStreamPolicy,
   getEventStream,
 } from '../../src/policies/EventStream.policy';
@@ -43,7 +44,7 @@ vi.mock('@hicommonwealth/core', async () => {
 describe('EventStream Policy Integration Tests', () => {
   const communityId = 'test-community';
   const threadId = 123;
-  const contestAddress = '0x123';
+  let contestManagers: z.infer<typeof ContestManager>[];
 
   beforeAll(async () => {
     const [community] = await tester.seed('Community', {
@@ -51,15 +52,16 @@ describe('EventStream Policy Integration Tests', () => {
       name: 'Test Community',
       icon_url: 'https://example.com/icon.png',
       profile_count: 0,
+      // seed enough contest managers to fill the event stream window
       contest_managers: [
-        {
-          contest_address: contestAddress,
+        ...Array.from({ length: EVENT_STREAM_WINDOW_SIZE }, (_, i) => ({
+          contest_address: `0x${(i + 1).toString()}`,
           community_id: communityId,
-          name: 'Test Contest',
+          name: `Test Contest #${i + 1}`,
           cancelled: false,
           ended: false,
           interval: 0,
-        },
+        })),
       ],
       topics: [
         {
@@ -69,6 +71,7 @@ describe('EventStream Policy Integration Tests', () => {
         },
       ],
     });
+    contestManagers = community!.contest_managers!;
 
     const [userAddress] = await tester.seed('Address', {
       address: '0x123',
@@ -160,7 +163,7 @@ describe('EventStream Policy Integration Tests', () => {
 
   test('should add ContestStarted event to the event stream', async () => {
     const contestStartedEvent: z.infer<typeof events.ContestStarted> = {
-      contest_address: contestAddress,
+      contest_address: contestManagers[0].contest_address,
       contest_id: 1,
       start_time: new Date(),
       end_time: new Date(),
@@ -259,7 +262,7 @@ describe('EventStream Policy Integration Tests', () => {
       {
         event_name: 'ContestStarted',
         event_payload: {
-          contest_address: contestAddress,
+          contest_address: contestManagers[0].contest_address,
           contest_id: 1,
           start_time: new Date(),
           end_time: new Date(),
@@ -281,5 +284,53 @@ describe('EventStream Policy Integration Tests', () => {
     expect(eventStreamItems[0].type).toBe(outboxEvents[0].event_name);
     expect(eventStreamItems[1].type).toBe(outboxEvents[1].event_name);
     expect(eventStreamItems[2].type).toBe(outboxEvents[2].event_name);
+  });
+
+  test('should only keep the most recent events when exceeding the window size', async () => {
+    // fill the event stream with the initial events
+    const initialEvents = contestManagers.map((contestManager) => ({
+      event_name: 'ContestStarted',
+      event_payload: {
+        contest_address: contestManager.contest_address,
+        contest_id: 0,
+        start_time: new Date(),
+        end_time: new Date(),
+        is_one_off: true,
+      } satisfies z.infer<typeof events.ContestStarted>,
+    }));
+
+    await models.Outbox.bulkCreate(initialEvents);
+
+    await drainOutbox(['ContestStarted'], EventStreamPolicy);
+
+    const eventStreamItems = await getEventStream();
+
+    // event stream length should be max
+    expect(eventStreamItems).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+
+    // add 1 more event to the stream
+    await models.Outbox.create({
+      event_name: 'ContestStarted',
+      event_payload: {
+        contest_address: contestManagers[0].contest_address,
+        contest_id: 1,
+        start_time: new Date(),
+        end_time: new Date(),
+        is_one_off: true,
+      } satisfies z.infer<typeof events.ContestStarted>,
+    });
+
+    await drainOutbox(['ContestStarted'], EventStreamPolicy);
+
+    const eventStreamItemsAfter = await getEventStream();
+
+    // event stream length should still be max
+    expect(eventStreamItemsAfter).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+
+    // oldest event should be removed
+    const oldestEvent = eventStreamItemsAfter[0].data as z.infer<
+      typeof ContestManager
+    >;
+    expect(oldestEvent.name).toEqual('Test Contest #2');
   });
 });
