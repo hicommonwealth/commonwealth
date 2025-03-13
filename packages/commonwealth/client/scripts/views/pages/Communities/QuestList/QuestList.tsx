@@ -87,7 +87,7 @@ const QuestList = ({
             'my-16': xpEnabled,
           })}
         >
-          <CWText type="h5" isCentered>
+          <CWText type="h2" className="empty-quests" isCentered>
             No quests found
           </CWText>
         </div>
