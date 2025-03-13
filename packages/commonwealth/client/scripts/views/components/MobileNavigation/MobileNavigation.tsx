@@ -69,7 +69,9 @@ const MobileNavigation = () => {
   ];
 
   const isNewThreadPage =
-    window.location?.pathname?.includes('/new/discussion');
+    ['/new/discussion', '/profile', ''].some((path) =>
+      window.location?.pathname?.includes(path),
+    ) || /^\/[^/]+\/discussion\/[^/]+$/.test(window.location?.pathname);
   const isDiscussionsPage = window.location?.pathname?.includes('/discussion');
   const shouldHideQuickPost = isNewThreadPage || isDiscussionsPage;
 
