@@ -40,6 +40,8 @@ abstract class ContractBase {
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
+
+          await distributeSkale(this.wallet.accounts[0], chainId);
         }
 
         this.web3 = new Web3(provider);
@@ -48,8 +50,6 @@ abstract class ContractBase {
           this.contractAddress,
         );
         this.initialized = true;
-
-        await distributeSkale(this.web3, chainId);
       } catch (error) {
         throw new Error('Failed to initialize contract: ' + error);
       }

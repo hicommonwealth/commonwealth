@@ -1,11 +1,14 @@
-import { type Command, AppError } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { skaleCalypso } from 'viem/chains';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
 const BALANCE_THRESHOLD = 10000;
+const DISTRIBUTION_VALUE = 10000000000000n;
 
 export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
   return {
@@ -21,26 +24,27 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
 
       mustExist('Chain Node', chainNode);
 
-      let balance;
-      try {
-        balance = await cp.getBalance(
-          address,
-          chainNode.private_url ?? chainNode.url,
-        );
-      } catch (error) {
-        throw new AppError(
-          `Failed to fetch skale balance for address ${address}`,
-        );
-      }
+      const client = createPublicClient({
+        transport: http(chainNode.private_url ?? chainNode.url),
+      });
+
+      const balance = await client.getBalance({
+        address: address as `0x${string}`,
+      });
 
       if (balance < BALANCE_THRESHOLD) {
-        const response = await fetch(`${config.SKALE.API_URL}/${address}`, {
-          method: 'GET',
+        const walletClient = createWalletClient({
+          account: privateKeyToAccount(
+            config.SKALE.PRIVATE_KEY as `0x${string}`,
+          ),
+          transport: http(chainNode.private_url ?? chainNode.url),
         });
 
-        if (!response.ok) {
-          throw new AppError(`Failed to claim sFUEL: ${response.statusText}`);
-        }
+        await walletClient.sendTransaction({
+          chain: skaleCalypso,
+          to: address as `0x${string}`,
+          value: DISTRIBUTION_VALUE,
+        });
       }
     },
   };

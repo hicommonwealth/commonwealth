@@ -7,4 +7,6 @@ export const trpcRouter = trpc.router({
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token),
   getToken: trpc.query(Token.GetLaunchpadToken, trpc.Tag.Token),
   getLaunchpadTrades: trpc.query(Token.GetLaunchpadTrades, trpc.Tag.Token),
+  // Not really part of the LaunchpadToken, but no better place to put it
+  distributeSkale: trpc.command(Token.DistributeSkale, trpc.Tag.Token),
 });

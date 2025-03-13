@@ -1,14 +1,23 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import axios from 'axios';
 import { BASE_API_PATH } from 'utils/trpcClient';
-import Web3 from 'web3';
 
-export const distributeSkale = async (web3: Web3, chainId?: string) => {
+export const distributeSkale = async (
+  walletAccount: string,
+  chainId?: string,
+) => {
   if (chainId && parseInt(chainId) === cp.ValidChains.SKALE_TEST) {
-    const accounts = await web3.eth.getAccounts();
-    const response = await axios.get(
+    const payload = {
+      '0': {
+        address: walletAccount,
+        eth_chain_id: parseInt(chainId!),
+      },
+    };
+
+    const response = await axios.post(
       // eslint-disable-next-line max-len
-      `${BASE_API_PATH}/token.distributeSkale?batch=1&input=%7B%220%22%3A%7B%22address%22%3A%22${accounts[0]}%22%2C%eth_chain_id%22%3A${chainId}%7D%7D`,
+      `${BASE_API_PATH}/launchpadToken.distributeSkale?batch=1`,
+      payload,
     );
     if (response.status !== 200) {
       throw new Error(

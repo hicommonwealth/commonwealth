@@ -10,6 +10,7 @@ export enum ValidChains {
   Arbitrum = 42161,
   BSC = 56,
   SKALE_TEST = 974399131,
+  SKALE = 1564830818,
   Anvil = 31337,
 }
 
@@ -102,6 +103,12 @@ export const factoryContracts = {
     factory: '0x16da329328d9816b5e68D96Ec5944D939ed9727E',
     communityStake: '0xC49eEcf7af055c4dfA3E918662D9BbAC45544BD6',
     chainId: 974399131,
+  },
+  [ValidChains.SKALE]: {
+    // TODO: These contracts have not been deployed to mainnet yet, fix
+    factory: '0xnotDeployed',
+    communityStake: '0xnotDeployed',
+    chainId: 1564830818,
   },
   [ValidChains.Anvil]: {
     factory: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
