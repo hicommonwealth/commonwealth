@@ -14,7 +14,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
-import { XPEarningsTable } from '../RewardsPage/tables/XPEarningsTable';
+import XPTable from '../Leaderboard/XPTable/XPTable';
 import ExploreContestList from './ExploreContestList';
 import { CommunityFilters } from './FiltersDrawer';
 import QuestList from './QuestList';
@@ -58,6 +58,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   hideHeader = false,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
+  const questsEnabled = useFlag('xp');
   const user = useUserStore();
   const navigate = useCommonNavigate();
 
@@ -80,21 +81,23 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       )}
 
       {/* Quests section */}
-      <div className="section-container">
-        <div className="heading-container">
-          <CWText type="h2">Quests</CWText>
-          <div
-            className="link-right"
-            onClick={() => navigate('/explore?tab=quests')}
-          >
-            <CWText className="link">See all quests</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+      {questsEnabled && (
+        <div className="section-container">
+          <div className="heading-container">
+            <CWText type="h2">Quests</CWText>
+            <div
+              className="link-right"
+              onClick={() => navigate('/explore?tab=quests')}
+            >
+              <CWText className="link">See all quests</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
+          </div>
+          <div className="horizontal-scroll-container">
+            <QuestList hideHeader />
           </div>
         </div>
-        <div className="horizontal-scroll-container">
-          <QuestList hideHeader />
-        </div>
-      </div>
+      )}
 
       {/* Contests section */}
       <div className="section-container">
@@ -145,7 +148,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
           </div>
         </div>
         <div className="users-xp-table">
-          <XPEarningsTable />
+          <XPTable />
         </div>
       </div>
 
@@ -181,17 +184,21 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
                   (address) => address?.community?.base === community?.base,
                 );
 
-                const historicalPriceMap: Map<string, string> = new Map(
-                  Object.entries(
-                    (historicalPrices || [])?.reduce(
-                      (acc, { community_id, old_price }) => {
-                        acc[community_id] = old_price;
-                        return acc;
-                      },
-                      {},
+                const historicalPriceMap: Map<string, string | undefined> =
+                  new Map(
+                    Object.entries(
+                      (historicalPrices || [])?.reduce(
+                        (
+                          acc: Record<string, string | undefined>,
+                          { community_id, old_price },
+                        ) => {
+                          acc[community_id] = old_price || undefined;
+                          return acc;
+                        },
+                        {},
+                      ),
                     ),
-                  ),
-                );
+                  );
 
                 return (
                   <Fragment key={community.id}>

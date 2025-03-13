@@ -67,17 +67,21 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                 (address) => address?.community?.base === community?.base,
               );
 
-              const historicalPriceMap: Map<string, string> = new Map(
-                Object.entries(
-                  (historicalPrices || [])?.reduce(
-                    (acc, { community_id, old_price }) => {
-                      acc[community_id] = old_price;
-                      return acc;
-                    },
-                    {},
+              const historicalPriceMap: Map<string, string | undefined> =
+                new Map(
+                  Object.entries(
+                    (historicalPrices || [])?.reduce(
+                      (
+                        acc: Record<string, string | undefined>,
+                        { community_id, old_price },
+                      ) => {
+                        acc[community_id] = old_price || undefined;
+                        return acc;
+                      },
+                      {},
+                    ),
                   ),
-                ),
-              );
+                );
 
               return (
                 <Fragment key={community.id}>

@@ -33,6 +33,7 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
+  NamespaceLinked: events.NamespaceLinked,
   ...ChannelQuestEvents,
 } as const;
 
