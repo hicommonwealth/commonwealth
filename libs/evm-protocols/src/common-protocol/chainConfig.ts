@@ -106,8 +106,8 @@ export const factoryContracts = {
   },
   [ValidChains.SKALE]: {
     // TODO: These contracts have not been deployed to mainnet yet, fix
-    factory: '0xnotDeployed',
-    communityStake: '0xnotDeployed',
+    factory: '0x16da329328d9816b5e68D96Ec5944D939ed9727E',
+    communityStake: '0xC49eEcf7af055c4dfA3E918662D9BbAC45544BD6',
     chainId: 1564830818,
   },
   [ValidChains.Anvil]: {
