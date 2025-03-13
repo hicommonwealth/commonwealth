@@ -79,7 +79,7 @@ export const ContestManager = z
       .describe('Vote weight multiplier'),
     farcaster_author_cast_hash: z
       .string()
-      .optional()
+      .nullish()
       .describe(
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
