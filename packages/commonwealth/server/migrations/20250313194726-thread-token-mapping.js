@@ -8,7 +8,7 @@ module.exports = {
         'Threads',
         'token_address',
         {
-          type: Sequelize.STRING(42),
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction },
