@@ -3,9 +3,9 @@ import * as schemas from '@hicommonwealth/schemas';
 import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { skaleCalypso } from 'viem/chains';
-import { config } from '../config';
-import { models } from '../database';
-import { mustExist } from '../middleware/guards';
+import { config } from '../../config';
+import { models } from '../../database';
+import { mustExist } from '../../middleware/guards';
 
 const BALANCE_THRESHOLD = 10000;
 const DISTRIBUTION_VALUE = 10000000000000n;
