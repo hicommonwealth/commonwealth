@@ -33,7 +33,6 @@ const featureFlags = {
   manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
-  stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
   xp: buildFlag(process.env.FLAG_XP),
