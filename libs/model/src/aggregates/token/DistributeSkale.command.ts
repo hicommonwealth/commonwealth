@@ -14,8 +14,14 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
   return {
     ...schemas.DistributeSkale,
     auth: [],
-    body: async ({ payload }) => {
+    body: async ({ payload, actor }) => {
       const { address, eth_chain_id } = payload;
+
+      const foundAddress = await models.Address.findOne({
+        where: { user_id: actor.user.id!, address },
+      });
+
+      mustExist('Address', foundAddress);
 
       const chainNode = await models.ChainNode.findOne({
         where: { eth_chain_id },
