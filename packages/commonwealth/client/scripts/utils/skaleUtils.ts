@@ -6,10 +6,7 @@ export const distributeSkale = async (
   walletAccount: string,
   chainId?: string,
 ) => {
-  if (
-    (chainId && parseInt(chainId) === cp.ValidChains.SKALE_TEST) ||
-    parseInt(chainId!) === cp.ValidChains.SKALE
-  ) {
+  if (chainId && parseInt(chainId) === cp.ValidChains.SKALE_TEST) {
     const payload = {
       '0': {
         address: walletAccount,
