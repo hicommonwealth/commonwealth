@@ -31,6 +31,7 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
         group_ids,
         featured_in_sidebar,
         featured_in_new_post,
+        allow_tokenized_threads,
       } = payload;
 
       const decodedDescription = decodeContent(description ?? '');
@@ -65,6 +66,12 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
       }
       if (typeof default_community_template !== 'undefined') {
         topic.default_offchain_template = default_community_template || '';
+      }
+      if (typeof default_community_template !== 'undefined') {
+        topic.default_offchain_template = default_community_template || '';
+      }
+      if (typeof allow_tokenized_threads !== 'undefined') {
+        topic.allow_tokenized_threads = allow_tokenized_threads || false;
       }
       await topic.save();
 

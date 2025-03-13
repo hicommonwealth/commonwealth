@@ -63,6 +63,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         token_name,
         chain_node_id,
+        allow_tokenized_threads,
       } = payload;
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -136,6 +137,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             directory_page_enabled: false,
             snapshot_spaces: [],
             stages_enabled: true,
+            allow_tokenized_threads,
           },
           { transaction },
         );
@@ -148,6 +150,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             featured_in_sidebar: true,
             featured_in_new_post: false,
             group_ids: [],
+            allow_tokenized_threads: false,
           },
           { transaction },
         );
