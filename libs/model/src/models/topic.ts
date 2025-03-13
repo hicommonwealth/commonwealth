@@ -58,6 +58,7 @@ export default (
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
+        allowNull: false,
         defaultValue: false,
       },
     },
