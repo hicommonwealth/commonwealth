@@ -163,6 +163,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
+      // If we expect to do tokenized stuff on the community homepage, modify this
+      allow_tokenized_threads: false,
     },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
