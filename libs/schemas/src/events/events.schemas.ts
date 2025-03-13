@@ -1,5 +1,6 @@
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { ClankerToken } from '../entities/community-indexer.schemas';
@@ -479,4 +480,11 @@ export const events = {
     }),
   }),
   ClankerTokenFound: ClankerToken,
+  NamespaceLinked: z.object({
+    namespace_address: z.string(),
+    deployer_address: z.string(),
+    community_id: z.string(),
+    referral: NamespaceReferral.optional(),
+    created_at: z.coerce.date(),
+  }),
 } as const;

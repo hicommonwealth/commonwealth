@@ -64,6 +64,7 @@ export const outboxEvents: Events[] = [
   'TokenUndelegated',
   'TokenPermanentConverted',
   'TokenLockDurationIncreased',
+  'NamespaceLinked',
 ] as const;
 
 export const Outbox = z.union(
