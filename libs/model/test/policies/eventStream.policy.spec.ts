@@ -37,9 +37,6 @@ vi.mock('@hicommonwealth/core', async () => {
   return {
     ...(actual as object),
     cache: () => mockCache,
-    config: {
-      APP_ENV: 'development',
-    },
   };
 });
 
