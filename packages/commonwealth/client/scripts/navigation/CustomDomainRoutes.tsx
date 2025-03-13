@@ -5,6 +5,7 @@ import { withLayout } from 'views/Layout';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
+const GovernancePage = lazy(() => import('views/pages/GovernancePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -282,6 +283,13 @@ const CustomDomainRoutes = () => {
       key="/new/proposal"
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/governance"
+      path="/governance"
+      element={withLayout(GovernancePage, {
         scoped: true,
       })}
     />,

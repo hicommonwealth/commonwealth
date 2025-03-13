@@ -1,4 +1,10 @@
 import clsx from 'clsx';
+import {
+  calculateTotalXPForQuestActions,
+  isQuestActionComplete,
+  QuestAction,
+  XPLog,
+} from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -40,6 +46,8 @@ const QuestList = ({
     cursor: 1,
     limit: minQuests,
     end_after: moment().startOf('week').toDate(),
+    // dont show system quests in quest lists for communities
+    include_system_quests: questsForCommunityId ? false : !user.isLoggedIn,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -66,7 +74,7 @@ const QuestList = ({
     navigate('/leaderboard');
   };
 
-  if (!xpEnabled || isLoadingXPProgression) return <></>;
+  if (!xpEnabled || (isLoadingXPProgression && user.isLoggedIn)) return <></>;
 
   return (
     <div className="QuestList">
@@ -79,25 +87,19 @@ const QuestList = ({
             'my-16': xpEnabled,
           })}
         >
-          <CWText type="h5" isCentered>
+          <CWText type="h2" className="empty-quests" isCentered>
             No quests found
           </CWText>
         </div>
       ) : (
         <div className="list">
           {(quests || []).map((quest) => {
-            const totalUserXP =
-              (quest.action_metas || [])
-                ?.map(
-                  (action) =>
-                    action.reward_amount -
-                    action.creator_reward_weight * action.reward_amount,
-                )
-                .reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                ) || 0;
-            const actionMetaIds = (quest.action_metas || []).map((a) => a.id);
+            const totalUserXP = calculateTotalXPForQuestActions({
+              questActions: (quest.action_metas as QuestAction[]) || [],
+              isUserReferred: !!user.referredByAddress,
+              questStartDate: new Date(quest.start_date),
+              questEndDate: new Date(quest.end_date),
+            });
 
             return (
               <QuestCard
@@ -109,9 +111,14 @@ const QuestList = ({
                 xpPoints={totalUserXP}
                 tasks={{
                   total: quest.action_metas?.length || 0,
-                  completed: xpProgressions.filter((p) =>
-                    actionMetaIds.includes(p.quest_action_meta_id),
-                  ).length,
+                  completed: (quest.action_metas || [])
+                    .map((action) =>
+                      isQuestActionComplete(
+                        action as QuestAction,
+                        xpProgressions as unknown as XPLog[],
+                      ),
+                    )
+                    .filter(Boolean).length,
                 }}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}

@@ -5,7 +5,6 @@ import farcasterUrl from 'assets/img/farcaster.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   BaseMixpanelPayload,
@@ -33,7 +32,6 @@ import FeeManagerBanner from './FeeManagerBanner';
 import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
-  const farcasterContestEnabled = useFlag('farcasterContest');
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
@@ -210,11 +208,11 @@ const AdminContestsPage = () => {
               />
             )}
 
-            {!farcasterContestEnabled ? null : community?.namespace ? (
+            {community?.namespace ? (
               <EmptyCard
                 img={farcasterUrl}
                 title="Launch on Farcaster"
-                subtitle="Share your contest on Farcastr platform"
+                subtitle="Share your contest on Farcaster"
                 button={{
                   label: 'Launch Farcaster contest',
                   handler: () => {
@@ -225,8 +223,8 @@ const AdminContestsPage = () => {
             ) : (
               <EmptyCard
                 img={farcasterUrl}
-                title="You must have namespace reserved for your community to run farcaster contest"
-                subtitle="Share your contest on Farcastr platform"
+                title="You must have namespace reserved for your community to run farcaster contests"
+                subtitle="Share your contest on Farcaster platform"
                 button={{
                   label: 'Create a namespace',
                   handler: () => {

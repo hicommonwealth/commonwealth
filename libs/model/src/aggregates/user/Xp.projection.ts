@@ -449,6 +449,22 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
         );
       },
+      NamespaceLinked: async ({ payload }) => {
+        const address = await models.Address.findOne({
+          where: { address: payload.deployer_address },
+          attributes: ['user_id'],
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'NamespaceLinked',
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+        );
+      },
       TwitterCommonMentioned: async ({ payload }) => {
         const address = await models.Address.findOne({
           where: {

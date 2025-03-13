@@ -28,6 +28,10 @@
 
 // Special style for when this component is inside a horizontal-scroll-container
 .horizontal-scroll-container .QuestList {
+  .empty-placeholder {
+    margin-left: 180px;
+  }
+
   .list {
     display: flex !important;
     flex-wrap: nowrap !important;

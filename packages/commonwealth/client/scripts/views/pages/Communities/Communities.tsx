@@ -5,7 +5,7 @@ import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
@@ -24,7 +24,7 @@ import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { Feed } from '../../components/feed';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import { XPEarningsTable } from '../../pages/RewardsPage/tables/XPEarningsTable/XPEarningsTable';
+import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import './Communities.scss';
 import CommunitiesTabContent from './CommunitiesTabContent';
@@ -49,23 +49,23 @@ type ExtendedCommunitySliceType = [
   ExtendedCommunityType,
 ];
 
-// Define available tab views
-const TAB_VIEWS = [
-  { value: 'all', label: 'All' },
-  { value: 'communities', label: 'Communities' },
-  { value: 'threads', label: 'Threads' },
-  { value: 'users', label: 'Users' },
-  { value: 'quests', label: 'Quests' },
-  { value: 'contests', label: 'Contests' },
-  // { value: 'transactions', label: 'Transactions' },
-  { value: 'tokens', label: 'Tokens' },
-];
-
 const CommunitiesPage = () => {
   const containerRef = useRef();
   const launchpadEnabled = useFlag('launchpad');
+  const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
+
+  // Define available tab views
+  const TAB_VIEWS = [
+    { value: 'all', label: 'All' },
+    { value: 'communities', label: 'Communities' },
+    { value: 'users', label: 'Users' },
+    { value: 'contests', label: 'Contests' },
+    { value: 'threads', label: 'Threads' },
+    ...(questsEnabled ? [{ value: 'quests', label: 'Quests' }] : []),
+    ...(launchpadEnabled ? [{ value: 'tokens', label: 'Tokens' }] : []),
+  ];
 
   // Add state for tracking active tab
   const activeTab = searchParams.get('tab') || 'all';
@@ -96,7 +96,7 @@ const CommunitiesPage = () => {
 
   const {
     data: communities,
-    fetchNextPage: fetchMoreCommunities,
+    fetchNextPage: fetchMoreCommunitiesOriginal,
     hasNextPage,
     isInitialLoading: isInitialCommunitiesLoading,
   } = useFetchCommunitiesQuery({
@@ -143,6 +143,11 @@ const CommunitiesPage = () => {
       ? CommunityType[filters.withCommunityType]
       : undefined,
   });
+
+  // Wrap fetchMoreCommunities to return Promise<void>
+  const fetchMoreCommunities = useCallback(async () => {
+    await fetchMoreCommunitiesOriginal();
+  }, [fetchMoreCommunitiesOriginal]);
 
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({
@@ -283,9 +288,15 @@ const CommunitiesPage = () => {
         </div>
 
         {/* Conditionally render content based on active tab */}
-        {activeTab === 'tokens' && <TokensList filters={filters} />}
-        {activeTab === 'quests' && <QuestList />}
-        {activeTab === 'contests' && <ExploreContestList />}
+        {launchpadEnabled
+          ? activeTab === 'tokens' && (
+              <TokensList filters={filters} hideHeader />
+            )
+          : null}
+        {questsEnabled
+          ? activeTab === 'quests' && <QuestList hideHeader />
+          : null}
+        {activeTab === 'contests' && <ExploreContestList hideHeader />}
         {activeTab === 'threads' && (
           <div className="threads-tab">
             <Feed
@@ -297,7 +308,7 @@ const CommunitiesPage = () => {
         {activeTab === 'users' && (
           <div className="users-tab">
             <div className="users-xp-table">
-              <XPEarningsTable />
+              <XPTable />
             </div>
           </div>
         )}
@@ -326,107 +337,6 @@ const CommunitiesPage = () => {
 
         {/* Communities Tab Content */}
         {activeTab === 'communities' && (
-          <>
-            <div
-              className={clsx('filters', {
-                hasAppliedFilter:
-                  Object.values(filters).filter(Boolean).length === 1
-                    ? !filters.withCommunitySortOrder
-                    : Object.values(filters).filter(Boolean).length > 0,
-              })}
-            >
-              <CWButton
-                label="Filters"
-                iconRight="funnelSimple"
-                buttonType="secondary"
-                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-              />
-              {filters.withCommunitySortBy && (
-                <CWTag
-                  label={`${filters.withCommunitySortBy}${
-                    filters.withCommunitySortOrder &&
-                    filters.withCommunitySortBy !==
-                      CommunitySortOptions.MostRecent
-                      ? ` : ${filters.withCommunitySortOrder}`
-                      : ''
-                  }
-                  `}
-                  type="filter"
-                  onCloseClick={removeCommunitySortByFilter}
-                />
-              )}
-              {filters.withCommunityType && (
-                <CWTag
-                  label={filters.withCommunityType}
-                  type="filter"
-                  onCloseClick={removeCommunityTypeFilter}
-                />
-              )}
-              {filters.withNetwork && (
-                <CWTag
-                  label={filters.withNetwork}
-                  type="filter"
-                  onCloseClick={removeChainNetworkFilter}
-                />
-              )}
-              {filters.withCommunityEcosystem && (
-                <CWTag
-                  label={filters.withCommunityEcosystem}
-                  type="filter"
-                  onCloseClick={removeCommunityEcosystemFilter}
-                />
-              )}
-              {filters.withEcosystemChainId && (
-                <CWTag
-                  label={
-                    Object.entries(communityChains).find(
-                      ([_, v]) => filters.withEcosystemChainId === v,
-                    )?.[0] as string
-                  }
-                  type="filter"
-                  onCloseClick={removeEcosystemChainIdFilter}
-                />
-              )}
-              {filters.withStakeEnabled && (
-                <CWTag
-                  label="Stake"
-                  type="filter"
-                  onCloseClick={removeStakeFilter}
-                />
-              )}
-              {filters.withTagsIds &&
-                filters.withTagsIds.map((id) => (
-                  <CWTag
-                    key={id}
-                    type="filter"
-                    label={(tags || []).find((t) => t.id === id)?.name || ''}
-                    onCloseClick={() => removeTagFilter(id)}
-                  />
-                ))}
-              <FiltersDrawer
-                isOpen={isFilterDrawerOpen}
-                onClose={() => setIsFilterDrawerOpen(false)}
-                filters={filters}
-                onFiltersChange={(newFilters) => setFilters(newFilters)}
-              />
-            </div>
-            <CommunitiesTabContent
-              isLoading={isLoading}
-              isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-              communitiesList={communitiesList}
-              containerRef={containerRef}
-              filters={filters}
-              historicalPrices={historicalPrices}
-              ethUsdRate={Number(ethUsdRate)}
-              setSelectedCommunityId={setSelectedCommunityId}
-              hasNextPage={hasNextPage}
-              fetchMoreCommunities={fetchMoreCommunities}
-            />
-          </>
-        )}
-
-        {/* Default fallback if tab is not recognized */}
-        {!TAB_VIEWS.find((tab) => tab.value === activeTab) && (
           <>
             <div
               className={clsx('filters', {

@@ -4,12 +4,11 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
 import useUserStore from 'state/ui/user';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { z } from 'zod';
-import { CWText } from '../../components/component_kit/cw_text';
+import CWSectionHeader from '../../components/component_kit/new_designs/CWSectionHeader';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
-import { XPEarningsTable } from '../RewardsPage/tables/XPEarningsTable';
-import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
+import XPTable from '../Leaderboard/XPTable/XPTable';
+import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview';
 import ExploreContestList from './ExploreContestList';
 import { CommunityFilters } from './FiltersDrawer';
 import QuestList from './QuestList';
@@ -35,7 +34,7 @@ interface AllTabContentProps {
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: any;
+  fetchMoreCommunities?: () => Promise<void>;
   hideHeader?: boolean;
 }
 
@@ -53,6 +52,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   hideHeader = false,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
+  const questsEnabled = useFlag('xp');
   const user = useUserStore();
   const navigate = useCommonNavigate();
 
@@ -60,16 +60,11 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
     <>
       {launchpadEnabled && (
         <div className="section-container">
-          <div className="heading-container">
-            <CWText type="h2">Tokens</CWText>
-            <div
-              className="link-right"
-              onClick={() => navigate('/explore?tab=tokens')}
-            >
-              <CWText className="link">See all tokens</CWText>
-              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
-            </div>
-          </div>
+          <CWSectionHeader
+            title="Tokens"
+            seeAllText="See all tokens"
+            onSeeAllClick={() => navigate('/explore?tab=tokens')}
+          />
           <TokensList filters={filters} hideHeader />
         </div>
       )}
@@ -80,34 +75,26 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       </div>
 
       {/* Quests section */}
-      <div className="section-container">
-        <div className="heading-container">
-          <CWText type="h2">Quests</CWText>
-          <div
-            className="link-right"
-            onClick={() => navigate('/explore?tab=quests')}
-          >
-            <CWText className="link">See all quests</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+      {questsEnabled && (
+        <div className="section-container">
+          <CWSectionHeader
+            title="Quests"
+            seeAllText="See all quests"
+            onSeeAllClick={() => navigate('/explore?tab=quests')}
+          />
+          <div className="horizontal-scroll-container">
+            <QuestList hideHeader />
           </div>
         </div>
-        <div className="horizontal-scroll-container">
-          <QuestList hideHeader />
-        </div>
-      </div>
+      )}
 
       {/* Contests section */}
       <div className="section-container">
-        <div className="heading-container">
-          <CWText type="h2">Contests</CWText>
-          <div
-            className="link-right"
-            onClick={() => navigate('/explore?tab=contests')}
-          >
-            <CWText className="link">See all contests</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
-          </div>
-        </div>
+        <CWSectionHeader
+          title="Contests"
+          seeAllText="See all contests"
+          onSeeAllClick={() => navigate('/explore?tab=contests')}
+        />
         <div className="horizontal-scroll-container">
           <ExploreContestList hideHeader />
         </div>
@@ -115,16 +102,11 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
 
       {/* Trending Threads section */}
       <div className="section-container">
-        <div className="heading-container">
-          <CWText type="h2">Trending Threads</CWText>
-          <div
-            className="link-right"
-            onClick={() => navigate('/explore?tab=threads')}
-          >
-            <CWText className="link">See all threads</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
-          </div>
-        </div>
+        <CWSectionHeader
+          title="Trending Threads"
+          seeAllText="See all threads"
+          onSeeAllClick={() => navigate('/explore?tab=threads')}
+        />
         <TrendingThreadList
           query={useFetchGlobalActivityQuery}
           customScrollParent={containerRef.current}
@@ -134,18 +116,13 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
 
       {/* Users section */}
       <div className="section-container">
-        <div className="heading-container">
-          <CWText type="h2">Users</CWText>
-          <div
-            className="link-right"
-            onClick={() => navigate('/explore?tab=users')}
-          >
-            <CWText className="link">See all users</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
-          </div>
-        </div>
+        <CWSectionHeader
+          title="Users"
+          seeAllText="See all users"
+          onSeeAllClick={() => navigate('/explore?tab=users')}
+        />
         <div className="users-xp-table">
-          <XPEarningsTable />
+          <XPTable />
         </div>
       </div>
     </>

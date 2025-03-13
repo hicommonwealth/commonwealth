@@ -53,7 +53,7 @@ const XPTable = () => {
     initialSortDirection: APIOrderDirection.Asc,
   });
 
-  const { data = [] } = useGetXPs({});
+  const { data = [], isLoading } = useGetXPs({});
 
   const rankings = [...data]
     .map((rank) => ({
@@ -78,32 +78,38 @@ const XPTable = () => {
 
   return (
     <section className="XPTable">
-      <CWTable
-        columnInfo={tableState.columns}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
-        rowData={rankings.map((rank) => ({
-          ...rank,
-          username: {
-            sortValue: rank.user_profile.name,
-            customElement: (
-              <div className="table-cell">
-                <Link
-                  to={`/profile/id/${rank.user_profile.id}`}
-                  className="user-info"
-                >
-                  <Avatar
-                    url={rank.user_profile.avatar_url ?? ''}
-                    size={24}
-                    address={rank.user_profile.id}
-                  />
-                  <p>{rank.user_profile.name}</p>
-                </Link>
-              </div>
-            ),
-          },
-        }))}
-      />
+      {!isLoading && rankings.length === 0 ? (
+        <CWText type="h2" className="empty-rankings">
+          No Users have earned aura yet
+        </CWText>
+      ) : (
+        <CWTable
+          columnInfo={tableState.columns}
+          sortingState={tableState.sorting}
+          setSortingState={tableState.setSorting}
+          rowData={rankings.map((rank) => ({
+            ...rank,
+            username: {
+              sortValue: rank.user_profile.name,
+              customElement: (
+                <div className="table-cell">
+                  <Link
+                    to={`/profile/id/${rank.user_profile.id}`}
+                    className="user-info"
+                  >
+                    <Avatar
+                      url={rank.user_profile.avatar_url ?? ''}
+                      size={24}
+                      address={rank.user_profile.id}
+                    />
+                    <p>{rank.user_profile.name}</p>
+                  </Link>
+                </div>
+              ),
+            },
+          }))}
+        />
+      )}
     </section>
   );
 };
