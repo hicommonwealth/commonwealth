@@ -46,9 +46,6 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
       env.FLAG_NEW_CONTEST_PAGE,
     ),
-    'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
-      env.FLAG_MANAGE_API_KEYS,
-    ),
     'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
     'process.env.FLAG_ONCHAIN_REFERRALS': JSON.stringify(
       env.FLAG_ONCHAIN_REFERRALS,
