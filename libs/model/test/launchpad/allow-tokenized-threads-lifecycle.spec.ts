@@ -58,7 +58,7 @@ describe('allow_tokenized_threads lifecycle', () => {
   }
 
   test('Should return false if both community and topic are false', async () => {
-    expect(await GetAllowTokenizedThreadsResult()).to.eq(true);
+    expect(await GetAllowTokenizedThreadsResult()).to.eq(false);
   });
 
   test('Should return true if both community is true regardless of topic', async () => {
