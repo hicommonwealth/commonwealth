@@ -81,7 +81,6 @@ export const EventStreamItemSchema = z.object({
   url: z.string(),
 });
 
-// Define the schema for the home feed
 export const EventStream = {
   input: z.object({}),
   output: z.object({

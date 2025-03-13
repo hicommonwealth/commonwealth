@@ -2,7 +2,7 @@ export * from './comment.schemas';
 export * from './community.schemas';
 export * from './contests.schemas';
 export * from './discord.schemas';
-export * from './feed.schemas';
+export * from './eventStream.schemas';
 export * from './pagination';
 export * from './quest.schemas';
 export * from './subscription.schemas';
