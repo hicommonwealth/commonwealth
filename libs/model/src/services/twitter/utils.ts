@@ -207,6 +207,7 @@ export async function getFromTwitterWrapper<
   const results: NonNullable<z.infer<Schema>['data']> = [];
 
   do {
+    // TODO: handle 429 errors (edge case) by retrying according to below strategy
     const res = await getFromTwitter({
       twitterBotConfig,
       url,
