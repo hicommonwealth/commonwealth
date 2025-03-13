@@ -75,6 +75,7 @@ export function CreateBotNamespace(): Command<
         directory_page_enabled: false,
         snapshot_spaces: [],
         stages_enabled: true,
+        allow_tokenized_threads: false,
       });
       return {
         community,

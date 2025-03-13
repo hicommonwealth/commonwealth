@@ -20,7 +20,6 @@ describe('allow_tokenized_threads lifecycle', () => {
   };
 
   beforeAll(async () => {
-    const [node] = await seed('ChainNode', { eth_chain_id: 1 });
     await seed('User', {
       id: user_id,
     });
