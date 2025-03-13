@@ -45,6 +45,7 @@
     flex-wrap: nowrap !important;
     grid-template-columns: unset !important;
     overflow-x: visible; // Let the parent handle scrolling
+    margin-left: 180px; // Add left margin to prevent first item from being cut off
 
     & > div {
       flex: 0 0 auto;
