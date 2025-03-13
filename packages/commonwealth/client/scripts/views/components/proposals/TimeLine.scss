@@ -1,0 +1,110 @@
+@import '../../../styles/shared.scss';
+$primary-green: #50d890;
+$white: #fff;
+$dark-gray: #232931;
+$light-gray: #fbfbfb;
+$text-gray: #262626;
+$shadow-gray: #777777;
+$border-gray: #4f5b66;
+
+// Container styles
+.TimeLine {
+  display: flex;
+  width: 248px;
+  height: 16.5625rem;
+  overflow: hidden;
+  flex-direction: column;
+  border: 2px solid $neutral-100;
+
+  .header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border: 2px solid #eeedef;
+    width: 100%;
+    background-color: #f7f6f7;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-left: 10px;
+  }
+
+  // Right box container styles
+  .rb-container {
+    display: flex;
+
+    // Timeline list styles
+    ul.rb {
+      margin: 1rem 0;
+      padding: 0;
+      display: inline-block;
+
+      // List items
+      li {
+        list-style: none;
+        margin: auto;
+        margin-left: 2em;
+        min-height: 50px;
+        padding: 0px 0px 26px 24px;
+        position: relative;
+        border-style: solid;
+        border-width: 0px 0px 0px 2px;
+        border-color: $neutral-500;
+
+        // Remove border for the last item
+        &:last-child {
+          border-left: 0;
+        }
+
+        // Dot using a real element instead of ::before
+        .timeline-dot {
+          position: absolute;
+          left: -15px;
+          top: -5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: white;
+
+          svg {
+            border: 2px solid rgba($white, 1);
+            border-radius: 500%;
+            background: none; // Default background (can be adjusted if icon has its own color)
+            transition: all 500ms ease-in-out;
+            &.active {
+              color: $primary-500;
+            }
+            &.coming {
+              color: $neutral-600;
+            }
+            &.past {
+              color: $neutral-600;
+            }
+          }
+        }
+        .timestamp {
+          .Text {
+            color: $neutral-500;
+            font-size: 14px;
+            line-height: 20px;
+          }
+        }
+        .item-title {
+          .Text {
+            font-size: 14px;
+            line-height: 20px;
+            font-weight: 500 !important;
+            &.active {
+              color: $primary-500;
+            }
+            &.coming {
+              color: $neutral-600;
+            }
+            &.past {
+              color: $neutral-600;
+            }
+          }
+        }
+      }
+    }
+  }
+}

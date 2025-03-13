@@ -19,9 +19,12 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';
+import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { Skeleton } from '../../components/Skeleton';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import DetailsCard from '../../components/proposals/DeatilsCard';
+import TimeLine from '../../components/proposals/TimeLine';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
@@ -109,7 +112,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
 
   const proposalTitle = title || proposal?.title;
   const proposalDescription = description || proposal?.description;
-
+  console.log({ proposal });
   // replace path with correct slug
   if (proposal?.slug) {
     const slugTitle = slugify(proposalTitle);
@@ -130,7 +133,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-
+  console.log({});
   return (
     <CWPageLayout>
       <CWContentPage
@@ -141,12 +144,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         subHeader={<ProposalSubheader proposal={proposal} />}
-        body={() =>
-          proposalDescription && (
-            <CollapsibleProposalBody doc={proposalDescription} />
-          )
-        }
-        subBody={
+        body={() => (
           <>
             {isFetchingMetadata ? (
               <Skeleton height={94.4} />
@@ -155,6 +153,10 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
                 <JSONDisplay data={metadata} title="Metadata" />
               )
             )}
+            <CWAccordView title="Description" defaultOpen={false}>
+              <MarkdownViewerWithFallback markdown={proposalDescription} />
+            </CWAccordView>
+
             {!_.isEmpty(proposal?.data?.messages) && (
               <JSONDisplay data={proposal.data.messages} title="Messages" />
             )}
@@ -167,7 +169,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
                 title="Community Spend Proposal"
               />
             )}
-            <VotingResults proposal={proposal} />
+
             <VotingActions
               onModalClose={onModalClose}
               proposal={proposal}
@@ -177,7 +179,13 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
               proposalRedrawState={proposalRedrawState}
             />
           </>
-        }
+        )}
+        showSidebar={true}
+        sidebarComponents={[
+          { label: 'Links', item: <DetailsCard /> },
+          { label: 'Links', item: <TimeLine proposalData={proposal?.data} /> },
+          { label: 'Results', item: <VotingResults proposal={proposal} /> },
+        ]}
       />
     </CWPageLayout>
   );

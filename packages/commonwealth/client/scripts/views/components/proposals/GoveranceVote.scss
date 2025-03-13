@@ -1,0 +1,73 @@
+@import '../../../styles/shared.scss';
+$primary-green: #50d890;
+$white: #fff;
+$dark-gray: #232931;
+$light-gray: #fbfbfb;
+$text-gray: #262626;
+$shadow-gray: #777777;
+$border-gray: #4f5b66;
+.governance-vote {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #f0eff0;
+  width: 248px;
+  .main-container {
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    padding: 10px;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border: 2px solid #eeedef;
+    width: 100%;
+    background-color: #f7f6f7;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-left: 10px;
+  }
+  .progress-bar {
+    position: relative;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .progress {
+      height: 100%;
+      position: absolute;
+      transition: width 0.3s ease;
+      // Color is now set via inline style, no need for class-based colors
+    }
+  }
+
+  .vote-option {
+    margin-bottom: 12px;
+    .container {
+      display: flex;
+      width: 100%;
+      padding-bottom: 4px;
+    }
+  }
+
+  .combined-progress {
+    margin: 16px 0;
+
+    .progress-bar {
+      height: 12px;
+    }
+  }
+
+  .option-label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .percentage {
+    margin-left: 8px;
+  }
+}
