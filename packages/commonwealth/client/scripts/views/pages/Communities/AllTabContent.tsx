@@ -74,6 +74,11 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
         </div>
       )}
 
+      {/* Communities section */}
+      <div className="section-container">
+        <TrendingCommunitiesPreview />
+      </div>
+
       {/* Quests section */}
       <div className="section-container">
         <div className="heading-container">
@@ -142,11 +147,6 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
         <div className="users-xp-table">
           <XPEarningsTable />
         </div>
-      </div>
-
-      {/* Communities section */}
-      <div className="section-container">
-        <TrendingCommunitiesPreview />
       </div>
     </>
   );
