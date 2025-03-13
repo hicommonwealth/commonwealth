@@ -27,6 +27,7 @@ const log = logger(import.meta);
 const FEED_WINDOW_SIZE = 50;
 export const HOME_FEED_KEY = 'HOME_FEED';
 
+// lists all the events that can be added to the home feed
 const FeedSchemas = {
   ContestStarted: {
     input: events.ContestStarted,
@@ -49,18 +50,6 @@ const FeedSchemas = {
     output: Thread.extend({}),
   },
 } as const;
-
-type FeedItem<T extends keyof typeof FeedSchemas> = {
-  type: T;
-  data: z.infer<(typeof FeedSchemas)[T]['output']>;
-  url: string;
-};
-
-type FeedMappers = {
-  [K in keyof typeof FeedSchemas]: (
-    payload: z.infer<(typeof FeedSchemas)[K]['input']>,
-  ) => Promise<FeedItem<K>>;
-};
 
 // maps events to feed items
 const feedMappers: FeedMappers = {
@@ -137,50 +126,6 @@ const feedMappers: FeedMappers = {
   },
 };
 
-const getFeed = async (): Promise<FeedItem<keyof typeof FeedSchemas>[]> => {
-  try {
-    const cachedFeed = await cache().getKey(
-      CacheNamespaces.Function_Response,
-      HOME_FEED_KEY,
-    );
-    if (cachedFeed) {
-      return JSON.parse(cachedFeed);
-    }
-    return [];
-  } catch (err) {
-    log.error(`Error getting home feed from cache`, err as Error);
-    return [];
-  }
-};
-
-const setFeed = async (feed: FeedItem<keyof typeof FeedSchemas>[]) => {
-  try {
-    await cache().setKey(
-      CacheNamespaces.Function_Response,
-      HOME_FEED_KEY,
-      JSON.stringify(feed),
-    );
-  } catch (err) {
-    log.error(`Error getting home feed from cache`, err as Error);
-  }
-};
-
-const feedMutex = new Mutex();
-
-const addToHomeFeed = async (
-  eventToAdd: FeedItem<keyof typeof FeedSchemas>,
-) => {
-  await feedMutex.runExclusive(async () => {
-    const oldFeed = await getFeed();
-    const newFeed = [...oldFeed, eventToAdd];
-    // if the feed exceeds the window size, remove the oldest items
-    if (newFeed.length > FEED_WINDOW_SIZE) {
-      return newFeed.slice(newFeed.length - FEED_WINDOW_SIZE);
-    }
-    await setFeed(newFeed);
-  });
-};
-
 export function HomeFeedPolicy(): Policy<{
   [K in keyof typeof FeedSchemas]: (typeof FeedSchemas)[K]['input'];
 }> {
@@ -211,3 +156,61 @@ export function HomeFeedPolicy(): Policy<{
     },
   };
 }
+
+// ---
+
+export type FeedItem<T extends keyof typeof FeedSchemas> = {
+  type: T;
+  data: z.infer<(typeof FeedSchemas)[T]['output']>;
+  url: string;
+};
+
+export type FeedMappers = {
+  [K in keyof typeof FeedSchemas]: (
+    payload: z.infer<(typeof FeedSchemas)[K]['input']>,
+  ) => Promise<FeedItem<K>>;
+};
+
+const feedMutex = new Mutex();
+
+const addToHomeFeed = async (
+  eventToAdd: FeedItem<keyof typeof FeedSchemas>,
+) => {
+  await feedMutex.runExclusive(async () => {
+    const oldFeed = await getFeed();
+    const newFeed = [...oldFeed, eventToAdd];
+    // if the feed exceeds the window size, remove the oldest items
+    if (newFeed.length > FEED_WINDOW_SIZE) {
+      return newFeed.slice(newFeed.length - FEED_WINDOW_SIZE);
+    }
+    await setFeed(newFeed);
+  });
+};
+
+const getFeed = async (): Promise<FeedItem<keyof typeof FeedSchemas>[]> => {
+  try {
+    const cachedFeed = await cache().getKey(
+      CacheNamespaces.Function_Response,
+      HOME_FEED_KEY,
+    );
+    if (cachedFeed) {
+      return JSON.parse(cachedFeed);
+    }
+    return [];
+  } catch (err) {
+    log.error(`Error getting home feed from cache`, err as Error);
+    return [];
+  }
+};
+
+const setFeed = async (feed: FeedItem<keyof typeof FeedSchemas>[]) => {
+  try {
+    await cache().setKey(
+      CacheNamespaces.Function_Response,
+      HOME_FEED_KEY,
+      JSON.stringify(feed),
+    );
+  } catch (err) {
+    log.error(`Error getting home feed from cache`, err as Error);
+  }
+};
