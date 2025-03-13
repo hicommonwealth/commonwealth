@@ -289,10 +289,14 @@ const CommunitiesPage = () => {
 
         {/* Conditionally render content based on active tab */}
         {launchpadEnabled
-          ? activeTab === 'tokens' && <TokensList filters={filters} />
+          ? activeTab === 'tokens' && (
+              <TokensList filters={filters} hideHeader />
+            )
           : null}
-        {questsEnabled ? activeTab === 'quests' && <QuestList /> : null}
-        {activeTab === 'contests' && <ExploreContestList />}
+        {questsEnabled
+          ? activeTab === 'quests' && <QuestList hideHeader />
+          : null}
+        {activeTab === 'contests' && <ExploreContestList hideHeader />}
         {activeTab === 'threads' && (
           <div className="threads-tab">
             <Feed
