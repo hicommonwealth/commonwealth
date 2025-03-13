@@ -1,13 +1,14 @@
 import {
   ChainBase,
-  WalletId,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
   getSessionSigners,
+  WalletId,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   LocalStorageKeys,
+  removeLocalStorageItem,
   setLocalStorageItem,
 } from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
@@ -31,15 +32,15 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { AuthModalType } from 'views/modals/AuthModal';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/RewardsPage/types';
 import { mobileTabParam } from '../../pages/RewardsPage/utils';
 import { useCommunityStake } from '../CommunityStake';
-import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+import UserMenuItem from './UserMenuItem';
 
 const resetWalletConnectSession = async () => {
   /**
@@ -64,6 +65,7 @@ export const handleLogout = async () => {
     darkModeStore.getState().setDarkMode(false);
     setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
     setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
+    removeLocalStorageItem(LocalStorageKeys.HasMobileAppOnboarded);
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();

@@ -26,7 +26,7 @@ const useFetchNotifications = () => {
     fetchNotifications(); // eslint-disable-line @typescript-eslint/no-floating-promises
   }, [feedClient]);
 
-  return { items };
+  return { items, feedClient };
 };
 
 export default useFetchNotifications;

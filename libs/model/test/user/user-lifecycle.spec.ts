@@ -4,13 +4,22 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import Chance from 'chance';
+import { seed } from 'model/src/tester';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CreateComment, CreateCommentReaction } from '../../src/comment';
+import {
+  CreateComment,
+  CreateCommentReaction,
+} from '../../src/aggregates/comment';
+import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { CreateThread } from '../../src/aggregates/thread';
+import {
+  GetUserProfile,
+  GetXps,
+  UpdateUser,
+  Xp,
+} from '../../src/aggregates/user';
 import { models } from '../../src/database';
-import { CreateQuest, UpdateQuest } from '../../src/quest';
-import { CreateThread } from '../../src/thread';
-import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { signIn } from '../utils/sign-in';
@@ -21,6 +30,7 @@ describe('User lifecycle', () => {
   let admin: Actor, member: Actor, new_actor: Actor, superadmin: Actor;
   let community_id: string;
   let topic_id: number;
+  let thread_id: number;
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
@@ -31,6 +41,17 @@ describe('User lifecycle', () => {
     admin = actors.admin;
     member = actors.member;
     superadmin = actors.superadmin;
+
+    // to vote on comments
+    const [thread] = await seed('Thread', {
+      community_id,
+      address_id: community!.Addresses!.at(0)!.id!,
+      topic_id,
+      pinned: false,
+      read_only: false,
+      reaction_weights_sum: '0',
+    });
+    thread_id = thread!.id!;
   });
 
   afterAll(async () => {
@@ -76,6 +97,7 @@ describe('User lifecycle', () => {
               event_name: 'CommentUpvoted',
               reward_amount: 20,
               creator_reward_weight: 0.1,
+              content_id: `thread:${thread_id}`,
             },
           ],
         },
@@ -86,8 +108,10 @@ describe('User lifecycle', () => {
         { where: { id: quest!.id } },
       );
 
+      const watermark = new Date();
+
       // act on community, triggering quest rewards
-      const thread = await command(CreateThread(), {
+      await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -102,14 +126,14 @@ describe('User lifecycle', () => {
       const comment = await command(CreateComment(), {
         actor: admin,
         payload: {
-          thread_id: thread!.id!,
+          thread_id,
           body: 'Comment body 1.1',
         },
       });
       await command(CreateComment(), {
         actor: admin,
         payload: {
-          thread_id: thread!.id!,
+          thread_id,
           body: 'Comment body 1.2',
         },
       });
@@ -125,6 +149,7 @@ describe('User lifecycle', () => {
       await drainOutbox(
         ['ThreadCreated', 'CommentCreated', 'CommentUpvoted'],
         Xp,
+        watermark,
       );
 
       // expect xp points awarded to admin who created two comments
@@ -231,6 +256,7 @@ describe('User lifecycle', () => {
               participation_limit: QuestParticipationLimit.OncePerPeriod,
               participation_period: QuestParticipationPeriod.Daily,
               participation_times_per_period: 3,
+              content_id: `thread:${thread_id}`,
             },
             {
               event_name: 'CommunityJoined',
@@ -249,7 +275,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      const thread = await command(CreateThread(), {
+      await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -264,7 +290,7 @@ describe('User lifecycle', () => {
       const comment = await command(CreateComment(), {
         actor: admin,
         payload: {
-          thread_id: thread!.id!,
+          thread_id,
           body: 'Comment body 2.1',
         },
       });
@@ -272,7 +298,7 @@ describe('User lifecycle', () => {
       await command(CreateComment(), {
         actor: admin,
         payload: {
-          thread_id: thread!.id!,
+          thread_id,
           body: 'Comment body 2.2',
         },
       });
@@ -658,7 +684,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      const thread = await command(CreateThread(), {
+      await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -673,7 +699,7 @@ describe('User lifecycle', () => {
       await command(CreateComment(), {
         actor: member,
         payload: {
-          thread_id: thread!.id!,
+          thread_id,
           body: 'Comment body 3',
         },
       });

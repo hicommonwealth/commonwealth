@@ -33,6 +33,7 @@ export const QuestEvents = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
+  NamespaceLinked: events.NamespaceLinked,
   ...ChannelQuestEvents,
 } as const;
 
@@ -57,8 +58,8 @@ export enum QuestParticipationPeriod {
 
 export const QuestActionMeta = z
   .object({
-    id: PG_INT.nullish(),
-    quest_id: PG_INT,
+    id: z.number().nullish(),
+    quest_id: z.number(),
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum([
       ...(Object.keys(QuestEvents) as [
@@ -76,7 +77,7 @@ export const QuestActionMeta = z
     participation_times_per_period: z.number().optional(),
     content_id: z
       .string()
-      .regex(/(topic:\d+)|(thread:\d+)|(comment:\d+)/)
+      .regex(/(chain:d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)/)
       .optional()
       .nullish(),
     created_at: z.coerce.date().optional(),
@@ -94,7 +95,7 @@ export const QuestScore = z
 
 export const Quest = z
   .object({
-    id: PG_INT.nullish(),
+    id: z.number().nullish(),
     name: z.string().max(255),
     description: z.string().max(1000),
     image_url: z.string(),
