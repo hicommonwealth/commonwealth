@@ -1,6 +1,11 @@
-import { type Command } from '@hicommonwealth/core';
+import { type Command, ServerError } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { createPublicClient, createWalletClient, http } from 'viem';
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  TransactionExecutionError,
+} from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { skaleCalypso } from 'viem/chains';
 import { config } from '../../config';
@@ -46,11 +51,22 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
           transport: http(chainNode.private_url ?? chainNode.url),
         });
 
-        await walletClient.sendTransaction({
-          chain: skaleCalypso,
-          to: address as `0x${string}`,
-          value: DISTRIBUTION_VALUE,
-        });
+        try {
+          await walletClient.sendTransaction({
+            chain: skaleCalypso,
+            to: address as `0x${string}`,
+            value: DISTRIBUTION_VALUE,
+          });
+        } catch (e) {
+          if (e instanceof TransactionExecutionError) {
+            // Check if the error message indicates an insufficient balance
+            if (e.shortMessage.includes('Account balance is too low')) {
+              throw new ServerError('Insufficient funds on Skale address.');
+            }
+          }
+
+          throw e;
+        }
       }
     },
   };
