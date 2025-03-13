@@ -78,10 +78,6 @@ const ContestsList = ({
     );
   }
 
-  if (!contests || contests.length === 0) {
-    return <EmptyContestsList />;
-  }
-
   return (
     <>
       <div className="ContestsList">
