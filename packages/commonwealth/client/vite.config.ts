@@ -38,9 +38,6 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
     ),
-    'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
-      env.FLAG_FARCASTER_CONTEST,
-    ),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
     'process.env.FLAG_UNISWAP_TRADE': JSON.stringify(env.FLAG_UNISWAP_TRADE),
     'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
