@@ -18,37 +18,33 @@ export function useSubscriptionPreferenceSettingToggle(
   const user = useUserStore();
 
   return useCallback(
-    (activate: boolean) => {
-      async function doAsync() {
-        if (activate) {
-          // *** we have to first request permissions if we're activating.
-          const verified = await verifyMobileNotificationPermissions();
-          if (!verified) {
-            return;
-          }
+    async (activate: boolean) => {
+      if (activate) {
+        // *** we have to first request permissions if we're activating.
+        const verified = await verifyMobileNotificationPermissions();
+        if (!verified) {
+          return;
         }
-
-        function createActivations() {
-          const activations = {};
-          for (const pref of prefs) {
-            activations[pref] = activate;
-          }
-          return activations;
-        }
-
-        const activations = createActivations();
-
-        // ** first we set the subscription preference
-        await updateSubscriptionPreferences({
-          id: user.id,
-          ...subscriptionPreferences.data,
-          ...activations,
-        });
-
-        await subscriptionPreferences.refetch();
       }
 
-      doAsync().catch(console.error);
+      function createActivations() {
+        const activations = {};
+        for (const pref of prefs) {
+          activations[pref] = activate;
+        }
+        return activations;
+      }
+
+      const activations = createActivations();
+
+      // ** first we set the subscription preference
+      await updateSubscriptionPreferences({
+        id: user.id,
+        ...subscriptionPreferences.data,
+        ...activations,
+      });
+
+      await subscriptionPreferences.refetch();
     },
     [prefs, subscriptionPreferences, updateSubscriptionPreferences, user.id],
   );
