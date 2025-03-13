@@ -25,7 +25,6 @@ import { buildThreadContentUrl } from '../utils';
 const log = logger(import.meta);
 
 const EVENT_STREAM_WINDOW_SIZE = 50;
-export const EVENT_STREAM_KEY = 'EVENT_STREAM';
 
 // lists all the events that can be added to the event stream
 const EventStreamSchemas = {
@@ -193,13 +192,15 @@ const addToEventStream = async (
   });
 };
 
-const getEventStream = async (): Promise<
+export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
+
+export const getEventStream = async (): Promise<
   EventStreamItem<keyof typeof EventStreamSchemas>[]
 > => {
   try {
     const cachedEventStream = await cache().getKey(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_KEY,
+      EVENT_STREAM_FN_CACHE_KEY,
     );
     if (cachedEventStream) {
       return JSON.parse(cachedEventStream);
@@ -217,7 +218,7 @@ const setEventStream = async (
   try {
     await cache().setKey(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_KEY,
+      EVENT_STREAM_FN_CACHE_KEY,
       JSON.stringify(eventStream),
     );
   } catch (err) {

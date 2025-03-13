@@ -75,16 +75,16 @@ export const ChainFeed = {
   output: z.array(ChainFeedRecord),
 };
 
-export const HomeFeedItemSchema = z.object({
+export const EventStreamItemSchema = z.object({
   type: z.string(),
   data: z.any(),
   url: z.string(),
 });
 
 // Define the schema for the home feed
-export const HomeFeed = {
+export const EventStream = {
   input: z.object({}),
   output: z.object({
-    items: z.array(HomeFeedItemSchema),
+    items: z.array(EventStreamItemSchema),
   }),
 };

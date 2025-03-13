@@ -1,19 +1,19 @@
 import { cache, CacheNamespaces, logger, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { HOME_FEED_KEY } from '../../policies/HomeFeed.policy';
+import { EVENT_STREAM_FN_CACHE_KEY } from '../../policies/EventStream.policy';
 
 const log = logger(import.meta);
 
-export function GetHomeFeed(): Query<typeof schemas.HomeFeed> {
+export function GetEventStream(): Query<typeof schemas.EventStream> {
   return {
-    ...schemas.HomeFeed,
+    ...schemas.EventStream,
     auth: [],
     secure: false,
     body: async () => {
       try {
         const cachedFeed = await cache().getKey(
           CacheNamespaces.Function_Response,
-          HOME_FEED_KEY,
+          EVENT_STREAM_FN_CACHE_KEY,
         );
 
         if (cachedFeed) {
@@ -22,7 +22,7 @@ export function GetHomeFeed(): Query<typeof schemas.HomeFeed> {
 
         return { items: [] };
       } catch (err) {
-        log.error(`Error getting home feed from cache`, err as Error);
+        log.error(`Error getting event stream from cache`, err as Error);
         return { items: [] };
       }
     },
