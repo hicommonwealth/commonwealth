@@ -65,7 +65,6 @@ const ViewSnapshotProposal = ({
   const { data: proposalsData } = useGetSnapshotProposalsQuery({
     space: snapshotId,
   });
-
   const threads = data || [];
 
   useEffect(() => {
@@ -144,6 +143,7 @@ const ViewSnapshotProposal = ({
     loadVotes(identifier).catch(console.error);
   }, [proposalsData, spaceData, identifier, loadVotes]);
 
+  console.log({ proposal, space, votes });
   if (!proposal || !space) {
     return (
       <CWPageLayout>

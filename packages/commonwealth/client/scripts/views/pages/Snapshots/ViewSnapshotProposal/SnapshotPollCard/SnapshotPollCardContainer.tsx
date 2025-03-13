@@ -9,6 +9,7 @@ import moment from 'moment';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 
+import GovernanceVote from '../../../../../views/components/proposals/GoveranceVote';
 import { SnapshotPollCard } from './SnapshotPollCard';
 import { calculateTimeRemaining } from './utils';
 
@@ -104,6 +105,30 @@ export const SnapshotPollCardContainer = (
     }
   }, [choice]);
 
+  const voteOptions = useMemo(() => {
+    if (!proposal || !votes) return [];
+    const { choices } = proposal;
+    const totalVoteCount = totals.sumOfResultsBalance || 0;
+
+    return choices.map((label: string, index: number) => {
+      const voteCount = votes
+        .filter((vote) => vote.choice === index + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      const percentage =
+        totalVoteCount > 0
+          ? ((voteCount / totalVoteCount) * 100).toFixed(2)
+          : '0';
+      const results = voteCount.toFixed(4); // Adjust precision as needed
+
+      return {
+        label,
+        percentage,
+        results,
+      };
+    });
+  }, [proposal, votes, totals.sumOfResultsBalance]);
+  console.log('test', { voteInformation, totals, userVote });
+  console.log('test', { voteOptions });
   return (
     <>
       <SnapshotPollCard
@@ -123,9 +148,14 @@ export const SnapshotPollCardContainer = (
           setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}
-        // @ts-expect-error <StrictNullChecks/>
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
+      />
+      <GovernanceVote
+        voteOptions={voteOptions}
+        quorum={60} // Adjust based on your governance rules
+        governanceType="Cosmos Proposal"
+        barColor="#3366cc" // Uniform color for all bars
       />
       <CWModal
         size="small"

@@ -4,10 +4,7 @@ import { MixpanelSnapshotEvents } from 'analytics/types';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import {
-  CastVoteSection,
   PollCardProps,
-  PollOptions,
-  ResultsSections,
   VoteDisplay,
   VoteInformation,
 } from 'views/components/Polls';
@@ -15,6 +12,7 @@ import { buildVoteDirectionString } from 'views/components/Polls/utils';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 
+import VotingUI from 'client/scripts/views/components/proposals/VotingUi';
 import '../../../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
@@ -58,9 +56,10 @@ export const SnapshotPollCard = ({
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
-  const castVote = () => {
-    setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
-    onSnapshotVoteCast(selectedOptions[0]);
+  const castVote = (e) => {
+    const selectedOption = e[0] || selectedOptions[0];
+    setVoteDirectionString(buildVoteDirectionString(selectedOption));
+    onSnapshotVoteCast(selectedOption);
     trackAnalytics({
       event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
       isPWA: isAddedToHomeScreen,
@@ -87,6 +86,7 @@ export const SnapshotPollCard = ({
     setInternalVoteInformation(voteInformation);
   }, [voteInformation]);
 
+  console.log('snapssss', { internalVoteInformation });
   return (
     <CWCard className="PollCard">
       <div className="poll-title-section">
@@ -98,20 +98,27 @@ export const SnapshotPollCard = ({
       <div className="poll-voting-section">
         {!internalHasVoted && !pollEnded && !isPreview && (
           <>
-            <PollOptions
+            <VotingUI
+              options={internalVoteInformation}
+              proposalTitle={proposalTitle}
+              timeRemaining={timeRemaining}
+              canVote={false}
+              hasVoted={false}
+              onVote={castVote}
+              type="snapshot"
+            />
+            {/* <PollOptions
               voteInformation={internalVoteInformation}
               selectedOptions={selectedOptions}
-              disableVoteOptions={disableVoteButton}
+              disableVoteOptions={false}
               setSelectedOptions={setSelectedOptions}
             />
             <CastVoteSection
-              disableVoteButton={
-                disableVoteButton || selectedOptions.length === 0
-              }
+              disableVoteButton={false}
               timeRemaining={timeRemaining}
               tooltipErrorMessage={tooltipErrorMessage}
               onVoteCast={castVote}
-            />
+            /> */}
           </>
         )}
         {((internalHasVoted && !isPreview) || pollEnded) && (
@@ -124,7 +131,8 @@ export const SnapshotPollCard = ({
           />
         )}
       </div>
-      <ResultsSections
+      <br />
+      {/* <ResultsSections
         resultString={resultString}
         // @ts-expect-error <StrictNullChecks/>
         onResultsClick={null}
@@ -134,7 +142,7 @@ export const SnapshotPollCard = ({
         totalVoteCount={internalTotalVoteCount}
         votedFor={votedFor}
         isPreview={isPreview}
-      />
+      /> */}
     </CWCard>
   );
 };

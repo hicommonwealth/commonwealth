@@ -23,6 +23,7 @@ import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
+import VotingUI from './VotingUi';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
@@ -44,6 +45,7 @@ export const VotingActions = ({
   proposalRedrawState,
 }: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
+  const [selectedOption, setSelectedOption] = useState<string>();
 
   const { isAddedToHomeScreen } = useAppStatus();
   const userData = useUserStore();
@@ -181,7 +183,25 @@ export const VotingActions = ({
       return notifyError('Invalid proposal type');
     }
   };
+  // const getPct = (n: BN, voteTotal: BN) =>
+  //   voteTotal.isZero()
+  //     ? '0'
+  //     : (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
 
+  // const getVoteCounts = (proposal) => {
+  //   const { yes, no, abstain, noWithVeto } = proposal?.data?.state?.tally;
+  //   const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
+  //   console.log({ voteTotal });
+  //   if (!proposal || !proposal.tally)
+  //     return { yes: 0, no: 0, abstain: 0, veto: 0 };
+
+  //   return {
+  //     yes: getPct(yes, voteTotal) || 0,
+  //     no: getPct(no, voteTotal) || 0,
+  //     abstain: getPct(abstain, voteTotal) || 0,
+  //     veto: getPct(noWithVeto, voteTotal) || 0,
+  //   };
+  // };
   const {
     hasVotedYes,
     hasVotedNo,
@@ -190,10 +210,10 @@ export const VotingActions = ({
     hasVotedForAnyChoice,
     // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
-
+  // const voteCounts = getVoteCounts(proposal);
+  // console.log({ voteCounts });
   // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
-
   const yesButton = (
     <CWButton
       disabled={!canVote || hasVotedYes || votingModalOpen}
@@ -238,7 +258,19 @@ export const VotingActions = ({
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}
     />
   );
-
+  const handleVote = async (e) => {
+    console.log('handleVote', e, selectedOption);
+    return;
+    if (selectedOption === 'yes') {
+      await voteYes(e);
+    } else if (selectedOption === 'no') {
+      await voteNo(e);
+    } else if (selectedOption === 'abstain') {
+      await voteAbstain(e);
+    } else if (selectedOption === 'veto') {
+      await voteVeto(e);
+    }
+  };
   let votingActionObj;
   if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
     votingActionObj = (
@@ -253,14 +285,48 @@ export const VotingActions = ({
     );
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
     if (!(proposal instanceof CosmosProposalV1AtomOne)) {
+      const voteOptions = [
+        { label: 'Yes', value: 'yes', voteCount: 0 },
+        { label: 'No', value: 'no', voteCount: 0 },
+        { label: 'Abstain', value: 'abstain', voteCount: 0 },
+        { label: 'Veto', value: 'veto', voteCount: 0 },
+      ];
       votingActionObj = (
         <>
-          <div className="button-row">
-            {yesButton}
-            {noButton}
-            {abstainButton}
-            {noWithVetoButton}
-          </div>
+          <VotingUI
+            options={voteOptions}
+            proposalTitle="Do you support this proposal?"
+            timeRemaining="7 days left" // Replace with dynamic value if available
+            canVote={canVote && !votingModalOpen}
+            hasVoted={false}
+            onVote={handleVote}
+            type="cosmos"
+          />
+          {/* <div className="poll-container">
+            <h2>Actions</h2>
+            <div className="poll-box">
+              <div className="poll-header">
+                <span>POLL</span>
+                <span>
+                  7 days left <a href="#">View Activity</a>
+                </span>
+              </div>
+              <p>Do you support this proposal?</p>
+              {['yes', 'no', 'abstain', 'veto'].map((option) => (
+                <button
+                  key={option}
+                  className={`option ${selectedOption === option ? 'selected' : ''}`}
+                  onClick={() => setSelectedOption(option)}
+                >
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </button>
+              ))}
+
+              <button className="vote-button" onClick={handleVote}>
+                vote
+              </button>
+            </div>
+          </div> */}
           {/* @ts-expect-error StrictNullChecks*/}
           <ProposalExtensions proposal={proposal} />
         </>

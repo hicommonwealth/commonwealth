@@ -1,0 +1,45 @@
+@import '../../../styles/shared.scss';
+$primary-green: #50d890;
+$white: #fff;
+$dark-gray: #232931;
+$light-gray: #fbfbfb;
+$text-gray: #262626;
+$shadow-gray: #777777;
+$border-gray: #4f5b66;
+.DetailCard {
+  display: flex;
+  width: 248px;
+  height: 344px;
+  overflow: hidden;
+  flex-direction: column;
+  border: 2px solid $neutral-100;
+
+  .header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border: 2px solid #eeedef;
+    width: 100%;
+    background-color: #f7f6f7;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-left: 10px;
+  }
+  .rb-container {
+    display: flex;
+    padding: 10px;
+    gap: 4px;
+    flex-direction: column;
+    .label {
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-500;
+    }
+
+    .title {
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-900;
+    }
+  }
+}
