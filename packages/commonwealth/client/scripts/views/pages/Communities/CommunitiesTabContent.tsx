@@ -30,7 +30,7 @@ interface CommunitiesTabContentProps {
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: any; // Using any here to handle the complex function type
+  fetchMoreCommunities?: () => Promise<void>;
 }
 
 const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({

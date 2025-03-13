@@ -40,7 +40,7 @@ interface AllTabContentProps {
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
   hasNextPage?: boolean;
-  fetchMoreCommunities?: any;
+  fetchMoreCommunities?: () => Promise<void>;
   hideHeader?: boolean;
 }
 
