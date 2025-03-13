@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CWText } from '../component_kit/cw_text';
 import './VotingUI.scss'; // Create this SCSS file for styling
 
 interface VoteOption {
@@ -33,18 +34,22 @@ const VotingUI: React.FC<VotingUIProps> = ({
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
     }
   };
-  //   console.log('UIvoting', options, canVote, hasVoted);
   return (
     <div className="poll-container">
-      <h2>Actions</h2>
+      <CWText type="h5" fontWeight="semiBold">
+        Actions
+      </CWText>
       <div className="poll-box">
         <div className="poll-header">
-          <span>POLL</span>
-          <span>
-            {timeRemaining} <a href="#">View Activity</a>
-          </span>
+          <CWText>POLL</CWText>
+          <div className="timeline">
+            <CWText>{timeRemaining}</CWText>
+            <a href="#">View Activity</a>
+          </div>
         </div>
-        <p>{proposalTitle}</p>
+        <CWText type="b2" className="poll-title">
+          {proposalTitle}
+        </CWText>
         {!hasVoted && !canVote && (
           <div className="voting-options">
             {options.map((option) => (

@@ -21,7 +21,6 @@ import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/go
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import VotingUI from './VotingUi';
 import { CannotVote } from './cannot_vote';
@@ -302,31 +301,6 @@ export const VotingActions = ({
             onVote={handleVote}
             type="cosmos"
           />
-          {/* <div className="poll-container">
-            <h2>Actions</h2>
-            <div className="poll-box">
-              <div className="poll-header">
-                <span>POLL</span>
-                <span>
-                  7 days left <a href="#">View Activity</a>
-                </span>
-              </div>
-              <p>Do you support this proposal?</p>
-              {['yes', 'no', 'abstain', 'veto'].map((option) => (
-                <button
-                  key={option}
-                  className={`option ${selectedOption === option ? 'selected' : ''}`}
-                  onClick={() => setSelectedOption(option)}
-                >
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
-                </button>
-              ))}
-
-              <button className="vote-button" onClick={handleVote}>
-                vote
-              </button>
-            </div>
-          </div> */}
           {/* @ts-expect-error StrictNullChecks*/}
           <ProposalExtensions proposal={proposal} />
         </>
@@ -348,12 +322,5 @@ export const VotingActions = ({
     votingActionObj = <CannotVote label="Unsupported proposal type" />;
   }
 
-  return (
-    <div className="VotingActions">
-      <CWText type="h4" className="voting-actions-header">
-        Cast Your Vote
-      </CWText>
-      {votingActionObj}
-    </div>
-  );
+  return <div className="VotingActions">{votingActionObj}</div>;
 };

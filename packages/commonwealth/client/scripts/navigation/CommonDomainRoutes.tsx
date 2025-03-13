@@ -132,6 +132,10 @@ const CommunityHomePage = lazy(
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
+);
+
 const CommonDomainRoutes = () => [
   <Route
     key="mobile-app-redirect"
@@ -371,6 +375,13 @@ const CommonDomainRoutes = () => [
     element={
       <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
     }
+  />,
+  <Route
+    key="/:scope/newproposalview/:identifier"
+    path="/:scope/newproposalview/:identifier"
+    element={withLayout(newProposalViewPage, {
+      scoped: true,
+    })}
   />,
   // GOVERNANCE END
 

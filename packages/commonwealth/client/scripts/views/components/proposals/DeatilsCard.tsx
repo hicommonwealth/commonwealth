@@ -2,26 +2,6 @@ import React from 'react';
 
 import { CWText } from '../component_kit/cw_text';
 import './DeatilsCard.scss';
-const timelineEvents = [
-  {
-    date: '10/02/2024',
-    title: 'Proposal Published',
-    type: 'past',
-    iconName: 'plusCirclePhosphor',
-  },
-  {
-    date: '15/02/2024',
-    title: 'Voting begins',
-    type: 'active',
-    iconName: 'vector',
-  },
-  {
-    date: '18/02/2024',
-    title: 'Voting ends',
-    type: 'coming',
-    iconName: 'infoEmpty',
-  },
-];
 
 const DetailsCard = () => {
   return (

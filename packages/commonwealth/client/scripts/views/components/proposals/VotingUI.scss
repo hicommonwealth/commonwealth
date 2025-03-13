@@ -1,3 +1,4 @@
+@import '../../../styles/shared.scss';
 .poll-container {
   background: #f7f7f7;
   gap: 16px;
@@ -7,30 +8,61 @@
   flex-direction: column;
 
   .poll-box {
-    background-color: #e0dfe1;
-    padding: 15px;
+    border: 1px solid #e0dfe1 !important;
+    padding: 16px;
     border-radius: 8px;
+    border-radius: 6px;
+    gap: 10px;
+    background: #f7f7f7 !important;
   }
 
   .poll-header {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
     color: gray;
-    margin-bottom: 10px;
+    height: 20px;
+    .Text {
+      color: $neutral-400;
+      font-weight: 500;
+      font-size: 12px;
+      line-height: 16px;
+    }
+    .timeline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      .Text {
+        color: $neutral-500;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+      }
+    }
   }
-
-  .option {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid black;
-    background: white;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &.selected {
-      background: lightgray;
+  .poll-title {
+    .Text {
+      color: $neutral-500;
+    }
+  }
+  .voting-options {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    .option {
+      width: 100%;
+      border: 1px solid $neutral-300;
+      background: white;
+      cursor: pointer;
+      height: 52px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      &:focus {
+        border: 1px solid $black !important;
+      }
+      &.selected {
+        border: 1px solid black;
+      }
     }
   }
 

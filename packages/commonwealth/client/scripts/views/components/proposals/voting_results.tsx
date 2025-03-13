@@ -106,24 +106,12 @@ export const VotingResults = (props: VotingResultsProps) => {
       ];
 
       return (
-        <>
-          <GovernanceVote
-            voteOptions={voteOptions}
-            quorum={60} // Adjust based on your governance rules
-            governanceType="Cosmos Proposal"
-            barColor="#3366cc" // Uniform color for all bars
-          />
-          {/* <GovernanceVote
-            abstainPct={getPct(abstain)}
-            abstainResults={formatCurrency(abstain)}
-            noPct={getPct(no)}
-            noResults={formatCurrency(no)}
-            noWithVetoPct={getPct(noWithVeto)}
-            noWithVetoResults={formatCurrency(noWithVeto)}
-            yesPct={getPct(yes)}
-            yesResults={formatCurrency(yes)}
-          /> */}
-        </>
+        <GovernanceVote
+          voteOptions={voteOptions}
+          quorum={60} // Adjust based on your governance rules
+          governanceType="Cosmos Proposal"
+          barColor="#3366cc" // Uniform color for all bars
+        />
       );
     } else {
       return (

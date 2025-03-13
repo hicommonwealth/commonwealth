@@ -1,8 +1,6 @@
-import { slugify } from '@hicommonwealth/shared';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { getProposalUrlPath } from 'identifiers';
 import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
@@ -28,16 +26,12 @@ import TimeLine from '../../components/proposals/TimeLine';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
-import { JSONDisplay } from './JSONDisplay';
-import { ProposalSubheader } from './proposal_components';
-
+import { JSONDisplay } from '../view_proposal/JSONDisplay';
 type ViewProposalPageAttrs = {
   identifier: string;
   type?: string;
 };
-
-const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
-  console.log({ identifier });
+const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
@@ -115,17 +109,17 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const proposalDescription = description || proposal?.description;
 
   // replace path with correct slug
-  if (proposal?.slug) {
-    const slugTitle = slugify(proposalTitle);
-    if (identifier !== `${proposalId}-${slugTitle}`) {
-      const newPath = getProposalUrlPath(
-        proposal.slug,
-        `${proposalId}-${slugTitle}`,
-        true,
-      );
-      navigate(newPath, { replace: true });
-    }
-  }
+  //   if (proposal?.slug) {
+  //     const slugTitle = slugify(proposalTitle);
+  //     if (identifier !== `${proposalId}-${slugTitle}`) {
+  //       const newPath = getProposalUrlPath(
+  //         proposal.slug,
+  //         `${proposalId}-${slugTitle}`,
+  //         true,
+  //       );
+  //       navigate(newPath, { replace: true });
+  //     }
+  //   }
 
   const toggleVotingModal = (newModalState: boolean) => {
     setVotingModalOpen(newModalState);
@@ -134,7 +128,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-
+  console.log('cosmo', proposal?.author);
   return (
     <CWPageLayout>
       <CWContentPage
@@ -144,7 +138,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
         createdAt={proposal?.createdAt}
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
-        subHeader={<ProposalSubheader proposal={proposal} />}
         body={() => (
           <>
             {isFetchingMetadata ? (
@@ -157,19 +150,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
             <CWAccordView title="Description" defaultOpen={false}>
               <MarkdownViewerWithFallback markdown={proposalDescription} />
             </CWAccordView>
-
-            {!_.isEmpty(proposal?.data?.messages) && (
-              <JSONDisplay data={proposal.data.messages} title="Messages" />
-            )}
-            {proposal?.data?.type === 'communitySpend' && (
-              <JSONDisplay
-                data={{
-                  recipient: proposal.data?.spendRecipient,
-                  amount: proposal.data?.spendAmount,
-                }}
-                title="Community Spend Proposal"
-              />
-            )}
 
             <VotingActions
               onModalClose={onModalClose}
@@ -192,4 +172,4 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   );
 };
 
-export default ViewProposalPage;
+export default NewProposalViewPage;
