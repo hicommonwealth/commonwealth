@@ -1,5 +1,4 @@
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -26,8 +25,6 @@ const ActiveContestList = ({
     fetchAll: true,
     isCommunityHomePage,
   });
-
-  const farcasterContestEnabled = useFlag('farcasterContest');
 
   const activeContestsLimited = isCommunityHomePage
     ? activeContests.length > 0
@@ -109,9 +106,7 @@ const ActiveContestList = ({
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
                   score={score || []}
-                  isFarcaster={
-                    farcasterContestEnabled && contest.is_farcaster_contest
-                  }
+                  isFarcaster={contest.is_farcaster_contest}
                   community={community[contest.community_id as string]}
                 />
               );

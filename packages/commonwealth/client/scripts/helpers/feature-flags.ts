@@ -25,7 +25,6 @@ const featureFlags = {
   knockPushNotifications: buildFlag(
     process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
   ),
-  farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
   uniswapTrade: buildFlag(process.env.FLAG_UNISWAP_TRADE),
