@@ -200,7 +200,6 @@ export async function getFromTwitter({
   };
 }
 
-// TODO: add overall max results (i.e. cap)
 export async function getFromTwitterWrapper<
   Schema extends (typeof TwitterApiResponses)[keyof typeof TwitterApiResponses],
 >({

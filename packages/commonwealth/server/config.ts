@@ -117,6 +117,17 @@ export const config = configure(
     },
     DEV_MODULITH: DEV_MODULITH === 'true',
     ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
+    TWITTER: {
+      WORKER_POLL_INTERVAL: (() => {
+        if (TWITTER_WORKER_POLL_INTERVAL)
+          return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
+        else if (target.APP_ENV === 'local')
+          return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
+        else return 0;
+      })(),
+      ENABLED_BOTS:
+        (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
+    },
     CACHE_TTL: {
       GET_COMMUNITIES_TRENDING_SIGNED_IN:
         CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN
@@ -129,17 +140,6 @@ export const config = configure(
       GET_COMMUNITIES_JOIN_COMMUNITY: CACHE_GET_COMMUNITIES_JOIN_COMMUNITY
         ? parseInt(CACHE_GET_COMMUNITIES_JOIN_COMMUNITY, 10)
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
-    },
-    TWITTER: {
-      WORKER_POLL_INTERVAL: (() => {
-        if (TWITTER_WORKER_POLL_INTERVAL)
-          return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
-        else if (target.APP_ENV === 'local')
-          return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
-        else return 0;
-      })(),
-      ENABLED_BOTS:
-        (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
     },
   },
   z.object({
@@ -225,11 +225,6 @@ export const config = configure(
     }),
     DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
-    CACHE_TTL: z.object({
-      GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
-      GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
-      GET_COMMUNITIES_JOIN_COMMUNITY: z.number(),
-    }),
     TWITTER: z
       .object({
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
@@ -242,5 +237,10 @@ export const config = configure(
             !model_config.TWITTER.APP_BEARER_TOKEN
           ),
       ),
+    CACHE_TTL: z.object({
+      GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
+      GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
+      GET_COMMUNITIES_JOIN_COMMUNITY: z.number(),
+    }),
   }),
 );
