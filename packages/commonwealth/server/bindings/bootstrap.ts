@@ -16,6 +16,7 @@ import {
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
+  EventStreamPolicy,
   FarcasterWorker,
   User,
   models,
@@ -96,6 +97,9 @@ export async function bootstrapBindings(
 
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
+
+  const eventStreamSubRes = await brokerInstance.subscribe(EventStreamPolicy);
+  checkSubscriptionResponse(eventStreamSubRes, EventStreamPolicy.name);
 
   // @timolegros can we automate subscriptions by iterating
   // over the rascal consumer map?... we can add retry strategies to the map
