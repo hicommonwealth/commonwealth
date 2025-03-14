@@ -8,7 +8,6 @@ import {
 import axios from 'axios';
 import {
   LocalStorageKeys,
-  removeLocalStorageItem,
   setLocalStorageItem,
 } from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
@@ -65,7 +64,6 @@ export const handleLogout = async () => {
     darkModeStore.getState().setDarkMode(false);
     setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
     setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
-    removeLocalStorageItem(LocalStorageKeys.HasMobileAppOnboarded);
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();
