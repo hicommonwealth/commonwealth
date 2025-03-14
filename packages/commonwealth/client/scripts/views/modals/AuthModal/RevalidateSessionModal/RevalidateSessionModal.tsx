@@ -8,6 +8,7 @@ const RevalidateSessionModal = ({
   onSuccess,
   showWalletsFor,
   showAuthOptionFor,
+  showAuthOptionTypesFor,
   onSignInClick,
 }: ModalVariantProps) => {
   return (
@@ -15,7 +16,7 @@ const RevalidateSessionModal = ({
       onClose={onClose}
       layoutType={AuthModalType.RevalidateSession}
       onSuccess={onSuccess}
-      showAuthOptionTypesFor={['wallets', 'sso']}
+      showAuthOptionTypesFor={showAuthOptionTypesFor}
       showWalletsFor={showWalletsFor}
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="RevalidateSessionModal"

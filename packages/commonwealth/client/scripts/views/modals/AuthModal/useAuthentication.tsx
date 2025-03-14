@@ -56,6 +56,7 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
+import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -513,42 +514,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
-    setSelectedWallet(wallet);
-
-    if (user.isLoggedIn) {
-      try {
-        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: address,
-                  currentPrefix: parseInt(
-                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
-                    10,
-                  ),
-                })
-              : address,
-          community_id: app.activeChainId() ?? wallet.chain,
-          jwt: user.jwt,
-        });
-
-        if (res.data.result.exists && res.data.result.belongsToUser) {
-          notifyInfo('This address is already linked to your current account.');
-          return;
-        }
-
-        if (res.data.result.exists) {
-          notifyInfo(
-            'This address is already linked to another account. Signing will transfer ownership to your account.',
-          );
-        }
-      } catch (err) {
-        notifyError(`Error getting address status`);
-        console.error(`Error getting address status: ${err}`);
-      }
-    }
-
+  const handleWalletTransfer = async (wallet: Wallet, address: string) => {
     try {
       const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
@@ -590,6 +556,69 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       notifyError(`Error authenticating with wallet`);
       console.error(`Error authenticating with wallet: ${err}`);
     }
+  };
+  const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
+    setSelectedWallet(wallet);
+
+    if (user.isLoggedIn) {
+      try {
+        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
+          address:
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address: address,
+                  currentPrefix: parseInt(
+                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+                    10,
+                  ),
+                })
+              : address,
+          community_id: app.activeChainId() ?? wallet.chain,
+          jwt: user.jwt,
+        });
+
+        if (res.data.result.exists && res.data.result.belongsToUser) {
+          notifyInfo('This address is already linked to your current account.');
+          return;
+        }
+
+        if (res.data.result.exists) {
+          openConfirmation({
+            title: 'Wallet Transfer Confirmation',
+            description: `
+            The wallet you want to link is owned by account Y. 
+            Do you want to transfer it? Your thread history will
+            now be associated with account X.
+            `,
+            buttons: [
+              {
+                label: 'Confirm Transfer',
+                buttonType: 'destructive',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  void handleWalletTransfer(wallet, address);
+                },
+              },
+              {
+                label: 'Cancel',
+                buttonType: 'secondary',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  void props.onSuccess?.(null, false).catch(console.error);
+                  return;
+                },
+              },
+            ],
+          });
+
+          return;
+        }
+      } catch (err) {
+        notifyError(`Error getting address status`);
+        console.error(`Error getting address status: ${err}`);
+      }
+    }
+    await handleWalletTransfer(wallet, address);
   };
 
   const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {

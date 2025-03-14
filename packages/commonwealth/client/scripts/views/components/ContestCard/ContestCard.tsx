@@ -30,10 +30,11 @@ import {
 } from '../../pages/CommunityManagement/Contests/utils';
 import ContestAlert from './ContestAlert';
 
+import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
+import { useFlag } from 'hooks/useFlag';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
-import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -103,6 +104,8 @@ const ContestCard = ({
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
 
+  const newContestPage = useFlag('newContestPage');
+
   const isActive = isContestActive({
     contest: {
       cancelled: isCancelled,
@@ -167,7 +170,7 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    isFarcaster
+    newContestPage
       ? navigate(`/contests/${address}`, {}, community?.id)
       : navigate(
           `/discussions?featured=mostLikes&contest=${address}`,
@@ -301,7 +304,7 @@ const ContestCard = ({
                       <CWText fontWeight="bold">
                         <FractionalValue
                           fontWeight="bold"
-                          value={parseFloat(prize.replace(',', ''))}
+                          value={Number(prize.replace(/,/g, ''))}
                         />
                         &nbsp;{ticker}
                       </CWText>
@@ -335,7 +338,6 @@ const ContestCard = ({
               )}
             />
           )}
-
           {onFund && isActive && user.isLoggedIn && (
             <CWThreadAction
               label="Fund"

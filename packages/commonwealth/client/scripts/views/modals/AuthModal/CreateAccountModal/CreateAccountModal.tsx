@@ -1,13 +1,13 @@
-import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
 import React from 'react';
 import { ModalBase } from '../common/ModalBase';
 import { AuthModalType, ModalVariantProps } from '../types';
 import './CreateAccountModal.scss';
-const mobileApp = isMobileApp();
+
 const CreateAccountModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionTypesFor,
   showAuthOptionFor,
   onSignInClick,
 }: ModalVariantProps) => {
@@ -17,7 +17,7 @@ const CreateAccountModal = ({
       onSuccess={onSuccess}
       layoutType={AuthModalType.CreateAccount}
       showWalletsFor={showWalletsFor}
-      showAuthOptionTypesFor={mobileApp ? ['sso'] : ['wallets', 'sso']}
+      showAuthOptionTypesFor={showAuthOptionTypesFor}
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="CreateAccountModal"
       onSignInClick={onSignInClick}

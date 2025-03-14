@@ -81,8 +81,6 @@ const UpdateQuest = ({ id }: { id: number }) => {
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
 
-  const actionMeta = quest.action_metas?.[0];
-
   return (
     <CWPageLayout>
       <div className="UpdateQuest">
@@ -102,19 +100,12 @@ const UpdateQuest = ({ id }: { id: number }) => {
             mode="update"
             questId={quest.id}
             initialValues={{
-              participation_limit:
-                actionMeta?.participation_limit ||
-                QuestParticipationLimit.OncePerQuest,
-              participation_period:
-                actionMeta?.participation_period ||
-                QuestParticipationPeriod.Daily,
-              participation_times_per_period:
-                actionMeta?.participation_times_per_period || 1,
               description: quest.description || '',
               end_date: quest.end_date,
               image: quest.image_url,
               name: quest.name,
               start_date: quest.start_date,
+              max_xp_to_end: `${quest.max_xp_to_end}`,
               ...(quest.community_id &&
                 community && {
                   community: {
@@ -126,6 +117,13 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   },
                 }),
               subForms: (quest.action_metas || [])?.map((action) => ({
+                participationLimit:
+                  action.participation_limit ||
+                  QuestParticipationLimit.OncePerQuest,
+                participationPeriod:
+                  action.participation_period || QuestParticipationPeriod.Daily,
+                participationTimesPerPeriod:
+                  action.participation_times_per_period || 1,
                 action: action.event_name as QuestAction,
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,

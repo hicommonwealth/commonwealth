@@ -76,7 +76,7 @@ async function main() {
     if (!config.MAGIC_API_KEY) {
       throw new Error('MAGIC_API_KEY is required in production');
     }
-    if (!process.argv[2]) {
+    if (!process.argv[2] && process.env.SKIP_DUMP_IMPORT !== 'true') {
       throw new Error('Must provide a filepath to the user dump (csv)');
     }
   }
@@ -85,21 +85,8 @@ async function main() {
     process.argv[2] || './2025-02-24T15_16_02.493Z.csv',
   );
 
-  const addressToBackfillCount = await models.Address.count({
-    where: {
-      address: {
-        [Op.in]: Object.keys(data),
-      },
-      wallet_id: 'magic',
-      oauth_provider: null,
-    },
-  });
-  let numBackfilled = 0;
-
-  let addresses: AddressInstance[] = [];
-  while (true) {
-    addresses = await models.Address.findAll({
-      attributes: ['id', 'address'],
+  if (process.env.SKIP_DUMP_IMPORT !== 'true') {
+    const addressToBackfillCount = await models.Address.count({
       where: {
         address: {
           [Op.in]: Object.keys(data),
@@ -107,47 +94,64 @@ async function main() {
         wallet_id: 'magic',
         oauth_provider: null,
       },
-      limit: 100,
     });
+    let numBackfilled = 0;
 
-    if (addresses.length === 0) {
-      log.info('All magic addresses migrated from user dump (csv)');
-      break;
-    }
+    let addresses: AddressInstance[] = [];
+    while (true) {
+      addresses = await models.Address.findAll({
+        attributes: ['id', 'address'],
+        where: {
+          address: {
+            [Op.in]: Object.keys(data),
+          },
+          wallet_id: 'magic',
+          oauth_provider: null,
+        },
+        limit: 100,
+      });
 
-    for (const address of addresses) {
-      if (!data[address.address]) {
-        log.warn(`No data for address ${address.address}`);
-        continue;
+      if (addresses.length === 0) {
+        log.info('All magic addresses migrated from user dump (csv)');
+        break;
       }
 
-      if (!data[address.address].issuer) {
-        log.warn(`No issuer for address ${address.address}`);
-        continue;
-      }
-      let provider = data[address.address].issuer.toLowerCase();
-      if (provider === 'sms') provider = WalletSsoSource.SMS;
+      for (const address of addresses) {
+        if (!data[address.address]) {
+          log.warn(`No data for address ${address.address}`);
+          continue;
+        }
 
-      if (
-        !provider ||
-        !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
-      ) {
-        log.warn(`Invalid provider ${provider} for address ${address.address}`);
-        continue;
-      }
-      address.oauth_provider = provider;
-      address.oauth_email = data[address.address].email;
-      address.oauth_phone_number = data[address.address].phone_number;
+        if (!data[address.address].issuer) {
+          log.warn(`No issuer for address ${address.address}`);
+          continue;
+        }
+        let provider = data[address.address].issuer.toLowerCase();
+        if (provider === 'sms') provider = WalletSsoSource.SMS;
 
-      if (address.oauth_provider === 'email' && address.oauth_email) {
-        address.oauth_email_verified = true;
-      }
+        if (
+          !provider ||
+          !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
+        ) {
+          log.warn(
+            `Invalid provider ${provider} for address ${address.address}`,
+          );
+          continue;
+        }
+        address.oauth_provider = provider;
+        address.oauth_email = data[address.address].email;
+        address.oauth_phone_number = data[address.address].phone_number;
 
-      await address.save();
-      numBackfilled++;
-      log.info(
-        `[${numBackfilled}/${addressToBackfillCount}]: Updated address ${address.address}`,
-      );
+        if (address.oauth_provider === 'email' && address.oauth_email) {
+          address.oauth_email_verified = true;
+        }
+
+        await address.save();
+        numBackfilled++;
+        log.info(
+          `[${numBackfilled}/${addressToBackfillCount}]: Updated address ${address.address}`,
+        );
+      }
     }
   }
 
@@ -178,26 +182,25 @@ async function main() {
       continue;
     }
 
-    if (fetchedData.oauthProvider) {
-      let provider = fetchedData.oauthProvider.toLowerCase();
-      if (provider === 'sms') provider = WalletSsoSource.SMS;
+    let provider = fetchedData.oauthProvider?.toLowerCase() || '';
+    if (provider === 'sms') provider = WalletSsoSource.SMS;
+    if (!provider && fetchedData.email) provider = WalletSsoSource.Email;
 
-      if (
-        !Object.values(WalletSsoSource).includes(provider as WalletSsoSource)
-      ) {
-        log.warn(`Invalid provider ${provider} for address ${address.address}`);
-        continue;
-      }
-      address.oauth_provider = provider;
-      address.oauth_email = fetchedData.email;
-      address.oauth_phone_number = fetchedData.phoneNumber;
-
-      // only Email oauth is considered verified email for backfilling purposes
-      if (address.oauth_provider === 'email' && fetchedData.email) {
-        address.oauth_email_verified = true;
-      }
-      await address.save();
+    if (!Object.values(WalletSsoSource).includes(provider as WalletSsoSource)) {
+      log.warn(`Invalid provider ${provider} for address ${address.address}`);
+      continue;
     }
+    address.oauth_provider = provider;
+    address.oauth_email = fetchedData.email;
+    address.oauth_phone_number = fetchedData.phoneNumber;
+    address.oauth_username = fetchedData.username;
+
+    // sign in with email on Magic has
+    if (provider === WalletSsoSource.Email) {
+      address.oauth_email_verified = true;
+    }
+    await address.save();
+
     processedAddresses++;
     log.info(
       `[${processedAddresses}/${missingDumpAddresses.length}]: Processed address ${address.address}`,

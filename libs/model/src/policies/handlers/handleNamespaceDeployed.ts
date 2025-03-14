@@ -1,19 +1,20 @@
 import { command, EventHandler } from '@hicommonwealth/core';
 import { ZodUndefined } from 'zod';
-import { CreateNamespaceAdminGroup } from '../../community/CreateNamespaceAdminGroup.command';
+import { LinkNamespace } from '../../aggregates/community';
 import { systemActor } from '../../middleware';
 
 export const handleNamespaceDeployed: EventHandler<
   'NamespaceDeployed',
   ZodUndefined
-  // eslint-disable-next-line @typescript-eslint/require-await
 > = async ({ payload }) => {
-  const { nameSpaceAddress } = payload.parsedArgs;
+  const { nameSpaceAddress, _namespaceDeployer } = payload.parsedArgs;
 
-  await command(CreateNamespaceAdminGroup(), {
+  await command(LinkNamespace(), {
     actor: systemActor({}),
     payload: {
       namespace_address: nameSpaceAddress,
+      deployer_address: _namespaceDeployer,
+      log_removed: payload.rawLog.removed,
     },
   });
 };

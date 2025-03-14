@@ -78,7 +78,6 @@ export enum CacheNamespaces {
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Test_Redis = 'test_redis',
-  Database_Cleaner = 'database_cleaner',
   Token_Balance = 'token_balance',
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
@@ -306,13 +305,6 @@ export type NotificationsProviderRecipient =
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
-  actor?: {
-    id: string;
-    profile_name: string;
-    profile_url: string;
-    email?: string;
-    profile_avatar_url?: string;
-  };
 };
 
 export type NotificationUser = {

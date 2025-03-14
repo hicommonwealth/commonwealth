@@ -1,6 +1,10 @@
-import { QuestEvents } from '@hicommonwealth/schemas';
+import {
+  QuestActionNames,
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
 
-export type QuestAction = keyof typeof QuestEvents;
+export type QuestAction = (typeof QuestActionNames)[number];
 
 export type QuestActionSubFormErrors = {
   action?: string;
@@ -8,6 +12,7 @@ export type QuestActionSubFormErrors = {
   contentLink?: string;
   rewardAmount?: string;
   creatorRewardAmount?: string;
+  participationLimit?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -16,12 +21,19 @@ export type QuestActionSubFormFields = {
   contentLink?: string;
   rewardAmount?: string | number;
   creatorRewardAmount?: string | number;
+  participationLimit?: QuestParticipationLimit;
+  participationPeriod?: QuestParticipationPeriod;
+  participationTimesPerPeriod?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
   requires_creator_points: boolean;
   with_optional_thread_id: boolean;
   with_optional_comment_id: boolean;
+};
+
+export type QuestActionSubFormInternalRefs = {
+  runParticipationLimitValidator: () => void;
 };
 
 export type QuestActionSubFormProps = {
@@ -32,6 +44,7 @@ export type QuestActionSubFormProps = {
   isRemoveable?: boolean;
   onRemove?: () => void;
   hiddenActions?: QuestAction[];
+  internalRefs?: QuestActionSubFormInternalRefs;
 };
 
 export type QuestActionSubFormState = {
@@ -39,6 +52,7 @@ export type QuestActionSubFormState = {
   values: QuestActionSubFormFields;
   errors?: QuestActionSubFormErrors;
   config?: QuestActionSubFormConfig;
+  refs?: QuestActionSubFormInternalRefs;
 };
 
 export type useQuestActionMultiFormsStateProps = {

@@ -4,7 +4,6 @@ import { z } from 'zod';
 
 const {
   DATABASE_URL,
-  DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
   DISCORD_CLIENT_ID,
@@ -37,7 +36,6 @@ const {
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_CAST_WEBHOOK_ID,
   FARCASTER_ACTION_URL,
-  FLAG_FARCASTER_CONTEST,
   FARCASTER_MANIFEST_HEADER,
   FARCASTER_MANIFEST_PAYLOAD,
   FARCASTER_MANIFEST_SIGNATURE,
@@ -69,9 +67,6 @@ export const config = configure(
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
-      CLEAN_HOUR: DATABASE_CLEAN_HOUR
-        ? parseInt(DATABASE_CLEAN_HOUR, 10)
-        : undefined,
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
@@ -93,7 +88,6 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
-      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
@@ -164,6 +158,8 @@ export const config = configure(
     OPENAI: {
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
@@ -184,7 +180,6 @@ export const config = configure(
         ),
       NAME: z.string(),
       NO_SSL: z.boolean(),
-      CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
@@ -212,7 +207,6 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
-      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
       FARCASTER_NGROK_DOMAIN: z.string().nullish(),
       NEYNAR_BOT_UUID: z
         .string()
@@ -362,6 +356,8 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+      USE_OPENROUTER: z.string().optional(),
+      OPENROUTER_API_KEY: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z

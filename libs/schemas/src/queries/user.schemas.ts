@@ -141,8 +141,8 @@ export const GetUserReferralFees = {
 
 export const XpLogView = XpLog.extend({
   user_profile: UserProfile,
-  quest_id: PG_INT,
-  quest_action_meta_id: PG_INT,
+  quest_id: z.number(),
+  quest_action_meta_id: z.number(),
   event_name: z.string(),
   creator_profile: UserProfile.nullish(),
 });
@@ -150,6 +150,9 @@ export const XpLogView = XpLog.extend({
 export const GetXps = {
   input: z.object({
     user_id: PG_INT.optional().describe('Filters events by user id'),
+    user_or_creator_id: PG_INT.optional().describe(
+      'Filters events by user or creator id',
+    ),
     community_id: z
       .string()
       .optional()

@@ -9,17 +9,23 @@
     align-items: center;
     margin-bottom: 16px;
 
+    .see-all-link {
+      cursor: pointer;
+      color: $primary-500;
+      text-decoration: none;
+
+      &:focus,
+      &:active,
+      &:hover,
+      &:visited {
+        outline: none;
+        text-decoration: none;
+      }
+    }
+
     .link-right {
       display: flex;
       gap: 4px;
-
-      .link {
-        &:hover,
-        &:active,
-        &:visited {
-          color: $primary-600;
-        }
-      }
     }
   }
 
