@@ -162,7 +162,9 @@ export async function getFromTwitter({
   const parsedQueryParams: Record<string, string> = Object.fromEntries(
     Object.entries(queryParams).map(([key, value]) => [
       key,
-      value instanceof Date ? value.toISOString() : value.toString(),
+      value instanceof Date
+        ? value.toISOString().replace(/\.\d{3}Z$/, 'Z')
+        : value.toString(),
     ]),
   );
 
@@ -273,7 +275,7 @@ export async function getFromTwitterWrapper<
       throw e;
     }
 
-    console.log('res.jsonBody', res.jsonBody);
+    console.log('>>>>>>>>', res.jsonBody);
     const parsedRes = responseSchema.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;

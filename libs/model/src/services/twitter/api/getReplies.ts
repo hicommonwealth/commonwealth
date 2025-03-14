@@ -2,6 +2,7 @@ import { GetRepliesResponse } from '@hicommonwealth/schemas';
 import { TwitterBotConfig } from '../types';
 import { getFromTwitterWrapper } from '../utils';
 
+// https://docs.x.com/x-api/posts/recent-search
 export async function getReplies({
   twitterBotConfig,
   tweetId,
@@ -17,6 +18,7 @@ export async function getReplies({
       'tweet.fields': 'author_id,created_at,conversation_id',
       expansions: 'author_id',
       'user.fields': 'username',
+      sort_order: 'recency',
     },
     oauthMethod: 'oauth2',
     responseSchema: GetRepliesResponse,

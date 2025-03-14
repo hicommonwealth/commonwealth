@@ -129,9 +129,6 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       const queryTweet = tweetsToQuery.find((q) => q.tweet_id === t.id);
       if (!queryTweet) throw new Error('Tweet not found');
 
-      const retweetCount =
-        t.public_metrics.retweet_count + t.public_metrics.quote_count;
-
       tweetUpdates.num_likes.push({
         newValue:
           t.public_metrics.like_count >= queryTweet.like_cap!
@@ -149,9 +146,9 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       });
       tweetUpdates.num_retweets.push({
         newValue:
-          retweetCount >= queryTweet.retweet_cap!
+          t.public_metrics.retweet_count >= queryTweet.retweet_cap!
             ? queryTweet.retweet_cap!
-            : retweetCount,
+            : t.public_metrics.retweet_count,
         whenCaseValue: t.id,
       });
 
@@ -160,7 +157,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       if (
         t.public_metrics.like_count >= queryTweet.like_cap! &&
         t.public_metrics.reply_count >= queryTweet.replies_cap! &&
-        retweetCount >= queryTweet.retweet_cap!
+        t.public_metrics.retweet_count >= queryTweet.retweet_cap!
       ) {
         endedAt = new Date();
       }
