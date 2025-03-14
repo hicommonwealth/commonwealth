@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { authVerified } from '../../middleware';
+import { authVerified } from '../../middleware/auth';
 import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';

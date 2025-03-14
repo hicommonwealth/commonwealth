@@ -309,7 +309,7 @@ export const DeleteAddress = {
     community_id: z.string(),
     address: z.string(),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const DeleteAllAddresses = {
@@ -353,6 +353,7 @@ export const SelectCommunity = {
     community_id: z.string(),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const JoinCommunity = {
@@ -367,6 +368,7 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const BanAddress = {
