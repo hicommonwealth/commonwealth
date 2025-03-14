@@ -418,11 +418,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         if (!contest?.creator_address) return;
 
         // make sure contest was funded
-        const prize = payload.winners.reduce(
+        const total_prize = payload.winners.reduce(
           (prize, winner) => prize + Number(winner.prize),
           0,
         );
-        if (prize <= 0) return;
+        if (total_prize <= 0) return;
 
         const user_id = await getUserByAddress(contest.creator_address);
         if (!user_id) return;
@@ -439,7 +439,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at!,
           action_metas,
           undefined,
-          { amount: prize },
+          { amount: total_prize },
         );
       },
       LaunchpadTokenCreated: async ({ payload }) => {
