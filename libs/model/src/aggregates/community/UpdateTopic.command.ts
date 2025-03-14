@@ -67,9 +67,6 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
       if (typeof default_community_template !== 'undefined') {
         topic.default_offchain_template = default_community_template || '';
       }
-      if (typeof default_community_template !== 'undefined') {
-        topic.default_offchain_template = default_community_template || '';
-      }
       if (typeof allow_tokenized_threads !== 'undefined') {
         topic.allow_tokenized_threads = allow_tokenized_threads || false;
       }
