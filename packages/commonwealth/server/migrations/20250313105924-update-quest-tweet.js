@@ -34,6 +34,9 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.removeColumn('QuestTweets', 'ended_at', {
+        transaction,
+      });
     });
   },
 
@@ -47,6 +50,10 @@ module.exports = {
       });
       await queryInterface.removeColumn('QuestTweets', 'like_xp_awarded', {
         transaction,
+      });
+      await queryInterface.addColumn('QuestTweets', 'ended_at', {
+        type: Sequelize.DATE,
+        allowNull: true,
       });
     });
   },
