@@ -283,7 +283,7 @@ export class Thread implements IUniqueId {
       ? moment(t.last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
         ? moment(this.versionHistory[0].timestamp)
-        : t.updated_at
+        : t.updated_at && moment(t.updated_at).isAfter(moment(t.created_at))
           ? moment(t.updated_at)
           : undefined;
     this.markedAsSpamAt = t.marked_as_spam_at
