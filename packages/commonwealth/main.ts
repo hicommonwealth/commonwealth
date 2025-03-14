@@ -121,13 +121,17 @@ export async function main(
     withLoggingMiddleware &&
       app.use(
         pinoHttp({
-          logger: pino({
-            formatters: {
-              level: (label: string) => {
-                return { level: label.toUpperCase() };
-              },
-            },
-          }),
+          ...(config.APP_ENV === 'production'
+            ? {
+                logger: pino({
+                  formatters: {
+                    level: (label: string) => {
+                      return { level: label.toUpperCase() };
+                    },
+                  },
+                }),
+              }
+            : {}),
           quietReqLogger: false,
           customLogLevel: function (_, res, err) {
             if (res.statusCode >= 400 && res.statusCode < 500) {
