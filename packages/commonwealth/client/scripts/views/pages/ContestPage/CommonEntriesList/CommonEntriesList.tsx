@@ -45,7 +45,9 @@ export const CommonEntriesList = ({
   const isActive = isContestActive({
     contest: {
       cancelled: Boolean(contest?.cancelled),
-      contests: [{ end_time: new Date(contest?.contests?.[0]?.end_time || '') }],
+      contests: [
+        { end_time: new Date(contest?.contests?.[0]?.end_time || '') },
+      ],
     },
   });
 
