@@ -1,14 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
-
-const client = OpenFeature.getClient();
-const farcasterContestEnabled = client.getBooleanValue(
-  'farcasterContest',
-  false,
-);
 
 export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
   return z.object({
@@ -29,7 +22,7 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
       .optional()
       .refine(
         (value) => {
-          if (farcasterContestEnabled && isFarcasterContest) {
+          if (isFarcasterContest) {
             return true;
           }
 
@@ -50,7 +43,7 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
       .nullable()
       .refine(
         (value) => {
-          if (farcasterContestEnabled && isFarcasterContest && !value) {
+          if (isFarcasterContest && !value) {
             return false;
           }
           return true;

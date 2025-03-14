@@ -173,8 +173,8 @@ const NotificationSettings = () => {
             <CommentSubscriptions />
           </>
         )}
+        <ReactNativeAboutSection />
       </div>
-      <ReactNativeAboutSection />
     </CWPageLayout>
   );
 };
