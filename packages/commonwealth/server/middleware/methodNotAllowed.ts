@@ -12,6 +12,8 @@ const routesMethods: { [key: string]: string[] } = {};
 
 type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
 
+const invocationCounts: Record<string, number> = {};
+
 // middleware to capture route traffic and latency
 const statsMiddleware = (method: string, path: string) => (req, res, next) => {
   try {
@@ -20,12 +22,18 @@ const statsMiddleware = (method: string, path: string) => (req, res, next) => {
       path: routePattern,
     });
     const start = Date.now();
+    if (!invocationCounts[routePattern]) invocationCounts[routePattern] = 0;
+
     res.on('finish', () => {
       const latency = Date.now() - start;
-      stats().histogram(`cw.path.latency`, latency, {
-        path: routePattern,
-        statusCode: `${res.statusCode}`,
-      });
+      invocationCounts[routePattern]++;
+      if (invocationCounts[routePattern] === 3) {
+        invocationCounts[routePattern] = 0;
+        stats().histogram(`cw.path.latency`, latency, {
+          path: routePattern,
+          statusCode: `${res.statusCode}`,
+        });
+      }
     });
   } catch (err) {
     console.error(err);
