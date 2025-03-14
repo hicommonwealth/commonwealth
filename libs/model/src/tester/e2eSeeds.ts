@@ -205,6 +205,7 @@ export const e2eTestEntities = async function (
                   reaction_count: 0,
                   reaction_weights_sum: '0',
                   comment_count: 0,
+                  is_linking_token: false,
                   search: getThreadSearchVector(
                     `testThread Title ${-i - 1}`,
                     `testThread Body ${-i - 1}`,
@@ -237,6 +238,7 @@ export const e2eTestEntities = async function (
                   reaction_count: 0,
                   reaction_weights_sum: '0',
                   comment_count: 0,
+                  is_linking_token: false,
                   search: getThreadSearchVector(
                     `testThread Title ${-i - 1 - 2}`,
                     `testThread Body ${-i - 1 - 2}`,

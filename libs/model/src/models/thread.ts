@@ -103,6 +103,12 @@ export default (
         allowNull: false,
       },
       content_url: { type: Sequelize.STRING, allowNull: true },
+      is_linking_token: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      launchpad_token_address: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
