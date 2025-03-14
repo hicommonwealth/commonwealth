@@ -42,6 +42,7 @@ import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { EIP1193Provider } from 'viem';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -117,7 +118,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
             `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
-          );
+          ) as unknown as EIP1193Provider;
         })
         .catch(console.error);
     }

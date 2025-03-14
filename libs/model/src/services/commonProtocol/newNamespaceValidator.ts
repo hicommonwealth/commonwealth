@@ -1,10 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
-  commonProtocol,
   decodeParameters,
   getNamespace,
   getTransactionReceipt,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
@@ -56,11 +56,7 @@ export const validateNamespace = async (
   }
 
   const chain_id = chainNode.eth_chain_id;
-  const factoryData =
-    commonProtocol.factoryContracts[chain_id as commonProtocol.ValidChains];
-  if (!factoryData) {
-    throw new AppError('Namespace not supported on selected chain');
-  }
+  mustBeProtocolChainId(chain_id);
 
   //tx data validation
   const { txReceipt } = await getTransactionReceipt({
@@ -76,9 +72,8 @@ export const validateNamespace = async (
 
   //validate contract data
   const activeNamespace = await getNamespace(
-    chainNode.private_url,
+    { rpc: chainNode.private_url, eth_chain_id: chain_id },
     namespace,
-    factoryData.factory,
   );
 
   let namespaceAddress: string | undefined;
