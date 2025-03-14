@@ -147,7 +147,6 @@ async function findVerifiedAddress(
       verified: { [Op.ne]: null },
       // TODO: check verification token expiration
     },
-    order: [['role', 'DESC']],
   });
 
   if (address) {
