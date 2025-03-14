@@ -53,7 +53,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     <div className="XpQuestList">
       <div className="heading-container">
         <CWText type="h2">XP Quests</CWText>
-        <Link to={`/${app.activeChainId()}/quests`}>
+        <Link to={`/${app.activeChainId()}/quests`} className="see-all-link">
           <div className="link-right">
             <CWText className="link">See all quests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
@@ -62,7 +62,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
       </div>
       <>
         {!isInitialLoading && quests.length === 0 && (
-          <CWText type="h2" className="empty-quests">
+          <CWText type="h2" className="empty-quests" isCentered>
             No quests found
           </CWText>
         )}

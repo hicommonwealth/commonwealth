@@ -1,12 +1,10 @@
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+// eslint-disable-next-line max-len
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-// eslint-disable-next-line max-len
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-// eslint-disable-next-line max-len
-import { useSubscriptionPreferenceSetting } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
 // eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 import './NotificationModal.scss';
@@ -15,22 +13,36 @@ type NotificationModalProps = {
   onComplete: () => void;
 };
 
-const NotificationModal = ({ onComplete }: NotificationModalProps) => {
-  const checked = useSubscriptionPreferenceSetting(
-    'mobile_push_notifications_enabled',
-  );
-
+/**
+ * Forcibly turn on mobile notifications when the device is a new mobile
+ * installation.
+ *
+ * Note that this should ALWAYS force the user to turn on push notifications
+ * because, while the cloud settings could be enabled for the user's account,
+ * they might not have permissions locally.
+ *
+ * Even if they DO have permissions enabled, which is probably false, we should
+ * ask again.
+ *
+ * The only way it would not be the case is if their localStorage was reset.
+ */
+export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
   const activate = useSubscriptionPreferenceSettingToggle([
     'mobile_push_notifications_enabled',
     'mobile_push_discussion_activity_enabled',
     'mobile_push_admin_alerts_enabled',
   ]);
 
-  const [enableNotifications, setEnableNotification] = useState(checked);
+  const [enableNotifications, setEnableNotification] = useState(false);
 
-  useEffect(() => {
-    setEnableNotification(checked);
-  }, [checked]);
+  const handleActivate = useCallback(() => {
+    async function doAsync() {
+      await activate(true);
+      setEnableNotification(true);
+    }
+
+    doAsync().catch(console.error);
+  }, [activate]);
 
   return (
     <section className="NotificationModal">
@@ -40,7 +52,7 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
       <button
         className={`notificationButton ${enableNotifications ? 'enabled' : ''}`}
         onClick={() => {
-          activate(!checked);
+          handleActivate();
         }}
       >
         <CWIcon iconSize="large" iconName="bellRinging" />
@@ -58,7 +70,7 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
           <CWCheckbox
             checked={enableNotifications}
             onChange={() => {
-              activate(!checked);
+              handleActivate();
             }}
           />
         </div>
@@ -90,5 +102,3 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
     </section>
   );
 };
-
-export { NotificationModal };
