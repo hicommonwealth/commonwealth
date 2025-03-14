@@ -8,7 +8,6 @@ import {
 import axios from 'axios';
 import {
   LocalStorageKeys,
-  removeLocalStorageItem,
   setLocalStorageItem,
 } from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
@@ -17,6 +16,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { getUniqueUserAddresses } from 'helpers/user';
 import { useFlag } from 'hooks/useFlag';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
@@ -33,6 +33,7 @@ import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { AuthModalType } from 'views/modals/AuthModal';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/RewardsPage/types';
 import { mobileTabParam } from '../../pages/RewardsPage/utils';
@@ -63,7 +64,6 @@ export const handleLogout = async () => {
     darkModeStore.getState().setDarkMode(false);
     setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
     setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
-    removeLocalStorageItem(LocalStorageKeys.HasMobileAppOnboarded);
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();
@@ -106,7 +106,8 @@ const useUserMenuItems = ({
   const { selectedAddress, setSelectedAddress } =
     useManageCommunityStakeModalStore();
 
-  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+  const { checkForSessionKeyRevalidationErrors, setAuthModalType } =
+    useAuthModalStore();
 
   const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
     [],
@@ -348,6 +349,9 @@ const useUserMenuItems = ({
           clearSetGatingGroupBannerForCommunities();
           clearSetAdminOnboardingCardVisibilityForCommunities();
           await handleLogout();
+          if (isMobileApp()) {
+            setAuthModalType(AuthModalType.SignIn);
+          }
         },
       },
     ] as PopoverMenuItem[],

@@ -1,5 +1,5 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { NavigateOptions, To } from 'react-router-dom';
 import {
   Navigate as ReactNavigate,
@@ -60,14 +60,17 @@ export const useCommonNavigate = () => {
    *  To navigate without prefix whatsoever, the null has to be passed.
    *  navigate("/privacy", {}, null)
    */
-  return (url: To, options?: NavigateOptions, prefix?: null | string) => {
-    if (prefix && prefix.startsWith('/')) {
-      console.warn('Prefix should not start with slash character!');
-    }
+  return useCallback(
+    (url: To, options?: NavigateOptions, prefix?: null | string) => {
+      if (prefix && prefix.startsWith('/')) {
+        console.warn('Prefix should not start with slash character!');
+      }
 
-    const scopePrefix = getScopePrefix(prefix);
-    return navigate(`${scopePrefix}${url}`, options);
-  };
+      const scopePrefix = getScopePrefix(prefix);
+      return navigate(`${scopePrefix}${url}`, options);
+    },
+    [navigate],
+  );
 };
 
 // This helper should be used as a wrapper to Class Components

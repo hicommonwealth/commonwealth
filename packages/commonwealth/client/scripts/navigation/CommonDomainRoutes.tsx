@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -174,6 +175,13 @@ const CommonDomainRoutes = () => [
     path="/home"
     element={withLayout(HomePage, { type: 'common' })}
   />,
+
+  <Route
+    key="/mobile-signin"
+    path="/mobile-signin"
+    element={withLayout(MobileSignIn, { type: 'common' })}
+  />,
+
   <Route
     key="/createCommunity"
     path="/createCommunity"
