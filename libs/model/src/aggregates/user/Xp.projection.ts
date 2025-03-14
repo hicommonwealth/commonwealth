@@ -106,6 +106,7 @@ async function recordXpsForQuest(
     topic_id?: number;
     thread_id?: number;
     comment_id?: number;
+    sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
   },
 ) {
@@ -123,7 +124,8 @@ async function recordXpsForQuest(
           (scoped === 'chain' && +id !== scope?.chain_id) ||
           (scoped === 'topic' && +id !== scope?.topic_id) ||
           (scoped === 'thread' && +id !== scope?.thread_id) ||
-          (scoped === 'comment' && +id !== scope?.comment_id)
+          (scoped === 'comment' && +id !== scope?.comment_id) ||
+          (scoped === 'sso' && id !== scope?.sso)
         )
           continue;
       }
@@ -477,13 +479,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       SSOLinked: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
           payload,
-          'WalletLinked',
+          'SSOLinked',
           payload.new_user ? -1 : undefined, // first user linking is system quest
         );
         await recordXpsForQuest(
           payload.user_id,
           payload.created_at,
           action_metas,
+          undefined,
+          { sso: payload.oauth_provider },
         );
       },
       NamespaceLinked: async ({ payload }) => {
