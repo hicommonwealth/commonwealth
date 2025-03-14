@@ -7,6 +7,7 @@ import {
   DefaultPage,
   bech32ToHex,
 } from '@hicommonwealth/shared';
+import { tiered } from 'model/src/middleware';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
@@ -45,7 +46,7 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [],
+    auth: [tiered({ creates: true })],
     body: async ({ actor, payload }) => {
       const {
         id,

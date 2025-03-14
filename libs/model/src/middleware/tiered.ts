@@ -137,10 +137,12 @@ export function tiered({
         throw new InvalidActor(actor, 'Exceeded upvote limit');
     }
     if (ai.images) {
+      // TODO: add tiered to ai image creation
       // load amount of ai images created in the last hour
       // compare with tier limits, throwing error if exceeded
     }
     if (ai.text) {
+      // TODO: add tiered to ai text creation
       // load amount of ai text generated in the last hour
       // compare with tier limits, throwing error if exceeded
     }
