@@ -17,6 +17,7 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
 import path, { dirname } from 'path';
+import pino from 'pino';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
@@ -120,17 +121,38 @@ export async function main(
     withLoggingMiddleware &&
       app.use(
         pinoHttp({
-          quietReqLogger: false,
-          transport: {
-            target: 'pino-http-print',
-            options: {
-              destination: 1,
-              all: false,
-              colorize: true,
-              relativeUrl: true,
-              translateTime: 'HH:MM:ss.l',
+          logger: pino({
+            formatters: {
+              level: (label: string) => {
+                return { level: label.toUpperCase() };
+              },
             },
+          }),
+          quietReqLogger: false,
+          customLogLevel: function (_, res, err) {
+            if (res.statusCode >= 400 && res.statusCode < 500) {
+              return 'warn';
+            } else if (res.statusCode >= 500 || err) {
+              return 'error';
+            }
+
+            if (config.APP_ENV === 'production') return 'silent';
+            else return 'info';
           },
+          ...(config.APP_ENV !== 'production'
+            ? {
+                transport: {
+                  target: 'pino-http-print',
+                  options: {
+                    destination: 1,
+                    all: false,
+                    colorize: true,
+                    relativeUrl: true,
+                    translateTime: 'HH:MM:ss.l',
+                  },
+                },
+              }
+            : {}),
         }),
       );
 
