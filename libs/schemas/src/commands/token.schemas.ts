@@ -40,7 +40,7 @@ export const GetLaunchpadTrades = {
     .nullish(),
 };
 
-export const GetAllowTokenizedThreads = {
+export const GetTokenizedThreadsAllowed = {
   input: z.object({
     community_id: z.string(),
     topic_id: z.number(),

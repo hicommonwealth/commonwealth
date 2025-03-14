@@ -3,11 +3,11 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 
-export function GetAllowTokenizedThreads(): Query<
-  typeof schemas.GetAllowTokenizedThreads
+export function GetTokenizedThreadsAllowed(): Query<
+  typeof schemas.GetTokenizedThreadsAllowed
 > {
   return {
-    ...schemas.GetAllowTokenizedThreads,
+    ...schemas.GetTokenizedThreadsAllowed,
     auth: [],
     body: async ({ payload }) => {
       const { community_id, topic_id } = payload;

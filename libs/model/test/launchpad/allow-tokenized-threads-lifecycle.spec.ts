@@ -2,7 +2,7 @@ import { command, dispose, query } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { UpdateCommunity, UpdateTopic } from '../../src/aggregates/community';
-import { GetAllowTokenizedThreads } from '../../src/aggregates/token';
+import { GetTokenizedThreadsAllowed } from '../../src/aggregates/token';
 import { seed } from '../../src/tester';
 
 describe('allow_tokenized_threads lifecycle', () => {
@@ -45,8 +45,8 @@ describe('allow_tokenized_threads lifecycle', () => {
     await dispose()();
   });
 
-  async function GetAllowTokenizedThreadsResult() {
-    const results = await query(GetAllowTokenizedThreads(), {
+  async function GetTokenizedThreadsAllowedResult() {
+    const results = await query(GetTokenizedThreadsAllowed(), {
       actor,
       payload: {
         community_id,
@@ -58,7 +58,7 @@ describe('allow_tokenized_threads lifecycle', () => {
   }
 
   test('Should return false if both community and topic are false', async () => {
-    expect(await GetAllowTokenizedThreadsResult()).to.eq(false);
+    expect(await GetTokenizedThreadsAllowedResult()).to.eq(false);
   });
 
   test('Should return true if both community is true regardless of topic', async () => {
@@ -70,7 +70,7 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetAllowTokenizedThreadsResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
 
     await command(UpdateTopic(), {
       actor,
@@ -81,7 +81,7 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetAllowTokenizedThreadsResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
 
     await command(UpdateCommunity(), {
       actor,
@@ -91,6 +91,6 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetAllowTokenizedThreadsResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
   });
 });

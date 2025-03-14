@@ -7,8 +7,8 @@ export const trpcRouter = trpc.router({
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token),
   getToken: trpc.query(Token.GetLaunchpadToken, trpc.Tag.Token),
   getLaunchpadTrades: trpc.query(Token.GetLaunchpadTrades, trpc.Tag.Token),
-  getAllowTokenizedThreads: trpc.query(
-    Token.GetAllowTokenizedThreads,
+  geTokenizedThreadsAllowed: trpc.query(
+    Token.GetTokenizedThreadsAllowed,
     trpc.Tag.Token,
   ),
 });
