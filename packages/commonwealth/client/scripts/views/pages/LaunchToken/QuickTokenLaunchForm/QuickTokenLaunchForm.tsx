@@ -178,6 +178,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                size: '256x256',
               });
           }
 
