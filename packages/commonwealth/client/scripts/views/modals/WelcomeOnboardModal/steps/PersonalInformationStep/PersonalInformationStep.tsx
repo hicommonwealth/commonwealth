@@ -112,7 +112,8 @@ const PersonalInformationStep = ({
     // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
-    setIsUserNameChangeDisabled(false);
+    // Auto-select the generated username
+    setIsUserNameChangeDisabled(true);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +121,9 @@ const PersonalInformationStep = ({
     if (value === '' && formMethodsRef.current) {
       formMethodsRef.current.setValue('enableAccountNotifications', false);
       formMethodsRef.current.setValue('enableProductUpdates', false);
+    } else if (value !== '' && formMethodsRef.current) {
+      // Auto-enable account notifications when email is provided
+      formMethodsRef.current.setValue('enableAccountNotifications', true);
     }
   };
 
@@ -167,7 +171,7 @@ const PersonalInformationStep = ({
       className="PersonalInformationStep"
       validationSchema={personalInformationFormValidation}
       initialValues={{
-        enableAccountNotifications: false,
+        enableAccountNotifications: true,
         enableProductUpdates: false,
       }}
       onSubmit={handleSubmit}
@@ -196,12 +200,12 @@ const PersonalInformationStep = ({
               disabled={isUserNameChangeDisabled}
             />
             <CWButton
-              label="Make a custom username"
+              label="Generate new username"
               buttonType="tertiary"
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
-              onClick={() => setIsUserNameChangeDisabled(false)}
+              onClick={handleGenerateUsername}
             />
           </div>
 
