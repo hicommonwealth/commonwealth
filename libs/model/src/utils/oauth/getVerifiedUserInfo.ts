@@ -1,8 +1,8 @@
 import {
   DiscordUser,
+  GetTwitterUserResponse,
   GitHubUser,
   GoogleUser,
-  TwitterUser,
 } from '@hicommonwealth/schemas';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { MagicUserMetadata } from '@magic-sdk/admin';
@@ -26,7 +26,7 @@ async function get(token: string, url: string) {
 
 async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
   const res = await get(token, 'https://api.twitter.com/2/users/me');
-  const userData = TwitterUser.parse(res);
+  const userData = GetTwitterUserResponse.parse(res);
   return {
     provider: WalletSsoSource.Twitter,
     username: userData.data.username,
