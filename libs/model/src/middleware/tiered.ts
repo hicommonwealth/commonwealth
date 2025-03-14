@@ -1,5 +1,6 @@
 import { Context, InvalidActor } from '@hicommonwealth/core';
 import moment from 'moment';
+import { QueryTypes } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { models } from '../database';
 
@@ -66,14 +67,74 @@ export function tiered({
       tier = 2;
     }
 
-    // validate tier
+    // validate tier TODO: cache sliding window?
     if (creates) {
       // load amount of content created in the last hour
+      const [{ last_creates }] = await models.sequelize.query<{
+        last_creates: number;
+      }>(
+        `
+        WITH
+        threads AS (
+          SELECT COUNT(T.*) as c 
+          FROM
+            "Threads" T
+            JOIN "Addresses" A ON A."id" = T."address_id"
+          WHERE 
+            A."user_id" = :user_id AND
+            T."created_at" >= NOW() - INTERVAL '1 hour'
+        ),
+        comments AS (
+          SELECT COUNT(C.*) as c 
+          FROM
+            "Comments" C
+            JOIN "Addresses" A ON A."id" = C."address_id"
+          WHERE
+            A."user_id" = :user_id AND
+            C."created_at" >= NOW() - INTERVAL '1 hour'
+        ),
+        communities AS (
+          SELECT COUNT(C.*) as c 
+          FROM
+            "Addresses" A
+            JOIN "Communities" C ON C."id" = A."community_id"
+          WHERE
+            A."user_id" = :user_id AND
+            A.role = "admin" AND -- proxy to community creator
+            C."created_at" >= NOW() - INTERVAL '1 hour'
+        )
+        SELECT threads.c + comments.c + communities.c as c
+        `,
+        {
+          type: QueryTypes.SELECT,
+          raw: true,
+          replacements: { user_id: user.id },
+        },
+      );
       // compare with tier limits, throwing error if exceeded
+      if (last_creates > tierLimitsPerHour[tier].create)
+        throw new InvalidActor(actor, 'Exceeded content creation limit');
     }
     if (upvotes) {
       // load amount of upvotes in the last hour
+      const [{ last_upvotes }] = await models.sequelize.query<{
+        last_upvotes: number;
+      }>(
+        `
+        SELECT COUNT(*) as c
+        FROM "Reactions" R
+        WHERE R."created_at" >= NOW() - INTERVAL '1 hour' AND
+              R."created_by" = :user_id
+        `,
+        {
+          type: QueryTypes.SELECT,
+          raw: true,
+          replacements: { user_id: actor.user.id },
+        },
+      );
       // compare with tier limits, throwing error if exceeded
+      if (last_upvotes > tierLimitsPerHour[tier].upvote)
+        throw new InvalidActor(actor, 'Exceeded upvote limit');
     }
     if (ai.images) {
       // load amount of ai images created in the last hour
