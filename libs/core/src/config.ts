@@ -22,9 +22,9 @@ const AppEnvironments = [
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
+type UnionToIntersection<U> = (
+  U extends unknown ? (k: U) => void : never
+) extends (k: infer I) => void
   ? I
   : never;
 
