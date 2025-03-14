@@ -72,10 +72,12 @@ export const GetTwitterMentionsTimelineResponse = GetResponseBase.extend({
     };
 
   const userMap = new Map(org.includes.users.map((user) => [user.id, user]));
+  const username = userMap.get(org.data[0].author_id)?.username;
+  if (!username) throw new Error('Could not find username');
 
   const enrichedData = org.data.map((reply) => ({
     ...reply,
-    username: userMap.get(reply.author_id)?.username!,
+    username,
   }));
 
   return {
@@ -155,10 +157,12 @@ export const GetRepliesResponse = GetResponseBase.extend({
     };
 
   const userMap = new Map(org.includes.users.map((user) => [user.id, user]));
+  const username = userMap.get(org.data[0].author_id)?.username;
+  if (!username) throw new Error('Could not find username');
 
   const enrichedData = org.data.map((reply) => ({
     ...reply,
-    username: userMap.get(reply.author_id)?.username!,
+    username,
   }));
 
   return {
