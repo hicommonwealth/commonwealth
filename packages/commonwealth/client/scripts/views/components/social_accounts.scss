@@ -10,6 +10,7 @@
     fill: $neutral-500;
     transition: fill 0.2s ease-in-out;
     margin: 0 8px 8px 8px;
+    cursor: pointer;
 
     &:hover {
       fill: $neutral-700;

@@ -296,6 +296,7 @@ const ReactQuillEditor = ({
     setLinkText('');
     setLinkUrl('');
   };
+
   const handleLinkModalClose = () => {
     const editor = editorRef?.current?.getEditor();
     if (!editor) {
@@ -310,6 +311,7 @@ const ReactQuillEditor = ({
     setLinkText('');
     setLinkUrl('');
   };
+
   return (
     <div className="CWEditor">
       {label && <MessageRow label={label} />}
