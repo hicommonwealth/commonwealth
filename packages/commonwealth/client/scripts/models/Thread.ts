@@ -214,7 +214,7 @@ export class Thread implements IUniqueId {
   public readonly latestActivity?: Moment;
   public contentUrl?: string | null;
   public isLinkingToken?: boolean;
-  public tokenAddress?: string | null;
+  public launchpadTokenAddress?: string | null;
 
   public readonly profile: UserProfile;
 
@@ -323,7 +323,7 @@ export class Thread implements IUniqueId {
     );
     this.contentUrl = t.content_url;
     this.isLinkingToken = t.is_linking_token;
-    this.tokenAddress = t.token_address;
+    this.launchpadTokenAddress = t.launchpad_token_address;
 
     this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>

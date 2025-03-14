@@ -108,7 +108,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      token_address: { type: Sequelize.STRING, allowNull: true },
+      launchpad_token_address: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

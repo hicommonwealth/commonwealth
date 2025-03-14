@@ -54,7 +54,7 @@ export function mapProfileThread(thread): Thread {
     ContestActions: thread.associatedContests ?? [],
     numberOfComments: thread.numberOfComments,
     is_linking_token: thread.isLinkingToken,
-    token_address: thread.tokenAddress,
+    launchpad_token_address: thread.tokenAddress,
     recentComments:
       thread.recentComments?.map((c) => ({
         id: c.id ?? 0,

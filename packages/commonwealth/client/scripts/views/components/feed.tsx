@@ -181,7 +181,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     is_linking_token: thread.is_linking_token,
-    token_address: thread.token_address ?? undefined,
+    launchpad_token_address: thread.launchpad_token_address ?? undefined,
     recentComments:
       thread.recent_comments?.map((c) => ({
         id: c.id,

@@ -224,8 +224,8 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                 ),
               }
             : {};
-        const tokenAddress = payload.token_address && {
-          token_address: payload.token_address,
+        const tokenAddress = payload.launchpad_token_address && {
+          launchpad_token_address: payload.launchpad_token_address,
         };
         await thread.update(
           {

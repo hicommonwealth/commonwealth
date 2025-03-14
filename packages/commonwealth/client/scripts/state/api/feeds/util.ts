@@ -29,7 +29,7 @@ type ActivityResponse = {
     topic: Topic;
     community_id: string;
     is_linking_token: boolean;
-    token_address?: string;
+    launchpad_token_address?: string;
   };
   recentcomments?: [];
 };
@@ -58,7 +58,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         locked_at: x.thread.locked_at,
         has_poll: x.thread.has_poll,
         is_linking_token: x.thread.is_linking_token,
-        token_address: x.thread.token_address,
+        launchpad_token_address: x.thread.launchpad_token_address,
         Address: {
           id: 0,
           address: x.thread.user_address,

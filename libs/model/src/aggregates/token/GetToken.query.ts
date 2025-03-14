@@ -25,7 +25,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
       }
 
       const threadTokenSql = `
-        LEFT JOIN "Threads" AS TT ON TT.token_address = T.token_address
+        JOIN "Threads" AS TT ON TT.launchpad_token_address = T.token_address
         WHERE TT.thread_id = :threadId
       `;
 

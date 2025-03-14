@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
         'Threads',
-        'token_address',
+        'launchpad_token_address',
         {
           type: Sequelize.STRING,
           allowNull: true,
@@ -41,7 +41,7 @@ module.exports = {
         transaction,
       });
 
-      await queryInterface.removeColumn('Threads', 'token_address', {
+      await queryInterface.removeColumn('Threads', 'launchpad_token_address', {
         transaction,
       });
     });

@@ -64,7 +64,7 @@ export const Thread = z.object({
 
   search: z.union([z.string(), z.record(z.any())]),
   is_linking_token: z.boolean(),
-  token_address: z.string().nullish(),
+  launchpad_token_address: z.string().nullish(),
 
   // associations
   Address: Address.nullish(),

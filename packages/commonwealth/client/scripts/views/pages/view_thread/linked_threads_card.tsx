@@ -63,7 +63,7 @@ export const LinkedThreadsCard = ({
                       stage: t.stage,
                       title: t.title,
                       is_linking_token: t.is_linking_token,
-                      token_address: t.token_address,
+                      launchpad_token_address: t.launchpad_token_address,
                       created_at: t.created_at,
                       updated_at: t.updated_at,
                     });
