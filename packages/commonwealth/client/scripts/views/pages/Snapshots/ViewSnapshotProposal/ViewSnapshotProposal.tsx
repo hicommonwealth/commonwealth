@@ -44,6 +44,7 @@ const ViewSnapshotProposal = ({
   identifier,
   snapshotId,
 }: ViewSnapshotProposalProps) => {
+  console.log('snapshot', { identifier, snapshotId });
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -143,7 +144,6 @@ const ViewSnapshotProposal = ({
     loadVotes(identifier).catch(console.error);
   }, [proposalsData, spaceData, identifier, loadVotes]);
 
-  console.log({ proposal, space, votes });
   if (!proposal || !space) {
     return (
       <CWPageLayout>
@@ -154,7 +154,17 @@ const ViewSnapshotProposal = ({
       </CWPageLayout>
     );
   }
-
+  console.log('Snaphot data', {
+    proposal,
+    threads,
+    votes,
+    space,
+    totals,
+    validatedAgainstStrategies,
+    proposalAuthor,
+    activeUserAddress,
+    totalScore,
+  });
   return (
     <CWPageLayout>
       <CWContentPage

@@ -34,6 +34,7 @@ const VotingUI: React.FC<VotingUIProps> = ({
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
     }
   };
+
   return (
     <div className="poll-container">
       <CWText type="h5" fontWeight="semiBold">
@@ -50,20 +51,20 @@ const VotingUI: React.FC<VotingUIProps> = ({
         <CWText type="b2" className="poll-title">
           {proposalTitle}
         </CWText>
-        {!hasVoted && !canVote && (
-          <div className="voting-options">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                className={`option ${selectedOption === option.value ? 'selected' : ''}`}
-                onClick={() => setSelectedOption(option.value)}
-                disabled={canVote || hasVoted}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        )}
+
+        <div className="voting-options">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              className={`option ${selectedOption === option.value ? 'selected' : ''}`}
+              onClick={() => setSelectedOption(option.value)}
+              disabled={canVote || hasVoted}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         {!hasVoted && !canVote && (
           <button
             className="vote-button"

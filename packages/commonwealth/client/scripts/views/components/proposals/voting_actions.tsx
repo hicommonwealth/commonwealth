@@ -182,25 +182,7 @@ export const VotingActions = ({
       return notifyError('Invalid proposal type');
     }
   };
-  // const getPct = (n: BN, voteTotal: BN) =>
-  //   voteTotal.isZero()
-  //     ? '0'
-  //     : (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
 
-  // const getVoteCounts = (proposal) => {
-  //   const { yes, no, abstain, noWithVeto } = proposal?.data?.state?.tally;
-  //   const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
-  //   console.log({ voteTotal });
-  //   if (!proposal || !proposal.tally)
-  //     return { yes: 0, no: 0, abstain: 0, veto: 0 };
-
-  //   return {
-  //     yes: getPct(yes, voteTotal) || 0,
-  //     no: getPct(no, voteTotal) || 0,
-  //     abstain: getPct(abstain, voteTotal) || 0,
-  //     veto: getPct(noWithVeto, voteTotal) || 0,
-  //   };
-  // };
   const {
     hasVotedYes,
     hasVotedNo,
@@ -209,8 +191,7 @@ export const VotingActions = ({
     hasVotedForAnyChoice,
     // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
-  // const voteCounts = getVoteCounts(proposal);
-  // console.log({ voteCounts });
+
   // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
   const yesButton = (

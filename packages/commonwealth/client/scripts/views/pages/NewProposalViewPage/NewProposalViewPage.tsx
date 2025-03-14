@@ -1,22 +1,16 @@
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { usePoolParamsQuery } from 'state/api/chainParams';
-import {
-  useCosmosProposalDepositsQuery,
-  useCosmosProposalMetadataQuery,
-  useCosmosProposalQuery,
-  useCosmosProposalTallyQuery,
-  useCosmosProposalVotesQuery,
-} from 'state/api/proposals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import type { AnyProposal } from '../../../models/types';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
@@ -26,7 +20,10 @@ import TimeLine from '../../components/proposals/TimeLine';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
+import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { JSONDisplay } from '../view_proposal/JSONDisplay';
+import { useCosmosProposal } from './useCosmosProposal';
+import { useSnapshotProposal } from './useSnapshotProposal';
 type ViewProposalPageAttrs = {
   identifier: string;
   type?: string;
@@ -37,63 +34,68 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
-  // @ts-expect-error <StrictNullChecks/>
-  const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
-  const [title, setTitle] = useState<string>(proposal?.title);
-  const [description, setDescription] = useState<string>(proposal?.description);
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
-  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
+  const snapshotId = 'aave.eth';
+
+  const snapshotProposalId =
+    '0x713989ad71340840fa1f52d6b19c00f001a967070c7a506696034f68774a1986';
   const {
-    data: cosmosProposal,
+    proposal,
+    title: proposalTitle,
+    description: proposalDescription,
+    isLoading,
+    isFetchingMetadata,
     error: cosmosError,
-    isFetching: isFetchingProposal,
-  } = useCosmosProposalQuery({
-    isApiReady: !!app.chain.apiInitialized,
-    proposalId,
+    metadata,
+  } = useCosmosProposal({ proposalId });
+  // Snapshot
+
+  // Snapshot proposal data
+  const {
+    proposal: snapshotProposal,
+    isLoading: isSnapshotLoading,
+    threads,
+    symbol,
+    votes,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    proposalAuthor,
+    activeUserAddress,
+    loadVotes,
+    power,
+  } = useSnapshotProposal({
+    identifier: snapshotProposalId,
+    snapshotId: snapshotId,
   });
-  const { data: metadata, isFetching: isFetchingMetadata } =
-    useCosmosProposalMetadataQuery(proposal);
-  const { data: poolData } = usePoolParamsQuery();
-  // @ts-expect-error <StrictNullChecks/>
-  useCosmosProposalVotesQuery(proposal, +poolData);
-  useCosmosProposalTallyQuery(proposal);
-  // @ts-expect-error <StrictNullChecks/>
-  useCosmosProposalDepositsQuery(proposal, +poolData);
+
+  console.log('Snaphot data', {
+    snapshotProposal,
+    isSnapshotLoading,
+    threads,
+    votes,
+    space,
+    totals,
+    validatedAgainstStrategies,
+    proposalAuthor,
+    activeUserAddress,
+    totalScore,
+  });
+  //COSMO
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
 
   useEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
-    setProposal(cosmosProposal);
-    // @ts-expect-error <StrictNullChecks/>
-    setTitle(cosmosProposal?.title);
-    setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
-
-  useEffect(() => {
-    if (_.isEmpty(metadata)) return;
-    setTitle(metadata?.title);
-    setDescription(metadata?.description || metadata?.summary);
-  }, [metadata]);
-
-  useEffect(() => {
-    proposal?.isFetched.once('redraw', forceRerender);
+    proposal?.isFetched?.once('redraw', forceRerender);
 
     return () => {
-      proposal?.isFetched.removeAllListeners();
+      proposal?.isFetched?.removeAllListeners();
     };
   }, [proposal, forceRerender]);
 
-  useManageDocumentTitle('View proposal', proposal?.title);
+  useManageDocumentTitle('View proposal', proposalTitle);
 
-  useNecessaryEffect(() => {
-    if (!isAdapterLoaded) {
-      app.chainAdapterReady.on('ready', () => {
-        setIsAdapterLoaded(true);
-      });
-    }
-  }, [isAdapterLoaded, proposalId]);
-
-  if (isFetchingProposal || !isAdapterLoaded) {
+  if (isLoading) {
     return <PageLoading message="Loading..." />;
   }
 
@@ -104,9 +106,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
       />
     );
   }
-
-  const proposalTitle = title || proposal?.title;
-  const proposalDescription = description || proposal?.description;
 
   // replace path with correct slug
   //   if (proposal?.slug) {
@@ -128,7 +127,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-  console.log('cosmo', proposal?.author);
   return (
     <CWPageLayout>
       <CWContentPage
@@ -151,13 +149,31 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
               <MarkdownViewerWithFallback markdown={proposalDescription} />
             </CWAccordView>
 
+            <CWAccordView title="SnapShot descrption" defaultOpen={false}>
+              <MarkdownViewerWithFallback markdown={snapshotProposal?.body} />
+            </CWAccordView>
             <VotingActions
               onModalClose={onModalClose}
+              // @ts-expect-error <StrictNullChecks/>
               proposal={proposal}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={votingModalOpen}
               redrawProposals={redrawProposals}
               proposalRedrawState={proposalRedrawState}
+            />
+            <SnapshotPollCardContainer
+              activeUserAddress={activeUserAddress}
+              fetchedPower={!!power}
+              identifier={identifier}
+              proposal={snapshotProposal as SnapshotProposal}
+              scores={[]} // unused?
+              space={space as SnapshotSpace}
+              symbol={symbol}
+              totals={totals}
+              totalScore={totalScore}
+              validatedAgainstStrategies={validatedAgainstStrategies}
+              votes={votes}
+              loadVotes={async () => loadVotes()}
             />
           </>
         )}
@@ -165,6 +181,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         sidebarComponents={[
           { label: 'Links', item: <DetailsCard /> },
           { label: 'Links', item: <TimeLine proposalData={proposal?.data} /> },
+          // @ts-expect-error <StrictNullChecks/>
           { label: 'Results', item: <VotingResults proposal={proposal} /> },
         ]}
       />
