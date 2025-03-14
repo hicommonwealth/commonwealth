@@ -1,4 +1,3 @@
-import { stats } from '@hicommonwealth/core';
 import {
   NextFunction,
   Request,
@@ -11,35 +10,6 @@ import { ValidationChain } from 'express-validator';
 const routesMethods: { [key: string]: string[] } = {};
 
 type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
-
-const invocationCounts: Record<string, number> = {};
-
-// middleware to capture route traffic and latency
-const statsMiddleware = (method: string, path: string) => (req, res, next) => {
-  try {
-    const routePattern = `${method.toUpperCase()} ${path}`;
-    stats().increment('cw.path.called', {
-      path: routePattern,
-    });
-    const start = Date.now();
-    if (!invocationCounts[routePattern]) invocationCounts[routePattern] = 0;
-
-    res.on('finish', () => {
-      const latency = Date.now() - start;
-      invocationCounts[routePattern]++;
-      if (invocationCounts[routePattern] === 3) {
-        invocationCounts[routePattern] = 0;
-        stats().histogram(`cw.path.latency`, latency, {
-          path: routePattern,
-          statusCode: `${res.statusCode}`,
-        });
-      }
-    });
-  } catch (err) {
-    console.error(err);
-  }
-  next();
-};
 
 /**
  * Use this function to register a route on a given Express Router. This function updates an object that stores the
@@ -58,7 +28,7 @@ export const registerRoute = (
   ...handlers: RequestHandler[] | ValidateThenHandle
 ) => {
   const realPath = `/api${path}`;
-  router[method](path, statsMiddleware(method, realPath), ...handlers);
+  router[method](path, ...handlers);
   if (!routesMethods[realPath]) routesMethods[realPath] = [];
   routesMethods[realPath].push(method.toUpperCase());
 };

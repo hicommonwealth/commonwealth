@@ -1,5 +1,5 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
@@ -34,6 +34,8 @@ import setupServer from './server/scripts/setupServer';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
+
+const invocationCounts: Record<string, number> = {};
 
 /**
  * Bootstraps express app
@@ -115,6 +117,37 @@ export async function main(
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      next();
+    });
+
+    // Report stats for all routes
+    app.use((req, res, next) => {
+      try {
+        const routePattern = `${req.method.toUpperCase()} ${req.path}`;
+        stats().increment('cw.path.called', {
+          path: routePattern,
+        });
+        const start = Date.now();
+        if (!invocationCounts[routePattern]) invocationCounts[routePattern] = 0;
+
+        res.on('finish', () => {
+          const latency = Date.now() - start;
+          invocationCounts[routePattern]++;
+          if (invocationCounts[routePattern] >= 2) {
+            invocationCounts[routePattern] = 0;
+            stats().histogram(`cw.path.latency`, latency, {
+              path: routePattern,
+              statusCode: `${res.statusCode}`,
+            });
+          }
+        });
+      } catch (e) {
+        log.error('Failed to record stats', e, {
+          method: req.method,
+          path: req.path,
+          statusCode: res.statusCode,
+        });
+      }
       next();
     });
 

@@ -11,7 +11,7 @@ const PATH = '/api/integration';
 
 function build() {
   const router = Router();
-  router.use(express.statsMiddleware);
+  // router.use(express.statsMiddleware);
 
   // Chain Events integration
   router.post(
