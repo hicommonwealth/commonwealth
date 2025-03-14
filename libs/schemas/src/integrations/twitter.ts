@@ -129,7 +129,7 @@ export const GetRepliesResponse = GetResponseBase.extend({
       z.object({
         id: z.string(),
         author_id: z.string(),
-        created_at: z.string(),
+        created_at: z.coerce.date(),
         conversation_id: z.string(),
       }),
     )

@@ -85,7 +85,11 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
     const tweetsToQuery = await models.QuestTweets.findAll({
       where: {
-        ended_at: null,
+        [Op.or]: [
+          { like_xp_awarded: false },
+          { reply_xp_awarded: false },
+          { retweet_xp_awarded: false },
+        ],
       },
       // Rotates through tweets so that all tweets are updated eventually
       // even if we get rate limited occasionally

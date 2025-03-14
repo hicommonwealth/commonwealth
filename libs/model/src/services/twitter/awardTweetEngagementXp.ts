@@ -141,7 +141,12 @@ const awardTweetEngagementXp = async (
     await models.sequelize.transaction(async (transaction) => {
       await awardBatchTweetEngagementXp({
         action_meta: quest.action_metas![0],
-        twitterUsernames: replies.map((reply) => reply.username),
+        twitterUsernames: replies
+          .filter(
+            (r) =>
+              r.created_at < quest.end_date && r.created_at >= quest.start_date,
+          )
+          .map((reply) => reply.username),
         transaction,
       });
       questTweet.reply_xp_awarded = true;
