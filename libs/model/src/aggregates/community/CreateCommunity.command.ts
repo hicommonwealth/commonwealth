@@ -9,6 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { authVerified } from '../../middleware';
 import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
@@ -45,7 +46,7 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [],
+    auth: [authVerified()],
     body: async ({ actor, payload }) => {
       const {
         id,
