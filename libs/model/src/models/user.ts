@@ -49,6 +49,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
     'User',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      tier: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
       email: { type: Sequelize.STRING, allowNull: true },
       emailVerified: {
         type: Sequelize.BOOLEAN,

@@ -40,6 +40,7 @@ export const ProfileTags = z.object({
 
 export const User = z.object({
   id: PG_INT.optional(),
+  tier: z.number().int().min(0).max(5),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
