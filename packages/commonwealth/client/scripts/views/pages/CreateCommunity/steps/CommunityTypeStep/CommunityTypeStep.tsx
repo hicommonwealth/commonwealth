@@ -85,6 +85,7 @@ const CommunityTypeStep = ({
 
   const [
     baseOption,
+    solanaOption,
     blastOption,
     ethereumOption,
     skaleOption,
@@ -111,6 +112,19 @@ const CommunityTypeStep = ({
             handleCommunitySelection({
               type: baseOption.type,
               chainBase: baseOption.chainBase,
+            })
+          }
+        />
+        <CWCommunitySelector
+          key={solanaOption.type}
+          img={solanaOption.img}
+          title={solanaOption.title}
+          description={solanaOption.description}
+          isRecommended={solanaOption.isRecommended}
+          onClick={() =>
+            handleCommunitySelection({
+              type: solanaOption.type,
+              chainBase: solanaOption.chainBase,
             })
           }
         />
