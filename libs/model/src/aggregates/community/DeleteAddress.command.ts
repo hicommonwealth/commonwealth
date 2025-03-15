@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
 
 export const DeleteAddressErrors = {
@@ -14,7 +15,7 @@ export const DeleteAddressErrors = {
 export function DeleteAddress(): Command<typeof schemas.DeleteAddress> {
   return {
     ...schemas.DeleteAddress,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ actor, payload }) => {
       const { community_id, address } = payload;

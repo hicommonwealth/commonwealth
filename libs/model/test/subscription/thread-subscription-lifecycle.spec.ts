@@ -35,6 +35,7 @@ describe('Thread subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
+          verified: new Date(),
         },
       ],
       topics: [{}],
@@ -58,7 +59,7 @@ describe('Thread subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: '0x',
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

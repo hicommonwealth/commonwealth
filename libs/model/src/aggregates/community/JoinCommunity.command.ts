@@ -2,6 +2,7 @@ import { InvalidActor, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 import { emitEvent } from '../../utils/utils';
@@ -15,7 +16,7 @@ export const JoinCommunityErrors = {
 export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
   return {
     ...schemas.JoinCommunity,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ actor, payload }) => {
       const { community_id } = payload;

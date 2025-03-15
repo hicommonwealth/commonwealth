@@ -2,11 +2,12 @@ import { cache, CacheNamespaces, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Sequelize } from 'sequelize';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 
 export function DeleteApiKey(): Command<typeof schemas.DeleteApiKey> {
   return {
     ...schemas.DeleteApiKey,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ actor }) => {
       const apiKey = await models.ApiKey.findOne({

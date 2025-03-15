@@ -773,7 +773,7 @@ describe('Community lifecycle', () => {
             community_id: community.id,
           },
         }),
-      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+      ).rejects.toThrow();
     });
 
     test('should join Ethereum community with evm compatible address', async () => {

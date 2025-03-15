@@ -9,7 +9,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContext, TopicContext } from '../context';
+import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { Community } from '../entities/community.schemas';
 import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
@@ -58,6 +58,7 @@ export const CreateCommunity = {
     community: Community,
     admin_address: z.string().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const SetCommunityStake = {
@@ -308,7 +309,7 @@ export const DeleteAddress = {
     community_id: z.string(),
     address: z.string(),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const DeleteAllAddresses = {
@@ -352,6 +353,7 @@ export const SelectCommunity = {
     community_id: z.string(),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const JoinCommunity = {
@@ -366,6 +368,7 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const BanAddress = {
