@@ -410,6 +410,38 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
+      ContestEnded: async ({ payload }) => {
+        const contest = await models.ContestManager.findOne({
+          where: { contest_address: payload.contest_address },
+          attributes: ['community_id', 'creator_address'],
+        });
+        if (!contest?.creator_address) return;
+
+        // make sure contest was funded
+        const total_prize = payload.winners.reduce(
+          (prize, winner) => prize + Number(winner.prize),
+          0,
+        );
+        if (total_prize <= 0) return;
+
+        const user_id = await getUserByAddress(contest.creator_address);
+        if (!user_id) return;
+
+        const action_metas = await getQuestActionMetas(
+          {
+            community_id: contest?.community_id,
+            created_at: payload.created_at,
+          },
+          'ContestEnded',
+        );
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          undefined,
+          { amount: total_prize },
+        );
+      },
       LaunchpadTokenCreated: async ({ payload }) => {
         const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
