@@ -1,6 +1,6 @@
 import { Context, InvalidActor } from '@hicommonwealth/core';
 import moment from 'moment';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { models } from '../database';
 
@@ -44,15 +44,18 @@ export function tiered({
   return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
-    // load user tier
     const user = await models.User.findOne({
       where: { id: actor.user.id },
-      attributes: ['tier', 'created_at', 'emailVerified'],
+      attributes: ['id', 'tier', 'created_at', 'emailVerified'],
+      include: [
+        {
+          model: models.Address,
+          required: true,
+          where: { verified: { [Op.ne]: null } },
+        },
+      ],
     });
-
-    // deny tier 0 users
-    if (!user || user.tier === 0)
-      throw new InvalidActor(actor, 'Unverified user');
+    if (!user) throw new InvalidActor(actor, 'Unverified user');
 
     // upgrade tier if necessary
     let tier = user.tier;
@@ -65,45 +68,49 @@ export function tiered({
     ) {
       await models.User.update({ tier: 2 }, { where: { id: actor.user.id } });
       tier = 2;
+    } else if (tier === 0) {
+      // verified address
+      await models.User.update({ tier: 1 }, { where: { id: actor.user.id } });
+      tier = 1;
     }
 
     // validate tier TODO: cache sliding window?
     if (creates) {
-      // load amount of content created in the last hour
+      // Load amount of content created in the last hour
       const [{ last_creates }] = await models.sequelize.query<{
         last_creates: number;
       }>(
         `
         WITH
         threads AS (
-          SELECT COUNT(T.*) as c 
-          FROM
-            "Threads" T
-            JOIN "Addresses" A ON A."id" = T."address_id"
+          SELECT COALESCE(COUNT(*), 0) AS c 
+          FROM "Threads" T
+          JOIN "Addresses" A ON A."id" = T."address_id"
           WHERE 
-            A."user_id" = :user_id AND
-            T."created_at" >= NOW() - INTERVAL '1 hour'
+            A."user_id" = :user_id 
+            AND T."created_at" >= NOW() - INTERVAL '1 hour'
         ),
         comments AS (
-          SELECT COUNT(C.*) as c 
-          FROM
-            "Comments" C
-            JOIN "Addresses" A ON A."id" = C."address_id"
+          SELECT COALESCE(COUNT(*), 0) AS c 
+          FROM "Comments" C
+          JOIN "Addresses" A ON A."id" = C."address_id"
           WHERE
-            A."user_id" = :user_id AND
-            C."created_at" >= NOW() - INTERVAL '1 hour'
+            A."user_id" = :user_id 
+            AND C."created_at" >= NOW() - INTERVAL '1 hour'
         ),
         communities AS (
-          SELECT COUNT(C.*) as c 
-          FROM
-            "Addresses" A
-            JOIN "Communities" C ON C."id" = A."community_id"
+          SELECT COALESCE(COUNT(*), 0) AS c 
+          FROM "Addresses" A
+          JOIN "Communities" C ON C."id" = A."community_id"
           WHERE
-            A."user_id" = :user_id AND
-            A.role = "admin" AND -- proxy to community creator
-            C."created_at" >= NOW() - INTERVAL '1 hour'
+            A."user_id" = :user_id 
+            AND A.role = 'admin' -- Proxy to community creator
+            AND C."created_at" >= NOW() - INTERVAL '1 hour'
         )
-        SELECT threads.c + comments.c + communities.c as c
+        SELECT 
+          (SELECT c FROM threads) +
+          (SELECT c FROM comments) +
+          (SELECT c FROM communities) AS last_creates;
         `,
         {
           type: QueryTypes.SELECT,
@@ -112,7 +119,7 @@ export function tiered({
         },
       );
       // compare with tier limits, throwing error if exceeded
-      if (last_creates > tierLimitsPerHour[tier].create)
+      if (last_creates >= tierLimitsPerHour[tier].create)
         throw new InvalidActor(actor, 'Exceeded content creation limit');
     }
     if (upvotes) {
@@ -133,7 +140,7 @@ export function tiered({
         },
       );
       // compare with tier limits, throwing error if exceeded
-      if (last_upvotes > tierLimitsPerHour[tier].upvote)
+      if (last_upvotes >= tierLimitsPerHour[tier].upvote)
         throw new InvalidActor(actor, 'Exceeded upvote limit');
     }
     if (ai.images) {
