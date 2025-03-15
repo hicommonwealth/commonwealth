@@ -175,6 +175,7 @@ export const GetStakeHistoricalPrice = {
 
 export const ConstestManagerView = ContestManager.extend({
   created_at: z.string(),
+  deleted_at: z.string().nullish(),
   topics: z.undefined(),
   contests: z.undefined(),
   content: z.array(

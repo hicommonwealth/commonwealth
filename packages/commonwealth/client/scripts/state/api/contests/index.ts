@@ -1,4 +1,5 @@
 import useCreateContestMutation from './createContest';
+import useDeleteContestMutation from './deleteContest';
 import useDeployRecurringContestOnchainMutation from './deployRecurringContestOnchain';
 import useDeploySingleERC20ContestOnchainMutation from './deploySingleERC20ContestOnchain';
 import useFundContestOnchainMutation from './fundContestOnchain';
@@ -8,6 +9,7 @@ import useFetchFarcasterCastsQuery from './getFarcasterCasts';
 
 export {
   useCreateContestMutation,
+  useDeleteContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
   useFetchFarcasterCastsQuery,
