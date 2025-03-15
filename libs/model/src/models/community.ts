@@ -147,6 +147,11 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      allow_tokenized_threads: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     {
       tableName: 'Communities',
