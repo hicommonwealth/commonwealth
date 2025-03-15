@@ -1,4 +1,3 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { LaunchpadTrade } from '../entities';
@@ -39,16 +38,4 @@ export const GetLaunchpadTrades = {
   })
     .array()
     .nullish(),
-};
-
-export const DistributeSkale = {
-  input: z.object({
-    address: z.string(),
-    eth_chain_id: z
-      .number()
-      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
-        message: `eth_chain_id must be a Skale chain Id`,
-      }),
-  }),
-  output: z.object({}),
 };

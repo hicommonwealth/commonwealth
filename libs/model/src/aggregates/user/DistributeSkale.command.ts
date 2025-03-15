@@ -1,4 +1,4 @@
-import { type Command, ServerError } from '@hicommonwealth/core';
+import { type Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   createPublicClient,
@@ -61,7 +61,7 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
           if (e instanceof TransactionExecutionError) {
             // Check if the error message indicates an insufficient balance
             if (e.shortMessage.includes('Account balance is too low')) {
-              throw new ServerError('Insufficient funds on Skale address.');
+              throw new InvalidState('Insufficient funds on Skale address.');
             }
           }
 

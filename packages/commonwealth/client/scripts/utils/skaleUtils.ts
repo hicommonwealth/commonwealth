@@ -16,7 +16,7 @@ export const distributeSkale = async (
 
     const response = await axios.post(
       // eslint-disable-next-line max-len
-      `${BASE_API_PATH}/launchpadToken.distributeSkale?batch=1`,
+      `${BASE_API_PATH}/user.distributeSkale?batch=1`,
       payload,
     );
     if (response.status !== 200) {
