@@ -49,7 +49,7 @@ const VotingUI: React.FC<VotingUIProps> = ({
           </div>
         </div>
         <CWText type="b2" className="poll-title">
-          {proposalTitle}
+          Do you support this proposal?
         </CWText>
 
         <div className="voting-options">

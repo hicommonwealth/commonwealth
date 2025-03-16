@@ -77,7 +77,8 @@ export const VotingActions = ({
   };
 
   const voteYes = async (e) => {
-    e.preventDefault();
+    console.log({ status: proposal.status });
+    // e.preventDefault();
     toggleVotingModal(true);
 
     if (
@@ -239,15 +240,13 @@ export const VotingActions = ({
     />
   );
   const handleVote = async (e) => {
-    console.log('handleVote', e, selectedOption);
-    return;
-    if (selectedOption === 'yes') {
+    if (e === 'yes') {
       await voteYes(e);
-    } else if (selectedOption === 'no') {
+    } else if (e === 'no') {
       await voteNo(e);
-    } else if (selectedOption === 'abstain') {
+    } else if (e === 'abstain') {
       await voteAbstain(e);
-    } else if (selectedOption === 'veto') {
+    } else if (e === 'veto') {
       await voteVeto(e);
     }
   };

@@ -5,22 +5,51 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../component_kit/cw_text';
 import './Timeline.scss';
+
+const formatDate = (isoString: string | undefined) => {
+  if (!isoString) return 'N/A';
+  return new Date(isoString).toLocaleDateString();
+};
+
 const getTimelineEvents = (proposalData: any) => {
+  let submitTime, votingStartTime, votingEndTime;
+
+  // Detect if it's a Cosmos proposal
+  if (
+    proposalData?.submitTime &&
+    proposalData?.votingStartTime &&
+    proposalData?.votingEndTime
+  ) {
+    submitTime = proposalData.submitTime;
+    votingStartTime = proposalData.votingStartTime;
+    votingEndTime = proposalData.votingEndTime;
+  }
+  // Detect if it's a Snapshot proposal
+  else if (proposalData?.id && proposalData?.body) {
+    submitTime = proposalData?.start
+      ? new Date(proposalData.start * 1000).toISOString()
+      : undefined;
+    votingStartTime = submitTime; // Snapshot proposals usually start voting at creation
+    votingEndTime = proposalData?.end
+      ? new Date(proposalData.end * 1000).toISOString()
+      : undefined;
+  }
+
   return [
     {
-      date: formatDate(proposalData?.submitTime),
+      date: formatDate(submitTime),
       title: 'Proposal Published',
       type: 'past',
       iconName: 'plusCirclePhosphor',
     },
     {
-      date: formatDate(proposalData?.votingStartTime),
+      date: formatDate(votingStartTime),
       title: 'Voting Begins',
       type: 'active',
       iconName: 'vector',
     },
     {
-      date: formatDate(proposalData?.votingEndTime),
+      date: formatDate(votingEndTime),
       title: 'Voting Ends',
       type: 'coming',
       iconName: 'infoEmpty',
@@ -28,9 +57,6 @@ const getTimelineEvents = (proposalData: any) => {
   ];
 };
 
-const formatDate = (isoString: string) => {
-  return new Date(isoString).toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
-};
 const TimeLine = ({ proposalData }: { proposalData: any }) => {
   const timelineEvents = getTimelineEvents(proposalData);
   return (

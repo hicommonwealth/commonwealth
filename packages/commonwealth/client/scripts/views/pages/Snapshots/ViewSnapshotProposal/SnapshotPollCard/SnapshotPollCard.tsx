@@ -9,8 +9,6 @@ import {
   VoteInformation,
 } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
-import { CWCard } from 'views/components/component_kit/cw_card';
-import { CWText } from 'views/components/component_kit/cw_text';
 
 import VotingUI from 'client/scripts/views/components/proposals/VotingUi';
 import '../../../../components/Polls/PollCard/PollCard.scss';
@@ -86,21 +84,13 @@ export const SnapshotPollCard = ({
     setInternalVoteInformation(voteInformation);
   }, [voteInformation]);
 
-  console.log('snapssss', { internalVoteInformation });
   return (
-    <CWCard className="PollCard">
-      <div className="poll-title-section">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
-      </div>
-
+    <>
       <div className="poll-voting-section">
         {!internalHasVoted && !pollEnded && !isPreview && (
           <>
             <VotingUI
               options={internalVoteInformation}
-              proposalTitle={proposalTitle}
               timeRemaining={timeRemaining}
               canVote={false}
               hasVoted={false}
@@ -112,8 +102,8 @@ export const SnapshotPollCard = ({
               selectedOptions={selectedOptions}
               disableVoteOptions={false}
               setSelectedOptions={setSelectedOptions}
-            />
-            <CastVoteSection
+            /> */}
+            {/* <CastVoteSection
               disableVoteButton={false}
               timeRemaining={timeRemaining}
               tooltipErrorMessage={tooltipErrorMessage}
@@ -143,6 +133,6 @@ export const SnapshotPollCard = ({
         votedFor={votedFor}
         isPreview={isPreview}
       /> */}
-    </CWCard>
+    </>
   );
 };
