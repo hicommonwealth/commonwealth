@@ -25,11 +25,11 @@ export type CustomCronItem = CronItem & {
 };
 
 export const TaskPayloads = {
-  ArchiveOutbox: z.undefined(),
-  UpdateSitemap: z.undefined(),
-  CleanSubscriptions: z.undefined(),
-  CleanChainEventXpSources: z.undefined(),
-  RunDbMaintenance: z.undefined(),
+  ArchiveOutbox: z.object({}),
+  UpdateSitemap: z.object({}),
+  CleanSubscriptions: z.object({}),
+  CleanChainEventXpSources: z.object({}),
+  RunDbMaintenance: z.object({}),
   AwardTwitterQuestXp: z.object({
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
