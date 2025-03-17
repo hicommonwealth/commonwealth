@@ -11,6 +11,7 @@ module.exports = {
         -- seed tiers based on verification status
         UPDATE "Users"
         SET "tier" = CASE 
+            -- TODO: find tier 4 users
             WHEN "emailVerified" = TRUE THEN 3
             WHEN EXISTS (
                 SELECT 1 FROM "Addresses" A 
