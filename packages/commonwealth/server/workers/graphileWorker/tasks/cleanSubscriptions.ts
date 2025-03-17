@@ -22,12 +22,13 @@ export const cleanSubscriptions = async () => {
         `;
     await models.sequelize.query(
       `
-          CREATE TEMPORARY TABLE user_ids_to_delete as (SELECT U.id
-                                                        FROM "Users" U
-                                                                 LEFT JOIN "Addresses" A ON U.id = A.user_id
-                                                        GROUP BY U.id
-                                                        HAVING (${noAccountsAndIsOldUser})
-                                                            OR (${noActiveAccountsQuery}));
+          CREATE TEMPORARY TABLE user_ids_to_delete as (
+            SELECT U.id
+            FROM "Users" U
+              LEFT JOIN "Addresses" A ON U.id = A.user_id
+            GROUP BY U.id
+            HAVING (${noAccountsAndIsOldUser})
+                OR (${noActiveAccountsQuery}));
       `,
       { transaction: t },
     );
