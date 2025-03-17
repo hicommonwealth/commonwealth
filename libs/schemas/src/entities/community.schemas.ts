@@ -56,7 +56,7 @@ export const Community = z.object({
   profile_count: PG_INT.nullish(),
   lifetime_thread_count: PG_INT.optional(),
   banner_text: z.string().nullish(),
-  allow_tokenized_threads: z.boolean().default(false),
+  allow_tokenized_threads: z.boolean().optional(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),

@@ -29,7 +29,6 @@ describe('getCommentDepth', () => {
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
-      allow_tokenized_threads: false,
     });
     const thread = await models.Thread.create({
       community_id,

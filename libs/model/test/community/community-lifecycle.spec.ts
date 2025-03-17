@@ -278,7 +278,6 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: cosmosNode.id!,
-          allow_tokenized_threads: false,
         },
       });
       expect(cosmos_result?.community?.id).toBe(cosmos_name);
@@ -300,7 +299,6 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: substrateNode.id!,
-          allow_tokenized_threads: false,
         },
       });
       expect(substrate_result?.community?.id).toBe(substrate_name);
@@ -586,7 +584,6 @@ describe('Community lifecycle', () => {
           featured_in_new_post: false,
           featured_in_sidebar: false,
           description: '',
-          allow_tokenized_threads: false,
         },
       }))!;
       const response = await command(ToggleArchiveTopic(), {
@@ -615,7 +612,6 @@ describe('Community lifecycle', () => {
           featured_in_new_post: false,
           featured_in_sidebar: false,
           description: '',
-          allow_tokenized_threads: false,
         },
       }))!;
 

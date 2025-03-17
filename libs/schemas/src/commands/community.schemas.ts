@@ -42,7 +42,7 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
-    allow_tokenized_threads: z.boolean().default(false),
+    allow_tokenized_threads: z.boolean().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
