@@ -144,6 +144,20 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+
+  lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false>;
+
+  getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    stop?: number,
+  ): Promise<string[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,4 +1,4 @@
-import { CacheNamespaces, config, dispose } from '@hicommonwealth/core';
+import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { ContestManager, events } from '@hicommonwealth/schemas';
 import {
@@ -12,14 +12,14 @@ import {
 } from 'vitest';
 import { z } from 'zod';
 import {
-  EVENT_STREAM_FN_CACHE_KEY,
   EVENT_STREAM_WINDOW_SIZE,
   EventStreamPolicy,
   getEventStream,
+  getEventStreamCacheKey,
 } from '../../src/policies/EventStream.policy';
 import { drainOutbox } from '../utils/outbox-drain';
 
-const inMemoryStore = new Map<string, any>();
+import { RedisCache } from '@hicommonwealth/adapters';
 
 const isValidUrl = (urlString: string): boolean => {
   try {
@@ -35,23 +35,13 @@ const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-const mockCache = {
-  getKey: vi.fn().mockImplementation(async (namespace, key) => {
-    const cacheKey = `${namespace}:${key}`;
-    return inMemoryStore.get(cacheKey) || null;
-  }),
-  setKey: vi.fn().mockImplementation(async (namespace, key, value) => {
-    const cacheKey = `${namespace}:${key}`;
-    inMemoryStore.set(cacheKey, value);
-    return true;
-  }),
-};
-
-vi.mock('@hicommonwealth/core', async () => {
-  const actual = await vi.importActual('@hicommonwealth/core');
+// mock cache key
+vi.mock('../../src/policies/EventStream.policy', async () => {
+  const actual = await vi.importActual('../../src/policies/EventStream.policy');
   return {
     ...(actual as object),
-    cache: () => mockCache,
+    EVENT_STREAM_FN_CACHE_KEY: 'test-cache-key',
+    getEventStreamCacheKey: () => 'test-cache-key',
   };
 });
 
@@ -61,6 +51,12 @@ describe('EventStream Policy Integration Tests', () => {
   let contestManagers: z.infer<typeof ContestManager>[];
 
   beforeAll(async () => {
+    // Set up Redis with the same configuration as in redisCache.spec.ts
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+    });
+    await cache().ready();
+
     const [community] = await tester.seed('Community', {
       id: communityId,
       name: 'Test Community',
@@ -103,16 +99,14 @@ describe('EventStream Policy Integration Tests', () => {
       address_id: userAddress!.id,
       topic_id: community!.topics![0].id,
     });
-
-    inMemoryStore.clear();
-
-    mockCache.getKey.mockClear();
-    mockCache.setKey.mockClear();
   });
 
   afterEach(async () => {
     await models.Outbox.truncate();
-    inMemoryStore.clear();
+    await cache().deleteKey(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+    );
     vi.clearAllMocks();
   });
 
@@ -217,9 +211,11 @@ describe('EventStream Policy Integration Tests', () => {
       url: `https://development.commonwealth.gg/community/${communityId}`,
     };
 
-    inMemoryStore.set(
-      `${CacheNamespaces.Function_Response}:${EVENT_STREAM_FN_CACHE_KEY}`,
-      JSON.stringify([existingEvent]),
+    await cache().lpushAndTrim(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+      JSON.stringify(existingEvent),
+      EVENT_STREAM_WINDOW_SIZE,
     );
 
     const threadCreatedEvent: z.infer<typeof events.ThreadCreated> = {
@@ -242,22 +238,23 @@ describe('EventStream Policy Integration Tests', () => {
     const eventStreamItems = await getEventStream();
 
     expect(eventStreamItems).toHaveLength(2);
-    expect(eventStreamItems[0].type).toBe(existingEvent.type);
+    expect(eventStreamItems[0].type).toBe('ThreadCreated');
 
-    const firstItemData = eventStreamItems[0].data as any;
-    expect(firstItemData.id).toBe(existingEvent.data.id);
+    const threadData = eventStreamItems[0].data as any;
+    expect(threadData.id).toBe(threadCreatedEvent.id!);
+    expect(eventStreamItems[0].url).toContain(
+      threadCreatedEvent.id!.toString(),
+    );
     expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
 
-    expect(eventStreamItems[1].type).toBe('ThreadCreated');
-
-    const secondItemData = eventStreamItems[1].data as any;
-    expect(secondItemData.id).toBe(threadCreatedEvent.id!);
+    expect(eventStreamItems[1].type).toBe(existingEvent.type);
+    const communityData = eventStreamItems[1].data as any;
+    expect(communityData.id).toBe(existingEvent.data.id);
+    expect(eventStreamItems[1].url).toContain(existingEvent.data.id);
     expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
   });
 
   test('should process multiple events of different types through the outbox', async () => {
-    mockCache.getKey.mockImplementationOnce(() => null);
-
     const outboxEvents = [
       {
         event_name: 'CommunityCreated',

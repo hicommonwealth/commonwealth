@@ -430,4 +430,71 @@ export class RedisCache implements Cache {
   public async sendCommand(args: string[]): Promise<any> {
     return await this._client.sendCommand(args);
   }
+
+  /**
+   * Push a value to the beginning of a list and trim it to a specific size in a single transaction.
+   * This is an atomic operation that adds an item to a list and ensures the list doesn't exceed the specified max length.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param value The value to push to the list
+   * @param maxLength The maximum length to maintain for the list
+   * @returns The new length of the list after the push operation, or false if an error occurred
+   */
+  public async lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false> {
+    if (!this.isReady()) return false;
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+
+      // Create a multi command (transaction)
+      const multi = this._client.multi();
+
+      // Add LPUSH command to the transaction
+      multi.lPush(finalKey, value);
+
+      // Add LTRIM command to the transaction to keep only the first maxLength elements
+      multi.lTrim(finalKey, 0, maxLength - 1);
+
+      // Execute the transaction
+      const results = await multi.exec();
+
+      // The first result is from LPUSH, which returns the new length of the list
+      return (results?.[0] as number) || false;
+    } catch (e) {
+      const msg = `An error occurred during lpushAndTrim for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return false;
+    }
+  }
+
+  /**
+   * Retrieve a range of elements from a list stored at the specified key.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param start The starting index (0-based, inclusive)
+   * @param stop The ending index (0-based, inclusive)
+   * @returns Array of elements in the specified range, or an empty array if the key doesn't exist or an error occurred
+   */
+  public async getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number = 0,
+    stop: number = -1,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      return await this._client.lRange(finalKey, start, stop);
+    } catch (e) {
+      const msg = `An error occurred while getting list range for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return [];
+    }
+  }
 }

@@ -16,7 +16,6 @@ import {
   buildContestLeaderboardUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { Mutex } from 'async-mutex';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -25,6 +24,7 @@ import { buildThreadContentUrl } from '../utils';
 const log = logger(import.meta);
 
 export const EVENT_STREAM_WINDOW_SIZE = 50;
+export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
 
 // lists all the events that can be added to the event stream
 const EventStreamSchemas = {
@@ -150,23 +150,27 @@ export function EventStreamPolicy(): Policy<{
     },
     body: {
       ContestStarted: async ({ payload }) => {
-        await addToEventStream(
+        await pushToEventStream(
           await eventStreamMappers.ContestStarted(payload),
         );
       },
       ContestEnding: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ContestEnding(payload));
+        await pushToEventStream(
+          await eventStreamMappers.ContestEnding(payload),
+        );
       },
       ContestEnded: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ContestEnded(payload));
+        await pushToEventStream(await eventStreamMappers.ContestEnded(payload));
       },
       CommunityCreated: async ({ payload }) => {
-        await addToEventStream(
+        await pushToEventStream(
           await eventStreamMappers.CommunityCreated(payload),
         );
       },
       ThreadCreated: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ThreadCreated(payload));
+        await pushToEventStream(
+          await eventStreamMappers.ThreadCreated(payload),
+        );
       },
     },
   };
@@ -186,51 +190,36 @@ export type EventStreamMappers = {
   ) => Promise<EventStreamItem<K>>;
 };
 
-const eventStreamMutex = new Mutex();
-
-const addToEventStream = async (
-  eventToAdd: EventStreamItem<keyof typeof EventStreamSchemas>,
-) => {
-  await eventStreamMutex.runExclusive(async () => {
-    const oldEventStream = await getEventStream();
-    const newEventStream = [...oldEventStream, eventToAdd];
-    if (newEventStream.length > EVENT_STREAM_WINDOW_SIZE) {
-      newEventStream.shift();
-    }
-    await setEventStream(newEventStream);
-  });
-};
-
-export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
+export const getEventStreamCacheKey = () => EVENT_STREAM_FN_CACHE_KEY;
 
 export const getEventStream = async (): Promise<
   EventStreamItem<keyof typeof EventStreamSchemas>[]
 > => {
   try {
-    const cachedEventStream = await cache().getKey(
+    const items = await cache().getList(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_FN_CACHE_KEY,
+      getEventStreamCacheKey(),
+      0,
+      EVENT_STREAM_WINDOW_SIZE - 1,
     );
-    if (cachedEventStream) {
-      return JSON.parse(cachedEventStream);
-    }
-    return [];
+    return items.map((item) => JSON.parse(item));
   } catch (err) {
     log.error(`Error getting event stream from cache`, err as Error);
     return [];
   }
 };
 
-const setEventStream = async (
-  eventStream: EventStreamItem<keyof typeof EventStreamSchemas>[],
+const pushToEventStream = async (
+  eventItem: EventStreamItem<keyof typeof EventStreamSchemas>,
 ) => {
   try {
-    await cache().setKey(
+    await cache().lpushAndTrim(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_FN_CACHE_KEY,
-      JSON.stringify(eventStream),
+      getEventStreamCacheKey(),
+      JSON.stringify(eventItem),
+      EVENT_STREAM_WINDOW_SIZE,
     );
   } catch (err) {
-    log.error(`Error setting event stream in cache`, err as Error);
+    log.error(`Error adding to event stream in cache`, err as Error);
   }
 };
