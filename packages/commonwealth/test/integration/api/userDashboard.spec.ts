@@ -61,7 +61,6 @@ describe('User Dashboard API', () => {
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
-      allow_tokenized_threads: false,
     });
     // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
