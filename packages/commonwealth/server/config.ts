@@ -33,6 +33,7 @@ const {
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
   TWITTER_ENABLED_BOTS,
   TWITTER_APP_BEARER_TOKEN,
+  EVM_CE_ETH_CHAIN_ID_OVERRIDE,
 } = process.env;
 
 const DEFAULTS = {
@@ -102,11 +103,16 @@ export const config = configure(
         MESSAGE_RELAYER_PREFETCH ?? DEFAULTS.MESSAGE_RELAYER_PREFETCH,
         10,
       ),
-      EVM_CE_POLL_INTERVAL_MS: parseInt(
+    },
+    EVM_CE: {
+      POLL_INTERVAL_MS: parseInt(
         EVM_CE_POLL_INTERVAL ?? DEFAULTS.EVM_CE_POLL_INTERVAL,
         10,
       ),
-      EVM_CE_TRACE: EVM_CE_LOG_TRACE !== 'false',
+      LOG_TRACE: EVM_CE_LOG_TRACE !== 'false',
+      ETH_CHAIN_ID_OVERRIDE: EVM_CE_ETH_CHAIN_ID_OVERRIDE
+        ? EVM_CE_ETH_CHAIN_ID_OVERRIDE.split(',').map((id) => parseInt(id))
+        : undefined,
     },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
@@ -200,8 +206,6 @@ export const config = configure(
     WORKERS: z.object({
       MESSAGE_RELAYER_TIMEOUT_MS: z.number().int().positive(),
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
-      EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
-      EVM_CE_TRACE: z.boolean().optional(),
     }),
     LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
@@ -240,6 +244,11 @@ export const config = configure(
       GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
       GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
       GET_COMMUNITIES_JOIN_COMMUNITY: z.number(),
+    }),
+    EVM_CE: z.object({
+      POLL_INTERVAL_MS: z.number().int().positive(),
+      LOG_TRACE: z.boolean(),
+      ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
     }),
   }),
 );

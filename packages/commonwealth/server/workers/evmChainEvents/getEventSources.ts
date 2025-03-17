@@ -11,6 +11,7 @@ import {
   buildChainNodeUrl,
   models,
 } from '@hicommonwealth/model';
+import { config } from '../../config';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
 
@@ -86,9 +87,17 @@ export async function getXpSources(
 export async function getEventSources(): Promise<EvmSources> {
   const evmSources: EvmSources = {};
 
+  let ethChainIds: string[] | number[] = Object.keys(EventRegistry);
+  if (
+    Array.isArray(config.EVM_CE.ETH_CHAIN_ID_OVERRIDE) &&
+    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0
+  ) {
+    ethChainIds = config.EVM_CE.ETH_CHAIN_ID_OVERRIDE;
+  }
+
   const chainNodes = await models.ChainNode.scope('withPrivateData').findAll({
     where: {
-      eth_chain_id: Object.keys(EventRegistry),
+      eth_chain_id: ethChainIds,
     },
   });
   const dbEvmSources = await models.EvmEventSource.findAll();
