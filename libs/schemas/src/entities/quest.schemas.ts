@@ -62,14 +62,14 @@ export const QuestTweet = z
     retweet_cap: z.number().optional(),
     like_cap: z.number().optional(),
     replies_cap: z.number().optional(),
-    num_likes: z.number().optional().default(0),
-    num_retweets: z.number().optional().default(0),
-    num_replies: z.number().optional().default(0),
-    like_xp_awarded: z.boolean().optional().default(false),
-    reply_xp_awarded: z.boolean().optional().default(false),
-    retweet_xp_awarded: z.boolean().optional().default(false),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    num_likes: z.number().default(0).optional(),
+    num_retweets: z.number().default(0).optional(),
+    num_replies: z.number().default(0).optional(),
+    like_xp_awarded: z.boolean().default(false).optional(),
+    reply_xp_awarded: z.boolean().default(false).optional(),
+    retweet_xp_awarded: z.boolean().default(false).optional(),
+    created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
   })
   .describe('A tweet associated to a quest from which XP can be earned');
 
@@ -94,9 +94,18 @@ export const QuestActionMeta = z
     participation_times_per_period: z.number().optional(),
     content_id: z
       .string()
-      .regex(/(chain:d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)/)
+      .regex(
+        /(chain:d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(tweet_url:https:\/\/x\.com\/[^\/]+\/status\/[^\/]+)/,
+      )
       .optional()
       .nullish(),
+    tweet_engagement_caps: z
+      .object({
+        likes: z.number().positive().max(100),
+        retweets: z.number().positive().max(100),
+        replies: z.number().positive().max(100),
+      })
+      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 

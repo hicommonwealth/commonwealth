@@ -1,6 +1,6 @@
 import { Command, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { AllChannelQuestActionNames } from '@hicommonwealth/schemas';
+import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
@@ -10,16 +10,227 @@ import {
   mustNotBeStarted,
   mustNotExist,
 } from '../../middleware/guards';
+import { QuestInstance } from '../../models/quest';
 import {
   GraphileTaskNames,
   removeJob,
   rescheduleJobs,
   scheduleTask,
 } from '../../services/graphileWorker';
-import { getDelta } from '../../utils';
+import { getDelta, tweetExists } from '../../utils';
 
-// TODO: use `tweetExists` util to check if `twitter_url` is valid
-//  once it is added on the client
+async function updateQuestInstance(
+  quest: QuestInstance,
+  {
+    name,
+    description,
+    community_id,
+    image_url,
+    start_date,
+    end_date,
+    max_xp_to_end,
+  }: z.infer<(typeof schemas.UpdateQuest)['input']>,
+  transaction?: Transaction,
+) {
+  const delta = getDelta(quest, {
+    name,
+    description,
+    community_id,
+    image_url,
+    start_date,
+    end_date,
+    max_xp_to_end,
+  });
+  delta.community_id =
+    !!community_id || community_id === null ? community_id : quest.community_id;
+
+  if (Object.keys(delta).length) {
+    await models.Quest.update(delta, {
+      where: { id: quest.id! },
+      transaction,
+    });
+  }
+}
+
+async function updateChannelQuest(
+  eventName: 'TweetEngagement',
+  quest: QuestInstance,
+  actionMetas:
+    | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>[]
+    | undefined,
+  payload: z.infer<(typeof schemas.UpdateQuest)['input']>,
+) {
+  if (quest.quest_type !== 'channel') return;
+
+  // DELETION
+  if (!actionMetas) {
+    await models.sequelize.transaction(async (transaction) => {
+      await updateQuestInstance(quest, payload, transaction);
+      const existingMeta = await models.QuestActionMeta.findOne({
+        where: {
+          quest_id: quest.id!,
+          event_name: eventName,
+        },
+        transaction,
+      });
+      if (quest.scheduled_job_id && existingMeta) {
+        await removeJob({
+          jobId: quest.scheduled_job_id,
+          transaction,
+        });
+      }
+      await existingMeta?.destroy({ transaction });
+    });
+    return;
+  }
+
+  if (actionMetas.length > 1)
+    throw new InvalidInput(
+      'Cannot have more than one action per channel quest',
+    );
+  const actionMeta = actionMetas[0];
+  if (actionMeta.event_name !== eventName)
+    throw new InvalidInput(
+      `Invalid action "${actionMeta.event_name}" for channel quest`,
+    );
+
+  // UPDATE OR CREATE
+  if (eventName === 'TweetEngagement') {
+    if (!actionMeta.content_id)
+      throw new InvalidInput('TweetEngagement action must have a Tweet url');
+    const [, ...rest] = actionMeta.content_id.split(':'); // this has been validated by the schema
+    const tweetUrl = rest.join(':');
+    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetUrl));
+    mustExist(`Tweet engagement caps`, actionMeta.tweet_engagement_caps);
+
+    await models.sequelize.transaction(async (transaction) => {
+      await updateQuestInstance(quest, payload, transaction);
+      const [actionMetaInstance, created] = await models.QuestActionMeta.upsert(
+        {
+          ...actionMeta,
+          quest_id: quest.id!,
+        },
+        { transaction },
+      );
+      await models.QuestTweets.upsert(
+        {
+          tweet_id: tweetUrl.split('/').at(-1)!,
+          quest_action_meta_id: actionMetaInstance.id!,
+          like_cap: actionMeta.tweet_engagement_caps!.likes,
+          retweet_cap: actionMeta.tweet_engagement_caps!.retweets,
+          replies_cap: actionMeta.tweet_engagement_caps!.replies,
+        },
+        { transaction },
+      );
+      if (created) {
+        const job = await scheduleTask(
+          GraphileTaskNames.AwardTwitterQuestXp,
+          {
+            quest_id: quest.id!,
+            quest_end_date: quest.end_date,
+          },
+          {
+            transaction,
+          },
+        );
+        quest.scheduled_job_id = job.id;
+        await quest.save({ transaction });
+      }
+
+      // If quest end date is updated then reschedule the job
+      if (
+        quest.end_date !== payload.end_date &&
+        !created &&
+        quest.scheduled_job_id
+      ) {
+        const job = await rescheduleJobs({
+          jobIds: [quest.scheduled_job_id],
+          options: {
+            runAt: payload.end_date,
+          },
+          transaction,
+        });
+      }
+    });
+  }
+}
+
+async function updateCommonQuest(
+  quest: QuestInstance,
+  payload: z.infer<(typeof schemas.UpdateQuest)['input']>,
+) {
+  const { quest_id, community_id, action_metas } = payload;
+  if (action_metas) {
+    const c_id = community_id || quest.community_id;
+    await Promise.all(
+      action_metas.map(async (action_meta) => {
+        // enforce comment upvoted action is scoped to a thread
+        if (
+          action_meta.event_name === 'CommentUpvoted' &&
+          !action_meta.content_id?.startsWith('thread:')
+        ) {
+          throw new InvalidInput(
+            'CommentUpvoted action must be scoped to a thread',
+          );
+        }
+        if (action_meta.content_id) {
+          // make sure content_id exists
+          const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
+          if (content === 'chain') {
+            const chain = await models.ChainNode.findOne({
+              where: { id: +id },
+            });
+            mustExist(`Chain node with id "${id}"`, chain);
+          } else if (content === 'topic') {
+            const topic = await models.Topic.findOne({
+              where: c_id ? { id: +id, community_id: c_id } : { id: +id },
+            });
+            mustExist(`Topic with id "${id}"`, topic);
+          } else if (content === 'thread') {
+            const thread = await models.Thread.findOne({
+              where: c_id ? { id: +id, community_id: c_id } : { id: +id },
+            });
+            mustExist(`Thread with id "${id}"`, thread);
+          } else if (content === 'comment') {
+            const comment = await models.Comment.findOne({
+              where: { id: +id },
+              include: c_id
+                ? [
+                    {
+                      model: models.Thread,
+                      attributes: ['community_id'],
+                      required: true,
+                      where: { community_id: c_id },
+                    },
+                  ]
+                : [],
+            });
+            mustExist(`Comment with id "${id}"`, comment);
+          }
+        }
+      }),
+    );
+  }
+
+  await models.sequelize.transaction(async (transaction) => {
+    if (action_metas?.length) {
+      // clean existing action_metas
+      await models.QuestActionMeta.destroy({
+        where: { quest_id },
+        transaction,
+      });
+      // create new action_metas
+      await models.QuestActionMeta.bulkCreate(
+        action_metas.map((action_meta) => ({
+          ...action_meta,
+          quest_id,
+        })),
+      );
+    }
+    await updateQuestInstance(quest, payload, transaction);
+  });
+}
+
 export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
   return {
     ...schemas.UpdateQuest,
@@ -29,12 +240,9 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       const {
         quest_id,
         name,
-        description,
         community_id,
-        image_url,
         start_date,
         end_date,
-        max_xp_to_end,
         action_metas,
       } = payload;
 
@@ -60,173 +268,16 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         end_date ?? quest.end_date,
       );
 
-      let channelActionMeta:
-        | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>
-        | undefined;
-      if (action_metas) {
-        if (quest.quest_type === 'channel') {
-          if (action_metas.length > 1) {
-            throw new InvalidInput(
-              'Cannot have more than one action per channel quest',
-            );
-          }
-          channelActionMeta = action_metas[0];
-
-          if (
-            channelActionMeta &&
-            !AllChannelQuestActionNames.some(
-              (e) => e === channelActionMeta!.event_name,
-            )
-          ) {
-            throw new InvalidInput(
-              `Invalid action "${channelActionMeta.event_name}" for channel quest`,
-            );
-          }
-        }
-
-        const c_id = community_id || quest.community_id;
-        await Promise.all(
-          action_metas.map(async (action_meta) => {
-            // enforce comment upvoted action is scoped to a thread
-            if (
-              action_meta.event_name === 'CommentUpvoted' &&
-              !action_meta.content_id?.startsWith('thread:')
-            ) {
-              throw new InvalidInput(
-                'CommentUpvoted action must be scoped to a thread',
-              );
-            }
-            if (action_meta.content_id) {
-              // make sure content_id exists
-              const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema
-              if (content === 'chain') {
-                const chain = await models.ChainNode.findOne({
-                  where: { id: +id },
-                });
-                mustExist(`Chain node with id "${id}"`, chain);
-              } else if (content === 'topic') {
-                const topic = await models.Topic.findOne({
-                  where: c_id ? { id: +id, community_id: c_id } : { id: +id },
-                });
-                mustExist(`Topic with id "${id}"`, topic);
-              } else if (content === 'thread') {
-                const thread = await models.Thread.findOne({
-                  where: c_id ? { id: +id, community_id: c_id } : { id: +id },
-                });
-                mustExist(`Thread with id "${id}"`, thread);
-              } else if (content === 'comment') {
-                const comment = await models.Comment.findOne({
-                  where: { id: +id },
-                  include: c_id
-                    ? [
-                        {
-                          model: models.Thread,
-                          attributes: ['community_id'],
-                          required: true,
-                          where: { community_id: c_id },
-                        },
-                      ]
-                    : [],
-                });
-                mustExist(`Comment with id "${id}"`, comment);
-              }
-            }
-          }),
+      if (quest.quest_type === 'channel') {
+        await updateChannelQuest(
+          'TweetEngagement',
+          quest,
+          action_metas,
+          payload,
         );
+      } else {
+        await updateCommonQuest(quest, payload);
       }
-
-      await models.sequelize.transaction(async (transaction) => {
-        // Add scheduled job for new TweetEngagement action
-        if (
-          quest.quest_type === 'channel' &&
-          channelActionMeta?.event_name === 'TweetEngagement'
-        ) {
-          const job = await scheduleTask(
-            GraphileTaskNames.AwardTwitterQuestXp,
-            {
-              quest_id: quest.id!,
-              quest_end_date: quest.end_date,
-            },
-            {
-              transaction,
-            },
-          );
-
-          quest.scheduled_job_id = job.id;
-          await quest.save({ transaction });
-        }
-
-        if (action_metas?.length) {
-          const existingTweetEngagementAction =
-            await models.QuestActionMeta.findOne({
-              where: {
-                quest_id,
-                event_name: 'TwitterEngagement',
-              },
-              transaction,
-            });
-          if (
-            existingTweetEngagementAction &&
-            !channelActionMeta &&
-            quest.scheduled_job_id
-          ) {
-            await removeJob({
-              jobId: quest.scheduled_job_id,
-              transaction,
-            });
-          }
-
-          // clean existing action_metas
-          await models.QuestActionMeta.destroy({
-            where: { quest_id },
-            transaction,
-          });
-          // create new action_metas
-          await models.QuestActionMeta.bulkCreate(
-            action_metas.map((action_meta) => ({
-              ...action_meta,
-              quest_id,
-            })),
-          );
-        }
-
-        const delta = getDelta(quest, {
-          name,
-          description,
-          community_id,
-          image_url,
-          start_date,
-          end_date,
-          max_xp_to_end,
-        });
-        delta.community_id =
-          !!community_id || community_id === null
-            ? community_id
-            : quest.community_id;
-        if (Object.keys(delta).length) {
-          await models.Quest.update(delta, {
-            where: { id: quest_id },
-            transaction,
-          });
-
-          // reschedule the quest job if end date is updated on a TwitterEngagement quest
-          if (
-            delta.end_date &&
-            delta.end_date > quest.end_date &&
-            quest.quest_type === 'channel' &&
-            channelActionMeta?.event_name === 'TweetEngagement' &&
-            quest.scheduled_job_id
-          ) {
-            await rescheduleJobs({
-              jobIds: [quest.scheduled_job_id],
-              options: {
-                runAt: delta.end_date,
-              },
-              transaction,
-            });
-          }
-        }
-      });
 
       const updated = await models.Quest.findOne({
         where: { id: quest_id },
