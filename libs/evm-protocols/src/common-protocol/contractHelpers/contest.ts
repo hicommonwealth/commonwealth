@@ -294,7 +294,7 @@ export const addContent = async (
       gas: BigInt(1_000_000),
       nonce,
     });
-    txReceipt = await client.getTransactionReceipt({
+    txReceipt = await client.waitForTransactionReceipt({
       hash: await client.writeContract(request),
     });
   } catch (e) {
@@ -349,7 +349,7 @@ export const voteContent = async (
       gas: BigInt(1_000_000),
       nonce,
     });
-    txReceipt = await client.getTransactionReceipt({
+    txReceipt = await client.waitForTransactionReceipt({
       hash: await client.writeContract(request),
     });
   } catch (error) {
@@ -544,7 +544,7 @@ export const deployERC20Contest = async ({
       ],
       ...(await client.estimateFeesPerGas()),
     });
-    const txReceipt = await client.getTransactionReceipt({
+    const txReceipt = await client.waitForTransactionReceipt({
       hash: await client.writeContract(request),
     });
 

@@ -84,6 +84,8 @@ export async function getXpSources(
   return evmSources;
 }
 
+let logWarning = true;
+
 export async function getEventSources(): Promise<EvmSources> {
   const evmSources: EvmSources = {};
 
@@ -93,6 +95,10 @@ export async function getEventSources(): Promise<EvmSources> {
     config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0
   ) {
     ethChainIds = config.EVM_CE.ETH_CHAIN_ID_OVERRIDE;
+    if (logWarning) {
+      log.warn(`Polling the following chain ids: ${ethChainIds.join(', ')}`);
+      logWarning = false;
+    }
   }
 
   const chainNodes = await models.ChainNode.scope('withPrivateData').findAll({
