@@ -84,36 +84,6 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
-    // const tweetsToQuery = await models.QuestTweets.findAll({
-    //   where: {
-    //     [Op.or]: [
-    //       { like_xp_awarded: false },
-    //       { reply_xp_awarded: false },
-    //       { retweet_xp_awarded: false },
-    //     ],
-    //   },
-    //   // Rotates through tweets so that all tweets are updated eventually
-    //   // even if we get rate limited occasionally
-    //   order: [['updated_at', 'ASC']],
-    //   include: [
-    //     {
-    //       model: models.QuestActionMeta,
-    //       required: true,
-    //       include: [
-    //         {
-    //           model: models.Quest,
-    //           required: true,
-    //           where: {
-    //             end_date: {
-    //               [Op.gt]: new Date(),
-    //             },
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // });
-
     const quests = await models.Quest.findAll({
       where: {
         end_date: {
