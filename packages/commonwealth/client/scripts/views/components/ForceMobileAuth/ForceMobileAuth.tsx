@@ -1,7 +1,5 @@
 import { isMobileApp } from 'hooks/useReactNativeWebView';
-import { useCommonNavigate } from 'navigation/helpers';
 import { memo, ReactNode, useCallback, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
 
 type ForceMobileAuthProps = {
@@ -20,8 +18,6 @@ export const ForceMobileAuth = memo(function ForceMobileAuth(
   props: ForceMobileAuthProps,
 ) {
   const { children } = props;
-  const location = useLocation();
-  const navigate = useCommonNavigate();
 
   const user = useUserStore();
 
@@ -36,19 +32,19 @@ export const ForceMobileAuth = memo(function ForceMobileAuth(
       return false;
     }
 
-    if (location.pathname.startsWith('/mobile-auth')) {
+    if (location.pathname.startsWith('/mobile-signin')) {
       // we're on the mobile auth page so we're good to go.
       return false;
     }
 
     return true;
-  }, [location.pathname, user.id]);
+  }, [user.id]);
 
   useEffect(() => {
     if (requiresMobileAuth()) {
-      navigate('/mobile-auth');
+      location.href = '/mobile-signin';
     }
-  }, [navigate, requiresMobileAuth]);
+  }, [requiresMobileAuth]);
 
   if (requiresMobileAuth()) {
     return null;
