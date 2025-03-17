@@ -52,7 +52,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const [selectedSort, setSelectedSort] = useState<SortType>(
     sortOptions[0].value,
   );
-  console.log('contestAddress', contestAddress);
+
   const { data: farcasterCasts, isLoading: isFarcasterCastsLoading } =
     useFetchFarcasterCastsQuery({
       contest_address: contestAddress,
