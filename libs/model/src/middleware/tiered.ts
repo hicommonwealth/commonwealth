@@ -22,33 +22,19 @@ const tierLimitsPerHour = [
 async function getLastHourCreates(user_id: number) {
   const [{ creates }] = await models.sequelize.query<{ creates: number }>(
     `
-    SELECT
-    (
-      SELECT COALESCE(COUNT(*), 0) 
-      FROM "Threads" T
-      JOIN "Addresses" A ON A."id" = T."address_id"
-      WHERE 
-        A."user_id" = :user_id 
+    SELECT 
+      COALESCE(COUNT(DISTINCT T.id), 0) +
+      COALESCE(COUNT(DISTINCT C.id), 0) +
+      COALESCE(COUNT(DISTINCT CM.id), 0) AS creates
+    FROM "Addresses" A
+      LEFT JOIN "Threads" T ON A."id" = T."address_id" 
         AND T."created_at" >= NOW() - INTERVAL '1 hour'
-    ) +
-    (
-      SELECT COALESCE(COUNT(*), 0) 
-      FROM "Comments" C
-      JOIN "Addresses" A ON A."id" = C."address_id"
-      WHERE
-        A."user_id" = :user_id 
+      LEFT JOIN "Comments" C ON A."id" = C."address_id" 
         AND C."created_at" >= NOW() - INTERVAL '1 hour'
-    ) +
-    (
-      SELECT COALESCE(COUNT(*), 0) 
-      FROM "Addresses" A
-      JOIN "Communities" C ON C."id" = A."community_id"
-      WHERE
-        A."user_id" = :user_id 
-        AND A.role = 'admin' -- Proxy to community creator
-        AND C."created_at" >= NOW() - INTERVAL '1 hour'
-    )
-    AS creates;
+      LEFT JOIN "Communities" CM ON A."community_id" = CM."id" 
+        AND A.role = 'admin' -- proxy to community creator
+        AND CM."created_at" >= NOW() - INTERVAL '1 hour'
+    WHERE A."user_id" = :user_id;
     `,
     {
       type: QueryTypes.SELECT,
