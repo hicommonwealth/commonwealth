@@ -35,7 +35,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
 
-const invocationCounts: Record<string, number> = {};
+const latencyInfo: Record<string, { invocationCount: number; total: number }> =
+  {};
 
 /**
  * Bootstraps express app
@@ -128,17 +129,24 @@ export async function main(
           path: routePattern,
         });
         const start = Date.now();
-        if (!invocationCounts[routePattern]) invocationCounts[routePattern] = 0;
+        if (!latencyInfo[routePattern])
+          latencyInfo[routePattern] = { invocationCount: 0, total: 0 };
 
         res.on('finish', () => {
           const latency = Date.now() - start;
-          invocationCounts[routePattern]++;
-          if (invocationCounts[routePattern] >= 2) {
-            invocationCounts[routePattern] = 0;
-            stats().histogram(`cw.path.latency`, latency, {
-              path: routePattern,
-              statusCode: `${res.statusCode}`,
-            });
+          latencyInfo[routePattern].invocationCount += 1;
+          latencyInfo[routePattern].total += latency;
+          if (latencyInfo[routePattern].invocationCount >= 3) {
+            stats().histogram(
+              `cw.path.latency`,
+              Math.round(latencyInfo[routePattern].total / 3),
+              {
+                path: routePattern,
+                statusCode: `${res.statusCode}`,
+              },
+            );
+            latencyInfo[routePattern].invocationCount = 0;
+            latencyInfo[routePattern].total = 0;
           }
         });
       } catch (e) {
