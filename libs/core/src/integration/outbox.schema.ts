@@ -56,6 +56,7 @@ export const outboxEvents: Events[] = [
   'WalletLinked',
   'SSOLinked',
   'XpChainEventCreated',
+  'TweetEngagementCapReached',
 ] as const;
 
 export const Outbox = z.union(

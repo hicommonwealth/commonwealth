@@ -58,6 +58,7 @@ export enum QuestParticipationPeriod {
 export const QuestTweet = z
   .object({
     tweet_id: z.string(),
+    tweet_url: z.string(),
     quest_action_meta_id: z.number().optional(),
     retweet_cap: z.number().optional(),
     like_cap: z.number().optional(),

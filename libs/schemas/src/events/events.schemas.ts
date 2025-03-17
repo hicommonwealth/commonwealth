@@ -477,4 +477,12 @@ export const events = {
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
+
+  TweetEngagementCapReached: z.object({
+    quest_id: z.number(),
+    quest_ended: z.boolean(),
+    like_cap_reached: z.boolean().optional(),
+    retweet_cap_reached: z.boolean().optional(),
+    reply_cap_reached: z.boolean().optional(),
+  }),
 } as const;

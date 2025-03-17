@@ -16,6 +16,7 @@ import {
   ContestWorker,
   DiscordBotPolicy,
   FarcasterWorker,
+  TwitterEngagementPolicy,
   User,
   models,
 } from '@hicommonwealth/model';
@@ -95,6 +96,11 @@ export async function bootstrapBindings(
 
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
+
+  const twitterEngSubRes = await brokerInstance.subscribe(
+    TwitterEngagementPolicy,
+  );
+  checkSubscriptionResponse(twitterEngSubRes, TwitterEngagementPolicy.name);
 }
 
 export async function bootstrapRelayer(

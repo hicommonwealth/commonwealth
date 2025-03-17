@@ -115,6 +115,7 @@ async function updateChannelQuest(
       await models.QuestTweets.upsert(
         {
           tweet_id: tweetUrl.split('/').at(-1)!,
+          tweet_url: tweetUrl,
           quest_action_meta_id: actionMetaInstance.id!,
           like_cap: actionMeta.tweet_engagement_caps!.likes,
           retweet_cap: actionMeta.tweet_engagement_caps!.retweets,
@@ -127,7 +128,7 @@ async function updateChannelQuest(
           GraphileTaskNames.AwardTwitterQuestXp,
           {
             quest_id: quest.id!,
-            quest_end_date: quest.end_date,
+            quest_ended: true,
           },
           {
             transaction,
