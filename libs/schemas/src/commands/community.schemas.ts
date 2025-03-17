@@ -10,15 +10,12 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext } from '../context';
-import {
-  Community,
-  Group,
-  PermissionEnum,
-  PinnedToken,
-  Requirement,
-  StakeTransaction,
-  Topic,
-} from '../entities';
+import { Community } from '../entities/community.schemas';
+import { PermissionEnum } from '../entities/group-permission.schemas';
+import { Group, Requirement } from '../entities/group.schemas';
+import { PinnedToken } from '../entities/pinned-token.schemas';
+import { StakeTransaction } from '../entities/stake.schemas';
+import { Topic } from '../entities/topic.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -253,11 +250,22 @@ export const CreateGroup = {
   context: AuthContext,
 };
 
-export const CreateNamespaceAdminGroup = {
+export const NamespaceReferral = z.object({
+  referrer_address: z.string(),
+  referee_address: z.string(),
+  timestamp: z.bigint(),
+  eth_chain_id: z.number(),
+  transaction_hash: z.string(),
+});
+
+export const LinkNamespace = {
   input: z.object({
     namespace_address: z.string(),
+    deployer_address: z.string(),
+    log_removed: z.boolean(),
+    referral: NamespaceReferral.optional(),
   }),
-  output: Group,
+  output: z.boolean(),
 };
 
 export const UpdateGroup = {
