@@ -7,6 +7,16 @@
   grid-column-gap: 56px;
   grid-row-gap: 16px;
 
+  &.single-child {
+    grid-template-columns: 1fr;
+  }
+
+  &.menu-visible {
+    @include medium {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @include mediumSmallInclusive {
     grid-template-columns: 1fr;
   }

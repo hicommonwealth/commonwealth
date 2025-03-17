@@ -1,12 +1,20 @@
-import { EventHandler, logger } from '@hicommonwealth/core';
+import { command, EventHandler } from '@hicommonwealth/core';
 import { ZodUndefined } from 'zod';
-
-const log = logger(import.meta);
+import { LinkNamespace } from '../../aggregates/community';
+import { systemActor } from '../../middleware';
 
 export const handleNamespaceDeployed: EventHandler<
   'NamespaceDeployed',
   ZodUndefined
-  // eslint-disable-next-line @typescript-eslint/require-await
-> = async ({ payload: _ }) => {
-  log.info('NamespaceDeployed event implementation not defined');
+> = async ({ payload }) => {
+  const { nameSpaceAddress, _namespaceDeployer } = payload.parsedArgs;
+
+  await command(LinkNamespace(), {
+    actor: systemActor({}),
+    payload: {
+      namespace_address: nameSpaceAddress,
+      deployer_address: _namespaceDeployer,
+      log_removed: payload.rawLog.removed,
+    },
+  });
 };

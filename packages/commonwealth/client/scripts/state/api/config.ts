@@ -33,6 +33,7 @@ export const ApiEndpoints = {
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
   GENERATE_COMMENT: '/generateCommentText',
+  GENERATE_THREAD: '/generateThreadText',
   UPLOAD_FILE: '/getUploadSignature',
 };
 
@@ -54,6 +55,10 @@ export const ExternalEndpoints = {
   coinbase: {
     tokenToUsdRate: (tokenSymbol: string) =>
       `https://api.coinbase.com/v2/prices/${tokenSymbol}-USD/sell`,
+  },
+  defiLlama: {
+    tokenToUsdRate: (tokenContractAddress: string) =>
+      `https://coins.llama.fi/prices/current/base:${tokenContractAddress}`,
   },
   snapshotHub: {
     url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',

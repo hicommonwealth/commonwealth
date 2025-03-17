@@ -39,5 +39,9 @@
 
   .CWModalBody {
     overflow: scroll;
+    .new-topic-template-section .Checkbox {
+      align-items: flex-start;
+      padding-bottom: 10px;
+    }
   }
 }

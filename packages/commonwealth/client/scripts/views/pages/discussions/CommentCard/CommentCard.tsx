@@ -81,6 +81,11 @@ type CommentCardProps = {
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
+  // voting
+  tokenNumDecimals?: number;
+  // Add props for root-level comment generation
+  isRootComment?: boolean;
+  threadContext?: string;
 };
 
 export const CommentCard = ({
@@ -121,6 +126,9 @@ export const CommentCard = ({
   isStreamingAIReply,
   parentCommentText,
   onStreamingComplete,
+  tokenNumDecimals,
+  isRootComment,
+  threadContext,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -220,7 +228,7 @@ export const CommentCard = ({
   const activeUserAddress = user.activeAccount?.address;
 
   useEffect(() => {
-    if (!isStreamingAIReply || !parentCommentText) return;
+    if (!isStreamingAIReply) return;
 
     let mounted = true;
     let finalText = '';
@@ -228,13 +236,19 @@ export const CommentCard = ({
 
     const generateAIReply = async () => {
       try {
-        const actualParentId = Number(comment.id);
-        if (actualParentId <= 0) {
-          console.error('Invalid parent ID:', actualParentId);
-          throw new Error('Invalid parent comment ID');
-        }
+        // Build context by combining thread context with parent comment if available
+        const threadPart = threadContext
+          ? `This is the thread body: ${threadContext}`
+          : '';
+        const parentPart = parentCommentText
+          ? `This is the parent comment: ${parentCommentText}`
+          : '';
 
-        await generateCommentRef.current(parentCommentText, (text) => {
+        const contextText = [threadPart, parentPart]
+          .filter(Boolean)
+          .join('\n\n');
+
+        await generateCommentRef.current(contextText || '', (text) => {
           if (mounted) {
             // Append incoming chunks so the full comment is built up
             accumulatedText += text;
@@ -245,9 +259,6 @@ export const CommentCard = ({
 
         if (mounted && finalText) {
           if (!activeUserAddress) {
-            console.error(
-              'No active account found: activeUserAddress is undefined',
-            );
             throw new Error('No active account found');
           }
 
@@ -255,9 +266,9 @@ export const CommentCard = ({
             communityId: comment.community_id,
             address: activeUserAddress,
             threadId: comment.thread_id,
+            parentCommentId: isRootComment ? null : comment.id,
             threadMsgId: null,
             unescapedText: finalText,
-            parentCommentId: actualParentId,
             parentCommentMsgId: null,
             existingNumberOfComments: 0,
           });
@@ -266,7 +277,6 @@ export const CommentCard = ({
           onStreamingCompleteRef.current?.();
         }
       } catch (error) {
-        console.error('Failed to generate AI reply:', error);
         if (mounted) {
           onStreamingCompleteRef.current?.();
         }
@@ -279,6 +289,8 @@ export const CommentCard = ({
     };
   }, [
     isStreamingAIReply,
+    isRootComment,
+    threadContext,
     parentCommentText,
     comment.id,
     comment.thread_id,
@@ -423,6 +435,7 @@ export const CommentCard = ({
                     }
                     onReaction={handleReaction}
                     weightType={weightType}
+                    tokenNumDecimals={tokenNumDecimals}
                   />
                 )}
 
@@ -438,6 +451,7 @@ export const CommentCard = ({
                       comment={comment}
                       isOpen={isUpvoteDrawerOpen}
                       setIsOpen={setIsUpvoteDrawerOpen}
+                      tokenDecimals={tokenNumDecimals}
                       weightType={weightType}
                     />
                   </>

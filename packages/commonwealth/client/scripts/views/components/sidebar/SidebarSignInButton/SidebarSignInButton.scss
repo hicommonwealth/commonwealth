@@ -1,0 +1,26 @@
+@import '../../../../styles/shared';
+
+.SidebarSignInButton {
+  display: flex;
+  width: $sidebar-width;
+  margin-top: 60px;
+  flex-direction: column;
+  padding: 10px;
+  align-items: center;
+  height: 114px;
+  border-bottom: 1px solid $neutral-200;
+
+  &.isInsideCommunity {
+    width: auto;
+  }
+  @include isWindowSmallToMediumInclusive {
+    width: 100vw;
+    &.isInsideCommunity {
+      width: auto;
+    }
+  }
+
+  .sign-in-text {
+    text-align: center;
+  }
+}

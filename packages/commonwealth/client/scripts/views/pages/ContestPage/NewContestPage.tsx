@@ -2,27 +2,28 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
+import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-
+import ContestCard from '../../components/ContestCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
-import ContestCard from '../../components/ContestCard';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import { MobileTabType } from './ContestPage';
+import useTokenData from './hooks/useTokenData';
+import type { EntriesTabProps } from './tabs/Entries';
 import EntriesTab from './tabs/Entries';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 import { getCurrentContestIndex, getSortedContests } from './utils';
 
-import useTokenData from './hooks/useTokenData';
 import './NewContestPage.scss';
 
 interface NewContestPageProps {
   contestAddress: string;
 }
-
 const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [selectedMobileTab, setSelectedMobileTab] = useState<MobileTabType>(
     MobileTabType.Entries,
@@ -46,6 +47,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     contestAddress,
   );
 
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+    includeNodeInfo: true,
+  });
+
   const handleNavigateContest = (direction: 'prev' | 'next') => {
     const newIndex =
       direction === 'prev' ? currentContestIndex - 1 : currentContestIndex + 1;
@@ -55,6 +62,15 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     if (targetContest) {
       navigate(`/contests/${targetContest.contest_address}`);
     }
+  };
+
+  const entriesTabProps: EntriesTabProps = {
+    contestAddress,
+    communityId: contest?.community_id || '',
+    contestDecimals: contest?.decimals || 18,
+    voteWeightMultiplier: contest?.vote_weight_multiplier || 1,
+    topicId: contest?.topic_id || undefined,
+    isFarcasterContest: !!contest?.is_farcaster_contest,
   };
 
   return (
@@ -80,6 +96,17 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
               payoutStructure={contest?.payout_structure}
               isFarcaster={contest?.is_farcaster_contest}
               onFund={() => setFundDrawerContest(contest)}
+              contestBalance={parseInt(
+                contest?.contests?.[0]?.contest_balance || '0',
+                10,
+              )}
+              community={{
+                name: community?.name || '',
+                iconUrl: community?.icon_url || '',
+                id: community?.id || '',
+                ethChainId: community?.ChainNode?.eth_chain_id || 0,
+                chainNodeUrl: community?.ChainNode?.url || '',
+              }}
             />
           )}
 
@@ -130,20 +157,24 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
         </div>
 
         <div className="mobile-tab-content">
-          {selectedMobileTab === MobileTabType.Entries && <EntriesTab />}
+          {selectedMobileTab === MobileTabType.Entries && (
+            <EntriesTab {...entriesTabProps} />
+          )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
         </div>
 
         <div className="desktop-view">
           <CWGrid>
-            <div>
-              <EntriesTab />
+            <div className="thread-list-container">
+              <EntriesTab {...entriesTabProps} />
             </div>
-            <div>
-              <TokenSwapTab />
-              <PriceChartTab />
-            </div>
+            {address ? (
+              <div>
+                <TokenSwapTab />
+                <PriceChartTab />
+              </div>
+            ) : null}
           </CWGrid>
         </div>
       </div>

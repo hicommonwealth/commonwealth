@@ -37,6 +37,7 @@ type StatusResp = {
     isAdmin: boolean;
     disableRichText?: boolean;
     communities: StarredCommunityResponse[];
+    referred_by_address?: string;
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
@@ -124,6 +125,8 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       isAdmin,
       disableRichText,
       communities: userCommunities || [],
+      referred_by_address: user.referred_by_address || undefined,
+      xp_points: user.xp_points || 0,
     },
     id: user.id,
     email: user.email,

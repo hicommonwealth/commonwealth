@@ -4,12 +4,18 @@ import { EventPair, EventSchemas } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { CreateCommunity, UpdateCommunity } from '../../src/community';
+import {
+  CreateCommunity,
+  UpdateCommunity,
+} from '../../src/aggregates/community';
+import {
+  GetUserReferralFees,
+  GetUserReferrals,
+} from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
-import { GetUserReferralFees, GetUserReferrals } from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
 function chainEvent<
@@ -161,13 +167,7 @@ describe('Referral lifecycle', () => {
         namespace_address: namespaceAddress,
         referrer_address: admin.address!,
         referee_address: nonMember.address!,
-        eth_chain_id: 1,
-        transaction_hash: '0x2',
         referrer_received_eth_amount: '0',
-        created_on_chain_timestamp:
-          chainEvents1[0].event_payload.block.timestamp.toString(),
-        created_at: expect.any(Date),
-        updated_at: expect.any(Date),
         referee_user_id: nonMember.user.id!,
         referee_profile: { name: 'non-member' },
         community_id: community!.id,

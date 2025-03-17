@@ -27,6 +27,7 @@ import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
 import CreateCommunityButton from '../CreateCommunityButton';
 import DirectoryMenuItem from '../DirectoryMenuItem';
+import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
@@ -50,7 +51,6 @@ export const CommunitySection = ({
   isInsideCommunity,
 }: CommunitySectionProps) => {
   const launchpadEnabled = useFlag('launchpad');
-  const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
@@ -134,6 +134,9 @@ export const CommunitySection = ({
   return (
     <>
       <div className="community-menu">
+        {!user.isLoggedIn && isInsideCommunity && (
+          <SidebarSignInButton isInsideCommunity />
+        )}
         {user.isLoggedIn && <ProfileCard />}
         {user.isLoggedIn && (
           <>
@@ -165,7 +168,7 @@ export const CommunitySection = ({
           </>
         )}
 
-        {(launchpadEnabled || uniswapTradeEnabled) && <TokenTradeWidget />}
+        {launchpadEnabled && <TokenTradeWidget />}
 
         <CreateCommunityButton />
 

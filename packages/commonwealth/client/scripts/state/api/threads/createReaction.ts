@@ -72,6 +72,7 @@ const useCreateThreadReactionMutation = ({
         type: 'like',
         updated_at: newReaction.updated_at,
         voting_weight: newReaction.calculated_voting_weight || 0,
+        calculated_voting_weight: newReaction.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,

@@ -62,7 +62,6 @@ const EditProfile = () => {
     linkValidation: linkValidationSchema.optional,
   });
 
-  const enableApiKeyManagement = useFlag('manageApiKeys');
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
     useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
@@ -263,7 +262,8 @@ const EditProfile = () => {
             <CWDivider />
             <ProfileSection
               title="General Info"
-              description="Let your community and others get to know you by sharing a bit about yourself."
+              description="Let your community and others get to know you by sharing a bit about yourself. These
+               will be publicly displayed on your profile"
               className="input-controls"
             >
               <div className="profile-image-section">
@@ -415,7 +415,6 @@ const EditProfile = () => {
                           )
                         }
                         icon="sparkle"
-                        size="xs"
                         iconColor="#757575"
                       />
                     </div>
@@ -435,7 +434,7 @@ const EditProfile = () => {
                 </div>
               )}
             </ProfileSection>
-            {enableApiKeyManagement ? <ManageApiKey /> : null}
+            <ManageApiKey />
             {actionButtons}
           </CWForm>
         </div>
