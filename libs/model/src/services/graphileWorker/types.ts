@@ -7,7 +7,7 @@ export enum GraphileTaskNames {
   CleanSubscriptions = 'CleanSubscriptions',
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
-  AwardTwitterQuestXp = 'AwardTwitterQuestXp',
+  AwardTwitterQuestXp = 'AwardTweetEngagementXp',
 }
 
 export type GraphileTask<
@@ -38,7 +38,7 @@ export const TaskPayloads = {
   CleanSubscriptions: z.object({}),
   CleanChainEventXpSources: z.object({}),
   RunDbMaintenance: z.object({}),
-  AwardTwitterQuestXp: z.object({
+  AwardTweetEngagementXp: z.object({
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
   }),

@@ -318,19 +318,7 @@ const CommunitiesPage = () => {
           <>
             {/* Communities section */}
             <div className="section-container">
-              <AllTabContent
-                isLoading={isLoading}
-                isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-                communitiesList={communitiesList}
-                containerRef={containerRef}
-                filters={filters}
-                historicalPrices={historicalPrices}
-                ethUsdRate={Number(ethUsdRate)}
-                setSelectedCommunityId={setSelectedCommunityId}
-                hasNextPage={hasNextPage}
-                fetchMoreCommunities={fetchMoreCommunities}
-                hideHeader={false}
-              />
+              <AllTabContent containerRef={containerRef} filters={filters} />
             </div>
           </>
         )}
