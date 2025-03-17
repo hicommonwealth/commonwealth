@@ -3,13 +3,13 @@ import {
   GraphileTaskNames,
   TaskPayloads,
   awardTweetEngagementXpTask,
-  countAggregatorTask,
 } from '@hicommonwealth/model';
 import { Task } from 'graphile-worker';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { archiveOutboxTask } from './tasks/archiveOutbox';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
+import { countAggregatorTask } from './tasks/countAggregator';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
 
