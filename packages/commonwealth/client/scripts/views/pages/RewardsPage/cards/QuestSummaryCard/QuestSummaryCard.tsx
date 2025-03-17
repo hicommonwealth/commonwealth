@@ -44,7 +44,7 @@ const QuestSummaryCard = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
-    end_after: moment().startOf('week').toDate(),
+    end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
     include_system_quests: !user.isLoggedIn,
     enabled: xpEnabled,
