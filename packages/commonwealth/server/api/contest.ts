@@ -15,6 +15,10 @@ export const trpcRouter = trpc.router({
     Contest.CancelContestManagerMetadata,
     trpc.Tag.Community,
   ),
+  deleteContestMetadata: trpc.command(
+    Contest.DeleteContestManagerMetadata,
+    trpc.Tag.Community,
+  ),
   getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Community),
   getFarcasterCasts: trpc.query(
     Contest.GetFarcasterContestCasts,
