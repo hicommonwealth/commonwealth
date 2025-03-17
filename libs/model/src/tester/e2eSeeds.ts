@@ -105,6 +105,7 @@ export const e2eTestEntities = async function (
             active: true,
             default_symbol: 'cmn',
             custom_domain: 'customdomain.com',
+            allow_tokenized_threads: false,
           },
           {
             id: 'cmntest2',
@@ -118,6 +119,7 @@ export const e2eTestEntities = async function (
             active: true,
             default_symbol: 'cmntest2',
             custom_domain: 'customdomain.com',
+            allow_tokenized_threads: false,
           },
         ].map((x) => ({
           ...x,

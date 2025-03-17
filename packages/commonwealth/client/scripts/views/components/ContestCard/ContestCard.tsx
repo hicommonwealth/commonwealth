@@ -170,7 +170,8 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    newContestPage
+    // after removing feature flag, we can remove the isFarcaster check as well
+    newContestPage || isFarcaster
       ? navigate(`/contests/${address}`, {}, community?.id)
       : navigate(
           `/discussions?featured=mostLikes&contest=${address}`,
