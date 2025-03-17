@@ -9,7 +9,7 @@ import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { main } from '../../server/util/countAggregator';
+import { main } from '../../server/workers/graphileWorker/tasks/countAggregator';
 
 chai.use(chaiHttp);
 

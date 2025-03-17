@@ -1,16 +1,30 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { cache, CacheNamespaces, dispose, logger } from '@hicommonwealth/core';
+import { GraphileTask, models, TaskPayloads } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { config } from '../config';
+import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-main().catch((error) => {
-  log.fatal('Count aggregator broke', error);
-});
+export const countAggregatorTask: GraphileTask = {
+  input: TaskPayloads.CleanSubscriptions,
+  fn: countAggregator,
+};
 
-export async function main() {
+if (import.meta.url.endsWith(process.argv[1])) {
+  countAggregator()
+    .then(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
+    })
+    .catch((err) => {
+      log.error('Failed to delete user', err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
+    });
+}
+
+export async function countAggregator() {
   config.CACHE.REDIS_URL &&
     config.NODE_ENV !== 'test' &&
     cache({
