@@ -1,5 +1,5 @@
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { z, ZodObject, ZodSchema, ZodUndefined } from 'zod';
+import { z, ZodObject, ZodSchema, ZodTypeAny, ZodUndefined } from 'zod';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -11,7 +11,15 @@ export enum GraphileTaskNames {
 }
 
 export type GraphileTask<
-  Input extends ZodSchema | ZodObject<{}> = ZodObject<{}>,
+  Input extends
+    | ZodSchema
+    | ZodObject<{}, 'strip', ZodTypeAny, {}, {}> = ZodObject<
+    {},
+    'strip',
+    ZodTypeAny,
+    {},
+    {}
+  >,
 > = {
   readonly input: Input;
   readonly fn: (
