@@ -8,6 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .IOSModal {
@@ -16,8 +17,9 @@
   width: 300px;
   border-radius: 14px;
   text-align: center;
-  padding: 20px;
+  padding-top: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
 
   h2 {
     font-size: 17px;
@@ -29,6 +31,27 @@
     font-size: 14px;
     color: #b0b0b0;
     line-height: 1.4;
+  }
+
+  &-content {
+    padding: 0 20px;
+  }
+
+  button {
+    outline: none;
+  }
+
+  button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.3);
+    user-select: none;
   }
 
   &-buttons {

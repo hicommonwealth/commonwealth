@@ -5,6 +5,9 @@ interface IOSModalProps {
   allowDisabled?: boolean;
   disallowDisabled?: boolean;
 
+  title: string;
+  description: string;
+
   onAllow: () => void;
   onDeny: () => void;
 }
@@ -12,16 +15,22 @@ interface IOSModalProps {
  * Native-like modal for iOS ...
  */
 export const IOSModal = (props: IOSModalProps) => {
-  const { onAllow, onDeny, allowDisabled, disallowDisabled } = props;
+  const {
+    onAllow,
+    onDeny,
+    allowDisabled,
+    disallowDisabled,
+    title,
+    description,
+  } = props;
 
   return (
     <div className="IOSModal-overlay">
       <div className="IOSModal">
-        <h2>“Common” Would Like to Send You Notifications</h2>
-        <p>
-          Notifications may include alerts, sounds, and icon badges. These can
-          be configured in Settings.
-        </p>
+        <div className="IOSModal-content">
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
         <div className="IOSModal-buttons">
           <button disabled={disallowDisabled} onClick={onDeny}>
             Don’t Allow
