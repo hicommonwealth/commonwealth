@@ -3,11 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import {
-  PollCardProps,
-  VoteDisplay,
-  VoteInformation,
-} from 'views/components/Polls';
+import { PollCardProps, VoteInformation } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
 import VotingUI from 'client/scripts/views/components/proposals/VotingUi';
@@ -21,15 +17,10 @@ export type SnapshotPollCardProps = Omit<
 >;
 
 export const SnapshotPollCard = ({
-  disableVoteButton = false,
   hasVoted,
-  isPreview,
   onSnapshotVoteCast,
   pollEnded,
-  proposalTitle,
   timeRemaining,
-  tokenSymbol,
-  tooltipErrorMessage,
   totalVoteCount,
   votedFor,
   voteInformation,
@@ -85,54 +76,15 @@ export const SnapshotPollCard = ({
   }, [voteInformation]);
 
   return (
-    <>
-      <div className="poll-voting-section">
-        {!internalHasVoted && !pollEnded && !isPreview && (
-          <>
-            <VotingUI
-              options={internalVoteInformation}
-              timeRemaining={timeRemaining}
-              canVote={false}
-              hasVoted={false}
-              onVote={castVote}
-              type="snapshot"
-            />
-            {/* <PollOptions
-              voteInformation={internalVoteInformation}
-              selectedOptions={selectedOptions}
-              disableVoteOptions={false}
-              setSelectedOptions={setSelectedOptions}
-            /> */}
-            {/* <CastVoteSection
-              disableVoteButton={false}
-              timeRemaining={timeRemaining}
-              tooltipErrorMessage={tooltipErrorMessage}
-              onVoteCast={castVote}
-            /> */}
-          </>
-        )}
-        {((internalHasVoted && !isPreview) || pollEnded) && (
-          <VoteDisplay
-            timeRemaining={timeRemaining}
-            voteDirectionString={voteDirectionString}
-            pollEnded={pollEnded}
-            voteInformation={internalVoteInformation}
-            isSnapshot
-          />
-        )}
-      </div>
-      <br />
-      {/* <ResultsSections
-        resultString={resultString}
-        // @ts-expect-error <StrictNullChecks/>
-        onResultsClick={null}
-        tokenSymbol={tokenSymbol}
-        voteInformation={internalVoteInformation}
-        pollEnded={pollEnded}
-        totalVoteCount={internalTotalVoteCount}
-        votedFor={votedFor}
-        isPreview={isPreview}
-      /> */}
-    </>
+    <div className="poll-voting-section">
+      <VotingUI
+        options={internalVoteInformation}
+        timeRemaining={timeRemaining}
+        canVote={!internalHasVoted && !pollEnded}
+        hasVoted={hasVoted}
+        onVote={castVote}
+        type="snapshot"
+      />
+    </div>
   );
 };

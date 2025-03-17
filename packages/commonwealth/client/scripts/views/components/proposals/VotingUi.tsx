@@ -20,21 +20,21 @@ interface VotingUIProps {
 
 const VotingUI: React.FC<VotingUIProps> = ({
   options,
-  proposalTitle = 'Do you support this proposal?',
-  timeRemaining = '7 days left',
-  canVote = true,
-  hasVoted = true,
+  timeRemaining,
+  canVote,
+  hasVoted,
   onVote,
   type,
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const handleVoteClick = () => {
-    if (selectedOption && !canVote && !hasVoted) {
+    if (selectedOption && canVote && !hasVoted) {
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
     }
   };
 
+  console.log(canVote);
   return (
     <div className="poll-container">
       <CWText type="h5" fontWeight="semiBold">
@@ -58,22 +58,19 @@ const VotingUI: React.FC<VotingUIProps> = ({
               key={option.value}
               className={`option ${selectedOption === option.value ? 'selected' : ''}`}
               onClick={() => setSelectedOption(option.value)}
-              disabled={canVote || hasVoted}
+              disabled={!canVote || hasVoted}
             >
               {option.label}
             </button>
           ))}
         </div>
-
-        {!hasVoted && !canVote && (
-          <button
-            className="vote-button"
-            onClick={handleVoteClick}
-            disabled={false}
-          >
-            Vote
-          </button>
-        )}
+        <button
+          className="vote-button"
+          onClick={handleVoteClick}
+          disabled={!canVote || hasVoted}
+        >
+          Vote
+        </button>
       </div>
     </div>
   );

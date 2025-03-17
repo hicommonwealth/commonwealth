@@ -11,12 +11,15 @@ import { useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import DetailsCard from '../../components/proposals/DeatilsCard';
 import GoveranceVote from '../../components/proposals/GoveranceVote';
 import TimeLine from '../../components/proposals/TimeLine';
@@ -32,28 +35,33 @@ type ViewProposalPageAttrs = {
   identifier: string;
   type?: string;
 };
+export enum CodeEditorType {
+  Code,
+  Preview,
+}
 const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [createdAt, setCreatedAt] = useState();
+  const [selectedCodeEditorType, setSelectedCodeEditorType] = useState(
+    CodeEditorType.Code,
+  );
+
   const { scope } = useParams<{
     scope: string;
   }>();
   const [searchParams] = useSearchParams();
-  const queryType = searchParams.get('type'); // e.g., 'snapshot' or 'cosmos'
-  const querySnapshotId = searchParams.get('snapshotId'); // e.g., 'aave.eth'
-
+  const queryType = searchParams.get('type');
+  const querySnapshotId = searchParams.get('snapshotId');
   const proposalId =
     queryType === 'cosmos' ? identifier.split('-')[0] : identifier;
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
-
-  const snapshotId = 'aave.eth';
-
-  const snapshotProposalId =
-    '0x29d176e4d36f38c665ac39775577982339c6a3fcc488a36af73fbd5edfd422ff';
   const {
     proposal,
     title: proposalTitle,
-    description: proposalDescription,
+    description,
     isLoading,
     isFetchingMetadata,
     error: cosmosError,
@@ -77,8 +85,9 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     loadVotes,
     power,
   } = useSnapshotProposal({
-    identifier: snapshotProposalId,
-    snapshotId: snapshotId,
+    identifier: proposalId,
+    // @ts-expect-error <StrictNullChecks/>
+    snapshotId: querySnapshotId,
   });
 
   const snapShotVoitingResult = React.useMemo(() => {
@@ -102,27 +111,8 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         results,
       };
     });
-  }, [proposal, votes, totals.sumOfResultsBalance]);
+  }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
 
-  console.log('url', {
-    querySnapshotId,
-    queryType,
-    isFetchingMetadata,
-    isLoading,
-    isSnapshotLoading,
-  });
-  console.log('Snaphot data', {
-    snapshotProposal,
-    isSnapshotLoading,
-    threads,
-    votes,
-    space,
-    totals,
-    validatedAgainstStrategies,
-    proposalAuthor,
-    activeUserAddress,
-    totalScore,
-  });
   //COSMO
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
@@ -136,10 +126,29 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   }, [proposal, forceRerender]);
 
   useManageDocumentTitle('View proposal', proposalTitle);
+  useEffect(() => {
+    if (proposal || snapshotProposal) {
+      if (queryType === 'cosmos') {
+        // @ts-expect-error <StrictNullChecks/>
+        setTitle(proposal?.title);
+        // @ts-expect-error <StrictNullChecks/>
+        setAuthor(proposal?.author);
+        // @ts-expect-error <StrictNullChecks/>
+        setCreatedAt(proposal?.createdAt);
+      } else {
+        // @ts-expect-error <StrictNullChecks/>
+        setTitle(snapshotProposal?.title);
+        // @ts-expect-error <StrictNullChecks/>
+        setAuthor(snapshotProposal?.author);
+        // @ts-expect-error <StrictNullChecks/>
+        setCreatedAt(snapshotProposal?.created);
+      }
+    }
+  }, [snapshotProposal, proposal, queryType]);
 
-  if (isLoading || isSnapshotLoading) {
-    return <PageLoading message="Loading..." />;
-  }
+  //   if (isLoading || isSnapshotLoading) {
+  //     return <PageLoading message="Loading..." />;
+  //   }
 
   if (cosmosError) {
     return (
@@ -169,14 +178,14 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-
   return (
     <CWPageLayout>
       <CWContentPage
         showSkeleton={!proposal && !snapshotProposal}
-        title={proposalTitle}
-        author={proposal?.author}
-        createdAt={proposal?.createdAt}
+        title={title}
+        // @ts-expect-error <StrictNullChecks/>
+        author={author}
+        createdAt={createdAt}
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         body={() => (
@@ -184,15 +193,41 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
             {isFetchingMetadata ? (
               <Skeleton height={94.4} />
             ) : (
-              !_.isEmpty(metadata) && (
-                <JSONDisplay data={metadata} title="Metadata" />
-              )
+              !_.isEmpty(metadata) && <JSONDisplay data={metadata} />
             )}
-            <CWAccordView title="Description" defaultOpen={false}>
-              <MarkdownViewerWithFallback
-                markdown={proposalDescription || snapshotProposal?.body}
-              />
-            </CWAccordView>
+            {(description || snapshotProposal?.body) && (
+              <CWAccordView title="Description" defaultOpen={true}>
+                <MarkdownViewerWithFallback
+                  markdown={description || snapshotProposal?.body}
+                />
+              </CWAccordView>
+            )}
+            {queryType === 'cosmos' && (
+              <CWAccordView title="Code" defaultOpen={false}>
+                <CWTabsRow>
+                  <CWTab
+                    label="Code"
+                    onClick={() =>
+                      setSelectedCodeEditorType(CodeEditorType.Code)
+                    }
+                    isSelected={true}
+                  />
+                  <CWTab
+                    label="Preview"
+                    isSelected={false}
+                    onClick={() => {
+                      setSelectedCodeEditorType(CodeEditorType.Preview);
+                    }}
+                    isDisabled
+                  />
+                </CWTabsRow>
+                {selectedCodeEditorType === CodeEditorType.Code && (
+                  <div>
+                    <JSONDisplay data={proposal?.data?.messages} />
+                  </div>
+                )}
+              </CWAccordView>
+            )}
             {queryType === 'cosmos' ? (
               <VotingActions
                 onModalClose={onModalClose}
@@ -207,9 +242,9 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
               <SnapshotPollCardContainer
                 activeUserAddress={activeUserAddress}
                 fetchedPower={!!power}
-                identifier={snapshotProposalId}
+                identifier={proposalId}
                 proposal={snapshotProposal as SnapshotProposal}
-                scores={[]} // unused?
+                scores={[]}
                 space={space as SnapshotSpace}
                 symbol={symbol}
                 totals={totals}

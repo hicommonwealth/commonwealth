@@ -84,8 +84,6 @@ export const useSnapshotProposal = ({
     user.activeAccount?.address || user.addresses?.[0]?.address;
   const activeCommunityId = app.activeChainId();
 
-  console.log('snap x3', user);
-
   // Create proposal author object
   const proposalAuthor = useMemo(() => {
     if (!proposal || !activeCommunityId) {

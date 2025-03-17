@@ -75,7 +75,9 @@ export const SnapshotPollCardContainer = (
       : null;
 
   const timeRemaining = useMemo(() => {
-    return calculateTimeRemaining(proposal);
+    // @ts-expect-error <StrictNullChecks/>
+    const end = new Date(moment(proposal.end * 1000));
+    return calculateTimeRemaining(end);
   }, [proposal]);
 
   const voteInformation = useMemo(() => {

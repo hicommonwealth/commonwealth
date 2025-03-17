@@ -154,17 +154,8 @@ const ViewSnapshotProposal = ({
       </CWPageLayout>
     );
   }
-  console.log('Snaphot data', {
-    proposal,
-    threads,
-    votes,
-    space,
-    totals,
-    validatedAgainstStrategies,
-    proposalAuthor,
-    activeUserAddress,
-    totalScore,
-  });
+
+  console.log('testing33', power);
   return (
     <CWPageLayout>
       <CWContentPage

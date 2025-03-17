@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import './CWAccordView.scss';
-
-const CWAccordView = ({ title, children, defaultOpen = false }: any) => {
+interface CWAccordViewProps {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}
+const CWAccordView = ({
+  title,
+  children,
+  defaultOpen = false,
+}: CWAccordViewProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultOpen);
 
   const toggleAccord = () => {

@@ -7,7 +7,7 @@ import {
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
@@ -18,9 +18,11 @@ import app from 'state';
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
+import moment from 'moment';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
+import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import VotingUI from './VotingUi';
 import { CannotVote } from './cannot_vote';
@@ -44,10 +46,14 @@ export const VotingActions = ({
   proposalRedrawState,
 }: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
-  const [selectedOption, setSelectedOption] = useState<string>();
-
   const { isAddedToHomeScreen } = useAppStatus();
   const userData = useUserStore();
+
+  const timeRemaining = useMemo(() => {
+    // @ts-expect-error <StrictNullChecks/>
+    const end = new Date(moment(proposal?.data?.votingEndTime));
+    return calculateTimeRemaining(end);
+  }, [proposal]);
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -274,12 +280,11 @@ export const VotingActions = ({
         <>
           <VotingUI
             options={voteOptions}
-            proposalTitle="Do you support this proposal?"
-            timeRemaining="7 days left" // Replace with dynamic value if available
             canVote={canVote && !votingModalOpen}
             hasVoted={false}
             onVote={handleVote}
             type="cosmos"
+            timeRemaining={timeRemaining}
           />
           {/* @ts-expect-error StrictNullChecks*/}
           <ProposalExtensions proposal={proposal} />

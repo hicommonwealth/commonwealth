@@ -14,7 +14,6 @@ const formatDate = (isoString: string | undefined) => {
 const getTimelineEvents = (proposalData: any) => {
   let submitTime, votingStartTime, votingEndTime;
 
-  // Detect if it's a Cosmos proposal
   if (
     proposalData?.submitTime &&
     proposalData?.votingStartTime &&
@@ -23,13 +22,11 @@ const getTimelineEvents = (proposalData: any) => {
     submitTime = proposalData.submitTime;
     votingStartTime = proposalData.votingStartTime;
     votingEndTime = proposalData.votingEndTime;
-  }
-  // Detect if it's a Snapshot proposal
-  else if (proposalData?.id && proposalData?.body) {
+  } else if (proposalData?.id && proposalData?.body) {
     submitTime = proposalData?.start
       ? new Date(proposalData.start * 1000).toISOString()
       : undefined;
-    votingStartTime = submitTime; // Snapshot proposals usually start voting at creation
+    votingStartTime = submitTime;
     votingEndTime = proposalData?.end
       ? new Date(proposalData.end * 1000).toISOString()
       : undefined;
