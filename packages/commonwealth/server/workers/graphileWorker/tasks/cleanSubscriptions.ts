@@ -22,12 +22,12 @@ export const cleanSubscriptions = async () => {
         `;
     await models.sequelize.query(
       `
-          CREATE TEMPORARY TABLE user_ids_to_delete as (
-            SELECT U.id
-            FROM "Users" U
-              LEFT JOIN "Addresses" A ON U.id = A.user_id
-            GROUP BY U.id
-            HAVING (${noAccountsAndIsOldUser}) OR (${noActiveAccountsQuery}));
+          CREATE TEMPORARY TABLE user_ids_to_delete as (SELECT U.id
+                                                        FROM "Users" U
+                                                                 LEFT JOIN "Addresses" A ON U.id = A.user_id
+                                                        GROUP BY U.id
+                                                        HAVING (${noAccountsAndIsOldUser})
+                                                            OR (${noActiveAccountsQuery}));
       `,
       { transaction: t },
     );
@@ -73,7 +73,9 @@ export const cleanSubscriptions = async () => {
   log.info(`Deleted ${subsDeleted} subscriptions`);
 };
 
-export const cleanSubscriptionsTask: GraphileTask = {
+export const cleanSubscriptionsTask: GraphileTask<
+  typeof TaskPayloads.CleanSubscriptions
+> = {
   input: TaskPayloads.CleanSubscriptions,
   fn: cleanSubscriptions,
 };
