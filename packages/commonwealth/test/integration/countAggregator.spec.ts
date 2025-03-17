@@ -9,7 +9,7 @@ import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { main } from '../../server/workers/graphileWorker/tasks/countAggregator';
+import { countAggregator } from '../../server/workers/graphileWorker/tasks/countAggregator';
 
 chai.use(chaiHttp);
 
@@ -45,7 +45,7 @@ describe('Count Aggregator Tests', () => {
 
   describe('Tests the count aggregator', () => {
     test('it shouldnt do anything when redis is empty', async () => {
-      await main();
+      await countAggregator();
       const thread = await models.Thread.findOne({
         where: { id: 1 },
       });
@@ -77,7 +77,7 @@ describe('Count Aggregator Tests', () => {
         thread!.id!.toString(),
         '5',
       );
-      await main(); // calling count aggregtor here
+      await countAggregator(); // calling count aggregtor here
       const community = await models.Community.findOne({
         where: { id: 'ethereum' },
       });
