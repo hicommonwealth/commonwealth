@@ -39,4 +39,8 @@ export const cronItems: Array<CustomCronItem> = [
     task: GraphileTaskNames.UpdateSitemap,
     match: '0 * * * *', // every hour
   }),
+  buildCustomCronItem({
+    task: GraphileTaskNames.CountAggregator,
+    match: '*/10 * * * *', // every 10 minutes
+  }),
 ];
