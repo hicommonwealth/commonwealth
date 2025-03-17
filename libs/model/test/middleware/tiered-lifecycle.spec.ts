@@ -32,14 +32,15 @@ describe('Tiered middleware lifecycle', () => {
     member = actors.member;
     rejected = actors.rejected;
 
-    // make rejected tier 2
+    // setup test tiers
     await models.User.update(
       { created_at: moment().subtract(2, 'weeks') },
       { where: { id: rejected.user.id } },
     );
-
-    // make admin tier 4, so he can create more content
-    await models.User.update({ tier: 4 }, { where: { id: admin.user.id } });
+    await models.User.update(
+      { tier: 0 },
+      { where: { id: [member.user.id!, rejected.user.id!] } },
+    );
   });
 
   afterAll(async () => {
