@@ -64,7 +64,7 @@ export const getTotalContestBalance = async (
   let contestBalancePromise: Promise<bigint>;
   if (contestToken === ZERO_ADDRESS) {
     contestBalancePromise = client.getBalance({
-      address: contestToken,
+      address: contestAddress as `0x${string}`,
     });
   } else {
     contestBalancePromise = client.readContract({
