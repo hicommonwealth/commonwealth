@@ -17,6 +17,7 @@ export const MobileSignIn = () => {
 
   useEffect(() => {
     if (user.isLoggedIn) {
+      console.log('Logged in, redirecting to home');
       navigate('/');
       return;
     }

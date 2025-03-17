@@ -27,8 +27,12 @@ export const ForceMobileAuth = memo(function ForceMobileAuth(
       return false;
     }
 
-    if (user.id !== 0) {
+    if (user.isLoggedIn) {
       // if the user is logged in, then we are ok
+      return false;
+    }
+
+    if (location.pathname.startsWith('/finishsociallogin')) {
       return false;
     }
 
@@ -38,7 +42,7 @@ export const ForceMobileAuth = memo(function ForceMobileAuth(
     }
 
     return true;
-  }, [user.id]);
+  }, [user.isLoggedIn]);
 
   useEffect(() => {
     if (requiresMobileAuth()) {
