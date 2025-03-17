@@ -1,0 +1,59 @@
+.IOSModal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); // Dim background
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.IOSModal {
+  background: rgba(28, 28, 30, 0.9); // iOS-style dark modal
+  color: white;
+  width: 300px;
+  border-radius: 14px;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #b0b0b0;
+    line-height: 1.4;
+  }
+
+  &-buttons {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 15px;
+
+    button {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      color: #007aff;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      &:active {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
