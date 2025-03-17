@@ -103,6 +103,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                   email: null,
                   profile: {},
                   referred_by_address: referrer_address,
+                  tier: 1,
                 },
                 { transaction },
               );

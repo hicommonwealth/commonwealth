@@ -263,6 +263,7 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
+    const emailVerified = !!magicUserMetadata.email;
     const newUser = await models.User.create(
       {
         // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
@@ -274,9 +275,10 @@ async function createNewMagicUser({
         // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord -> Discord allows oauth
         // sign in with unverified email addresses)
-        emailVerified: !!magicUserMetadata.email,
+        emailVerified,
         profile: {},
         referred_by_address: referrer_address,
+        tier: emailVerified ? 3 : 1,
       },
       { transaction },
     );
