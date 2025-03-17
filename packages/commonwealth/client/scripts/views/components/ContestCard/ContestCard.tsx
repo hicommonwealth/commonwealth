@@ -258,6 +258,13 @@ const ContestCard = ({
             />
           </div>
         </div>
+        {ticker && (
+          <CWTag
+            label={`Weighted voting using ${ticker}`}
+            type="group"
+            classNames="contest-tag"
+          />
+        )}
         {!isFarcaster && topics?.length > 0 && (
           <CWText className="topics">
             Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
