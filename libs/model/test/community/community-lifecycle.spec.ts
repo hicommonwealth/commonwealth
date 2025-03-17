@@ -101,11 +101,11 @@ describe('Community lifecycle', () => {
     cosmosNode = _cosmosNode!;
     substrateNode = _substrateNode!;
 
-    const [superadmin] = await seed('User', { isAdmin: true });
-    const [admin] = await seed('User', { isAdmin: false });
-    const [member] = await seed('User', { isAdmin: false });
-    const [cosmosMember] = await seed('User', { isAdmin: false });
-    const [substrateMember] = await seed('User', { isAdmin: false });
+    const [superadmin] = await seed('User', { isAdmin: true, tier: 4 });
+    const [admin] = await seed('User', { isAdmin: false, tier: 4 });
+    const [member] = await seed('User', { isAdmin: false, tier: 4 });
+    const [cosmosMember] = await seed('User', { isAdmin: false, tier: 4 });
+    const [substrateMember] = await seed('User', { isAdmin: false, tier: 4 });
 
     const [ethBase] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
