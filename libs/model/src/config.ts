@@ -36,7 +36,6 @@ const {
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_CAST_WEBHOOK_ID,
   FARCASTER_ACTION_URL,
-  FLAG_FARCASTER_CONTEST,
   FARCASTER_MANIFEST_HEADER,
   FARCASTER_MANIFEST_PAYLOAD,
   FARCASTER_MANIFEST_SIGNATURE,
@@ -94,7 +93,6 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
-      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
@@ -165,6 +163,8 @@ export const config = configure(
     OPENAI: {
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
@@ -219,7 +219,6 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
-      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
       FARCASTER_NGROK_DOMAIN: z.string().nullish(),
       NEYNAR_BOT_UUID: z
         .string()
@@ -369,6 +368,8 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+      USE_OPENROUTER: z.string().optional(),
+      OPENROUTER_API_KEY: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z

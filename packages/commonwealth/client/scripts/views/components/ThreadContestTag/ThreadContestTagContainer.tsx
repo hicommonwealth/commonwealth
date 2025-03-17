@@ -20,7 +20,7 @@ const ThreadContestTagContainer = ({
     <>
       {showContestWinnerTag &&
         contestWinners.map((winner, index) => {
-          if (!winner || winner?.prize === 0) {
+          if (!winner || winner?.prize === null || winner?.prize === -1) {
             return null;
           }
 
@@ -29,7 +29,7 @@ const ThreadContestTagContainer = ({
               date={winner.date}
               round={winner.round}
               title={winner.title ?? ''}
-              prize={winner.prize}
+              prize={winner.prize + 1}
               key={index}
             />
           );

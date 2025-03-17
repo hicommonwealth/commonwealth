@@ -21,6 +21,8 @@ import {
   ThreadContextInput,
   TopicContext,
   TopicContextInput,
+  VerifiedContext,
+  VerifiedContextInput,
 } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
@@ -129,6 +131,44 @@ async function findPoll(actor: Actor, poll_id: number) {
   }
 
   return poll;
+}
+
+async function findVerifiedAddress(
+  actor: Actor,
+): Promise<{ address: AddressInstance }> {
+  if (!actor.address)
+    throw new InvalidActor(actor, 'Must provide an address to authorize');
+
+  // Loads and tracks real user's address activity
+  const address = await models.Address.findOne({
+    where: {
+      user_id: actor.user.id,
+      address: actor.address,
+      verified: { [Op.ne]: null },
+      // TODO: check verification token expiration
+    },
+  });
+
+  if (address) {
+    // fire and forget address activity tracking
+    address.last_active = new Date();
+    void address.save();
+    return { address };
+  }
+
+  if (!actor.user.isAdmin)
+    throw new InvalidActor(actor, `User is not verified`);
+
+  const super_address = await models.Address.findOne({
+    where: {
+      user_id: actor.user.id,
+      address: actor.address,
+    },
+  });
+  if (!super_address)
+    throw new InvalidActor(actor, `Super admin address not found`);
+
+  return { address: super_address };
 }
 
 async function findAddress(
@@ -358,6 +398,19 @@ export const systemActor = ({
 export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
   if (!ctx.actor.user.isAdmin)
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
+}
+
+/**
+ * Validates if actor's address is authorized/verified, not tied to any specific community
+ * @throws InvalidActor when not authorized
+ */
+export function authVerified() {
+  return async (
+    ctx: Context<typeof VerifiedContextInput, typeof VerifiedContext>,
+  ) => {
+    const { address } = await findVerifiedAddress(ctx.actor);
+    (ctx as { context: VerifiedContext }).context = { address };
+  };
 }
 
 /**

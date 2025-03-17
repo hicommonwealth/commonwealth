@@ -1,0 +1,48 @@
+.streaming-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: pulse 1.5s infinite;
+  opacity: 0.95;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+
+  .CWIcon {
+    color: #757575;
+    animation: sparkle 2s infinite;
+  }
+
+  .CWText {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

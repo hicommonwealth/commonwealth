@@ -1,6 +1,6 @@
 import { events } from '@hicommonwealth/schemas';
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { z, ZodSchema, ZodUndefined } from 'zod';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -11,9 +11,7 @@ export enum GraphileTaskNames {
   AwardTwitterQuestXp = 'AwardTweetEngagementXp',
 }
 
-export type GraphileTask<
-  Input extends ZodSchema | ZodUndefined = ZodUndefined,
-> = {
+export type GraphileTask<Input extends ZodSchema> = {
   readonly input: Input;
   readonly fn: (
     payload: z.infer<Input>,
@@ -26,10 +24,10 @@ export type CustomCronItem = CronItem & {
 };
 
 export const TaskPayloads = {
-  ArchiveOutbox: z.undefined(),
-  UpdateSitemap: z.undefined(),
-  CleanSubscriptions: z.undefined(),
-  CleanChainEventXpSources: z.undefined(),
-  RunDbMaintenance: z.undefined(),
+  ArchiveOutbox: z.object({}),
+  UpdateSitemap: z.object({}),
+  CleanSubscriptions: z.object({}),
+  CleanChainEventXpSources: z.object({}),
+  RunDbMaintenance: z.object({}),
   AwardTweetEngagementXp: events.TweetEngagementCapReached,
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;

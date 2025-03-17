@@ -1,13 +1,15 @@
-import { QuestParticipationLimit } from '@hicommonwealth/schemas';
-import { linkValidationSchema } from 'helpers/formValidations/common';
+import {
+  linkValidationSchema,
+  numberNonDecimalGTZeroValidationSchema,
+} from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
 
+// update in future if required
+export const MAX_XP_TO_END_UPPER_LIMIT = 10_000_000;
+
 export const questFormValidationSchema = z
   .object({
-    participation_limit: z.nativeEnum(QuestParticipationLimit, {
-      invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-    }),
     start_date: z
       .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
@@ -24,6 +26,17 @@ export const questFormValidationSchema = z
       .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
     image: linkValidationSchema.optional,
+    max_xp_to_end: numberNonDecimalGTZeroValidationSchema.refine(
+      (value) => {
+        const intVal = parseInt(value, 10);
+        return intVal <= MAX_XP_TO_END_UPPER_LIMIT;
+      },
+      {
+        message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL(
+          MAX_XP_TO_END_UPPER_LIMIT,
+        ),
+      },
+    ),
     community: z
       .object(
         {

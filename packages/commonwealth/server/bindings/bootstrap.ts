@@ -14,6 +14,7 @@ import {
   ChainEventPolicy,
   Contest,
   ContestWorker,
+  CreateUnverifiedUser,
   DiscordBotPolicy,
   FarcasterWorker,
   TwitterEngagementPolicy,
@@ -96,6 +97,13 @@ export async function bootstrapBindings(
 
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
+
+  const createUnverifiedUserSubRes =
+    await brokerInstance.subscribe(CreateUnverifiedUser);
+  checkSubscriptionResponse(
+    createUnverifiedUserSubRes,
+    CreateUnverifiedUser.name,
+  );
 
   const twitterEngSubRes = await brokerInstance.subscribe(
     TwitterEngagementPolicy,
