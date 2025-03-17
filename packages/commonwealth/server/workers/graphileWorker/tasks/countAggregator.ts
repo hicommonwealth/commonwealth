@@ -12,6 +12,12 @@ export const countAggregatorTask: GraphileTask = {
 };
 
 if (import.meta.url.endsWith(process.argv[1])) {
+  config.CACHE.REDIS_URL &&
+    config.NODE_ENV !== 'test' &&
+    cache({
+      adapter: new RedisCache(config.CACHE.REDIS_URL),
+    });
+
   countAggregator()
     .then(() => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -25,12 +31,6 @@ if (import.meta.url.endsWith(process.argv[1])) {
 }
 
 export async function countAggregator() {
-  config.CACHE.REDIS_URL &&
-    config.NODE_ENV !== 'test' &&
-    cache({
-      adapter: new RedisCache(config.CACHE.REDIS_URL),
-    });
-
   await cache().ready();
 
   try {
