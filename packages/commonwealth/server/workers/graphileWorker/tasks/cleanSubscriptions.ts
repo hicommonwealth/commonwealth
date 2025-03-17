@@ -27,8 +27,7 @@ export const cleanSubscriptions = async () => {
             FROM "Users" U
               LEFT JOIN "Addresses" A ON U.id = A.user_id
             GROUP BY U.id
-            HAVING (${noAccountsAndIsOldUser})
-                OR (${noActiveAccountsQuery}));
+            HAVING (${noAccountsAndIsOldUser}) OR (${noActiveAccountsQuery}));
       `,
       { transaction: t },
     );
