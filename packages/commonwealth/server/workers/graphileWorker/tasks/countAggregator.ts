@@ -9,7 +9,7 @@ const log = logger(import.meta);
 export const countAggregatorTask: GraphileTask<
   typeof TaskPayloads.CountAggregator
 > = {
-  input: TaskPayloads.CleanSubscriptions,
+  input: TaskPayloads.CountAggregator,
   fn: countAggregator,
 };
 
