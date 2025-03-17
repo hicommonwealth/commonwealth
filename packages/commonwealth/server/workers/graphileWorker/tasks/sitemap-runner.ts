@@ -36,7 +36,7 @@ const updateSitemaps = async () => {
   log.info('Sitemap written to: ' + index.location);
 };
 
-export const sitemapTask: GraphileTask<typeof TaskPayloads.UpdateSitemap> = {
+export const sitemapTask: GraphileTask = {
   input: TaskPayloads.UpdateSitemap,
   fn: updateSitemaps,
 };

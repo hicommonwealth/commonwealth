@@ -73,9 +73,7 @@ export const cleanSubscriptions = async () => {
   log.info(`Deleted ${subsDeleted} subscriptions`);
 };
 
-export const cleanSubscriptionsTask: GraphileTask<
-  typeof TaskPayloads.CleanSubscriptions
-> = {
+export const cleanSubscriptionsTask: GraphileTask = {
   input: TaskPayloads.CleanSubscriptions,
   fn: cleanSubscriptions,
 };

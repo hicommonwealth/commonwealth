@@ -21,9 +21,7 @@ const cleanChainEventXpSources = async () => {
   log.info(`Deactivated ${res} chain event XP sources`);
 };
 
-export const cleanChainEventXpSourcesTask: GraphileTask<
-  typeof TaskPayloads.CleanChainEventXpSources
-> = {
+export const cleanChainEventXpSourcesTask: GraphileTask = {
   input: TaskPayloads.CleanChainEventXpSources,
   fn: cleanChainEventXpSources,
 };

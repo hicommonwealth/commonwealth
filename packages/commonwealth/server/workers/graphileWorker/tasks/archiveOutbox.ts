@@ -175,9 +175,7 @@ const archiveOutbox: Task = async () => {
   }
 };
 
-export const archiveOutboxTask: GraphileTask<
-  typeof TaskPayloads.ArchiveOutbox
-> = {
+export const archiveOutboxTask: GraphileTask = {
   input: TaskPayloads.ArchiveOutbox,
   fn: archiveOutbox,
 };

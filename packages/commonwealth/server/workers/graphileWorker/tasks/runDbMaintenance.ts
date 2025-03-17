@@ -6,9 +6,7 @@ const runDbMaintenance = async () => {
   `);
 };
 
-export const runDbMaintenanceTask: GraphileTask<
-  typeof TaskPayloads.RunDbMaintenance
-> = {
+export const runDbMaintenanceTask: GraphileTask = {
   input: TaskPayloads.RunDbMaintenance,
   fn: runDbMaintenance,
 };
