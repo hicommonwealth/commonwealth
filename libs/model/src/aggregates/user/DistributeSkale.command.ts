@@ -1,13 +1,6 @@
-import { type Command, InvalidState } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
+import { getBalance, sendTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-  TransactionExecutionError,
-} from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { skaleCalypso } from 'viem/chains';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
@@ -20,7 +13,10 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
     ...schemas.DistributeSkale,
     auth: [],
     body: async ({ payload, actor }) => {
-      const { address, eth_chain_id } = payload;
+      const { address, eth_chain_id } = payload as {
+        address: `0x${string}`;
+        eth_chain_id: number;
+      };
 
       const foundAddress = await models.Address.findOne({
         where: { user_id: actor.user.id!, address },
@@ -35,38 +31,20 @@ export function DistributeSkale(): Command<typeof schemas.DistributeSkale> {
 
       mustExist('Chain Node', chainNode);
 
-      const client = createPublicClient({
-        transport: http(chainNode.private_url ?? chainNode.url),
-      });
+      const rpcUrl = chainNode.private_url ?? chainNode.url;
 
-      const balance = await client.getBalance({
-        address: address as `0x${string}`,
+      const balance = await getBalance({
+        address,
+        rpcUrl,
       });
 
       if (balance < BALANCE_THRESHOLD) {
-        const walletClient = createWalletClient({
-          account: privateKeyToAccount(
-            config.SKALE.PRIVATE_KEY as `0x${string}`,
-          ),
-          transport: http(chainNode.private_url ?? chainNode.url),
+        await sendTransaction({
+          privateKey: config.SKALE.PRIVATE_KEY as `0x${string}`,
+          to: address,
+          value: DISTRIBUTION_VALUE,
+          rpcUrl,
         });
-
-        try {
-          await walletClient.sendTransaction({
-            chain: skaleCalypso,
-            to: address as `0x${string}`,
-            value: DISTRIBUTION_VALUE,
-          });
-        } catch (e) {
-          if (e instanceof TransactionExecutionError) {
-            // Check if the error message indicates an insufficient balance
-            if (e.shortMessage.includes('Account balance is too low')) {
-              throw new InvalidState('Insufficient funds on Skale address.');
-            }
-          }
-
-          throw e;
-        }
       }
     },
   };
