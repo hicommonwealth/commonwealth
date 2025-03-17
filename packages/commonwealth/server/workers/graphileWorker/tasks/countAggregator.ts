@@ -6,7 +6,9 @@ import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-export const countAggregatorTask: GraphileTask = {
+export const countAggregatorTask: GraphileTask<
+  typeof TaskPayloads.CountAggregator
+> = {
   input: TaskPayloads.CleanSubscriptions,
   fn: countAggregator,
 };
