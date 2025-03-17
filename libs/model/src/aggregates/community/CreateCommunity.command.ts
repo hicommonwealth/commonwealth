@@ -7,9 +7,9 @@ import {
   DefaultPage,
   bech32ToHex,
 } from '@hicommonwealth/shared';
-import { tiered } from 'model/src/middleware';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { tiered } from '../../middleware';
 import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
