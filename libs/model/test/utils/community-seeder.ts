@@ -59,7 +59,7 @@ export async function seedCommunity({
     referral_count: 0,
     referral_eth_earnings: 0,
     xp_points: 0,
-    tier: 0,
+    tier: 4,
     emailVerified: false,
   }));
 
