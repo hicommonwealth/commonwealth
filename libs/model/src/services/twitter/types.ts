@@ -19,11 +19,11 @@ export type twitterMentions =
       event_payload: z.infer<typeof events.TwitterCommonMentioned>;
     }>;
 
-type AllKeys<T> = T extends any ? keyof T : never;
+type AllKeys<T> = T extends unknown ? keyof T : never;
 
 type RequiredFromUnion<T> = {
   [P in AllKeys<T>]-?: NonNullable<
-    T extends any ? (P extends keyof T ? T[P] : never) : never
+    T extends unknown ? (P extends keyof T ? T[P] : never) : never
   >;
 };
 
