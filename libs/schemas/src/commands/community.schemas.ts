@@ -42,6 +42,7 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
+    allow_tokenized_threads: z.boolean().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -179,6 +180,7 @@ export const CreateTopic = {
         token_decimals: true,
         vote_weight_multiplier: true,
         chain_node_id: true,
+        allow_tokenized_threads: true,
       }),
     ),
   output: z.object({
@@ -203,6 +205,7 @@ export const UpdateTopic = {
         featured_in_sidebar: true,
         featured_in_new_post: true,
         default_offchain_template: true,
+        allow_tokenized_threads: true,
       }).partial(),
     ),
   output: z.object({

@@ -30,6 +30,7 @@ export const QuestEvents = {
   UserMentioned: events.UserMentioned,
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  ContestEnded: events.ContestEnded,
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
