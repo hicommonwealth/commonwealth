@@ -14,6 +14,7 @@ import {
   buildFarcasterContestFrameUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
+import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
@@ -27,17 +28,6 @@ import {
 } from '../../utils';
 
 const log = logger(import.meta);
-
-export class MissingContestManager extends Error {
-  constructor(
-    message: string,
-    public readonly namespace: string,
-    public readonly contest_address: string,
-  ) {
-    super(message);
-    this.name = 'Missing Contest Manager';
-  }
-}
 
 const inputs = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
@@ -220,6 +210,16 @@ export function Contests(): Projection<typeof inputs> {
     inputs,
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -231,6 +231,16 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       OneOffContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -241,14 +251,8 @@ export function Contests(): Projection<typeof inputs> {
         );
 
         // if bot-created farcaster contest, notify author
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-          },
-        });
-        mustExist('Contest Manager', contestManager);
 
-        if (contestManager.farcaster_author_cast_hash) {
+        if (contestManager?.farcaster_author_cast_hash) {
           await publishCast(
             contestManager.farcaster_author_cast_hash,
             ({ username }) => {
@@ -274,12 +278,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-            environment: config.APP_ENV,
-          },
-        });
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
         if (!contestManager) {
           log.warn(
             `ContestManager not found for contest ${payload.contest_address}`,
@@ -341,6 +342,12 @@ export function Contests(): Projection<typeof inputs> {
             },
           ],
         });
+        if (!add_action) {
+          log.warn(
+            `ContestAction not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
 
         let calculated_voting_weight: string | undefined;
 
