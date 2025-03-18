@@ -86,6 +86,7 @@ export enum CacheNamespaces {
   Community_Thread_Count_Changed = 'community_thread_count_changed',
   Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
   Community_Profile_Count_Changed = 'community_profile_count_changed',
+  TieredCounter = 'tiered_counter',
 }
 
 /**

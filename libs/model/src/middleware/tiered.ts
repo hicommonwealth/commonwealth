@@ -1,6 +1,11 @@
-import { Context, InvalidActor } from '@hicommonwealth/core';
+import {
+  CacheNamespaces,
+  Context,
+  InvalidActor,
+  cache,
+} from '@hicommonwealth/core';
 import moment from 'moment';
-import { Op, QueryTypes } from 'sequelize';
+import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { models } from '../database';
 
@@ -15,55 +20,33 @@ const tierLimitsPerHour = [
   { create: 5, upvote: 25, ai: { images: 10, text: 50 } },
 ];
 
-/*
- * Gets amount of content created by user id in the last hour
- * TODO: cache creations by user to avoid db query?
- */
-async function getLastHourCreates(user_id: number) {
-  const [{ creates }] = await models.sequelize.query<{ creates: number }>(
-    `
-    SELECT 
-      COALESCE(COUNT(DISTINCT T.id), 0) +
-      COALESCE(COUNT(DISTINCT C.id), 0) +
-      COALESCE(COUNT(DISTINCT CM.id), 0) AS creates
-    FROM "Addresses" A
-      LEFT JOIN "Threads" T ON A."id" = T."address_id" 
-        AND T."created_at" >= NOW() - INTERVAL '1 hour'
-      LEFT JOIN "Comments" C ON A."id" = C."address_id" 
-        AND C."created_at" >= NOW() - INTERVAL '1 hour'
-      LEFT JOIN "Communities" CM ON A."community_id" = CM."id" 
-        AND A.role = 'admin' -- proxy to community creator
-        AND CM."created_at" >= NOW() - INTERVAL '1 hour'
-    WHERE A."user_id" = :user_id;
-    `,
-    {
-      type: QueryTypes.SELECT,
-      raw: true,
-      replacements: { user_id },
-    },
-  );
-  return +creates;
+function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
+  return `${user_id}-${counter}-${new Date().toISOString().substring(0, 10)}`;
 }
 
-/*
- * Gets amount of upvotes made by user id in the last hour
- * TODO: cache upvotes by user to avoid db query?
- */
-async function getLastHourUpvotes(user_id: number) {
-  const [{ upvotes }] = await models.sequelize.query<{ upvotes: number }>(
-    `
-    SELECT COUNT(*) as upvotes
-    FROM "Reactions" R JOIN "Addresses" A ON A."id" = R."address_id"
-    WHERE R."created_at" >= NOW() - INTERVAL '1 hour' AND
-          A."user_id" = :user_id
-    `,
-    {
-      type: QueryTypes.SELECT,
-      raw: true,
-      replacements: { user_id },
-    },
-  );
-  return +upvotes;
+async function getUserCount(user_id: number, counter: 'creates' | 'upvotes') {
+  const cacheKey = builtKey(user_id, counter);
+  const count = await cache().getKey(CacheNamespaces.TieredCounter, cacheKey);
+  return +(count ?? '0');
+}
+
+export async function incrementUserCount(
+  user_id: number,
+  counter: 'creates' | 'upvotes',
+) {
+  const cacheKey = builtKey(user_id, counter);
+  try {
+    const requestCount = await cache().incrementKey(
+      CacheNamespaces.TieredCounter,
+      cacheKey,
+    );
+    if (requestCount === 1) {
+      // is first request in window, set expiration
+      await cache().setKeyTTL(CacheNamespaces.TieredCounter, cacheKey, 60);
+    }
+  } catch {
+    // ignore
+  }
 }
 
 export function tiered({
@@ -103,12 +86,12 @@ export function tiered({
     if (tier >= tierLimitsPerHour.length) return;
 
     if (creates) {
-      const last_creates = await getLastHourCreates(user.id);
+      const last_creates = await getUserCount(user.id, 'creates');
       if (last_creates >= tierLimitsPerHour[tier].create)
         throw new InvalidActor(actor, 'Exceeded content creation limit');
     }
     if (upvotes) {
-      const last_upvotes = await getLastHourUpvotes(user.id);
+      const last_upvotes = await getUserCount(user.id, 'upvotes');
       if (last_upvotes >= tierLimitsPerHour[tier].upvote)
         throw new InvalidActor(actor, 'Exceeded upvote limit');
     }
