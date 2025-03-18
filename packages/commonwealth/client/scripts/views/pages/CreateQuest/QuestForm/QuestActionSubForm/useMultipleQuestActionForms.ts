@@ -1,5 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
+  doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
@@ -159,14 +160,15 @@ const useQuestActionMultiFormsState = ({
     if (chosenAction) {
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
+      const allowsTopicId =
+        allowsContentId && doesActionAllowTopicId(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
-        with_optional_topic_id:
-          allowsContentId && doesActionAllowTopicId(chosenAction),
+        with_optional_topic_id: allowsTopicId,
         with_optional_comment_id:
-          allowsContentId && doesActionAllowThreadId(chosenAction),
+          allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
           allowsContentId && doesActionAllowThreadId(chosenAction),
       };
@@ -185,6 +187,18 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
+          contentLink: undefined,
+        };
+      }
+
+      // reset errors/values if action doesn't allow topic id
+      if (!allowsTopicId) {
+        updatedSubForms[index].values.contentIdScope =
+          QuestActionContentIdScope.Thread;
+        updatedSubForms[index].values.contentLink = '';
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          contentIdScope: undefined,
           contentLink: undefined,
         };
       }

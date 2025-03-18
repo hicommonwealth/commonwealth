@@ -82,7 +82,10 @@ const QuestActionSubForm = ({
       if (config?.with_optional_comment_id)
         return contentIdInputConfig.labels.commentId;
     }
-    if (config?.with_optional_topic_id)
+    if (
+      config?.with_optional_topic_id ||
+      defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
+    )
       return contentIdInputConfig.labels.topicId;
 
     return 'Content Id';
@@ -95,19 +98,20 @@ const QuestActionSubForm = ({
       if (config?.with_optional_comment_id)
         return contentIdInputConfig.placeholders.sampleCommentLink;
     }
-    if (config?.with_optional_topic_id)
+    if (
+      config?.with_optional_topic_id ||
+      defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
+    )
       return contentIdInputConfig.placeholders.sampleTopicLink;
 
     return 'Content Id';
   };
 
-  const withOptionalThreadOrCommentId =
-    config?.with_optional_comment_id || config?.with_optional_thread_id;
-
   const withOptionalContentId =
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
+  console.log('config => ', config);
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -365,7 +369,7 @@ const QuestActionSubForm = ({
         )}
       </div>
 
-      {withOptionalThreadOrCommentId && (
+      {config?.with_optional_thread_id && (
         <div className="content-id-type-selector">
           <CWText type="caption">Action Scope</CWText>
           <CWRadioButton
