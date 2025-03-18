@@ -209,3 +209,14 @@ export const UpdateContestManagerFrameHashes = {
   }),
   output: z.object({}),
 };
+
+export const DeleteContestManagerMetadata = {
+  input: z.object({
+    community_id: z.string(),
+    contest_address: z.string(),
+  }),
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
+  context: AuthContext,
+};

@@ -1,5 +1,6 @@
 export * from './CreateApiKey.command';
 export * from './DeleteApiKey.command';
+export * from './DistributeSkale.command';
 export * from './GetApiKey.query';
 export * from './GetNewContent.query';
 export * from './GetRandomResourceIds.query';

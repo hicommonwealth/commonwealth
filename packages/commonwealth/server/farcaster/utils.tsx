@@ -152,6 +152,7 @@ export const FrameLayout = ({
           flexDirection: 'row',
           marginRight: '40px',
           gap: '20px',
+          height: '20%',
         }}
       >
         <p

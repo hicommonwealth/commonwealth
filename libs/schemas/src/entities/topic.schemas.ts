@@ -52,6 +52,10 @@ export const Topic = z.object({
     .gte(0)
     .nullish()
     .describe('number of decimals of ERC20 token'),
+  allow_tokenized_threads: z
+    .boolean()
+    .optional()
+    .describe('Allows a thread in this topic to be tokenized'),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

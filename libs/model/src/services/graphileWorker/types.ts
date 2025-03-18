@@ -1,5 +1,5 @@
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { z, ZodSchema, ZodUndefined } from 'zod';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -7,12 +7,11 @@ export enum GraphileTaskNames {
   CleanSubscriptions = 'CleanSubscriptions',
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
-  AwardTwitterQuestXp = 'AwardTwitterQuestXp',
+  AwardTwitterQuestXp = 'AwardTweetEngagementXp',
+  CountAggregator = 'CountAggregator',
 }
 
-export type GraphileTask<
-  Input extends ZodSchema | ZodUndefined = ZodUndefined,
-> = {
+export type GraphileTask<Input extends ZodSchema> = {
   readonly input: Input;
   readonly fn: (
     payload: z.infer<Input>,
@@ -25,13 +24,14 @@ export type CustomCronItem = CronItem & {
 };
 
 export const TaskPayloads = {
-  ArchiveOutbox: z.undefined(),
-  UpdateSitemap: z.undefined(),
-  CleanSubscriptions: z.undefined(),
-  CleanChainEventXpSources: z.undefined(),
-  RunDbMaintenance: z.undefined(),
-  AwardTwitterQuestXp: z.object({
+  ArchiveOutbox: z.object({}),
+  UpdateSitemap: z.object({}),
+  CleanSubscriptions: z.object({}),
+  CleanChainEventXpSources: z.object({}),
+  RunDbMaintenance: z.object({}),
+  AwardTweetEngagementXp: z.object({
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
   }),
+  CountAggregator: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;
