@@ -23,7 +23,6 @@ export function findActiveContestManager(
     },
   });
   if (!contestManager) {
-    log.warn(`ContestManager not found for contest ${contest_address}`);
     return null;
   }
   return contestManager;
