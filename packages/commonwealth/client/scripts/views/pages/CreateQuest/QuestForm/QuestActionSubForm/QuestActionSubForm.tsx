@@ -306,7 +306,7 @@ const QuestActionSubForm = ({
         name="action"
         options={actionOptions}
         onChange={(newValue) =>
-          newValue && onChange?.({ action: newValue.value })
+          newValue && onChange?.({ action: newValue.value, contentLink: '' })
         }
         {...(defaultValues?.action && {
           value: {
