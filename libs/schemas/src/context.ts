@@ -7,6 +7,7 @@ import { Topic } from './entities/topic.schemas';
 import { Address } from './entities/user.schemas';
 
 // Input schemas for authorization context
+export const VerifiedContextInput = z.object({});
 export const AuthContextInput = z.object({ community_id: z.string() });
 export const TopicContextInput = z.object({ topic_id: z.number() });
 export const ThreadContextInput = z.object({ thread_id: z.number() });
@@ -16,6 +17,13 @@ export const ReactionContextInput = z.object({
   reaction_id: z.number(),
 });
 export const PollContextInput = z.object({ poll_id: z.number() });
+
+/**
+ * Light authorization context
+ * - Authorizes verified address, loading address instance
+ */
+export const VerifiedContext = z.object({ address: Address });
+export type VerifiedContext = z.infer<typeof VerifiedContext>;
 
 /**
  * Base authorization context

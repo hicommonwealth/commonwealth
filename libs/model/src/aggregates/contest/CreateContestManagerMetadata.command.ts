@@ -59,6 +59,7 @@ export function CreateContestManagerMetadata(): Command<
               is_farcaster_contest: !!is_farcaster_contest,
               image_url: rest.image_url || getDefaultContestImage(),
               environment: config.APP_ENV,
+              farcaster_author_cast_hash: undefined,
             },
             { transaction },
           );
@@ -67,10 +68,14 @@ export function CreateContestManagerMetadata(): Command<
       );
 
       mustExist('Contest Manager', contestManager);
+      const contestManagerData = contestManager.get({ plain: true });
+
       return {
         contest_managers: [
           {
-            ...contestManager.get({ plain: true }),
+            ...contestManagerData,
+            farcaster_author_cast_hash:
+              contestManagerData.farcaster_author_cast_hash || '',
             topic: topic?.get({ plain: true }),
           },
         ],
