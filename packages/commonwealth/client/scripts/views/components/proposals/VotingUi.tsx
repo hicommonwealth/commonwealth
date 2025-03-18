@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { CWText } from '../component_kit/cw_text';
+import VotingResultView, { VoteOption } from './VotingResultView';
 import './VotingUI.scss'; // Create this SCSS file for styling
 
-interface VoteOption {
+interface VotingOption {
   label: string;
   value: string;
   voteCount: number | string;
 }
 
 interface VotingUIProps {
-  options: VoteOption[]; // Dynamic voting options with counts
-  proposalTitle?: string; // Title/question for the poll
-  timeRemaining?: string; // Time remaining text
-  canVote?: boolean; // Whether voting is allowed
-  hasVoted?: boolean; // Whether the user has already voted
-  onVote: (option: string | [string]) => void; // Voting callback
-  type: 'cosmos' | 'snapshot'; // Differentiate between Cosmos and Snapshot
+  options: VotingOption[];
+  proposalTitle?: string;
+  timeRemaining?: string;
+  canVote?: boolean;
+  hasVoted?: boolean;
+  onVote: (option: string | [string]) => void;
+  type: 'cosmos' | 'snapshot';
+  votingOption: VoteOption[];
 }
 
 const VotingUI: React.FC<VotingUIProps> = ({
@@ -25,6 +27,7 @@ const VotingUI: React.FC<VotingUIProps> = ({
   hasVoted,
   onVote,
   type,
+  votingOption,
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
@@ -34,7 +37,6 @@ const VotingUI: React.FC<VotingUIProps> = ({
     }
   };
 
-  console.log(canVote);
   return (
     <div className="poll-container">
       <CWText type="h5" fontWeight="semiBold">
@@ -72,6 +74,10 @@ const VotingUI: React.FC<VotingUIProps> = ({
           Vote
         </button>
       </div>
+      <CWText type="h5" fontWeight="semiBold">
+        Results
+      </CWText>
+      <VotingResultView voteOptions={votingOption} showCombineBarOnly />
     </div>
   );
 };

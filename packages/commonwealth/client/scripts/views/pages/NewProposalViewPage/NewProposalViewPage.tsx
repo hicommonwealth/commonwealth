@@ -2,6 +2,7 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import _ from 'lodash';
@@ -21,13 +22,14 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import DetailsCard from '../../components/proposals/DeatilsCard';
-import GoveranceVote from '../../components/proposals/GoveranceVote';
 import TimeLine from '../../components/proposals/TimeLine';
+import VotingResultView from '../../components/proposals/VotingResultView';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { JSONDisplay } from '../view_proposal/JSONDisplay';
+import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
 import { useSnapshotProposal } from './useSnapshotProposal';
 type ViewProposalPageAttrs = {
@@ -40,6 +42,7 @@ export enum CodeEditorType {
   Preview,
 }
 const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [createdAt, setCreatedAt] = useState();
@@ -90,7 +93,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     snapshotId: querySnapshotId,
   });
 
-  const snapShotVoitingResult = React.useMemo(() => {
+  const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
     const { choices } = snapshotProposal;
     const totalVoteCount = totals.sumOfResultsBalance || 0;
@@ -180,6 +183,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   };
   return (
     <CWPageLayout>
+      <TimeLine proposalData={proposal?.data || snapshotProposal} />
       <CWContentPage
         showSkeleton={!proposal && !snapshotProposal}
         title={title}
@@ -195,6 +199,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
             ) : (
               !_.isEmpty(metadata) && <JSONDisplay data={metadata} />
             )}
+            {isWindowSmallInclusive && <DetailsCard />}
             {(description || snapshotProposal?.body) && (
               <CWAccordView title="Description" defaultOpen={true}>
                 <MarkdownViewerWithFallback
@@ -229,34 +234,57 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
               </CWAccordView>
             )}
             {queryType === 'cosmos' ? (
-              <VotingActions
-                onModalClose={onModalClose}
-                // @ts-expect-error <StrictNullChecks/>
-                proposal={proposal}
-                toggleVotingModal={toggleVotingModal}
-                votingModalOpen={votingModalOpen}
-                redrawProposals={redrawProposals}
-                proposalRedrawState={proposalRedrawState}
-              />
+              <>
+                <VotingActions
+                  onModalClose={onModalClose}
+                  // @ts-expect-error <StrictNullChecks/>
+                  proposal={proposal}
+                  toggleVotingModal={toggleVotingModal}
+                  votingModalOpen={votingModalOpen}
+                  redrawProposals={redrawProposals}
+                  proposalRedrawState={proposalRedrawState}
+                />
+                {isWindowSmallInclusive && (
+                  // @ts-expect-error <StrictNullChecks/>
+                  <VotingResults proposal={proposal} />
+                )}
+              </>
             ) : (
-              <SnapshotPollCardContainer
-                activeUserAddress={activeUserAddress}
-                fetchedPower={!!power}
-                identifier={proposalId}
-                proposal={snapshotProposal as SnapshotProposal}
-                scores={[]}
-                space={space as SnapshotSpace}
-                symbol={symbol}
-                totals={totals}
-                totalScore={totalScore}
-                validatedAgainstStrategies={validatedAgainstStrategies}
-                votes={votes}
-                loadVotes={async () => loadVotes()}
-              />
+              <>
+                <SnapshotPollCardContainer
+                  activeUserAddress={activeUserAddress}
+                  fetchedPower={!!power}
+                  identifier={proposalId}
+                  proposal={snapshotProposal as SnapshotProposal}
+                  scores={[]}
+                  space={space as SnapshotSpace}
+                  symbol={symbol}
+                  totals={totals}
+                  totalScore={totalScore}
+                  validatedAgainstStrategies={validatedAgainstStrategies}
+                  votes={votes}
+                  loadVotes={async () => loadVotes()}
+                  snapShotVotingResult={snapShotVotingResult}
+                />
+
+                {isWindowSmallInclusive && (
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
+                  />
+                )}
+                <ProposalVotesDrawer
+                  header="Votes"
+                  votes={votes}
+                  choices={snapshotProposal?.choices}
+                  isOpen={false}
+                  setIsOpen={(isOpen) => isOpen}
+                />
+              </>
             )}
           </>
         )}
-        showSidebar={true}
+        showSidebar={isWindowSmallInclusive ? false : true}
         sidebarComponents={[
           { label: 'Links', item: <DetailsCard /> },
           {
@@ -273,11 +301,9 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                   // @ts-expect-error <StrictNullChecks/>
                   <VotingResults proposal={proposal} />
                 ) : (
-                  <GoveranceVote
-                    voteOptions={snapShotVoitingResult}
-                    quorum={60}
-                    governanceType="Cosmos Proposal"
-                    barColor="#3366cc"
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
                   />
                 )}
               </>

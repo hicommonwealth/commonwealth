@@ -1,0 +1,14 @@
+.ProposalVotesDrawer {
+  display: flex;
+  width: 100%;
+  padding: 24px;
+
+  .content-container {
+    padding-left: 34px;
+    gap: 8px;
+
+    .Table {
+      margin-top: 20px !important;
+    }
+  }
+}

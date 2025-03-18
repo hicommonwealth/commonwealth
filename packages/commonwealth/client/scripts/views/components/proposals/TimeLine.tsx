@@ -68,9 +68,13 @@ const TimeLine = ({ proposalData }: { proposalData: any }) => {
           {timelineEvents.map((event, index) => (
             <li
               key={index}
-              className={`rb-item ${index === timelineEvents.length - 1 ? 'last-item' : ''}`}
+              className={`rb-item ${index === timelineEvents.length - 1 ? 'last_item' : ''}`}
             >
-              <div className="timeline-dot">
+              <div
+                className={clsx('timeline-dot', {
+                  last_item: index === timelineEvents.length - 1,
+                })}
+              >
                 <CWIcon
                   className={event.type}
                   iconName={event.iconName as IconName}
@@ -78,15 +82,17 @@ const TimeLine = ({ proposalData }: { proposalData: any }) => {
                   fill="red"
                 />
               </div>
-              <div className="timestamp">
-                <CWText type="h5" fontWeight="regular">
-                  {event.date}
-                </CWText>
-              </div>
-              <div className={clsx('item-title', event.type)}>
-                <CWText type="b2" fontWeight="regular" className={event.type}>
-                  {event.title}
-                </CWText>
+              <div className="right-container">
+                <div className="timestamp">
+                  <CWText type="h5" fontWeight="regular">
+                    {event.date}
+                  </CWText>
+                </div>
+                <div className={clsx('item-title', event.type)}>
+                  <CWText type="b2" fontWeight="regular" className={event.type}>
+                    {event.title}
+                  </CWText>
+                </div>
               </div>
             </li>
           ))}

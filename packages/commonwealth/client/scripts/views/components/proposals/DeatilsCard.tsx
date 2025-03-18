@@ -12,37 +12,21 @@ const DetailsCard = () => {
         </CWText>
       </div>
       <div className="rb-container">
-        <CWText type="b1" className="label">
-          Status
-        </CWText>
+        <CWText className="label">Status</CWText>
 
-        <CWText type="b1" className="title">
-          Status
-        </CWText>
+        <CWText className="detail">Status</CWText>
 
-        <CWText type="b1" className="label">
-          GovernanceType
-        </CWText>
+        <CWText className="label">GovernanceType</CWText>
 
-        <CWText type="b1" className="title">
-          GovernanceType
-        </CWText>
+        <CWText className="detail">GovernanceType</CWText>
 
-        <CWText type="b1" className="label">
-          Date Proposed
-        </CWText>
+        <CWText className="label">Date Proposed</CWText>
 
-        <CWText type="b1" className="title">
-          DD/MM/YYYY
-        </CWText>
+        <CWText className="detail">DD/MM/YYYY</CWText>
 
-        <CWText type="b1" className="label">
-          ID
-        </CWText>
+        <CWText className="label">ID</CWText>
 
-        <CWText type="b1" className="title">
-          DD/MM/YYYY
-        </CWText>
+        <CWText className="detail">DD/MM/YYYY</CWText>
       </div>
     </div>
   );

@@ -6,12 +6,14 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
+import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
 import VotingUI from 'client/scripts/views/components/proposals/VotingUi';
 import '../../../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
   PollCardProps & {
     onSnapshotVoteCast: (option: string) => void;
+    snapShotVotingResult: VoteOption[];
   },
   'onResultsClick'
 >;
@@ -24,6 +26,7 @@ export const SnapshotPollCard = ({
   totalVoteCount,
   votedFor,
   voteInformation,
+  snapShotVotingResult,
 }: SnapshotPollCardProps) => {
   const [internalHasVoted, setInternalHasVoted] =
     // @ts-expect-error <StrictNullChecks/>
@@ -84,6 +87,7 @@ export const SnapshotPollCard = ({
         hasVoted={hasVoted}
         onVote={castVote}
         type="snapshot"
+        votingOption={snapShotVotingResult}
       />
     </div>
   );

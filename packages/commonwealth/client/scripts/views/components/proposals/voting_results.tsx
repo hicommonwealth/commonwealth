@@ -9,7 +9,7 @@ import { VotingType } from '../../../models/types';
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import app from 'state';
-import GovernanceVote from './GoveranceVote';
+import VotingResultView from './VotingResultView';
 import {
   SimpleYesApprovalVotingResult,
   YesNoAbstainVetoVotingResult,
@@ -106,11 +106,9 @@ export const VotingResults = (props: VotingResultsProps) => {
       ];
 
       return (
-        <GovernanceVote
+        <VotingResultView
           voteOptions={voteOptions}
-          quorum={60} // Adjust based on your governance rules
-          governanceType="Cosmos Proposal"
-          barColor="#3366cc" // Uniform color for all bars
+          showCombineBarOnly={false}
         />
       );
     } else {

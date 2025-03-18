@@ -6,7 +6,10 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-
+  .governance-vote {
+    width: 100%;
+    border: none;
+  }
   .poll-box {
     border: 1px solid #e0dfe1 !important;
     padding: 16px;

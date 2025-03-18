@@ -1,16 +1,13 @@
 @import '../../../styles/shared.scss';
-$primary-green: #50d890;
-$white: #fff;
-$dark-gray: #232931;
-$light-gray: #fbfbfb;
-$text-gray: #262626;
-$shadow-gray: #777777;
-$border-gray: #4f5b66;
+
 .governance-vote {
   display: flex;
   flex-direction: column;
   border: 2px solid #f0eff0;
   width: 248px;
+  @include smallInclusive {
+    width: 100%;
+  }
   .main-container {
     display: flex;
     gap: 4px;

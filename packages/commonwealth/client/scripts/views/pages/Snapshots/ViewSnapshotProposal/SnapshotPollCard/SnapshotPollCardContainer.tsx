@@ -9,6 +9,7 @@ import moment from 'moment';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 
+import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
 import { SnapshotPollCard } from './SnapshotPollCard';
 import { calculateTimeRemaining } from './utils';
 
@@ -26,6 +27,7 @@ type SnapshotProposalCardsProps = {
   fetchedPower: boolean;
   totalScore: number;
   loadVotes: () => Promise<void>;
+  snapShotVotingResult: VoteOption[];
 };
 
 const enum VotingError {
@@ -48,6 +50,7 @@ export const SnapshotPollCardContainer = (
     fetchedPower,
     totalScore,
     loadVotes,
+    snapShotVotingResult,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -128,6 +131,7 @@ export const SnapshotPollCardContainer = (
         // @ts-expect-error <StrictNullChecks/>
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
+        snapShotVotingResult={snapShotVotingResult}
       />
       <CWModal
         size="small"
