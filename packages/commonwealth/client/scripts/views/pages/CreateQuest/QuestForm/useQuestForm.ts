@@ -326,6 +326,24 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             }
             setQuestActionSubForms([...tempForm]);
           }
+          if (error.includes('topic with id')) {
+            const topicId = error.match(/id "(\d+)"/)[1];
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find((form) =>
+              form.values.contentLink?.includes(`discussion/topic/${topicId}`),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentLink: `Invalid topic link.${
+                  values?.community
+                    ? ' Topic must belong to selected community'
+                    : ''
+                }`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
           notifyError('Failed to update quest! Please fix form errors');
           return;
         }
