@@ -12,11 +12,20 @@ module.exports = {
         UPDATE "Users"
         SET "tier" = CASE 
             -- TODO: find tier 4 users
-            WHEN "emailVerified" = TRUE THEN 3
             WHEN EXISTS (
-                SELECT 1 FROM "Addresses" A 
-                WHERE A."user_id" = "Users"."id" 
-                AND A."verified" IS NOT NULL
+              SELECT 1 FROM "Addresses" A
+              WHERE A."user_id" = "Users"."id"
+              AND A.oauth_provider IS NOT NULL
+              AND (
+                (A.oauth_email IS NOT NULL AND A.oauth_email_verified = TRUE) 
+                OR A.oauth_phone_number IS NOT NULL
+                OR A.oauth_username IS NOT NULL
+              )
+            ) THEN 3
+            WHEN EXISTS (
+              SELECT 1 FROM "Addresses" A 
+              WHERE A."user_id" = "Users"."id" 
+              AND A."verified" IS NOT NULL
             ) THEN CASE WHEN "created_at" < NOW() - INTERVAL '1 week' THEN 2 ELSE 1 END
             ELSE 0
         END;

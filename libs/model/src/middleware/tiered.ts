@@ -80,7 +80,7 @@ export function tiered({
 
     const user = await models.User.findOne({
       where: { id: actor.user.id },
-      attributes: ['id', 'tier', 'created_at', 'emailVerified'],
+      attributes: ['id', 'tier', 'created_at'],
       include: [
         {
           model: models.Address,
@@ -91,9 +91,8 @@ export function tiered({
     });
     if (!user?.id) throw new InvalidActor(actor, 'Unverified user');
 
-    // upgrade tier if necessary
+    // upgrade tier after a week
     let tier = user.tier;
-    if (tier < 3 && user.emailVerified) tier = 3;
     if (tier < 2 && moment().diff(moment(user.created_at), 'weeks') >= 1)
       tier = 2;
     if (tier < 1) tier = 1;
