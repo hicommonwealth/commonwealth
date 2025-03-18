@@ -1,8 +1,6 @@
-import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, dispose, logger } from '@hicommonwealth/core';
 import { GraphileTask, models, TaskPayloads } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { config } from '../../../config';
 
 const log = logger(import.meta);
 
@@ -14,12 +12,6 @@ export const countAggregatorTask: GraphileTask<
 };
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  config.CACHE.REDIS_URL &&
-    config.NODE_ENV !== 'test' &&
-    cache({
-      adapter: new RedisCache(config.CACHE.REDIS_URL),
-    });
-
   countAggregator()
     .then(() => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
