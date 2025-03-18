@@ -74,6 +74,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
       xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
+      xp_referrer_points: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: true,
+      },
       unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
       referred_by_address: { type: Sequelize.STRING, allowNull: true },
       referral_count: {
