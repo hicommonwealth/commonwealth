@@ -21,7 +21,7 @@ const tierLimitsPerHour = [
 ];
 
 function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
-  return `${user_id}-${counter}-${new Date().toISOString().substring(0, 10)}`;
+  return `${user_id}-${counter}-${new Date().toISOString().substring(0, 13)}`;
 }
 
 async function getUserCount(user_id: number, counter: 'creates' | 'upvotes') {
