@@ -33,5 +33,5 @@ export const TaskPayloads = {
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
   }),
-  CountAggregator: z.undefined(),
+  CountAggregator: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;
