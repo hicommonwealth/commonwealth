@@ -144,7 +144,7 @@ async function updateChannelQuest(
         !created &&
         quest.scheduled_job_id
       ) {
-        const job = await rescheduleJobs({
+        await rescheduleJobs({
           jobIds: [quest.scheduled_job_id],
           options: {
             runAt: payload.end_date,

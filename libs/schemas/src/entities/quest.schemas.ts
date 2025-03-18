@@ -10,6 +10,7 @@ export const ChannelQuestEvents = {
 // Channel quest action types that are not event related
 export const ChannelBatchActions = ['TweetEngagement'] as const;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const AllChannelQuestActionNames = [
   ...(Object.keys(ChannelQuestEvents) as [
     keyof typeof ChannelQuestEvents,
@@ -97,7 +98,7 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(tweet_url:https:\/\/x\.com\/[^\/]+\/status\/[^\/]+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
       )
       .optional()
       .nullish(),
