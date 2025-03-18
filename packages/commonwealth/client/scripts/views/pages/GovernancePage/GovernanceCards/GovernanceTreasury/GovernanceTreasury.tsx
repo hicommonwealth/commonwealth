@@ -31,6 +31,10 @@ const GovernanceTresury = () => {
 
   if (isLoadingToken) return;
 
+  const handleRequestFunds = () => {
+    // TODO : It should open up to a modal that allows users to "create a proposal"
+  };
+
   const tokenPricing = communityToken
     ? calculateTokenPricing(
         communityToken as z.infer<typeof TokenView>,
@@ -113,7 +117,12 @@ const GovernanceTresury = () => {
         </div>
       </div>
 
-      <CWButton buttonType="primary" label="Request Funds" buttonWidth="full" />
+      <CWButton
+        buttonType="primary"
+        label="Request Funds"
+        buttonWidth="full"
+        onClick={handleRequestFunds}
+      />
     </div>
   );
 };

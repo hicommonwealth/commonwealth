@@ -68,7 +68,7 @@ const GovernancePage = () => {
     onCosmos && completedCosmosProposals ? completedCosmosProposals.length : 0;
   const totalProposalsCount = activeProposalsCount + inactiveProposalsCount;
 
-  if (!governancePageEnabled || !onEtherem || !onCosmos) {
+  if (!governancePageEnabled && (!onEtherem || !onCosmos)) {
     return <PageNotFound />;
   }
 
