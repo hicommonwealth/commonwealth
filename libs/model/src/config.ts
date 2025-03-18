@@ -51,6 +51,7 @@ const {
   TWITTER_CONSUMER_SECRET,
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
+  SKALE_PRIVATE_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -175,6 +176,9 @@ export const config = configure(
       CONSUMER_SECRET: TWITTER_CONSUMER_SECRET,
       ACCESS_TOKEN: TWITTER_ACCESS_TOKEN,
       ACCESS_TOKEN_SECRET: TWITTER_ACCESS_TOKEN_SECRET,
+    },
+    SKALE: {
+      PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
   },
   z.object({
@@ -386,6 +390,15 @@ export const config = configure(
       CONSUMER_SECRET: z.string().optional(),
       ACCESS_TOKEN: z.string().optional(),
       ACCESS_TOKEN_SECRET: z.string().optional(),
+    }),
+    SKALE: z.object({
+      PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
     }),
   }),
 );

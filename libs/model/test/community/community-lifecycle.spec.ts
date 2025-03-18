@@ -113,6 +113,7 @@ describe('Community lifecycle', () => {
       active: true,
       lifetime_thread_count: 0,
       profile_count: 1,
+      allow_tokenized_threads: true,
       Addresses: [
         {
           role: 'member',
@@ -255,6 +256,7 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: ethNode.id!,
+          allow_tokenized_threads: true,
         },
       });
       expect(eth_result?.community?.id).toBe(eth_name);
@@ -467,6 +469,7 @@ describe('Community lifecycle', () => {
             description: 'abc',
             featured_in_sidebar: false,
             featured_in_new_post: false,
+            allow_tokenized_threads: true,
           },
         }),
       ).rejects.toThrow('User is not admin in the community');
@@ -483,6 +486,7 @@ describe('Community lifecycle', () => {
           description: 'bbb',
           featured_in_sidebar: false,
           featured_in_new_post: false,
+          allow_tokenized_threads: true,
         },
       });
       expect(result).to.haveOwnProperty('topic');
@@ -512,6 +516,7 @@ describe('Community lifecycle', () => {
           featured_in_sidebar: false,
           featured_in_new_post: false,
           weighted_voting: TopicWeightedVoting.Stake,
+          allow_tokenized_threads: true,
         },
       });
       const { topic } = result!;
@@ -556,6 +561,18 @@ describe('Community lifecycle', () => {
         },
       }))!;
       expect(updatedTopic.description).to.eq('newDesc by system actor');
+    });
+
+    test('Ensure not supplying allow_tokenized_threads does not override old value', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: systemActor({}),
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          description: 'newDesc by system actor',
+        },
+      }))!;
+      expect(updatedTopic.allow_tokenized_threads).to.eq(true);
     });
 
     test('should archive a topic', async () => {
@@ -670,6 +687,22 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.directory_page_enabled, true);
       assert.equal(updated?.directory_page_chain_node_id, ethNode.id);
       assert.equal(updated?.type, 'offchain');
+    });
+
+    test('ensure update community does not override allow_tokenized_threads', async () => {
+      const updated = await command(UpdateCommunity(), {
+        actor: ethAdminActor,
+        payload: {
+          ...baseRequest,
+          community_id: community.id,
+          chain_node_id: ethNode.id,
+          directory_page_enabled: true,
+          directory_page_chain_node_id: ethNode.id,
+          type: ChainType.Offchain,
+        },
+      });
+
+      assert.equal(updated?.allow_tokenized_threads, true);
     });
 
     test('should remove directory', async () => {
