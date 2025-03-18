@@ -6,12 +6,16 @@ import GovernanceUserProfile from './GovernanceUserProfile/GovernanceUserProfile
 
 import './GovernanceCards.scss';
 
-const GovernanceCards = () => {
+interface GovernaceCardsProps {
+  totalProposals?: number;
+}
+
+const GovernanceCards = ({ totalProposals }: GovernaceCardsProps) => {
   return (
     <div className="GovernanceCards">
       <GovernanceMember />
       <GovernanceTresury />
-      <GovernanceProposalCard />
+      <GovernanceProposalCard totalProposals={totalProposals} />
       <GovernanceUserProfile />
     </div>
   );
