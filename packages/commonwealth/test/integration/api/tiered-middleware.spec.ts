@@ -4,7 +4,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
-import jwt from 'jsonwebtoken';
+import jsonwebtoken from 'jsonwebtoken';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { testServer, TestServer } from '../../../server-test';
@@ -155,23 +155,23 @@ describe('Tiered middleware', () => {
       },
       address: community?.Addresses?.at(2)?.address,
     };
-    community_id = community?.id!;
-    topic_id = community?.topics?.at(0)?.id!;
-    jwt1 = jwt.sign(
+    community_id = community!.id!;
+    topic_id = community!.topics!.at(0)!.id!;
+    jwt1 = jsonwebtoken.sign(
       {
         id: member1_user!.id!,
         email: member1_user!.email!,
       },
       config.AUTH.JWT_SECRET,
     );
-    jwt2 = jwt.sign(
+    jwt2 = jsonwebtoken.sign(
       {
         id: member2_user!.id!,
         email: member2_user!.email!,
       },
       config.AUTH.JWT_SECRET,
     );
-    jwt3 = jwt.sign(
+    jwt3 = jsonwebtoken.sign(
       {
         id: member3_user!.id!,
         email: member3_user!.email!,
