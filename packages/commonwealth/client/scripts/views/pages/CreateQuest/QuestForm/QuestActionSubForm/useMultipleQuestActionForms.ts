@@ -193,12 +193,9 @@ const useQuestActionMultiFormsState = ({
 
       // set/reset default values/config if action allows content link
       if (allowsContentId) {
-        updatedSubForms[index].values.contentIdScope = updatedSubForms[index]
-          .values.contentIdScope
-          ? updatedSubForms[index].values.contentIdScope
-          : allowsTopicId
-            ? QuestActionContentIdScope.Topic
-            : QuestActionContentIdScope.Thread;
+        updatedSubForms[index].values.contentIdScope = allowsTopicId
+          ? QuestActionContentIdScope.Topic
+          : QuestActionContentIdScope.Thread;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdScope: undefined,
