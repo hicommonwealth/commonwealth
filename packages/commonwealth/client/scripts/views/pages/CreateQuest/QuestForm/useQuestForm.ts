@@ -170,7 +170,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             }),
             ...(subForm.values.contentLink &&
               (subForm.config?.with_optional_comment_id ||
-                subForm.config?.with_optional_thread_id) && {
+                subForm.config?.with_optional_thread_id ||
+                subForm.config?.with_optional_topic_id) && {
                 content_id: await buildContentIdFromURL(
                   subForm.values.contentLink,
                   subForm.values?.contentIdScope ===
@@ -229,7 +230,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           }),
           ...(subForm.values.contentLink &&
             (subForm.config?.with_optional_comment_id ||
-              subForm.config?.with_optional_thread_id) && {
+              subForm.config?.with_optional_thread_id ||
+              subForm.config?.with_optional_topic_id) && {
               content_id: await buildContentIdFromURL(
                 subForm.values.contentLink,
                 subForm.values?.contentIdScope ===

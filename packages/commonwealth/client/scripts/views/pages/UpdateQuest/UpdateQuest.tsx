@@ -2,6 +2,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { doesActionAllowThreadId, doesActionAllowTopicId } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -139,7 +140,11 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   ? action.content_id.split(':')[0] === 'topic'
                     ? QuestActionContentIdScope.Topic
                     : QuestActionContentIdScope.Thread
-                  : undefined,
+                  : doesActionAllowTopicId(action.event_name as QuestAction)
+                    ? QuestActionContentIdScope.Topic
+                    : doesActionAllowThreadId(action.event_name as QuestAction)
+                      ? QuestActionContentIdScope.Thread
+                      : undefined,
                 contentLink: action.content_id
                   ? buildURLFromContentId(
                       action.content_id.split(':')[1],

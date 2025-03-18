@@ -111,7 +111,6 @@ const QuestActionSubForm = ({
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
-  console.log('config => ', config);
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({

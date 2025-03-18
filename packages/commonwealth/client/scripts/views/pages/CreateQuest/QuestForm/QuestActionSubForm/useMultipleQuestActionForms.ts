@@ -191,6 +191,12 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
+      // set default values/config if action allows content link
+      if (allowsContentId) {
+        updatedSubForms[index].values.contentIdScope =
+          QuestActionContentIdScope.Topic;
+      }
+
       // reset errors/values if action doesn't allow topic id
       if (!allowsTopicId) {
         updatedSubForms[index].values.contentIdScope =
