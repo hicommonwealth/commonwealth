@@ -10,6 +10,7 @@ import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import { MobileAppOnboardModal } from 'views/modals/MobileAppOnboardModal/MobileAppOnboardModal';
 import { useMobileAppOnboarding } from 'views/modals/MobileAppOnboardModal/useMobileAppOnboarding';
+import useFarcasterFrameRedirect from '../hooks/useFarcasterFrameRedirect';
 import { useFlag } from '../hooks/useFlag';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
@@ -33,7 +34,6 @@ import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarBut
 import { AuthModal, AuthModalType } from './modals/AuthModal';
 import InviteLinkModal from './modals/InviteLinkModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
-
 type SublayoutProps = {
   hideFooter?: boolean;
   isInsideCommunity?: boolean;
@@ -46,6 +46,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const growlEnabled = useFlag('growl');
 
   const location = useLocation();
+
+  useFarcasterFrameRedirect();
 
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
