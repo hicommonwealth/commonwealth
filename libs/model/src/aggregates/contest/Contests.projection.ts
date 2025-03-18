@@ -14,7 +14,6 @@ import {
   buildFarcasterContestFrameUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
@@ -26,6 +25,7 @@ import {
   getChainNodeUrl,
   publishCast,
 } from '../../utils';
+import { findActiveContestManager } from '../../utils/findActiveContestManager';
 
 const log = logger(import.meta);
 

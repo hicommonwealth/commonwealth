@@ -1,9 +1,6 @@
-import { logger } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
-
-const log = logger(import.meta);
 
 export function findActiveContestManager(
   contest_address: string,
