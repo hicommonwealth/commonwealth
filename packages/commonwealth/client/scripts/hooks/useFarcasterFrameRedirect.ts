@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useCommonNavigate } from '../navigation/helpers';
 import useFarcasterStore from '../state/ui/farcaster';
@@ -11,8 +11,7 @@ const parsePath = (path: string) => {
 // Farcaster frame V2 opens root URL, so we need to redirect to the relative path
 // which will be the contest page URL (e.g. /dydx/contests/0x123...)
 const useFarcasterFrameRedirect = () => {
-  const [redirected, setRedirected] = useState(false);
-  const { farcasterContext } = useFarcasterStore();
+  const { farcasterContext, redirected, setRedirected } = useFarcasterStore();
   const navigate = useCommonNavigate();
 
   useEffect(() => {
@@ -41,7 +40,7 @@ const useFarcasterFrameRedirect = () => {
     };
 
     openEmbedUrl();
-  }, [farcasterContext, navigate, redirected]);
+  }, [farcasterContext, navigate, redirected, setRedirected]);
 };
 
 export default useFarcasterFrameRedirect;
