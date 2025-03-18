@@ -5,6 +5,7 @@ import {
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
+import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useEffect } from 'react';
@@ -18,7 +19,6 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './QuestActionSubForm.scss';
-import { doesActionRewardShareForReferrer } from './helpers';
 import { QuestAction, QuestActionSubFormProps } from './types';
 
 // these restrictions are only on client side, update per future requirements

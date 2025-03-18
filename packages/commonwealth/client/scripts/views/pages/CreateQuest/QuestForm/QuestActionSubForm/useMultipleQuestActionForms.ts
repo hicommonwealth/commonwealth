@@ -1,12 +1,12 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import {
+  doesActionAllowContentId,
+  doesActionRequireRewardShare,
+} from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
-import {
-  doesActionAllowContentId,
-  doesActionRequireRewardShare,
-} from './helpers';
 import {
   QuestAction,
   QuestActionSubFormConfig,

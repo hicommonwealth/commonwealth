@@ -2,6 +2,10 @@ import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
+import {
+  doesActionAllowContentId,
+  doesActionRequireRewardShare,
+} from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -14,10 +18,6 @@ import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction } from './QuestActionSubForm';
-import {
-  doesActionAllowContentId,
-  doesActionRequireRewardShare,
-} from './QuestActionSubForm/helpers';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
 import { buildContentIdFromURL } from './helpers';
