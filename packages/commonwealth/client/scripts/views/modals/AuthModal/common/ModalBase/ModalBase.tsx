@@ -171,7 +171,6 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -282,11 +281,9 @@ const ModalBase = ({
         setIsEVMWalletsModalVisible(true);
         return;
       }
-
       // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
-
     // if any SSO option is selected
     if (activeTabIndex === 1) {
       // TODO: decide if twitter references are to be updated to 'x'
