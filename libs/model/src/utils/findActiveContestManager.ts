@@ -2,10 +2,7 @@ import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
 
-export function findActiveContestManager(
-  contest_address: string,
-  where: Record<string, any> = {},
-) {
+export function findActiveContestManager(contest_address: string) {
   const contestManager = models.ContestManager.findOne({
     where: {
       contest_address,
@@ -16,7 +13,6 @@ export function findActiveContestManager(
       ended: {
         [Op.not]: true,
       },
-      ...where,
     },
   });
   if (!contestManager) {
