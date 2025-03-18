@@ -1,6 +1,8 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
   doesActionAllowContentId,
+  doesActionAllowThreadId,
+  doesActionAllowTopicId,
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -9,6 +11,7 @@ import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
   QuestAction,
+  QuestActionContentIdScope,
   QuestActionSubFormConfig,
   QuestActionSubFormErrors,
   QuestActionSubFormFields,
@@ -43,6 +46,7 @@ const useQuestActionMultiFormsState = ({
           Array.from({ length: minSubForms }, (_, index) => ({
             values: {
               participationLimit: QuestParticipationLimit.OncePerQuest,
+              contentIdScope: QuestActionContentIdScope.Topic,
             },
             refs: {
               runParticipationLimitValidator: () => {},
@@ -61,7 +65,10 @@ const useQuestActionMultiFormsState = ({
     setQuestActionSubForms((a) => [
       ...a,
       {
-        values: { participationLimit: QuestParticipationLimit.OncePerQuest },
+        values: {
+          participationLimit: QuestParticipationLimit.OncePerQuest,
+          contentIdScope: QuestActionContentIdScope.Topic,
+        },
         refs: { runParticipationLimitValidator: () => {} },
         id: questActionSubForms.length + 1,
       },
@@ -69,7 +76,11 @@ const useQuestActionMultiFormsState = ({
   };
 
   const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
-    if (config?.with_optional_comment_id || config?.with_optional_thread_id) {
+    if (
+      config?.with_optional_comment_id ||
+      config?.with_optional_thread_id ||
+      config?.with_optional_topic_id
+    ) {
       if (config?.requires_creator_points) {
         return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
       }
@@ -152,12 +163,12 @@ const useQuestActionMultiFormsState = ({
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        with_optional_topic_id:
+          allowsContentId && doesActionAllowTopicId(chosenAction),
         with_optional_comment_id:
-          allowsContentId && chosenAction === 'CommentUpvoted',
+          allowsContentId && doesActionAllowThreadId(chosenAction),
         with_optional_thread_id:
-          allowsContentId &&
-          (chosenAction === 'CommentCreated' ||
-            chosenAction === 'ThreadUpvoted'),
+          allowsContentId && doesActionAllowThreadId(chosenAction),
       };
 
       // reset errors/values if action doesn't require creator points

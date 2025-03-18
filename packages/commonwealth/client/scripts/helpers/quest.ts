@@ -33,8 +33,28 @@ export const doesActionRewardShareForCreator = (action: QuestActionType) => {
 export const doesActionAllowContentId = (action: QuestActionType) => {
   // These are inferred from libs/model/src/user/Xp.projection.ts
   return (
+    action === 'ThreadCreated' ||
     action === 'CommentCreated' ||
     action === 'CommentUpvoted' ||
+    action === 'ThreadUpvoted'
+  );
+};
+
+export const doesActionAllowThreadId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentCreated' || action === 'ThreadUpvoted';
+};
+
+export const doesActionAllowCommentId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowTopicId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
     action === 'ThreadUpvoted'
   );
 };

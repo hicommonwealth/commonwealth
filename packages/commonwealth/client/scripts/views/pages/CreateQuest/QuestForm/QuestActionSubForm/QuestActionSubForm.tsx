@@ -19,7 +19,11 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './QuestActionSubForm.scss';
-import { QuestAction, QuestActionSubFormProps } from './types';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+  QuestActionSubFormProps,
+} from './types';
 
 // these restrictions are only on client side, update per future requirements
 const MAX_REPETITION_COUNTS = {
@@ -58,10 +62,52 @@ const QuestActionSubForm = ({
         action.value !== 'UserMentioned',
     );
 
-  const placeholders = {
-    sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
-    sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
+  const contentIdInputConfig = {
+    placeholders: {
+      sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
+      sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
+      sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
+    },
+    labels: {
+      threadId: 'Thread Link (optional)',
+      commentId: 'Comment Link (optional)',
+      topicId: 'Topic Link (optional)',
+    },
   };
+
+  const getContentIdInputLabel = () => {
+    if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
+      if (config?.with_optional_thread_id)
+        return contentIdInputConfig.labels.threadId;
+      if (config?.with_optional_comment_id)
+        return contentIdInputConfig.labels.commentId;
+    }
+    if (config?.with_optional_topic_id)
+      return contentIdInputConfig.labels.topicId;
+
+    return 'Content Id';
+  };
+
+  const getContentIdInputPlaceholder = () => {
+    if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
+      if (config?.with_optional_thread_id)
+        return contentIdInputConfig.placeholders.sampleThreadLink;
+      if (config?.with_optional_comment_id)
+        return contentIdInputConfig.placeholders.sampleCommentLink;
+    }
+    if (config?.with_optional_topic_id)
+      return contentIdInputConfig.placeholders.sampleTopicLink;
+
+    return 'Content Id';
+  };
+
+  const withOptionalThreadOrCommentId =
+    config?.with_optional_comment_id || config?.with_optional_thread_id;
+
+  const withOptionalContentId =
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -319,24 +365,58 @@ const QuestActionSubForm = ({
         )}
       </div>
 
+      {withOptionalThreadOrCommentId && (
+        <div className="content-id-type-selector">
+          <CWText type="caption">Action Scope</CWText>
+          <CWRadioButton
+            className="radio-btn mt-8"
+            value={QuestActionContentIdScope.Topic}
+            label="Linked Topic"
+            groupName={`contentIdScope-${defaultValues?.action}`}
+            {...(defaultValues?.contentIdScope ===
+              QuestActionContentIdScope.Topic && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                contentLink: '',
+                contentIdScope: QuestActionContentIdScope.Topic,
+              })
+            }
+          />
+          <CWRadioButton
+            className="radio-btn"
+            value={QuestActionContentIdScope.Thread}
+            label="Linked Thread"
+            groupName={`contentIdScope-${defaultValues?.action}`}
+            {...(defaultValues?.contentIdScope ===
+              QuestActionContentIdScope.Thread && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                contentLink: '',
+                contentIdScope: QuestActionContentIdScope.Thread,
+              })
+            }
+          />
+        </div>
+      )}
+
       <div
         className={clsx(
           'grid-row',
-          config?.with_optional_comment_id || config?.with_optional_thread_id
-            ? 'cols-2'
-            : 'cols-1',
+          withOptionalContentId ? 'cols-2' : 'cols-1',
         )}
       >
-        {(config?.with_optional_comment_id ||
-          config?.with_optional_thread_id) && (
+        {withOptionalContentId && (
           <CWTextInput
-            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
+            key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
             name="contentLink"
-            placeholder={
-              config?.with_optional_thread_id
-                ? placeholders.sampleThreadLink
-                : placeholders.sampleCommentLink
-            }
+            label={getContentIdInputLabel()}
+            placeholder={getContentIdInputPlaceholder()}
             fullWidth
             {...(defaultValues?.contentLink && {
               defaultValue: defaultValues?.contentLink,

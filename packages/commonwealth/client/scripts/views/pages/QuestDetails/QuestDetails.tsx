@@ -3,10 +3,10 @@ import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
-  QuestAction as QuestActionType,
-  XPLog,
   calculateTotalXPForQuestActions,
   isQuestActionComplete,
+  QuestAction as QuestActionType,
+  XPLog,
 } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -41,7 +41,10 @@ import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import {
+  buildURLFromContentId,
+  ContentIdType,
+} from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -179,7 +182,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           navigate(
             buildURLFromContentId(
               actionContentId.split(':')[1],
-              'thread',
+              actionContentId.split(':')[0] as ContentIdType,
             ).split(window.location.origin)[1],
             {},
             null,
@@ -199,7 +202,7 @@ const QuestDetails = ({ id }: { id: number }) => {
             actionContentId
               ? buildURLFromContentId(
                   actionContentId.split(':')[1],
-                  'comment',
+                  actionContentId.split(':')[0] as ContentIdType,
                 ).split(window.location.origin)[1]
               : `/discussion/${
                   randomResourceId?.thread_id

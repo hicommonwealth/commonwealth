@@ -3,7 +3,10 @@ import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
+  doesActionAllowCommentId,
   doesActionAllowContentId,
+  doesActionAllowThreadId,
+  doesActionAllowTopicId,
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -17,7 +20,7 @@ import {
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
-import { QuestAction } from './QuestActionSubForm';
+import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
 import { buildContentIdFromURL } from './helpers';
@@ -58,6 +61,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 values: {
                   action: chosenAction,
                   instructionsLink: subForm.instructionsLink || '',
+                  contentIdScope: (
+                    subForm as QuestActionSubFormValuesWithContentLink
+                  ).contentIdScope,
                   contentLink:
                     (subForm as QuestActionSubFormValuesWithContentLink)
                       .contentLink || '',
@@ -77,12 +83,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 config: {
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
+                  with_optional_topic_id:
+                    allowsContentId && doesActionAllowTopicId(chosenAction),
                   with_optional_thread_id:
-                    allowsContentId &&
-                    (chosenAction === 'CommentCreated' ||
-                      chosenAction === 'ThreadUpvoted'),
+                    allowsContentId && doesActionAllowThreadId(chosenAction),
                   with_optional_comment_id:
-                    allowsContentId && chosenAction === 'CommentUpvoted',
+                    allowsContentId && doesActionAllowCommentId(chosenAction),
                 },
               };
             }),
@@ -151,34 +157,42 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (quest && quest.id) {
       await updateQuest({
         quest_id: quest.id,
-        action_metas: questActionSubForms.map((subForm) => ({
-          event_name: subForm.values.action as QuestAction,
-          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-          ...(subForm.values.creatorRewardAmount && {
-            creator_reward_weight: calculateRemainingPercentageChangeFractional(
-              parseInt(`${subForm.values.rewardAmount}`, 10),
-              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-            ),
-          }),
-          ...(subForm.values.contentLink &&
-            (subForm.config?.with_optional_comment_id ||
-              subForm.config?.with_optional_thread_id) && {
-              content_id: buildContentIdFromURL(
-                subForm.values.contentLink,
-                subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
-              ),
+        action_metas: await Promise.all(
+          questActionSubForms.map(async (subForm) => ({
+            event_name: subForm.values.action as QuestAction,
+            reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+            ...(subForm.values.creatorRewardAmount && {
+              creator_reward_weight:
+                calculateRemainingPercentageChangeFractional(
+                  parseInt(`${subForm.values.rewardAmount}`, 10),
+                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+                ),
             }),
-          participation_limit: subForm.values.participationLimit,
-          participation_period: subForm.values
-            .participationPeriod as QuestParticipationPeriod,
-          participation_times_per_period: parseInt(
-            `${subForm.values.participationTimesPerPeriod}`,
-          ),
-          ...(subForm.values.instructionsLink && {
-            instructions_link: subForm.values.instructionsLink.trim(),
-          }),
-          amount_multiplier: 0,
-        })),
+            ...(subForm.values.contentLink &&
+              (subForm.config?.with_optional_comment_id ||
+                subForm.config?.with_optional_thread_id) && {
+                content_id: await buildContentIdFromURL(
+                  subForm.values.contentLink,
+                  subForm.values?.contentIdScope ===
+                    QuestActionContentIdScope.Thread
+                    ? subForm.config?.with_optional_comment_id
+                      ? 'comment'
+                      : 'thread'
+                    : 'topic',
+                ),
+              }),
+            participation_limit: subForm.values.participationLimit,
+            participation_period: subForm.values
+              .participationPeriod as QuestParticipationPeriod,
+            participation_times_per_period: parseInt(
+              `${subForm.values.participationTimesPerPeriod}`,
+            ),
+            ...(subForm.values.instructionsLink && {
+              instructions_link: subForm.values.instructionsLink.trim(),
+            }),
+            amount_multiplier: 0,
+          })),
+        ),
       });
     }
   };
@@ -203,34 +217,41 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || null, // send null to remove community association
-      action_metas: questActionSubForms.map((subForm) => ({
-        event_name: subForm.values.action as QuestAction,
-        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-        ...(subForm.values.creatorRewardAmount && {
-          creator_reward_weight: calculateRemainingPercentageChangeFractional(
-            parseInt(`${subForm.values.rewardAmount}`, 10),
-            parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-          ),
-        }),
-        ...(subForm.values.contentLink &&
-          (subForm.config?.with_optional_comment_id ||
-            subForm.config?.with_optional_thread_id) && {
-            content_id: buildContentIdFromURL(
-              subForm.values.contentLink,
-              subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
+      action_metas: await Promise.all(
+        questActionSubForms.map(async (subForm) => ({
+          event_name: subForm.values.action as QuestAction,
+          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+          ...(subForm.values.creatorRewardAmount && {
+            creator_reward_weight: calculateRemainingPercentageChangeFractional(
+              parseInt(`${subForm.values.rewardAmount}`, 10),
+              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
             ),
           }),
-        participation_limit: subForm.values.participationLimit,
-        participation_period: subForm.values
-          .participationPeriod as QuestParticipationPeriod,
-        participation_times_per_period: parseInt(
-          `${subForm.values.participationTimesPerPeriod}`,
-        ),
-        ...(subForm.values.instructionsLink && {
-          instructions_link: subForm.values.instructionsLink.trim(),
-        }),
-        amount_multiplier: 0,
-      })),
+          ...(subForm.values.contentLink &&
+            (subForm.config?.with_optional_comment_id ||
+              subForm.config?.with_optional_thread_id) && {
+              content_id: await buildContentIdFromURL(
+                subForm.values.contentLink,
+                subForm.values?.contentIdScope ===
+                  QuestActionContentIdScope.Thread
+                  ? subForm.config?.with_optional_comment_id
+                    ? 'comment'
+                    : 'thread'
+                  : 'topic',
+              ),
+            }),
+          participation_limit: subForm.values.participationLimit,
+          participation_period: subForm.values
+            .participationPeriod as QuestParticipationPeriod,
+          participation_times_per_period: parseInt(
+            `${subForm.values.participationTimesPerPeriod}`,
+          ),
+          ...(subForm.values.instructionsLink && {
+            instructions_link: subForm.values.instructionsLink.trim(),
+          }),
+          amount_multiplier: 0,
+        })),
+      ),
     });
   };
 

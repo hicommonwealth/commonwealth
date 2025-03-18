@@ -17,8 +17,14 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
-import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+} from '../CreateQuest/QuestForm/QuestActionSubForm';
+import {
+  buildURLFromContentId,
+  ContentIdType,
+} from '../CreateQuest/QuestForm/helpers';
 import './UpdateQuest.scss';
 
 const UpdateQuest = ({ id }: { id: number }) => {
@@ -129,10 +135,15 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
                 instructionsLink: action.instructions_link,
+                contentIdScope: action.content_id
+                  ? action.content_id.split(':')[0] === 'topic'
+                    ? QuestActionContentIdScope.Topic
+                    : QuestActionContentIdScope.Thread
+                  : undefined,
                 contentLink: action.content_id
                   ? buildURLFromContentId(
                       action.content_id.split(':')[1],
-                      action.content_id.split(':')[0] as 'thread' | 'comment',
+                      action.content_id.split(':')[0] as ContentIdType,
                     )
                   : action.content_id,
               })),
