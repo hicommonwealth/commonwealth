@@ -1,7 +1,10 @@
 name: Pre-Release Notes & Merge
 
 on:
-  workflow_dispatch: # Manual trigger
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   generate-notes-and-merge:
