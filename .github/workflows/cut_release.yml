@@ -61,14 +61,9 @@ jobs:
 #            echo "No new merge commits found."
 #          fi
 
-      - name: Setup tmate session
-        env:
-          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
-        uses: mxschmitt/action-tmate@v3
-
       - name: Send Mapped Release Notes to Slack
         env:
-          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
+          SLACK_PRE_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
         run: |
           if [ -n "$MAPPED_NOTES" ]; then
             PAYLOAD=$(jq -n --arg text "Pre-Release Notes:\\nIf you are mentioned :thumbsup: after you have tested your changes on [beta.commonwealth.im](https://beta.commonwealth.im)\\n\\n$MAPPED_NOTES" '{text: $text}')
