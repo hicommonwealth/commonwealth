@@ -2,6 +2,7 @@ import { Actor, command, dispose } from '@hicommonwealth/core';
 import { CommunityGoalsPolicy } from '@hicommonwealth/model';
 import { JoinCommunity } from 'model/src/aggregates/community';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Xp } from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 import { drainOutbox, seedCommunity } from '../utils';
@@ -75,7 +76,7 @@ describe('community goals lifecycle', () => {
     });
     expect(goal2?.reached_at).toBeTruthy();
 
-    const e = await drainOutbox(['CommunityGoalReached']);
+    const e = await drainOutbox(['CommunityGoalReached'], Xp);
     expect(e.length).toBe(1);
   });
 });

@@ -35,6 +35,7 @@ export const QuestEvents = {
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
   NamespaceLinked: events.NamespaceLinked,
+  CommunityGoalReached: events.CommunityGoalReached,
   ...ChannelQuestEvents,
 } as const;
 
