@@ -22,12 +22,16 @@ import ErrorPage from 'views/pages/error';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './DirectoryPage.scss';
+import DirectorySettingsModal from './DirectorySettingsModal';
 
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
+  const [isDirectorySettingsModalOpen, setIsDirectorySettingsModalOpen] =
+    useState(false);
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const { data: nodes } = useFetchNodesQuery();
@@ -101,40 +105,49 @@ const DirectoryPage = () => {
         <CWText type="h4" className="subtitle">
           {baseChain?.name} ecosystem
         </CWText>
-        <div className="search-row">
-          <div className="community-search">
-            <CWTextInput
-              value={communitySearch}
-              onInput={(e: any) => setCommunitySearch(e.target.value)}
-              fullWidth
-              placeholder="Search communities"
-              iconLeft={<MagnifyingGlass size={24} weight="regular" />}
-            />
-          </div>
-          <div className="toggle-view-icons">
-            <div
-              className={clsx('icon-container', {
-                selected: selectedViewType === ViewType.Rows,
-              })}
-            >
-              <CWIconButton
-                onClick={() => setSelectedViewType(ViewType.Rows)}
-                iconName="rows"
-                weight="light"
+        <div className="search-row-and-filter">
+          <div className="search-row">
+            <div className="community-search">
+              <CWTextInput
+                value={communitySearch}
+                onInput={(e: any) => setCommunitySearch(e.target.value)}
+                fullWidth
+                placeholder="Search communities"
+                iconLeft={<MagnifyingGlass size={24} weight="regular" />}
               />
             </div>
-            <div
-              className={clsx('icon-container', {
-                selected: selectedViewType === ViewType.Tiles,
-              })}
-            >
-              <CWIconButton
-                onClick={() => setSelectedViewType(ViewType.Tiles)}
-                iconName="squaresFour"
-                weight="light"
+            <div className="toggle-view-icons">
+              <div
+                className={clsx('icon-container', {
+                  selected: selectedViewType === ViewType.Rows,
+                })}
+              >
+                <CWIconButton
+                  onClick={() => setSelectedViewType(ViewType.Rows)}
+                  iconName="rows"
+                  weight="light"
+                />
+              </div>
+              <div
+                className={clsx('icon-container', {
+                  selected: selectedViewType === ViewType.Tiles,
+                })}
+              >
+                <CWIconButton
+                  onClick={() => setSelectedViewType(ViewType.Tiles)}
+                  iconName="squaresFour"
+                  weight="light"
+                />
+              </div>
+              <CWButton
+                iconLeft="gear"
+                buttonType="secondary"
+                label="Directory Settings"
+                onClick={() => setIsDirectorySettingsModalOpen(true)}
               />
             </div>
           </div>
+          <div>FILTER GOES HERE</div>
         </div>
 
         <DirectoryPageContent
@@ -147,6 +160,18 @@ const DirectoryPage = () => {
           tableData={tableData}
           selectedViewType={selectedViewType}
         />
+        {isDirectorySettingsModalOpen && (
+          <CWModal
+            size="small"
+            content={
+              <DirectorySettingsModal
+                onModalClose={() => setIsDirectorySettingsModalOpen(false)}
+              />
+            }
+            open={true}
+            onClose={() => setIsDirectorySettingsModalOpen(false)}
+          />
+        )}
       </div>
     </CWPageLayout>
   );
