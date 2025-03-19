@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityGoalsPolicy,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
@@ -104,6 +105,12 @@ export async function bootstrapBindings(
   checkSubscriptionResponse(
     createUnverifiedUserSubRes,
     CreateUnverifiedUser.name,
+  );
+  const createCommunityGoalsSubRes =
+    await brokerInstance.subscribe(CommunityGoalsPolicy);
+  checkSubscriptionResponse(
+    createCommunityGoalsSubRes,
+    CommunityGoalsPolicy.name,
   );
 }
 

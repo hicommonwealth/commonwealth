@@ -88,18 +88,18 @@ export const ExtendedCommunity = Community.extend({
 });
 
 export const CommunityGoalMeta = z.object({
-  id: PG_INT,
+  id: PG_INT.optional(), // auto-generated (ง •̀_•́)ง
   name: z.string(),
   description: z.string(),
   type: z.enum(['members', 'threads']),
   target: z.number(),
-  created_at: z.coerce.date(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
 });
 
 export const CommunityGoalReached = z.object({
   community_goal_meta_id: PG_INT,
-  community_id: PG_INT,
-  created_at: z.coerce.date(),
+  community_id: z.string(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
   reached_at: z.coerce.date().nullish(),
 
   // associations

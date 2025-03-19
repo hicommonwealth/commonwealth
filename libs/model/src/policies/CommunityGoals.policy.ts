@@ -1,5 +1,6 @@
 import { Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { SetReachedGoal } from '../aggregates/community';
 import { models } from '../database';
 import { systemActor } from '../middleware';
@@ -16,21 +17,24 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
         const { community_id } = payload;
 
         // check if community has any unreached members goal
-        const goals = await models.CommunityGoalReached.findAll({
-          where: { community_id, reached_at: null },
-          include: [
-            {
-              model: models.CommunityGoalMeta,
-              required: true,
-              where: { type: 'members' },
-            },
-          ],
-        });
+        const goals = (
+          await models.CommunityGoalReached.findAll({
+            where: { community_id, reached_at: { [Op.is]: null } },
+            include: [
+              {
+                model: models.CommunityGoalMeta,
+                as: 'meta',
+                required: true,
+                where: { type: 'members' },
+              },
+            ],
+          })
+        ).map((g) => g.toJSON());
         if (!goals) return;
 
         // get community members
         const members = await models.Address.count({
-          where: { community_id, verified: true },
+          where: { community_id, verified: { [Op.not]: null } },
         });
 
         // set reached goals

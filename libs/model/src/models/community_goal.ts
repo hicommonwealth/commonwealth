@@ -20,9 +20,13 @@ export const CommunityGoalMeta = (
       description: { type: Sequelize.STRING, allowNull: false },
       type: { type: Sequelize.STRING, allowNull: false },
       target: { type: Sequelize.INTEGER, allowNull: false },
-      created_at: { type: Sequelize.DATE, allowNull: false },
     },
-    { tableName: 'CommunityGoalMetas', timestamps: false },
+    {
+      tableName: 'CommunityGoalMetas',
+      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: false,
+    },
   );
 
 export type CommunityGoalReachedAttributes = z.infer<
@@ -39,8 +43,12 @@ export const CommunityGoalReached = (
     {
       community_goal_meta_id: { type: Sequelize.INTEGER, primaryKey: true },
       community_id: { type: Sequelize.STRING, primaryKey: true },
-      created_at: { type: Sequelize.DATE, allowNull: false },
       reached_at: { type: Sequelize.DATE, allowNull: true },
     },
-    { tableName: 'CommunityGoalReached', timestamps: false },
+    {
+      tableName: 'CommunityGoalReached',
+      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: false,
+    },
   );
