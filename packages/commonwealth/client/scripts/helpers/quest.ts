@@ -6,13 +6,58 @@ import {
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { z } from 'zod';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/helpers';
+import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
 export type QuestAction = z.infer<typeof QuestActionMeta>;
 export type XPLog = z.infer<typeof XpLogView>;
+
+export const doesActionRequireRewardShare = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'CommunityCreated' ||
+    action === 'CommunityJoined' ||
+    action === 'CommentUpvoted'
+  );
+};
+
+export const doesActionRewardShareForReferrer = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommunityCreated' || action === 'CommunityJoined';
+};
+
+export const doesActionRewardShareForCreator = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowContentId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'CommentUpvoted' ||
+    action === 'ThreadUpvoted'
+  );
+};
+
+export const doesActionAllowThreadId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentCreated' || action === 'ThreadUpvoted';
+};
+
+export const doesActionAllowCommentId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowTopicId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'ThreadUpvoted'
+  );
+};
 
 const convertTimeRemainingToLabel = ({
   days,
