@@ -30,8 +30,8 @@ jobs:
           # Generate raw (unmodified) release notes
           RAW_NOTES=$(git log origin/beta..origin/master --pretty="«%s»¦«%aN»¦%b" | \
             grep 'Merge pull request #[0-9]' | \
-            sed -E 's/«Merge pull request #([0-9]+).*»¦«([^»]+)»¦(.*)/- [\3](https:\/\/github.com\/hicommonwealth\/commonwealth\/pull\/\1) @\2/')
-
+            sed -E 's/«Merge pull request #([0-9]+).*»¦«([^»]+)»¦(.*)/- [\3](https:\/\/github.com\/hicommonwealth\/commonwealth\/pull\/\1) @\2/' | \
+            tr '\n' '\n')
           
           # Make a copy for mapped names
           MAPPED_NOTES="$RAW_NOTES"
@@ -55,7 +55,7 @@ jobs:
 #          SLACK_PRE_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
 #        run: |
 #          if [ -n "$RAW_NOTES" ]; then
-#            PAYLOAD=$(jq -n --arg text "Pre-Release Notes (Unmodified):\n$RAW_NOTES" '{text: $text}')
+#            PAYLOAD=$(jq -n --arg text "Pre-Release Notes (Unmodified):"\n"$RAW_NOTES" '{text: $text}')
 #            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_PRE_RELEASE_WEBHOOK_URL
 #          else
 #            echo "No new merge commits found."
@@ -66,7 +66,7 @@ jobs:
 #          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
 #        run: |
 #          if [ -n "$MAPPED_NOTES" ]; then
-#            PAYLOAD=$(jq -n --arg text "Pre-Release Notes:\nIf you are mentioned :thumbsup: after you have tested your changes on [beta.commonwealth.im](https://beta.common.im)\n\n$MAPPED_NOTES" '{text: $text}')
+#            PAYLOAD=$(jq -n --arg text "Pre-Release Notes:"\n"If you are mentioned :thumbsup: after you have tested your changes on [beta.commonwealth.im](https://beta.common.im)"\n""\n"$MAPPED_NOTES" '{text: $text}')
 #            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_RELEASE_WEBHOOK_URL
 #          else
 #            echo "No new merge commits found."
