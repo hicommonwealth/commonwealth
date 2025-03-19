@@ -9,7 +9,9 @@ const indexCommunities = async () => {
   });
 };
 
-export const indexCommunitiesTask: GraphileTask = {
+export const indexCommunitiesTask: GraphileTask<
+  typeof TaskPayloads.IndexCommunities
+> = {
   input: TaskPayloads.IndexCommunities,
   fn: indexCommunities,
 };
