@@ -136,7 +136,8 @@ async function recordXpsForQuest(
           (scoped === 'topic' && +id !== scope?.topic_id) ||
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
-          (scoped === 'sso' && id !== scope?.sso)
+          (scoped === 'sso' && id !== scope?.sso) ||
+          (scoped === 'goal' && +id !== scope?.goal_id)
         )
           continue;
       }

@@ -129,6 +129,15 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
                     : [],
                 });
                 mustExist(`Comment with id "${id}"`, comment);
+              } else if (content === 'goal') {
+                if (!c_id)
+                  throw new InvalidInput(
+                    'Community id is required when setting goals',
+                  );
+                const goal = await models.CommunityGoalMeta.findOne({
+                  where: { id: +id },
+                });
+                mustExist(`Community goal with id "${id}"`, goal);
               }
             }
           }),
@@ -187,6 +196,19 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
               ...action_meta,
               quest_id,
             })),
+          );
+          // set community goal reached entries
+          models.CommunityGoalReached.bulkCreate(
+            action_metas
+              .filter(
+                (m) =>
+                  m.event_name === 'CommunityGoalReached' &&
+                  m.content_id?.startsWith('goal:'),
+              )
+              .map((m) => ({
+                community_goal_meta_id: +m.content_id!.split(':')[1]!,
+                community_id: community_id || quest.community_id!,
+              })),
           );
         }
 
