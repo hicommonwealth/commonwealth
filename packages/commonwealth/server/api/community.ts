@@ -112,6 +112,7 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
+  getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,

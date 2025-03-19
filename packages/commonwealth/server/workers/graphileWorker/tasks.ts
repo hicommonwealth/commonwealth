@@ -2,13 +2,14 @@ import {
   GraphileTask,
   GraphileTaskNames,
   TaskPayloads,
+  awardTweetEngagementXpTask,
 } from '@hicommonwealth/model';
 import { Task } from 'graphile-worker';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { archiveOutboxTask } from './tasks/archiveOutbox';
-import { awardTwitterQuestXpTask } from './tasks/awardTwitterQuestXp';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
+import { countAggregatorTask } from './tasks/countAggregator';
 import { indexCommunitiesTask } from './tasks/indexCommunities';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
@@ -32,6 +33,7 @@ export const graphileTasks: {
   [GraphileTaskNames.CleanSubscriptions]: cleanSubscriptionsTask,
   [GraphileTaskNames.CleanChainEventXpSources]: cleanChainEventXpSourcesTask,
   [GraphileTaskNames.RunDbMaintenance]: runDbMaintenanceTask,
-  [GraphileTaskNames.AwardTwitterQuestXp]: awardTwitterQuestXpTask,
+  [GraphileTaskNames.AwardTwitterQuestXp]: awardTweetEngagementXpTask,
   [GraphileTaskNames.IndexCommunities]: indexCommunitiesTask,
+  [GraphileTaskNames.CountAggregator]: countAggregatorTask,
 } as const;

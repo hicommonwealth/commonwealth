@@ -4,17 +4,19 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
-import { Op } from 'node_modules/sequelize/types';
-import { fileURLToPath } from 'url';
-import { config } from '../../config';
-import { getMentions, getTweets } from './pollTwitter';
 import {
+  emitEvent,
+  getMentions,
+  getTweets,
+  models,
+  pgMultiRowUpdate,
   TwitterBotConfig,
   TwitterBotConfigs,
-  createMentionEvents,
-  pgMultiRowUpdate,
-} from './utils';
+} from '@hicommonwealth/model';
+import { Op } from 'sequelize';
+import { fileURLToPath } from 'url';
+import { config } from '../../config';
+import { createMentionEvents } from './utils';
 
 const log = logger(import.meta);
 
@@ -83,7 +85,11 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
     const tweetsToQuery = await models.QuestTweets.findAll({
       where: {
-        ended_at: null,
+        [Op.or]: [
+          { like_xp_awarded: false },
+          { reply_xp_awarded: false },
+          { retweet_xp_awarded: false },
+        ],
       },
       // Rotates through tweets so that all tweets are updated eventually
       // even if we get rate limited occasionally
@@ -127,9 +133,6 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       const queryTweet = tweetsToQuery.find((q) => q.tweet_id === t.id);
       if (!queryTweet) throw new Error('Tweet not found');
 
-      const retweetCount =
-        t.public_metrics.retweet_count + t.public_metrics.quote_count;
-
       tweetUpdates.num_likes.push({
         newValue:
           t.public_metrics.like_count >= queryTweet.like_cap!
@@ -147,9 +150,9 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       });
       tweetUpdates.num_retweets.push({
         newValue:
-          retweetCount >= queryTweet.retweet_cap!
+          t.public_metrics.retweet_count >= queryTweet.retweet_cap!
             ? queryTweet.retweet_cap!
-            : retweetCount,
+            : t.public_metrics.retweet_count,
         whenCaseValue: t.id,
       });
 
@@ -158,7 +161,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       if (
         t.public_metrics.like_count >= queryTweet.like_cap! &&
         t.public_metrics.reply_count >= queryTweet.replies_cap! &&
-        retweetCount >= queryTweet.retweet_cap!
+        t.public_metrics.retweet_count >= queryTweet.retweet_cap!
       ) {
         endedAt = new Date();
       }

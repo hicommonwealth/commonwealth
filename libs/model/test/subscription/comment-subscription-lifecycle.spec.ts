@@ -36,6 +36,7 @@ describe('Comment subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
+          verified: new Date(),
         },
       ],
       topics: [{}],
@@ -62,7 +63,7 @@ describe('Comment subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: undefined,
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

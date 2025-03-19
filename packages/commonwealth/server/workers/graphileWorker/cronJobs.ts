@@ -44,4 +44,8 @@ export const cronItems: Array<CustomCronItem> = [
     task: GraphileTaskNames.IndexCommunities,
     match: config.COMMUNITY_INDEXER.CRON!,
   }),
+  buildCustomCronItem({
+    task: GraphileTaskNames.CountAggregator,
+    match: '*/10 * * * *', // every 10 minutes
+  }),
 ];

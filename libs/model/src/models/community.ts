@@ -160,6 +160,11 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      allow_tokenized_threads: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     {
       tableName: 'Communities',

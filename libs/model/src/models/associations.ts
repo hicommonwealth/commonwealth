@@ -30,6 +30,7 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
+
   db.QuestActionMeta.withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
@@ -39,7 +40,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     })
-    .withMany(db.QuestTweets, {
+    .withOne(db.QuestTweets, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
