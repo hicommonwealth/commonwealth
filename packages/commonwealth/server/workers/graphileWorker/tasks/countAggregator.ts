@@ -118,14 +118,15 @@ async function processProfileCounts() {
 
   await models.sequelize.query(
     `
-        WITH profile_count AS (SELECT community_id, COUNT(*) AS count
-            FROM "Addresses" A
-            WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
-            GROUP BY "community_id"
-        )
-        UPDATE "Communities"
-        SET profile_count = profile_count.count FROM profile_count
-        WHERE "Communities".id = profile_count.community_id;
+    UPDATE "Communities" C
+    SET profile_count = sub.count
+        FROM (
+            SELECT community_id, COUNT(*) AS count
+            FROM "Addresses"
+            WHERE user_id IS NOT NULL AND verified IS NOT NULL
+            GROUP BY community_id
+        ) AS sub
+    WHERE C.id = sub.community_id AND C.id IN (:communityIds);
     `,
     {
       replacements: { communityIds },

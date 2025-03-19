@@ -127,6 +127,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       communities: userCommunities || [],
       referred_by_address: user.referred_by_address || undefined,
       xp_points: user.xp_points || 0,
+      xp_referrer_points: user.xp_referrer_points || 0,
     },
     id: user.id,
     email: user.email,
