@@ -1,5 +1,6 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { authVerified } from '../../middleware/auth';
 import { handleSubscriptionPreferencesUpdate } from '../../utils/handleSubscriptionPreferencesUpdate';
 
 export function UpdateSubscriptionPreferences(): Command<
@@ -7,7 +8,7 @@ export function UpdateSubscriptionPreferences(): Command<
 > {
   return {
     ...schemas.UpdateSubscriptionPreferences,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ payload, actor }) => {
       return await handleSubscriptionPreferencesUpdate({

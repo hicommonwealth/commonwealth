@@ -1,30 +1,5 @@
-import { AnalyticsOptions, User, analytics, stats } from '@hicommonwealth/core';
+import { AnalyticsOptions, User, analytics } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
-
-/**
- * Captures traffic and latency
- */
-export const statsMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const path = `${req.method.toUpperCase()} ${req.path}`;
-    stats().increment('cw.path.called', { path });
-    const start = Date.now();
-    res.on('finish', () => {
-      const latency = Date.now() - start;
-      stats().histogram(`cw.path.latency`, latency, {
-        path,
-        statusCode: `${res.statusCode}`,
-      });
-    });
-  } catch (err: unknown) {
-    console.error(err); // don't use logger port here
-  }
-  next();
-};
 
 /**
  * Captures analytics

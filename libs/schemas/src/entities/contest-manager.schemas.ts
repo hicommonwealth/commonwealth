@@ -84,5 +84,6 @@ export const ContestManager = z
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
     environment: ContestManagerEnvironmentsSchema.optional(),
+    deleted_at: z.coerce.date().nullish().describe('Soft deletion timestamp'),
   })
   .describe('On-Chain Contest Manager');
