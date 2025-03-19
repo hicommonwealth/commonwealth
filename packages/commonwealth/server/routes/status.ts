@@ -174,7 +174,6 @@ export const status = async (
       return success(res, {
         loggedIn: true,
         user: {
-          xp_referrer_points: 0,
           ...user,
           id: user.id!,
           isAdmin: user.isAdmin ?? false,
