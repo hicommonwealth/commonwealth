@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { emitEvent } from 'model/src/utils';
 import { models } from '../../database';
+import { emitEvent } from '../../utils';
 
 export function SetReachedGoal(): Command<typeof schemas.SetReachedGoal> {
   return {
