@@ -89,6 +89,9 @@ export default defineConfig(({ mode }) => {
       (env.NODE_ENV || '').trim() === 'test'
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
+    'process.env.FARCASTER_MANIFEST_DOMAIN': JSON.stringify(
+      env.FARCASTER_MANIFEST_DOMAIN,
+    ),
   };
 
   return {
