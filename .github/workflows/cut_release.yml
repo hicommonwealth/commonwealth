@@ -21,32 +21,50 @@ jobs:
           # Convert GitHub Secrets into an associative array
           declare -A NAME_MAP
           while IFS="=" read -r key value; do
-          NAME_MAP["$key"]="$value"
+            NAME_MAP["$key"]="$value"
           done <<< "$NAME_MAPPING"
           
-          # Generate Release Notes
-          NOTES=$(git log origin/production..origin/master --pretty="«%s»¦«%aN»¦%b" | \
-          grep 'Merge pull request #[0-9]' | \
-          sed -E 's/«Merge pull request #([0-9]+).*»¦«([^»]+)»¦(.*)/- [\3](https:\/\/github.com\/hicommonwealth\/commonwealth\/pull\/\1) @\2/' | \
-          tr '\n' '\n')
-  
+          # Generate raw (unmodified) release notes
+          RAW_NOTES=$(git log origin/beta..origin/master --pretty="«%s»¦«%aN»¦%b" | \
+            grep 'Merge pull request #[0-9]' | \
+            sed -E 's/«Merge pull request #([0-9]+).*»¦«([^»]+)»¦(.*)/- [\3](https:\/\/github.com\/hicommonwealth\/commonwealth\/pull\/\1) @\2/' | \
+            tr '\n' '\n')
+          
+          # Make a copy for mapped names
+          MAPPED_NOTES="$RAW_NOTES"
+          
           # Perform name replacements using NAME_MAP
           for KEY in "${!NAME_MAP[@]}"; do
-          NOTES=$(echo "$NOTES" | sed "s/$KEY/${NAME_MAP[$KEY]}/g")
+            MAPPED_NOTES=$(echo "$MAPPED_NOTES" | sed "s/$KEY/${NAME_MAP[$KEY]}/g")
           done
-      
-          # Save the updated notes
-          echo "NOTES<<EOF" >> $GITHUB_ENV
-          echo "$NOTES" >> $GITHUB_ENV
+          
+          # Save both versions as environment variables
+          echo "RAW_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RAW_NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+          echo "MAPPED_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$MAPPED_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Send to Slack
+      - name: Send Raw Release Notes to Slack (Pre-Release)
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
+          SLACK_PRE_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_GITHUB_WEBHOOK_URL }}
         run: |
-          if [ -n "$NOTES" ]; then
-            PAYLOAD=$(jq -n --arg text "Pre-Release Notes:\nIf you are mentioned :thumbsup: after you have tested your changes on [beta.commonwealth.im](https://beta.common.im)\n\n$NOTES" '{text: $text}')
-            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
+          if [ -n "$RAW_NOTES" ]; then
+            PAYLOAD=$(jq -n --arg text "Pre-Release Notes (Unmodified):\n$RAW_NOTES" '{text: $text}')
+            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_PRE_RELEASE_WEBHOOK_URL
+          else
+            echo "No new merge commits found."
+          fi
+
+      - name: Send Mapped Release Notes to Slack
+        env:
+          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
+        run: |
+          if [ -n "$MAPPED_NOTES" ]; then
+            PAYLOAD=$(jq -n --arg text "Pre-Release Notes:\nIf you are mentioned :thumbsup: after you have tested your changes on [beta.commonwealth.im](https://beta.common.im)\n\n$MAPPED_NOTES" '{text: $text}')
+            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_RELEASE_WEBHOOK_URL
           else
             echo "No new merge commits found."
           fi
