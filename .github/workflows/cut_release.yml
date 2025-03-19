@@ -50,17 +50,17 @@ jobs:
           echo "$MAPPED_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-#      - name: Send Raw Release Notes to Slack (Pre-Release)
-#        env:
-#          SLACK_PRE_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
-#        run: |
-#          if [ -n "$RAW_NOTES" ]; then
-#            PAYLOAD=$(jq -n --arg text "Pre-Release Notes (Unmodified):"\n"$RAW_NOTES" '{text: $text}')
-#            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_PRE_RELEASE_WEBHOOK_URL
-#          else
-#            echo "No new merge commits found."
-#          fi
-#
+      - name: Send Raw Release Notes to Slack (Pre-Release)
+        env:
+          SLACK_PRE_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
+        run: |
+          if [ -n "$RAW_NOTES" ]; then
+            PAYLOAD=$(jq -n --arg text "Pre-Release Notes (Unmodified):"\n"$RAW_NOTES" '{text: $text}')
+            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_PRE_RELEASE_WEBHOOK_URL
+          else
+            echo "No new merge commits found."
+          fi
+
 #      - name: Send Mapped Release Notes to Slack
 #        env:
 #          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
@@ -71,9 +71,6 @@ jobs:
 #          else
 #            echo "No new merge commits found."
 #          fi
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - name: Merge master into beta
         run: |
