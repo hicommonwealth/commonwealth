@@ -19,5 +19,6 @@ export async function renderIndex(indexFilePath: string): Promise<string> {
     FARCASTER_MANIFEST_DOMAIN: config.CONTESTS.FARCASTER_MANIFEST_DOMAIN,
   };
   cache = template(data);
+  console.log('renderIndex: cache = ', cache);
   return cache;
 }
