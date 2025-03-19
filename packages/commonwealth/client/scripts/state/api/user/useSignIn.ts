@@ -49,7 +49,7 @@ export function useSignIn() {
     });
     return {
       account,
-      newlyCreated: address.first_community,
+      newlyCreated: address.first_community && address.address_created,
       joinedCommunity: address.address_created,
     };
   };
