@@ -64,6 +64,7 @@ export const outboxEvents: Events[] = [
   'TokenPermanentConverted',
   'TokenLockDurationIncreased',
   'NamespaceLinked',
+  'CommunityGoalReached',
 ] as const;
 
 export const Outbox = z.union(

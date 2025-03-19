@@ -486,4 +486,10 @@ export const events = {
     referral: NamespaceReferral.optional(),
     created_at: z.coerce.date(),
   }),
+
+  CommunityGoalReached: z.object({
+    community_goal_meta_id: PG_INT,
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
 } as const;

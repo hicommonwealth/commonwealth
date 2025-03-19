@@ -253,6 +253,7 @@ export const buildAssociations = (db: DB) => {
     {
       model: db.CommunityGoalMeta,
       onDelete: 'CASCADE',
+      asOne: 'meta',
     },
   );
 

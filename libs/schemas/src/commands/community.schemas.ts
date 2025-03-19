@@ -400,3 +400,11 @@ export const UnpinToken = {
   output: z.object({}),
   context: AuthContext,
 };
+
+export const SetReachedGoal = {
+  input: z.object({
+    community_id: z.string(),
+    community_goal_meta_id: z.number(),
+  }),
+  output: z.object({}),
+};

@@ -100,7 +100,10 @@ export const CommunityGoalReached = z.object({
   community_goal_meta_id: PG_INT,
   community_id: PG_INT,
   created_at: z.coerce.date(),
-  reached_at: z.coerce.date(),
+  reached_at: z.coerce.date().nullish(),
+
+  // associations
+  meta: CommunityGoalMeta.optional(),
 });
 
 // aliases
