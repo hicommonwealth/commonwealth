@@ -117,7 +117,7 @@ export async function main(
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
-      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      // res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
 
