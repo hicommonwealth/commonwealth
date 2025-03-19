@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
@@ -6,14 +6,26 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
+import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
+import './DirectorySettingsModal.scss';
 
-interface DirectorySettingsModalProps {
-  onModalClose: () => void;
+enum DirectoryTabsType {
+  TagSelection = 'TagSelection',
+  ManualSelection = 'ManualSelection',
 }
+
+type DirectorySettingsModalProps = {
+  onModalClose: () => void;
+};
 
 const DirectorySettingsModal = ({
   onModalClose,
 }: DirectorySettingsModalProps) => {
+  const [activeDirectoryTab, setActiveDirectoryTab] = useState(
+    DirectoryTabsType.TagSelection,
+  );
+
   return (
     <div className="DirectorySettingsModal">
       <CWModalHeader label="Directory Settings" onModalClose={onModalClose} />
@@ -23,8 +35,25 @@ const DirectorySettingsModal = ({
           Configure which communities appear in the directory through tags or
           manual selection.
         </CWText>
-        <CWText>TOGGLE GOES HERE</CWText>
-        <CWText>Tag/Manual Selection GOES HERE</CWText>
+        <CWTabsRow className="explore-tabs-row">
+          <CWTab
+            label="Tag Selection"
+            isSelected={activeDirectoryTab === DirectoryTabsType.TagSelection}
+            onClick={() =>
+              setActiveDirectoryTab(DirectoryTabsType.TagSelection)
+            }
+          />
+          <CWTab
+            label="Manual Selection"
+            isSelected={
+              activeDirectoryTab === DirectoryTabsType.ManualSelection
+            }
+            onClick={() =>
+              setActiveDirectoryTab(DirectoryTabsType.ManualSelection)
+            }
+          />
+        </CWTabsRow>
+        {/* <CWText>Tag/Manual Selection GOES HERE</CWText> */}
       </CWModalBody>
       <CWModalFooter>
         <CWButton
