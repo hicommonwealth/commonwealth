@@ -24,7 +24,7 @@ export function SetReachedGoal(): Command<typeof schemas.SetReachedGoal> {
           },
         );
         if (rows)
-          emitEvent(models.Outbox, [
+          await emitEvent(models.Outbox, [
             {
               event_name: 'CommunityGoalReached',
               event_payload: {

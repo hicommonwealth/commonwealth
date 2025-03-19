@@ -38,17 +38,19 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
         });
 
         // set reached goals
-        goals.forEach(async (goal) => {
-          if (goal.meta!.target <= members) {
-            await command(SetReachedGoal(), {
-              actor: systemActor({}),
-              payload: {
-                community_id,
-                community_goal_meta_id: goal.community_goal_meta_id,
-              },
-            });
-          }
-        });
+        await Promise.all(
+          goals.map(async (goal) => {
+            if (goal.meta!.target <= members) {
+              await command(SetReachedGoal(), {
+                actor: systemActor({}),
+                payload: {
+                  community_id,
+                  community_goal_meta_id: goal.community_goal_meta_id,
+                },
+              });
+            }
+          }),
+        );
       },
     },
   };

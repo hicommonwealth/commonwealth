@@ -198,7 +198,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
             })),
           );
           // set community goal reached entries
-          models.CommunityGoalReached.bulkCreate(
+          await models.CommunityGoalReached.bulkCreate(
             action_metas
               .filter(
                 (m) =>
