@@ -259,6 +259,7 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       ready: () => Promise.resolve(true),
       isReady: () => true,
       getKey: () => Promise.resolve(''),
+      scan: () => Promise.resolve(null),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
       setKeys: () => Promise.resolve(false),

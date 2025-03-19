@@ -1,0 +1,41 @@
+name: Pre-Release Notes & Merge
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  generate-notes-and-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history is available for release notes
+
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          NOTES=$(git log origin/production..origin/master --pretty="«%s»¦«%aN»¦%b" | \
+            grep 'Merge pull request #[0-9]' | \
+            sed -E 's/«Merge pull request #([0-9]+).*»¦«([^»]+)»¦(.*)/- [\3](https:\/\/github.com\/hicommonwealth\/commonwealth\/pull\/\1) @\2/' | \
+            tr '\n' '\n')
+          
+          echo "NOTES<<EOF" >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Send to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
+        run: |
+          if [ -n "$NOTES" ]; then
+            curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"*Pre-Release Notes:*\n$NOTES\"}" $SLACK_WEBHOOK_URL
+          else
+            echo "No new merge commits found."
+          fi
+
+      - name: Merge master into beta
+        run: |
+          git fetch origin
+          git push --force origin master:beta
