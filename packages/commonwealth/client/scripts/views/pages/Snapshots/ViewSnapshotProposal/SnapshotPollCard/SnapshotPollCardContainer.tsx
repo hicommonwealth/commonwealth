@@ -28,6 +28,7 @@ type SnapshotProposalCardsProps = {
   totalScore: number;
   loadVotes: () => Promise<void>;
   snapShotVotingResult: VoteOption[];
+  toggleShowVotesDrawer: (newState: boolean) => void;
 };
 
 const enum VotingError {
@@ -51,6 +52,7 @@ export const SnapshotPollCardContainer = (
     totalScore,
     loadVotes,
     snapShotVotingResult,
+    toggleShowVotesDrawer,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -132,6 +134,7 @@ export const SnapshotPollCardContainer = (
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
         snapShotVotingResult={snapShotVotingResult}
+        toggleShowVotesDrawer={toggleShowVotesDrawer}
       />
       <CWModal
         size="small"

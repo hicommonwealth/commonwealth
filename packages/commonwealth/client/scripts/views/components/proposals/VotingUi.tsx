@@ -18,6 +18,7 @@ interface VotingUIProps {
   onVote: (option: string | [string]) => void;
   type: 'cosmos' | 'snapshot';
   votingOption: VoteOption[];
+  toggleShowVotesDrawer: (newState: boolean) => void;
 }
 
 const VotingUI: React.FC<VotingUIProps> = ({
@@ -28,9 +29,11 @@ const VotingUI: React.FC<VotingUIProps> = ({
   onVote,
   type,
   votingOption,
+  toggleShowVotesDrawer,
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
+  console.log({ toggleShowVotesDrawer });
   const handleVoteClick = () => {
     if (selectedOption && canVote && !hasVoted) {
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
@@ -47,7 +50,15 @@ const VotingUI: React.FC<VotingUIProps> = ({
           <CWText>POLL</CWText>
           <div className="timeline">
             <CWText>{timeRemaining}</CWText>
-            <a href="#">View Activity</a>
+
+            <CWText
+              onClick={() => {
+                console.log('xxxxxxxxxxx');
+                toggleShowVotesDrawer(true);
+              }}
+            >
+              ViewActivity
+            </CWText>
           </div>
         </div>
         <CWText type="b2" className="poll-title">

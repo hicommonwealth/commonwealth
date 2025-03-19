@@ -2,8 +2,19 @@ import React from 'react';
 
 import { CWText } from '../component_kit/cw_text';
 import './DeatilsCard.scss';
-
-const DetailsCard = () => {
+type DetailCardProps = {
+  status: string;
+  governanceType: string;
+  publishDate: Date | string;
+  id: string;
+};
+const DetailsCard = ({
+  status,
+  governanceType,
+  publishDate,
+  id,
+}: DetailCardProps) => {
+  console.log({ status, governanceType, publishDate, id });
   return (
     <div className="DetailCard">
       <div className="header">
@@ -13,20 +24,20 @@ const DetailsCard = () => {
       </div>
       <div className="rb-container">
         <CWText className="label">Status</CWText>
-
-        <CWText className="detail">Status</CWText>
-
+        <CWText className="status">{status}</CWText>
         <CWText className="label">GovernanceType</CWText>
 
-        <CWText className="detail">GovernanceType</CWText>
+        <CWText className="detail">{governanceType}</CWText>
 
         <CWText className="label">Date Proposed</CWText>
 
-        <CWText className="detail">DD/MM/YYYY</CWText>
+        <CWText className="detail">hello</CWText>
 
         <CWText className="label">ID</CWText>
 
-        <CWText className="detail">DD/MM/YYYY</CWText>
+        <CWText className="detail">{id}</CWText>
+        <CWText className="label">Attachments</CWText>
+        <CWText className="detail">thread</CWText>
       </div>
     </div>
   );

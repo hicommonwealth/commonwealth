@@ -38,6 +38,7 @@ type VotingActionsProps = {
   votingModalOpen: boolean;
   redrawProposals: React.Dispatch<React.SetStateAction<boolean>>;
   proposalRedrawState: boolean;
+  toggleShowVotesDrawer: (newModalState: boolean) => void;
 };
 
 export const VotingActions = ({
@@ -46,6 +47,7 @@ export const VotingActions = ({
   votingModalOpen,
   redrawProposals,
   proposalRedrawState,
+  toggleShowVotesDrawer,
 }: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
   const { isAddedToHomeScreen } = useAppStatus();
@@ -332,6 +334,7 @@ export const VotingActions = ({
               type="cosmos"
               timeRemaining={timeRemaining}
               votingOption={voteRestult}
+              toggleShowVotesDrawer={toggleShowVotesDrawer}
             />
             {/* @ts-expect-error StrictNullChecks*/}
             <ProposalExtensions proposal={proposal} />

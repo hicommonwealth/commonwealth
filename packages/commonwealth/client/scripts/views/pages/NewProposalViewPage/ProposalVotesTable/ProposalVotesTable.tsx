@@ -27,7 +27,7 @@ const columns: CWTableColumnInfo[] = [
   },
   {
     key: 'balance',
-    header: 'balance',
+    header: 'Power',
     numeric: false,
     sortable: true,
   },

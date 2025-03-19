@@ -17,12 +17,14 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
   voteOptions,
   showCombineBarOnly,
 }) => {
-  const totalVotes = voteOptions.reduce(
+  const totalVotes = voteOptions?.reduce(
     (sum, option) => sum + parseFloat(option.results || '0'),
     0,
   );
 
-  const totalPercent = voteOptions.reduce(
+  console.log({ totalVotes });
+
+  const totalPercent = voteOptions?.reduce(
     (sum, option) => sum + parseFloat(option.percentage || '0'),
     0,
   );
@@ -51,7 +53,7 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
 
       <div className="main-container">
         {!showCombineBarOnly &&
-          voteOptions.map((option) => {
+          voteOptions?.map((option) => {
             const percentage = parseFloat(option.percentage || '0');
 
             return (
@@ -87,7 +89,7 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
         <div className="combined-progress">
           <div className="progress-bar">
             {
-              voteOptions.reduce(
+              voteOptions?.reduce(
                 (acc, option, index) => {
                   const percentage = parseFloat(option.percentage || '0');
                   const leftPosition = acc.prevLeft || 0;

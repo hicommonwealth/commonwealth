@@ -14,6 +14,7 @@ export type SnapshotPollCardProps = Omit<
   PollCardProps & {
     onSnapshotVoteCast: (option: string) => void;
     snapShotVotingResult: VoteOption[];
+    toggleShowVotesDrawer: (newState: boolean) => void;
   },
   'onResultsClick'
 >;
@@ -27,13 +28,12 @@ export const SnapshotPollCard = ({
   votedFor,
   voteInformation,
   snapShotVotingResult,
+  toggleShowVotesDrawer,
 }: SnapshotPollCardProps) => {
   const [internalHasVoted, setInternalHasVoted] =
     // @ts-expect-error <StrictNullChecks/>
     useState<boolean>(hasVoted);
-  const [selectedOptions, setSelectedOptions] = useState<Array<string>>(
-    [], // is never updated?
-  );
+
   const [internalTotalVoteCount, setInternalTotalVoteCount] =
     useState<number>(totalVoteCount);
   const [voteDirectionString, setVoteDirectionString] = useState<string>(
@@ -42,14 +42,12 @@ export const SnapshotPollCard = ({
   const [internalVoteInformation, setInternalVoteInformation] =
     useState<Array<VoteInformation>>(voteInformation);
 
-  const resultString = 'Results';
-
   const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   const castVote = (e) => {
-    const selectedOption = e[0] || selectedOptions[0];
+    const selectedOption = e[0];
     setVoteDirectionString(buildVoteDirectionString(selectedOption));
     onSnapshotVoteCast(selectedOption);
     trackAnalytics({
@@ -88,6 +86,7 @@ export const SnapshotPollCard = ({
         onVote={castVote}
         type="snapshot"
         votingOption={snapShotVotingResult}
+        toggleShowVotesDrawer={toggleShowVotesDrawer}
       />
     </div>
   );

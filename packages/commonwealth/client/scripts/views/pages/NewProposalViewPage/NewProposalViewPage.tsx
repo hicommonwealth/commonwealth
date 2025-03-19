@@ -49,7 +49,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const [selectedCodeEditorType, setSelectedCodeEditorType] = useState(
     CodeEditorType.Code,
   );
-
+  const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const { scope } = useParams<{
     scope: string;
   }>();
@@ -92,7 +92,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     // @ts-expect-error <StrictNullChecks/>
     snapshotId: querySnapshotId,
   });
-
   const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
     const { choices } = snapshotProposal;
@@ -181,9 +180,17 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+  const toggleShowVotesDrawer = (newModalState: boolean) => {
+    setShowVotesDrawer(newModalState);
+  };
+
+  const governanceUrl = `https://snapshot.box/#/s:${querySnapshotId}/proposal/${identifier}`;
+  console.log({ governanceUrl });
   return (
     <CWPageLayout>
-      <TimeLine proposalData={proposal?.data || snapshotProposal} />
+      {isWindowSmallInclusive && (
+        <TimeLine proposalData={proposal?.data || snapshotProposal} />
+      )}
       <CWContentPage
         showSkeleton={!proposal && !snapshotProposal}
         title={title}
@@ -199,7 +206,21 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
             ) : (
               !_.isEmpty(metadata) && <JSONDisplay data={metadata} />
             )}
-            {isWindowSmallInclusive && <DetailsCard />}
+            {isWindowSmallInclusive && (
+              <DetailsCard
+                status={
+                  queryType === 'cosmos'
+                    ? // @ts-expect-error <StrictNullChecks/>
+                      proposal?.status
+                    : snapshotProposal?.state
+                }
+                // @ts-expect-error <StrictNullChecks/>
+                governanceType={queryType}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={createdAt}
+                id={identifier}
+              />
+            )}
             {(description || snapshotProposal?.body) && (
               <CWAccordView title="Description" defaultOpen={true}>
                 <MarkdownViewerWithFallback
@@ -243,6 +264,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                   votingModalOpen={votingModalOpen}
                   redrawProposals={redrawProposals}
                   proposalRedrawState={proposalRedrawState}
+                  toggleShowVotesDrawer={toggleShowVotesDrawer}
                 />
                 {isWindowSmallInclusive && (
                   // @ts-expect-error <StrictNullChecks/>
@@ -265,6 +287,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                   votes={votes}
                   loadVotes={async () => loadVotes()}
                   snapShotVotingResult={snapShotVotingResult}
+                  toggleShowVotesDrawer={toggleShowVotesDrawer}
                 />
 
                 {isWindowSmallInclusive && (
@@ -277,8 +300,8 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                   header="Votes"
                   votes={votes}
                   choices={snapshotProposal?.choices}
-                  isOpen={false}
-                  setIsOpen={(isOpen) => isOpen}
+                  isOpen={showVotesDrawer}
+                  setIsOpen={setShowVotesDrawer}
                 />
               </>
             )}
@@ -286,7 +309,24 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         )}
         showSidebar={isWindowSmallInclusive ? false : true}
         sidebarComponents={[
-          { label: 'Links', item: <DetailsCard /> },
+          {
+            label: 'Links',
+            item: (
+              <DetailsCard
+                status={
+                  queryType === 'cosmos'
+                    ? // @ts-expect-error <StrictNullChecks/>
+                      proposal?.status
+                    : snapshotProposal?.state
+                }
+                // @ts-expect-error <StrictNullChecks/>
+                governanceType={queryType}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={createdAt}
+                id={identifier}
+              />
+            ),
+          },
           {
             label: 'Timeline',
             item: (

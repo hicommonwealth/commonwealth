@@ -35,8 +35,6 @@ export const useSnapshotProposal = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const user = useUserStore();
-
-  // Query hooks
   const { data: spaceData, isLoading: isSpaceLoading } =
     useGetSnapshotSpaceQuery({
       space: snapshotId,
@@ -59,7 +57,6 @@ export const useSnapshotProposal = ({
     },
     enabled: !!(app.activeChainId() && proposal?.id),
   });
-
   const threads = threadsData || [];
 
   // Detect and notify errors
