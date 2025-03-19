@@ -38,6 +38,8 @@ type StatusResp = {
     disableRichText?: boolean;
     communities: StarredCommunityResponse[];
     referred_by_address?: string;
+    xp_points: number;
+    xp_referrer_points: number;
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
@@ -171,6 +173,7 @@ export const status = async (
       return success(res, {
         loggedIn: true,
         user: {
+          xp_referrer_points: 0,
           ...user,
           id: user.id!,
           isAdmin: user.isAdmin ?? false,

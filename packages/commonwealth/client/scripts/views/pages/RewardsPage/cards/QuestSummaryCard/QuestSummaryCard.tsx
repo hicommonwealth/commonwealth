@@ -1,3 +1,4 @@
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -75,6 +76,12 @@ const QuestSummaryCard = () => {
       onSeeAllClick={handleSeeAllClick}
     >
       <div className="QuestSummaryCard">
+        <div className="xp-body">
+          <CWText fontWeight="bold" type="h4">
+            {user.xpPoints} XP&nbsp;
+            <CWText type="caption">earned from quests</CWText>
+          </CWText>
+        </div>
         <CWTabsRow>
           {Object.values(QuestTimeline).map((type) => (
             <CWTab
