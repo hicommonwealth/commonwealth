@@ -14,14 +14,14 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
     inputs,
     body: {
       ClankerTokenFound: async ({ payload }) => {
-        const existingCommunity = await models.Community.findOne({
+        const pinnedToken = await models.PinnedToken.findOne({
           where: {
-            token_address: payload.contract_address,
+            contract_address: payload.contract_address,
           },
         });
-        if (existingCommunity) {
+        if (pinnedToken) {
           log.warn(
-            `token already has community: ${payload.contract_address}="${existingCommunity.name}"`,
+            `token already has community: ${payload.contract_address}="${pinnedToken.community_id}"`,
           );
         } else {
           await createCommunityFromClankerToken(payload);

@@ -151,15 +151,6 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
-      token_address: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        unique: true,
-      },
-      token_created_at: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

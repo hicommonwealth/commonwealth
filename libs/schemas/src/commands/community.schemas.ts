@@ -48,10 +48,9 @@ export const CreateCommunity = {
     // hidden optional params
     token_name: z.string().optional(),
     referrer_address: z.string().optional(),
+    website: z.string().url().optional(),
     community_indexer_id: z.string().optional(),
     token_address: z.string().optional(),
-    token_created_at: z.coerce.date().optional(),
-    website: z.string().url().optional(),
 
     // deprecated params to be removed
     github: z.string().url().startsWith('https://github.com/').optional(),

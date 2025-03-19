@@ -26,6 +26,8 @@ export const CreateCommunityErrors = {
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   // eslint-disable-next-line max-len
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  TokenAddressRequired:
+    'Token address is required when creating a community from an indexer',
 };
 
 function baseToNetwork(n: ChainBase): ChainNetwork {
@@ -66,15 +68,19 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         chain_node_id,
         community_indexer_id,
         token_address,
-        token_created_at,
         tags,
         allow_tokenized_threads,
       } = payload;
+
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
       });
       if (community)
         throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
+
+      if (community_indexer_id && !token_address) {
+        throw new InvalidInput(CreateCommunityErrors.TokenAddressRequired);
+      }
 
       // requires super admin privilege for creating Chain/DAO
       if (type === ChainType.Chain || type === ChainType.DAO)
@@ -143,12 +149,21 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             snapshot_spaces: [],
             stages_enabled: true,
             community_indexer_id,
-            token_address,
-            token_created_at,
             allow_tokenized_threads,
           },
           { transaction },
         );
+
+        if (community_indexer_id && token_address) {
+          await models.PinnedToken.create(
+            {
+              community_id: id,
+              contract_address: token_address,
+              chain_node_id: node.id!,
+            },
+            { transaction },
+          );
+        }
 
         // add tag associations
         if (tags.length > 0) {

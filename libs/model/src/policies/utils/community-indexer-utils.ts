@@ -292,7 +292,6 @@ export async function createCommunityFromClankerToken(
       chain_node_id: chainNode!.id!,
       community_indexer_id: 'clanker',
       token_address: payload.contract_address,
-      token_created_at: moment(payload.created_at).toDate(),
     };
   if (uploadedImageUrl) {
     createCommunityPayload.icon_url = uploadedImageUrl;
