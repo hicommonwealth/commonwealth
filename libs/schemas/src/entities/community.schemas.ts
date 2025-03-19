@@ -87,5 +87,21 @@ export const ExtendedCommunity = Community.extend({
   communityBanner: z.string().nullish(),
 });
 
+export const CommunityGoalMeta = z.object({
+  id: PG_INT,
+  name: z.string(),
+  description: z.string(),
+  type: z.enum(['members', 'threads']),
+  target: z.number(),
+  created_at: z.coerce.date(),
+});
+
+export const CommunityGoalReached = z.object({
+  community_goal_meta_id: PG_INT,
+  community_id: PG_INT,
+  created_at: z.coerce.date(),
+  reached_at: z.coerce.date(),
+});
+
 // aliases
 export const Chain = Community;

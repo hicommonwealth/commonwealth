@@ -245,6 +245,17 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
+  db.CommunityGoalReached.withManyToMany(
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.CommunityGoalMeta,
+      onDelete: 'CASCADE',
+    },
+  );
+
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
   });
