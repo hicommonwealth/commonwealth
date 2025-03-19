@@ -62,6 +62,8 @@ jobs:
 #          fi
 
       - name: Setup tmate session
+        env:
+          SLACK_RELEASE_WEBHOOK_URL: ${{ secrets.SLACK_PRE_RELEASE_WEBHOOK_URL }}
         uses: mxschmitt/action-tmate@v3
 
       - name: Send Mapped Release Notes to Slack
