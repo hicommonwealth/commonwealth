@@ -15,13 +15,32 @@ const ThreadRedirect = ({ id }: { id: number }) => {
 
   useRunOnceOnCondition({
     callback: () => {
-      !topic || error
-        ? navigate('/error')
-        : navigate(
-            `/discussions/${topic.name}${window.location.search}`,
-            { replace: true },
-            topic?.community_id,
-          );
+      if (!topic || error) {
+        navigate('/error');
+        return;
+      }
+
+      // redirect to thread creation with the specified topic
+      const params = new URLSearchParams(window.location.search);
+      const newThread = params.get('newThread') === 'true';
+      if (newThread) {
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.delete('newThread');
+        newParams.append('topic', topic.id);
+        navigate(
+          `/new/discussion?${newParams.toString()}`,
+          { replace: true },
+          topic?.community_id,
+        );
+        return;
+      }
+
+      // redirect to thread list view for the provided topic
+      navigate(
+        `/discussions/${topic.name}${window.location.search}`,
+        { replace: true },
+        topic?.community_id,
+      );
     },
     shouldRun: !!(topic || error),
   });

@@ -51,13 +51,21 @@ export const buildContentIdFromURL = async (
   }
 };
 
-export const buildURLFromContentId = (id: string, idType: ContentIdType) => {
+export const buildURLFromContentId = (
+  id: string,
+  idType: ContentIdType,
+  withParams = {},
+) => {
   if (idType === 'thread') return `${window.location.origin}/discussion/${id}`;
   if (idType === 'comment') {
     return `${window.location.origin}/discussion/comment/${id}`;
   }
   if (idType === 'topic') {
-    return `${window.location.origin}/discussion/topic/${id}`;
+    const params =
+      Object.keys(withParams || {}).length > 0
+        ? new URLSearchParams(withParams).toString()
+        : '';
+    return `${window.location.origin}/discussion/topic/${id}${params ? `?${params}` : ''}`;
   }
   return '';
 };

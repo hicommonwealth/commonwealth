@@ -165,6 +165,15 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
+        if (actionContentId) {
+          const url = buildURLFromContentId(
+            actionContentId?.split?.(':')?.[1],
+            actionContentId?.split?.(':')?.[0] as ContentIdType,
+            { newThread: true },
+          ).split(window.location.origin)[1];
+          navigate(url, {}, null);
+          return;
+        }
         navigate(`/new/discussion`, {}, quest?.community_id || null);
         break;
       }
