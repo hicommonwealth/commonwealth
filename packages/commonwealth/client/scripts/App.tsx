@@ -1,5 +1,6 @@
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
 import { OpenFeature } from '@openfeature/web-sdk';
+import { PrivyProvider } from '@privy-io/react-auth';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
@@ -37,20 +38,38 @@ const App = () => {
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <>
-                    <OnBoardingWrapperForMobile>
-                      <ReactNativeBridgeUser />
-                      <ReactNativeLogForwarder />
-                      <RouterProvider router={router()} />
-                      {isAddedToHomeScreen || isMarketingPage ? null : (
-                        <AddToHomeScreenPrompt
-                          isIOS={isIOS}
-                          isAndroid={isAndroid}
-                          displayDelayMilliseconds={1000}
-                        />
-                      )}
-                    </OnBoardingWrapperForMobile>
-                  </>
+                  <PrivyProvider
+                    appId={process.env.PRIVY_APP_ID!}
+                    config={{
+                      loginMethods: ['email', 'wallet'],
+                      appearance: {
+                        theme: 'light',
+                      },
+                      embeddedWallets: {
+                        ethereum: {
+                          createOnLogin: 'users-without-wallets',
+                        },
+                        solana: {
+                          createOnLogin: 'users-without-wallets',
+                        },
+                      },
+                    }}
+                  >
+                    <>
+                      <OnBoardingWrapperForMobile>
+                        <ReactNativeBridgeUser />
+                        <ReactNativeLogForwarder />
+                        <RouterProvider router={router()} />
+                        {isAddedToHomeScreen || isMarketingPage ? null : (
+                          <AddToHomeScreenPrompt
+                            isIOS={isIOS}
+                            isAndroid={isAndroid}
+                            displayDelayMilliseconds={1000}
+                          />
+                        )}
+                      </OnBoardingWrapperForMobile>
+                    </>
+                  </PrivyProvider>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && <ReactQueryDevtools />}
