@@ -139,7 +139,7 @@ export async function generateUniqueId(
     };
   }
 
-  const baseId = lo.kebabCase(communityName);
+  let baseId = lo.kebabCase(communityName);
   if (baseId.length === 0) {
     return {
       id: null,
@@ -147,6 +147,7 @@ export async function generateUniqueId(
       error: `generated ID has zero length: original="${name}" formatted="${communityName}"`,
     };
   }
+  baseId = `clanker-${baseId}`;
 
   // Find all communities that start with this base ID
   const existingCommunities = await models.Community.findAll({
@@ -250,9 +251,7 @@ async function uploadTokenImage(
 export async function createCommunityFromClankerToken(
   payload: z.infer<typeof ClankerToken>,
 ) {
-  const { id, name, error } = await generateUniqueId(
-    `Clanker - ${payload.name}`,
-  );
+  const { id, name, error } = await generateUniqueId(payload.name);
   if (error) {
     log.warn(error);
     return;

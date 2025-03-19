@@ -43,49 +43,49 @@ describe('generateUniqueId', () => {
   it('should generate base ID when no conflicts exist', async () => {
     const result = await generateUniqueId('Test Community');
     expect(result.error).toBeNull();
-    expect(result.id).toBe('test-community');
+    expect(result.id).toBe('clanker-test-community');
     expect(result.name).toBe('Test Community');
   });
 
   it('should handle existing base ID and generate sequential variant', async () => {
     await models.Community.create({
-      id: 'test-community',
+      id: 'clanker-test-community',
       name: 'Test Community',
       ...baseFields,
     });
 
     const result = await generateUniqueId('Test Community');
     expect(result.error).toBeNull();
-    expect(result.id).toBe('test-community-2');
+    expect(result.id).toBe('clanker-test-community-2');
     expect(result.name).toBe('Test Community (2)');
   });
 
   it('should generate sequential numbers without using gaps', async () => {
     await models.Community.create({
-      id: 'test-community',
+      id: 'clanker-test-community',
       name: 'Test Community',
       ...baseFields,
     });
     await models.Community.create({
-      id: 'test-community-2',
+      id: 'clanker-test-community-2',
       name: 'Test Community (2)',
       ...baseFields,
     });
     await models.Community.create({
-      id: 'test-community-3',
+      id: 'clanker-test-community-3',
       name: 'Test Community (3)',
       ...baseFields,
     });
 
     await models.Community.create({
-      id: 'test-community-5',
+      id: 'clanker-test-community-5',
       name: 'Test Community (5)',
       ...baseFields,
     });
 
     const result = await generateUniqueId('Test Community');
     expect(result.error).toBeNull();
-    expect(result.id).toBe('test-community-6');
+    expect(result.id).toBe('clanker-test-community-6');
     expect(result.name).toBe('Test Community (6)');
   });
 
@@ -100,17 +100,17 @@ describe('generateUniqueId', () => {
         ...baseFields,
       });
       if (i === 0) {
-        expect(c.id).toBe('test-community');
+        expect(c.id).toBe('clanker-test-community');
         expect(c.name).toBe('Test Community');
       } else {
-        expect(c.id).toBe(`test-community-${i + 1}`);
+        expect(c.id).toBe(`clanker-test-community-${i + 1}`);
         expect(c.name).toBe(`Test Community (${i + 1})`);
       }
     }
 
     const result = await generateUniqueId('Test Community');
     expect(result.error).toContain(
-      'too many conflicting community IDs for: test-community',
+      'too many conflicting community IDs for: clanker-test-community',
     );
     expect(result.id).toBeNull();
     expect(result.name).toBeNull();
@@ -119,7 +119,7 @@ describe('generateUniqueId', () => {
   it('should handle special characters in community names', async () => {
     const result = await generateUniqueId('Test & Community @ 123!');
     expect(result.error).toBeNull();
-    expect(result.id).toBe('test-community-123');
+    expect(result.id).toBe('clanker-test-community-123');
     expect(result.name).toBe('Test & Community @ 123!');
   });
 });
