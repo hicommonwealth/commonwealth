@@ -146,8 +146,25 @@ export async function generateUniqueId(
     };
   }
   const [kebabCommunityName, communityName] = formattedResult;
+
+  // assume clanker community ID is unique since token ID is unique
   const newCommunityId = `clanker-${kebabCommunityName}-${clankerTokenId}`;
 
+  // check for existing community with same ID
+  const existingCommunity = await models.Community.findOne({
+    where: {
+      id: newCommunityId,
+    },
+  });
+  if (existingCommunity) {
+    return {
+      id: null,
+      name: null,
+      error: `community already exists: ${newCommunityId}`,
+    };
+  }
+
+  // check for ID pattern matches
   const matchingCommunities = await models.Community.findAll({
     where: {
       id: {
@@ -165,9 +182,33 @@ export async function generateUniqueId(
     };
   }
 
-  // if there are matches, return ID and enumerated name
-  const suffix = matchingCommunities.length + 1;
-  const numberedCommunityName = `${communityName} (${suffix})`;
+  // if there are matches, generate an enumerated name
+  let suffix = matchingCommunities.length + 1;
+  let numberedCommunityName =
+    suffix > 1 ? `${communityName} #${suffix}` : communityName;
+
+  // if the numbered community name already exists, keep incrementing the suffix until we find a unique name
+  let existingNumberedCommunity = await models.Community.findOne({
+    where: { name: numberedCommunityName },
+  });
+  if (existingNumberedCommunity) {
+    let numAttemptsLeft = 5;
+    while (existingNumberedCommunity && numAttemptsLeft > 0) {
+      suffix++;
+      numberedCommunityName = `${communityName} #${suffix}`;
+      existingNumberedCommunity = await models.Community.findOne({
+        where: { name: numberedCommunityName },
+      });
+      numAttemptsLeft--;
+    }
+    if (existingNumberedCommunity) {
+      return {
+        id: null,
+        name: null,
+        error: `failed to generate unique ID: ${name}`,
+      };
+    }
+  }
 
   return {
     id: newCommunityId,
@@ -196,7 +237,7 @@ async function uploadTokenImage(
     });
     return url;
   } catch (err) {
-    log.error(
+    log.warn(
       `failed to download clanker token image: ${(err as Error).message}`,
     );
     return null;

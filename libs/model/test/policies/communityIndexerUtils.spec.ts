@@ -1,5 +1,5 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { models } from '../../src/database';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
 
@@ -20,7 +20,15 @@ describe('generateUniqueId', () => {
     stages_enabled: true,
     custom_stages: [],
     collapsed_on_homepage: false,
+    community_indexer_id: 'clanker',
   };
+
+  beforeAll(async () => {
+    await models.CommunityIndexer.create({
+      id: 'clanker',
+      status: 'idle',
+    });
+  });
 
   beforeEach(async () => {
     await models.Community.destroy({ where: {} });
@@ -70,7 +78,7 @@ describe('generateUniqueId', () => {
     expect(result.name).toBe('Test Community');
   });
 
-  it('should return enumerated name when there are conflicts', async () => {
+  it('should fail on duplicate ID', async () => {
     await models.Community.create({
       id: `clanker-test-community-${MOCK_TOKEN_ID}`,
       name: 'Test Community',
@@ -79,9 +87,9 @@ describe('generateUniqueId', () => {
 
     const result = await generateUniqueId('Test Community', MOCK_TOKEN_ID);
     expect(result).toMatchObject({
-      error: null,
-      id: `clanker-test-community-${MOCK_TOKEN_ID}`,
-      name: 'Test Community (2)',
+      error: `community already exists: clanker-test-community-${MOCK_TOKEN_ID}`,
+      id: null,
+      name: null,
     });
   });
 
@@ -93,17 +101,17 @@ describe('generateUniqueId', () => {
     });
     await models.Community.create({
       id: `clanker-test-community-66`,
-      name: 'Test Community (2)',
+      name: 'Test Community #2',
       ...baseFields,
     });
     await models.Community.create({
       id: `clanker-test-community-77`,
-      name: 'Test Community (3)',
+      name: 'Test Community #3',
       ...baseFields,
     });
     await models.Community.create({
       id: `clanker-test-community-88`,
-      name: 'Test Community (4)',
+      name: 'Test Community #4',
       ...baseFields,
     });
 
@@ -118,7 +126,7 @@ describe('generateUniqueId', () => {
     expect(result).toMatchObject({
       error: null,
       id: `clanker-test-community-100`,
-      name: 'Test Community (5)',
+      name: 'Test Community #5',
     });
   });
 
