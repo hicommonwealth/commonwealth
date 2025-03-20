@@ -147,6 +147,10 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      community_indexer_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

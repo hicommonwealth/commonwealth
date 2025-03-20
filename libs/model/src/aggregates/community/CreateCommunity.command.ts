@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -26,6 +26,8 @@ export const CreateCommunityErrors = {
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   // eslint-disable-next-line max-len
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  TokenAddressRequired:
+    'Token address is required when creating a community from an indexer',
 };
 
 function baseToNetwork(n: ChainBase): ChainNetwork {
@@ -64,13 +66,21 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         token_name,
         chain_node_id,
+        community_indexer_id,
+        token_address,
+        tags,
         allow_tokenized_threads,
       } = payload;
+
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
       });
       if (community)
         throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
+
+      if (community_indexer_id && !token_address) {
+        throw new InvalidInput(CreateCommunityErrors.TokenAddressRequired);
+      }
 
       // requires super admin privilege for creating Chain/DAO
       if (type === ChainType.Chain || type === ChainType.DAO)
@@ -138,10 +148,43 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             directory_page_enabled: false,
             snapshot_spaces: [],
             stages_enabled: true,
+            community_indexer_id,
             allow_tokenized_threads,
           },
           { transaction },
         );
+
+        if (community_indexer_id && token_address) {
+          await models.PinnedToken.create(
+            {
+              community_id: id,
+              contract_address: token_address,
+              chain_node_id: node.id!,
+            },
+            { transaction },
+          );
+        }
+
+        // add tag associations
+        if (tags.length > 0) {
+          const existingTags = await models.Tags.findAll({
+            where: {
+              name: tags,
+            },
+          });
+          if (existingTags.length !== tags.length) {
+            throw new InvalidState('Invalid tags');
+          }
+          for (const t of existingTags) {
+            await models.CommunityTags.create(
+              {
+                community_id: id,
+                tag_id: t.id!,
+              },
+              { transaction },
+            );
+          }
+        }
 
         await models.Topic.create(
           {
@@ -184,21 +227,24 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           { transaction },
         );
 
-        await emitEvent(
-          models.Outbox,
-          [
-            {
-              event_name: 'CommunityCreated',
-              event_payload: {
-                community_id: id,
-                user_id: user.id!,
-                referrer_address: user.referred_by_address ?? undefined,
-                created_at: created.created_at!,
+        // Only emit the event if the community was not created by an indexer
+        if (!payload.community_indexer_id) {
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'CommunityCreated',
+                event_payload: {
+                  community_id: id,
+                  user_id: user.id!,
+                  referrer_address: user.referred_by_address ?? undefined,
+                  created_at: created.created_at!,
+                },
               },
-            },
-          ],
-          transaction,
-        );
+            ],
+            transaction,
+          );
+        }
       });
       // == end of command transaction boundary ==
 

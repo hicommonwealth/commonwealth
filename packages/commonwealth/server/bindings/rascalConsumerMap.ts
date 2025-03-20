@@ -1,6 +1,7 @@
 import { RoutingKeyTags } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityIndexerWorker,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
@@ -17,6 +18,7 @@ export const rascalConsumerMap = [
   Contest.Contests,
   FarcasterWorker,
   NotificationsSettingsPolicy,
+  CommunityIndexerWorker,
   CreateUnverifiedUser,
   {
     consumer: ContestWorker,

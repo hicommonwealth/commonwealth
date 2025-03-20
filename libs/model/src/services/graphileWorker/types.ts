@@ -1,4 +1,4 @@
-import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
+import type { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
 import { z, ZodSchema, ZodUndefined } from 'zod';
 
 export enum GraphileTaskNames {
@@ -7,7 +7,8 @@ export enum GraphileTaskNames {
   CleanSubscriptions = 'CleanSubscriptions',
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
-  AwardTwitterQuestXp = 'AwardTweetEngagementXp',
+  AwardTwitterQuestXp = 'AwardTwitterQuestXp',
+  IndexCommunities = 'IndexCommunities',
   CountAggregator = 'CountAggregator',
 }
 
@@ -29,9 +30,10 @@ export const TaskPayloads = {
   CleanSubscriptions: z.object({}),
   CleanChainEventXpSources: z.object({}),
   RunDbMaintenance: z.object({}),
-  AwardTweetEngagementXp: z.object({
+  AwardTwitterQuestXp: z.object({
     quest_id: z.number(),
     quest_end_date: z.coerce.date(),
   }),
+  IndexCommunities: z.object({}),
   CountAggregator: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;

@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityIndexerWorker,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
@@ -20,6 +21,7 @@ import {
   User,
   models,
 } from '@hicommonwealth/model';
+import { CronJob } from 'cron';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -80,6 +82,14 @@ export async function bootstrapBindings(
   );
   checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
 
+  const communityIndexerSubRes = await brokerInstance.subscribe(
+    CommunityIndexerWorker,
+  );
+  checkSubscriptionResponse(
+    communityIndexerSubRes,
+    CommunityIndexerWorker.name,
+  );
+
   const contestProjectionsSubRes = await brokerInstance.subscribe(
     Contest.Contests,
   );
@@ -128,21 +138,22 @@ export async function bootstrapRelayer(
 }
 
 export function bootstrapContestRolloverLoop() {
-  log.info('Starting rollover loop');
+  const cronFrequency = '* * * * *'; // every minute
 
-  const loop = async () => {
-    try {
-      await handleEvent(ContestWorker(), {
-        name: 'ContestRolloverTimerTicked',
-        payload: {},
-      });
-    } catch (err) {
-      log.error(err);
-    }
-  };
+  log.info(`Starting rollover cron job (${cronFrequency})`);
 
-  // TODO: move to external service triggered via scheduler?
-  setInterval(() => {
-    loop().catch(console.error);
-  }, 1_000 * 60);
+  CronJob.from({
+    cronTime: cronFrequency,
+    onTick: async () => {
+      try {
+        await handleEvent(ContestWorker(), {
+          name: 'ContestRolloverTimerTicked',
+          payload: {},
+        });
+      } catch (err) {
+        log.error(err);
+      }
+    },
+    start: true,
+  });
 }
