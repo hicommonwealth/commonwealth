@@ -71,6 +71,7 @@ const MembersSection = ({
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
+    includeGroups: true,
   });
 
   const chainRpc =
