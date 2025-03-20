@@ -1,0 +1,30 @@
+.ProposalListing {
+  width: 100%;
+  margin: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+
+  .proposal-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .snapshot {
+      display: flex;
+      align-items: center;
+
+      .dropdown-container {
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .table-view,
+  .card-view {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+}

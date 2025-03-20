@@ -14,6 +14,7 @@ import { PageLoading } from '../loading';
 import GovernanceCards from './GovernanceCards';
 import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
 import './GovernancePage.scss';
+import ProposalListing from './ProposalListing/ProposalListing';
 
 const GovernancePage = () => {
   const governancePageEnabled = useFlag('governancePage');
@@ -77,6 +78,7 @@ const GovernancePage = () => {
       <div className="GovernancePage">
         <GovernanceHeader />
         <GovernanceCards totalProposals={totalProposalsCount} />
+        <ProposalListing />
       </div>
     </CWPageLayout>
   );

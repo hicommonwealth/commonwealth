@@ -128,11 +128,7 @@ const Snapshots = () => {
           onClick={onSaveChanges}
         />
       ) : (
-        <CWButton
-          buttonType="secondary"
-          label="Add Snapshot"
-          onClick={onLinkAdd}
-        />
+        <></>
       )}
     </section>
   );
