@@ -1,6 +1,6 @@
-import { canvas } from 'server/federation';
+import { AppError } from '@hicommonwealth/core';
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { TypedRequestQuery, TypedResponse } from '../../types';
 
 type GetStatsResponse = {
   clock: number;
@@ -12,7 +12,8 @@ export const getCanvasClockHandler = async (
   req: TypedRequestQuery<{}>,
   res: TypedResponse<GetStatsResponse>,
 ) => {
-  const [clock, heads] = await canvas.messageLog.getClock();
-
-  return success(res, { clock, heads });
+  throw new AppError('Not implemented');
+  // const [clock, heads] = await canvas.messageLog.getClock();
+  //
+  // return success(res, { clock, heads });
 };
