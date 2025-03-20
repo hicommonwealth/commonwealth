@@ -1,9 +1,9 @@
 import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'client/scripts/state/api/proposals';
-import { CardsCollection } from 'client/scripts/views/components/cards_collection';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'client/scripts/views/components/component_kit/new_designs/CWTable';
@@ -45,6 +45,13 @@ const ProposalListing: React.FC = () => {
   const [snapshot, setSnapshot] = useState<OptionType>(snapshots[0]);
   const [filter, setFilter] = useState<OptionType>(filterOptions[0]);
 
+  const communityId = app.activeChainId() || '';
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: communityId,
+      enabled: !!communityId,
+    });
+
   const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
@@ -58,6 +65,10 @@ const ProposalListing: React.FC = () => {
       ...(completedCosmosProposals || []),
     ];
   }, [activeCosmosProposals, completedCosmosProposals]);
+
+  const snapshotst = community?.snapshot_spaces || [];
+
+  console.log('snapshotst :', snapshotst);
 
   const rowData = useMemo(
     () =>
@@ -148,14 +159,7 @@ const ProposalListing: React.FC = () => {
       </div>
 
       <div className="view-container">
-        {view === 'table' ? (
-          <>{TableComponent}</>
-        ) : (
-          <CardsCollection
-            content={completedCosmosProposals}
-            header="Inactive"
-          />
-        )}
+        {view === 'table' ? <>{TableComponent}</> : <></>}
       </div>
     </div>
   );
