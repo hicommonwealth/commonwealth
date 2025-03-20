@@ -112,6 +112,7 @@ const start = async () => {
     })
     .catch((e) => log.error(e.message, e));
 };
-void start();
+
+start().catch((e) => log.error(e.message, e));
 
 export default app;
