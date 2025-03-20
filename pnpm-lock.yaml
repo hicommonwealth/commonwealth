@@ -504,6 +504,9 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
+      abitype:
+        specifier: ^1.0.8
+        version: 1.0.8(typescript@5.8.2)(zod@3.24.1)
       async-mutex:
         specifier: ^0.5.0
         version: 0.5.0
@@ -8907,17 +8910,6 @@ packages:
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.19.1
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
-  abitype@1.0.6:
-    resolution: {integrity: sha512-MMSqYh4+C/aVqI2RQaWqbvI4Kxo5cQV40WQ4QFtDnNzCkqChm8MuENhElmynZlO0qUy/ObkEUaXtKqYnx1Kp3A==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -32165,16 +32157,6 @@ snapshots:
       typescript: 5.8.2
       zod: 3.24.1
 
-  abitype@1.0.6(typescript@5.8.2)(zod@3.23.6):
-    optionalDependencies:
-      typescript: 5.8.2
-      zod: 3.23.6
-
-  abitype@1.0.6(typescript@5.8.2)(zod@3.24.1):
-    optionalDependencies:
-      typescript: 5.8.2
-      zod: 3.24.1
-
   abitype@1.0.8(typescript@5.8.2)(zod@3.23.6):
     optionalDependencies:
       typescript: 5.8.2
@@ -40095,7 +40077,7 @@ snapshots:
       '@noble/hashes': 1.7.1
       '@scure/bip32': 1.5.0
       '@scure/bip39': 1.4.0
-      abitype: 1.0.6(typescript@5.8.2)(zod@3.23.6)
+      abitype: 1.0.8(typescript@5.8.2)(zod@3.23.6)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.8.2
@@ -40109,7 +40091,7 @@ snapshots:
       '@noble/hashes': 1.7.1
       '@scure/bip32': 1.5.0
       '@scure/bip39': 1.4.0
-      abitype: 1.0.6(typescript@5.8.2)(zod@3.24.1)
+      abitype: 1.0.8(typescript@5.8.2)(zod@3.24.1)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.8.2

@@ -35,7 +35,10 @@ export const SignIn = {
 };
 
 export const UpdateUser = {
-  input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({
+  input: User.omit({
+    is_welcome_onboard_flow_complete: true,
+    tier: true,
+  }).extend({
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),

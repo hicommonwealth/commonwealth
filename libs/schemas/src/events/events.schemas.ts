@@ -497,4 +497,12 @@ export const events = {
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),
+
+  TweetEngagementCapReached: z.object({
+    quest_id: z.number(),
+    quest_ended: z.boolean(),
+    like_cap_reached: z.boolean().optional(),
+    retweet_cap_reached: z.boolean().optional(),
+    reply_cap_reached: z.boolean().optional(),
+  }),
 } as const;

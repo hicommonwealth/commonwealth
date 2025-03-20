@@ -15,6 +15,10 @@ export default (sequelize: Sequelize.Sequelize) =>
         allowNull: false,
         primaryKey: true,
       },
+      tweet_url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

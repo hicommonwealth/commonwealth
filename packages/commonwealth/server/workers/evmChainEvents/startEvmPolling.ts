@@ -35,7 +35,7 @@ export async function startEvmPolling(
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  startEvmPolling(config.WORKERS.EVM_CE_POLL_INTERVAL_MS).catch((e) => {
+  startEvmPolling(config.EVM_CE.POLL_INTERVAL_MS).catch((e) => {
     log.fatal('Evm poller shutting down due to a critical error:', e);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
