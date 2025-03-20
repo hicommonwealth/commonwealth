@@ -1,3 +1,4 @@
+import FrameSDK from '@farcaster/frame-sdk';
 import {
   ChainBase,
   chainBaseToCaip2,
@@ -335,8 +336,16 @@ const useUserMenuItems = ({
             <CWToggle checked={darkMode.isDarkMode} />
           </div>
         ),
-        onClick: () => {
-          darkMode.toggleDarkMode();
+        onClick: async () => {
+          try {
+            const accounts = await FrameSDK.wallet.ethProvider.request({
+              method: 'eth_requestAccounts',
+            });
+            console.log('accounts', accounts);
+          } catch (error) {
+            console.error('error', error);
+          }
+          // darkMode.toggleDarkMode();
         },
         preventClosing: true,
       },
