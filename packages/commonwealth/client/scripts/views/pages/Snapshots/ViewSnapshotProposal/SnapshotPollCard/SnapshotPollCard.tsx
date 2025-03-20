@@ -7,7 +7,7 @@ import { PollCardProps, VoteInformation } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
-import VotingUI from 'client/scripts/views/components/proposals/VotingUi';
+import VotingUI from 'client/scripts/views/components/proposals/VotingUI';
 import '../../../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<

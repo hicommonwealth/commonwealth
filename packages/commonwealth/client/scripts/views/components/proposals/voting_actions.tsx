@@ -26,10 +26,11 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { VoteOption } from './VotingResultView';
-import VotingUI from './VotingUi';
+
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
+import VotingUI from './VotingUI';
 
 type VotingActionsProps = {
   onModalClose: () => void;

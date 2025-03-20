@@ -72,6 +72,7 @@ interface ProposalsQueryResponse {
 
 interface UseGetSnapshotProposalsQueryProps {
   space: string;
+  enabled?: boolean;
 }
 
 const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
@@ -91,7 +92,11 @@ const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
 
 export const getSnapshotProposalsQuery = async ({
   space,
+  enabled = true,
 }: UseGetSnapshotProposalsQueryProps) => {
+  if (!enabled) {
+    return null;
+  }
   return await queryClient.fetchQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
     queryFn: () => getProposals({ space }),
@@ -101,11 +106,13 @@ export const getSnapshotProposalsQuery = async ({
 
 const useGetSnapshotProposalsQuery = ({
   space,
+  enabled = true,
 }: UseGetSnapshotProposalsQueryProps) => {
   return useQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
     queryFn: () => getProposals({ space }),
     staleTime: PROPOSALS_STALE_TIME,
+    enabled: enabled,
   });
 };
 

@@ -11,11 +11,13 @@ export interface VoteOption {
 interface GovernanceVoteProps {
   voteOptions: VoteOption[];
   showCombineBarOnly: boolean;
+  governanceUrl?: string;
 }
 
 const VotingResultView: React.FC<GovernanceVoteProps> = ({
   voteOptions,
   showCombineBarOnly,
+  governanceUrl,
 }) => {
   const totalVotes = voteOptions?.reduce(
     (sum, option) => sum + parseFloat(option.results || '0'),
@@ -59,13 +61,10 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
             return (
               <div className="vote-option" key={option.label}>
                 <div className="container">
-                  <span
-                    className="option-label"
-                    aria-label={`${option.label}: ${option.percentage}%`}
-                  >
+                  <CWText type="b2" className="option-label">
                     {option.label}
-                  </span>
-                  <span className="percentage">{option.percentage}%</span>
+                  </CWText>
+                  <CWText className="percentage">{option.percentage}% </CWText>
                 </div>
                 <div
                   className="progress-bar"
@@ -117,13 +116,13 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
             }
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="vote-footer">
-          <a href="#" className="view-link">
-            {'goverance'} <span>↗</span>
-          </a>
-        </div>
+        {!showCombineBarOnly && (
+          <div className="vote-footer">
+            <a href={governanceUrl} className="view-link">
+              View on snapshot <span>↗</span>
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

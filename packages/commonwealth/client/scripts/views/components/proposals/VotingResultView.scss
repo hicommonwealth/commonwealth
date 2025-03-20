@@ -61,9 +61,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: 'NeueHaasUnica';
+    color: $neutral-800;
   }
 
   .percentage {
     margin-left: 8px;
+    font-family: 'NeueHaasUnica';
+    color: $neutral-500;
   }
 }

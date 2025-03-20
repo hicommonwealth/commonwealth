@@ -5,7 +5,6 @@ import {
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
@@ -14,7 +13,6 @@ import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
-import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
@@ -28,6 +26,7 @@ import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { PageLoading } from '../loading';
 import { JSONDisplay } from '../view_proposal/JSONDisplay';
 import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
@@ -91,6 +90,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     identifier: proposalId,
     // @ts-expect-error <StrictNullChecks/>
     snapshotId: querySnapshotId,
+    enabled: queryType === 'cosmos' ? false : true,
   });
   const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
@@ -147,10 +147,11 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
       }
     }
   }, [snapshotProposal, proposal, queryType]);
+  console.log({ isLoading, isSnapshotLoading, isFetchingMetadata });
 
-  //   if (isLoading || isSnapshotLoading) {
-  //     return <PageLoading message="Loading..." />;
-  //   }
+  if (isLoading || isSnapshotLoading) {
+    return <PageLoading message="Loading..." />;
+  }
 
   if (cosmosError) {
     return (
@@ -185,7 +186,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   };
 
   const governanceUrl = `https://snapshot.box/#/s:${querySnapshotId}/proposal/${identifier}`;
-  console.log({ governanceUrl });
   return (
     <CWPageLayout>
       {isWindowSmallInclusive && (
@@ -201,11 +201,11 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         updatedAt={null}
         body={() => (
           <>
-            {isFetchingMetadata ? (
+            {/* {isFetchingMetadata ? (
               <Skeleton height={94.4} />
             ) : (
               !_.isEmpty(metadata) && <JSONDisplay data={metadata} />
-            )}
+            )} */}
             {isWindowSmallInclusive && (
               <DetailsCard
                 status={
@@ -344,6 +344,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                   <VotingResultView
                     voteOptions={snapShotVotingResult}
                     showCombineBarOnly={false}
+                    governanceUrl={governanceUrl}
                   />
                 )}
               </>

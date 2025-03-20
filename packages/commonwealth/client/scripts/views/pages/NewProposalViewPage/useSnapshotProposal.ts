@@ -22,11 +22,13 @@ import useUserStore from 'state/ui/user';
 interface UseSnapshotProposalProps {
   identifier: string;
   snapshotId: string;
+  enabled: boolean;
 }
 
 export const useSnapshotProposal = ({
   identifier,
   snapshotId,
+  enabled = false,
 }: UseSnapshotProposalProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
@@ -38,11 +40,13 @@ export const useSnapshotProposal = ({
   const { data: spaceData, isLoading: isSpaceLoading } =
     useGetSnapshotSpaceQuery({
       space: snapshotId,
+      enabled: enabled,
     });
 
   const { data: proposalsData, isLoading: isProposalsLoading } =
     useGetSnapshotProposalsQuery({
       space: snapshotId,
+      enabled: enabled,
     });
 
   const {
@@ -101,38 +105,40 @@ export const useSnapshotProposal = ({
   // Load votes data
   const loadVotes = useCallback(
     async (proposalId) => {
-      setIsLoading(true);
-      try {
-        if (!proposalsData || !spaceData) {
-          return;
-        }
+      if (enabled) {
+        setIsLoading(true);
+        try {
+          if (!proposalsData || !spaceData) {
+            return;
+          }
 
-        const currentProposal = (proposalsData || []).find(
-          (p) => p.id === proposalId,
-        );
-
-        if (!currentProposal) {
-          return;
-        }
-
-        setProposal(currentProposal);
-        setSpace(spaceData);
-
-        const results = await getResults(spaceData, currentProposal);
-        setVoteResults(results);
-
-        if (activeUserAddress) {
-          const powerRes = await getPower(
-            spaceData,
-            currentProposal,
-            activeUserAddress,
+          const currentProposal = (proposalsData || []).find(
+            (p) => p.id === proposalId,
           );
-          setPower(powerRes);
+
+          if (!currentProposal) {
+            return;
+          }
+
+          setProposal(currentProposal);
+          setSpace(spaceData);
+
+          const results = await getResults(spaceData, currentProposal);
+          setVoteResults(results);
+
+          if (activeUserAddress) {
+            const powerRes = await getPower(
+              spaceData,
+              currentProposal,
+              activeUserAddress,
+            );
+            setPower(powerRes);
+          }
+        } catch (error) {
+          console.error('Error loading votes:', error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Error loading votes:', error);
-      } finally {
-        setIsLoading(false);
       }
     },
     [activeUserAddress, proposalsData, spaceData],
@@ -140,25 +146,24 @@ export const useSnapshotProposal = ({
 
   // Initial load
   useEffect(() => {
-    if (!proposalsData || !spaceData) {
+    if (!proposalsData || !spaceData || !enabled) {
       return;
     }
 
     loadVotes(identifier).catch(console.error);
-  }, [proposalsData, spaceData, identifier, loadVotes]);
+  }, [proposalsData, spaceData, identifier, loadVotes, enabled]);
 
   // Update loading state
   useEffect(() => {
     setIsLoading(isSpaceLoading || isProposalsLoading || isThreadsLoading);
   }, [isSpaceLoading, isProposalsLoading, isThreadsLoading]);
 
-  // Return all necessary data and functions
   return {
     proposal,
     space,
     voteResults,
     power,
-    isLoading,
+    isLoading: !enabled ? false : isLoading,
     threads,
     symbol,
     validatedAgainstStrategies,

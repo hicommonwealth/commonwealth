@@ -23,7 +23,6 @@ interface VoteOption {
 }
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
-  console.log({ result: proposal });
   const [, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized,
   );

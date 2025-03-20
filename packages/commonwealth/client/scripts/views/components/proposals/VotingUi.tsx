@@ -19,6 +19,7 @@ interface VotingUIProps {
   type: 'cosmos' | 'snapshot';
   votingOption: VoteOption[];
   toggleShowVotesDrawer: (newState: boolean) => void;
+  governanceUrl?: string;
 }
 
 const VotingUI: React.FC<VotingUIProps> = ({
@@ -53,9 +54,9 @@ const VotingUI: React.FC<VotingUIProps> = ({
 
             <CWText
               onClick={() => {
-                console.log('xxxxxxxxxxx');
                 toggleShowVotesDrawer(true);
               }}
+              className="ViewActivity"
             >
               ViewActivity
             </CWText>
