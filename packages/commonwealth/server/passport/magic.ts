@@ -48,6 +48,7 @@ type MagicLoginContext = {
 };
 
 const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
+const DEFAULT_COMMON_COMMUNITY_ID = 'common-protocol';
 
 type OauthInfo = {
   oauth_provider: WalletSsoSource;
@@ -576,6 +577,10 @@ async function magicLoginRoute(
     {
       address: decodedMagicToken.publicAddress,
       community_id: DEFAULT_ETH_COMMUNITY_ID,
+    },
+    {
+      address: decodedMagicToken.publicAddress,
+      community_id: DEFAULT_COMMON_COMMUNITY_ID,
     },
   ];
 

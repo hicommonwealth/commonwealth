@@ -73,6 +73,9 @@ const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
 
+const DEFAULT_ETH_COMMUNITY_ID = 'ethereum';
+const DEFAULT_COMMON_COMMUNITY_ID = 'common-protocol';
+
 const useAuthentication = (props: UseAuthenticationProps) => {
   const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
@@ -391,10 +394,36 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const handleAutoJoinCommunities = async (
+    session: Session,
+    address: string,
+    wallet_id: WalletId,
+    block_info: string | null,
+    refcode: string | null,
+  ) => {
+    const communitiesToJoin = [
+      DEFAULT_COMMON_COMMUNITY_ID,
+      DEFAULT_ETH_COMMUNITY_ID,
+    ];
+    for (const communityId of communitiesToJoin) {
+      try {
+        await signIn(session, {
+          address,
+          community_id: communityId,
+          wallet_id,
+          block_info,
+          referrer_address: refcode,
+        });
+      } catch (e) {
+        console.error(`Error auto-joining community ${communityId}:`, e);
+      }
+    }
+  };
+
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      if (session && account)
+      if (session && account) {
         await signIn(session, {
           address: account.address,
           community_id: account.community.id,
@@ -402,6 +431,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
+
+        // Auto-join common and ethereum communities if this is an Ethereum address
+        if (account.community.base === ChainBase.Ethereum) {
+          await handleAutoJoinCommunities(
+            session,
+            account.address,
+            account.walletId!,
+            account.validationBlockInfo || null,
+            refcode,
+          );
+        }
+      }
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
@@ -639,6 +680,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ? JSON.stringify(validationBlockInfo)
         : null,
     });
+
+    // Auto-join common and ethereum communities if this is an Ethereum address
+    if (app.chain?.base === ChainBase.Ethereum) {
+      await handleAutoJoinCommunities(
+        session,
+        address,
+        wallet.name,
+        validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
+        refcode,
+      );
+    }
+
     await verifySession(session);
     console.log('Started new session for', wallet.chain, chainIdentifier);
 
