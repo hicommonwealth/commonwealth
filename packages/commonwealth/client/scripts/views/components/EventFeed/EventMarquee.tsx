@@ -19,7 +19,9 @@ const EventMarquee: React.FC<EventMarqueeProps> = ({
 
   useEffect(() => {
     if (hasNextPage) {
-      fetchNextPage();
+      void fetchNextPage().catch((error) => {
+        console.error('Failed to fetch next page:', error);
+      });
     }
   }, [hasNextPage, fetchNextPage]);
 
