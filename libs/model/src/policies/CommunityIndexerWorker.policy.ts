@@ -24,7 +24,11 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
             `token already has community: ${payload.contract_address}="${pinnedToken.community_id}"`,
           );
         } else {
-          await createCommunityFromClankerToken(payload);
+          try {
+            await createCommunityFromClankerToken(payload);
+          } catch (err) {
+            log.warn(`failed to create clanker community: ${err}`);
+          }
         }
       },
     },

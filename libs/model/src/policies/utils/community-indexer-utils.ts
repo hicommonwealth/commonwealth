@@ -102,22 +102,29 @@ export async function* paginateClankerTokens({
   }
 }
 
-function formatCommunityName(input: string) {
+/**
+ * Formats a community name by removing invalid characters and converting to kebab case.
+ *
+ * @param {string} input - The original community name.
+ * @returns {[string, string] | null} A tuple containing the kebab case formatted name and the original name, or null if the name is invalid.
+ */
+function formatCommunityName(input: string): [string, string] | null {
   const formatted = input
     // eslint-disable-next-line no-useless-escape
     .replace(/[^a-zA-Z0-9!@#&():_$\/\\|.\- ]+/g, '') // Keep only allowed characters
     .replace(/\s+/g, ' ') // Replace multiple spaces with one
     .trim(); // Trim leading and trailing spaces
   if (!COMMUNITY_NAME_REGEX.test(formatted)) {
-    return '';
+    return null;
   }
-  return formatted;
+  return [lo.kebabCase(formatted), formatted];
 }
 
 /**
  * Generates a compliant community name and unique ID based on the provided community name.
  *
  * @param {string} name - The original community name.
+ * @param {number} clankerTokenId - The token ID to append to the community ID.
  * @returns {Promise<
  *   | { id: string; name: string; error: null }
  *   | { id: null; name: null; error: string }
@@ -125,90 +132,46 @@ function formatCommunityName(input: string) {
  */
 export async function generateUniqueId(
   name: string,
+  clankerTokenId: number,
 ): Promise<
   | { id: string; name: string; error: null }
   | { id: null; name: null; error: string }
 > {
-  const communityName = formatCommunityName(name.trim());
-
-  if (communityName.length <= 3) {
+  const formattedResult = formatCommunityName(name.trim());
+  if (!formattedResult) {
     return {
       id: null,
       name: null,
-      error: `formatted community name invalid or too short: original="${name}" formatted="${communityName}"`,
+      error: `invalid community name: original="${name}"`,
     };
   }
+  const [kebabCommunityName, communityName] = formattedResult;
+  const newCommunityId = `clanker-${kebabCommunityName}-${clankerTokenId}`;
 
-  let baseId = lo.kebabCase(communityName);
-  if (baseId.length === 0) {
-    return {
-      id: null,
-      name: null,
-      error: `generated ID has zero length: original="${name}" formatted="${communityName}"`,
-    };
-  }
-  baseId = `clanker-${baseId}`;
-
-  // Find all communities that start with this base ID
-  const existingCommunities = await models.Community.findAll({
+  const matchingCommunities = await models.Community.findAll({
     where: {
       id: {
-        [Op.like]: `${baseId}%`,
+        [Op.regexp]: `^clanker-${kebabCommunityName}-[0-9]+$`,
       },
     },
-    attributes: ['id'],
-    order: [['created_at', 'ASC']],
   });
 
-  // If no communities exist with this base ID, use it
-  if (existingCommunities.length === 0) {
+  // no matches, return the base ID and name
+  if (matchingCommunities.length === 0) {
     return {
-      id: baseId,
+      id: newCommunityId,
       name: communityName,
       error: null,
     };
   }
 
-  // Check if the base ID exists without a number suffix
-  const baseIdExists = existingCommunities.some(
-    (community) => community.id === baseId,
-  );
-
-  if (!baseIdExists) {
-    return {
-      id: baseId,
-      name: communityName,
-      error: null,
-    };
-  }
-
-  // Find the maximum number suffix used
-  const maxNumber = existingCommunities.reduce((max, community) => {
-    const match = community.id.match(new RegExp(`^${baseId}-([0-9]+)$`));
-    if (match) {
-      const num = parseInt(match[1], 10);
-      return num > max ? num : max;
-    }
-    return max;
-  }, 1); // Start with 1 as the minimum
-
-  // Use the maximum number + 1
-  const nextNumber = maxNumber + 1;
-
-  if (nextNumber > 10) {
-    return {
-      id: null,
-      name: null,
-      error: `too many conflicting community IDs for: ${baseId} (checked first 10)`,
-    };
-  }
-
-  const newId = `${baseId}-${nextNumber}`;
-  const newName = `${communityName} (${nextNumber})`;
+  // if there are matches, return ID and enumerated name
+  const suffix = matchingCommunities.length + 1;
+  const numberedCommunityName = `${communityName} (${suffix})`;
 
   return {
-    id: newId,
-    name: newName,
+    id: newCommunityId,
+    name: numberedCommunityName,
     error: null,
   };
 }
@@ -251,10 +214,9 @@ async function uploadTokenImage(
 export async function createCommunityFromClankerToken(
   payload: z.infer<typeof ClankerToken>,
 ) {
-  const { id, name, error } = await generateUniqueId(payload.name);
+  const { id, name, error } = await generateUniqueId(payload.name, payload.id);
   if (error) {
-    log.warn(error);
-    return;
+    throw new Error(`failed to generate unique ID: ${error}`);
   }
 
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({

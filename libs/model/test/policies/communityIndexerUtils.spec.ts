@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { models } from '../../src/database';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
 
+const MOCK_TOKEN_ID = 1234;
+
 describe('generateUniqueId', () => {
   const baseFields = {
     default_symbol: 'TEST',
@@ -25,101 +27,110 @@ describe('generateUniqueId', () => {
   });
 
   it('should handle invalid input names', async () => {
-    const shortName = await generateUniqueId('ab');
-    expect(shortName.error).toContain(
-      'formatted community name invalid or too short: original="ab"',
-    );
-    expect(shortName.id).toBeNull();
-    expect(shortName.name).toBeNull();
+    // test empty name
+    const emptyName1 = await generateUniqueId('', MOCK_TOKEN_ID);
+    expect(emptyName1).toMatchObject({
+      error: 'invalid community name: original=""',
+      id: null,
+      name: null,
+    });
 
-    const emptyName = await generateUniqueId('   ');
-    expect(emptyName.error).toContain(
-      'formatted community name invalid or too short: original="   "',
-    );
-    expect(emptyName.id).toBeNull();
-    expect(emptyName.name).toBeNull();
+    // test empty name with whitespace
+    const emptyName2 = await generateUniqueId('   ', MOCK_TOKEN_ID);
+    expect(emptyName2).toMatchObject({
+      error: 'invalid community name: original="   "',
+      id: null,
+      name: null,
+    });
+
+    // test invalid name
+    const invalidName = await generateUniqueId('👍', MOCK_TOKEN_ID);
+    expect(invalidName).toMatchObject({
+      error: 'invalid community name: original="👍"',
+      id: null,
+      name: null,
+    });
+    expect(invalidName.id).toBeNull();
+    expect(invalidName.name).toBeNull();
   });
 
   it('should generate base ID when no conflicts exist', async () => {
-    const result = await generateUniqueId('Test Community');
+    // test short name
+    const shortName = await generateUniqueId('a', MOCK_TOKEN_ID);
+    expect(shortName).toMatchObject({
+      error: null,
+      id: `clanker-a-${MOCK_TOKEN_ID}`,
+      name: 'a',
+    });
+
+    // test typical name
+    const result = await generateUniqueId('Test Community', MOCK_TOKEN_ID);
     expect(result.error).toBeNull();
-    expect(result.id).toBe('clanker-test-community');
+    expect(result.id).toBe(`clanker-test-community-${MOCK_TOKEN_ID}`);
     expect(result.name).toBe('Test Community');
   });
 
-  it('should handle existing base ID and generate sequential variant', async () => {
+  it('should return enumerated name when there are conflicts', async () => {
     await models.Community.create({
-      id: 'clanker-test-community',
+      id: `clanker-test-community-${MOCK_TOKEN_ID}`,
       name: 'Test Community',
       ...baseFields,
     });
 
-    const result = await generateUniqueId('Test Community');
-    expect(result.error).toBeNull();
-    expect(result.id).toBe('clanker-test-community-2');
-    expect(result.name).toBe('Test Community (2)');
+    const result = await generateUniqueId('Test Community', MOCK_TOKEN_ID);
+    expect(result).toMatchObject({
+      error: null,
+      id: `clanker-test-community-${MOCK_TOKEN_ID}`,
+      name: 'Test Community (2)',
+    });
   });
 
-  it('should generate sequential numbers without using gaps', async () => {
+  it('should generate enumerated community names', async () => {
     await models.Community.create({
-      id: 'clanker-test-community',
+      id: `clanker-test-community-55`,
       name: 'Test Community',
       ...baseFields,
     });
     await models.Community.create({
-      id: 'clanker-test-community-2',
+      id: `clanker-test-community-66`,
       name: 'Test Community (2)',
       ...baseFields,
     });
     await models.Community.create({
-      id: 'clanker-test-community-3',
+      id: `clanker-test-community-77`,
       name: 'Test Community (3)',
       ...baseFields,
     });
-
     await models.Community.create({
-      id: 'clanker-test-community-5',
-      name: 'Test Community (5)',
+      id: `clanker-test-community-88`,
+      name: 'Test Community (4)',
       ...baseFields,
     });
 
-    const result = await generateUniqueId('Test Community');
-    expect(result.error).toBeNull();
-    expect(result.id).toBe('clanker-test-community-6');
-    expect(result.name).toBe('Test Community (6)');
-  });
+    // add similarly name community with different kebab case name
+    await models.Community.create({
+      id: `clanker-test-community-foobar-99`,
+      name: 'Test CommunityFOOBAR',
+      ...baseFields,
+    });
 
-  it('should return error when more than 10 communities exist', async () => {
-    for (let i = 0; i < 10; i++) {
-      const result = await generateUniqueId('Test Community');
-      expect(result.error).toBeNull();
-      const { id, name } = result;
-      const c = await models.Community.create({
-        id: id!,
-        name: name!,
-        ...baseFields,
-      });
-      if (i === 0) {
-        expect(c.id).toBe('clanker-test-community');
-        expect(c.name).toBe('Test Community');
-      } else {
-        expect(c.id).toBe(`clanker-test-community-${i + 1}`);
-        expect(c.name).toBe(`Test Community (${i + 1})`);
-      }
-    }
-
-    const result = await generateUniqueId('Test Community');
-    expect(result.error).toContain(
-      'too many conflicting community IDs for: clanker-test-community',
-    );
-    expect(result.id).toBeNull();
-    expect(result.name).toBeNull();
+    const result = await generateUniqueId('Test Community', 100);
+    expect(result).toMatchObject({
+      error: null,
+      id: `clanker-test-community-100`,
+      name: 'Test Community (5)',
+    });
   });
 
   it('should handle special characters in community names', async () => {
-    const result = await generateUniqueId('Test & Community @ 123!');
-    expect(result.error).toBeNull();
-    expect(result.id).toBe('clanker-test-community-123');
-    expect(result.name).toBe('Test & Community @ 123!');
+    const result = await generateUniqueId(
+      'Test & Community @ 123!',
+      MOCK_TOKEN_ID,
+    );
+    expect(result).toMatchObject({
+      error: null,
+      id: `clanker-test-community-123-${MOCK_TOKEN_ID}`,
+      name: 'Test & Community @ 123!',
+    });
   });
 });
