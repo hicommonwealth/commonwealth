@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import { AnyProposal } from 'client/scripts/models/types';
 import clsx from 'clsx';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
@@ -11,7 +13,7 @@ const formatDate = (isoString: string | undefined) => {
   return new Date(isoString).toLocaleDateString();
 };
 
-const getTimelineEvents = (proposalData: any) => {
+const getTimelineEvents = (proposalData) => {
   let submitTime, votingStartTime, votingEndTime;
 
   if (
@@ -54,7 +56,11 @@ const getTimelineEvents = (proposalData: any) => {
   ];
 };
 
-const TimeLine = ({ proposalData }: { proposalData: any }) => {
+const TimeLine = ({
+  proposalData,
+}: {
+  proposalData: SnapshotProposal | AnyProposal;
+}) => {
   const timelineEvents = getTimelineEvents(proposalData);
   return (
     <div className="TimeLine">

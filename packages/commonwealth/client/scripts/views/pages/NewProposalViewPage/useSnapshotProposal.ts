@@ -141,7 +141,7 @@ export const useSnapshotProposal = ({
         }
       }
     },
-    [activeUserAddress, proposalsData, spaceData],
+    [activeUserAddress, proposalsData, spaceData, enabled],
   );
 
   // Initial load

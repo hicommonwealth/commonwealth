@@ -5,9 +5,7 @@ import {
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -49,15 +47,12 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     CodeEditorType.Code,
   );
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
-  const { scope } = useParams<{
-    scope: string;
-  }>();
+
   const [searchParams] = useSearchParams();
   const queryType = searchParams.get('type');
   const querySnapshotId = searchParams.get('snapshotId');
   const proposalId =
     queryType === 'cosmos' ? identifier.split('-')[0] : identifier;
-  const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
   const {
@@ -65,9 +60,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     title: proposalTitle,
     description,
     isLoading,
-    isFetchingMetadata,
     error: cosmosError,
-    metadata,
   } = useCosmosProposal({ proposalId });
   // Snapshot
 
@@ -75,14 +68,12 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const {
     proposal: snapshotProposal,
     isLoading: isSnapshotLoading,
-    threads,
     symbol,
     votes,
     space,
     totals,
     totalScore,
     validatedAgainstStrategies,
-    proposalAuthor,
     activeUserAddress,
     loadVotes,
     power,
@@ -147,7 +138,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
       }
     }
   }, [snapshotProposal, proposal, queryType]);
-  console.log({ isLoading, isSnapshotLoading, isFetchingMetadata });
 
   if (isLoading || isSnapshotLoading) {
     return <PageLoading message="Loading..." />;
@@ -160,19 +150,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
       />
     );
   }
-
-  // replace path with correct slug
-  //   if (proposal?.slug) {
-  //     const slugTitle = slugify(proposalTitle);
-  //     if (identifier !== `${proposalId}-${slugTitle}`) {
-  //       const newPath = getProposalUrlPath(
-  //         proposal.slug,
-  //         `${proposalId}-${slugTitle}`,
-  //         true,
-  //       );
-  //       navigate(newPath, { replace: true });
-  //     }
-  //   }
 
   const toggleVotingModal = (newModalState: boolean) => {
     setVotingModalOpen(newModalState);
@@ -201,11 +178,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         updatedAt={null}
         body={() => (
           <>
-            {/* {isFetchingMetadata ? (
-              <Skeleton height={94.4} />
-            ) : (
-              !_.isEmpty(metadata) && <JSONDisplay data={metadata} />
-            )} */}
             {isWindowSmallInclusive && (
               <DetailsCard
                 status={

@@ -156,7 +156,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteAbstain = (e) => {
+  const voteAbstain = async (e) => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -166,17 +166,23 @@ export const VotingActions = ({
       proposal instanceof CosmosProposalGovgen ||
       proposal instanceof CosmosProposalV1AtomOne
     ) {
-      proposal
-        .voteTx(new CosmosVote(user, 'Abstain'))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.voteTx(new CosmosVote(user, 'Abstain'));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
     }
   };
 
-  const voteVeto = (e) => {
+  const voteVeto = async (e) => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -185,10 +191,16 @@ export const VotingActions = ({
       proposal instanceof CosmosProposalV1 ||
       proposal instanceof CosmosProposalGovgen
     ) {
-      proposal
-        .voteTx(new CosmosVote(user, 'NoWithVeto'))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.voteTx(new CosmosVote(user, 'NoWithVeto'));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
@@ -250,17 +262,18 @@ export const VotingActions = ({
       label={hasVotedVeto ? 'Vetoed' : 'Veto'}
     />
   );
-  const handleVote = async (e) => {
+  const handleVote = (e: string) => {
     if (e === 'yes') {
-      await voteYes(e);
+      voteYes(e).catch((err) => notifyError(err.toString()));
     } else if (e === 'no') {
-      await voteNo(e);
+      voteNo(e).catch((err) => notifyError(err.toString()));
     } else if (e === 'abstain') {
-      await voteAbstain(e);
+      voteAbstain(e).catch((err) => notifyError(err.toString()));
     } else if (e === 'veto') {
-      await voteVeto(e);
+      voteVeto(e).catch((err) => notifyError(err.toString()));
     }
   };
+
   let votingActionObj;
   if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
     votingActionObj = (
@@ -331,6 +344,7 @@ export const VotingActions = ({
               options={voteOptions}
               canVote={canVote && !votingModalOpen}
               hasVoted={false}
+              //  @typescript-eslint/no-misused-promises
               onVote={handleVote}
               type="cosmos"
               timeRemaining={timeRemaining}

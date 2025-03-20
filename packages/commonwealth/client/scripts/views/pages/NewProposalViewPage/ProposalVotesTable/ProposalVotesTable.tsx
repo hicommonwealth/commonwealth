@@ -1,4 +1,5 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
+import { SnapshotProposalVote } from 'client/scripts/helpers/snapshot_utils';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTable } from 'client/scripts/views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
@@ -8,7 +9,7 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import './ProposalVotesTable.scss';
 type ProposalVotesTableProps = {
-  votes: any[];
+  votes: SnapshotProposalVote[];
   choices?: Array<string> | undefined;
 };
 const columns: CWTableColumnInfo[] = [
@@ -62,7 +63,7 @@ const ProposalVotesTable = ({ votes, choices }: ProposalVotesTableProps) => {
                   ),
                 },
                 voter: {
-                  sortValue: reactor.name,
+                  sortValue: reactor.voter,
                   customElement: (
                     <User
                       avatarSize={20}

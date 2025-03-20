@@ -1,3 +1,4 @@
+import { SnapshotProposalVote } from 'client/scripts/helpers/snapshot_utils';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
@@ -7,7 +8,7 @@ import ProposalVotesTable from '../ProposalVotesTable/ProposalVotesTable';
 import './ProposalVotesDrawer.scss';
 type ProposalVotesDrawerProps = {
   header: string;
-  votes: any[];
+  votes: SnapshotProposalVote[];
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   choices?: Array<string> | undefined;

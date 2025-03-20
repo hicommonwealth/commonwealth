@@ -4,7 +4,6 @@ import { MixpanelSnapshotEvents } from 'analytics/types';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
-import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
 import VotingActionCard from 'client/scripts/views/components/proposals/VotingActionCard';
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
@@ -24,8 +23,6 @@ export const SnapshotPollCard = ({
   onSnapshotVoteCast,
   pollEnded,
   timeRemaining,
-  totalVoteCount,
-  votedFor,
   voteInformation,
   snapShotVotingResult,
   toggleShowVotesDrawer,
@@ -34,11 +31,6 @@ export const SnapshotPollCard = ({
     // @ts-expect-error <StrictNullChecks/>
     useState<boolean>(hasVoted);
 
-  const [internalTotalVoteCount, setInternalTotalVoteCount] =
-    useState<number>(totalVoteCount);
-  const [voteDirectionString, setVoteDirectionString] = useState<string>(
-    votedFor ? buildVoteDirectionString(votedFor) : '',
-  );
   const [internalVoteInformation, setInternalVoteInformation] =
     useState<Array<VoteInformation>>(voteInformation);
 
@@ -48,7 +40,6 @@ export const SnapshotPollCard = ({
 
   const castVote = (e) => {
     const selectedOption = e[0];
-    setVoteDirectionString(buildVoteDirectionString(selectedOption));
     onSnapshotVoteCast(selectedOption);
     trackAnalytics({
       event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
@@ -61,16 +52,6 @@ export const SnapshotPollCard = ({
       setInternalHasVoted(true);
     }
   }, [hasVoted]);
-
-  useEffect(() => {
-    if (votedFor) {
-      buildVoteDirectionString(votedFor);
-    }
-  }, [votedFor]);
-
-  useEffect(() => {
-    setInternalTotalVoteCount(totalVoteCount);
-  }, [totalVoteCount]);
 
   useEffect(() => {
     setInternalVoteInformation(voteInformation);
