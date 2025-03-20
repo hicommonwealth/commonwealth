@@ -14,6 +14,7 @@ export * from './GetCommunityStake.query';
 export * from './GetMembers.query';
 export * from './GetPinnedTokens.query';
 export * from './GetStakeHistoricalPrice.query';
+export * from './GetTopicById.query';
 export * from './GetTopics.query';
 export * from './GetTransactions.query';
 export * from './JoinCommunity.command';

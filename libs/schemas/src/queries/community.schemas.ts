@@ -208,6 +208,14 @@ export const GetTopics = {
   output: z.array(TopicView),
 };
 
+export const GetTopicById = {
+  input: z.object({
+    topic_id: z.number(),
+  }),
+  // TODO: fix type
+  output: z.any(),
+};
+
 export const GetPinnedTokens = {
   input: z.object({
     community_ids: z.string(),
