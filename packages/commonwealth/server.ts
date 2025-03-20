@@ -5,8 +5,6 @@ import {
   R2BlobStorage,
   RedisCache,
   S3BlobStorage,
-  ServiceKey,
-  startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   analytics,
@@ -49,16 +47,6 @@ config.CACHE.REDIS_URL &&
   });
 
 const log = logger(import.meta);
-
-let isServiceHealthy = false;
-startHealthCheckLoop({
-  service: ServiceKey.Commonwealth,
-  checkFn: async () => {
-    if (!isServiceHealthy) {
-      throw new Error('service not healthy');
-    }
-  },
-});
 
 const app = express();
 
