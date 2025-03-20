@@ -186,7 +186,7 @@ const MembersSection = ({
                   customElement: (
                     <CWButton
                       label={
-                        !!community?.namespace
+                        community?.namespace
                           ? 'Manage On Chain Role Privileges'
                           : 'Manage Role'
                       }
