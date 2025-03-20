@@ -133,4 +133,5 @@ export const CommunityMember = z.object({
     .nullish(),
   referral_count: PG_INT.default(0).nullish(),
   referral_eth_earnings: z.number().nullish(),
+  xp_points: PG_INT.default(0).nullish(),
 });

@@ -124,6 +124,7 @@ function membersSqlWithoutSearch(
         ) as referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        COALESCE(U.xp_points, 0) AS xp_points,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
@@ -176,6 +177,7 @@ function membersSqlWithSearch(
         ) AS referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        COALESCE(U.xp_points, 0) AS xp_points,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
