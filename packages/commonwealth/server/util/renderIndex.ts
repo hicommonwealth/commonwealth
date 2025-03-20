@@ -6,10 +6,6 @@ let cache: string | null = null;
 
 // renders index.html file with dynamic metadata
 export async function renderIndex(indexFilePath: string): Promise<string> {
-  console.log(
-    'renderIndex: config.CONTESTS.FARCASTER_MANIFEST_DOMAIN = ',
-    config.CONTESTS.FARCASTER_MANIFEST_DOMAIN,
-  );
   if (cache) {
     return cache;
   }
@@ -19,6 +15,5 @@ export async function renderIndex(indexFilePath: string): Promise<string> {
     FARCASTER_MANIFEST_DOMAIN: config.CONTESTS.FARCASTER_MANIFEST_DOMAIN,
   };
   cache = template(data);
-  console.log('renderIndex: cache = ', cache);
   return cache;
 }

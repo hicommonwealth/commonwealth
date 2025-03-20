@@ -68,6 +68,7 @@ describe('renderIndex', () => {
   `;
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (fs.readFile as any).mockResolvedValue(mockTemplateContent);
     vi.clearAllMocks();
   });

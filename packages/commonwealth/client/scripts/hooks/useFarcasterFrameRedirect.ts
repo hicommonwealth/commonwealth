@@ -15,7 +15,7 @@ const useFarcasterFrameRedirect = () => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    const openEmbedUrl = async () => {
+    const openEmbedUrl = () => {
       if (
         farcasterContext?.location &&
         'embed' in farcasterContext.location &&

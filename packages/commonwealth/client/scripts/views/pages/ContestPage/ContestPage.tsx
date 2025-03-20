@@ -34,7 +34,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
 
   const [{ data: communityData }] = trpc.useQueries((t) =>
     [contest?.community_id].map((id) =>
-      t.community.getCommunity({ id: id!, include_node_info: true }),
+      t.community.getCommunity(
+        { id: id!, include_node_info: true },
+        { enabled: !!id },
+      ),
     ),
   );
 
