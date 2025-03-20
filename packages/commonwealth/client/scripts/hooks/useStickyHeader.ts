@@ -11,7 +11,7 @@ type StickyHeaderProps = {
 // having a `position: relative` property applied
 const useStickyHeader = ({
   elementId,
-  zIndex = 999,
+  zIndex = 10, // Default to a much lower z-index
   top = 0,
   stickyBehaviourEnabled = true,
 }: StickyHeaderProps) => {
@@ -39,12 +39,22 @@ const useStickyHeader = ({
       }
     };
 
+    // Use both wheel and scroll events for better responsiveness
     if (stickyBehaviourEnabled) {
       window.addEventListener('wheel', listener);
+      window.addEventListener('scroll', listener);
     }
 
     return () => {
       window.removeEventListener('wheel', listener);
+      window.removeEventListener('scroll', listener);
+
+      // Clean up any sticky behavior when unmounting
+      if (stickyElement?.style) {
+        stickyElement.style.position = 'initial';
+        stickyElement.style.top = 'initial';
+        stickyElement.style.zIndex = 'initial';
+      }
     };
   }, [stickyBehaviourEnabled, elementId, zIndex, top]);
 };
