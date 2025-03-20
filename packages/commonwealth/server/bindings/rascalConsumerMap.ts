@@ -5,6 +5,7 @@ import {
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
+  EventStreamPolicy,
   FarcasterWorker,
   NotificationsPolicy,
   User,
@@ -16,6 +17,7 @@ export const rascalConsumerMap = [
   DiscordBotPolicy,
   Contest.Contests,
   FarcasterWorker,
+  EventStreamPolicy,
   NotificationsSettingsPolicy,
   CreateUnverifiedUser,
   {
