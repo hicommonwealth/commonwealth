@@ -21,6 +21,7 @@ import useDirectoryPageData, {
 import ErrorPage from 'views/pages/error';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './DirectoryPage.scss';
@@ -68,6 +69,11 @@ const DirectoryPage = () => {
   const handleCreateCommunity = () => {
     navigate('/createCommunity', {}, null);
   };
+
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -139,15 +145,16 @@ const DirectoryPage = () => {
                   weight="light"
                 />
               </div>
-              <CWButton
-                iconLeft="gear"
-                buttonType="secondary"
-                label="Directory Settings"
-                onClick={() => setIsDirectorySettingsModalOpen(true)}
-              />
+              {isAdmin && (
+                <CWButton
+                  iconLeft="gear"
+                  buttonType="secondary"
+                  label="Directory Settings"
+                  onClick={() => setIsDirectorySettingsModalOpen(true)}
+                />
+              )}
             </div>
           </div>
-          <div>FILTER GOES HERE</div>
         </div>
 
         <DirectoryPageContent
@@ -160,11 +167,12 @@ const DirectoryPage = () => {
           tableData={tableData}
           selectedViewType={selectedViewType}
         />
-        {isDirectorySettingsModalOpen && (
+        {isDirectorySettingsModalOpen && isAdmin && (
           <CWModal
             size="small"
             content={
               <DirectorySettingsModal
+                filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
                 onModalClose={() => setIsDirectorySettingsModalOpen(false)}
               />
             }

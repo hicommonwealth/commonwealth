@@ -1,0 +1,19 @@
+@import '../../../styles/shared.scss';
+
+.DirectorySelectorItem {
+  border: 1px solid $neutral-100;
+  height: 50px;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  .body {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    align-items: center;
+  }
+}

@@ -9,6 +9,7 @@ import {
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import './DirectorySettingsModal.scss';
+import DirectorySettingsModalContent from './DirectorySettingsModalContent';
 
 enum DirectoryTabsType {
   TagSelection = 'TagSelection',
@@ -17,10 +18,12 @@ enum DirectoryTabsType {
 
 type DirectorySettingsModalProps = {
   onModalClose: () => void;
+  filteredRelatedCommunitiesData: any;
 };
 
 const DirectorySettingsModal = ({
   onModalClose,
+  filteredRelatedCommunitiesData,
 }: DirectorySettingsModalProps) => {
   const [activeDirectoryTab, setActiveDirectoryTab] = useState(
     DirectoryTabsType.TagSelection,
@@ -53,6 +56,10 @@ const DirectorySettingsModal = ({
             }
           />
         </CWTabsRow>
+        <DirectorySettingsModalContent
+          filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
+          activeDirectoryTab={activeDirectoryTab}
+        />
         {/* <CWText>Tag/Manual Selection GOES HERE</CWText> */}
       </CWModalBody>
       <CWModalFooter>
