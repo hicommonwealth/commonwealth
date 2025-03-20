@@ -269,7 +269,7 @@ export class RedisCache implements Cache {
         multi.expire(finalKey, duration);
         const [[, value]] = (await multi.exec()) as [
           [Error | null, number],
-          [Error | null, any],
+          [Error | null, number],
         ];
         return value;
       }
