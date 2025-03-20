@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VerifiedContext } from '../context';
 import {
   CommentSubscription,
   CommunityAlert,
@@ -22,6 +23,7 @@ export const UpdateSubscriptionPreferences = {
   //   return Object.values(data).some((value) => value !== undefined);
   // }),
   output: SubscriptionPreference,
+  context: VerifiedContext,
 };
 
 export const CreateCommunityAlert = {
@@ -30,6 +32,7 @@ export const CreateCommunityAlert = {
     community_id: z.string(),
   }),
   output: CommunityAlert,
+  context: VerifiedContext,
 };
 
 export const DeleteCommunityAlert = {
@@ -40,6 +43,7 @@ export const DeleteCommunityAlert = {
   output: z
     .number()
     .describe('Number of community alert subscriptions deleted'),
+  context: VerifiedContext,
 };
 
 export const CreateCommentSubscription = {
@@ -48,6 +52,7 @@ export const CreateCommentSubscription = {
     comment_id: PG_INT,
   }),
   output: CommentSubscription,
+  context: VerifiedContext,
 };
 
 export const DeleteCommentSubscription = {
@@ -56,6 +61,7 @@ export const DeleteCommentSubscription = {
     comment_ids: z.array(PG_INT),
   }),
   output: PG_INT.describe('Number of comment subscriptions deleted'),
+  context: VerifiedContext,
 };
 
 export const DeleteThreadSubscription = {
@@ -64,6 +70,7 @@ export const DeleteThreadSubscription = {
     thread_ids: z.array(PG_INT),
   }),
   output: PG_INT.describe('Number of thread subscriptions deleted'),
+  context: VerifiedContext,
 };
 
 export const CreateThreadSubscription = {
@@ -72,6 +79,7 @@ export const CreateThreadSubscription = {
     thread_id: PG_INT,
   }),
   output: ThreadSubscription,
+  context: VerifiedContext,
 };
 
 export const RegisterClientRegistrationToken = {
@@ -81,6 +89,7 @@ export const RegisterClientRegistrationToken = {
     channelType: z.enum(['APNS', 'FCM']),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const UnregisterClientRegistrationToken = {
@@ -90,6 +99,7 @@ export const UnregisterClientRegistrationToken = {
     channelType: z.enum(['APNS', 'FCM']),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const UnsubscribeEmail = {
@@ -98,4 +108,5 @@ export const UnsubscribeEmail = {
     email_notifications_enabled: z.boolean(),
   }),
   output: SubscriptionPreference,
+  context: VerifiedContext,
 };

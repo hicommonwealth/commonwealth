@@ -1,0 +1,92 @@
+@import '../../../styles/shared.scss';
+
+.MobileAppOnboardModal {
+  overflow-y: scroll;
+  position: relative;
+  padding-bottom: 10px;
+  .logo-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0px;
+    .logo {
+      height: auto;
+      margin: 0 auto;
+      width: 227px;
+
+      @include extraSmall {
+        display: none;
+      }
+    }
+    &.extra-padding {
+      padding-bottom: 16px;
+    }
+  }
+
+  .content {
+    @include extraSmall {
+      height: 100%;
+    }
+    .logo {
+      display: flex;
+      height: auto;
+      margin: auto;
+      width: 210px;
+      @include extraSmall {
+        width: 175px;
+        display: flex;
+        gap: 14px;
+      }
+    }
+    .close-btn {
+      position: absolute;
+      right: 0;
+      top: 16px;
+      margin-right: 16px;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: not-allowed !important;
+        pointer-events: painted;
+      }
+    }
+
+    .modal-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0px;
+    }
+
+    padding: 48px;
+
+    @include extraSmall {
+      padding: 32px;
+    }
+
+    .progress {
+      display: grid;
+      gap: 8px;
+      padding-bottom: 18px;
+
+      span {
+        width: 100%;
+        height: 6px;
+        border-radius: 5px;
+        background-color: $neutral-200;
+
+        &.completed {
+          background-color: $primary-600 !important;
+        }
+      }
+    }
+    .progress--with-magic {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+
+    .progress--without-magic {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+}

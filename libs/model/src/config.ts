@@ -46,6 +46,12 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  TWITTER_APP_BEARER_TOKEN,
+  TWITTER_CONSUMER_KEY,
+  TWITTER_CONSUMER_SECRET,
+  TWITTER_ACCESS_TOKEN,
+  TWITTER_ACCESS_TOKEN_SECRET,
+  SKALE_PRIVATE_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -61,7 +67,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  target,
+  [target],
   {
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
@@ -163,6 +169,16 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
+    TWITTER: {
+      APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
+      CONSUMER_KEY: TWITTER_CONSUMER_KEY,
+      CONSUMER_SECRET: TWITTER_CONSUMER_SECRET,
+      ACCESS_TOKEN: TWITTER_ACCESS_TOKEN,
+      ACCESS_TOKEN_SECRET: TWITTER_ACCESS_TOKEN_SECRET,
+    },
+    SKALE: {
+      PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
   },
   z.object({
@@ -366,6 +382,22 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
+    }),
+    TWITTER: z.object({
+      APP_BEARER_TOKEN: z.string().optional(),
+      CONSUMER_KEY: z.string().optional(),
+      CONSUMER_SECRET: z.string().optional(),
+      ACCESS_TOKEN: z.string().optional(),
+      ACCESS_TOKEN_SECRET: z.string().optional(),
+    }),
+    SKALE: z.object({
+      PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
   }),

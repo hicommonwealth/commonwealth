@@ -148,6 +148,23 @@
     padding: 0 8px;
   }
 
+  // Specific styles for the Threads tab
+  .threads-tab {
+    width: 100%;
+
+    .Feed {
+      width: 100%;
+      min-height: 400px;
+
+      .no-feed-message {
+        text-align: center;
+        padding: 32px;
+        font-size: 16px;
+        color: $neutral-600;
+      }
+    }
+  }
+
   // Specific styles for the Users tab
   .users-tab {
     .users-xp-table {
@@ -232,5 +249,55 @@
   .section-header {
     margin-bottom: 16px;
     font-weight: 600;
+  }
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+      cursor: pointer;
+
+      .link {
+        color: $primary-500;
+
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+
+      .blue-icon {
+        color: $primary-500;
+      }
+    }
+  }
+
+  .horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding-bottom: 10px;
+
+    // Apply to children of QuestList and ExploreContestList
+    & > div {
+      display: flex !important;
+      gap: 15px;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+    }
+
+    // Ensure cards have a fixed width and don't shrink
+    & > div > div {
+      flex: 0 0 auto;
+      min-width: 300px;
+      max-width: 350px;
+    }
   }
 }

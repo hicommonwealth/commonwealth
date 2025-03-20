@@ -39,3 +39,13 @@ export const GetLaunchpadTrades = {
     .array()
     .nullish(),
 };
+
+export const GetTokenizedThreadsAllowed = {
+  input: z.object({
+    community_id: z.string(),
+    topic_id: z.number(),
+  }),
+  output: z.object({
+    tokenized_threads_enabled: z.boolean(),
+  }),
+};

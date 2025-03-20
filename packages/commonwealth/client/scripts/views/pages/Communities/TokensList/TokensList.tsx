@@ -33,9 +33,10 @@ const TokenWithCommunity = TokenView.extend({
 
 type TokensListProps = {
   filters: CommunityFilters;
+  hideHeader?: boolean;
 };
 
-const TokensList = ({ filters }: TokensListProps) => {
+const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
@@ -119,7 +120,7 @@ const TokensList = ({ filters }: TokensListProps) => {
 
   return (
     <div className="TokensList">
-      <CWText type="h2">Tokens</CWText>
+      {!hideHeader && <CWText type="h2">Tokens</CWText>}
       {isInitialLoading || isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (

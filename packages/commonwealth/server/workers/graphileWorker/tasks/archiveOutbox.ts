@@ -1,8 +1,7 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
-import { GraphileTask, TaskPayloads, config } from '@hicommonwealth/model';
+import { TaskPayloads, config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
-import { Task } from 'graphile-worker';
 import { QueryTypes } from 'sequelize';
 import { createGzip } from 'zlib';
 
@@ -136,7 +135,7 @@ function getCompressedDumpName(dumpName: string): string {
   return `${dumpName}.gz`;
 }
 
-const archiveOutbox: Task = async () => {
+const archiveOutbox = async () => {
   log.info('Checking outbox child table archive status...');
   const tables = await getTablesToBackup();
   log.info(`Found ${tables.length} to archive`, {
@@ -175,7 +174,7 @@ const archiveOutbox: Task = async () => {
   }
 };
 
-export const archiveOutboxTask: GraphileTask = {
+export const archiveOutboxTask = {
   input: TaskPayloads.ArchiveOutbox,
   fn: archiveOutbox,
 };

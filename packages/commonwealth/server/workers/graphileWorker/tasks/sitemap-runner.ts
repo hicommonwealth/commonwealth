@@ -1,5 +1,5 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { GraphileTask, TaskPayloads } from '@hicommonwealth/model';
+import { TaskPayloads } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import {
   createDatabasePaginatorDefault,
@@ -36,7 +36,7 @@ const updateSitemaps = async () => {
   log.info('Sitemap written to: ' + index.location);
 };
 
-export const sitemapTask: GraphileTask = {
+export const sitemapTask = {
   input: TaskPayloads.UpdateSitemap,
   fn: updateSitemaps,
 };

@@ -1,5 +1,4 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
-import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
@@ -33,7 +32,6 @@ const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery({});
-  const enableKnockPushNotifications = useFlag('knockPushNotifications');
   const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
@@ -62,7 +60,7 @@ const NotificationSettings = () => {
 
         <ScrollContainer>
           <CWTabsRow>
-            {enableKnockPushNotifications && supportsPushNotifications && (
+            {supportsPushNotifications && (
               <CWTab
                 label="Push Notifications"
                 isSelected={section === 'push-notifications'}
@@ -115,7 +113,7 @@ const NotificationSettings = () => {
 
         {section === 'push-notifications' && (
           <>
-            {enableKnockPushNotifications && supportsPushNotifications && (
+            {supportsPushNotifications && (
               <div className="mt-1">
                 <div className="setting-container">
                   <div className="setting-container-left">
@@ -175,8 +173,8 @@ const NotificationSettings = () => {
             <CommentSubscriptions />
           </>
         )}
+        <ReactNativeAboutSection />
       </div>
-      <ReactNativeAboutSection />
     </CWPageLayout>
   );
 };

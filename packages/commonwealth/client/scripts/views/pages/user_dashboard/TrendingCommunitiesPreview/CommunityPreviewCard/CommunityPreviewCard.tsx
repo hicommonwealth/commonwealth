@@ -22,10 +22,12 @@ type CommunityPreviewCardProps = {
 } & (
   | {
       isExploreMode: true;
+      customExploreText?: string;
       community?: never;
     }
   | {
       isExploreMode?: never;
+      customExploreText?: never;
       community: NonNullable<{
         name: string;
         icon_url: string;
@@ -42,6 +44,7 @@ const CommunityPreviewCard = ({
   hasNewContent,
   onClick,
   isExploreMode,
+  customExploreText,
 }: CommunityPreviewCardProps) => {
   const user = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
@@ -74,7 +77,8 @@ const CommunityPreviewCard = ({
       >
         {isExploreMode ? (
           <CWText type="h4" className="explore-label">
-            Explore communities <CWIcon iconName="arrowRightPhosphor" />
+            {customExploreText || 'Explore communities'}{' '}
+            <CWIcon iconName="arrowRightPhosphor" />
           </CWText>
         ) : (
           <>

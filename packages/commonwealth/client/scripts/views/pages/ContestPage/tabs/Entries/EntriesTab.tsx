@@ -83,6 +83,7 @@ const EntriesTab = ({
           selectedSort={selectedSort}
           onSortChange={handleSortChange}
           communityId={communityId}
+          contestAddress={contestAddress}
         />
       )}
     </div>

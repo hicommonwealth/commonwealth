@@ -35,23 +35,15 @@ export default defineConfig(({ mode }) => {
   const featureFlags = {
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
-      env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
-    ),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
-    'process.env.FLAG_UNISWAP_TRADE': JSON.stringify(env.FLAG_UNISWAP_TRADE),
     'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
       env.FLAG_NEW_CONTEST_PAGE,
-    ),
-    'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
-      env.FLAG_MANAGE_API_KEYS,
     ),
     'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
     'process.env.FLAG_ONCHAIN_REFERRALS': JSON.stringify(
       env.FLAG_ONCHAIN_REFERRALS,
     ),
     'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
-    'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
     'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
     'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),

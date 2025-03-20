@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { GraphileTask, models, TaskPayloads } from '@hicommonwealth/model';
+import { models, TaskPayloads } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
 const log = logger(import.meta);
@@ -21,7 +21,7 @@ const cleanChainEventXpSources = async () => {
   log.info(`Deactivated ${res} chain event XP sources`);
 };
 
-export const cleanChainEventXpSourcesTask: GraphileTask = {
+export const cleanChainEventXpSourcesTask = {
   input: TaskPayloads.CleanChainEventXpSources,
   fn: cleanChainEventXpSources,
 };

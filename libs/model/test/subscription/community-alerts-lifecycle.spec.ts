@@ -32,6 +32,13 @@ describe('Community alerts lifecycle', () => {
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 0,
+      Addresses: [
+        {
+          role: 'member',
+          user_id: user!.id,
+          verified: new Date(),
+        },
+      ],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: node?.id,
@@ -40,7 +47,7 @@ describe('Community alerts lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: '0x',
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

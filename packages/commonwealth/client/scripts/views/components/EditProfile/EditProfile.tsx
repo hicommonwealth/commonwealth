@@ -62,7 +62,6 @@ const EditProfile = () => {
     linkValidation: linkValidationSchema.optional,
   });
 
-  const enableApiKeyManagement = useFlag('manageApiKeys');
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
     useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
@@ -435,7 +434,7 @@ const EditProfile = () => {
                 </div>
               )}
             </ProfileSection>
-            {enableApiKeyManagement ? <ManageApiKey /> : null}
+            <ManageApiKey />
             {actionButtons}
           </CWForm>
         </div>

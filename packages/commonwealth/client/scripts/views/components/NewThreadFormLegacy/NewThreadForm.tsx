@@ -356,7 +356,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadTitle('');
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
-    onCancel?.(e) || navigate('/discussions');
+
+    if (location.search.includes('cancel')) {
+      navigate(`/contests/${location.search.split('cancel=')[1]}`);
+    } else {
+      onCancel?.(e) || navigate('/discussions');
+    }
   };
 
   const showBanner =

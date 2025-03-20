@@ -4,10 +4,19 @@ import {
   DecodeEventLogParameters,
   DecodeEventLogReturnType,
   Hex,
+  TransactionExecutionError,
+  createPublicClient,
+  createWalletClient,
   decodeEventLog,
   getAddress,
+  http,
 } from 'viem';
-import { english, generateMnemonic, mnemonicToAccount } from 'viem/accounts';
+import {
+  english,
+  generateMnemonic,
+  mnemonicToAccount,
+  privateKeyToAccount,
+} from 'viem/accounts';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
@@ -222,3 +231,53 @@ export const createEvmSigner = (
       account.signMessage({ message }),
   };
 };
+
+export async function getBalance({
+  address,
+  rpcUrl,
+}: {
+  address: `0x${string}`;
+  rpcUrl: string;
+}) {
+  const client = createPublicClient({
+    transport: http(rpcUrl),
+  });
+
+  return await client.getBalance({
+    address: address,
+  });
+}
+
+export async function sendTransaction({
+  privateKey,
+  to,
+  value,
+  rpcUrl,
+}: {
+  privateKey: `0x${string}`;
+  to: `0x${string}`;
+  value: bigint;
+  rpcUrl: string;
+}) {
+  const walletClient = createWalletClient({
+    account: privateKeyToAccount(privateKey),
+    transport: http(rpcUrl),
+  });
+
+  try {
+    await walletClient.sendTransaction({
+      chain: null,
+      to,
+      value,
+    });
+  } catch (e) {
+    if (e instanceof TransactionExecutionError) {
+      // Check if the error message indicates an insufficient balance
+      if (e.shortMessage.includes('Account balance is too low')) {
+        throw new Error('Insufficient funds on Skale address.');
+      }
+    }
+
+    throw e;
+  }
+}

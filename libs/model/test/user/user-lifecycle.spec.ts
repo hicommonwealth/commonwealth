@@ -3,14 +3,15 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { ChainBase, ChainType, WalletSsoSource } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import { seed } from 'model/src/tester';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateComment,
   CreateCommentReaction,
 } from '../../src/aggregates/comment';
+import { CreateCommunity } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
@@ -20,6 +21,8 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
+import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { signIn } from '../utils/sign-in';
@@ -31,6 +34,7 @@ describe('User lifecycle', () => {
   let community_id: string;
   let topic_id: number;
   let thread_id: number;
+  let chain_node_id: number;
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
@@ -38,6 +42,7 @@ describe('User lifecycle', () => {
     });
     community_id = community!.id;
     topic_id = community!.topics!.at(0)!.id!;
+    chain_node_id = community!.chain_node_id!;
     admin = actors.admin;
     member = actors.member;
     superadmin = actors.superadmin;
@@ -712,6 +717,87 @@ describe('User lifecycle', () => {
       });
       expect(final!.end_date < new Date()).toBe(true);
       expect(final!.xp_awarded).toBe(37);
+    });
+
+    it('should award xp points to scoped actions', async () => {
+      // setup quest
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp quest with scoped actions',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 200,
+          quest_type: 'common',
+        },
+      });
+      // setup quest actions
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest!.id!,
+          action_metas: [
+            {
+              event_name: 'CommunityCreated',
+              reward_amount: 12,
+              creator_reward_weight: 0,
+              content_id: `chain:${chain_node_id}`,
+            },
+            {
+              event_name: 'SSOLinked',
+              reward_amount: 11,
+              creator_reward_weight: 0,
+              content_id: `sso:google`,
+            },
+          ],
+        },
+      });
+      // hack start date to make it active
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
+
+      const watermark = new Date();
+
+      await command(CreateCommunity(), {
+        actor: member,
+        payload: {
+          id: 'scoped-community',
+          name: chance.name(),
+          chain_node_id,
+          type: ChainType.Offchain,
+          default_symbol: 'TEST',
+          base: ChainBase.Ethereum,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+        },
+      });
+
+      // simulate SSO event
+      await emitEvent(models.Outbox, [
+        {
+          event_name: 'SSOLinked',
+          event_payload: {
+            community_id,
+            user_id: member.user.id!,
+            oauth_provider: WalletSsoSource.Google,
+            new_user: false,
+            created_at: new Date(),
+          },
+        },
+      ]);
+
+      // drain the outbox
+      await drainOutbox(['CommunityCreated', 'SSOLinked'], Xp, watermark);
+
+      const final = await models.Quest.findOne({
+        where: { id: quest!.id },
+      });
+      expect(final!.xp_awarded).toBe(23);
     });
   });
 });

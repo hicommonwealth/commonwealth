@@ -7,19 +7,14 @@ import {
 } from '../../src/aggregates/subscription';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
+import { seedCommunity } from '../utils';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
 
   beforeAll(async () => {
-    const [user] = await seed('User', {
-      isAdmin: false,
-      selected_community_id: null,
-    });
-    actor = {
-      user: { id: user!.id!, email: user!.email! },
-      address: '0x',
-    };
+    const { actors } = await seedCommunity({ roles: ['member'] });
+    actor = actors.member;
   });
 
   afterAll(async () => {

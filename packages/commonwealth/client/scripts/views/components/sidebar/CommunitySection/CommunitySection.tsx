@@ -51,7 +51,6 @@ export const CommunitySection = ({
   isInsideCommunity,
 }: CommunitySectionProps) => {
   const launchpadEnabled = useFlag('launchpad');
-  const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
@@ -169,7 +168,7 @@ export const CommunitySection = ({
           </>
         )}
 
-        {(launchpadEnabled || uniswapTradeEnabled) && <TokenTradeWidget />}
+        {launchpadEnabled && <TokenTradeWidget />}
 
         <CreateCommunityButton />
 

@@ -114,7 +114,7 @@ const TrendingTokensList = ({
     <div className="TokensList">
       <div className="heading-container">
         <CWText type="h2">Tokens</CWText>
-        <Link to="/explore">
+        <Link to="/explore?tab=tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />

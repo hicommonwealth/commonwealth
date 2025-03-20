@@ -56,6 +56,11 @@ export default (
       token_symbol: { type: Sequelize.STRING, allowNull: true },
       token_decimals: { type: Sequelize.INTEGER, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
+      allow_tokenized_threads: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       timestamps: true,

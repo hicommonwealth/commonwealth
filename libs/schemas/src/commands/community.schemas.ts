@@ -9,7 +9,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContext, TopicContext } from '../context';
+import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { Community } from '../entities/community.schemas';
 import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
@@ -42,6 +42,7 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
+    allow_tokenized_threads: z.boolean().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -58,6 +59,7 @@ export const CreateCommunity = {
     community: Community,
     admin_address: z.string().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const SetCommunityStake = {
@@ -178,6 +180,7 @@ export const CreateTopic = {
         token_decimals: true,
         vote_weight_multiplier: true,
         chain_node_id: true,
+        allow_tokenized_threads: true,
       }),
     ),
   output: z.object({
@@ -202,6 +205,7 @@ export const UpdateTopic = {
         featured_in_sidebar: true,
         featured_in_new_post: true,
         default_offchain_template: true,
+        allow_tokenized_threads: true,
       }).partial(),
     ),
   output: z.object({
@@ -308,7 +312,7 @@ export const DeleteAddress = {
     community_id: z.string(),
     address: z.string(),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const DeleteAllAddresses = {
@@ -352,6 +356,7 @@ export const SelectCommunity = {
     community_id: z.string(),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const JoinCommunity = {
@@ -366,6 +371,7 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const BanAddress = {

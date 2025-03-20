@@ -62,7 +62,7 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
       </div>
       <>
         {!isInitialLoading && quests.length === 0 && (
-          <CWText type="h2" className="empty-quests">
+          <CWText type="h2" className="empty-quests" isCentered>
             No quests found
           </CWText>
         )}
