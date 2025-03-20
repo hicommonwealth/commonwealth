@@ -14,7 +14,7 @@ export const getProposalUrlPath = (
   if (type === ProposalType.Thread) {
     basePath = `/discussion/${id}`;
   } else {
-    basePath = `/proposal/${id}`;
+    basePath = `/newproposalview/${id}?type=cosmos`;
   }
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

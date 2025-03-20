@@ -1,11 +1,12 @@
 import React from 'react';
 
+import moment from 'moment';
 import { CWText } from '../component_kit/cw_text';
 import './DeatilsCard.scss';
 type DetailCardProps = {
   status: string;
   governanceType: string;
-  publishDate: Date | string;
+  publishDate: moment.Moment | number;
   id: string;
 };
 const DetailsCard = ({
@@ -31,7 +32,9 @@ const DetailsCard = ({
 
         <CWText className="label">Date Proposed</CWText>
 
-        <CWText className="detail">hello</CWText>
+        <CWText className="detail">
+          {moment(publishDate, 'X')?.utc?.()?.local?.()?.format('DD/MM/YYYY')}
+        </CWText>
 
         <CWText className="label">ID</CWText>
 

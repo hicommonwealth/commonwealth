@@ -26,7 +26,7 @@ export const SnapshotProposalCard = ({
 }: SnapshotProposalCardProps) => {
   const navigate = useCommonNavigate();
 
-  const proposalLink = `/snapshot/${snapshotId}/${proposal.id}`;
+  const proposalLink = `/newproposalview/${proposal.id}?snapshotId=${snapshotId}&?type=snapshot`;
 
   const time = moment(+proposal.end * 1000);
   const now = moment();
