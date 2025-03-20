@@ -35,7 +35,13 @@ export async function incrementUserCount(
   counter: 'creates' | 'upvotes',
 ) {
   const cacheKey = builtKey(user_id, counter);
-  await cache().incrementKey(CacheNamespaces.TieredCounter, cacheKey, 60);
+  const value = await cache().incrementKey(
+    CacheNamespaces.TieredCounter,
+    cacheKey,
+    1,
+    60,
+  );
+  return value;
 }
 
 export function tiered({

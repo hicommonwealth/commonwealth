@@ -267,11 +267,8 @@ export class RedisCache implements Cache {
         const multi = this._client.multi();
         multi.incrBy(finalKey, increment);
         multi.expire(finalKey, duration, 'NX');
-        const [[, value]] = (await multi.exec()) as [
-          [Error | null, number],
-          [Error | null, number],
-        ];
-        return value;
+        const [incr] = (await multi.exec()) as [number, boolean];
+        return incr;
       }
       // plain increment
       return await this._client.incrBy(finalKey, increment);
