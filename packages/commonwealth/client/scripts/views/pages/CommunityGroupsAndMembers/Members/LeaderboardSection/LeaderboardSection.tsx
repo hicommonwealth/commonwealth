@@ -72,7 +72,7 @@ const LeaderboardSection = () => {
       search: debouncedSearchTerm,
     }),
   });
-  console.log('MEMEBERS: ', members);
+
   const formattedMembers =
     members?.pages?.[0]?.results.map((member, index) => ({
       ...member,
