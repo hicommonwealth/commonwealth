@@ -251,16 +251,29 @@ export class RedisCache implements Cache {
    * @param namespace The namespace of the key to increment.
    * @param key The key whose value is to be incremented.
    * @param increment The amount by which the key's value should be incremented.
+   * @param duration Optional duration for the key to live in the cache. (in seconds)
    * @returns The new value of the key after the increment.
    */
   public async incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment = 1,
+    duration?: number,
   ): Promise<number | null> {
     if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      if (duration) {
+        const multi = this._client.multi();
+        multi.incrBy(finalKey, increment);
+        multi.expire(finalKey, duration);
+        const [[, value]] = (await multi.exec()) as [
+          [Error | null, number],
+          [Error | null, any],
+        ];
+        return value;
+      }
+      // plain increment
       return await this._client.incrBy(finalKey, increment);
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;

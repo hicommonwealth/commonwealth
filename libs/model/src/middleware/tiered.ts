@@ -35,18 +35,7 @@ export async function incrementUserCount(
   counter: 'creates' | 'upvotes',
 ) {
   const cacheKey = builtKey(user_id, counter);
-  try {
-    const requestCount = await cache().incrementKey(
-      CacheNamespaces.TieredCounter,
-      cacheKey,
-    );
-    if (requestCount === 1) {
-      // is first request in window, set expiration
-      await cache().setKeyTTL(CacheNamespaces.TieredCounter, cacheKey, 60);
-    }
-  } catch {
-    // ignore
-  }
+  await cache().incrementKey(CacheNamespaces.TieredCounter, cacheKey, 60);
 }
 
 export function tiered({

@@ -140,6 +140,7 @@ export interface Cache extends Disposable {
     namespace: CacheNamespaces,
     key: string,
     increment?: number,
+    duration?: number,
   ): Promise<number | null>;
 
   decrementKey(
