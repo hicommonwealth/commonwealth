@@ -20,11 +20,16 @@
     right: 12px;
   }
 
-  .repeatition-selector {
+  .repeatition-selector,
+  .content-id-type-selector {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 100%;
+
+    .caption .Text {
+      color: $neutral-600 !important;
+    }
 
     .b1 {
       color: $neutral-600 !important;

@@ -28,6 +28,7 @@ export const questSubFormValidationSchema = z.object({
 
 export const questSubFormValidationSchemaWithContentLink =
   questSubFormValidationSchema.extend({
+    contentIdScope: z.enum(['thread', 'topic']).optional(), // this is a placeholder, not used for validation
     contentLink: linkValidationSchema.optional,
   });
 
