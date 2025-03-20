@@ -291,12 +291,11 @@ export async function publishCast(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function tweetExists(tweetId: string, bearerToken: string) {
+export async function tweetExists(tweetId: string) {
   try {
     const response = await fetch(`https://api.x.com/2/tweets/${tweetId}`, {
       headers: {
-        Authorization: `Bearer ${bearerToken}`,
+        Authorization: `Bearer ${config.TWITTER.APP_BEARER_TOKEN}`,
       },
     });
     const data = await response.json();

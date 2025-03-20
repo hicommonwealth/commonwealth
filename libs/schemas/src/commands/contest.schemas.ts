@@ -188,6 +188,7 @@ export const SetContestEnding = {
 
 export const SetContestEnded = {
   input: z.object({
+    eth_chain_id: z.number(),
     contest_address: z.string(),
     contest_id: PG_INT,
     prize_percentage: z.number(),

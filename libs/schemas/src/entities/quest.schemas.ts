@@ -10,6 +10,7 @@ export const ChannelQuestEvents = {
 // Channel quest action types that are not event related
 export const ChannelBatchActions = ['TweetEngagement'] as const;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const AllChannelQuestActionNames = [
   ...(Object.keys(ChannelQuestEvents) as [
     keyof typeof ChannelQuestEvents,
@@ -61,18 +62,19 @@ export enum QuestParticipationPeriod {
 export const QuestTweet = z
   .object({
     tweet_id: z.string(),
+    tweet_url: z.string(),
     quest_action_meta_id: z.number().optional(),
     retweet_cap: z.number().optional(),
     like_cap: z.number().optional(),
     replies_cap: z.number().optional(),
-    num_likes: z.number().optional().default(0),
-    num_retweets: z.number().optional().default(0),
-    num_replies: z.number().optional().default(0),
-    like_xp_awarded: z.boolean().optional().default(false),
-    reply_xp_awarded: z.boolean().optional().default(false),
-    retweet_xp_awarded: z.boolean().optional().default(false),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    num_likes: z.number().default(0).optional(),
+    num_retweets: z.number().default(0).optional(),
+    num_replies: z.number().default(0).optional(),
+    like_xp_awarded: z.boolean().default(false).optional(),
+    reply_xp_awarded: z.boolean().default(false).optional(),
+    retweet_xp_awarded: z.boolean().default(false).optional(),
+    created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
   })
   .describe('A tweet associated to a quest from which XP can be earned');
 
@@ -98,10 +100,17 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
       )
       .optional()
       .nullish(),
+    tweet_engagement_caps: z
+      .object({
+        likes: z.number().positive().max(100),
+        retweets: z.number().positive().max(100),
+        replies: z.number().positive().max(100),
+      })
+      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
