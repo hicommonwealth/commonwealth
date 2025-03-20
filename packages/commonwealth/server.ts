@@ -110,9 +110,12 @@ const start = async () => {
         bootstrapContestRolloverLoop();
       }
     })
-    .catch((e) => log.error(e.message, e));
+    .catch((e) => log.fatal(e.message, e));
 };
 
-start().catch((e) => log.error(e.message, e));
+start().catch((e) => {
+  console.error(e);
+  log.fatal(e.message, e);
+});
 
 export default app;
