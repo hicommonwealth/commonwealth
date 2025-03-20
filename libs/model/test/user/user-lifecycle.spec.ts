@@ -377,6 +377,12 @@ describe('User lifecycle', () => {
         },
       });
 
+      // upgrade tier for testing
+      await models.User.update(
+        { tier: 4 },
+        { where: { id: new_address!.user_id! } },
+      );
+
       // drain the outbox to award xp points
       await drainOutbox(
         [

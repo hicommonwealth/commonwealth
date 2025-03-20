@@ -289,6 +289,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         session: serializeCanvas(session),
       });
 
+    // update tier for testing
+    await models.User.update({ tier: 4 }, { where: { id: res.body.user_id } });
+
     const address_id = res.body.id;
     const user_id = res.body.user_id;
     const email = res.body.User.email;

@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { authThread } from '../../middleware';
+import { authThread, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
@@ -20,6 +20,7 @@ export function CreateThreadReaction(): Command<
         action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
       }),
       verifyReactionSignature,
+      tiered({ upvotes: true }),
     ],
     body: async ({ payload, actor, context }) => {
       const { address, thread } = mustBeAuthorizedThread(actor, context);
