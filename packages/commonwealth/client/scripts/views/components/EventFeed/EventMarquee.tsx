@@ -35,39 +35,46 @@ const EventIcon: React.FC<EventIconProps> = ({ type }) => {
   }
 };
 
+const formatAddress = (address: string | null | undefined): string => {
+  if (!address) return 'Anonymous';
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+const getEventText = (type: string, data: any): string => {
+  switch (type) {
+    case 'ContestStarted':
+      return `created contest: ${data.name || data.title}`;
+    case 'ContestEnding':
+      return `contest ending soon: ${data.name || data.title}`;
+    case 'ContestEnded':
+      return `contest ended: ${data.name || data.title}`;
+    case 'CommunityCreated':
+      return `created new community: ${data.name}`;
+    case 'ThreadCreated':
+      return `posted new thread: ${data.title}`;
+    default:
+      return 'New activity';
+  }
+};
+
 const EventItem: React.FC<{
   type: string;
   data: any;
   url: string;
 }> = ({ type, data, url }) => {
-  let text = '';
-
-  switch (type) {
-    case 'ContestStarted':
-      text = `Contest started: ${data.title}`;
-      break;
-    case 'ContestEnding':
-      text = `Contest ending soon: ${data.title}`;
-      break;
-    case 'ContestEnded':
-      text = `Contest ended: ${data.title}`;
-      break;
-    case 'CommunityCreated':
-      text = `New community: ${data.name}`;
-      break;
-    case 'ThreadCreated':
-      text = `New thread: ${data.title}`;
-      break;
-    default:
-      text = 'New activity';
-  }
+  const authorAddress = data.created_by || data.address || data.user_address;
+  const formattedAddress = formatAddress(authorAddress);
+  const eventText = getEventText(type, data);
 
   return (
     <Link to={url} className="event-item">
       <span className="event-icon">
         <EventIcon type={type} />
       </span>
-      <span className="event-link">{text}</span>
+      <span className="event-author">{formattedAddress}</span>
+      <span className="event-text">{eventText}</span>
+      <span className="event-link-indicator">→</span>
     </Link>
   );
 };
@@ -85,22 +92,25 @@ const EventMarquee: React.FC<EventMarqueeProps> = ({
 }) => {
   const { data, isLoading, error } = useFetchEventStreamQuery();
 
+  // Debug information - disabled in production
+  useEffect(() => {
+    console.log('EventMarquee Debug:', {
+      isLoading,
+      hasData: !!data,
+      error,
+      items: data?.pages?.flatMap((page) => page.items) || [],
+      elementId,
+      isSticky,
+      zIndex,
+    });
+  }, [data, isLoading, error, elementId, isSticky, zIndex]);
+
   // Use sticky header behavior if isSticky is true
   useStickyHeader({
     elementId,
     zIndex,
     stickyBehaviourEnabled: isSticky,
   });
-
-  // Debug information - disabled in production
-  if (process.env.NODE_ENV === 'development') {
-    // Log only on significant changes to reduce console spam
-    useEffect(() => {
-      console.log('EventMarquee data:', data);
-      console.log('EventMarquee loading:', isLoading);
-      if (error) console.log('EventMarquee error:', error);
-    }, [data, isLoading, error]);
-  }
 
   // Always render the component, even if there's no data yet
   if (isLoading) {
@@ -115,56 +125,34 @@ const EventMarquee: React.FC<EventMarqueeProps> = ({
     );
   }
 
-  // Always use mock data for now to ensure the banner works
-  // Later this can be replaced with real data from the API
-  let items = [
-    {
-      type: 'ThreadCreated',
-      data: { title: 'Welcome to Commonwealth' },
-      url: '/',
-    },
-    {
-      type: 'CommunityCreated',
-      data: { name: 'Test Community' },
-      url: '/',
-    },
-    {
-      type: 'ContestStarted',
-      data: { title: 'Sample Contest' },
-      url: '/',
-    },
-    {
-      type: 'ThreadCreated',
-      data: { title: 'Governance Discussion' },
-      url: '/',
-    },
-    {
-      type: 'ContestEnding',
-      data: { title: 'Weekly Challenge' },
-      url: '/',
-    },
-    {
-      type: 'CommunityCreated',
-      data: { name: 'DAO Enthusiasts' },
-      url: '/',
-    },
-    {
-      type: 'ContestEnded',
-      data: { title: 'Hackathon Results' },
-      url: '/',
-    },
-    {
-      type: 'ThreadCreated',
-      data: { title: 'Protocol Upgrade Proposal' },
-      url: '/',
-    },
-  ];
+  // Get all items from all pages
+  const items = data?.pages?.flatMap((page) => page.items) || [];
+
+  // If no items, show a placeholder
+  if (items.length === 0) {
+    return (
+      <div
+        id={elementId}
+        className={`EventMarquee ${isSticky ? 'sticky' : ''}`}
+        style={{ justifyContent: 'center' }}
+      >
+        <div>No recent activity</div>
+      </div>
+    );
+  }
 
   // Duplicate the items to create a continuous scrolling effect
   const duplicatedItems = [...items, ...items, ...items];
 
   return (
-    <div id={elementId} className={`EventMarquee ${isSticky ? 'sticky' : ''}`}>
+    <div
+      id={elementId}
+      className={`EventMarquee ${isSticky ? 'sticky' : ''}`}
+      style={{
+        display: 'block', // Ensure it's displayed
+        visibility: 'visible', // Ensure it's visible
+      }}
+    >
       <div className="event-content">
         {duplicatedItems.map((event, i) => (
           <EventItem
