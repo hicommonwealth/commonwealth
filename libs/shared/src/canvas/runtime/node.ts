@@ -12,7 +12,7 @@ export const startCanvasNode = async (config: {
   LIBP2P_PRIVATE_KEY?: string;
 }): Promise<{ app: Canvas; libp2p: Libp2p | null }> => {
   const path =
-    process.env.FEDERATION_POSTGRES_DB_URL ??
+    process.env.FEDERATION_DB_URL ??
     (process.env.APP_ENV === 'local'
       ? undefined
       : 'postgresql://commonwealth:edgeware@localhost/federation');
