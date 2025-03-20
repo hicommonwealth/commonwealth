@@ -14,9 +14,14 @@ import './EventMarquee.scss';
 
 interface EventIconProps {
   type: string;
+  imageUrl?: string;
 }
 
-const EventIcon: React.FC<EventIconProps> = ({ type }) => {
+const EventIcon: React.FC<EventIconProps> = ({ type, imageUrl }) => {
+  if (imageUrl) {
+    return <img src={imageUrl} className="custom-icon" alt={type} />;
+  }
+
   const iconProps = { size: 16, weight: 'bold' as IconWeight };
 
   switch (type) {
@@ -41,20 +46,44 @@ const formatAddress = (address: string | null | undefined): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-const getEventText = (type: string, data: any): string => {
+const getEventText = (type: string, data: any): JSX.Element[] => {
+  const communityName = data.community_id
+    ? data.community_id.charAt(0).toUpperCase() + data.community_id.slice(1)
+    : '';
+
   switch (type) {
     case 'ContestStarted':
-      return `created contest: ${data.name || data.title}`;
+      return [
+        <span key="action"> created contest for </span>,
+        <strong key="title">{data.name || data.title}</strong>,
+      ];
     case 'ContestEnding':
-      return `contest ending soon: ${data.name || data.title}`;
+      return [
+        <span key="action">contest for </span>,
+        <strong key="title">{data.name || data.title}</strong>,
+        <span key="suffix"> ends soon</span>,
+      ];
     case 'ContestEnded':
-      return `contest ended: ${data.name || data.title}`;
+      return [
+        <span key="action">contest for </span>,
+        <strong key="title">{data.name || data.title}</strong>,
+        <span key="suffix"> ended</span>,
+      ];
     case 'CommunityCreated':
-      return `created new community: ${data.name}`;
+      return [
+        <span key="action">created the </span>,
+        <strong key="name">{data.name}</strong>,
+        <span key="suffix"> space</span>,
+      ];
     case 'ThreadCreated':
-      return `posted new thread: ${data.title}`;
+      return [
+        <span key="action">posted </span>,
+        <strong key="title">"{data.title}"</strong>,
+        <span key="in"> in </span>,
+        <strong key="community">{communityName}</strong>,
+      ];
     default:
-      return 'New activity';
+      return [<span key="default">New activity</span>];
   }
 };
 
@@ -67,13 +96,41 @@ const EventItem: React.FC<{
   const formattedAddress = formatAddress(authorAddress);
   const eventText = getEventText(type, data);
 
+  // Get the appropriate image URL based on event type
+  const imageUrl = (() => {
+    switch (type) {
+      case 'ContestStarted':
+      case 'ContestEnding':
+      case 'ContestEnded':
+        return data.image_url;
+      case 'CommunityCreated':
+        return data.icon_url;
+      case 'ThreadCreated':
+        return data.author_profile_picture;
+      default:
+        return undefined;
+    }
+  })();
+
+  const isAuthorEvent = type === 'ThreadCreated';
+
   return (
-    <Link to={url} className="event-item">
-      <span className="event-icon">
-        <EventIcon type={type} />
-      </span>
-      <span className="event-author">{formattedAddress}</span>
+    <Link
+      to={url}
+      className={`event-item ${isAuthorEvent ? 'author-event' : 'community-event'}`}
+    >
+      {isAuthorEvent && imageUrl && (
+        <span className="event-icon author-icon">
+          <EventIcon type={type} imageUrl={imageUrl} />
+        </span>
+      )}
+      <strong className="event-author">{formattedAddress}</strong>
       <span className="event-text">{eventText}</span>
+      {!isAuthorEvent && imageUrl && (
+        <span className="event-icon community-icon">
+          <EventIcon type={type} imageUrl={imageUrl} />
+        </span>
+      )}
       <span className="event-link-indicator">→</span>
     </Link>
   );

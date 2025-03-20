@@ -37,7 +37,6 @@
     text-decoration: none;
     color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    font-weight: 500;
     padding: 0 8px;
     transition: all 0.2s ease;
 
@@ -49,21 +48,40 @@
     }
 
     .event-icon {
-      margin-right: 12px;
       display: flex;
       align-items: center;
       filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+
+      .custom-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      &.author-icon {
+        margin-right: 12px;
+      }
+
+      &.community-icon {
+        margin-left: 12px;
+      }
     }
 
     .event-author {
       margin-right: 8px;
       opacity: 0.9;
-      font-weight: 400;
+      font-weight: 700;
     }
 
     .event-text {
-      font-weight: 600;
+      font-weight: 400;
       margin-right: 8px;
+
+      strong {
+        font-weight: 700;
+      }
     }
 
     .event-link-indicator {
