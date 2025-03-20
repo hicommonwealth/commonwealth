@@ -1,12 +1,14 @@
-import {
-  QuestEvents,
-  QuestParticipationLimit,
-  QuestParticipationPeriod,
-} from '@hicommonwealth/schemas';
+import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
+import {
+  doesActionAllowCommentId,
+  doesActionAllowContentId,
+  doesActionAllowThreadId,
+  doesActionAllowTopicId,
+  doesActionRequireRewardShare,
+} from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -15,16 +17,10 @@ import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
-import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
-import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
-import { QuestAction } from './QuestActionSubForm';
-import {
-  doesActionAllowContentId,
-  doesActionRequireRewardShare,
-} from './QuestActionSubForm/helpers';
+import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
 import { buildContentIdFromURL } from './helpers';
@@ -37,12 +33,6 @@ import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
 const MAX_ACTIONS_LIMIT = Object.values(QuestEvents).length; // = 8 max actions
-// these restrictions are only on client side, update per future requirements
-const MAX_REPETITION_COUNTS = {
-  PER_DAY: 4,
-  PER_WEEK: 28,
-  PER_MONTH: 120,
-};
 
 const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const {
@@ -60,24 +50,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   useRunOnceOnCondition({
     callback: () => {
       if (initialValues) {
-        if (
-          initialValues.participation_limit !==
-          QuestParticipationLimit.OncePerQuest
-        ) {
-          initialValues.participation_times_per_period &&
-            repetitionCycleRadioProps.repetitionCycleInputProps.onChange(
-              initialValues.participation_times_per_period,
-            );
-          initialValues.participation_period &&
-            repetitionCycleRadioProps.repetitionCycleSelectListProps.onChange({
-              value: initialValues.participation_period,
-              label:
-                Object.entries(QuestParticipationPeriod).find(
-                  ([_, v]) => v === initialValues.participation_period,
-                )?.[0] || '',
-            });
-        }
-
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
@@ -89,6 +61,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 values: {
                   action: chosenAction,
                   instructionsLink: subForm.instructionsLink || '',
+                  contentIdScope: (
+                    subForm as QuestActionSubFormValuesWithContentLink
+                  ).contentIdScope,
                   contentLink:
                     (subForm as QuestActionSubFormValuesWithContentLink)
                       .contentLink || '',
@@ -99,17 +74,21 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                       subForm as QuestActionSubFormValuesWithCreatorPoints
                     ).creatorRewardAmount,
                   }),
+                  participationLimit: subForm.participationLimit,
+                  participationPeriod: subForm.participationPeriod,
+                  participationTimesPerPeriod:
+                    subForm.participationTimesPerPeriod,
                 },
                 errors: {},
                 config: {
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
+                  with_optional_topic_id:
+                    allowsContentId && doesActionAllowTopicId(chosenAction),
                   with_optional_thread_id:
-                    allowsContentId &&
-                    (chosenAction === 'CommentCreated' ||
-                      chosenAction === 'ThreadUpvoted'),
+                    allowsContentId && doesActionAllowThreadId(chosenAction),
                   with_optional_comment_id:
-                    allowsContentId && chosenAction === 'CommentUpvoted',
+                    allowsContentId && doesActionAllowCommentId(chosenAction),
                 },
               };
             }),
@@ -134,79 +113,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const navigate = useCommonNavigate();
 
   const formMethodsRef = useRef<CWFormRef>(null);
-  const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
-    (k) => ({
-      label: k,
-      value: QuestParticipationPeriod[k],
-    }),
-  );
-
-  const repetitionCycleValidatorFn = (props: ValidationFnProps) => {
-    const participation_limit = formMethodsRef.current?.getValues(
-      'participation_limit',
-    );
-    const { input, selectList } = props.values;
-
-    // clear errors if participation timeline is not a repeatable
-    if (participation_limit !== QuestParticipationLimit.OncePerPeriod) {
-      return { error: undefined };
-    }
-
-    // validate repetition cycle value
-    if (
-      !Object.values(QuestParticipationPeriod).includes(
-        selectList?.value as QuestParticipationPeriod,
-      )
-    ) {
-      return { error: 'Invalid value for reptition cycle' };
-    }
-
-    // validate repetition count value
-    try {
-      numberNonDecimalGTZeroValidationSchema.parse(`${input}`);
-
-      const count = parseInt(`${input}`);
-
-      // verify repetition counts fall within a certain range
-      if (
-        (selectList?.value === QuestParticipationPeriod.Daily &&
-          count > MAX_REPETITION_COUNTS.PER_DAY) ||
-        (selectList?.value === QuestParticipationPeriod.Weekly &&
-          count > MAX_REPETITION_COUNTS.PER_WEEK) ||
-        (selectList?.value === QuestParticipationPeriod.Monthly &&
-          count > MAX_REPETITION_COUNTS.PER_MONTH)
-      ) {
-        const allowedCount =
-          selectList?.value === QuestParticipationPeriod.Daily
-            ? MAX_REPETITION_COUNTS.PER_DAY
-            : selectList?.value === QuestParticipationPeriod.Weekly
-              ? MAX_REPETITION_COUNTS.PER_WEEK
-              : MAX_REPETITION_COUNTS.PER_MONTH;
-        return {
-          error: `Cannot repeat more than ${allowedCount} times ${selectList?.value}`,
-        };
-      }
-    } catch {
-      return { error: 'Invalid value for repetition count' };
-    }
-
-    return { error: undefined };
-  };
-
-  const {
-    error: repetitionCycleRadioError,
-    triggerValidation: triggerRepetitionCycleRadioValidation,
-    ...repetitionCycleRadioProps
-  } = useCWRepetitionCycleRadioButton({
-    validatorFn: repetitionCycleValidatorFn,
-    repetitionCycleInputProps: {
-      value: 1,
-    },
-    repetitionCycleSelectListProps: {
-      options: repetitionCycleOptions,
-      selected: repetitionCycleOptions[0],
-    },
-  });
 
   const handleQuestMutateConfirmation = async (hours: number) => {
     return new Promise((resolve, reject) => {
@@ -241,43 +147,53 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       end_date: new Date(values.end_date),
       start_date: new Date(values.start_date),
       image_url: values.image || getDefaultContestImage(),
+      max_xp_to_end: parseInt(values.max_xp_to_end),
       ...(values?.community && {
         community_id: values.community.value,
       }),
+      quest_type: 'common',
     });
 
     if (quest && quest.id) {
       await updateQuest({
         quest_id: quest.id,
-        action_metas: questActionSubForms.map((subForm) => ({
-          event_name: subForm.values.action as QuestAction,
-          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-          ...(subForm.values.creatorRewardAmount && {
-            creator_reward_weight: calculateRemainingPercentageChangeFractional(
-              parseInt(`${subForm.values.rewardAmount}`, 10),
-              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-            ),
-          }),
-          ...(subForm.values.contentLink &&
-            (subForm.config?.with_optional_comment_id ||
-              subForm.config?.with_optional_thread_id) && {
-              content_id: buildContentIdFromURL(
-                subForm.values.contentLink,
-                subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
-              ),
+        action_metas: await Promise.all(
+          questActionSubForms.map(async (subForm) => ({
+            event_name: subForm.values.action as QuestAction,
+            reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+            ...(subForm.values.creatorRewardAmount && {
+              creator_reward_weight:
+                calculateRemainingPercentageChangeFractional(
+                  parseInt(`${subForm.values.rewardAmount}`, 10),
+                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+                ),
             }),
-          participation_limit: values.participation_limit,
-          participation_period: repetitionCycleRadioProps
-            .repetitionCycleSelectListProps.selected
-            ?.value as QuestParticipationPeriod,
-          participation_times_per_period: parseInt(
-            `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
-          ),
-          ...(subForm.values.instructionsLink && {
-            instructions_link: subForm.values.instructionsLink.trim(),
-          }),
-          amount_multiplier: 0,
-        })),
+            ...(subForm.values.contentLink &&
+              (subForm.config?.with_optional_comment_id ||
+                subForm.config?.with_optional_thread_id ||
+                subForm.config?.with_optional_topic_id) && {
+                content_id: await buildContentIdFromURL(
+                  subForm.values.contentLink,
+                  subForm.values?.contentIdScope ===
+                    QuestActionContentIdScope.Thread
+                    ? subForm.config?.with_optional_comment_id
+                      ? 'comment'
+                      : 'thread'
+                    : 'topic',
+                ),
+              }),
+            participation_limit: subForm.values.participationLimit,
+            participation_period: subForm.values
+              .participationPeriod as QuestParticipationPeriod,
+            participation_times_per_period: parseInt(
+              `${subForm.values.participationTimesPerPeriod}`,
+            ),
+            ...(subForm.values.instructionsLink && {
+              instructions_link: subForm.values.instructionsLink.trim(),
+            }),
+            amount_multiplier: 0,
+          })),
+        ),
       });
     }
   };
@@ -299,50 +215,52 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(initialValues.start_date !== values.start_date && {
         start_date: new Date(values.start_date),
       }),
+      max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
-      community_id: values?.community?.value || undefined,
-      action_metas: questActionSubForms.map((subForm) => ({
-        event_name: subForm.values.action as QuestAction,
-        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-        ...(subForm.values.creatorRewardAmount && {
-          creator_reward_weight: calculateRemainingPercentageChangeFractional(
-            parseInt(`${subForm.values.rewardAmount}`, 10),
-            parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-          ),
-        }),
-        ...(subForm.values.contentLink &&
-          (subForm.config?.with_optional_comment_id ||
-            subForm.config?.with_optional_thread_id) && {
-            content_id: buildContentIdFromURL(
-              subForm.values.contentLink,
-              subForm.config?.with_optional_comment_id ? 'comment' : 'thread',
+      community_id: values?.community?.value || null, // send null to remove community association
+      action_metas: await Promise.all(
+        questActionSubForms.map(async (subForm) => ({
+          event_name: subForm.values.action as QuestAction,
+          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+          ...(subForm.values.creatorRewardAmount && {
+            creator_reward_weight: calculateRemainingPercentageChangeFractional(
+              parseInt(`${subForm.values.rewardAmount}`, 10),
+              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
             ),
           }),
-        participation_limit: values.participation_limit,
-        participation_period: repetitionCycleRadioProps
-          .repetitionCycleSelectListProps.selected
-          ?.value as QuestParticipationPeriod,
-        participation_times_per_period: parseInt(
-          `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
-        ),
-        ...(subForm.values.instructionsLink && {
-          instructions_link: subForm.values.instructionsLink.trim(),
-        }),
-        amount_multiplier: 0,
-      })),
+          ...(subForm.values.contentLink &&
+            (subForm.config?.with_optional_comment_id ||
+              subForm.config?.with_optional_thread_id ||
+              subForm.config?.with_optional_topic_id) && {
+              content_id: await buildContentIdFromURL(
+                subForm.values.contentLink,
+                subForm.values?.contentIdScope ===
+                  QuestActionContentIdScope.Thread
+                  ? subForm.config?.with_optional_comment_id
+                    ? 'comment'
+                    : 'thread'
+                  : 'topic',
+              ),
+            }),
+          participation_limit: subForm.values.participationLimit,
+          participation_period: subForm.values
+            .participationPeriod as QuestParticipationPeriod,
+          participation_times_per_period: parseInt(
+            `${subForm.values.participationTimesPerPeriod}`,
+          ),
+          ...(subForm.values.instructionsLink && {
+            instructions_link: subForm.values.instructionsLink.trim(),
+          }),
+          amount_multiplier: 0,
+        })),
+      ),
     });
   };
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const subFormErrors = validateSubForms();
-    const repetitionCycleRadioBtnError =
-      triggerRepetitionCycleRadioValidation();
 
-    if (
-      subFormErrors ||
-      repetitionCycleRadioBtnError ||
-      (mode === 'update' ? !questId : false)
-    ) {
+    if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
 
@@ -356,7 +274,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'update') {
           await handleUpdateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate(`/quests/${questId}`, {}, values?.community?.value); // redirect to quest details page after update
+          // redirect to quest details page after update
+          navigate(`/quests/${questId}`, {}, values?.community?.value || null);
         }
       } catch (e) {
         console.error(e);
@@ -409,6 +328,24 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             }
             setQuestActionSubForms([...tempForm]);
           }
+          if (error.includes('topic with id')) {
+            const topicId = error.match(/id "(\d+)"/)[1];
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find((form) =>
+              form.values.contentLink?.includes(`discussion/topic/${topicId}`),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentLink: `Invalid topic link.${
+                  values?.community
+                    ? ' Topic must belong to selected community'
+                    : ''
+                }`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
           notifyError('Failed to update quest! Please fix form errors');
           return;
         }
@@ -445,19 +382,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     minStartDate,
     idealStartDate,
     minEndDate,
-    // custom radio button props
-    repetitionCycleRadio: {
-      error: repetitionCycleRadioError,
-      triggerValidation: triggerRepetitionCycleRadioValidation,
-      props: {
-        repetitionCycleInputProps: {
-          ...repetitionCycleRadioProps.repetitionCycleInputProps,
-        },
-        repetitionCycleSelectListProps: {
-          ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
-        },
-      },
-    },
     formMethodsRef,
   };
 };

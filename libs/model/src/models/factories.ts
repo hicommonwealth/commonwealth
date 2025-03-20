@@ -11,6 +11,7 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
+import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -29,6 +30,7 @@ import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
 import { Quest, QuestActionMeta } from './quest';
+import QuestTweets from './quest_tweets';
 import Reaction from './reaction';
 import { Referral } from './referral';
 import { ReferralFee } from './referral_fee';
@@ -59,6 +61,8 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
+  CommunityGoalMeta,
+  CommunityGoalReached,
   CommunityStake,
   CommunityTags,
   Contest,
@@ -79,6 +83,7 @@ export const Factories = {
   ProfileTags,
   Quest,
   QuestActionMeta,
+  QuestTweets,
   Reaction,
   Referral,
   ReferralFee,

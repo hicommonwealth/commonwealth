@@ -1,22 +1,28 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { createPortal } from 'react-dom';
+import useSidebarStore from 'state/ui/sidebar/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
-import CommentEditor, {
-  CommentEditorProps,
-} from 'views/components/Comments/CommentEditor/CommentEditor';
-import { MobileInput } from 'views/components/StickEditorContainer/MobileInput';
+import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
+import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
+import { StickCommentContext } from './context/StickCommentProvider';
 
-/**
- * This mobile version uses a portal to add itself to the bottom nav.
- */
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const { mode } = useContext(StickCommentContext);
+  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const menuVisible = useSidebarStore((state) => state.menuVisible);
+
+  const handleCancel = useCallback(() => {
+    console.log('MobileStickyInput: handleCancel triggered');
+    setFocused(false);
+  }, []);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -30,6 +36,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   const customHandleSubmitComment = useCallback(async (): Promise<number> => {
     setFocused(false);
+
     const commentId = await handleSubmitComment();
 
     if (typeof commentId !== 'number' || isNaN(commentId)) {
@@ -37,12 +44,10 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       throw new Error('Invalid comment ID');
     }
 
-    // If AI mode is enabled, trigger the streaming reply
     if (aiCommentsToggleEnabled) {
       handleAiReply(commentId);
     }
 
-    // Use the new listenForComment function
     try {
       await listenForComment(commentId, aiCommentsToggleEnabled);
     } catch (error) {
@@ -56,10 +61,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     setFocused(true);
   }, []);
 
-  const handleCancel = useCallback(() => {
-    setFocused(false);
-  }, []);
-
   const parent = document.getElementById('MobileNavigationHead');
 
   if (!parent) {
@@ -67,19 +68,36 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     return null;
   }
 
+  if (menuVisible) {
+    return null;
+  }
+
   if (focused) {
     return (
       <div className="MobileStickyInputFocused">
-        <CommentEditor
-          {...props}
-          shouldFocus={true}
-          onCancel={handleCancel}
-          aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-          setAICommentsToggleEnabled={setAICommentsToggleEnabled}
-          handleSubmitComment={customHandleSubmitComment}
-          onAiReply={handleAiReply}
-          streamingReplyIds={streamingReplyIds}
-        />
+        <div className="mobile-editor-container">
+          <div className="header-row">
+            <div className="left-section">
+              <CWText type="h4">
+                {mode === 'thread' ? 'Create Thread' : 'Write Comment'}
+              </CWText>
+            </div>
+          </div>
+
+          {mode === 'thread' ? (
+            <NewThreadForm onCancel={handleCancel} />
+          ) : (
+            <CommentEditor
+              {...props}
+              shouldFocus={true}
+              onCancel={handleCancel}
+              aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+              handleSubmitComment={customHandleSubmitComment}
+              onAiReply={handleAiReply}
+              streamingReplyIds={streamingReplyIds}
+            />
+          )}
+        </div>
       </div>
     );
   }
@@ -90,7 +108,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
         {...props}
         onFocus={handleFocused}
         aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-        setAICommentsToggleEnabled={setAICommentsToggleEnabled}
       />
     </div>,
     parent,

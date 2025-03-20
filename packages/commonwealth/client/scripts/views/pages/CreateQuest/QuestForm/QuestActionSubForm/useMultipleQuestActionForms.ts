@@ -1,16 +1,22 @@
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import {
+  doesActionAllowCommentId,
+  doesActionAllowContentId,
+  doesActionAllowThreadId,
+  doesActionAllowTopicId,
+  doesActionRequireRewardShare,
+} from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import {
-  doesActionAllowContentId,
-  doesActionRequireRewardShare,
-} from './helpers';
-import {
   QuestAction,
+  QuestActionContentIdScope,
   QuestActionSubFormConfig,
   QuestActionSubFormErrors,
   QuestActionSubFormFields,
+  QuestActionSubFormInternalRefs,
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
 } from './types';
@@ -39,7 +45,13 @@ const useQuestActionMultiFormsState = ({
       if (minSubForms) {
         setQuestActionSubForms(
           Array.from({ length: minSubForms }, (_, index) => ({
-            values: {},
+            values: {
+              participationLimit: QuestParticipationLimit.OncePerQuest,
+              contentIdScope: QuestActionContentIdScope.Topic,
+            },
+            refs: {
+              runParticipationLimitValidator: () => {},
+            },
             id: index + 1,
           })),
         );
@@ -53,12 +65,23 @@ const useQuestActionMultiFormsState = ({
 
     setQuestActionSubForms((a) => [
       ...a,
-      { values: {}, id: questActionSubForms.length + 1 },
+      {
+        values: {
+          participationLimit: QuestParticipationLimit.OncePerQuest,
+          contentIdScope: QuestActionContentIdScope.Topic,
+        },
+        refs: { runParticipationLimitValidator: () => {} },
+        id: questActionSubForms.length + 1,
+      },
     ]);
   };
 
   const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
-    if (config?.with_optional_comment_id || config?.with_optional_thread_id) {
+    if (
+      config?.with_optional_comment_id ||
+      config?.with_optional_thread_id ||
+      config?.with_optional_topic_id
+    ) {
       if (config?.requires_creator_points) {
         return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
       }
@@ -75,9 +98,12 @@ const useQuestActionMultiFormsState = ({
 
   const validateFormValues = (
     values: QuestActionSubFormFields,
+    refs?: QuestActionSubFormInternalRefs,
     config?: QuestActionSubFormConfig,
   ) => {
     let errors: QuestActionSubFormErrors = {};
+
+    // validate via zod
     try {
       const schema = buildValidationSchema(config);
       schema.parse(values);
@@ -90,6 +116,11 @@ const useQuestActionMultiFormsState = ({
         };
       });
     }
+
+    // validate via custom validators
+    const error = refs?.runParticipationLimitValidator?.();
+    if (!errors.participationLimit && error) errors.participationLimit = error;
+
     return errors;
   };
 
@@ -97,6 +128,7 @@ const useQuestActionMultiFormsState = ({
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms[index].errors = validateFormValues(
       updatedSubForms[index].values,
+      updatedSubForms[index].refs,
       updatedSubForms[index].config,
     );
     setQuestActionSubForms([...updatedSubForms]);
@@ -105,7 +137,7 @@ const useQuestActionMultiFormsState = ({
   const validateSubForms = (): boolean => {
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms.map((form) => {
-      form.errors = validateFormValues(form.values, form.config);
+      form.errors = validateFormValues(form.values, form.refs, form.config);
     });
     setQuestActionSubForms([...updatedSubForms]);
     const hasErrors = updatedSubForms.find(
@@ -128,16 +160,17 @@ const useQuestActionMultiFormsState = ({
     if (chosenAction) {
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
+      const allowsTopicId =
+        allowsContentId && doesActionAllowTopicId(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        with_optional_topic_id: allowsTopicId,
         with_optional_comment_id:
-          allowsContentId && chosenAction === 'CommentUpvoted',
+          allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
-          allowsContentId &&
-          (chosenAction === 'CommentCreated' ||
-            chosenAction === 'ThreadUpvoted'),
+          allowsContentId && doesActionAllowThreadId(chosenAction),
       };
 
       // reset errors/values if action doesn't require creator points
@@ -154,6 +187,18 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
+          contentLink: undefined,
+        };
+      }
+
+      // set/reset default values/config if action allows content link
+      if (allowsContentId) {
+        updatedSubForms[index].values.contentIdScope = allowsTopicId
+          ? QuestActionContentIdScope.Topic
+          : QuestActionContentIdScope.Thread;
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          contentIdScope: undefined,
           contentLink: undefined,
         };
       }

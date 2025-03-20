@@ -176,6 +176,7 @@ export const GetStakeHistoricalPrice = {
 
 export const ConstestManagerView = ContestManager.extend({
   created_at: z.string(),
+  deleted_at: z.string().nullish(),
   topics: z.undefined(),
   contests: z.undefined(),
   content: z.array(
@@ -206,6 +207,14 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetTopicById = {
+  input: z.object({
+    topic_id: z.number(),
+  }),
+  // TODO: fix type
+  output: z.any(),
 };
 
 export const GetPinnedTokens = {

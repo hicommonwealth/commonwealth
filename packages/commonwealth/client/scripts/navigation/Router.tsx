@@ -11,6 +11,8 @@ import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
+export type RouteFeatureFlags = {};
+
 const Router = () => {
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
 

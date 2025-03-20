@@ -11,6 +11,7 @@ const SignInModal = ({
   onSuccess,
   showWalletsFor,
   showAuthOptionFor,
+  showAuthOptionTypesFor,
   onSignInClick,
   triggerOpenEVMWalletsSubModal,
   isUserFromWebView,
@@ -20,7 +21,7 @@ const SignInModal = ({
       onClose={onClose}
       layoutType={AuthModalType.SignIn}
       onSuccess={onSuccess}
-      showAuthOptionTypesFor={mobileApp ? ['sso'] : ['wallets', 'sso']}
+      showAuthOptionTypesFor={showAuthOptionTypesFor}
       showWalletsFor={showWalletsFor}
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="SignInModal"

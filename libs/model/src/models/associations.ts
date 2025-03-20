@@ -30,14 +30,21 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
+
   db.QuestActionMeta.withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
-  }).withMany(db.ChainEventXpSource, {
-    foreignKey: 'quest_action_meta_id',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  });
+  })
+    .withMany(db.ChainEventXpSource, {
+      foreignKey: 'quest_action_meta_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    })
+    .withOne(db.QuestTweets, {
+      foreignKey: 'quest_action_meta_id',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -235,6 +242,18 @@ export const buildAssociations = (db: DB) => {
       model: db.User,
       as: 'commentSubscriptions',
       onDelete: 'CASCADE',
+    },
+  );
+
+  db.CommunityGoalReached.withManyToMany(
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.CommunityGoalMeta,
+      onDelete: 'CASCADE',
+      asOne: 'meta',
     },
   );
 

@@ -4,12 +4,12 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
-import { models } from '../../src/database';
 import {
   CreateCommunityAlert,
   DeleteCommunityAlerts,
   GetCommunityAlerts,
-} from '../../src/subscription';
+} from '../../src/aggregates/subscription';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 
 describe('Community alerts lifecycle', () => {
@@ -32,6 +32,13 @@ describe('Community alerts lifecycle', () => {
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 0,
+      Addresses: [
+        {
+          role: 'member',
+          user_id: user!.id,
+          verified: new Date(),
+        },
+      ],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: node?.id,
@@ -40,7 +47,7 @@ describe('Community alerts lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: '0x',
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

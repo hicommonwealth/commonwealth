@@ -56,6 +56,7 @@ export const Community = z.object({
   profile_count: PG_INT.nullish(),
   lifetime_thread_count: PG_INT.optional(),
   banner_text: z.string().nullish(),
+  allow_tokenized_threads: z.boolean().optional(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -84,6 +85,25 @@ export const ExtendedCommunity = Community.extend({
     }),
   ),
   communityBanner: z.string().nullish(),
+});
+
+export const CommunityGoalMeta = z.object({
+  id: PG_INT.optional(), // auto-generated (ง •̀_•́)ง
+  name: z.string(),
+  description: z.string(),
+  type: z.enum(['members', 'threads']),
+  target: z.number(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
+});
+
+export const CommunityGoalReached = z.object({
+  community_goal_meta_id: PG_INT,
+  community_id: z.string(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
+  reached_at: z.coerce.date().nullish(),
+
+  // associations
+  meta: CommunityGoalMeta.optional(),
 });
 
 // aliases

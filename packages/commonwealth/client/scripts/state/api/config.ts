@@ -33,6 +33,7 @@ export const ApiEndpoints = {
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
   GENERATE_COMMENT: '/generateCommentText',
+  GENERATE_THREAD: '/generateThreadText',
   UPLOAD_FILE: '/getUploadSignature',
 };
 

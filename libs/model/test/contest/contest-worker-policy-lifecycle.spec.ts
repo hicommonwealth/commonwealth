@@ -1,10 +1,11 @@
 import { config, dispose, handleEvent, query } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { emitEvent, models } from '../../src';
-import { GetTopics } from '../../src/community';
-import { Contests } from '../../src/contest';
+import { GetTopics } from '../../src/aggregates/community';
+import { Contests } from '../../src/aggregates/contest';
 import { systemActor } from '../../src/middleware';
 import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
@@ -21,7 +22,9 @@ describe('Contest Worker Policy Lifecycle', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode');
+    const [chainNode] = await seed('ChainNode', {
+      eth_chain_id: ValidChains.SepoliaBase,
+    });
     const [user] = await seed(
       'User',
       {

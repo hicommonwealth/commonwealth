@@ -1,6 +1,11 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
-import { Community, models, refreshProfileCount } from '@hicommonwealth/model';
+import {
+  Community,
+  middleware,
+  models,
+  refreshProfileCount,
+} from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -9,6 +14,9 @@ import { config } from '../config';
 
 export const trpcRouter = trpc.router({
   createCommunity: trpc.command(Community.CreateCommunity, trpc.Tag.Community, [
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
+    }),
     trpc.trackAnalytics([
       MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
       (output) => ({
@@ -112,6 +120,7 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
+  getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,

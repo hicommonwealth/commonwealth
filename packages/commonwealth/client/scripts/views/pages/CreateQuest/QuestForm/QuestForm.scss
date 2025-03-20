@@ -10,6 +10,7 @@
   }
 
   .quest-period-section,
+  .xp-configuration-section,
   .basic-information-section,
   .actions-section {
     display: flex;
@@ -23,23 +24,6 @@
 
     > .b1 {
       color: $neutral-600 !important;
-    }
-  }
-
-  .quest-period-section {
-    .repeatition-selector {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-
-      .b1 {
-        color: $neutral-600 !important;
-      }
-
-      .radio-btn .Text {
-        color: $neutral-800 !important;
-      }
     }
   }
 
@@ -95,5 +79,9 @@
         }
       }
     }
+  }
+
+  .radio-btn {
+    z-index: 0 !important;
   }
 }

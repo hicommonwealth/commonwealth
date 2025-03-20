@@ -9,7 +9,7 @@ import { ComponentType } from '../types';
 
 import './CWTag.scss';
 
-type TagType =
+export type TagType =
   | 'passed'
   | 'failed'
   | 'active' // i.e. snapshot

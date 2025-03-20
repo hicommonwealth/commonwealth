@@ -290,3 +290,24 @@ export async function publishCast(
     log.error(`Failed to post as FC bot`, err as Error);
   }
 }
+
+export async function tweetExists(tweetId: string) {
+  try {
+    const response = await fetch(`https://api.x.com/2/tweets/${tweetId}`, {
+      headers: {
+        Authorization: `Bearer ${config.TWITTER.APP_BEARER_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to get tweet ${tweetId}: ${data.message}`);
+    }
+
+    if (!data.data?.id) return false;
+  } catch (err) {
+    log.error(`Failed to get tweet ${tweetId}`, err as Error);
+    return false;
+  }
+
+  return true;
+}

@@ -20,6 +20,30 @@
     right: 12px;
   }
 
+  .repeatition-selector,
+  .content-id-type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+
+    .caption .Text {
+      color: $neutral-600 !important;
+    }
+
+    .b1 {
+      color: $neutral-600 !important;
+    }
+
+    .radio-btn .Text {
+      color: $neutral-800 !important;
+    }
+
+    .mt-8 {
+      margin-top: 8px;
+    }
+  }
+
   .grid-row {
     display: grid;
 

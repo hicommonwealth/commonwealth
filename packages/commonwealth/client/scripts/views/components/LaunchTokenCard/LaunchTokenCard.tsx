@@ -9,7 +9,7 @@ const LaunchTokenCard = () => {
       <CWText type="h2" fontWeight="bold" isCentered>
         Launch a token
         <br />
-        right on common!
+        right on Common!
       </CWText>
       <CWText isCentered>
         1. Add an image and a name

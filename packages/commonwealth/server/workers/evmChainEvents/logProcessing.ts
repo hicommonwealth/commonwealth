@@ -231,18 +231,17 @@ export async function migrateEvents(
       oldestBlock,
       endingBlockNum,
     );
-    config.WORKERS.EVM_CE_TRACE &&
-      logger.warn('Events migrated', {
-        startingBlockNum: oldestBlock,
-        endingBlockNum,
-      });
+    logger.info('Events migrated', {
+      startingBlockNum: oldestBlock,
+      endingBlockNum,
+    });
     return {
       events: result.events,
       lastBlockNum: result.lastBlockNum,
       contracts,
     };
   } else {
-    config.WORKERS.EVM_CE_TRACE && logger.info('No events to migrate');
+    config.EVM_CE.LOG_TRACE && logger.debug('No events to migrate');
     return { contracts };
   }
 }

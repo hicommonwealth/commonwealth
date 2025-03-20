@@ -63,7 +63,9 @@ export default (
       topic_id: { type: Sequelize.INTEGER, allowNull: true },
       is_farcaster_contest: { type: Sequelize.BOOLEAN, allowNull: false },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
+      farcaster_author_cast_hash: { type: Sequelize.STRING, allowNull: true },
       environment: { type: Sequelize.STRING, allowNull: false },
+      deleted_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
       tableName: 'ContestManagers',
