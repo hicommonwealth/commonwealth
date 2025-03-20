@@ -3,7 +3,7 @@ import './IOSModal.scss';
 
 interface IOSModalProps {
   allowDisabled?: boolean;
-  disallowDisabled?: boolean;
+  denyDisabled?: boolean;
 
   title: string;
   description: string;
@@ -15,14 +15,8 @@ interface IOSModalProps {
  * Native-like modal for iOS ...
  */
 export const IOSModal = (props: IOSModalProps) => {
-  const {
-    onAllow,
-    onDeny,
-    allowDisabled,
-    disallowDisabled,
-    title,
-    description,
-  } = props;
+  const { onAllow, onDeny, allowDisabled, denyDisabled, title, description } =
+    props;
 
   return (
     <div className="IOSModal-overlay">
@@ -32,7 +26,7 @@ export const IOSModal = (props: IOSModalProps) => {
           <p>{description}</p>
         </div>
         <div className="IOSModal-buttons">
-          <button disabled={disallowDisabled} onClick={onDeny}>
+          <button disabled={denyDisabled} onClick={onDeny}>
             Don’t Allow
           </button>
           <button disabled={allowDisabled} onClick={onAllow}>
