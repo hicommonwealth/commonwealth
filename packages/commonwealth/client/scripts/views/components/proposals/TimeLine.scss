@@ -5,7 +5,6 @@
   min-height: 16.5625rem;
   overflow: hidden;
   flex-direction: column;
-  border: 2px solid $neutral-100;
 
   @include smallInclusive {
     width: 100%;
@@ -14,31 +13,31 @@
 
   .header {
     display: flex;
-    align-items: center;
     height: 40px;
     border: 2px solid #eeedef;
     width: 100%;
-    background-color: #f7f6f7;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    padding-left: 10px;
+    background: #f7f6f7;
+    border-radius: 5px 5px 0px 0px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 10px;
   }
-
-  // Right box container styles
   .rb-container {
     display: flex;
-
-    // Timeline list styles
+    width: 100%;
+    padding: 16px;
+    gap: 8px;
+    border-radius: 0px 0px 5px 5px;
+    border: 2px solid #e6e5e7;
+    flex-direction: column;
     ul.rb {
-      margin-top: 1rem;
       padding: 0;
       display: inline-block;
 
-      // List items
       li {
         list-style: none;
         margin: auto;
-        margin-left: 1rem;
+        margin-left: 0.4rem;
         min-height: 50px;
         padding: 2px 0px 38px 24px;
         position: relative;

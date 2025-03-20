@@ -6,8 +6,8 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
 
+import VotingActionCard from 'client/scripts/views/components/proposals/VotingActionCard';
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
-import VotingUI from 'client/scripts/views/components/proposals/VotingUI';
 import '../../../../components/Polls/PollCard/PollCard.scss';
 
 export type SnapshotPollCardProps = Omit<
@@ -78,7 +78,7 @@ export const SnapshotPollCard = ({
 
   return (
     <div className="poll-voting-section">
-      <VotingUI
+      <VotingActionCard
         options={internalVoteInformation}
         timeRemaining={timeRemaining}
         canVote={!internalHasVoted && !pollEnded}

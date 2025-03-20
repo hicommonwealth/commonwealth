@@ -24,8 +24,6 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
     0,
   );
 
-  console.log({ totalVotes });
-
   const totalPercent = voteOptions?.reduce(
     (sum, option) => sum + parseFloat(option.percentage || '0'),
     0,
@@ -42,49 +40,100 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
     if (negativeLabels.includes(label)) return '#D63200';
     return '#666666';
   };
-
+  function formatVoteCount(number) {
+    if (number >= 1_000_000) {
+      return (number / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    } else if (number >= 1_000) {
+      return (number / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+    } else {
+      return number.toString();
+    }
+  }
   return (
-    <div className="governance-vote" role="region" aria-label="Voting Results">
-      {!showCombineBarOnly && (
-        <div className="header">
-          <CWText type="h5" fontWeight="semiBold">
-            Result
-          </CWText>
-        </div>
-      )}
+    <>
+      {!showCombineBarOnly ? (
+        <div className="governance-vote">
+          <div className="header">
+            <CWText type="h5" fontWeight="semiBold">
+              Result
+            </CWText>
+            <CWText type="h5" fontWeight="semiBold">
+              {formatVoteCount(totalVotes)} Votes
+            </CWText>
+          </div>
 
-      <div className="main-container">
-        {!showCombineBarOnly &&
-          voteOptions?.map((option) => {
-            const percentage = parseFloat(option.percentage || '0');
+          <div className="main-container">
+            {voteOptions?.map((option) => {
+              const percentage = parseFloat(option.percentage || '0');
 
-            return (
-              <div className="vote-option" key={option.label}>
-                <div className="container">
-                  <CWText type="b2" className="option-label">
-                    {option.label}
-                  </CWText>
-                  <CWText className="percentage">{option.percentage}% </CWText>
-                </div>
-                <div
-                  className="progress-bar"
-                  role="progressbar"
-                  aria-valuenow={percentage}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
+              return (
+                <div className="vote-option" key={option.label}>
+                  <div className="container">
+                    <CWText type="b2" className="option-label">
+                      {option.label}
+                    </CWText>
+                    <CWText className="percentage">
+                      {option.percentage}%{' '}
+                    </CWText>
+                  </div>
                   <div
-                    className="progress"
-                    style={{
-                      width: `${option.percentage}%`,
-                      backgroundColor: '#3366cc',
-                    }}
-                  />
+                    className="progress-bar"
+                    role="progressbar"
+                    aria-valuenow={percentage}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <div
+                      className="progress"
+                      style={{
+                        width: `${option.percentage}%`,
+                        backgroundColor: '#3366cc',
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
+            <div className="combined-progress">
+              <div className="progress-bar">
+                {
+                  voteOptions?.reduce(
+                    (acc, option, index) => {
+                      const percentage = parseFloat(option.percentage || '0');
+                      const leftPosition = acc.prevLeft || 0;
+                      const combinedColor = getCombinedBarColor(
+                        option.label,
+                        index,
+                      );
+
+                      acc.elements.push(
+                        <div
+                          key={option.label}
+                          className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
+                          style={{
+                            width: `${percentage}%`,
+                            left: `${leftPosition}%`,
+                            backgroundColor: combinedColor,
+                          }}
+                        />,
+                      );
+                      acc.prevLeft = (acc.prevLeft || 0) + percentage;
+                      return acc;
+                    },
+                    { elements: [] as JSX.Element[], prevLeft: 0 },
+                  ).elements
+                }
+              </div>
+            </div>
+            <div className="vote-footer">
+              <a href={governanceUrl} className="view-link">
+                View on snapshot <span>↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : (
         <div className="combined-progress">
           <div className="progress-bar">
             {
@@ -116,15 +165,8 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
             }
           </div>
         </div>
-        {!showCombineBarOnly && (
-          <div className="vote-footer">
-            <a href={governanceUrl} className="view-link">
-              View on snapshot <span>↗</span>
-            </a>
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CWText } from '../component_kit/cw_text';
+import './VotingActionCard.scss'; // Create this SCSS file for styling
 import VotingResultView, { VoteOption } from './VotingResultView';
-import './VotingUI.scss'; // Create this SCSS file for styling
 
 interface VotingOption {
   label: string;
@@ -9,7 +9,7 @@ interface VotingOption {
   voteCount: number | string;
 }
 
-interface VotingUIProps {
+interface VotingActionCardProps {
   options: VotingOption[];
   proposalTitle?: string;
   timeRemaining?: string;
@@ -22,7 +22,7 @@ interface VotingUIProps {
   governanceUrl?: string;
 }
 
-const VotingUI: React.FC<VotingUIProps> = ({
+const VotingActionCard: React.FC<VotingActionCardProps> = ({
   options,
   timeRemaining,
   canVote,
@@ -33,8 +33,6 @@ const VotingUI: React.FC<VotingUIProps> = ({
   toggleShowVotesDrawer,
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-
-  console.log({ toggleShowVotesDrawer });
   const handleVoteClick = () => {
     if (selectedOption && canVote && !hasVoted) {
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
@@ -94,4 +92,4 @@ const VotingUI: React.FC<VotingUIProps> = ({
   );
 };
 
-export default VotingUI;
+export default VotingActionCard;

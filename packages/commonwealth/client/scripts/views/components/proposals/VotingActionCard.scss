@@ -13,10 +13,10 @@
   .poll-box {
     border: 1px solid #e0dfe1 !important;
     padding: 16px;
-    border-radius: 8px;
-    border-radius: 6px;
     gap: 10px;
     background: #f7f7f7 !important;
+    display: flex;
+    flex-direction: column;
   }
 
   .poll-header {

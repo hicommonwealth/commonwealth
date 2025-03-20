@@ -30,7 +30,7 @@ import { VoteOption } from './VotingResultView';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
-import VotingUI from './VotingUI';
+import VotingActionCard from './VotingActionCard';
 
 type VotingActionsProps = {
   onModalClose: () => void;
@@ -294,7 +294,7 @@ export const VotingActions = ({
         return (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
       };
       const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
-      const voteRestult: VoteOption[] = [
+      const voteResult: VoteOption[] = [
         {
           label: 'Yes',
           percentage: getPct(yes, voteTotal),
@@ -327,14 +327,14 @@ export const VotingActions = ({
 
         votingActionObj = (
           <>
-            <VotingUI
+            <VotingActionCard
               options={voteOptions}
               canVote={canVote && !votingModalOpen}
               hasVoted={false}
               onVote={handleVote}
               type="cosmos"
               timeRemaining={timeRemaining}
-              votingOption={voteRestult}
+              votingOption={voteResult}
               toggleShowVotesDrawer={toggleShowVotesDrawer}
             />
             {/* @ts-expect-error StrictNullChecks*/}
