@@ -41,6 +41,7 @@ async function setReachedGoal(
           payload: {
             community_id: goal.community_id,
             community_goal_meta_id: goal.community_goal_meta_id,
+            goal_type: goal.meta!.type,
           },
         });
       }

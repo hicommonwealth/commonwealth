@@ -3,6 +3,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityGoalTypes,
   DefaultPage,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -91,7 +92,7 @@ export const CommunityGoalMeta = z.object({
   id: PG_INT.optional(), // auto-generated (ง •̀_•́)ง
   name: z.string(),
   description: z.string(),
-  type: z.enum(['members', 'threads']),
+  type: z.enum(CommunityGoalTypes),
   target: z.number(),
   created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
 });

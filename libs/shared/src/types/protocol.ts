@@ -159,3 +159,6 @@ export enum CommunityType {
   Launchpad = 'launchpad',
   Basic = 'basic',
 }
+
+export const CommunityGoalTypes = ['members', 'threads'] as const;
+export type CommunityGoalType = (typeof CommunityGoalTypes)[number];

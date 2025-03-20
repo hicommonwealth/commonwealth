@@ -8,7 +8,7 @@ export function SetReachedGoal(): Command<typeof schemas.SetReachedGoal> {
     ...schemas.SetReachedGoal,
     auth: [],
     body: async ({ payload }) => {
-      const { community_id, community_goal_meta_id } = payload;
+      const { community_id, community_goal_meta_id, goal_type } = payload;
 
       await models.sequelize.transaction(async (transaction) => {
         const now = new Date();
@@ -29,6 +29,7 @@ export function SetReachedGoal(): Command<typeof schemas.SetReachedGoal> {
               event_name: 'CommunityGoalReached',
               event_payload: {
                 community_goal_meta_id,
+                goal_type,
                 community_id,
                 created_at: now,
               },
