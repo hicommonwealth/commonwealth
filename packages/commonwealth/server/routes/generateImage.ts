@@ -7,6 +7,7 @@ import {
 import { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
+import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -33,18 +34,21 @@ if (process.env.OPENAI_API_KEY) {
 
 type generateImageReq = {
   description: string;
+  size?: '1024x1024' | '512x512' | '256x256';
 };
 
 type generateImageResp = {
   imageUrl: string;
 };
 
+const DEFAULT_SIZE = '1024x1024';
+
 const generateImage = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>,
 ) => {
-  const { description } = req.body;
+  const { description, size = DEFAULT_SIZE } = req.body;
 
   if (!openai) {
     throw new ServerError('OpenAI not initialized');
@@ -57,10 +61,10 @@ const generateImage = async (
   let image;
   try {
     const response = await openai.images.generate({
-      model: 'dall-e-2',
+      model: 'dall-e-3',
       n: 1,
       prompt: description,
-      size: '256x256',
+      size: DEFAULT_SIZE,
       response_format: 'url',
     });
 
@@ -71,7 +75,20 @@ const generateImage = async (
 
   try {
     const resp = await fetch(image);
-    const buffer = await resp.buffer();
+    let buffer = await resp.buffer();
+
+    if (size !== DEFAULT_SIZE) {
+      // compress image from buffer to desired size
+      const dimension = parseInt(size.split('x')[0]);
+      buffer = await sharp(buffer)
+        .resize(dimension, dimension, {
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .png({ quality: 100 })
+        .toBuffer();
+    }
+
     const { url } = await blobStorage().upload({
       key: `${uuidv4()}.png`,
       bucket: 'assets',

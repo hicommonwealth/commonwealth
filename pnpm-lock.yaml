@@ -1355,6 +1355,9 @@ importers:
       sequelize-cli:
         specifier: ^6.2.0
         version: 6.6.2
+      sharp:
+        specifier: ^0.33.5
+        version: 0.33.5
       siwe:
         specifier: ^2.1.4
         version: 2.3.2(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
