@@ -28,6 +28,7 @@ type ManageOnchainModalProps = {
   chainRpc: string;
   ethChainId: number;
   chainId: string;
+  communityNamespace: boolean;
 };
 
 export const ManageOnchainModal = ({
@@ -38,6 +39,7 @@ export const ManageOnchainModal = ({
   chainRpc,
   ethChainId,
   chainId,
+  communityNamespace,
 }: ManageOnchainModalProps) => {
   const [userRole, setUserRole] = useState(Addresses);
   const [loading, setLoading] = useState(false);
@@ -132,7 +134,7 @@ export const ManageOnchainModal = ({
 
   const handleUpdate = async () => {
     try {
-      await mintPermission();
+      if (communityNamespace) await mintPermission();
       await updateRolesOnServer();
     } catch (err) {
       console.error(err);
@@ -145,8 +147,8 @@ export const ManageOnchainModal = ({
   return (
     <div className="ManageOnchainModal">
       <CWModalHeader
-        label="Manage onchain privileges"
-        subheader="This action cannot be undone."
+        label={communityNamespace ? 'Manage onchain privileges' : 'Manage Role'}
+        subheader={communityNamespace ? 'This action cannot be undone.' : ''}
         onModalClose={onClose}
       />
       <CWModalBody>
@@ -182,7 +184,7 @@ export const ManageOnchainModal = ({
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          label="Confirm & Mint"
+          label={communityNamespace ? 'Confirm & Mint' : 'Confirm'}
           buttonType="secondary"
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={handleUpdate}

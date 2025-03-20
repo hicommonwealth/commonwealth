@@ -144,7 +144,7 @@ const CommunityMembersPage = () => {
     },
     {
       key: 'actions',
-      header: 'Onchain Permissions',
+      header: 'Permissions',
       numeric: false,
       sortable: false,
     },

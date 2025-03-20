@@ -185,7 +185,11 @@ const MembersSection = ({
                 actions: {
                   customElement: (
                     <CWButton
-                      label="Manage On Chain Role Privileges"
+                      label={
+                        !!community?.namespace
+                          ? 'Manage On Chain Role Privileges'
+                          : 'Manage Role'
+                      }
                       buttonType="secondary"
                       onClick={() =>
                         handleManageOnchainClick(member?.addresses)
@@ -214,6 +218,7 @@ const MembersSection = ({
             chainRpc={chainRpc}
             ethChainId={ethChainId}
             chainId={chainId}
+            communityNamespace={!!community?.namespace}
           />
         }
         onClose={() => {
