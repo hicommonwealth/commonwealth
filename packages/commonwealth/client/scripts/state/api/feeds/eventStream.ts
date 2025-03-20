@@ -1,13 +1,7 @@
-import type { UseTRPCInfiniteQueryOptions } from '@trpc/react-query/shared';
 import { trpc } from '../../../utils/trpcClient';
 
 export const useFetchEventStreamQuery = (
-  options?: UseTRPCInfiniteQueryOptions<
-    'feed.getEventStream',
-    { cursor: string | undefined },
-    { items: { type: string; url: string; data?: any }[] },
-    any
-  >,
+  options?: Parameters<typeof trpc.feed.getEventStream.useInfiniteQuery>[1],
 ) => {
   // Use the built-in trpc hooks which handle proper query initialization
   return trpc.feed.getEventStream.useInfiniteQuery(

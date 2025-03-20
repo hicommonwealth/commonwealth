@@ -1,4 +1,4 @@
-.EventMarquee {
+.event-marquee {
   height: 50px;
   width: 100%;
   background: linear-gradient(90deg, #ff80d7 0%, #0079cc 50%, #ff1f00 100%);
@@ -11,7 +11,13 @@
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  .event-content {
+  &.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .event-marquee-content {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -42,9 +48,16 @@
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);
-      .event-text {
+      .event-content {
         text-decoration: underline;
       }
+    }
+
+    .event-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 12px;
     }
 
     .event-icon {
@@ -59,48 +72,33 @@
         object-fit: cover;
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
-
-      &.author-icon {
-        margin-right: 12px;
-      }
-
-      &.community-icon {
-        margin-left: 12px;
-      }
     }
 
-    .event-author {
-      margin-right: 8px;
+    .event-address {
       opacity: 0.9;
       font-weight: 700;
     }
 
-    .event-text {
+    span,
+    strong {
       font-weight: 400;
-      margin-right: 8px;
 
-      strong {
+      &.event-address {
         font-weight: 700;
       }
     }
 
-    .event-link-indicator {
-      opacity: 0.8;
-      font-weight: 300;
-      margin-left: 4px;
+    strong {
+      font-weight: 700;
     }
-  }
-
-  .event-content {
-    padding-left: 140px;
   }
 }
 
 @keyframes scrollLeft {
   0% {
-    transform: translateX(100%);
+    transform: translateX(0);
   }
   100% {
-    transform: translateX(-200%);
+    transform: translateX(-100%);
   }
 }
