@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityGoalsPolicy,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
@@ -109,6 +110,12 @@ export async function bootstrapBindings(
     TwitterEngagementPolicy,
   );
   checkSubscriptionResponse(twitterEngSubRes, TwitterEngagementPolicy.name);
+  const createCommunityGoalsSubRes =
+    await brokerInstance.subscribe(CommunityGoalsPolicy);
+  checkSubscriptionResponse(
+    createCommunityGoalsSubRes,
+    CommunityGoalsPolicy.name,
+  );
 }
 
 export async function bootstrapRelayer(

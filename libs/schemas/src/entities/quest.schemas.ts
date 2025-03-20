@@ -36,6 +36,7 @@ export const QuestEvents = {
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
   NamespaceLinked: events.NamespaceLinked,
+  CommunityGoalReached: events.CommunityGoalReached,
   ...ChannelQuestEvents,
 } as const;
 
@@ -99,7 +100,7 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
       )
       .optional()
       .nullish(),

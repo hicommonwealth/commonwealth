@@ -487,6 +487,12 @@ export const events = {
     created_at: z.coerce.date(),
   }),
 
+  CommunityGoalReached: z.object({
+    community_goal_meta_id: PG_INT,
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
   TweetEngagementCapReached: z.object({
     quest_id: z.number(),
     quest_ended: z.boolean(),
