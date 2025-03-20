@@ -9,6 +9,12 @@ on:
       - demo
       - production
 
+  workflow_run:
+    workflows:
+      - "Pre-Release Notes & Merge"  # Match the name in `cut_release.yml`
+    types:
+      - completed
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

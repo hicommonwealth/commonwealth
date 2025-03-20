@@ -2,16 +2,27 @@ import { categorizeSocialLinks } from 'client/scripts/helpers/link';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import AuthButton from 'client/scripts/views/components/AuthButton';
-import React from 'react';
+import React, { useState } from 'react';
+import { CWModal } from '../../../../components/component_kit/new_designs/CWModal';
+import { SocialAccountLinkModal } from '../../../../modals/SocialAccountLinkModal/SocialAccountLinkModal';
 import './SocialLinks.scss';
 
 const SocialLinks = () => {
+  const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
   });
 
   if (!app.chain || !community) return;
+
+  const handleModalClose = () => {
+    setSelectedLink(null);
+  };
+
+  const formatLink = (link: string) => {
+    return link.includes('http') ? link : `https://${link}`;
+  };
 
   const {
     discords,
@@ -36,7 +47,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="discord"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {twitters.map((link) => (
@@ -44,7 +55,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="x"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {githubs.map((link) => (
@@ -52,7 +63,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="github"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {telegrams.map((link) => (
@@ -60,7 +71,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="telegram"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {warpcasts.map((link) => (
@@ -68,7 +79,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="warpcast"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {tiktoks.map((link) => (
@@ -76,7 +87,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="tiktok"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {elements.map((link) => (
@@ -84,7 +95,7 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="element"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
       {[...remainingLinks, ...slacks].map((link) => (
@@ -92,9 +103,22 @@ const SocialLinks = () => {
           className="autoWidth"
           key={link}
           type="website"
-          onClick={() => window.open(link)}
+          onClick={() => setSelectedLink(link)}
         />
       ))}
+      {selectedLink && (
+        <CWModal
+          size="small"
+          content={
+            <SocialAccountLinkModal
+              onModalClose={handleModalClose}
+              formattedLink={formatLink(selectedLink)}
+            />
+          }
+          onClose={handleModalClose}
+          open={true}
+        />
+      )}
     </div>
   );
 };

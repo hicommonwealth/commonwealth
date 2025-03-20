@@ -42,6 +42,7 @@ export const UserProfileView = z.object({
   referral_count: PG_INT.default(0),
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0),
+  xp_referrer_points: PG_INT.default(0),
 });
 
 type UserProfileView = z.infer<typeof UserProfileView>;
