@@ -54,20 +54,26 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
+  console.log(1);
   const log = logger(import.meta);
+  console.log(2);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
 
+  console.log(3);
   // @ts-expect-error StrictNullChecks
   sgMail.setApiKey(config.SENDGRID.API_KEY);
 
+  console.log(4);
   const cacheDecorator = new CacheDecorator();
 
+  console.log(5);
   const SequelizeStore = SessionSequelizeStore(session.Store);
 
+  console.log(6);
   const sessionStore = new SequelizeStore({
     db: db.sequelize,
     tableName: 'Sessions',
@@ -75,8 +81,10 @@ export async function main(
     expiration: config.AUTH.SESSION_EXPIRY_MILLIS,
   });
 
+  console.log(7);
   sessionStore.sync();
 
+  console.log(8);
   const sessionParser = session({
     secret: config.AUTH.SESSION_SECRET,
     store: sessionStore,
@@ -88,7 +96,9 @@ export async function main(
     },
   });
 
+  console.log(9);
   const setupMiddleware = () => {
+    console.log(10);
     // redirect from commonwealthapp.herokuapp.com to PRODUCTION_DOMAIN
     app.all(/.*/, (req, res, next) => {
       if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
@@ -111,9 +121,11 @@ export async function main(
       ),
     );
 
+    console.log(11);
     // dynamic compression settings used
     app.use(compression());
 
+    console.log(12);
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
@@ -121,6 +133,7 @@ export async function main(
       next();
     });
 
+    console.log(13);
     // Report stats for all routes
     app.use((req, res, next) => {
       try {
@@ -159,6 +172,7 @@ export async function main(
       next();
     });
 
+    console.log(14);
     withLoggingMiddleware &&
       app.use(
         pinoHttp({
@@ -201,17 +215,20 @@ export async function main(
         }),
       );
 
+    console.log(15);
     app.use((req, res, next) => {
       if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
       else parseJson(req, res, next);
     });
 
+    console.log(16);
     app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
     app.use(passport.session());
 
+    console.log(17);
     if (withPrerender) {
       const rendererInstance = prerenderNode.set(
         'prerenderToken',
@@ -224,20 +241,27 @@ export async function main(
     }
   };
 
+  console.log(18);
   setupMiddleware();
+
+  console.log(19);
   setupPassport(db);
 
+  console.log(20);
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(db);
 
+  console.log(21);
   setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
+  console.log(22);
   app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
   });
 
+  console.log(23);
   app.use(
     '/.well-known/apple-app-site-association',
     (req: Request, res: Response) => {
@@ -246,26 +270,32 @@ export async function main(
     },
   );
 
+  console.log(24);
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
 
+  console.log(25);
   app.use('/blank.html', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/blank.html`);
   });
 
+  console.log(26);
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
   });
 
+  console.log(27);
   app.use('/.well-known/farcaster.json', (req, res) => {
     res.json(buildFarcasterManifest());
   });
 
+  console.log(28);
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
+  console.log(29);
   app.use(
     '/assets',
     express.static(path.join(__dirname, 'assets'), {
@@ -275,6 +305,7 @@ export async function main(
     }),
   );
 
+  console.log(30);
   app.use(
     '/brand_assets',
     express.static(path.join(__dirname, 'brand_assets'), {
@@ -284,6 +315,7 @@ export async function main(
     }),
   );
 
+  console.log(31);
   app.get('*', async (req: Request, res: Response) => {
     try {
       const indexFilePath = path.join(__dirname, 'index.html');
@@ -295,9 +327,12 @@ export async function main(
     }
   });
 
+  console.log(32);
   setupErrorHandlers(app);
 
+  console.log(33);
   const server = setupServer(app, port);
 
+  console.log(34);
   return { server, cacheDecorator };
 }
