@@ -65,7 +65,10 @@ export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
           title="Turn on Push Notifications to use 'Common'"
           description="We deeply respect your privacy and will never spam you."
           denyDisabled={true}
-          onAllow={() => handleActivate()}
+          onAllow={() => {
+            setInitialModalActive(false);
+            handleActivate();
+          }}
           onDeny={() => {}}
         />
       )}
