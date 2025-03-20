@@ -27,7 +27,8 @@ beforeAll(async ({ name }) => {
   if (
     ['@hicommonwealth/model', 'commonwealth'].includes(
       process.env.npm_package_name ?? '',
-    )
+    ) ||
+    process.env.RUN_FROM_GUTTER === 'true'
   )
     await bootstrap_testing();
 }, 20_000);

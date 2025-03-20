@@ -22,6 +22,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           'referral_count',
           'referral_eth_earnings',
           'xp_points',
+          'xp_referrer_points',
         ],
       });
 
@@ -115,6 +116,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         referral_count: user!.referral_count ?? 0,
         referral_eth_earnings: user!.referral_eth_earnings ?? 0,
         xp_points: user!.xp_points ?? 0,
+        xp_referrer_points: user!.xp_referrer_points ?? 0,
       };
     },
   };
