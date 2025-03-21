@@ -1,13 +1,17 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { CommunityGoalsPolicy } from '@hicommonwealth/model';
 import Chance from 'chance';
-import { JoinCommunity } from 'model/src/aggregates/community';
-import { CreateThread } from 'model/src/aggregates/thread';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+  CreateGroup,
+  JoinCommunity,
+  UpdateCommunity,
+} from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { CreateThread } from '../../src/aggregates/thread';
 import { Xp } from '../../src/aggregates/user';
 import { models } from '../../src/database';
+import { CommunityGoalsPolicy } from '../../src/policies';
 import { seed } from '../../src/tester';
 import { drainOutbox, seedCommunity } from '../utils';
 
@@ -236,5 +240,184 @@ describe('community goals lifecycle', () => {
       where: { id: superadmin.user.id! },
     });
     expect(user?.xp_points).toBe(30); // from 10 + 20
+  });
+
+  it('should reach groups goal', async () => {
+    const meta = await models.CommunityGoalMeta.create({
+      name: 'threads goal',
+      description: 'reach 3 groups',
+      type: 'groups',
+      target: 3,
+    });
+
+    // setup community quest with goal
+    const quest = await command(CreateQuest(), {
+      actor: superadmin,
+      payload: {
+        name: 'xp groups goal quest',
+        description: chance.sentence(),
+        image_url: chance.url(),
+        start_date: moment().add(2, 'day').toDate(),
+        end_date: moment().add(3, 'day').toDate(),
+        max_xp_to_end: 100,
+        quest_type: 'common',
+        community_id,
+      },
+    });
+    // setup quest actions
+    await command(UpdateQuest(), {
+      actor: superadmin,
+      payload: {
+        quest_id: quest!.id!,
+        action_metas: [
+          {
+            event_name: 'CommunityGoalReached',
+            reward_amount: 30,
+            creator_reward_weight: 0,
+            content_id: `goal:${meta.id}`,
+          },
+        ],
+      },
+    });
+    // hack start date to make it active
+    await models.Quest.update(
+      { start_date: moment().subtract(3, 'day').toDate() },
+      { where: { id: quest!.id } },
+    );
+
+    // create two threads
+    await command(CreateGroup(), {
+      actor: superadmin,
+      payload: {
+        community_id,
+        topics: [],
+        metadata: {
+          name: chance.name(),
+          description: chance.sentence(),
+        },
+        requirements: [],
+      },
+    });
+    await command(CreateGroup(), {
+      actor: superadmin,
+      payload: {
+        community_id,
+        topics: [],
+        metadata: {
+          name: chance.name(),
+          description: chance.sentence(),
+        },
+        requirements: [],
+      },
+    });
+    await drainOutbox(['GroupCreated'], CommunityGoalsPolicy);
+    // check goals
+    const goal = await models.CommunityGoalReached.findOne({
+      where: { community_id, community_goal_meta_id: meta.id },
+    });
+    expect(goal?.reached_at).toBeNull();
+
+    // create one more group to reach the goal
+    await command(CreateGroup(), {
+      actor: superadmin,
+      payload: {
+        community_id,
+        topics: [],
+        metadata: {
+          name: chance.name(),
+          description: chance.sentence(),
+        },
+        requirements: [],
+      },
+    });
+    await drainOutbox(['GroupCreated'], CommunityGoalsPolicy);
+
+    // check goals
+    const goal2 = await models.CommunityGoalReached.findOne({
+      where: { community_id, community_goal_meta_id: meta.id },
+    });
+    expect(goal2?.reached_at).toBeTruthy();
+
+    const e = await drainOutbox(['CommunityGoalReached'], Xp);
+    expect(e.length).toBe(3); // three goals now
+
+    // check xp awarded
+    const user = await models.User.findOne({
+      where: { id: superadmin.user.id! },
+    });
+    expect(user?.xp_points).toBe(60); // from 10 + 20 + 30
+  });
+
+  it('should reach social links goal', async () => {
+    const meta = await models.CommunityGoalMeta.create({
+      name: 'social links',
+      description: 'reach 3 social links',
+      type: 'social-links',
+      target: 3,
+    });
+
+    // setup community quest with goal
+    const quest = await command(CreateQuest(), {
+      actor: superadmin,
+      payload: {
+        name: 'xp social links goal quest',
+        description: chance.sentence(),
+        image_url: chance.url(),
+        start_date: moment().add(2, 'day').toDate(),
+        end_date: moment().add(3, 'day').toDate(),
+        max_xp_to_end: 100,
+        quest_type: 'common',
+        community_id,
+      },
+    });
+    // setup quest actions
+    await command(UpdateQuest(), {
+      actor: superadmin,
+      payload: {
+        quest_id: quest!.id!,
+        action_metas: [
+          {
+            event_name: 'CommunityGoalReached',
+            reward_amount: 1,
+            creator_reward_weight: 0,
+            content_id: `goal:${meta.id}`,
+          },
+        ],
+      },
+    });
+    // hack start date to make it active
+    await models.Quest.update(
+      { start_date: moment().subtract(3, 'day').toDate() },
+      { where: { id: quest!.id } },
+    );
+
+    // create one more group to reach the goal
+    await command(UpdateCommunity(), {
+      actor: superadmin,
+      payload: {
+        community_id,
+        social_links: [
+          'http://hicommonwealth.io',
+          'http://hicommonwealth.io/discord',
+          'http://hicommonwealth.io/twitter',
+        ],
+      },
+    });
+    await drainOutbox(['CommunityUpdated'], CommunityGoalsPolicy);
+
+    // check goals
+    const goal2 = await models.CommunityGoalReached.findOne({
+      where: { community_id, community_goal_meta_id: meta.id },
+    });
+    expect(goal2?.reached_at).toBeTruthy();
+
+    const e = await drainOutbox(['CommunityGoalReached'], Xp);
+    expect(e.length).toBe(4); // four goals now
+
+    // check xp awarded
+    const user = await models.User.findOne({
+      where: { id: superadmin.user.id! },
+    });
+    expect(user?.xp_points).toBe(61); // from 10 + 20 + 30 + 1
   });
 });

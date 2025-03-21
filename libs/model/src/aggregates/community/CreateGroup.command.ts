@@ -5,6 +5,7 @@ import { models, sequelize } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustNotExist } from '../../middleware/guards';
 import { GroupAttributes } from '../../models';
+import { emitEvent } from '../../utils/utils';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 
@@ -17,7 +18,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
     auth: [authRoles('admin')],
-    body: async ({ payload }) => {
+    body: async ({ actor, payload }) => {
       const { community_id } = payload;
 
       const topics = await models.Topic.findAll({
@@ -87,6 +88,23 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
               });
             }
           }
+
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'GroupCreated',
+                event_payload: {
+                  community_id,
+                  group_id: group.id!,
+                  creator_user_id: actor.user.id!,
+                  created_at: group.created_at!,
+                },
+              },
+            ],
+            transaction,
+          );
+
           return group.toJSON();
         },
       );

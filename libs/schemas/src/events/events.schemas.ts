@@ -104,8 +104,10 @@ export const events = {
   }),
 
   GroupCreated: z.object({
-    groupId: z.string(),
-    userId: z.string(),
+    community_id: z.string(),
+    group_id: z.number(),
+    creator_user_id: z.number(),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({
@@ -122,6 +124,14 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     referrer_address: z.string().optional(),
+    social_links: z.array(z.string()).optional(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityUpdated: z.object({
+    community_id: z.string(),
+    user_id: z.number(),
+    social_links: z.array(z.string().nullish()).optional(),
     created_at: z.coerce.date(),
   }),
 
