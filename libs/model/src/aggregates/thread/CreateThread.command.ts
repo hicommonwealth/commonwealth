@@ -91,7 +91,8 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
     body: async ({ actor, payload, context }) => {
       const { address } = mustBeAuthorized(actor, context);
 
-      const { community_id, topic_id, kind, url, ...rest } = payload;
+      const { community_id, topic_id, kind, url, is_linking_token, ...rest } =
+        payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
@@ -135,6 +136,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               reaction_weights_sum: '0',
               search: getThreadSearchVector(rest.title, body),
               content_url: contentUrl,
+              is_linking_token,
             },
             {
               transaction,
