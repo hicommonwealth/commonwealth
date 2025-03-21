@@ -264,7 +264,7 @@ export const config = configure(
         .optional()
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+          'FARCASTER_MANIFEST_HEADER must be set to a non-default value in production.',
         ),
       FARCASTER_MANIFEST_PAYLOAD: z
         .string()
