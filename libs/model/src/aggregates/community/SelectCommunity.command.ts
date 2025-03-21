@@ -2,6 +2,7 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 
 export const SelectCommunityErrors = {
   CommunityNotFound: 'Community not found',
@@ -10,7 +11,7 @@ export const SelectCommunityErrors = {
 export function SelectCommunity(): Command<typeof schemas.SelectCommunity> {
   return {
     ...schemas.SelectCommunity,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ actor, payload }) => {
       const { community_id } = payload;

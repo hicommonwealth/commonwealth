@@ -1,6 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
-import { Reaction, Thread, models } from '@hicommonwealth/model';
+import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
+import { middleware, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedData } from '../federation';
 
@@ -10,6 +10,9 @@ export const trpcRouter = trpc.router({
   createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
     trpc.fireAndForget(async (input, _, ctx) => {
       await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
@@ -34,6 +37,9 @@ export const trpcRouter = trpc.router({
     [
       trpc.fireAndForget(async (input, _, ctx) => {
         await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      }),
+      trpc.fireAndForget(async (_, __, ctx) => {
+        await middleware.incrementUserCount(ctx.actor.user.id!, 'upvotes');
       }),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,
@@ -66,9 +72,13 @@ export const trpcRouter = trpc.router({
       trpc.fireAndForget(async (input) => {
         log.trace('incrementing thread view count', { ids: input.thread_ids });
         const ids = input.thread_ids.split(',').map((x) => parseInt(x, 10));
-        await models.Thread.increment(
-          { view_count: 1 },
-          { where: { id: ids } },
+        await Promise.all(
+          ids.map((t) =>
+            cache().incrementKey(
+              CacheNamespaces.Thread_View_Count,
+              t.toString(),
+            ),
+          ),
         );
       }),
     ],

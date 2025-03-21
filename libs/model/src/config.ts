@@ -36,7 +36,6 @@ const {
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_CAST_WEBHOOK_ID,
   FARCASTER_ACTION_URL,
-  FLAG_FARCASTER_CONTEST,
   FARCASTER_MANIFEST_HEADER,
   FARCASTER_MANIFEST_PAYLOAD,
   FARCASTER_MANIFEST_SIGNATURE,
@@ -47,6 +46,12 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  TWITTER_APP_BEARER_TOKEN,
+  TWITTER_CONSUMER_KEY,
+  TWITTER_CONSUMER_SECRET,
+  TWITTER_ACCESS_TOKEN,
+  TWITTER_ACCESS_TOKEN_SECRET,
+  SKALE_PRIVATE_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -62,7 +67,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  target,
+  [target],
   {
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
@@ -89,7 +94,6 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
-      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
@@ -160,9 +164,21 @@ export const config = configure(
     OPENAI: {
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+      USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
+    TWITTER: {
+      APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
+      CONSUMER_KEY: TWITTER_CONSUMER_KEY,
+      CONSUMER_SECRET: TWITTER_CONSUMER_SECRET,
+      ACCESS_TOKEN: TWITTER_ACCESS_TOKEN,
+      ACCESS_TOKEN_SECRET: TWITTER_ACCESS_TOKEN_SECRET,
+    },
+    SKALE: {
+      PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
   },
   z.object({
@@ -207,7 +223,6 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
-      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
       FARCASTER_NGROK_DOMAIN: z.string().nullish(),
       NEYNAR_BOT_UUID: z
         .string()
@@ -357,6 +372,8 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+      USE_OPENROUTER: z.string().optional(),
+      OPENROUTER_API_KEY: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z
@@ -365,6 +382,22 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
+    }),
+    TWITTER: z.object({
+      APP_BEARER_TOKEN: z.string().optional(),
+      CONSUMER_KEY: z.string().optional(),
+      CONSUMER_SECRET: z.string().optional(),
+      ACCESS_TOKEN: z.string().optional(),
+      ACCESS_TOKEN_SECRET: z.string().optional(),
+    }),
+    SKALE: z.object({
+      PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
   }),

@@ -71,10 +71,9 @@ from
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
-${payload.community_id || payload.contest_address ? 'where' : ''}
+  where cm.deleted_at is null ${payload.community_id || payload.contest_address ? 'and' : ''}
   ${payload.community_id ? 'cm.community_id = :community_id' : ''}
-  ${payload.community_id && payload.contest_address ? 'and' : ''}
-  ${payload.contest_address ? `cm.contest_address = :contest_address` : ''}
+  ${payload.community_id && payload.contest_address ? 'and cm.contest_address = :contest_address' : ''}
 group by
   cm.community_id,
   cm.contest_address,

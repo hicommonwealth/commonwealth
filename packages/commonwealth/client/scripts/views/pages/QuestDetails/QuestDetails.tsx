@@ -1,38 +1,50 @@
-import {
-  QuestActionMeta,
-  QuestParticipationLimit,
-} from '@hicommonwealth/schemas';
+import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { questParticipationPeriodToCopyMap } from 'helpers/quest';
+import {
+  calculateTotalXPForQuestActions,
+  isQuestActionComplete,
+  QuestAction as QuestActionType,
+  XPLog,
+} from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
+import app from 'state';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
-import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { AuthModalType } from 'views/modals/AuthModal';
+import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
+import { AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import {
+  buildURLFromContentId,
+  ContentIdType,
+} from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -61,7 +73,13 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const { setAuthModalType } = useAuthModalStore();
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    type: AuthModalType | undefined;
+    options: AuthOptionTypes[] | undefined;
+  }>({
+    type: undefined,
+    options: undefined,
+  });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
     useDeleteQuestMutation();
@@ -93,6 +111,8 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const { pendingWeeklyQuests } = useXPProgress();
 
+  const popoverProps = usePopover();
+
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
   }
@@ -112,16 +132,15 @@ const QuestDetails = ({ id }: { id: number }) => {
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
+  const isUserReferred = !!user.referredByAddress;
   // this only includes end user xp gain, creator/referrer xp is not included in this
-  const totalUserXP =
-    (quest.action_metas || [])
-      ?.map(
-        (action) =>
-          action.reward_amount -
-          action.creator_reward_weight * action.reward_amount,
-      )
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
-    0;
+  const totalUserXP = calculateTotalXPForQuestActions({
+    isUserReferred,
+    questStartDate: new Date(quest.start_date),
+    questEndDate: new Date(quest.end_date),
+    questActions:
+      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+  });
 
   const isCompleted = gainedXP === totalUserXP;
 
@@ -131,11 +150,14 @@ const QuestDetails = ({ id }: { id: number }) => {
   ) => {
     switch (actionName) {
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['wallets'],
+        });
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
         break;
       }
       case 'CommunityCreated': {
@@ -143,6 +165,15 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
+        if (actionContentId) {
+          const url = buildURLFromContentId(
+            actionContentId?.split?.(':')?.[1],
+            actionContentId?.split?.(':')?.[0] as ContentIdType,
+            { newThread: true },
+          ).split(window.location.origin)[1];
+          navigate(url, {}, null);
+          return;
+        }
         navigate(`/new/discussion`, {}, quest?.community_id || null);
         break;
       }
@@ -160,7 +191,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           navigate(
             buildURLFromContentId(
               actionContentId.split(':')[1],
-              'thread',
+              actionContentId.split(':')[0] as ContentIdType,
             ).split(window.location.origin)[1],
             {},
             null,
@@ -180,7 +211,7 @@ const QuestDetails = ({ id }: { id: number }) => {
             actionContentId
               ? buildURLFromContentId(
                   actionContentId.split(':')[1],
-                  'comment',
+                  actionContentId.split(':')[0] as ContentIdType,
                 ).split(window.location.origin)[1]
               : `/discussion/${
                   randomResourceId?.thread_id
@@ -270,14 +301,9 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
   const isDeletionAllowed = !isStarted || isEnded;
 
-  const isRepeatableQuest =
-    quest.action_metas?.[0]?.participation_limit ===
-    QuestParticipationLimit.OncePerPeriod;
-  const questRepeatitionCycle = quest.action_metas?.[0]?.participation_period;
-  const questParticipationLimitPerCycle =
-    quest.action_metas?.[0]?.participation_times_per_period || 0;
-
   const isSiteAdmin = Permissions.isSiteAdmin();
+
+  const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
 
   return (
     <CWPageLayout>
@@ -321,25 +347,43 @@ const QuestDetails = ({ id }: { id: number }) => {
                   true,
                 )}
               </CWText>
-              {isRepeatableQuest && (
-                <CWText className="timeline">
-                  Users can participate&ensp;
-                  <CWTag
-                    type="group"
-                    label={`${questParticipationLimitPerCycle}`}
-                  />
-                  &ensp;time{questParticipationLimitPerCycle > 1 ? 's' : ''}{' '}
-                  every&ensp;
-                  <CWTag
-                    type="group"
-                    label={
-                      questParticipationPeriodToCopyMap[
-                        questRepeatitionCycle || ''
-                      ]
+              <div className="progress">
+                <div className="progress-label">
+                  <CWText type="caption">
+                    Rewarded {xpAwarded} / Max {quest.max_xp_to_end}
+                  </CWText>
+                  <CWPopover
+                    body={
+                      <div>
+                        <CWText type="b2">
+                          Indicates the maximum xp allocation before this quest
+                          is considered complete.
+                        </CWText>
+                        <br />
+
+                        <CWText type="b2">
+                          The quest automatically transitions to completed
+                          status, if max XP is alloted before quest end date.
+                        </CWText>
+                      </div>
                     }
+                    placement="top-start"
+                    {...popoverProps}
                   />
-                </CWText>
-              )}
+                  <CWIconButton
+                    iconName="question"
+                    iconSize="small"
+                    onMouseEnter={popoverProps.handleInteraction}
+                    onMouseLeave={popoverProps.handleInteraction}
+                  />
+                </div>
+
+                <progress
+                  className={clsx('progress-bar', { isEnded })}
+                  value={xpAwarded}
+                  max={quest.max_xp_to_end}
+                />
+              </div>
               {isSiteAdmin && (
                 <>
                   <CWDivider />
@@ -395,10 +439,17 @@ const QuestDetails = ({ id }: { id: number }) => {
                   key={action.id}
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
-                  questAction={action as z.infer<typeof QuestActionMeta>}
-                  isActionCompleted={
-                    !!xpProgressions.find((p) => p.action_meta_id === action.id)
-                  }
+                  questAction={action as QuestActionType}
+                  isActionCompleted={isQuestActionComplete(
+                    action as QuestActionType,
+                    xpProgressions as unknown as XPLog[],
+                  )}
+                  xpLogsForActions={xpProgressions
+                    .filter((log) => log.action_meta_id === action.id)
+                    .map((log) => ({
+                      id: log.action_meta_id,
+                      createdAt: new Date(log.event_created_at),
+                    }))}
                   canStartAction={isStarted && !isEnded}
                   {...((!isStarted || isEnded) && {
                     actionStartBlockedReason: !isStarted
@@ -415,8 +466,6 @@ const QuestDetails = ({ id }: { id: number }) => {
             <CWText type="h3">Suggested Quests</CWText>
             <div className="list">
               {pendingWeeklyQuests.activeWeeklyQuests.slice(0, 3).map((q) => {
-                const actionMetaIds = (q.action_metas || []).map((a) => a.id);
-
                 return (
                   <QuestCard
                     key={q.id}
@@ -427,9 +476,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     xpPoints={totalUserXP}
                     tasks={{
                       total: q.action_metas?.length || 0,
-                      completed: xpProgressions.filter((p) =>
-                        actionMetaIds.includes(p.quest_action_meta_id),
-                      ).length,
+                      completed: (quest.action_metas || [])
+                        .map((action) =>
+                          isQuestActionComplete(
+                            action as QuestActionType,
+                            xpProgressions as unknown as XPLog[],
+                          ),
+                        )
+                        .filter(Boolean).length,
                     }}
                     startDate={new Date(q.start_date)}
                     endDate={new Date(q.end_date)}
@@ -444,6 +498,17 @@ const QuestDetails = ({ id }: { id: number }) => {
           </div>
         )}
       </section>
+      <AuthModal
+        type={authModalConfig.type}
+        onClose={() =>
+          setAuthModalConfig({ type: undefined, options: undefined })
+        }
+        showWalletsFor={
+          (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
+        }
+        showAuthOptionTypesFor={authModalConfig.options}
+        isOpen={!!(authModalConfig.type && authModalConfig.options)}
+      />
     </CWPageLayout>
   );
 };

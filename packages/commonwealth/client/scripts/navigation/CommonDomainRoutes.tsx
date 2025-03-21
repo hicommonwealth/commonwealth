@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -57,6 +58,7 @@ const DiscussionsPage = lazy(
 const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
 );
+const TopicRedirectPage = lazy(() => import('views/pages/topic_redirect'));
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
 const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
@@ -129,6 +131,7 @@ const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
+const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
@@ -177,6 +180,13 @@ const CommonDomainRoutes = () => [
     path="/home"
     element={withLayout(HomePage, { type: 'common' })}
   />,
+
+  <Route
+    key="/mobile-signin"
+    path="/mobile-signin"
+    element={withLayout(MobileSignIn, { type: 'common' })}
+  />,
+
   <Route
     key="/createCommunity"
     path="/createCommunity"
@@ -383,6 +393,13 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
+  <Route
+    key="/:scope/governance"
+    path="/:scope/governance"
+    element={withLayout(GovernancePage, {
+      scoped: true,
+    })}
+  />,
   // GOVERNANCE END
 
   // DISCUSSIONS
@@ -413,6 +430,13 @@ const CommonDomainRoutes = () => [
     element={withLayout(ViewThreadPage, {
       scoped: true,
       renderDefaultMetatags: false,
+    })}
+  />,
+  <Route
+    key="/discussion/topic/:id"
+    path="/discussion/topic/:id"
+    element={withLayout(TopicRedirectPage, {
+      scoped: false,
     })}
   />,
   <Route

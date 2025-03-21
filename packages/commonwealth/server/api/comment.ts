@@ -1,5 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { Comment } from '@hicommonwealth/model';
+import { Comment, middleware } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedData } from '../federation';
 
@@ -7,6 +7,9 @@ export const trpcRouter = trpc.router({
   createComment: trpc.command(Comment.CreateComment, trpc.Tag.Comment, [
     trpc.fireAndForget(async (input, _, ctx) => {
       await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_COMMENT,
@@ -24,6 +27,9 @@ export const trpcRouter = trpc.router({
     [
       trpc.fireAndForget(async (input, _, ctx) => {
         await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      }),
+      trpc.fireAndForget(async (_, __, ctx) => {
+        await middleware.incrementUserCount(ctx.actor.user.id!, 'upvotes');
       }),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,

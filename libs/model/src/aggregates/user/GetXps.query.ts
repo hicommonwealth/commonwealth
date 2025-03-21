@@ -10,20 +10,28 @@ export function GetXps(): Query<typeof schemas.GetXps> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { user_id, community_id, quest_id, from, to, event_name } = payload;
+      const {
+        user_id,
+        user_or_creator_id,
+        community_id,
+        quest_id,
+        from,
+        to,
+        event_name,
+      } = payload;
 
       const include: FindOptions['include'] = [
         {
           model: models.User,
           required: true,
           as: 'user',
-          attributes: ['profile'],
+          attributes: ['profile', 'tier'],
         },
         {
           model: models.User,
           as: 'creator',
           required: false,
-          attributes: ['profile'],
+          attributes: ['profile', 'tier'],
         },
         {
           model: models.QuestActionMeta,
@@ -50,7 +58,15 @@ export function GetXps(): Query<typeof schemas.GetXps> {
       to && (where.created_at = { [Op.lte]: to });
 
       const xps = await models.XpLog.findAll({
-        where,
+        where: {
+          ...where,
+          ...(user_or_creator_id && {
+            [Op.or]: [
+              { user_id: user_or_creator_id },
+              { creator_user_id: user_or_creator_id },
+            ],
+          }),
+        },
         include,
         order: [['created_at', 'DESC']],
       });

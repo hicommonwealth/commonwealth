@@ -32,6 +32,7 @@ describe('API KeyAuthentication', () => {
       emailVerified: true,
       promotional_emails_enabled: false,
       profile: {},
+      tier: 4,
     });
     admin = await models.User.create({
       email: 'admin@gmail.com',
@@ -39,6 +40,7 @@ describe('API KeyAuthentication', () => {
       emailVerified: true,
       promotional_emails_enabled: false,
       profile: {},
+      tier: 4,
     });
     await tester.seed('Community', {
       chain_node_id: node!.id!,

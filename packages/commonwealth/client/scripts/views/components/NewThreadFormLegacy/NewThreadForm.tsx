@@ -6,21 +6,26 @@ import {
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { useCreateThreadMutation } from 'state/api/threads';
+import {
+  useCreateThreadMutation,
+  useGenerateThreadText,
+} from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore from 'state/ui/user';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -33,16 +38,18 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
+import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
+import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -53,14 +60,20 @@ import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
-export const NewThreadForm = () => {
+interface NewThreadFormProps {
+  onCancel?: (e: React.MouseEvent | undefined) => void;
+}
+
+export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
   const user = useUserStore();
+
+  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   useAppStatus();
 
@@ -114,6 +127,18 @@ export const NewThreadForm = () => {
     setCanShowTopicPermissionBanner,
   } = useNewThreadForm(selectedCommunityId, topicsForSelector);
 
+  const { data: recentThreads } = useFetchThreadsQuery({
+    queryType: 'bulk',
+    limit: 3,
+    communityId: selectedCommunityId,
+    apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
+    topicId: threadTopic?.id,
+  });
+
+  const { generateComment } = useGenerateCommentText();
+  const { generateThread } = useGenerateThreadText();
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const hasTopicOngoingContest =
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
@@ -163,18 +188,49 @@ export const NewThreadForm = () => {
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const isPopulated = useMemo(() => {
-    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
-  }, [threadContentDelta, threadTitle]);
-
   const gatedGroupNames = groups
     .filter((group) =>
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
 
-  const handleNewThreadCreation = async () => {
-    // adding to avoid ts issues, submit button is disabled in this case
+  const bodyAccumulatedRef = useRef('');
+
+  const isWalletBalanceErrorEnabled = false;
+  const walletBalanceError =
+    isContestAvailable &&
+    hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
+    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!userSelectedAddress,
+    isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_THREAD,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
+  });
+
+  const buttonDisabled =
+    !user.activeAccount ||
+    !userSelectedAddress ||
+    walletBalanceError ||
+    contestTopicError ||
+    (selectedCommunityId && !!disabledActionsTooltipText) ||
+    isLoadingCommunity ||
+    (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
+    isDisabled ||
+    isGenerating;
+
+  // Define default values for title and body
+  const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
+  const DEFAULT_THREAD_BODY = 'No content provided.';
+
+  const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
       return;
@@ -190,26 +246,44 @@ export const NewThreadForm = () => {
       return;
     }
 
-    const deltaString = JSON.stringify(threadContentDelta);
+    // In AI mode, provide default values so the backend validation is not broken.
+    const effectiveTitle = aiInteractionsToggleEnabled
+      ? threadTitle.trim() || DEFAULT_THREAD_TITLE
+      : threadTitle;
 
-    checkNewThreadErrors(
-      { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString,
-      !!hasTopics,
-    );
+    const effectiveBody = aiInteractionsToggleEnabled
+      ? getTextFromDelta(threadContentDelta).trim()
+        ? serializeDelta(threadContentDelta)
+        : DEFAULT_THREAD_BODY
+      : serializeDelta(threadContentDelta);
+
+    if (!aiInteractionsToggleEnabled) {
+      const deltaString = JSON.stringify(threadContentDelta);
+      checkNewThreadErrors(
+        { threadKind, threadUrl, threadTitle, threadTopic },
+        deltaString,
+        !!hasTopics,
+      );
+    }
 
     setIsSaving(true);
 
     try {
+      if (!threadTopic) {
+        console.error('NewThreadForm: No topic selected');
+        notifyError('Please select a topic');
+        return;
+      }
+
       const input = await buildCreateThreadInput({
         address: userSelectedAddress || '',
         kind: threadKind,
         stage: ThreadStage.Discussion,
         communityId: selectedCommunityId,
         communityBase: community.base,
-        title: threadTitle,
+        title: effectiveTitle,
         topic: threadTopic,
-        body: serializeDelta(threadContentDelta),
+        body: effectiveBody,
         url: threadUrl,
         ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
           base: community.base,
@@ -217,33 +291,35 @@ export const NewThreadForm = () => {
           eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
         }),
       });
-      if (!isInsideCommunity) {
-        user.setData({
-          addressSelectorSelectedAddress: userSelectedAddress,
-        });
-      }
+
       const thread = await createThread(input);
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(
-        `${isInsideCommunity ? '' : `/${selectedCommunityId}`}/discussion/${thread.id}-${thread.title}`,
-      );
+      // Construct the correct navigation path
+      const communityPrefix = isInsideCommunity
+        ? ''
+        : `/${selectedCommunityId}`;
+      const navigationUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+
+      navigate(navigationUrl);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
         return;
       }
 
       if (err?.message?.includes('limit')) {
+        console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
           'Limit of submitted threads in selected contest has been exceeded.',
         );
         return;
       }
 
-      console.error(err?.message);
+      console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
@@ -253,27 +329,43 @@ export const NewThreadForm = () => {
         });
       }
     }
-  };
+  }, [
+    community,
+    createThread,
+    isInsideCommunity,
+    isRestrictedMembership,
+    isDiscussion,
+    threadUrl,
+    threadTopic,
+    threadKind,
+    threadContentDelta,
+    threadTitle,
+    setIsSaving,
+    setThreadContentDelta,
+    clearDraft,
+    navigate,
+    selectedCommunityId,
+    userSelectedAddress,
+    hasTopics,
+    checkForSessionKeyRevalidationErrors,
+    user,
+    aiInteractionsToggleEnabled,
+  ]);
 
-  const handleCancel = () => {
+  const handleCancel = (e: React.MouseEvent | undefined) => {
     setThreadTitle('');
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
+
+    if (location.search.includes('cancel')) {
+      navigate(`/contests/${location.search.split('cancel=')[1]}`);
+    } else {
+      onCancel?.(e) || navigate('/discussions');
+    }
   };
 
   const showBanner =
     selectedCommunityId && !userSelectedAddress && isBannerVisible;
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!userSelectedAddress,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
 
   const contestThreadBannerVisible =
     isContestAvailable && hasTopicOngoingContest;
@@ -281,24 +373,62 @@ export const NewThreadForm = () => {
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
-  const isWalletBalanceErrorEnabled = false;
-  const walletBalanceError =
-    isContestAvailable &&
-    hasTopicOngoingContest &&
-    isWalletBalanceErrorEnabled &&
-    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+  const handleGenerateAIThread = async () => {
+    setIsGenerating(true);
+    setThreadTitle('');
+    setThreadContentDelta(createDeltaFromText(''));
+    bodyAccumulatedRef.current = '';
+
+    const context = recentThreads?.map((thread) => {
+      return `Title: ${thread.title}\nBody: ${thread.body}`;
+    });
+
+    try {
+      const body = await generateThread(
+        `Context: ${context.join('\n')}`,
+        (chunk: string) => {
+          bodyAccumulatedRef.current += chunk;
+          setThreadContentDelta(
+            createDeltaFromText(bodyAccumulatedRef.current),
+          );
+        },
+      );
+
+      await generateComment(
+        `Generate a single-line, concise title (max 100 characters) 
+        without quotes or punctuation at the end based on the body: ${body}`,
+        (chunk: string) => {
+          const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
+          setThreadTitle((prev) =>
+            prev === '' ? cleanChunk : prev + cleanChunk,
+          );
+        },
+      );
+    } catch (error) {
+      console.error('Error generating AI thread:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     refreshTopics().catch(console.error);
   }, [refreshTopics]);
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        void handleNewThreadCreation();
+      }
+    },
+    [handleNewThreadCreation],
+  );
+
   return (
     <>
       <CWPageLayout>
-        <div className="NewThreadForm">
-          <CWText type="h2" fontWeight="medium" className="header">
-            Create thread
-          </CWText>
+        <div className="NewThreadForm" onKeyDown={handleKeyDown}>
           <div className="new-thread-body">
             <div className="new-thread-form-inputs">
               {!isInsideCommunity && (
@@ -360,20 +490,23 @@ export const NewThreadForm = () => {
                 </>
               )}
 
-              <CWTextInput
-                fullWidth
-                autoFocus
-                placeholder="Title"
-                value={threadTitle}
-                tabIndex={1}
-                onInput={(e) => setThreadTitle(e.target.value)}
-              />
+              <div className="thread-title-row">
+                <div className="thread-title-row-left">
+                  <CWTextInput
+                    fullWidth
+                    autoFocus
+                    placeholder="Title"
+                    value={threadTitle}
+                    tabIndex={1}
+                    onInput={(e) => setThreadTitle(e.target.value)}
+                  />
+                </div>
+              </div>
 
-              {!!hasTopics && (
+              {!!hasTopics && !!threadTopic && (
                 <CWSelectList
                   className="topic-select"
                   components={{
-                    // eslint-disable-next-line react/no-multi-comp
                     Option: (originalProps) =>
                       CustomTopicOption({
                         originalProps,
@@ -403,6 +536,10 @@ export const NewThreadForm = () => {
                     label: topic?.name,
                     value: `${topic?.id}`,
                   }))}
+                  defaultValue={{
+                    label: threadTopic?.name,
+                    value: `${threadTopic?.id}`,
+                  }}
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
@@ -418,12 +555,15 @@ export const NewThreadForm = () => {
                       : ''
                   }
                   onChange={(topic) => {
+                    if (!topic) return;
                     setCanShowGatingBanner(true);
                     setCanShowTopicPermissionBanner(true);
-                    setThreadTopic(
-                      // @ts-expect-error <StrictNullChecks/>
-                      topicsForSelector.find((t) => `${t.id}` === topic.value),
+                    const foundTopic = topicsForSelector.find(
+                      (t) => `${t.id}` === topic.value,
                     );
+                    if (foundTopic) {
+                      setThreadTopic(foundTopic);
+                    }
                   }}
                 />
               )}
@@ -478,30 +618,31 @@ export const NewThreadForm = () => {
               />
 
               <div className="buttons-row">
-                {isPopulated && userSelectedAddress && (
-                  <CWButton
-                    buttonType="tertiary"
-                    onClick={handleCancel}
-                    tabIndex={3}
-                    label="Cancel"
-                    containerClassName="no-pad"
+                <CWButton
+                  buttonType="tertiary"
+                  onClick={handleCancel}
+                  tabIndex={3}
+                  label="Cancel"
+                  containerClassName="no-pad"
+                />
+
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <CWThreadAction
+                    action="ai-reply"
+                    label="Draft with AI"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleGenerateAIThread().catch(console.error);
+                    }}
                   />
                 )}
+
                 <CWButton
-                  label="Create thread"
-                  disabled={
-                    isDisabled ||
-                    !user.activeAccount ||
-                    !userSelectedAddress ||
-                    walletBalanceError ||
-                    contestTopicError ||
-                    (selectedCommunityId && !!disabledActionsTooltipText) ||
-                    isLoadingCommunity ||
-                    (isInsideCommunity &&
-                      (!userSelectedAddress || !selectedCommunityId))
-                  }
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onClick={handleNewThreadCreation}
+                  label="Create"
+                  disabled={buttonDisabled}
+                  onClick={() => {
+                    handleNewThreadCreation().catch(console.error);
+                  }}
                   tabIndex={4}
                   containerClassName="no-pad"
                 />
@@ -510,8 +651,9 @@ export const NewThreadForm = () => {
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onJoin={handleJoinCommunity}
+                  onJoin={() => {
+                    handleJoinCommunity().catch(console.error);
+                  }}
                 />
               )}
 
@@ -545,3 +687,5 @@ export const NewThreadForm = () => {
     </>
   );
 };
+
+export default NewThreadForm;

@@ -1,13 +1,36 @@
+import {
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
+import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
-import React from 'react';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import React, { useEffect } from 'react';
+import CWRepetitionCycleRadioButton, {
+  useCWRepetitionCycleRadioButton,
+} from 'views/components/component_kit/CWRepetitionCycleRadioButton';
+import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './QuestActionSubForm.scss';
-import { doesActionRewardShareForReferrer } from './helpers';
-import { QuestAction, QuestActionSubFormProps } from './types';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+  QuestActionSubFormProps,
+} from './types';
+
+// these restrictions are only on client side, update per future requirements
+const MAX_REPETITION_COUNTS = {
+  PER_DAY: 4,
+  PER_WEEK: 28,
+  PER_MONTH: 120,
+};
 
 const QuestActionSubForm = ({
   isRemoveable = true,
@@ -17,6 +40,7 @@ const QuestActionSubForm = ({
   config,
   onChange,
   hiddenActions,
+  internalRefs,
 }: QuestActionSubFormProps) => {
   const actionOptions = [
     'CommunityCreated',
@@ -38,10 +62,193 @@ const QuestActionSubForm = ({
         action.value !== 'UserMentioned',
     );
 
-  const placeholders = {
-    sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
-    sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
+  const contentIdInputConfig = {
+    placeholders: {
+      sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
+      sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
+      sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
+    },
+    labels: {
+      threadId: 'Thread Link (optional)',
+      commentId: 'Comment Link (optional)',
+      topicId: 'Topic Link (optional)',
+    },
   };
+
+  const getContentIdInputLabel = () => {
+    if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
+      if (config?.with_optional_thread_id)
+        return contentIdInputConfig.labels.threadId;
+      if (config?.with_optional_comment_id)
+        return contentIdInputConfig.labels.commentId;
+    }
+    if (
+      config?.with_optional_topic_id ||
+      defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
+    )
+      return contentIdInputConfig.labels.topicId;
+
+    return 'Content Id';
+  };
+
+  const getContentIdInputPlaceholder = () => {
+    if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
+      if (config?.with_optional_thread_id)
+        return contentIdInputConfig.placeholders.sampleThreadLink;
+      if (config?.with_optional_comment_id)
+        return contentIdInputConfig.placeholders.sampleCommentLink;
+    }
+    if (
+      config?.with_optional_topic_id ||
+      defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
+    )
+      return contentIdInputConfig.placeholders.sampleTopicLink;
+
+    return 'Content Id';
+  };
+
+  const withOptionalContentId =
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id;
+
+  const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
+    (k) => ({
+      label: k,
+      value: QuestParticipationPeriod[k],
+    }),
+  );
+
+  const repetitionCycleValidatorFn = (props: ValidationFnProps) => {
+    const participation_limit = defaultValues?.participationLimit;
+    const { input, selectList } = props.values;
+
+    // clear errors if participation timeline is not a repeatable
+    if (participation_limit !== QuestParticipationLimit.OncePerPeriod) {
+      return { error: undefined };
+    }
+
+    // validate repetition cycle value
+    if (
+      !Object.values(QuestParticipationPeriod).includes(
+        selectList?.value as QuestParticipationPeriod,
+      )
+    ) {
+      return { error: 'Invalid value for reptition cycle' };
+    }
+
+    // validate repetition count value
+    try {
+      numberNonDecimalGTZeroValidationSchema.parse(`${input}`);
+
+      const count = parseInt(`${input}`);
+
+      // verify repetition counts fall within a certain range
+      if (
+        (selectList?.value === QuestParticipationPeriod.Daily &&
+          count > MAX_REPETITION_COUNTS.PER_DAY) ||
+        (selectList?.value === QuestParticipationPeriod.Weekly &&
+          count > MAX_REPETITION_COUNTS.PER_WEEK) ||
+        (selectList?.value === QuestParticipationPeriod.Monthly &&
+          count > MAX_REPETITION_COUNTS.PER_MONTH)
+      ) {
+        const allowedCount =
+          selectList?.value === QuestParticipationPeriod.Daily
+            ? MAX_REPETITION_COUNTS.PER_DAY
+            : selectList?.value === QuestParticipationPeriod.Weekly
+              ? MAX_REPETITION_COUNTS.PER_WEEK
+              : MAX_REPETITION_COUNTS.PER_MONTH;
+        return {
+          error: `Cannot repeat more than ${allowedCount} times ${selectList?.value}`,
+        };
+      }
+    } catch {
+      return { error: 'Invalid value for repetition count' };
+    }
+
+    return { error: undefined };
+  };
+
+  const {
+    error: repetitionCycleRadioError,
+    triggerValidation: triggerRepetitionCycleRadioValidation,
+    ...repetitionCycleRadioProps
+  } = useCWRepetitionCycleRadioButton({
+    validatorFn: repetitionCycleValidatorFn,
+    repetitionCycleInputProps: {
+      value: 1,
+    },
+    repetitionCycleSelectListProps: {
+      options: repetitionCycleOptions,
+      selected: repetitionCycleOptions[0],
+    },
+  });
+
+  const repetitionCycleRadio = {
+    error: repetitionCycleRadioError,
+    triggerValidation: triggerRepetitionCycleRadioValidation,
+    props: {
+      repetitionCycleInputProps: {
+        ...repetitionCycleRadioProps.repetitionCycleInputProps,
+      },
+      repetitionCycleSelectListProps: {
+        ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
+      },
+    },
+  };
+
+  if (internalRefs) {
+    internalRefs.runParticipationLimitValidator =
+      triggerRepetitionCycleRadioValidation;
+  }
+
+  useRunOnceOnCondition({
+    callback: () => {
+      if (
+        defaultValues?.participationTimesPerPeriod ||
+        defaultValues?.participationPeriod
+      ) {
+        defaultValues?.participationTimesPerPeriod &&
+          repetitionCycleRadioProps.repetitionCycleInputProps.onChange(
+            defaultValues?.participationTimesPerPeriod,
+          );
+        defaultValues?.participationPeriod &&
+          repetitionCycleRadioProps.repetitionCycleSelectListProps.onChange({
+            value: defaultValues?.participationPeriod,
+            label:
+              Object.entries(QuestParticipationPeriod).find(
+                ([_, v]) => v === defaultValues?.participationPeriod,
+              )?.[0] || '',
+          });
+      }
+    },
+    shouldRun: true,
+  });
+
+  const participationTimesPerPeriod =
+    repetitionCycleRadioProps.repetitionCycleInputProps.value;
+  useEffect(() => {
+    if (
+      participationTimesPerPeriod === defaultValues?.participationTimesPerPeriod
+    )
+      return;
+    onChange?.({
+      participationTimesPerPeriod: participationTimesPerPeriod,
+    });
+  }, [
+    participationTimesPerPeriod,
+    defaultValues?.participationTimesPerPeriod,
+    onChange,
+  ]);
+
+  const participationPeriod = repetitionCycleRadioProps
+    .repetitionCycleSelectListProps.selected?.value as QuestParticipationPeriod;
+  useEffect(() => {
+    if (participationPeriod === defaultValues?.participationPeriod) return;
+    onChange?.({
+      participationPeriod: participationPeriod,
+    });
+  }, [participationPeriod, defaultValues?.participationPeriod, onChange]);
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
@@ -53,6 +260,45 @@ const QuestActionSubForm = ({
         />
       )}
 
+      <div className="repeatition-selector">
+        <CWText type="caption" fontWeight="semiBold">
+          Action Schedule
+        </CWText>
+        <CWRepetitionCycleRadioButton
+          customError={repetitionCycleRadio.error}
+          {...repetitionCycleRadio.props}
+          className="radio-btn mt-8"
+          value={QuestParticipationLimit.OncePerPeriod}
+          groupName={`participationLimit-${defaultValues?.action}`}
+          {...(defaultValues?.participationLimit ===
+            QuestParticipationLimit.OncePerPeriod && {
+            checked: true,
+          })}
+          onChange={(e) =>
+            e.target.checked &&
+            onChange?.({
+              participationLimit: QuestParticipationLimit.OncePerPeriod,
+            })
+          }
+        />
+        <CWRadioButton
+          className="radio-btn"
+          value={QuestParticipationLimit.OncePerQuest}
+          label="One time only"
+          groupName={`participationLimit-${defaultValues?.action}`}
+          {...(defaultValues?.participationLimit ===
+            QuestParticipationLimit.OncePerQuest && {
+            checked: true,
+          })}
+          onChange={(e) =>
+            e.target.checked &&
+            onChange?.({
+              participationLimit: QuestParticipationLimit.OncePerQuest,
+            })
+          }
+        />
+      </div>
+
       <CWSelectList
         isClearable={false}
         label="Action"
@@ -60,7 +306,7 @@ const QuestActionSubForm = ({
         name="action"
         options={actionOptions}
         onChange={(newValue) =>
-          newValue && onChange?.({ action: newValue.value })
+          newValue && onChange?.({ action: newValue.value, contentLink: '' })
         }
         {...(defaultValues?.action && {
           value: {
@@ -122,24 +368,58 @@ const QuestActionSubForm = ({
         )}
       </div>
 
+      {config?.with_optional_thread_id && (
+        <div className="content-id-type-selector">
+          <CWText type="caption">Action Scope</CWText>
+          <CWRadioButton
+            className="radio-btn mt-8"
+            value={QuestActionContentIdScope.Topic}
+            label="Linked Topic"
+            groupName={`contentIdScope-${defaultValues?.action}`}
+            {...(defaultValues?.contentIdScope ===
+              QuestActionContentIdScope.Topic && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                contentLink: '',
+                contentIdScope: QuestActionContentIdScope.Topic,
+              })
+            }
+          />
+          <CWRadioButton
+            className="radio-btn"
+            value={QuestActionContentIdScope.Thread}
+            label="Linked Thread"
+            groupName={`contentIdScope-${defaultValues?.action}`}
+            {...(defaultValues?.contentIdScope ===
+              QuestActionContentIdScope.Thread && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                contentLink: '',
+                contentIdScope: QuestActionContentIdScope.Thread,
+              })
+            }
+          />
+        </div>
+      )}
+
       <div
         className={clsx(
           'grid-row',
-          config?.with_optional_comment_id || config?.with_optional_thread_id
-            ? 'cols-2'
-            : 'cols-1',
+          withOptionalContentId ? 'cols-2' : 'cols-1',
         )}
       >
-        {(config?.with_optional_comment_id ||
-          config?.with_optional_thread_id) && (
+        {withOptionalContentId && (
           <CWTextInput
-            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
+            key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
             name="contentLink"
-            placeholder={
-              config?.with_optional_thread_id
-                ? placeholders.sampleThreadLink
-                : placeholders.sampleCommentLink
-            }
+            label={getContentIdInputLabel()}
+            placeholder={getContentIdInputPlaceholder()}
             fullWidth
             {...(defaultValues?.contentLink && {
               defaultValue: defaultValues?.contentLink,

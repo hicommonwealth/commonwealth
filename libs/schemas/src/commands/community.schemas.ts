@@ -4,21 +4,19 @@ import {
   COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
+  CommunityGoalTypes,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContext, TopicContext } from '../context';
-import {
-  Community,
-  Group,
-  PermissionEnum,
-  PinnedToken,
-  Requirement,
-  StakeTransaction,
-  Topic,
-} from '../entities';
+import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { Community } from '../entities/community.schemas';
+import { PermissionEnum } from '../entities/group-permission.schemas';
+import { Group, Requirement } from '../entities/group.schemas';
+import { PinnedToken } from '../entities/pinned-token.schemas';
+import { StakeTransaction } from '../entities/stake.schemas';
+import { Topic } from '../entities/topic.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -45,6 +43,7 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
+    allow_tokenized_threads: z.boolean().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
@@ -61,6 +60,7 @@ export const CreateCommunity = {
     community: Community,
     admin_address: z.string().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const SetCommunityStake = {
@@ -181,6 +181,7 @@ export const CreateTopic = {
         token_decimals: true,
         vote_weight_multiplier: true,
         chain_node_id: true,
+        allow_tokenized_threads: true,
       }),
     ),
   output: z.object({
@@ -205,6 +206,7 @@ export const UpdateTopic = {
         featured_in_sidebar: true,
         featured_in_new_post: true,
         default_offchain_template: true,
+        allow_tokenized_threads: true,
       }).partial(),
     ),
   output: z.object({
@@ -253,11 +255,22 @@ export const CreateGroup = {
   context: AuthContext,
 };
 
-export const CreateNamespaceAdminGroup = {
+export const NamespaceReferral = z.object({
+  referrer_address: z.string(),
+  referee_address: z.string(),
+  timestamp: z.bigint(),
+  eth_chain_id: z.number(),
+  transaction_hash: z.string(),
+});
+
+export const LinkNamespace = {
   input: z.object({
     namespace_address: z.string(),
+    deployer_address: z.string(),
+    log_removed: z.boolean(),
+    referral: NamespaceReferral.optional(),
   }),
-  output: Group,
+  output: z.boolean(),
 };
 
 export const UpdateGroup = {
@@ -300,7 +313,7 @@ export const DeleteAddress = {
     community_id: z.string(),
     address: z.string(),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const DeleteAllAddresses = {
@@ -344,6 +357,7 @@ export const SelectCommunity = {
     community_id: z.string(),
   }),
   output: z.object({}),
+  context: VerifiedContext,
 };
 
 export const JoinCommunity = {
@@ -358,6 +372,7 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+  context: VerifiedContext,
 };
 
 export const BanAddress = {
@@ -385,4 +400,13 @@ export const UnpinToken = {
   }),
   output: z.object({}),
   context: AuthContext,
+};
+
+export const SetReachedGoal = {
+  input: z.object({
+    community_id: z.string(),
+    community_goal_meta_id: z.number(),
+    goal_type: z.enum(CommunityGoalTypes),
+  }),
+  output: z.object({}),
 };

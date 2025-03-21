@@ -123,6 +123,24 @@ export enum ChainNetwork {
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
+  ArbitrumMainnet = 'arbitrum_mainnet',
+  Base = 'base',
+  Blast = 'blast',
+  EthereumMainnet = 'ethereum_mainnet',
+  Linea = 'linea',
+  Optimism = 'optimism',
+  Polygon = 'polygon',
+  HorizenEON = 'horizen_eon',
+  Harmony = 'harmony',
+  Gnosis = 'gnosis',
+  FuseMainnet = 'fuse_mainnet',
+  Fantom = 'fantom',
+  Soneium = 'soneium',
+  Core = 'core',
+  Celo = 'celo',
+  BSC = 'bsc',
+  Avalanche = 'avalanche',
+  Arthera = 'arthera',
 }
 
 /**
@@ -141,3 +159,6 @@ export enum CommunityType {
   Launchpad = 'launchpad',
   Basic = 'basic',
 }
+
+export const CommunityGoalTypes = ['members', 'threads'] as const;
+export type CommunityGoalType = (typeof CommunityGoalTypes)[number];

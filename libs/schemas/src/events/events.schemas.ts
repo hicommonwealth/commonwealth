@@ -1,5 +1,10 @@
-import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  CommunityGoalTypes,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
@@ -476,5 +481,28 @@ export const events = {
       newAmount: z.coerce.bigint().describe('New amount'),
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
+  }),
+
+  NamespaceLinked: z.object({
+    namespace_address: z.string(),
+    deployer_address: z.string(),
+    community_id: z.string(),
+    referral: NamespaceReferral.optional(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityGoalReached: z.object({
+    community_goal_meta_id: PG_INT,
+    goal_type: z.enum(CommunityGoalTypes),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  TweetEngagementCapReached: z.object({
+    quest_id: z.number(),
+    quest_ended: z.boolean(),
+    like_cap_reached: z.boolean().optional(),
+    retweet_cap_reached: z.boolean().optional(),
+    reply_cap_reached: z.boolean().optional(),
   }),
 } as const;

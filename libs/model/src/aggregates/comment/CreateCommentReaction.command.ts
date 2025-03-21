@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { authComment } from '../../middleware';
+import { authComment, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
@@ -16,6 +16,7 @@ export function CreateCommentReaction(): Command<
         action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
       }),
       verifyReactionSignature,
+      tiered({ upvotes: true }),
     ],
     body: async ({ payload, actor, context }) => {
       const { address, comment } = mustBeAuthorizedComment(actor, context);

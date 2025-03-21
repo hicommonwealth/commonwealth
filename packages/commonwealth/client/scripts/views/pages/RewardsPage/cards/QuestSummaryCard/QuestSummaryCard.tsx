@@ -1,8 +1,10 @@
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import useUserStore from 'state/ui/user';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWTab,
@@ -23,6 +25,7 @@ const QuestSummaryCard = () => {
     QuestTimeline.Active,
   );
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   const {
     data: onGoingQuestsList,
@@ -31,6 +34,8 @@ const QuestSummaryCard = () => {
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
+    // only show system quests in non-auth state
+    include_system_quests: !user.isLoggedIn,
     enabled: xpEnabled,
   });
 
@@ -40,7 +45,9 @@ const QuestSummaryCard = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
-    end_after: moment().startOf('week').toDate(),
+    end_before: moment().startOf('week').toDate(),
+    // only show system quests in non-auth state
+    include_system_quests: !user.isLoggedIn,
     enabled: xpEnabled,
   });
 
@@ -69,6 +76,12 @@ const QuestSummaryCard = () => {
       onSeeAllClick={handleSeeAllClick}
     >
       <div className="QuestSummaryCard">
+        <div className="xp-body">
+          <CWText fontWeight="bold" type="h4">
+            {user.xpPoints} XP&nbsp;
+            <CWText type="caption">earned from quests</CWText>
+          </CWText>
+        </div>
         <CWTabsRow>
           {Object.values(QuestTimeline).map((type) => (
             <CWTab
