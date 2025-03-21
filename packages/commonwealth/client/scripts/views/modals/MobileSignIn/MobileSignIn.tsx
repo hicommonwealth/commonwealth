@@ -1,8 +1,9 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { AuthModalType } from 'views/modals/AuthModal';
+import './MobileSignIn.scss';
 
 /**
  * This is a very basic component to JUST trigger the auth dialog in the mobile
@@ -17,6 +18,7 @@ export const MobileSignIn = () => {
 
   useEffect(() => {
     if (user.isLoggedIn) {
+      console.log('Logged in, redirecting to home');
       navigate('/');
       return;
     }
@@ -24,5 +26,5 @@ export const MobileSignIn = () => {
     setAuthModalType(AuthModalType.SignIn);
   }, [setAuthModalType, navigate, user.isLoggedIn]);
 
-  return null;
+  return <div className="MobileSignIn"></div>;
 };
