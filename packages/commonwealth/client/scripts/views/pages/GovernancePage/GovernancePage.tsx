@@ -2,7 +2,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
@@ -35,14 +34,8 @@ const GovernancePage = () => {
     };
   }, [setLoading]);
 
-  const communityId = app.activeChainId() || '';
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-  });
-
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
-  const onEtherem = community?.base !== ChainBase.Ethereum;
+  const onEtherem = app.chain?.base === ChainBase.Ethereum;
 
   const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
