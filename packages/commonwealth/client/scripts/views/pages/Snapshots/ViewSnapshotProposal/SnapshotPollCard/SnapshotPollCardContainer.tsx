@@ -54,7 +54,6 @@ export const SnapshotPollCardContainer = (
     snapShotVotingResult,
     toggleShowVotesDrawer,
   } = props;
-
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [choice, setChoice] = React.useState<string>();
 
@@ -63,15 +62,27 @@ export const SnapshotPollCardContainer = (
     moment(+proposal.start * 1000) <= moment() &&
     moment(+proposal.end * 1000) > moment();
 
-  const [userVote, setUserVote] = useState(
-    proposal.choices[
-      // @ts-expect-error <StrictNullChecks/>
-      votes.find((vote) => {
-        return vote.voter === activeUserAddress;
-      })?.choice - 1
-    ],
+  // Keep useState for immediate updates
+  const [userVote, setUserVote] = useState<string | undefined>(() =>
+    votes?.find((vote) => vote.voter === activeUserAddress)
+      ? proposal.choices[
+          votes.find((vote) => vote.voter === activeUserAddress)!.choice - 1
+        ]
+      : undefined,
   );
-  const [hasVoted, setHasVoted] = useState(userVote !== undefined);
+  const [hasVoted, setHasVoted] = useState<boolean>(!!userVote);
+
+  // Memoize derived values, but allow state to override
+  const { memoUserVote, memoHasVoted } = useMemo(() => {
+    const userVoteObj = votes?.find((vote) => vote.voter === activeUserAddress);
+    const userVoteChoice = userVoteObj
+      ? proposal.choices[userVoteObj.choice - 1]
+      : undefined;
+    return {
+      memoUserVote: userVoteChoice,
+      memoHasVoted: !!userVoteChoice,
+    };
+  }, [votes, activeUserAddress, proposal.choices]);
 
   const voteErrorText = !validatedAgainstStrategies
     ? VotingError.NOT_VALIDATED
@@ -110,13 +121,14 @@ export const SnapshotPollCardContainer = (
       setIsModalOpen(true);
     }
   }, [choice]);
-
+  const finalUserVote = userVote !== undefined ? userVote : memoUserVote;
+  const finalHasVoted = hasVoted || memoHasVoted;
   return (
     <>
       <SnapshotPollCard
         pollEnded={!isActive}
-        hasVoted={hasVoted}
-        votedFor={hasVoted ? userVote : ''}
+        hasVoted={finalHasVoted}
+        votedFor={finalUserVote}
         disableVoteButton={!fetchedPower || voteErrorText !== null}
         proposalTitle={proposal.title}
         timeRemaining={timeRemaining}
@@ -151,7 +163,6 @@ export const SnapshotPollCardContainer = (
             successCallback={async () => {
               await loadVotes();
               setHasVoted(true);
-              // @ts-expect-error <StrictNullChecks/>
               setUserVote(choice);
             }}
             onModalClose={() => setIsModalOpen(false)}

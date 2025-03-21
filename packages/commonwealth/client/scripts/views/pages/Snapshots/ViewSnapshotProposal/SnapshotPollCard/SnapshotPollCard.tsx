@@ -26,6 +26,7 @@ export const SnapshotPollCard = ({
   voteInformation,
   snapShotVotingResult,
   toggleShowVotesDrawer,
+  votedFor,
 }: SnapshotPollCardProps) => {
   const [internalHasVoted, setInternalHasVoted] =
     // @ts-expect-error <StrictNullChecks/>
@@ -57,6 +58,7 @@ export const SnapshotPollCard = ({
     setInternalVoteInformation(voteInformation);
   }, [voteInformation]);
 
+  console.log('userVote', { votedFor });
   return (
     <div className="poll-voting-section">
       <VotingActionCard
@@ -68,6 +70,7 @@ export const SnapshotPollCard = ({
         type="snapshot"
         votingOption={snapShotVotingResult}
         toggleShowVotesDrawer={toggleShowVotesDrawer}
+        defaultVotingOption={votedFor}
       />
     </div>
   );

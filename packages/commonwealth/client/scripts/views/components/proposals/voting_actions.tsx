@@ -60,6 +60,23 @@ export const VotingActions = ({
     return calculateTimeRemaining(end);
   }, [proposal]);
 
+  const {
+    hasVotedYes,
+    hasVotedNo,
+    hasVotedAbstain,
+    hasVotedVeto,
+    hasVotedForAnyChoice,
+    // @ts-expect-error <StrictNullChecks/>
+  } = getVotingResults(proposal, user);
+
+  const defaultVotingOption = useMemo(() => {
+    if (hasVotedYes) return 'yes';
+    if (hasVotedNo) return 'no';
+    if (hasVotedAbstain) return 'abstain';
+    if (hasVotedVeto) return 'NoWithVeto';
+    return undefined; // No default if user hasn't voted
+  }, [hasVotedYes, hasVotedNo, hasVotedAbstain, hasVotedVeto]);
+
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
   if (!userData.isLoggedIn) {
@@ -207,15 +224,6 @@ export const VotingActions = ({
     }
   };
 
-  const {
-    hasVotedYes,
-    hasVotedNo,
-    hasVotedAbstain,
-    hasVotedVeto,
-    hasVotedForAnyChoice,
-    // @ts-expect-error <StrictNullChecks/>
-  } = getVotingResults(proposal, user);
-
   // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
   const yesButton = (
@@ -343,13 +351,12 @@ export const VotingActions = ({
             <VotingActionCard
               options={voteOptions}
               canVote={canVote && !votingModalOpen}
-              hasVoted={false}
-              //  @typescript-eslint/no-misused-promises
               onVote={handleVote}
               type="cosmos"
               timeRemaining={timeRemaining}
               votingOption={voteResult}
               toggleShowVotesDrawer={toggleShowVotesDrawer}
+              defaultVotingOption={defaultVotingOption}
             />
             {/* @ts-expect-error StrictNullChecks*/}
             <ProposalExtensions proposal={proposal} />

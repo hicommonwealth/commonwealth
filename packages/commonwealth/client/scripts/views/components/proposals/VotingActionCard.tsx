@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CWText } from '../component_kit/cw_text';
 import './VotingActionCard.scss'; // Create this SCSS file for styling
 import VotingResultView, { VoteOption } from './VotingResultView';
@@ -20,6 +20,7 @@ interface VotingActionCardProps {
   votingOption: VoteOption[];
   toggleShowVotesDrawer: (newState: boolean) => void;
   governanceUrl?: string;
+  defaultVotingOption?: string | undefined;
 }
 
 const VotingActionCard: React.FC<VotingActionCardProps> = ({
@@ -31,14 +32,19 @@ const VotingActionCard: React.FC<VotingActionCardProps> = ({
   type,
   votingOption,
   toggleShowVotesDrawer,
+  defaultVotingOption,
 }) => {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState(defaultVotingOption);
   const handleVoteClick = () => {
     if (selectedOption && canVote && !hasVoted) {
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
     }
   };
-
+  useEffect(() => {
+    if (defaultVotingOption) {
+      setSelectedOption(defaultVotingOption);
+    }
+  }, [defaultVotingOption]);
   return (
     <div className="poll-container">
       <CWText type="h5" fontWeight="semiBold">
