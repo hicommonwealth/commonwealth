@@ -14,6 +14,7 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
+import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
@@ -56,8 +57,11 @@ const CommentEditor = ({
   onCommentCreated,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiCommentsToggleEnabled, aiInteractionsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    aiInteractionsToggleEnabled,
+    setAICommentsToggleEnabled,
+  } = useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
@@ -179,18 +183,7 @@ const CommentEditor = ({
             />
           </CWText>
         </div>
-        <div className="attribution-right-content">
-          <div className="ml-auto">
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-              <CWThreadAction
-                action="ai-reply"
-                label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
-                disabled={isSubmitDisabled}
-                onClick={handleCommentWithAI}
-              />
-            )}
-          </div>
-        </div>
+
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
       <ReactQuillEditor
@@ -205,8 +198,35 @@ const CommentEditor = ({
       <div className="form-bottom">
         <div className="form-buttons">
           <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
+          <div className="attribution-right-content">
+            <div className="ml-auto">
+              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                <CWThreadAction
+                  action="ai-reply"
+                  label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
+                  disabled={isSubmitDisabled}
+                  onClick={handleCommentWithAI}
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="ai-toggle-wrapper">
+            <CWToggle
+              className="ai-toggle"
+              icon="sparkle"
+              iconColor="#757575"
+              checked={aiCommentsToggleEnabled}
+              onChange={() => {
+                setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+              }}
+            />
+            <CWText type="caption" className="toggle-label">
+              AI auto reply
+            </CWText>
+          </div>
           <CWButton
-            buttonWidth="wide"
+            buttonWidth="narrow"
             disabled={disabled || isSubmitDisabled}
             onClick={() => void handleEnhancedSubmit()}
             label="Post"

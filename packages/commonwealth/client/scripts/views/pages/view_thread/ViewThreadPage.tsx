@@ -809,6 +809,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
+                      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
                       tooltipText={
                         typeof disabledActionsTooltipText === 'function'
                           ? disabledActionsTooltipText?.('comment')
