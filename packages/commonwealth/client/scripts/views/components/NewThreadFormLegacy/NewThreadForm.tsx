@@ -48,8 +48,10 @@ import { useGenerateCommentText } from 'client/scripts/state/api/comments/genera
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
+import { CWText } from '../component_kit/cw_text';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
+import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -72,7 +74,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const user = useUserStore();
 
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const {
+    aiInteractionsToggleEnabled,
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+  } = useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   useAppStatus();
@@ -629,13 +635,28 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
                   <CWThreadAction
                     action="ai-reply"
-                    label="Draft with AI"
+                    label="Draft thread with AI"
                     onClick={(e) => {
                       e.preventDefault();
                       handleGenerateAIThread().catch(console.error);
                     }}
                   />
                 )}
+
+                <div className="ai-toggle-wrapper">
+                  <CWToggle
+                    className="ai-toggle"
+                    icon="sparkle"
+                    iconColor="#757575"
+                    checked={aiCommentsToggleEnabled}
+                    onChange={() => {
+                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                    }}
+                  />
+                  <CWText type="caption" className="toggle-label">
+                    AI initial comment
+                  </CWText>
+                </div>
 
                 <CWButton
                   label="Create"

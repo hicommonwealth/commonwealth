@@ -101,10 +101,25 @@
 
       .buttons-row {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         width: 100%;
-        gap: 8px;
+        gap: 16px;
+
+        .ai-toggle-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .ai-toggle {
+          display: flex;
+        }
+
+        .toggle-label {
+          color: $neutral-500;
+          // font-size: 12px;
+        }
       }
     }
   }
