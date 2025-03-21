@@ -1,9 +1,10 @@
-import axios from 'axios';
+import { Role } from '@hicommonwealth/shared';
 import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
+import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
@@ -16,7 +17,6 @@ import { CWTag } from 'client/scripts/views/components/component_kit/new_designs
 import { CWRadioButton } from 'client/scripts/views/components/component_kit/new_designs/cw_radio_button';
 import React, { useState } from 'react';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import './ManageOnchainModal.scss';
 import { AddressInfo } from './MembersSection';
 
@@ -44,6 +44,7 @@ export const ManageOnchainModal = ({
   const [userRole, setUserRole] = useState(Addresses);
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const { mutateAsync: updateRole } = useUpdateRoleMutation();
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
@@ -69,22 +70,13 @@ export const ManageOnchainModal = ({
         (user, index) => user.role !== Addresses[index]?.role,
       );
       if (updates.length === 0) return;
-      const axiosPromises = updates.map(({ role, address }) =>
-        axios.post(`${SERVER_URL}/upgradeMember`, {
-          new_role: role,
-          address: address,
-          community_id: app.activeChainId(),
-          jwt: userData.jwt,
+      updates.forEach(({ role, address }) =>
+        updateRole({
+          community_id: app.activeChainId()!,
+          address,
+          role: role as Role,
         }),
       );
-      const responses = await Promise.all(axiosPromises);
-      responses.forEach((response) => {
-        if (response.data.status === 'Success') {
-          notifySuccess('Role Updated');
-        } else {
-          notifyError('Update failed');
-        }
-      });
       if (refetch) refetch();
     } catch (error) {
       console.error('Error upgrading members:', error);

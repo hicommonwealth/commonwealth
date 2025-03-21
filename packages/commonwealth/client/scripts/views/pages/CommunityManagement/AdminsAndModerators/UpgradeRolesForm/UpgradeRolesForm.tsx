@@ -1,10 +1,9 @@
 import { AddressRole, DEFAULT_NAME, Role } from '@hicommonwealth/shared';
-import axios from 'axios';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
+import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
@@ -43,6 +42,7 @@ export const UpgradeRolesForm = ({
   ]);
 
   const userData = useUserStore();
+  const { mutateAsync: updateRole } = useUpdateRoleMutation();
 
   const zeroOutRadioButtons = () => {
     const zeroedOutRadioButtons = radioButtons.map((radioButton) => ({
@@ -96,29 +96,23 @@ export const UpgradeRolesForm = ({
           : '';
 
     try {
-      const response = await axios.post(`${SERVER_URL}/upgradeMember`, {
-        new_role: newRole,
+      const result = await updateRole({
+        community_id: app.activeChainId()!,
         address: selectedAddress,
-        community_id: app.activeChainId(),
-        jwt: userData.jwt,
+        role: newRole as Role,
       });
 
-      if (response.data.status === 'Success') {
-        notifySuccess('Member upgraded');
-        onRoleUpdate(
-          {
-            address: selectedAddress as string,
-            role: selectedRole as Role,
-          },
-          {
-            address: response.data.result.address as string,
-            role: response.data.result.role as Role,
-          },
-        );
-        zeroOutRadioButtons();
-      } else {
-        notifyError('Upgrade failed');
-      }
+      onRoleUpdate(
+        {
+          address: selectedAddress as string,
+          role: selectedRole as Role,
+        },
+        {
+          address: result.address!,
+          role: result.role!,
+        },
+      );
+      zeroOutRadioButtons();
     } catch (error) {
       console.error('Error upgrading member:', error);
       notifyError('Upgrade failed');

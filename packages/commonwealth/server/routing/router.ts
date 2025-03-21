@@ -26,9 +26,6 @@ import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 
 import setDefaultRole from '../routes/setDefaultRole';
-import upgradeMember, {
-  upgradeMemberValidation,
-} from '../routes/upgradeMember';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -341,16 +338,6 @@ function setupRouter(
     '/roles',
     databaseValidationService.validateCommunity,
     controllers.listRoles.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/upgradeMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    upgradeMemberValidation,
-    upgradeMember.bind(this, models),
   );
 
   // user model update

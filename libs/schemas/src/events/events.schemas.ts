@@ -1,5 +1,6 @@
 import {
   CommunityGoalTypes,
+  Roles,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
@@ -106,6 +107,13 @@ export const events = {
   GroupCreated: z.object({
     groupId: z.string(),
     userId: z.string(),
+  }),
+
+  RoleUpdated: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({

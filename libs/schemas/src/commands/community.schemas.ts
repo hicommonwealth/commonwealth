@@ -7,10 +7,12 @@ import {
   CommunityGoalTypes,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  Roles,
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { Address } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
@@ -326,6 +328,16 @@ export const DeleteAllAddresses = {
     address: z.string(),
     deleted: z.number(),
   }),
+  context: AuthContext,
+};
+
+export const UpdateRole = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+  }),
+  output: Address.partial(),
   context: AuthContext,
 };
 

@@ -34,6 +34,7 @@ export const outboxEvents: Events[] = [
   'FarcasterVoteCreated',
   'FarcasterContestBotMentioned',
   'GroupCreated',
+  'RoleUpdated',
   'OneOffContestManagerDeployed',
   'RecurringContestManagerDeployed',
   'SignUpFlowCompleted',
