@@ -144,7 +144,7 @@ const CommunityMembersPage = () => {
     },
     {
       key: 'actions',
-      header: 'Onchain Role',
+      header: 'Permissions',
       numeric: false,
       sortable: false,
     },
@@ -478,6 +478,7 @@ const CommunityMembersPage = () => {
             tableState={tableState}
             extraColumns={extraColumns}
             refetch={() => void refetchMembers()}
+            canManagePermissions={isAdmin}
           />
         )}
       </section>
