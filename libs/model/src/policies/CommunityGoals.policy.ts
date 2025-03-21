@@ -8,6 +8,8 @@ import { models } from '../database';
 import { systemActor } from '../middleware';
 
 const inputs = {
+  CommunityCreated: events.CommunityCreated,
+  CommunityUpdated: events.CommunityUpdated,
   CommunityJoined: events.CommunityJoined,
   GroupCreated: events.GroupCreated,
   ThreadCreated: events.ThreadCreated,
@@ -32,26 +34,52 @@ async function setReachedGoal(
   goals: Array<z.infer<typeof CommunityGoalReached>>,
   target: number,
 ) {
-  await Promise.all(
-    goals.map(async (goal) => {
-      if (goal.meta!.target <= target) {
-        await command(SetReachedGoal(), {
-          actor: systemActor({}),
-          payload: {
-            community_id: goal.community_id,
-            community_goal_meta_id: goal.community_goal_meta_id,
-            goal_type: goal.meta!.type,
-          },
-        });
-      }
-    }),
-  );
+  await models.sequelize.transaction(async (transaction) => {
+    await Promise.all(
+      goals.map(async (goal) => {
+        if (goal.meta!.target <= target) {
+          await command(SetReachedGoal(transaction), {
+            actor: systemActor({}),
+            payload: {
+              community_id: goal.community_id,
+              community_goal_meta_id: goal.community_goal_meta_id,
+              goal_type: goal.meta!.type,
+            },
+          });
+        }
+      }),
+    );
+  });
 }
 
 export function CommunityGoalsPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
+      CommunityCreated: async ({ payload }) => {
+        const { community_id } = payload;
+        const goals = await findOpenGoals(community_id, 'social-links');
+        if (goals.length) {
+          const community = await models.Community.findOne({
+            where: { id: community_id },
+          });
+          const links = community?.social_links?.filter(Boolean) || [];
+          await setReachedGoal(goals, links.length);
+        }
+      },
+
+      CommunityUpdated: async ({ payload }) => {
+        const { community_id } = payload;
+        const goals = await findOpenGoals(community_id, 'social-links');
+        if (goals.length) {
+          const community = await models.Community.findOne({
+            where: { id: community_id },
+          });
+          const links = community?.social_links?.filter(Boolean) || [];
+          await setReachedGoal(goals, links.length);
+        }
+      },
+
       CommunityJoined: async ({ payload }) => {
         const { community_id } = payload;
         const goals = await findOpenGoals(community_id, 'members');

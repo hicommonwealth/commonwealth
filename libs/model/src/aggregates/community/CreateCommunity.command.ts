@@ -193,6 +193,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               event_payload: {
                 community_id: id,
                 user_id: user.id!,
+                social_links: uniqueLinksArray,
                 referrer_address: user.referred_by_address ?? undefined,
                 created_at: created.created_at!,
               },
