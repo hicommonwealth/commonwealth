@@ -11,7 +11,13 @@ export const PinnedToken = z.object({
   ChainNode: ChainNode.optional(),
 });
 
-export const PinnedTokenWithPrices = PinnedToken.extend({
+export const PinnedTokenView = PinnedToken.extend({
+  name: z.string(),
+  symbol: z.string(),
+  icon_url: z.string().optional(),
+});
+
+export const PinnedTokenWithPrices = PinnedTokenView.extend({
   prices: z
     .array(
       z.object({

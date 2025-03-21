@@ -1,5 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
@@ -53,7 +54,10 @@ const TrendingTokensList = ({
     shouldRunTrigger: user.isLoggedIn,
   });
 
-  const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
+  const {
+    data: launchpadTokensList,
+    isInitialLoading: isLoadingLaunchpadTokens,
+  } = useFetchTokensQuery({
     cursor: 1,
     limit: 3,
     with_stats: true,
@@ -74,9 +78,25 @@ const TrendingTokensList = ({
     })(),
     enabled: launchpadEnabled,
   });
-  const tokens = (tokensList?.pages || [])
+
+  const { data: pinnedTokensList, isInitialLoading: isLoadingPinnedTokens } =
+    useGetPinnedTokensByCommunityId({
+      cursor: 1,
+      limit: 3,
+      with_chain_node: true,
+      with_price: true,
+      enabled: !!launchpadTokensList,
+    });
+
+  const launchpadTokens = (launchpadTokensList?.pages || [])
     .flatMap((page) => page.results)
     .slice(0, 3);
+
+  const pinnedTokens = (pinnedTokensList?.pages || [])
+    .flatMap((page) => page.results)
+    .slice(0, 3);
+
+  const tokens = [...launchpadTokens, ...pinnedTokens];
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
@@ -121,7 +141,9 @@ const TrendingTokensList = ({
           </div>
         </Link>
       </div>
-      {isInitialLoading || isLoadingETHToCurrencyRate ? (
+      {isLoadingLaunchpadTokens ||
+      isLoadingPinnedTokens ||
+      isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
@@ -134,7 +156,7 @@ const TrendingTokensList = ({
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => {
+          {tokens.map((token) => {
             const pricing = calculateTokenPricing(
               token as z.infer<typeof TokenView>,
               ethToUsdRate,

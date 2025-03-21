@@ -3,7 +3,7 @@ import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useMemo, useState } from 'react';
 import app from 'state';
-import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
+import { useGetPinnedTokensByCommunityId } from 'state/api/communities';
 import {
   useGetTokenByCommunityId,
   useTokenMetadataQuery,
@@ -27,13 +27,16 @@ export const useTokenTradeWidget = () => {
     });
 
   const { data: communityPinnedTokens, isLoading: isLoadingPinnedToken } =
-    useGetPinnedTokenByCommunityId({
-      community_ids: [communityId],
+    useGetPinnedTokensByCommunityId({
+      community_ids: [communityId].join(','),
       with_chain_node: true,
       with_price: true,
       enabled: !!communityId,
+      limit: 1,
+      cursor: 0,
     });
-  const communityPinnedToken = communityPinnedTokens?.[0];
+
+  const communityPinnedToken = communityPinnedTokens?.pages?.[0]?.results?.[0];
   const { data: tokenMetadata, isLoading: isLoadingTokenMetadata } =
     useTokenMetadataQuery({
       tokenId: communityPinnedToken?.contract_address || '',

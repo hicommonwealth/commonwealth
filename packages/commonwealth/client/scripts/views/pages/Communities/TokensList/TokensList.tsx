@@ -1,5 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
@@ -53,7 +54,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
 
   const {
     data: tokensList,
-    isInitialLoading,
+    isInitialLoading: isLoadingLaunchpadTokens,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -78,7 +79,23 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     })(),
     enabled: launchpadEnabled,
   });
-  const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+  const launchpadTokens = (tokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  // fetch pinned tokens
+  const { data: pinnedTokensList, isInitialLoading: isLoadingPinnedTokens } =
+    useGetPinnedTokensByCommunityId({
+      cursor: 1,
+      limit: 8,
+      with_chain_node: true,
+      with_price: true,
+    });
+  const pinnedTokens = (pinnedTokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  const tokens = [...launchpadTokens, ...pinnedTokens];
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
@@ -121,7 +138,9 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      {isInitialLoading || isLoadingETHToCurrencyRate ? (
+      {isLoadingLaunchpadTokens ||
+      isLoadingPinnedTokens ||
+      isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div

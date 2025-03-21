@@ -218,9 +218,27 @@ export const GetTopicById = {
 
 export const GetPinnedTokens = {
   input: z.object({
-    community_ids: z.string(),
+    community_ids: z.string().optional(),
     with_chain_node: z.boolean().optional(),
     with_price: z.boolean().optional(),
+    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+    cursor: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .optional()
+      .default(1)
+      .describe(
+        'required for tRPC useInfiniteQuery hook, equivalent to page number',
+      ),
+    order_by: z.enum(['created_at']).optional(),
+    order_direction: z.enum(['ASC', 'DESC']).optional(),
   }),
-  output: PinnedTokenWithPrices.array(),
+  output: z.object({
+    results: PinnedTokenWithPrices.array(),
+    limit: PG_INT,
+    page: PG_INT,
+    totalPages: PG_INT,
+    totalResults: PG_INT,
+  }),
 };
