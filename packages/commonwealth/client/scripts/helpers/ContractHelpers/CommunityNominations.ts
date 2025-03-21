@@ -16,7 +16,7 @@ class communityNominations extends ContractBase {
 
   async nominateJudge(
     namespace: string,
-    judge: string,
+    judges: string[],
     walletAddress: string,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
@@ -24,10 +24,13 @@ class communityNominations extends ContractBase {
     }
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
+    const feeAmount = await this.contract.methods.feeAmount().call();
+    const totalFeeAmount = feeAmount * judges.length;
     try {
       txReceipt = await this.contract.methods
-        .nominateJudge(namespace, judge, 100)
+        .nominateJudges(namespace, judges, 100)
         .send({
+          value: totalFeeAmount,
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),

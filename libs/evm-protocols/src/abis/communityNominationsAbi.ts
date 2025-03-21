@@ -3,6 +3,9 @@ export const communityNominationsAbi = [
     type: 'constructor',
     inputs: [
       { name: '_namespaceFactory', type: 'address', internalType: 'address' },
+      { name: '_feeDestination', type: 'address', internalType: 'address' },
+      { name: '_feeAmount', type: 'uint256', internalType: 'uint256' },
+      { name: '_owner', type: 'address', internalType: 'address' },
     ],
     stateMutability: 'nonpayable',
   },
@@ -16,6 +19,20 @@ export const communityNominationsAbi = [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'feeAmount',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'feeDestination',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -35,14 +52,21 @@ export const communityNominationsAbi = [
   },
   {
     type: 'function',
-    name: 'nominateJudge',
+    name: 'newOwner',
+    inputs: [{ name: '_newOwner', type: 'address', internalType: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'nominateJudges',
     inputs: [
       { name: 'namespace', type: 'string', internalType: 'string' },
-      { name: 'judge', type: 'address', internalType: 'address' },
+      { name: 'judges', type: 'address[]', internalType: 'address[]' },
       { name: 'judgeId', type: 'uint256', internalType: 'uint256' },
     ],
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
   },
   {
     type: 'function',
@@ -60,10 +84,33 @@ export const communityNominationsAbi = [
   },
   {
     type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'referralModeEnabled',
     inputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
     outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'setFeeAmount',
+    inputs: [{ name: '_feeAmount', type: 'uint256', internalType: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setFeeDestination',
+    inputs: [
+      { name: '_feeDestination', type: 'address', internalType: 'address' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'event',
