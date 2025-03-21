@@ -164,7 +164,6 @@ export const CommunityGoalTypes = [
   'groups',
   'members',
   'moderators',
-  'site-links',
   'social-links',
   'tags',
   'threads',
