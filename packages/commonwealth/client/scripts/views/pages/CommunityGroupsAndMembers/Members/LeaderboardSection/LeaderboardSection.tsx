@@ -31,6 +31,12 @@ const columns = [
     sortable: true,
   },
   {
+    key: 'xp',
+    header: 'XP',
+    numeric: true,
+    sortable: true,
+  },
+  {
     key: 'referrals',
     header: 'Referrals',
     numeric: true,
@@ -87,6 +93,12 @@ const LeaderboardSection = () => {
               <p>{member.profile_name}</p>
             </Link>
           </div>
+        ),
+      },
+      xp: {
+        sortValue: member.xp_points,
+        customElement: (
+          <div className="table-cell text-right">{member.xp_points}</div>
         ),
       },
       referrals: {
