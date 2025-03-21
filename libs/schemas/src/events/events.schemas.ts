@@ -1,4 +1,8 @@
-import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  CommunityGoalTypes,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
@@ -489,6 +493,7 @@ export const events = {
 
   CommunityGoalReached: z.object({
     community_goal_meta_id: PG_INT,
+    goal_type: z.enum(CommunityGoalTypes),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),

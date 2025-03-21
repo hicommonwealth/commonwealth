@@ -4,6 +4,7 @@ import {
   COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
+  CommunityGoalTypes,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   WalletId,
@@ -405,6 +406,7 @@ export const SetReachedGoal = {
   input: z.object({
     community_id: z.string(),
     community_goal_meta_id: z.number(),
+    goal_type: z.enum(CommunityGoalTypes),
   }),
   output: z.object({}),
 };
