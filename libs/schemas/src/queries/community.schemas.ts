@@ -90,6 +90,7 @@ export const GetCommunity = {
   input: z.object({
     id: z.string(),
     include_node_info: z.boolean().optional(),
+    include_groups: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };

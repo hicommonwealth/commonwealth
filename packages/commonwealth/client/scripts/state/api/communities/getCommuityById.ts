@@ -10,6 +10,7 @@ const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins
 type UseGetCommunityByIdProps = {
   id: string;
   includeNodeInfo?: boolean;
+  includeGroups?: boolean;
   enabled?: boolean;
 };
 
@@ -161,12 +162,14 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
 const useGetCommunityByIdQuery = ({
   id,
   includeNodeInfo = false,
+  includeGroups = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
   return trpc.community.getCommunity.useQuery(
     {
       id,
       include_node_info: includeNodeInfo,
+      include_groups: includeGroups,
     },
     {
       staleTime: COMMUNITIY_STALE_TIME,
