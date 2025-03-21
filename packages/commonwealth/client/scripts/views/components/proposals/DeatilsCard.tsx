@@ -15,7 +15,6 @@ const DetailsCard = ({
   publishDate,
   id,
 }: DetailCardProps) => {
-  console.log({ status, governanceType, publishDate, id });
   return (
     <div className="DetailCard">
       <div className="header">

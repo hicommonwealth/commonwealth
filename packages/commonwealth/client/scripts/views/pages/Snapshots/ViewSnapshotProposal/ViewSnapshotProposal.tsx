@@ -40,7 +40,6 @@ const ViewSnapshotProposal = ({
   identifier,
   snapshotId,
 }: ViewSnapshotProposalProps) => {
-  console.log('snapshot', { identifier, snapshotId });
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);

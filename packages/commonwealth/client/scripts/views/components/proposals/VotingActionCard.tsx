@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CWText } from '../component_kit/cw_text';
-import './VotingActionCard.scss'; // Create this SCSS file for styling
+import './VotingActionCard.scss';
 import VotingResultView, { VoteOption } from './VotingResultView';
 
 interface VotingOption {

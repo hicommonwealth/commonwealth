@@ -62,9 +62,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     isLoading,
     error: cosmosError,
   } = useCosmosProposal({ proposalId });
-  // Snapshot
 
-  // Snapshot proposal data
   const {
     proposal: snapshotProposal,
     isLoading: isSnapshotLoading,
@@ -106,7 +104,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     });
   }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
 
-  //COSMO
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
 

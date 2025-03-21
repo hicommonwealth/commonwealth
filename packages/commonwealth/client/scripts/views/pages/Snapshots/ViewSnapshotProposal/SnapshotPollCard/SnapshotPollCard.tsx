@@ -58,7 +58,6 @@ export const SnapshotPollCard = ({
     setInternalVoteInformation(voteInformation);
   }, [voteInformation]);
 
-  console.log('userVote', { votedFor });
   return (
     <div className="poll-voting-section">
       <VotingActionCard

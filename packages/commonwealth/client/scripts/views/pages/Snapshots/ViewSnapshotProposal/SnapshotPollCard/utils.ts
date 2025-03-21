@@ -1,7 +1,6 @@
 import moment from 'moment/moment';
 
 export const calculateTimeRemaining = (isoDate?: Date): string => {
-  console.log(isoDate);
   const now = moment();
   const endTime = isoDate ? moment(isoDate) : moment();
 

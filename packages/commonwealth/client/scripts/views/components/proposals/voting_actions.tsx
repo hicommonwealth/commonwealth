@@ -104,9 +104,7 @@ export const VotingActions = ({
     redrawProposals(!proposalRedrawState);
   };
 
-  const voteYes = async (e) => {
-    console.log({ status: proposal.status });
-    // e.preventDefault();
+  const voteYes = async () => {
     toggleVotingModal(true);
 
     if (
@@ -147,7 +145,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteNo = async (e) => {
+  const voteNo = async () => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -173,7 +171,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteAbstain = async (e) => {
+  const voteAbstain = async () => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -199,7 +197,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteVeto = async (e) => {
+  const voteVeto = async () => {
     e.preventDefault();
     toggleVotingModal(true);
 
@@ -298,7 +296,6 @@ export const VotingActions = ({
     if ((proposal as CosmosProposal).data?.state?.tally) {
       const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
         .state.tally;
-      // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {
         const decimals = new BN(10).pow(
           new BN(
@@ -337,7 +334,7 @@ export const VotingActions = ({
           results: formatCurrency(noWithVeto),
         },
       ];
-      //
+
       if (!(proposal instanceof CosmosProposalV1AtomOne)) {
         const voteOptions = [
           { label: 'Yes', value: 'yes', voteCount: 0 },

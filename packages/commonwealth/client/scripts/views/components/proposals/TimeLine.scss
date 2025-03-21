@@ -45,7 +45,6 @@
         border-width: 0px 0px 0px 2px;
         border-color: $neutral-500;
 
-        // Remove border for the last item
         &:last-child {
           border-left: 0;
         }

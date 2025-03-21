@@ -62,7 +62,6 @@ export const SnapshotPollCardContainer = (
     moment(+proposal.start * 1000) <= moment() &&
     moment(+proposal.end * 1000) > moment();
 
-  // Keep useState for immediate updates
   const [userVote, setUserVote] = useState<string | undefined>(() =>
     votes?.find((vote) => vote.voter === activeUserAddress)
       ? proposal.choices[
@@ -72,7 +71,6 @@ export const SnapshotPollCardContainer = (
   );
   const [hasVoted, setHasVoted] = useState<boolean>(!!userVote);
 
-  // Memoize derived values, but allow state to override
   const { memoUserVote, memoHasVoted } = useMemo(() => {
     const userVoteObj = votes?.find((vote) => vote.voter === activeUserAddress);
     const userVoteChoice = userVoteObj

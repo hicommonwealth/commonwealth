@@ -37,12 +37,10 @@ export const VotingResults = (props: VotingResultsProps) => {
   }, []);
 
   const votes = proposal.getVotes();
-  // TODO: fix up this function for cosmos votes
   if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
     (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
-    // special case for cosmos proposals in deposit stage
     return (
       <SimpleYesApprovalVotingResult
         approvedCount={proposal.depositorsAsVotes.length}

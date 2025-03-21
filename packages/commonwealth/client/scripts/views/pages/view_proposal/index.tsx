@@ -37,7 +37,6 @@ type ViewProposalPageAttrs = {
 };
 
 const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
-  console.log({ identifier });
   const proposalId = identifier.split('-')[0];
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();

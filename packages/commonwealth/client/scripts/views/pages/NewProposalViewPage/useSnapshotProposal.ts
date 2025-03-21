@@ -63,14 +63,12 @@ export const useSnapshotProposal = ({
   });
   const threads = threadsData || [];
 
-  // Detect and notify errors
   useEffect(() => {
     if (!isThreadsLoading && threadsError) {
       notifyError('Could not get threads');
     }
   }, [threadsError, isThreadsLoading]);
 
-  // Compute derived state
   const symbol = space?.symbol || '';
   const validatedAgainstStrategies = !power ? true : power.totalScore > 0;
   const totalScore = power?.totalScore || 0;
@@ -85,7 +83,6 @@ export const useSnapshotProposal = ({
     user.activeAccount?.address || user.addresses?.[0]?.address;
   const activeCommunityId = app.activeChainId();
 
-  // Create proposal author object
   const proposalAuthor = useMemo(() => {
     if (!proposal || !activeCommunityId) {
       return null;
@@ -102,7 +99,6 @@ export const useSnapshotProposal = ({
     });
   }, [proposal, activeCommunityId, user.activeAccount?.community]);
 
-  // Load votes data
   const loadVotes = useCallback(
     async (proposalId) => {
       if (enabled) {
@@ -144,7 +140,6 @@ export const useSnapshotProposal = ({
     [activeUserAddress, proposalsData, spaceData, enabled],
   );
 
-  // Initial load
   useEffect(() => {
     if (!proposalsData || !spaceData || !enabled) {
       return;
@@ -153,7 +148,6 @@ export const useSnapshotProposal = ({
     loadVotes(identifier).catch(console.error);
   }, [proposalsData, spaceData, identifier, loadVotes, enabled]);
 
-  // Update loading state
   useEffect(() => {
     setIsLoading(isSpaceLoading || isProposalsLoading || isThreadsLoading);
   }, [isSpaceLoading, isProposalsLoading, isThreadsLoading]);

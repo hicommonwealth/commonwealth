@@ -22,13 +22,11 @@ interface ProposalMetadata {
 }
 
 export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
-  // State management
   const [proposal, setProposal] = useState<AnyProposal | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
 
-  // Query hooks
   const {
     data: cosmosProposal,
     error: cosmosError,
@@ -62,7 +60,6 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
     poolValue,
   );
 
-  // Set proposal data when available
   useEffect(() => {
     if (cosmosProposal) {
       // @ts-expect-error <StrictNullChecks/>
@@ -73,7 +70,6 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
     }
   }, [cosmosProposal]);
 
-  // Update title and description from metadata when available
   useEffect(() => {
     if (!_.isEmpty(metadata)) {
       const typedMetadata = metadata as ProposalMetadata;
@@ -84,7 +80,6 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
     }
   }, [metadata]);
 
-  // Set up chain adapter ready listener
   useEffect(() => {
     if (!isAdapterLoaded) {
       const handleAdapterReady = () => setIsAdapterLoaded(true);
