@@ -1,9 +1,19 @@
+import { Actor, command } from '@hicommonwealth/core';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { CreateCommunity } from '../../src/aggregates/community';
 import { models } from '../../src/database';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
 
 const MOCK_TOKEN_ID = 1234;
+
+const testActor: Actor = {
+  address: '0x1234567890123456789012345678901234567890',
+  user: {
+    isAdmin: true,
+    email: 'test@test.com',
+  },
+};
 
 describe('generateUniqueId', () => {
   const baseFields = {
@@ -21,12 +31,22 @@ describe('generateUniqueId', () => {
     custom_stages: [],
     collapsed_on_homepage: false,
     community_indexer_id: 'clanker',
+    chain_node_id: 1,
+    tags: [],
   };
 
   beforeAll(async () => {
     await models.CommunityIndexer.create({
       id: 'clanker',
       status: 'idle',
+    });
+    await models.User.create({
+      id: testActor.user.id,
+      email: testActor.user.email,
+      profile: {
+        name: 'Test User',
+      },
+      isAdmin: testActor.user.isAdmin,
     });
   });
 
@@ -79,10 +99,13 @@ describe('generateUniqueId', () => {
   });
 
   it('should fail on duplicate ID', async () => {
-    await models.Community.create({
-      id: `clanker-test-community-${MOCK_TOKEN_ID}`,
-      name: 'Test Community',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-${MOCK_TOKEN_ID}`,
+        name: 'Test Community',
+        ...baseFields,
+      },
     });
 
     const result = await generateUniqueId('Test Community', MOCK_TOKEN_ID);
@@ -94,32 +117,47 @@ describe('generateUniqueId', () => {
   });
 
   it('should generate enumerated community names', async () => {
-    await models.Community.create({
-      id: `clanker-test-community-55`,
-      name: 'Test Community',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-55`,
+        name: 'Test Community',
+        ...baseFields,
+      },
     });
-    await models.Community.create({
-      id: `clanker-test-community-66`,
-      name: 'Test Community #2',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-66`,
+        name: 'Test Community #2',
+        ...baseFields,
+      },
     });
-    await models.Community.create({
-      id: `clanker-test-community-77`,
-      name: 'Test Community #3',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-77`,
+        name: 'Test Community #3',
+        ...baseFields,
+      },
     });
-    await models.Community.create({
-      id: `clanker-test-community-88`,
-      name: 'Test Community #4',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-88`,
+        name: 'Test Community #4',
+        ...baseFields,
+      },
     });
 
     // add similarly name community with different kebab case name
-    await models.Community.create({
-      id: `clanker-test-community-foobar-99`,
-      name: 'Test CommunityFOOBAR',
-      ...baseFields,
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: `clanker-test-community-foobar-99`,
+        name: 'Test CommunityFOOBAR',
+        ...baseFields,
+      },
     });
 
     const result = await generateUniqueId('Test Community', 100);
