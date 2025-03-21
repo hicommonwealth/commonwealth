@@ -104,6 +104,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         // create on-chain namespace admin group if not already created
         const GROUP_NAME = 'Namespace Admins';
         if (!log_removed) {
+          // don't create group if chain event represents a log removal
           // TODO: should we remove group when log is removed?
           // TODO: should we add any default users to this group?
           await models.Group.findOrCreate({
@@ -148,6 +149,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
           );
 
         if (!log_removed) {
+          // don't emit if chain event represents a log removal
           await emitEvent(
             models.Outbox,
             [
