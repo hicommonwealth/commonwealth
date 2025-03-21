@@ -6,7 +6,6 @@ import { CWButton } from 'client/scripts/views/components/component_kit/new_desi
 import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 // eslint-disable-next-line max-len
-import useAppStatus from 'hooks/useAppStatus';
 import { IOSModal } from 'views/components/IOSModal/IOSModal';
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 import './NotificationModal.scss';
@@ -29,8 +28,6 @@ type NotificationModalProps = {
  * The only way it would not be the case is if their localStorage was reset.
  */
 export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
-  const { isIOS } = useAppStatus();
-
   const activate = useSubscriptionPreferenceSettingToggle([
     'mobile_push_notifications_enabled',
     'mobile_push_discussion_activity_enabled',
@@ -50,13 +47,8 @@ export const NotificationModal = ({ onComplete }: NotificationModalProps) => {
   }, [activate]);
 
   const handleStartActivation = useCallback(() => {
-    if (isIOS) {
-      setInitialModalActive(true);
-    } else {
-      // we just trigger directly on Android for now
-      handleActivate();
-    }
-  }, [handleActivate, isIOS]);
+    setInitialModalActive(true);
+  }, []);
 
   return (
     <>
