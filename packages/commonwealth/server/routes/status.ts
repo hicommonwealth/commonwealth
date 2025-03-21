@@ -60,12 +60,12 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     ],
   });
   // TODO: fetch all this data with a single query
+  const communityIds = new Set(communities.map((c) => c.id));
   const [addresses, selectedCommunity, isAdmin, disableRichText] =
     await Promise.all([
       unfilteredAddresses.filter(
         (address) =>
-          !!address.verified &&
-          communities.map((c) => c.id).includes(address.community_id),
+          !!address.verified && communityIds.has(address.community_id),
       ),
       user.getSelectedCommunity(),
       user.isAdmin,
