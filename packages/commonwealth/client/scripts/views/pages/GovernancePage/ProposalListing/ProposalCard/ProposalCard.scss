@@ -1,0 +1,39 @@
+@import '../../../../../styles/shared.scss';
+
+.ProposalCard {
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: $white;
+  width: 240px;
+  height: 170px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .content {
+    .header {
+      display: flex;
+      justify-content: end;
+      font-size: 14px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: $neutral-200;
+      border-radius: 3px;
+      margin: 8px 0;
+    }
+
+    .quorm {
+      display: flex;
+      justify-content: end;
+    }
+  }
+
+  .comments {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+}

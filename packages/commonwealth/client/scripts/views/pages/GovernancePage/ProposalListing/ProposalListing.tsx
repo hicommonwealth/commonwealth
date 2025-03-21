@@ -12,8 +12,11 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import { GridComponents, VirtuosoGrid } from 'react-virtuoso';
 import { smartTrim } from 'shared/utils';
+import { ListContainerProps } from '../../discussions/DiscussionsPage';
+import ProposalCard from './ProposalCard/ProposalCard';
 import './ProposalListing.scss';
 
 type OptionType = {
@@ -159,7 +162,56 @@ const ProposalListing: React.FC = () => {
       </div>
 
       <div className="view-container">
-        {view === 'table' ? <>{TableComponent}</> : <></>}
+        {view === 'table' ? (
+          <>{TableComponent}</>
+        ) : (
+          <>
+            <VirtuosoGrid
+              data={proposals}
+              components={
+                {
+                  List: (() => {
+                    const GridContainer = forwardRef<
+                      HTMLDivElement,
+                      ListContainerProps
+                    >(({ children, ...props }, ref) => (
+                      <div
+                        ref={ref}
+                        {...props}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns:
+                            'repeat(auto-fill, minmax(210px, 1fr))',
+                          gap: '16px',
+                          padding: '16px',
+                        }}
+                      >
+                        {children}
+                      </div>
+                    ));
+                    GridContainer.displayName = 'GridContainer';
+                    return GridContainer;
+                  })(),
+                  Item: (() => {
+                    const GridItem: React.FC<
+                      React.HTMLAttributes<HTMLDivElement>
+                    > = ({ children, ...props }) => (
+                      <div {...props}>{children}</div>
+                    );
+                    return GridItem;
+                  })(),
+                } as GridComponents
+              }
+              itemContent={(_, item: any) => (
+                <ProposalCard
+                  key={item.id}
+                  status={item.status}
+                  title={item.title}
+                />
+              )}
+            />
+          </>
+        )}
       </div>
     </div>
   );
