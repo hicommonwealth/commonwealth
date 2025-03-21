@@ -1,11 +1,11 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { emitEvent } from 'model/src/utils';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustNotExist } from '../../middleware/guards';
 import { GroupAttributes } from '../../models';
+import { emitEvent } from '../../utils/utils';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 
