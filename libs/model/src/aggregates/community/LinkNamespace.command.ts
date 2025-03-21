@@ -148,18 +148,22 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
           );
 
         if (!log_removed) {
-          await emitEvent(models.Outbox, [
-            {
-              event_name: 'NamespaceLinked',
-              event_payload: {
-                namespace_address,
-                deployer_address,
-                community_id: community.id,
-                referral,
-                created_at: new Date(),
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'NamespaceLinked',
+                event_payload: {
+                  namespace_address,
+                  deployer_address,
+                  community_id: community.id,
+                  referral,
+                  created_at: new Date(),
+                },
               },
-            },
-          ]);
+            ],
+            transaction,
+          );
         }
       });
 

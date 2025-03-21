@@ -24,17 +24,21 @@ export function SetReachedGoal(): Command<typeof schemas.SetReachedGoal> {
           },
         );
         if (rows)
-          await emitEvent(models.Outbox, [
-            {
-              event_name: 'CommunityGoalReached',
-              event_payload: {
-                community_goal_meta_id,
-                goal_type,
-                community_id,
-                created_at: now,
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'CommunityGoalReached',
+                event_payload: {
+                  community_goal_meta_id,
+                  goal_type,
+                  community_id,
+                  created_at: now,
+                },
               },
-            },
-          ]);
+            ],
+            transaction,
+          );
       });
 
       return {};

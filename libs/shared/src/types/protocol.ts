@@ -160,5 +160,13 @@ export enum CommunityType {
   Basic = 'basic',
 }
 
-export const CommunityGoalTypes = ['members', 'threads'] as const;
+export const CommunityGoalTypes = [
+  'groups',
+  'members',
+  'moderators',
+  'site-links',
+  'social-links',
+  'tags',
+  'threads',
+] as const;
 export type CommunityGoalType = (typeof CommunityGoalTypes)[number];

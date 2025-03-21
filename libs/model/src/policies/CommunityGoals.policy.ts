@@ -1,5 +1,6 @@
 import { Policy, command } from '@hicommonwealth/core';
 import { CommunityGoalReached, events } from '@hicommonwealth/schemas';
+import { CommunityGoalType } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { SetReachedGoal } from '../aggregates/community';
@@ -8,13 +9,11 @@ import { systemActor } from '../middleware';
 
 const inputs = {
   CommunityJoined: events.CommunityJoined,
+  GroupCreated: events.GroupCreated,
   ThreadCreated: events.ThreadCreated,
 };
 
-async function findOpenGoals(
-  community_id: string,
-  type: 'members' | 'threads',
-) {
+async function findOpenGoals(community_id: string, type: CommunityGoalType) {
   const goals = await models.CommunityGoalReached.findAll({
     where: { community_id, reached_at: { [Op.is]: null } },
     include: [
@@ -61,6 +60,17 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
             where: { community_id, verified: { [Op.not]: null } },
           });
           await setReachedGoal(goals, members);
+        }
+      },
+
+      GroupCreated: async ({ payload }) => {
+        const { community_id } = payload;
+        const goals = await findOpenGoals(community_id, 'groups');
+        if (goals.length) {
+          const groups = await models.Group.count({
+            where: { community_id },
+          });
+          await setReachedGoal(goals, groups);
         }
       },
 

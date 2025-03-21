@@ -104,8 +104,10 @@ export const events = {
   }),
 
   GroupCreated: z.object({
-    groupId: z.string(),
-    userId: z.string(),
+    community_id: z.string(),
+    group_id: z.number(),
+    creator_user_id: z.number(),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({
