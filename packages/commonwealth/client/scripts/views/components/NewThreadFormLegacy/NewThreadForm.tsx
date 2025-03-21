@@ -629,7 +629,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   onClick={handleCancel}
                   tabIndex={3}
                   label="Cancel"
-                  containerClassName="no-pad"
+                  containerClassName="no-pad cancel-button"
                 />
 
                 {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
@@ -665,7 +665,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     handleNewThreadCreation().catch(console.error);
                   }}
                   tabIndex={4}
-                  containerClassName="no-pad"
+                  containerClassName="no-pad create-button"
                 />
               </div>
 

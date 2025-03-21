@@ -197,7 +197,12 @@ const CommentEditor = ({
       />
       <div className="form-bottom">
         <div className="form-buttons">
-          <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
+          <CWButton
+            buttonType="tertiary"
+            containerClassName="cancel-button"
+            onClick={onCancel}
+            label="Cancel"
+          />
           <div className="attribution-right-content">
             <div className="ml-auto">
               {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
@@ -226,6 +231,7 @@ const CommentEditor = ({
             </CWText>
           </div>
           <CWButton
+            containerClassName="post-button"
             buttonWidth="narrow"
             disabled={disabled || isSubmitDisabled}
             onClick={() => void handleEnhancedSubmit()}
