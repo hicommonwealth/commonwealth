@@ -17,7 +17,7 @@ import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import DetailsCard from '../../components/proposals/DeatilsCard';
+import DetailCard from '../../components/proposals/DetailCard';
 import TimeLine from '../../components/proposals/TimeLine';
 import VotingResultView from '../../components/proposals/VotingResultView';
 import { VotingActions } from '../../components/proposals/voting_actions';
@@ -176,7 +176,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
         body={() => (
           <>
             {isWindowSmallInclusive && (
-              <DetailsCard
+              <DetailCard
                 status={
                   queryType === 'cosmos'
                     ? // @ts-expect-error <StrictNullChecks/>
@@ -281,7 +281,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
           {
             label: 'Links',
             item: (
-              <DetailsCard
+              <DetailCard
                 status={
                   queryType === 'cosmos'
                     ? // @ts-expect-error <StrictNullChecks/>

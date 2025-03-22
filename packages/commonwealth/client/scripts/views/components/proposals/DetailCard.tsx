@@ -2,14 +2,14 @@ import React from 'react';
 
 import moment from 'moment';
 import { CWText } from '../component_kit/cw_text';
-import './DeatilsCard.scss';
+import './DetailCard.scss';
 type DetailCardProps = {
   status: string;
   governanceType: string;
   publishDate: moment.Moment | number;
   id: string;
 };
-const DetailsCard = ({
+const DetailCard = ({
   status,
   governanceType,
   publishDate,
@@ -45,4 +45,4 @@ const DetailsCard = ({
   );
 };
 
-export default DetailsCard;
+export default DetailCard;

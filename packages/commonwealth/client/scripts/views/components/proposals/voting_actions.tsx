@@ -59,6 +59,7 @@ export const VotingActions = ({
     const end = new Date(moment(proposal?.data?.votingEndTime));
     return calculateTimeRemaining(end);
   }, [proposal]);
+  let user;
 
   const {
     hasVotedYes,
@@ -66,7 +67,6 @@ export const VotingActions = ({
     hasVotedAbstain,
     hasVotedVeto,
     hasVotedForAnyChoice,
-    // @ts-expect-error <StrictNullChecks/>
   } = getVotingResults(proposal, user);
 
   const defaultVotingOption = useMemo(() => {
@@ -86,8 +86,6 @@ export const VotingActions = ({
   } else if (!proposal.canVoteFrom(userData.activeAccount)) {
     return <CannotVote label="Cannot vote from this address" />;
   }
-
-  let user;
 
   if (
     proposal instanceof CosmosProposal ||
