@@ -135,6 +135,7 @@ export const NewSnapshotProposalForm = ({
         space: snapshotId,
       });
       const scoreResponse = await getScore(
+        // @ts-expect-error <StrictNullChecks/>
         snapshotSpace,
         user.activeAccount?.address || '',
       );

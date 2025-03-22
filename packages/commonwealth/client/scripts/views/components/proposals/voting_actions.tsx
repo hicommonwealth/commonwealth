@@ -196,7 +196,6 @@ export const VotingActions = ({
   };
 
   const voteVeto = async () => {
-    preventDefault();
     toggleVotingModal(true);
 
     if (
