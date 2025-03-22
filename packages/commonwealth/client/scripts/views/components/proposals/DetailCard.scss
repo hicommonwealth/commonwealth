@@ -1,0 +1,62 @@
+@import '../../../styles/shared.scss';
+.DetailCard {
+  display: flex;
+  width: 248px;
+  height: 344px;
+  overflow: hidden;
+  flex-direction: column;
+  @include smallInclusive {
+    width: 100%;
+  }
+  .header {
+    display: flex;
+    height: 40px;
+    border: 2px solid #eeedef;
+    width: 100%;
+    background: #f7f6f7;
+    border-radius: 5px 5px 0px 0px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 10px;
+  }
+  .rb-container {
+    display: flex;
+    width: 100%;
+    padding: 16px;
+    gap: 8px;
+    border-radius: 0px 0px 5px 5px;
+    border: 2px solid #e6e5e7;
+    flex-direction: column;
+    .label {
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-400;
+      font-weight: 400;
+      line-height: 20px;
+      font-family: 'NeueHaasUnica';
+    }
+
+    .status {
+      font-weight: 400;
+      line-height: 20px;
+      font-size: 12px;
+      line-height: 16px;
+      color: #352e38;
+      font-family: 'NeueHaasUnica';
+      height: 24px;
+      border-radius: 4px;
+      padding: 4px 8px 4px 8px;
+      background-color: #fff9e5;
+      color: #806000;
+      width: fit-content;
+    }
+    .detail {
+      font-weight: 400;
+      line-height: 20px;
+      font-size: 14px;
+      line-height: 20px;
+      color: #352e38;
+      font-family: 'NeueHaasUnica';
+    }
+  }
+}

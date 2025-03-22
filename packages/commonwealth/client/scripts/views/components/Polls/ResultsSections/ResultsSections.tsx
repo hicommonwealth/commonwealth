@@ -16,7 +16,7 @@ export type ResultsSectionProps = {
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
-  votedFor: string;
+  votedFor: string | undefined;
   isPreview: boolean;
 };
 

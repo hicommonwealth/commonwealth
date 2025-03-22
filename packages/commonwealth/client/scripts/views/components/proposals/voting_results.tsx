@@ -9,14 +9,18 @@ import { VotingType } from '../../../models/types';
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import app from 'state';
+import VotingResultView from './VotingResultView';
 import {
-  CompletedProposalVotingResult,
   SimpleYesApprovalVotingResult,
   YesNoAbstainVetoVotingResult,
 } from './voting_result_components';
 
 type VotingResultsProps = { proposal: AnyProposal };
-
+interface VoteOption {
+  label: string;
+  percentage: string;
+  results: string;
+}
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const [, setLoading] = useState(
@@ -33,13 +37,10 @@ export const VotingResults = (props: VotingResultsProps) => {
   }, []);
 
   const votes = proposal.getVotes();
-
-  // TODO: fix up this function for cosmos votes
   if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
     (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
-    // special case for cosmos proposals in deposit stage
     return (
       <SimpleYesApprovalVotingResult
         approvedCount={proposal.depositorsAsVotes.length}
@@ -58,10 +59,9 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
     // return different voting results on completed cosmos proposal, as voters are not available
-    if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
+    if ((proposal as CosmosProposal).data?.state?.tally) {
       const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
         .state.tally;
-
       // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {
         const decimals = new BN(10).pow(
@@ -74,23 +74,38 @@ export const VotingResults = (props: VotingResultsProps) => {
         return coin.format();
       };
 
-      const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
-
-      const getPct = (n: BN) => {
+      const getPct = (n: BN, voteTotal: BN) => {
         if (voteTotal.isZero()) return '0';
         return (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
       };
+      const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
+      const voteOptions: VoteOption[] = [
+        {
+          label: 'Yes',
+          percentage: getPct(yes, voteTotal),
+          results: formatCurrency(yes),
+        },
+        {
+          label: 'No',
+          percentage: getPct(no, voteTotal),
+          results: formatCurrency(no),
+        },
+        {
+          label: 'Abstain',
+          percentage: getPct(abstain, voteTotal),
+          results: formatCurrency(abstain),
+        },
+        {
+          label: 'No with Veto',
+          percentage: getPct(noWithVeto, voteTotal),
+          results: formatCurrency(noWithVeto),
+        },
+      ];
 
       return (
-        <CompletedProposalVotingResult
-          abstainPct={getPct(abstain)}
-          abstainResults={formatCurrency(abstain)}
-          noPct={getPct(no)}
-          noResults={formatCurrency(no)}
-          noWithVetoPct={getPct(noWithVeto)}
-          noWithVetoResults={formatCurrency(noWithVeto)}
-          yesPct={getPct(yes)}
-          yesResults={formatCurrency(yes)}
+        <VotingResultView
+          voteOptions={voteOptions}
+          showCombineBarOnly={false}
         />
       );
     } else {

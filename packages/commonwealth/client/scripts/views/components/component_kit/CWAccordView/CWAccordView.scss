@@ -1,0 +1,39 @@
+@import '../../../../styles/shared.scss';
+.accord-container {
+  width: 100%;
+  border: 2px solid $neutral-200;
+  border-radius: 6px;
+}
+
+.accord-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.2s ease;
+}
+
+.accord-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.accord-arrow {
+  font-size: 12px;
+  color: #666666;
+  transition: transform 0.3s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.accord-content {
+  padding: 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 2px solid $neutral-200;
+}
