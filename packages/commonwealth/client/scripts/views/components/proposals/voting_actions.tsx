@@ -146,7 +146,6 @@ export const VotingActions = ({
   };
 
   const voteNo = async () => {
-    e.preventDefault();
     toggleVotingModal(true);
 
     if (
@@ -172,7 +171,6 @@ export const VotingActions = ({
   };
 
   const voteAbstain = async () => {
-    e.preventDefault();
     toggleVotingModal(true);
 
     if (
@@ -198,7 +196,7 @@ export const VotingActions = ({
   };
 
   const voteVeto = async () => {
-    e.preventDefault();
+    preventDefault();
     toggleVotingModal(true);
 
     if (
@@ -259,24 +257,15 @@ export const VotingActions = ({
     />
   );
 
-  // cosmos: veto
-  const noWithVetoButton = (
-    <CWButton
-      buttonType="destructive"
-      disabled={!canVote || hasVotedVeto || votingModalOpen}
-      onClick={voteVeto}
-      label={hasVotedVeto ? 'Vetoed' : 'Veto'}
-    />
-  );
   const handleVote = (e: string) => {
     if (e === 'yes') {
-      voteYes(e).catch((err) => notifyError(err.toString()));
+      voteYes().catch((err) => notifyError(err.toString()));
     } else if (e === 'no') {
-      voteNo(e).catch((err) => notifyError(err.toString()));
+      voteNo().catch((err) => notifyError(err.toString()));
     } else if (e === 'abstain') {
-      voteAbstain(e).catch((err) => notifyError(err.toString()));
+      voteAbstain().catch((err) => notifyError(err.toString()));
     } else if (e === 'veto') {
-      voteVeto(e).catch((err) => notifyError(err.toString()));
+      voteVeto().catch((err) => notifyError(err.toString()));
     }
   };
 

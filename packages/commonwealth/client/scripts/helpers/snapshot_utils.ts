@@ -272,8 +272,9 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
       const proposals = await getSnapshotProposalsQuery({
         space: cleanSpaceId,
       });
-
       const space = await getSnapshotSpaceQuery({ space: cleanSpaceId });
+      // @ts-expect-error <StrictNullChecks/>
+
       spacesData.push({ space, proposals });
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${cleanSpaceId}.`);

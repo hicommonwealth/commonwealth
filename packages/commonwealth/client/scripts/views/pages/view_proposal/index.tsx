@@ -23,9 +23,7 @@ import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallb
 import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import DetailsCard from '../../components/proposals/DeatilsCard';
 import TimeLine from '../../components/proposals/TimeLine';
-import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
 import { JSONDisplay } from './JSONDisplay';
@@ -44,10 +42,8 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
 
   // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [title, setTitle] = useState<string>(proposal?.title);
   const [description, setDescription] = useState<string>(proposal?.description);
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const {
     data: cosmosProposal,
@@ -126,14 +122,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     }
   }
 
-  const toggleVotingModal = (newModalState: boolean) => {
-    setVotingModalOpen(newModalState);
-  };
-
-  const onModalClose = () => {
-    setVotingModalOpen(false);
-  };
-
   return (
     <CWPageLayout>
       <CWContentPage
@@ -169,20 +157,10 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
                 title="Community Spend Proposal"
               />
             )}
-
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-              redrawProposals={redrawProposals}
-              proposalRedrawState={proposalRedrawState}
-            />
           </>
         )}
         showSidebar={true}
         sidebarComponents={[
-          { label: 'Links', item: <DetailsCard /> },
           { label: 'Links', item: <TimeLine proposalData={proposal?.data} /> },
           { label: 'Results', item: <VotingResults proposal={proposal} /> },
         ]}
