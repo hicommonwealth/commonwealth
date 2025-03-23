@@ -58,5 +58,13 @@
       color: #352e38;
       font-family: 'NeueHaasUnica';
     }
+    .address {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      .detail {
+        @extend .detail;
+      }
+    }
   }
 }

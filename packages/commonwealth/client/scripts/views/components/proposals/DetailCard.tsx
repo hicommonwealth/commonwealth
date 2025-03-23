@@ -1,7 +1,11 @@
 import React from 'react';
 
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import moment from 'moment';
+import { formatAddressShort } from 'shared/utils';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './DetailCard.scss';
 type DetailCardProps = {
   status: string;
@@ -37,7 +41,37 @@ const DetailCard = ({
 
         <CWText className="label">ID</CWText>
 
-        <CWText className="detail">{id}</CWText>
+        {id ? (
+          <div className="address">
+            <CWText className="detail">
+              {formatAddressShort(id, '', true, 8)}
+            </CWText>
+            <CWTooltip
+              placement="top"
+              content="address copied!"
+              renderTrigger={(handleInteraction, isTooltipOpen) => {
+                return (
+                  <CWIconButton
+                    iconName="copySimple"
+                    onClick={(event) => {
+                      saveToClipboard(id).catch(console.error);
+                      handleInteraction(event);
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isTooltipOpen) {
+                        handleInteraction(e);
+                      }
+                    }}
+                    className="copy-icon"
+                  />
+                );
+              }}
+            />
+          </div>
+        ) : (
+          <CWText>N/A</CWText>
+        )}
+
         <CWText className="label">Attachments</CWText>
         <CWText className="detail">thread</CWText>
       </div>
