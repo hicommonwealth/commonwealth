@@ -18,7 +18,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import DetailCard from '../../components/proposals/DetailCard';
-import TimeLine from '../../components/proposals/TimeLine';
+import TimeLineCard from '../../components/proposals/TimeLineCard';
 import VotingResultView from '../../components/proposals/VotingResultView';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
@@ -163,7 +163,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   return (
     <CWPageLayout>
       {isWindowSmallInclusive && (
-        <TimeLine proposalData={proposal?.data || snapshotProposal} />
+        <TimeLineCard proposalData={proposal?.data || snapshotProposal} />
       )}
       <CWContentPage
         showSkeleton={!proposal && !snapshotProposal}
@@ -299,7 +299,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
           {
             label: 'Timeline',
             item: (
-              <TimeLine proposalData={proposal?.data || snapshotProposal} />
+              <TimeLineCard proposalData={proposal?.data || snapshotProposal} />
             ),
           },
           {

@@ -107,17 +107,28 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
                         index,
                       );
 
-                      acc.elements.push(
-                        <div
-                          key={option.label}
-                          className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
-                          style={{
-                            width: `${percentage}%`,
-                            left: `${leftPosition}%`,
-                            backgroundColor: combinedColor,
-                          }}
-                        />,
-                      );
+                      // Only add to visual elements if percentage is greater than 0
+                      if (percentage > 0) {
+                        acc.elements.push(
+                          <div
+                            key={option.label}
+                            className="progress-container"
+                            style={{
+                              width: `${percentage}%`,
+                              left: `${leftPosition}%`,
+                            }}
+                          >
+                            <div
+                              className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
+                              style={{
+                                width: '100%',
+                                backgroundColor: combinedColor,
+                              }}
+                            />
+                          </div>,
+                        );
+                      }
+
                       acc.prevLeft = (acc.prevLeft || 0) + percentage;
                       return acc;
                     },

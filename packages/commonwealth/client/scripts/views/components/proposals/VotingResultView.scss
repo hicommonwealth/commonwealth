@@ -51,10 +51,27 @@
   }
 
   .combined-progress {
-    margin: 16px 0;
+    margin: 16px 0 30px; // Increased bottom margin to make space for labels
 
     .progress-bar {
       height: 7px;
+      position: relative;
+      overflow: visible; // Changed to visible to show labels
+    }
+
+    .progress-container {
+      position: absolute;
+      height: 100%;
+
+      .vote-value {
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+        font-family: 'NeueHaasUnica';
+        font-weight: 600;
+      }
     }
   }
 

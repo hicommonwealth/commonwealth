@@ -23,7 +23,7 @@ import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallb
 import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import TimeLine from '../../components/proposals/TimeLine';
+import TimeLineCard from '../../components/proposals/TimeLineCard';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
 import { JSONDisplay } from './JSONDisplay';
@@ -161,7 +161,10 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
         )}
         showSidebar={true}
         sidebarComponents={[
-          { label: 'Links', item: <TimeLine proposalData={proposal?.data} /> },
+          {
+            label: 'Links',
+            item: <TimeLineCard proposalData={proposal?.data} />,
+          },
           { label: 'Results', item: <VotingResults proposal={proposal} /> },
         ]}
       />

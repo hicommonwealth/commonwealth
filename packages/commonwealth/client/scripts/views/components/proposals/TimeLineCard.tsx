@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../component_kit/cw_text';
-import './Timeline.scss';
+import './TimeLineCard.scss';
 
 const formatDate = (isoString: string | undefined) => {
   if (!isoString) return 'N/A';
@@ -56,17 +56,17 @@ const getTimelineEvents = (proposalData) => {
   ];
 };
 
-const TimeLine = ({
+const TimeLineCard = ({
   proposalData,
 }: {
   proposalData: SnapshotProposal | AnyProposal;
 }) => {
   const timelineEvents = getTimelineEvents(proposalData);
   return (
-    <div className="TimeLine">
+    <div className="TimeLineCard">
       <div className="header">
         <CWText type="h5" fontWeight="semiBold">
-          TimeLine
+          TimeLineCard
         </CWText>
       </div>
       <div className="rb-container">
@@ -108,4 +108,4 @@ const TimeLine = ({
   );
 };
 
-export default TimeLine;
+export default TimeLineCard;
