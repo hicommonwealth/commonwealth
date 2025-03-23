@@ -44,6 +44,7 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -143,6 +144,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const { generateComment } = useGenerateCommentText();
   const { generateThread } = useGenerateThreadText();
+  const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const hasTopicOngoingContest =
@@ -389,14 +391,35 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       return `Title: ${thread.title}\nBody: ${thread.body}`;
     });
 
+    const nonStreaming = await generateCompletion(
+      `Created a short thread based on this Context: ${context.join('\n')}`,
+      {
+        model: 'openai/gpt-4o',
+        stream: true,
+        onError: (error) => {
+          console.error('Error generating AI thread:', error);
+        },
+        // streaming
+        onChunk: (chunk) => {
+          bodyAccumulatedRef.current += chunk;
+          setThreadContentDelta(
+            createDeltaFromText(bodyAccumulatedRef.current),
+          );
+        },
+      },
+    );
+
+    // non streaming
+    // setThreadContentDelta(createDeltaFromText(nonStreaming));
+
     try {
       const body = await generateThread(
         `Context: ${context.join('\n')}`,
         (chunk: string) => {
           bodyAccumulatedRef.current += chunk;
-          setThreadContentDelta(
-            createDeltaFromText(bodyAccumulatedRef.current),
-          );
+          // setThreadContentDelta(
+          //   createDeltaFromText(bodyAccumulatedRef.current),
+          // );
         },
       );
 

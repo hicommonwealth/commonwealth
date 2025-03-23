@@ -1,18 +1,23 @@
+import { CompletionOptions } from '@hicommonwealth/shared';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
 
-type CompletionModel = 'gpt-4' | 'anthropic/claude-3.5-sonnet';
-
-interface AiCompletionOptions {
+interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
-  model?: CompletionModel;
-  temperature?: number;
-  maxTokens?: number;
-  stream?: boolean;
 }
 
+interface CompletionError {
+  error: string;
+  status?: number;
+  metadata?: any;
+}
+
+/**
+ * Hook for streaming AI completions from the server
+ * Supports both OpenAI and OpenRouter
+ */
 export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -35,18 +40,29 @@ export const useAiCompletion = () => {
           },
           body: JSON.stringify({
             prompt,
-            model: options?.model,
+            model: options?.model || 'gpt-4o', // Default model
             temperature: options?.temperature,
             maxTokens: options?.maxTokens,
             stream: streamMode,
+            useOpenRouter: options?.useOpenRouter,
             jwt: userStore.getState().jwt,
           }),
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Server responded with ${response.status}: ${response.statusText}`,
-          );
+          // Try to parse the error response
+          let errorData: CompletionError;
+          try {
+            errorData = await response.json();
+          } catch {
+            errorData = {
+              error: `Server responded with ${response.status}: ${response.statusText}`,
+            };
+          }
+
+          const errorMessage = errorData.error || `Error ${response.status}`;
+          console.error('API error:', errorData);
+          throw new Error(errorMessage);
         }
 
         // Handle streaming vs. non-streaming response
@@ -76,6 +92,12 @@ export const useAiCompletion = () => {
 
             // Decode the new chunk and add to buffer
             const chunk = decoder.decode(value, { stream: true });
+
+            // Check if the chunk contains an error message
+            if (chunk.startsWith('\nError:')) {
+              throw new Error(chunk.substring(8));
+            }
+
             buffer += chunk;
 
             // Process and update UI immediately
@@ -86,12 +108,18 @@ export const useAiCompletion = () => {
         } else {
           // Handle non-streaming response
           const data = await response.json();
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
           accumulatedText = data.completion || '';
           setCompletion(accumulatedText);
           options?.onComplete?.(accumulatedText);
         }
       } catch (err) {
         const tempError = err instanceof Error ? err : new Error(String(err));
+        console.error('AI completion error:', tempError);
         setError(tempError);
         options?.onError?.(tempError);
       } finally {
