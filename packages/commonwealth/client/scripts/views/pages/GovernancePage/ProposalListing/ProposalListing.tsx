@@ -1,3 +1,4 @@
+import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
@@ -203,12 +204,8 @@ const ProposalListing: React.FC = () => {
                   })(),
                 } as GridComponents
               }
-              itemContent={(_, item: any) => (
-                <ProposalCard
-                  key={item.id}
-                  status={item.status}
-                  title={item.title}
-                />
+              itemContent={(_, item: CosmosProposal) => (
+                <ProposalCard status={item.status} title={item.title} />
               )}
             />
           </>
