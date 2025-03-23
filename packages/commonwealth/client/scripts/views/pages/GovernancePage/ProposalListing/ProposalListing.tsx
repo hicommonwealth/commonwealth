@@ -49,11 +49,10 @@ const ProposalListing: React.FC = () => {
   const [filter, setFilter] = useState<OptionType>(filterOptions[0]);
 
   const communityId = app.activeChainId() || '';
-  const { data: community, isLoading: isLoadingCommunity } =
-    useGetCommunityByIdQuery({
-      id: communityId,
-      enabled: !!communityId,
-    });
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
@@ -171,6 +170,7 @@ const ProposalListing: React.FC = () => {
               components={
                 {
                   List: (() => {
+                    // eslint-disable-next-line react/no-multi-comp
                     const GridContainer = forwardRef<
                       HTMLDivElement,
                       ListContainerProps
@@ -195,6 +195,7 @@ const ProposalListing: React.FC = () => {
                   Item: (() => {
                     const GridItem: React.FC<
                       React.HTMLAttributes<HTMLDivElement>
+                      // eslint-disable-next-line react/no-multi-comp
                     > = ({ children, ...props }) => (
                       <div {...props}>{children}</div>
                     );
