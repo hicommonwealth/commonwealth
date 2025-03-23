@@ -33,44 +33,64 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
     const openai = new OpenAI(openAIConfig);
 
-    // Common parameters for both streaming and non-streaming
-    const params = {
-      model: model || 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: temperature || 0.7,
-      max_tokens: maxTokens || 1000,
-    };
-
     if (stream) {
       // Set proper headers for streaming
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('X-Accel-Buffering', 'no'); // Disable Nginx buffering if present
 
-      // Handle streaming response
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const streamResponse = await openai.chat.completions.create({
-        ...params,
-        stream: true,
-      } as any);
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const streamConfig: any = {
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature,
+          max_tokens: maxTokens,
+          stream: true,
+        };
 
-      for await (const chunk of streamResponse) {
-        const content = chunk.choices[0]?.delta?.content || '';
-        if (content) {
-          res.write(content);
-          // Force flush the response to prevent buffering
-          if (res.flush) res.flush();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const streamResponse: any =
+          await openai.chat.completions.create(streamConfig);
+
+        for await (const chunk of streamResponse) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            res.write(content);
+            // Force flush the response to prevent buffering
+            if (res.flush) res.flush();
+          }
         }
+      } catch (streamError) {
+        console.error('Streaming error:', streamError);
+        if (!res.headersSent) {
+          return res.status(500).json({ error: 'Streaming failed' });
+        }
+        res.write('\nError during streaming');
       }
 
       res.end();
     } else {
       // Handle regular response
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const completion = await openai.chat.completions.create(params as any);
-      const responseText = completion.choices[0]?.message?.content || '';
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const completionConfig: any = {
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature,
+          max_tokens: maxTokens,
+        };
 
-      res.json({ completion: responseText });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const completion =
+          await openai.chat.completions.create(completionConfig);
+
+        const responseText = completion.choices[0]?.message?.content || '';
+        res.json({ completion: responseText });
+      } catch (completionError) {
+        console.error('Completion error:', completionError);
+        return res.status(500).json({ error: 'Completion failed' });
+      }
     }
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
