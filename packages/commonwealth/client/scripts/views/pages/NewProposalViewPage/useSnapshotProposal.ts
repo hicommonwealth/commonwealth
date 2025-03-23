@@ -57,7 +57,7 @@ export const useSnapshotProposal = ({
     communityId: app.activeChainId() || '',
     link: {
       source: LinkSource.Snapshot,
-      identifier: proposal?.id || '',
+      identifier: `${snapshotId}/${proposal?.id}`,
     },
     enabled: !!(app.activeChainId() && proposal?.id),
   });

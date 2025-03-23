@@ -2,7 +2,7 @@
 .DetailCard {
   display: flex;
   width: 248px;
-  height: 344px;
+  min-height: 344px;
   overflow: hidden;
   flex-direction: column;
   @include smallInclusive {
@@ -64,6 +64,14 @@
       gap: 10px;
       .detail {
         @extend .detail;
+      }
+    }
+    .link {
+      cursor: pointer;
+      flex-wrap: wrap;
+      .detail {
+        @extend .detail;
+        color: $primary-500;
       }
     }
   }

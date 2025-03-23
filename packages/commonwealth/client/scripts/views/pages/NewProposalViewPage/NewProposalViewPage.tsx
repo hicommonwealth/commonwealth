@@ -31,6 +31,7 @@ import { useCosmosProposal } from './useCosmosProposal';
 import { useSnapshotProposal } from './useSnapshotProposal';
 type ViewProposalPageAttrs = {
   id: string;
+  scope: string;
   identifier: string;
   type?: string;
 };
@@ -38,7 +39,7 @@ export enum CodeEditorType {
   Code,
   Preview,
 }
-const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
+const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -75,6 +76,7 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
     activeUserAddress,
     loadVotes,
     power,
+    threads,
   } = useSnapshotProposal({
     identifier: proposalId,
     // @ts-expect-error <StrictNullChecks/>
@@ -158,7 +160,6 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
   const toggleShowVotesDrawer = (newModalState: boolean) => {
     setShowVotesDrawer(newModalState);
   };
-
   const governanceUrl = `https://snapshot.box/#/s:${querySnapshotId}/proposal/${identifier}`;
   return (
     <CWPageLayout>
@@ -188,6 +189,8 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={createdAt}
                 id={identifier}
+                Threads={threads}
+                scope={scope}
               />
             )}
             {(description || snapshotProposal?.body) && (
@@ -293,6 +296,8 @@ const NewProposalViewPage = ({ identifier }: ViewProposalPageAttrs) => {
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={createdAt}
                 id={identifier}
+                Threads={threads}
+                scope={scope}
               />
             ),
           },

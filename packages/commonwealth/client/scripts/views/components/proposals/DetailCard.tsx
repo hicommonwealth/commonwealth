@@ -2,6 +2,7 @@ import React from 'react';
 
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import moment from 'moment';
+import { useNavigate } from 'react-router';
 import { formatAddressShort } from 'shared/utils';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
@@ -9,16 +10,21 @@ import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './DetailCard.scss';
 type DetailCardProps = {
   status: string;
+  scope: string;
   governanceType: string;
   publishDate: moment.Moment | number;
   id: string;
+  Threads: { id: number; title: string }[];
 };
 const DetailCard = ({
   status,
+  scope,
   governanceType,
   publishDate,
   id,
+  Threads = [],
 }: DetailCardProps) => {
+  const navigate = useNavigate();
   return (
     <div className="DetailCard">
       <div className="header">
@@ -73,7 +79,21 @@ const DetailCard = ({
         )}
 
         <CWText className="label">Attachments</CWText>
-        <CWText className="detail">thread</CWText>
+        {Threads.length ? (
+          Threads.map((thread) => (
+            <div
+              className="link"
+              onClick={() =>
+                navigate(`/${scope}/discussion/${thread.id}-${thread.title}`)
+              }
+              key={thread.id}
+            >
+              <CWText className="detail">{thread.title}</CWText>
+            </div>
+          ))
+        ) : (
+          <CWText>N/A</CWText>
+        )}
       </div>
     </div>
   );
