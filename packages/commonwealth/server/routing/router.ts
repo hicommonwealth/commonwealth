@@ -67,6 +67,7 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
+import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
@@ -627,6 +628,14 @@ function setupRouter(
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));
+
+  registerRoute(
+    router,
+    'post',
+    '/aicompletion',
+    passport.authenticate('jwt', { session: false }),
+    aiCompletionHandler,
+  );
 
   // proxies
   setupCosmosProxy(router, cacheDecorator);
