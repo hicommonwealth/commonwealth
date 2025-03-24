@@ -12,13 +12,13 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
-import { Address } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
 import { Topic } from '../entities/topic.schemas';
+import { Address } from '../entities/user.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
