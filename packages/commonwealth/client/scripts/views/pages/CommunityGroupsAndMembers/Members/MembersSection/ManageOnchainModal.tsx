@@ -70,12 +70,14 @@ export const ManageOnchainModal = ({
         (user, index) => user.role !== Addresses[index]?.role,
       );
       if (updates.length === 0) return;
-      updates.forEach(({ role, address }) =>
-        updateRole({
-          community_id: app.activeChainId()!,
-          address,
-          role: role as Role,
-        }),
+      await Promise.all(
+        updates.map(({ role, address }) =>
+          updateRole({
+            community_id: app.activeChainId()!,
+            address,
+            role: role as Role,
+          }),
+        ),
       );
       if (refetch) refetch();
     } catch (error) {
