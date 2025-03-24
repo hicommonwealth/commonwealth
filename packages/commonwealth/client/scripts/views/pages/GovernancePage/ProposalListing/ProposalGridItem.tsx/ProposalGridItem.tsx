@@ -1,4 +1,11 @@
 import React from 'react';
 
-export const ProposalGridItem: React.FC<React.HTMLAttributes<HTMLDivElement>> =
-  React.memo(({ children, ...props }) => <div {...props}>{children}</div>);
+const ProposalGridItemComponent: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = ({ children, ...props }) => {
+  return <div {...props}>{children}</div>;
+};
+
+ProposalGridItemComponent.displayName = 'ProposalGridItem';
+
+export const ProposalGridItem = React.memo(ProposalGridItemComponent);
