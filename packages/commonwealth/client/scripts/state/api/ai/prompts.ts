@@ -16,6 +16,12 @@ Tips for an engaging thread:
 - Include relevant questions to encourage discussion
 - End with a call to action that invites responses
 
+Formatting guidelines:
+- Use Markdown to enhance readability (e.g., headers, bold, italics, lists)
+- Incorporate a few relevant emojis to add visual appeal (but don't overuse them)
+- Break up long paragraphs for better readability
+- Use bullet points or numbered lists when appropriate
+
 Be authentic, conversational, and focused on starting a meaningful community discussion.
 
 IMPORTANT: Return only the thread content without any introduction, explanations, or meta-text.
