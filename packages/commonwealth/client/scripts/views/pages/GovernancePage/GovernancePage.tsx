@@ -2,6 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
@@ -37,12 +38,28 @@ const GovernancePage = () => {
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
   const onEtherem = app.chain?.base === ChainBase.Ethereum;
 
-  const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
+  const {
+    data: activeCosmosProposals,
+    isLoading: isLoadingActicCosmosProposal,
+  } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
-  const { data: completedCosmosProposals } = useCompletedCosmosProposalsQuery({
+  const {
+    data: completedCosmosProposals,
+    isLoading: isLoadingCompletedCosmosProposal,
+  } = useCompletedCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
+
+  const snapshotst = community?.snapshot_spaces || [];
+
+  console.log('snapshotst :', snapshotst);
 
   if (isLoading) {
     if (app.chain?.failed) {
@@ -56,6 +73,9 @@ const GovernancePage = () => {
 
     return <PageLoading message="Connecting to chain" />;
   }
+
+  if (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
+    return <PageLoading message="Connecting to chain" />;
 
   const activeProposalsCount = activeCosmosProposals?.length || 0;
   const inactiveProposalsCount =
@@ -71,7 +91,10 @@ const GovernancePage = () => {
       <div className="GovernancePage">
         <GovernanceHeader />
         <GovernanceCards totalProposals={totalProposalsCount} />
-        <ProposalListing />
+        <ProposalListing
+          activeCosmosProposals={activeCosmosProposals}
+          completedCosmosProposals={completedCosmosProposals}
+        />
       </div>
     </CWPageLayout>
   );

@@ -1,10 +1,4 @@
 import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import {
-  useActiveCosmosProposalsQuery,
-  useCompletedCosmosProposalsQuery,
-} from 'client/scripts/state/api/proposals';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'client/scripts/views/components/component_kit/new_designs/CWTable';
@@ -44,23 +38,18 @@ const columnInfo = [
   { key: 'comment', header: 'Comments', numeric: false, sortable: true },
 ];
 
-const ProposalListing: React.FC = () => {
+interface ProposalListingProps {
+  activeCosmosProposals: CosmosProposal[] | undefined;
+  completedCosmosProposals: CosmosProposal[] | undefined;
+}
+
+const ProposalListing = ({
+  activeCosmosProposals,
+  completedCosmosProposals,
+}: ProposalListingProps) => {
   const [view, setView] = useState<'table' | 'card'>('table');
   const [snapshot, setSnapshot] = useState<OptionType>(snapshots[0]);
   const [filter, setFilter] = useState<OptionType>(filterOptions[0]);
-
-  const communityId = app.activeChainId() || '';
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-  });
-
-  const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
-    isApiReady: !!app.chain?.apiInitialized,
-  });
-  const { data: completedCosmosProposals } = useCompletedCosmosProposalsQuery({
-    isApiReady: !!app.chain?.apiInitialized,
-  });
 
   const proposals = useMemo(() => {
     return [
@@ -68,10 +57,6 @@ const ProposalListing: React.FC = () => {
       ...(completedCosmosProposals || []),
     ];
   }, [activeCosmosProposals, completedCosmosProposals]);
-
-  const snapshotst = community?.snapshot_spaces || [];
-
-  console.log('snapshotst :', snapshotst);
 
   const rowData = useMemo(
     () =>
