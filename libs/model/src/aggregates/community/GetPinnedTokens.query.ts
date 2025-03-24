@@ -45,7 +45,12 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
         {
           model: models.Community,
           required: true,
-          attributes: ['name', 'default_symbol', 'icon_url'],
+          attributes: [
+            'name',
+            'default_symbol',
+            'icon_url',
+            'community_indexer_id',
+          ],
         },
       ];
       if (with_chain_node || with_price) {
@@ -77,22 +82,28 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
       let prices: Awaited<ReturnType<typeof alchemyGetTokenPrices>> | undefined;
       if (with_price && tokens.length > 0) {
         try {
-          prices = await alchemyGetTokenPrices({
-            alchemyApiKey: config.ALCHEMY.APP_KEYS.PRIVATE,
-            tokenSources: tokens.map((t) => ({
+          const tokenSources = tokens
+            .filter((t) => !t.Community?.community_indexer_id) // don't get prices for indexed tokens
+            .map((t) => ({
               contractAddress: t.contract_address,
               alchemyNetworkId: t.ChainNode?.alchemy_metadata?.network_id || '',
-            })),
-          });
+            }));
 
-          if (
-            !Array.isArray(prices?.data) ||
-            prices.data.length !== 1 ||
-            prices.data[0].error
-          ) {
-            throw new InvalidState(
-              `${PinTokenErrors.FailedToFetchPrice}: ${prices.data.map((p) => p.error).join(', ')}`,
-            );
+          if (tokenSources.length > 0) {
+            prices = await alchemyGetTokenPrices({
+              alchemyApiKey: config.ALCHEMY.APP_KEYS.PRIVATE,
+              tokenSources,
+            });
+
+            if (
+              !Array.isArray(prices?.data) ||
+              prices.data.length !== 1 ||
+              prices.data[0].error
+            ) {
+              throw new InvalidState(
+                `${PinTokenErrors.FailedToFetchPrice}: ${prices.data.map((p) => p.error).join(', ')}`,
+              );
+            }
           }
         } catch (err) {
           log.warn(`Failed to get prices: ${err}`);

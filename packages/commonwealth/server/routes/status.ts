@@ -58,7 +58,10 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
         attributes: ['id', 'base', 'ss58_prefix'],
       },
     ],
+    limit: 300,
+    order: [['created_at', 'DESC']],
   });
+
   // TODO: fetch all this data with a single query
   const communityIds = new Set(communities.map((c) => c.id));
   const [addresses, selectedCommunity, isAdmin, disableRichText] =
