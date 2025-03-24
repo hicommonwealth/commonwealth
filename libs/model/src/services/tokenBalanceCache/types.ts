@@ -76,6 +76,7 @@ export type GetSPLBalancesOptions = {
   balanceSourceType: BalanceSourceType.SPL;
   addresses: string[];
   mintAddress: string;
+  solanaNetwork?: string;
 } & TbcConfigOptions;
 
 export type GetErcBalanceOptions =

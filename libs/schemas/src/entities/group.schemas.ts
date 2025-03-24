@@ -17,6 +17,12 @@ const ContractSource = z.object({
     .nullish(),
 });
 
+const SolanaSource = z.object({
+  source_type: z.enum([BalanceSourceType.SPL]),
+  solana_network: z.string(),
+  contract_address: z.string().regex(/^[a-zA-Z0-9]{32,44}$/),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -40,6 +46,7 @@ const ThresholdData = z.object({
     NativeSource,
     CosmosSource,
     CosmosContractSource,
+    SolanaSource,
   ]),
 });
 

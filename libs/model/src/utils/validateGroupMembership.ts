@@ -102,7 +102,7 @@ function _thresholdCheck(
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.evm_chain_id.toString();
+        chainId = thresholdData.source.solana_network.toString();
         break;
       }
       case 'erc20': {

@@ -1,5 +1,6 @@
 import {
   BalanceSourceType,
+  SolanaSource,
   type ContractSource,
   type CosmosContractSource,
   type CosmosSource,
@@ -154,7 +155,7 @@ export function makeGetBalancesOptions(
             break;
           }
           case BalanceSourceType.SPL: {
-            const castedSource = requirement.data.source as ContractSource;
+            const castedSource = requirement.data.source as SolanaSource;
             const existingOptions = allOptions.find((opt) => {
               const castedOpt = opt as GetSPLBalancesOptions;
               return (
@@ -167,6 +168,7 @@ export function makeGetBalancesOptions(
                 balanceSourceType:
                   castedSource.source_type as BalanceSourceType.SPL,
                 mintAddress: castedSource.contract_address,
+                solanaNetwork: castedSource.solana_network,
                 addresses,
               });
             }
