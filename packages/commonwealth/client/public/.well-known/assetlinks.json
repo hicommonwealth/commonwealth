@@ -6,7 +6,9 @@
       "package_name": "xyz.common.mobile",
       "sha256_cert_fingerprints": [
         "55:9F:D8:46:85:90:D5:C2:E6:46:88:A4:7F:10:5F:CD:73:15:1C:5A:12:41:08:3A:3A:65:9F:4C:15:69:5B:9A",
-        "17:8A:4E:A9:E0:90:C5:32:8C:6F:D8:93:A4:0B:2D:BC:DF:CA:F5:31:53:A4:31:E5:C0:CF:F3:81:0F:FE:7B:F7"
+        "17:8A:4E:A9:E0:90:C5:32:8C:6F:D8:93:A4:0B:2D:BC:DF:CA:F5:31:53:A4:31:E5:C0:CF:F3:81:0F:FE:7B:F7",
+        "A5:48:98:E8:A5:CC:3B:7D:6D:3A:D0:53:09:3D:E7:A7:5E:F4:1F:3A:EC:32:A3:D5:07:E3:95:B3:B2:27:F3:62",
+        "AB:5C:AD:FC:46:9A:7D:F8:0F:AD:0D:13:24:FA:DF:FA:9F:E1:4B:45:4A:7D:3E:FD:2D:17:64:8D:AC:25:92:F3"
       ]
     }
   }
