@@ -17,8 +17,14 @@
       align-items: center;
 
       .dropdown-container {
+        width: 250px;
         margin-bottom: 16px;
       }
+    }
+
+    .filter-dropdown-container {
+      width: 180px;
+      margin-bottom: 16px;
     }
   }
 

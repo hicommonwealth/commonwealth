@@ -196,7 +196,7 @@ const ProposalListing = ({
             />
           </CWTabsRow>
         </div>
-        <div className="dropdown-container">
+        <div className="filter-dropdown-container">
           <CWSelectList<OptionType>
             options={filterOptions}
             defaultValue={filter}
