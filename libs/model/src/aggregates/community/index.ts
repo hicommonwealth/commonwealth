@@ -30,4 +30,5 @@ export * from './UnpinToken.command';
 export * from './UpdateCommunity.command';
 export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
+export * from './UpdateRole.command';
 export * from './UpdateTopic.command';

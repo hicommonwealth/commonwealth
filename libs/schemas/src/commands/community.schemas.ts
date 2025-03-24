@@ -7,6 +7,7 @@ import {
   CommunityGoalTypes,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  Roles,
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -17,6 +18,7 @@ import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
 import { Topic } from '../entities/topic.schemas';
+import { Address } from '../entities/user.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -326,6 +328,16 @@ export const DeleteAllAddresses = {
     address: z.string(),
     deleted: z.number(),
   }),
+  context: AuthContext,
+};
+
+export const UpdateRole = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+  }),
+  output: Address.partial(),
   context: AuthContext,
 };
 
