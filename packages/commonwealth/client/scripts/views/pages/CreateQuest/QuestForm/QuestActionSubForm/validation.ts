@@ -10,8 +10,9 @@ import {
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
+import { QuestActionSubFormConfig } from './types';
 
-export const questSubFormValidationSchema = z.object({
+const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
@@ -26,45 +27,50 @@ export const questSubFormValidationSchema = z.object({
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
-export const questSubFormValidationSchemaWithContentLink =
-  questSubFormValidationSchema.extend({
-    contentIdScope: z.enum(['thread', 'topic']).optional(), // this is a placeholder, not used for validation
-    contentLink: linkValidationSchema.optional,
-  });
+export const buildQuestSubFormValidationSchema = (
+  config?: QuestActionSubFormConfig,
+) => {
+  const allowsContentId =
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id;
+  const requiresCreatorPoints = config?.requires_creator_points;
 
-const questSubFormValidationSchemaWithCreatorPointsTemp =
-  questSubFormValidationSchema.extend({
-    creatorRewardAmount: numberNonDecimalValidationSchema,
-  });
+  const needsExtension = requiresCreatorPoints || allowsContentId;
 
-const refineSchemaForCreatorRewardWeightValidation = (schema: z.AnyZodObject) =>
-  schema.refine(
-    (data) => {
-      try {
-        const creatorRewardAmount = numberValidationSchema.parse(
-          data.creatorRewardAmount,
-        );
-        const rewardAmount = numberValidationSchema.parse(data.rewardAmount);
-        // verify creatorRewardAmount is less or equal to rewardAmount
-        return parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10);
-      } catch {
-        return false;
-      }
-    },
-    {
-      message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
-      path: ['creatorRewardAmount'],
-    },
-  );
+  if (!needsExtension) return questSubFormValidationSchema;
 
-export const questSubFormValidationSchemaWithCreatorPoints =
-  refineSchemaForCreatorRewardWeightValidation(
-    questSubFormValidationSchemaWithCreatorPointsTemp,
-  );
-
-export const questSubFormValidationSchemaWithCreatorPointsWithContentLink =
-  refineSchemaForCreatorRewardWeightValidation(
-    questSubFormValidationSchemaWithCreatorPointsTemp.extend({
+  const baseSchema = questSubFormValidationSchema.extend({
+    ...(requiresCreatorPoints && {
+      creatorRewardAmount: numberNonDecimalValidationSchema,
+    }),
+    ...(allowsContentId && {
       contentLink: linkValidationSchema.optional,
     }),
-  );
+  });
+
+  if (requiresCreatorPoints) {
+    baseSchema.refine(
+      (data) => {
+        try {
+          const creatorRewardAmount = numberValidationSchema.parse(
+            data.creatorRewardAmount,
+          );
+          const rewardAmount = numberValidationSchema.parse(data.rewardAmount);
+          // verify creatorRewardAmount is less or equal to rewardAmount
+          return (
+            parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
+          );
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
+        path: ['creatorRewardAmount'],
+      },
+    );
+  }
+
+  return baseSchema;
+};

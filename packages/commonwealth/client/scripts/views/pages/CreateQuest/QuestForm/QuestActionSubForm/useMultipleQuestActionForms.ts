@@ -20,12 +20,7 @@ import {
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
 } from './types';
-import {
-  questSubFormValidationSchema,
-  questSubFormValidationSchemaWithContentLink,
-  questSubFormValidationSchemaWithCreatorPoints,
-  questSubFormValidationSchemaWithCreatorPointsWithContentLink,
-} from './validation';
+import { buildQuestSubFormValidationSchema } from './validation';
 
 const useQuestActionMultiFormsState = ({
   minSubForms,
@@ -76,26 +71,6 @@ const useQuestActionMultiFormsState = ({
     ]);
   };
 
-  const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
-    if (
-      config?.with_optional_comment_id ||
-      config?.with_optional_thread_id ||
-      config?.with_optional_topic_id
-    ) {
-      if (config?.requires_creator_points) {
-        return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
-      }
-
-      return questSubFormValidationSchemaWithContentLink;
-    }
-
-    if (config?.requires_creator_points) {
-      return questSubFormValidationSchemaWithCreatorPoints;
-    }
-
-    return questSubFormValidationSchema;
-  };
-
   const validateFormValues = (
     values: QuestActionSubFormFields,
     refs?: QuestActionSubFormInternalRefs,
@@ -105,7 +80,7 @@ const useQuestActionMultiFormsState = ({
 
     // validate via zod
     try {
-      const schema = buildValidationSchema(config);
+      const schema = buildQuestSubFormValidationSchema(config);
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
