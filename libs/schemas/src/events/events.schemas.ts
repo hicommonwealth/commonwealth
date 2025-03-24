@@ -531,9 +531,13 @@ export const events = {
     created_at: z.coerce.date(),
   }),
 
-  MembershipRefreshed: z.object({
+  MembershipsCreated: z.object({
     community_id: z.string(),
-    created: Membership.array(),
-    updated: Membership.array(),
+    memberships: Membership.array(),
+  }),
+
+  MembershipsUpdated: z.object({
+    community_id: z.string(),
+    memberships: Membership.array(),
   }),
 } as const;

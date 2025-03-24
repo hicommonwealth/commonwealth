@@ -79,20 +79,18 @@ async function processMemberships(
       updateOnDuplicate: ['reject_reason', 'last_checked'],
       transaction,
     });
-    await emitEvent(
-      models.Outbox,
-      [
-        {
-          event_name: 'MembershipRefreshed',
-          event_payload: {
-            community_id,
-            created: toCreate,
-            updated: toUpdate,
-          },
-        },
-      ],
-      transaction,
-    );
+    const events = [] as schemas.EventPairs[];
+    toCreate.length &&
+      events.push({
+        event_name: 'MembershipsCreated',
+        event_payload: { community_id, memberships: toCreate },
+      });
+    toUpdate.length &&
+      events.push({
+        event_name: 'MembershipsUpdated',
+        event_payload: { community_id, memberships: toUpdate },
+      });
+    await emitEvent(models.Outbox, events, transaction);
   });
   return [toCreate.length, toUpdate.length];
 }
