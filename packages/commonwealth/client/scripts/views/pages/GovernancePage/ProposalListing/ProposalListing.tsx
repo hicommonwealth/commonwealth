@@ -11,12 +11,13 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { GridComponents, VirtuosoGrid } from 'react-virtuoso';
 import { smartTrim } from 'shared/utils';
-import { ListContainerProps } from '../../discussions/DiscussionsPage';
 import { PageLoading } from '../../loading';
 import ProposalCard from './ProposalCard/ProposalCard';
+import { ProposalGridContainer } from './ProposalGridContainer/ProposalGridContainer';
+import { ProposalGridItem } from './ProposalGridItem.tsx/ProposalGridItem';
 import './ProposalListing.scss';
 
 type OptionType = {
@@ -24,7 +25,7 @@ type OptionType = {
   label: string;
 };
 
-interface UnifiedProposal {
+export interface UnifiedProposal {
   title: string;
   status: string;
 }
@@ -76,7 +77,7 @@ const ProposalListing = ({
   );
 
   const [view, setView] = useState<'table' | 'card'>('table');
-  const [snapshot] = useState<OptionType>(
+  const [snapshot, setSnapshot] = useState<OptionType>(
     snapshots[0] || { label: '', value: '' },
   );
   const [filter, setFilter] = useState<OptionType>(filterOptions[0]);
@@ -93,7 +94,6 @@ const ProposalListing = ({
         ...(activeCosmosProposals || []),
         ...(completedCosmosProposals || []),
       ];
-
       return cosmosProposals.map((proposal) => ({
         title: proposal.title,
         status: proposal.data.state.status,
@@ -156,7 +156,14 @@ const ProposalListing = ({
     [unifiedProposals],
   );
 
-  const handleSnapshotChange = () => {};
+  const handleSnapshotChange = useCallback(
+    (selected: OptionType | null) => {
+      if (selected && selected.value !== snapshot.value) {
+        setSnapshot(selected);
+      }
+    },
+    [snapshot.value],
+  );
 
   const handleFilterChange = useCallback((selected: OptionType | null) => {
     if (selected) setFilter(selected);
@@ -177,7 +184,7 @@ const ProposalListing = ({
           <div className="dropdown-container">
             <CWSelectList<OptionType>
               options={snapshots}
-              defaultValue={snapshot}
+              value={snapshot}
               onChange={handleSnapshotChange}
             />
           </div>
@@ -199,7 +206,7 @@ const ProposalListing = ({
         <div className="filter-dropdown-container">
           <CWSelectList<OptionType>
             options={filterOptions}
-            defaultValue={filter}
+            value={filter}
             onChange={handleFilterChange}
           />
         </div>
@@ -209,50 +216,18 @@ const ProposalListing = ({
         {view === 'table' ? (
           <>{TableComponent}</>
         ) : (
-          <>
-            <VirtuosoGrid
-              data={unifiedProposals}
-              components={
-                {
-                  List: (() => {
-                    // eslint-disable-next-line react/no-multi-comp
-                    const GridContainer = forwardRef<
-                      HTMLDivElement,
-                      ListContainerProps
-                    >(({ children, ...props }, ref) => (
-                      <div
-                        ref={ref}
-                        {...props}
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns:
-                            'repeat(auto-fill, minmax(210px, 1fr))',
-                          gap: '16px',
-                          padding: '16px',
-                        }}
-                      >
-                        {children}
-                      </div>
-                    ));
-                    GridContainer.displayName = 'GridContainer';
-                    return GridContainer;
-                  })(),
-                  Item: (() => {
-                    const GridItem: React.FC<
-                      React.HTMLAttributes<HTMLDivElement>
-                      // eslint-disable-next-line react/no-multi-comp
-                    > = ({ children, ...props }) => (
-                      <div {...props}>{children}</div>
-                    );
-                    return GridItem;
-                  })(),
-                } as GridComponents
-              }
-              itemContent={(_, item: UnifiedProposal) => (
-                <ProposalCard status={item.status} title={item.title} />
-              )}
-            />
-          </>
+          <VirtuosoGrid
+            data={unifiedProposals}
+            components={
+              {
+                List: ProposalGridContainer,
+                Item: ProposalGridItem,
+              } as GridComponents
+            }
+            itemContent={(_, item: UnifiedProposal) => (
+              <ProposalCard status={item.status} title={item.title} />
+            )}
+          />
         )}
       </div>
     </div>
