@@ -17,10 +17,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import {
-  useCreateThreadMutation,
-  useGenerateThreadText,
-} from 'state/api/threads';
+import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -143,7 +140,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   });
 
   const { generateComment } = useGenerateCommentText();
-  const { generateThread } = useGenerateThreadText();
   const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -391,41 +387,30 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       return `Title: ${thread.title}\nBody: ${thread.body}`;
     });
 
-    const nonStreaming = await generateCompletion(
-      `Created a short thread based on this Context: ${context.join('\n')}`,
-      {
-        model: 'openai/gpt-4o',
-        stream: true,
-        onError: (error) => {
-          console.error('Error generating AI thread:', error);
-        },
-        // streaming
-        onChunk: (chunk) => {
-          bodyAccumulatedRef.current += chunk;
-          setThreadContentDelta(
-            createDeltaFromText(bodyAccumulatedRef.current),
-          );
-        },
-      },
-    );
-
-    // non streaming
-    // setThreadContentDelta(createDeltaFromText(nonStreaming));
-
     try {
-      const body = await generateThread(
-        `Context: ${context.join('\n')}`,
-        (chunk: string) => {
-          bodyAccumulatedRef.current += chunk;
-          // setThreadContentDelta(
-          //   createDeltaFromText(bodyAccumulatedRef.current),
-          // );
+      // Generate thread body using generateCompletion
+      await generateCompletion(
+        `Create a detailed thread based on this context: ${context?.join('\n')}`,
+        {
+          model: 'openai/gpt-4o',
+          stream: true,
+          onError: (error) => {
+            console.error('Error generating AI thread:', error);
+            notifyError('Failed to generate AI thread content');
+          },
+          onChunk: (chunk) => {
+            bodyAccumulatedRef.current += chunk;
+            setThreadContentDelta(
+              createDeltaFromText(bodyAccumulatedRef.current),
+            );
+          },
         },
       );
 
+      // Generate title using generateComment
       await generateComment(
         `Generate a single-line, concise title (max 100 characters) 
-        without quotes or punctuation at the end based on the body: ${body}`,
+        without quotes or punctuation at the end based on the body: ${bodyAccumulatedRef.current}`,
         (chunk: string) => {
           const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
           setThreadTitle((prev) =>
@@ -435,6 +420,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       );
     } catch (error) {
       console.error('Error generating AI thread:', error);
+      notifyError('Failed to generate AI thread');
     } finally {
       setIsGenerating(false);
     }
