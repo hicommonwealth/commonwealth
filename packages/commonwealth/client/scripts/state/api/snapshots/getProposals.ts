@@ -46,7 +46,7 @@ const GET_PROPOSALS_QUERY = gql`
   }
 `;
 
-interface ProposalsQueryResponse {
+export interface ProposalsQueryResponse {
   proposals: {
     id: string;
     ipfs: string;
@@ -72,6 +72,7 @@ interface ProposalsQueryResponse {
 
 interface UseGetSnapshotProposalsQueryProps {
   space: string;
+  enabled?: boolean;
 }
 
 const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
@@ -101,11 +102,13 @@ export const getSnapshotProposalsQuery = async ({
 
 const useGetSnapshotProposalsQuery = ({
   space,
+  enabled = true,
 }: UseGetSnapshotProposalsQueryProps) => {
   return useQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
     queryFn: () => getProposals({ space }),
     staleTime: PROPOSALS_STALE_TIME,
+    enabled,
   });
 };
 

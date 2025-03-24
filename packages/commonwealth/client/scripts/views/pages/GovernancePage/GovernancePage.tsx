@@ -2,7 +2,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
@@ -38,12 +37,6 @@ const GovernancePage = () => {
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
   const onEtherem = app.chain?.base === ChainBase.Ethereum;
 
-  const communityId = app.activeChainId() || '';
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-  });
-
   const {
     data: activeCosmosProposals,
     isLoading: isLoadingActicCosmosProposal,
@@ -56,10 +49,6 @@ const GovernancePage = () => {
   } = useCompletedCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
-
-  const snapshotst = community?.snapshot_spaces || [];
-
-  console.log('snapshotst :', snapshotst);
 
   if (isLoading) {
     if (app.chain?.failed) {
@@ -74,7 +63,10 @@ const GovernancePage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  if (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
+  if (
+    onCosmos &&
+    (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
+  )
     return <PageLoading message="Connecting to chain" />;
 
   const activeProposalsCount = activeCosmosProposals?.length || 0;
@@ -92,6 +84,7 @@ const GovernancePage = () => {
         <GovernanceHeader />
         <GovernanceCards totalProposals={totalProposalsCount} />
         <ProposalListing
+          chain={onCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum}
           activeCosmosProposals={activeCosmosProposals}
           completedCosmosProposals={completedCosmosProposals}
         />

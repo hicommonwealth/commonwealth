@@ -1,4 +1,8 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { useGetSnapshotProposalsQuery } from 'client/scripts/state/api/snapshots';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'client/scripts/views/components/component_kit/new_designs/CWTable';
@@ -11,6 +15,7 @@ import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { GridComponents, VirtuosoGrid } from 'react-virtuoso';
 import { smartTrim } from 'shared/utils';
 import { ListContainerProps } from '../../discussions/DiscussionsPage';
+import { PageLoading } from '../../loading';
 import ProposalCard from './ProposalCard/ProposalCard';
 import './ProposalListing.scss';
 
@@ -19,9 +24,10 @@ type OptionType = {
   label: string;
 };
 
-const snapshots: OptionType[] = [
-  { label: 'commonspace.eth', value: 'commonspace.eth' },
-];
+interface UnifiedProposal {
+  title: string;
+  status: string;
+}
 
 const filterOptions: OptionType[] = [
   { label: 'All Proposals', value: 'all' },
@@ -41,26 +47,77 @@ const columnInfo = [
 interface ProposalListingProps {
   activeCosmosProposals: CosmosProposal[] | undefined;
   completedCosmosProposals: CosmosProposal[] | undefined;
+  chain: ChainBase.CosmosSDK | ChainBase.Ethereum;
 }
 
 const ProposalListing = ({
   activeCosmosProposals,
   completedCosmosProposals,
+  chain,
 }: ProposalListingProps) => {
+  const communityId = app.activeChainId() || '';
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
+  const communitySnapshotsts = useMemo(
+    () => community?.snapshot_spaces || [],
+    [community],
+  );
+  const snapshots: OptionType[] = useMemo(
+    () =>
+      communitySnapshotsts.map((space) => ({
+        label: space,
+        value: space,
+      })),
+    [communitySnapshotsts],
+  );
+
   const [view, setView] = useState<'table' | 'card'>('table');
-  const [snapshot, setSnapshot] = useState<OptionType>(snapshots[0]);
+  const [snapshot] = useState<OptionType>(
+    snapshots[0] || { label: '', value: '' },
+  );
   const [filter, setFilter] = useState<OptionType>(filterOptions[0]);
 
-  const proposals = useMemo(() => {
-    return [
-      ...(activeCosmosProposals || []),
-      ...(completedCosmosProposals || []),
-    ];
-  }, [activeCosmosProposals, completedCosmosProposals]);
+  const { data: snapshotProposals, isLoading: isSnapshotProposalsLoading } =
+    useGetSnapshotProposalsQuery({
+      space: snapshot.value,
+      enabled: !!snapshot.value,
+    });
+
+  const unifiedProposals: UnifiedProposal[] = useMemo(() => {
+    if (chain === ChainBase.CosmosSDK) {
+      const cosmosProposals = [
+        ...(activeCosmosProposals || []),
+        ...(completedCosmosProposals || []),
+      ];
+
+      return cosmosProposals.map((proposal) => ({
+        title: proposal.title,
+        status: proposal.data.state.status,
+      }));
+    } else if (chain === ChainBase.Ethereum) {
+      if (snapshotProposals) {
+        return snapshotProposals.map((proposal) => ({
+          title: proposal.title,
+          status: proposal.state,
+        }));
+      }
+      return [];
+    }
+    return [];
+  }, [
+    activeCosmosProposals,
+    completedCosmosProposals,
+    snapshotProposals,
+    chain,
+  ]);
 
   const rowData = useMemo(
     () =>
-      proposals.map((proposal) => ({
+      unifiedProposals.map((proposal) => ({
         proposal: (
           <div style={{ whiteSpace: 'nowrap' }}>
             <CWTag label={proposal.status} type="proposal" />
@@ -96,12 +153,10 @@ const ProposalListing = ({
           </div>
         ),
       })),
-    [proposals],
+    [unifiedProposals],
   );
 
-  const handleSnapshotChange = useCallback((selected: OptionType | null) => {
-    if (selected) setSnapshot(selected);
-  }, []);
+  const handleSnapshotChange = () => {};
 
   const handleFilterChange = useCallback((selected: OptionType | null) => {
     if (selected) setFilter(selected);
@@ -110,6 +165,10 @@ const ProposalListing = ({
   const TableComponent = useMemo(() => {
     return <CWTable columnInfo={columnInfo} rowData={rowData} />;
   }, [rowData]);
+
+  if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
+    return <PageLoading message="Connecting to chain" />;
+  }
 
   return (
     <div className="ProposalListing">
@@ -152,7 +211,7 @@ const ProposalListing = ({
         ) : (
           <>
             <VirtuosoGrid
-              data={proposals}
+              data={unifiedProposals}
               components={
                 {
                   List: (() => {
@@ -189,7 +248,7 @@ const ProposalListing = ({
                   })(),
                 } as GridComponents
               }
-              itemContent={(_, item: CosmosProposal) => (
+              itemContent={(_, item: UnifiedProposal) => (
                 <ProposalCard status={item.status} title={item.title} />
               )}
             />
