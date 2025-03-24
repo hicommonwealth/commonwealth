@@ -43,7 +43,7 @@ import {
 import { useAiCompletion } from 'state/api/ai';
 import {
   generateThreadPrompt,
-  generateTitlePrompt,
+  generateThreadTitlePrompt,
 } from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
@@ -412,7 +412,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         },
       });
 
-      await generateCompletion(generateTitlePrompt(threadContent), {
+      const titlePrompt = generateThreadTitlePrompt(threadContent);
+
+      await generateCompletion(titlePrompt, {
         stream: false,
         onComplete(fullText) {
           setThreadTitle(fullText);

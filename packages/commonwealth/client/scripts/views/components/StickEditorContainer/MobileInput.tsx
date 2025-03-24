@@ -155,6 +155,7 @@ export const MobileInput = (props: MobileInputProps) => {
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
+          //
           aiPromise = generateCompletion(
             isReplying
               ? `Generate a thoughtful reply to ${replyingToAuthor || 'the comment'}`

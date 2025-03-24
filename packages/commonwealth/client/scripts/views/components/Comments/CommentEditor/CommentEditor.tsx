@@ -4,9 +4,11 @@ import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
+import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -37,6 +39,8 @@ export type CommentEditorProps = {
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   replyingToAuthor?: string;
   streamingReplyIds?: number[];
+  thread?: Thread;
+  parentCommentText?: string;
 };
 
 const CommentEditor = ({
@@ -55,6 +59,8 @@ const CommentEditor = ({
   aiCommentsToggleEnabled: initialAiStreaming,
   onAiReply,
   onCommentCreated,
+  thread,
+  parentCommentText,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const {
@@ -74,27 +80,29 @@ const CommentEditor = ({
     let text = '';
     setContentDelta(text);
 
-    generateCompletion(
-      isReplying
-        ? 'Generate a thoughtful reply comment'
-        : 'Generate a thoughtful comment',
-      {
-        stream: true,
-        onError: (error) => {
-          console.error('Error generating AI comment:', error);
-          notifyError('Failed to generate AI comment');
-          setIsSubmitDisabled(false);
-        },
-        onChunk: (chunk) => {
-          text += chunk;
-          text = text.trim();
-          setContentDelta(text);
-        },
-        onComplete: () => {
-          setIsSubmitDisabled(false);
-        },
+    const context = `
+    Thread: ${thread?.title || ''}
+    ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+    `;
+
+    const prompt = generateCommentPrompt(context);
+
+    generateCompletion(prompt, {
+      stream: true,
+      onError: (error) => {
+        console.error('Error generating AI comment:', error);
+        notifyError('Failed to generate AI comment');
+        setIsSubmitDisabled(false);
       },
-    ).catch((error) => {
+      onChunk: (chunk) => {
+        text += chunk;
+        text = text.trim();
+        setContentDelta(text);
+      },
+      onComplete: () => {
+        setIsSubmitDisabled(false);
+      },
+    }).catch((error) => {
       console.error('Failed to generate comment:', error);
       setIsSubmitDisabled(false);
     });

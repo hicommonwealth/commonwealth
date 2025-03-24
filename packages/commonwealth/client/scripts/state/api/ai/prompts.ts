@@ -28,9 +28,29 @@ IMPORTANT: Return only the thread content without any introduction, explanations
   `;
 };
 
-const generateTitlePrompt = (context: string) => {
+const generateThreadTitlePrompt = (context: string) => {
   return `Generate a single-line, concise title (max 100 characters) 
           without quotes or punctuation at the end based on the thread: ${context}`;
 };
 
-export { generateThreadPrompt, generateTitlePrompt };
+const generateCommentPrompt = (context: string) => {
+  return `
+You are a helpful forum assistant.
+Generate a thoughtful comment reply based on the following thread and parent comment: ${context}
+
+Your comment should be:
+- Detailed and relevant to the thread topic
+- Engaging and conversational in tone
+- Include a touch of humor where appropriate
+- Several sentences long (but not excessive)
+- Written in a way that encourages further discussion
+
+IMPORTANT: Return only the comment without any introduction, explanations, or meta-text.
+  `;
+};
+
+export {
+  generateCommentPrompt,
+  generateThreadPrompt,
+  generateThreadTitlePrompt,
+};

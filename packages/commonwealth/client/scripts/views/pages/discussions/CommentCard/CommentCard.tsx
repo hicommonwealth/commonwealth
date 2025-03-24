@@ -14,6 +14,7 @@ import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
@@ -76,7 +77,7 @@ type CommentCardProps = {
   className?: string;
   shareURL: string;
   weightType?: TopicWeightedVoting | null;
-  onAIReply?: () => Promise<void>;
+  onAIReply?: (commentText?: string) => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
@@ -244,7 +245,9 @@ export const CommentCard = ({
           .filter(Boolean)
           .join('\n\n');
 
-        await generateCompletion(contextText || '', {
+        const prompt = generateCommentPrompt(contextText);
+
+        await generateCompletion(prompt, {
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
@@ -495,7 +498,7 @@ export const CommentCard = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            void onAIReply?.();
+                            void onAIReply?.(comment.body);
                           }}
                         />
                       )}
