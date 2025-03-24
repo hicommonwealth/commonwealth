@@ -9,6 +9,7 @@ import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { Membership } from '../entities/group.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -528,5 +529,11 @@ export const events = {
     community_id: z.string(),
     tag_ids: z.array(z.number()),
     created_at: z.coerce.date(),
+  }),
+
+  MembershipRefreshed: z.object({
+    community_id: z.string(),
+    created: Membership.array(),
+    updated: Membership.array(),
   }),
 } as const;

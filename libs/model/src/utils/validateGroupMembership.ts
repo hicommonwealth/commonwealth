@@ -11,7 +11,7 @@ import type { OptionsWithBalances } from '../services';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
-  messages: z.infer<typeof MembershipRejectReason>;
+  messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
 };
 
@@ -75,7 +75,7 @@ export function validateGroupMembership(
 
   if (allowListOverride) {
     // allow if address is whitelisted
-    return { isValid: true, messages: null };
+    return { isValid: true, messages: undefined };
   }
 
   if (numRequiredRequirements) {
