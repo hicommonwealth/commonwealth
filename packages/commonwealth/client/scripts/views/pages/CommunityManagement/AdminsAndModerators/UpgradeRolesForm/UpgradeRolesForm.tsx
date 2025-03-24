@@ -4,7 +4,6 @@ import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import useUserStore from 'state/ui/user';
 import { CWRadioGroup } from '../../../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton';
 import { CWRadioButton } from '../../../../components/component_kit/new_designs/cw_radio_button';
@@ -41,7 +40,6 @@ export const UpgradeRolesForm = ({
     { id: 2, checked: false },
   ]);
 
-  const userData = useUserStore();
   const { mutateAsync: updateRole } = useUpdateRoleMutation();
 
   const zeroOutRadioButtons = () => {
