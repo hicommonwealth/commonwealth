@@ -10,6 +10,7 @@ import useToggleCommunityStarMutation from './toggleCommunityStar';
 import useUnpinTokenFromCommunityMutation from './unpinTokenFromCommunity';
 import useUpdateCommunityMutation from './updateCommunity';
 import useUpdateCustomDomainMutation from './updateCustomDomain';
+import { useUpdateRoleMutation } from './updateRole';
 
 export {
   useEditCommunityBannerMutation,
@@ -24,4 +25,5 @@ export {
   useUnpinTokenFromCommunityMutation,
   useUpdateCommunityMutation,
   useUpdateCustomDomainMutation,
+  useUpdateRoleMutation,
 };
