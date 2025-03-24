@@ -1,13 +1,16 @@
-import { VerifiedUserInfo } from '@hicommonwealth/model';
+import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../../database';
-import { AddressInstance } from '../../../models/address';
-import { UserInstance } from '../../../models/user';
+import { AddressAttributes } from '../../../models/address';
+import { UserAttributes } from '../../../models/user';
+import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { emitSignInEvents } from './emitSignInEvents';
+
+const log = logger(import.meta);
 
 /**
  * Finds or creates a user by address. If the address already belongs to a user, it may
@@ -17,7 +20,8 @@ import { emitSignInEvents } from './emitSignInEvents';
 export async function findAddressesByAddress(
   address: string,
   transaction: Transaction,
-): Promise<AddressInstance[]> {
+): Promise<AddressAttributes[]> {
+  log.trace(`findAddressesByAddress: ${address}`);
   return await models.Address.findAll({
     where: {
       user_id: { [Op.not]: null },
@@ -27,7 +31,6 @@ export async function findAddressesByAddress(
       {
         model: models.User,
         required: true,
-        attributes: ['id', 'privy_id'],
       },
     ],
     transaction,
@@ -41,7 +44,8 @@ export async function findAddressesByAddress(
 export async function findAddressesBySso(
   ssoInfo: VerifiedUserInfo,
   transaction: Transaction,
-): Promise<AddressInstance[]> {
+): Promise<AddressAttributes[]> {
+  log.trace(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
   let query = `
     SELECT *
     FROM "Addresses"
@@ -87,10 +91,10 @@ export async function findOrCreateUser(
   privyUserId?: string,
 ): Promise<{
   newUser: boolean;
-  user: UserInstance;
-  addresses: AddressInstance[];
+  user: UserAttributes;
+  addresses: AddressAttributes[];
 }> {
-  let addresses: AddressInstance[];
+  let addresses: AddressAttributes[];
   if (ssoInfo) {
     addresses = await findAddressesBySso(ssoInfo, transaction);
   } else {
@@ -114,6 +118,7 @@ export async function findOrCreateUser(
       },
       { transaction },
     );
+    log.trace(`Created new user: ${user.id}`);
     return { newUser: true, user, addresses };
   } else if (privyUserId && !addresses[0].User!.privy_id) {
     await models.User.update(
@@ -127,11 +132,13 @@ export async function findOrCreateUser(
         transaction,
       },
     );
+    log.trace(`Updated user privy id: ${addresses[0].user_id}`);
   }
 
+  log.trace(`Address user object: ${JSON.stringify(addresses[0].User)}`);
   return {
     newUser: false,
-    user: models.User.build(addresses[0].User!),
+    user: addresses[0].User!,
     addresses,
   };
 }
@@ -142,7 +149,7 @@ export async function findOrCreateUser(
  * the user is the same, it updates the verification data and last active date.
  */
 export async function updateOrCreateAddressByCommunity(
-  addresses: AddressInstance[],
+  addresses: AddressAttributes[],
   {
     user_id,
     community_id,
@@ -164,7 +171,12 @@ export async function updateOrCreateAddressByCommunity(
   },
   transaction: Transaction,
 ) {
-  let addressInstance: AddressInstance | undefined;
+  log.trace(
+    'Update or create address by community. User:' +
+      ` ${user_id}, Community: ${community_id}, Address: ${address},` +
+      ` existingAddresses: ${JSON.stringify(addresses.map((a) => [a.address, a.community_id]))}`,
+  );
+  let addressInstance: AddressAttributes | undefined;
   let lastUserId: number | undefined;
   for (const currentAddress of addresses) {
     if (!lastUserId) lastUserId = currentAddress.user_id!;
@@ -181,7 +193,8 @@ export async function updateOrCreateAddressByCommunity(
   }
 
   let transferredUser = false;
-  if (lastUserId !== user_id) {
+  if (lastUserId && lastUserId !== user_id) {
+    log.trace('Transferring address to user: ' + lastUserId + ' -> ' + user_id);
     await models.Address.update(
       {
         user_id,
@@ -214,6 +227,7 @@ export async function updateOrCreateAddressByCommunity(
       hex,
     });
     newAddress = true;
+    log.trace(`Created new address: ${addressInstance.id}`);
   } else {
     await models.Address.update(
       {
@@ -231,6 +245,9 @@ export async function updateOrCreateAddressByCommunity(
         transaction,
       },
     );
+    log.trace(
+      `Updated address activity. Address: ${addressInstance.address}, Community: ${addressInstance.community_id}`,
+    );
   }
 
   return { address: addressInstance, transferredUser, newAddress };
@@ -246,7 +263,7 @@ export async function addressUpdatesAndEmitEvents(
     newUser,
     user,
     addresses,
-  }: { newUser: boolean; user: UserInstance; addresses: AddressInstance[] },
+  }: { newUser: boolean; user: UserAttributes; addresses: AddressAttributes[] },
   transaction: Transaction,
 ) {
   const { transferredUser, address, newAddress } =
@@ -305,7 +322,7 @@ export async function signInUser(
         community_id: { [Op.ne]: payload.community_id },
         address: payload.address,
       },
-      attributes: ['community_d'],
+      attributes: ['community_id'],
       transaction,
     }));
   });

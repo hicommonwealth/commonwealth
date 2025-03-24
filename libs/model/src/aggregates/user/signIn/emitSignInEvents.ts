@@ -1,14 +1,14 @@
 import * as schemas from '@hicommonwealth/schemas';
 import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
-import { AddressInstance } from '../../../models/address';
-import { UserInstance } from '../../../models/user';
+import { AddressAttributes } from '../../../models/address';
+import { UserAttributes } from '../../../models/user';
 import { emitEvent } from '../../../utils/utils';
 
 export async function emitSignInEvents(
   triggers: { newAddress: boolean; newUser: boolean; transferredUser: boolean },
-  addressInstance: AddressInstance,
-  user: UserInstance,
+  addressInstance: AddressAttributes,
+  user: UserAttributes,
   transaction: Transaction,
   originalAddressOwnerUserId?: number,
 ) {

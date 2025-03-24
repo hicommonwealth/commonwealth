@@ -1,23 +1,30 @@
-import { Actor, type Command, InvalidActor } from '@hicommonwealth/core';
-import { UserInstance } from '@hicommonwealth/model';
+import {
+  Actor,
+  type Command,
+  InvalidActor,
+  logger,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { deserializeCanvas, WalletId } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import crypto from 'crypto';
-import { getVerifiedUserInfo } from 'model/src/utils/oauth/getVerifiedUserInfo';
-import { VerifiedUserInfo } from 'model/src/utils/oauth/types';
 import { z } from 'zod';
 import { config } from '../../../config';
 import { models } from '../../../database';
 import { mustExist } from '../../../middleware/guards';
 import { AddressAttributes } from '../../../models/address';
+import { UserAttributes } from '../../../models/user';
 import {
   type VerifiedAddress,
   verifyAddress,
   verifySessionSignature,
 } from '../../../services/session';
+import { getVerifiedUserInfo } from '../../../utils/oauth/getVerifiedUserInfo';
+import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { mapPrivyTypeToWalletSso, privyClient } from './privy';
 import { addressUpdatesAndEmitEvents, signInUser } from './utils';
+
+const log = logger(import.meta);
 
 async function signInPrivy(
   payload: z.infer<(typeof schemas.SignIn)['input']>,
@@ -30,9 +37,10 @@ async function signInPrivy(
   newUser: boolean;
   newAddress: boolean;
   firstCommunity: boolean;
-  user: UserInstance;
+  user: UserAttributes;
 }> {
   if (payload.wallet_id !== WalletId.Privy) throw new Error('Invalid wallet');
+  log.trace('Signing in with Privy');
 
   if (!payload.privyIdentityToken)
     throw new InvalidActor(actor, 'Privy ID token is required');
@@ -65,6 +73,9 @@ async function signInPrivy(
   // First time signing in with Privy (existing or new user)
   // Over time, only new users will go down this path
   if (!user) {
+    log.trace(
+      'Existing privy user not found, creating new user: ' + privyUser.id,
+    );
     let verifiedSsoInfo: VerifiedUserInfo | undefined;
     if (privyUser.wallet?.walletClientType === 'privy') {
       const fullPrivyUser = await privyClient.getUserById(privyUser.id);
@@ -87,6 +98,7 @@ async function signInPrivy(
   }
   // User has signed in with Privy before
   else {
+    log.trace('Existing privy user found: ' + privyUser.id);
     let addressData:
       | Awaited<ReturnType<typeof addressUpdatesAndEmitEvents>>
       | undefined;
@@ -97,9 +109,7 @@ async function signInPrivy(
         {
           newUser: false,
           user,
-          addresses: ((user.Addresses as AddressAttributes[]) || []).map((a) =>
-            models.Address.build(a),
-          ),
+          addresses: user.Addresses as AddressAttributes[],
         },
         transaction,
       );
@@ -178,7 +188,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         newUser: boolean;
         newAddress: boolean;
         firstCommunity: boolean;
-        user: UserInstance;
+        user: UserAttributes;
       };
       if (wallet_id === WalletId.Privy) {
         res = await signInPrivy(
@@ -218,6 +228,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ],
       });
       mustExist('Address', addr);
+      console.log('DAFUQ');
       return {
         ...addr.toJSON(),
         community_base: base,
