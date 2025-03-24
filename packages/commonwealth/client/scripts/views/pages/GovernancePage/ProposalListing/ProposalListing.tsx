@@ -32,8 +32,8 @@ export interface UnifiedProposal {
 
 const filterOptions: OptionType[] = [
   { label: 'All Proposals', value: 'all' },
-  { label: 'In Voting', value: 'voting' },
-  { label: 'Ended', value: 'ended' },
+  { label: 'In Voting', value: 'active' },
+  { label: 'Ended', value: 'closed' },
   { label: 'Upcoming', value: 'upcoming' },
 ];
 
@@ -115,9 +115,33 @@ const ProposalListing = ({
     chain,
   ]);
 
+  const filteredProposals = useMemo(() => {
+    if (filter.value === 'all') {
+      return unifiedProposals;
+    } else if (filter.value === 'active') {
+      return unifiedProposals.filter(
+        (proposal) => proposal.status.toLowerCase() === 'active',
+      );
+    } else if (filter.value === 'upcoming') {
+      return unifiedProposals.filter((proposal) => {
+        const status = proposal.status.toLowerCase();
+        return status === 'upcoming' || status === 'pending';
+      });
+    } else if (filter.value === 'Rejected') {
+      return unifiedProposals.filter((proposal) => {
+        const status = proposal.status.toLowerCase();
+        return (
+          status === 'rejected' || status === 'closed' || status === 'passed'
+        );
+      });
+    }
+    return unifiedProposals;
+  }, [unifiedProposals, filter]);
+
   const rowData = useMemo(
     () =>
-      unifiedProposals.map((proposal) => ({
+      filteredProposals.map((proposal, idx) => ({
+        key: idx,
         proposal: (
           <div style={{ whiteSpace: 'nowrap' }}>
             <CWTag label={proposal.status} type="proposal" />
@@ -134,7 +158,7 @@ const ProposalListing = ({
         status: (
           <div style={{ whiteSpace: 'nowrap' }}>
             <CWText fontWeight="regular" type="caption">
-              {proposal?.status || ''}
+              {proposal.status || ''}
             </CWText>
           </div>
         ),
@@ -153,7 +177,7 @@ const ProposalListing = ({
           </div>
         ),
       })),
-    [unifiedProposals],
+    [filteredProposals],
   );
 
   const handleSnapshotChange = useCallback(
@@ -217,7 +241,7 @@ const ProposalListing = ({
           <>{TableComponent}</>
         ) : (
           <VirtuosoGrid
-            data={unifiedProposals}
+            data={filteredProposals}
             components={
               {
                 List: ProposalGridContainer,
