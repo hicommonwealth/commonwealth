@@ -1,5 +1,4 @@
 import useEditCommunityBannerMutation from './editCommunityBanner';
-import useEditCommunityTagsMutation from './editCommunityTags';
 import useFetchCommunitiesQuery from './fetchCommunities';
 import useFetchRelatedCommunitiesQuery from './fetchRelatedCommunities';
 import useGetCommunityByIdQuery from './getCommuityById';
@@ -15,7 +14,6 @@ import { useUpdateRoleMutation } from './updateRole';
 
 export {
   useEditCommunityBannerMutation,
-  useEditCommunityTagsMutation,
   useFetchCommunitiesQuery,
   useFetchRelatedCommunitiesQuery,
   useGetCommunityByIdQuery,

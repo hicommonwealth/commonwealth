@@ -7,6 +7,7 @@ import {
   CreateGroup,
   JoinCommunity,
   UpdateCommunity,
+  UpdateCommunityTags,
   UpdateRole,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
@@ -336,5 +337,43 @@ describe('community goals lifecycle', () => {
       where: { id: superadmin.user.id! },
     });
     expect(user?.xp_points).toBe(64); // from 10 + 20 + 30 + 1 + 3
+  });
+
+  it('should reach tags goal', async () => {
+    const meta = await createQuest('tags', 2, 4);
+
+    const [tag1] = await seed('Tags');
+    const [tag2] = await seed('Tags');
+
+    // add two tags to reach goal
+    const result = await command(UpdateCommunityTags(), {
+      actor: superadmin,
+      payload: {
+        community_id,
+        tag_ids: [tag1!.id!, tag2!.id!],
+      },
+    });
+    expect(result).toEqual({
+      community_id,
+      tags: [
+        { id: tag1!.id!, name: tag1!.name },
+        { id: tag2!.id!, name: tag2!.name },
+      ],
+    });
+
+    await drainOutbox(['CommunityTagsUpdated'], CommunityGoalsPolicy);
+
+    const goal = await models.CommunityGoalReached.findOne({
+      where: { community_id, community_goal_meta_id: meta.id },
+    });
+    expect(goal?.reached_at).toBeTruthy();
+
+    const e = await drainOutbox(['CommunityGoalReached'], Xp);
+    expect(e.length).toBe(6); // six goals now
+
+    const user = await models.User.findOne({
+      where: { id: superadmin.user.id! },
+    });
+    expect(user?.xp_points).toBe(68); // from 10 + 20 + 30 + 1 + 3 + 4
   });
 });

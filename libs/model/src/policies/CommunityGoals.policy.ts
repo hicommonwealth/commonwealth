@@ -11,6 +11,7 @@ const inputs = {
   CommunityCreated: events.CommunityCreated,
   CommunityUpdated: events.CommunityUpdated,
   CommunityJoined: events.CommunityJoined,
+  CommunityTagsUpdated: events.CommunityTagsUpdated,
   GroupCreated: events.GroupCreated,
   ThreadCreated: events.ThreadCreated,
   RoleUpdated: events.RoleUpdated,
@@ -89,6 +90,17 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
             where: { community_id, verified: { [Op.not]: null } },
           });
           await setReachedGoal(goals, members);
+        }
+      },
+
+      CommunityTagsUpdated: async ({ payload }) => {
+        const { community_id } = payload;
+        const goals = await findOpenGoals(community_id, 'tags');
+        if (goals.length) {
+          const tags = await models.CommunityTags.count({
+            where: { community_id },
+          });
+          await setReachedGoal(goals, tags);
         }
       },
 

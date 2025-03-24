@@ -68,6 +68,7 @@ export const outboxEvents: Events[] = [
   'NamespaceLinked',
   'CommunityGoalReached',
   'TweetEngagementCapReached',
+  'CommunityTagsUpdated',
 ] as const;
 
 export const Outbox = z.union(

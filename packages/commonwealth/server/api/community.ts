@@ -175,4 +175,8 @@ export const trpcRouter = trpc.router({
   getPinnedTokens: trpc.query(Community.GetPinnedTokens, trpc.Tag.Community),
   pinToken: trpc.command(Community.PinToken, trpc.Tag.Community),
   unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
+  updateCommunityTags: trpc.command(
+    Community.UpdateCommunityTags,
+    trpc.Tag.Community,
+  ),
 });
