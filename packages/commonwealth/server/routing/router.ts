@@ -26,16 +26,12 @@ import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 
 import setDefaultRole from '../routes/setDefaultRole';
-import upgradeMember, {
-  upgradeMemberValidation,
-} from '../routes/upgradeMember';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
-import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 
@@ -342,16 +338,6 @@ function setupRouter(
     controllers.listRoles.bind(this, models),
   );
 
-  registerRoute(
-    router,
-    'post',
-    '/upgradeMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    upgradeMemberValidation,
-    upgradeMember.bind(this, models),
-  );
-
   // user model update
   registerRoute(
     router,
@@ -402,15 +388,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     setAddressWallet.bind(this, models),
-  );
-
-  // community categories
-  registerRoute(
-    router,
-    'post',
-    '/updateCommunityCategory',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityCategory.bind(this, models),
   );
 
   // settings
