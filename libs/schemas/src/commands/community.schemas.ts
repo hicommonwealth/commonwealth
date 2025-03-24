@@ -16,6 +16,7 @@ import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
+import { Tags } from '../entities/tag.schemas';
 import { Topic } from '../entities/topic.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
@@ -409,4 +410,16 @@ export const SetReachedGoal = {
     goal_type: z.enum(CommunityGoalTypes),
   }),
   output: z.object({}),
+};
+
+export const UpdateCommunityTags = {
+  input: z.object({
+    community_id: z.string(),
+    tag_ids: z.array(z.number()),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    tags: z.array(Tags),
+  }),
+  context: AuthContext,
 };

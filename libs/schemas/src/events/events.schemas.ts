@@ -515,4 +515,10 @@ export const events = {
     retweet_cap_reached: z.boolean().optional(),
     reply_cap_reached: z.boolean().optional(),
   }),
+
+  CommunityTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_ids: z.array(z.number()),
+    created_at: z.coerce.date(),
+  }),
 } as const;

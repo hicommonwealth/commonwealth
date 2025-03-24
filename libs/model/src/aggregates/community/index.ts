@@ -28,6 +28,7 @@ export * from './SetReachedGoal.command';
 export * from './ToggleArchiveTopic.command';
 export * from './UnpinToken.command';
 export * from './UpdateCommunity.command';
+export * from './UpdateCommunityTags.command';
 export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
 export * from './UpdateTopic.command';
