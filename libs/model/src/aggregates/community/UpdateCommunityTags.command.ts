@@ -37,7 +37,7 @@ export function UpdateCommunityTags(): Command<
       const tags = await models.Tags.findAll({
         where: { id: { [Op.in]: tag_ids } },
       });
-      return { community_id, tags };
+      return { community_id, tags: tags.map((t) => t.toJSON()) };
     },
   };
 }

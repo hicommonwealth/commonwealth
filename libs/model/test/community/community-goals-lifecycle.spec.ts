@@ -346,13 +346,21 @@ describe('community goals lifecycle', () => {
     const [tag2] = await seed('Tags');
 
     // add two tags to reach goal
-    await command(UpdateCommunityTags(), {
+    const result = await command(UpdateCommunityTags(), {
       actor: superadmin,
       payload: {
         community_id,
         tag_ids: [tag1!.id!, tag2!.id!],
       },
     });
+    expect(result).toEqual({
+      community_id,
+      tags: [
+        { id: tag1!.id!, name: tag1!.name },
+        { id: tag2!.id!, name: tag2!.name },
+      ],
+    });
+
     await drainOutbox(['CommunityTagsUpdated'], CommunityGoalsPolicy);
 
     const goal = await models.CommunityGoalReached.findOne({
