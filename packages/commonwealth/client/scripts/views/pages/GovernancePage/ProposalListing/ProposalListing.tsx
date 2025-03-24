@@ -151,6 +151,7 @@ const ProposalListing = ({
           </div>
         ),
         votes: (
+          // TODO : Will levrage the componet developed in ISSUE##11070
           <CWText fontWeight="regular" type="caption">
             N/A
           </CWText>
