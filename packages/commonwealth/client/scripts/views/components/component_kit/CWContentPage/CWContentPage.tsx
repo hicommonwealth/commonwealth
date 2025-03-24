@@ -19,6 +19,7 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { SharePopover } from '../../SharePopover';
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
@@ -83,6 +84,7 @@ type ContentPageProps = {
   onChangeVersionHistoryNumber?: (id: number) => void;
   editingDisabled?: boolean;
   onCommentClick?: () => void;
+  shareUrl?: string;
 };
 
 export const CWContentPage = ({
@@ -123,6 +125,7 @@ export const CWContentPage = ({
   onChangeVersionHistoryNumber,
   editingDisabled,
   onCommentClick,
+  shareUrl,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -247,12 +250,15 @@ export const CWContentPage = ({
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
-          <h1 className="title">
-            <ThreadContestTagContainer
-              associatedContests={thread?.associatedContests}
-            />
-            {truncate(title)}
-          </h1>
+          <div className="title-container">
+            <h1 className="title">
+              <ThreadContestTagContainer
+                associatedContests={thread?.associatedContests}
+              />
+              {truncate(title)}
+            </h1>
+            {shareUrl && <SharePopover linkToShare={shareUrl} buttonLabel="" />}
+          </div>
         ) : (
           title
         )}

@@ -387,8 +387,8 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
-    key="/:scope/newproposalview/:identifier"
-    path="/:scope/newproposalview/:identifier"
+    key="/:scope/proposal-details/:identifier"
+    path="/:scope/proposal-details/:identifier"
     element={withLayout(newProposalViewPage, {
       scoped: true,
     })}

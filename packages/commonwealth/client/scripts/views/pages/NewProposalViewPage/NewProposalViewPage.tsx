@@ -161,6 +161,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
     setShowVotesDrawer(newModalState);
   };
   const governanceUrl = `https://snapshot.box/#/s:${querySnapshotId}/proposal/${identifier}`;
+  const shareUrl = window.location.href;
   return (
     <CWPageLayout>
       {isWindowSmallInclusive && (
@@ -174,6 +175,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
         createdAt={createdAt}
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
+        shareUrl={shareUrl}
         body={() => (
           <>
             {isWindowSmallInclusive && (
