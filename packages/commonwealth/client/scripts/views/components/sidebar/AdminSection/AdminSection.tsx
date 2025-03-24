@@ -31,10 +31,6 @@ const AdminSection = () => {
     [{ path: '/manage/topics' }, { path: ':scope/manage/topics' }],
     location,
   );
-  const matchesCommunityModeratorsRoute = matchRoutes(
-    [{ path: '/manage/moderators' }, { path: ':scope/manage/moderators' }],
-    location,
-  );
   const matchesContestsRoute = matchRoutes(
     [{ path: '/manage/contests/*' }, { path: ':scope/manage/contests/*' }],
     location,
@@ -107,28 +103,6 @@ const AdminSection = () => {
         handleRedirectClicks(navigate, e, `/manage/topics`, communityId, () => {
           setToggleTree(`children.topics.toggledState`, toggle);
         });
-      },
-    },
-    {
-      title: 'Admins & Moderators',
-      containsChildren: false,
-      displayData: null,
-      hasDefaultToggle: false,
-      isActive: !!matchesCommunityModeratorsRoute,
-      isVisible: true,
-      isUpdated: false,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/manage/moderators`,
-          communityId,
-          () => {
-            setToggleTree(`children.adminsAndModerators.toggledState`, toggle);
-          },
-        );
       },
     },
     {

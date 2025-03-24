@@ -75,9 +75,6 @@ const DiscordCallbackPage = lazy(
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 
-const CommunityAdminAndModerators = lazy(
-  () => import('views/pages/CommunityManagement/AdminsAndModerators'),
-);
 const CommunityProfile = lazy(
   () => import('views/pages/CommunityManagement/CommunityProfile'),
 );
@@ -525,13 +522,6 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
     element={withLayout(CommunityTopics, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    key="/:scope/manage/moderators"
-    path="/:scope/manage/moderators"
-    element={withLayout(CommunityAdminAndModerators, {
       scoped: true,
     })}
   />,
