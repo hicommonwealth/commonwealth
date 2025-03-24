@@ -1,5 +1,8 @@
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { MixpanelCommunityInteractionEvent } from '../../../../../shared/analytics/types';
+import useAppStatus from '../../../hooks/useAppStatus';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -17,22 +20,44 @@ enum DirectoryTabsType {
 }
 
 type DirectorySettingsModalProps = {
-  onModalClose: () => void;
   filteredRelatedCommunitiesData: any;
+  onModalClose: () => void;
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+  selectedCommunities: string[];
+  setSelectedCommunities: (communities: string[]) => void;
 };
 
 const DirectorySettingsModal = ({
-  onModalClose,
   filteredRelatedCommunitiesData,
+  onModalClose,
+  selectedTags,
+  setSelectedTags,
+  selectedCommunities,
+  setSelectedCommunities,
 }: DirectorySettingsModalProps) => {
-  const [activeDirectoryTab, setActiveDirectoryTab] = useState(
-    DirectoryTabsType.TagSelection,
-  );
+  const [activeDirectoryTab, setActiveDirectoryTab] = useState('TagSelection');
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
+
+  const handleSubmit = async () => {
+    //mutation call to update the directory settings goes here
+    onModalClose();
+    trackAnalytics({
+      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+      isPWA: isAddedToHomeScreen,
+    });
+  };
 
   return (
     <div className="DirectorySettingsModal">
       <CWModalHeader label="Directory Settings" onModalClose={onModalClose} />
-      <CWText></CWText>
       <CWModalBody>
         <CWText>
           Configure which communities appear in the directory through tags or
@@ -59,8 +84,11 @@ const DirectorySettingsModal = ({
         <DirectorySettingsModalContent
           filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
           activeDirectoryTab={activeDirectoryTab}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+          selectedCommunities={selectedCommunities}
+          setSelectedCommunities={setSelectedCommunities}
         />
-        {/* <CWText>Tag/Manual Selection GOES HERE</CWText> */}
       </CWModalBody>
       <CWModalFooter>
         <CWButton
@@ -71,7 +99,7 @@ const DirectorySettingsModal = ({
         />
         <CWButton
           buttonHeight="sm"
-          onClick={() => console.log('SAVE CHANGES')}
+          type="submit"
           label="Save Changes"
           buttonType="primary"
         />

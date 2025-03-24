@@ -7,22 +7,25 @@ import './DirectorySelectorItem.scss';
 type DirectorySelectorItemProps = {
   tagOrCommunityName: string;
   communityIcon?: string;
+  isSelected?: boolean;
+  onChange?: () => void;
 };
 
 const DirectorySelectorItem = ({
   tagOrCommunityName,
   communityIcon,
+  isSelected,
+  onChange,
 }: DirectorySelectorItemProps) => {
   return (
-    <div
-      className="DirectorySelectorItem"
-      onClick={() => {
-        console.log('hello from DirectorySelectorItem');
-      }}
-    >
+    <div className={`DirectorySelectorItem ${isSelected ? 'selected' : ''}`}>
       <div className="body">
-        <CWCheckbox />
-        {communityIcon && <CWAvatar avatarUrl={communityIcon} size={24} />}
+        <CWCheckbox checked={isSelected} onChange={onChange} />
+        {communityIcon && (
+          <div className="community-avatar">
+            <CWAvatar avatarUrl={communityIcon} size={24} />
+          </div>
+        )}
         <CWText>{tagOrCommunityName}</CWText>
       </div>
     </div>

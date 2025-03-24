@@ -1,0 +1,47 @@
+.DirectorySettingsModalContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .TagSelection,
+  .ManualSelection {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .selected-tags,
+    .selected-communities {
+      flex: 0 0 auto;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .QueryList {
+      margin-top: 16px;
+      max-height: 300px;
+      min-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #e1e1e1;
+      border-radius: 6px;
+      padding: 8px;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    }
+  }
+}

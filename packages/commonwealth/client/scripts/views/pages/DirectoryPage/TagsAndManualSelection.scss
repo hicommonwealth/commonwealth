@@ -1,0 +1,48 @@
+@import '../../../styles/shared.scss';
+
+.TagsAndManualSelection {
+  border-radius: $border-radius-corners;
+  border: 1px solid $neutral-100;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 8px;
+  overflow: hidden;
+
+  .selected-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    padding: 4px 0;
+
+    &:empty {
+      display: none;
+    }
+
+    .selected-tags,
+    .selected-communities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
+
+  .CWTextInput {
+    margin-bottom: -8px;
+  }
+
+  .QueryList {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 200px;
+    border: 1px solid $neutral-100;
+    border-radius: $border-radius-corners;
+  }
+
+  .added-text,
+  .available-text {
+    margin-block: 10px;
+  }
+}

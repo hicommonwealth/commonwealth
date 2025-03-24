@@ -1,25 +1,3 @@
-import { sequelize } from '@hicommonwealth/model';
-import { QueryTypes } from 'sequelize';
-import { ServerCommunitiesController } from '../server_communities_controller';
-
-/**
- * Options for the getRelatedCommunities function.
- *
- * @typedef {Object} GetRelatedCommunitiesQuery
- * @property {string} chainNodeId - The id of the ChainNode variable for filtering.
- */
-export type GetRelatedCommunitiesQuery = { chainNodeId: number };
-
-/**
- * Response for the getRelatedCommunities function.
- *
- * @typedef {Object} GetRelatedCommunitiesResult
- * @property {string} id - The id of the community
- * @property {string} community - The name of the community
- * @property {string} icon_url - The icon url of the community
- * @property {number} lifetime_thread_count - The Number of threads associated with the community
- * @property {number} profile_count - The Number of profiles with an address belonging to the community
- */
 export type GetRelatedCommunitiesResult = {
   id: string;
   community: string;
@@ -29,7 +7,7 @@ export type GetRelatedCommunitiesResult = {
   description: string;
   namespace: string;
   chain_node_id: number;
-  tag_ids: string[];
+  tag_ids: string[]; // This will now contain tag names instead of IDs
 }[];
 
 export async function __getRelatedCommunities(
