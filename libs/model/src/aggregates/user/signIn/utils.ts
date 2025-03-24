@@ -21,7 +21,7 @@ export async function findAddressesByAddress(
   address: string,
   transaction: Transaction,
 ): Promise<AddressAttributes[]> {
-  log.trace(`findAddressesByAddress: ${address}`);
+  console.log(`findAddressesByAddress: ${address}`);
   return await models.Address.findAll({
     where: {
       user_id: { [Op.not]: null },
@@ -45,7 +45,7 @@ export async function findAddressesBySso(
   ssoInfo: VerifiedUserInfo,
   transaction: Transaction,
 ): Promise<AddressAttributes[]> {
-  log.trace(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
+  console.log(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
   let query = `
     SELECT *
     FROM "Addresses"
@@ -118,7 +118,7 @@ export async function findOrCreateUser(
       },
       { transaction },
     );
-    log.trace(`Created new user: ${user.id}`);
+    console.log(`Created new user: ${user.id}`);
     return { newUser: true, user, addresses };
   } else if (privyUserId && !addresses[0].User!.privy_id) {
     await models.User.update(
@@ -132,16 +132,27 @@ export async function findOrCreateUser(
         transaction,
       },
     );
-    log.trace(`Updated user privy id: ${addresses[0].user_id}`);
+    console.log(`Updated user privy id: ${addresses[0].user_id}`);
   }
 
-  log.trace(`Address user object: ${JSON.stringify(addresses[0].User)}`);
+  console.log(`Address user object: ${JSON.stringify(addresses[0].User)}`);
   return {
     newUser: false,
     user: addresses[0].User!,
     addresses,
   };
 }
+
+type AddressCrudProperties = {
+  user_id: number;
+  community_id: string;
+  address: string;
+  wallet_id: WalletId;
+  verification_token: string;
+  verification_token_expires: Date;
+  block_info?: string | null | undefined;
+  hex?: string | undefined;
+};
 
 /**
  * Updates or creates an address for a user in a community. If the address already belongs to
@@ -159,19 +170,10 @@ export async function updateOrCreateAddressByCommunity(
     verification_token_expires,
     block_info,
     hex,
-  }: {
-    user_id: number;
-    community_id: string;
-    address: string;
-    wallet_id: WalletId;
-    verification_token: string;
-    verification_token_expires: Date;
-    block_info?: string | null | undefined;
-    hex?: string | undefined;
-  },
+  }: AddressCrudProperties,
   transaction: Transaction,
 ) {
-  log.trace(
+  console.log(
     'Update or create address by community. User:' +
       ` ${user_id}, Community: ${community_id}, Address: ${address},` +
       ` existingAddresses: ${JSON.stringify(addresses.map((a) => [a.address, a.community_id]))}`,
@@ -194,7 +196,9 @@ export async function updateOrCreateAddressByCommunity(
 
   let transferredUser = false;
   if (lastUserId && lastUserId !== user_id) {
-    log.trace('Transferring address to user: ' + lastUserId + ' -> ' + user_id);
+    console.log(
+      'Transferring address to user: ' + lastUserId + ' -> ' + user_id,
+    );
     await models.Address.update(
       {
         user_id,
@@ -210,24 +214,27 @@ export async function updateOrCreateAddressByCommunity(
 
   let newAddress = false;
   if (!addressInstance) {
-    addressInstance = await models.Address.create({
-      community_id,
-      user_id,
-      address,
-      wallet_id,
-      role: 'member',
-      is_user_default: false,
-      ghost_address: false,
-      is_banned: false,
-      last_active: new Date(),
-      verified: new Date(),
-      verification_token,
-      verification_token_expires,
-      block_info: block_info ?? null,
-      hex,
-    });
+    addressInstance = await models.Address.create(
+      {
+        community_id,
+        user_id,
+        address,
+        hex,
+        wallet_id,
+        role: 'member',
+        is_user_default: false,
+        ghost_address: false,
+        is_banned: false,
+        last_active: new Date(),
+        verified: new Date(),
+        verification_token,
+        verification_token_expires,
+        block_info: block_info ?? null,
+      },
+      { transaction },
+    );
     newAddress = true;
-    log.trace(`Created new address: ${addressInstance.id}`);
+    console.log(`Created new address: ${addressInstance.id}`);
   } else {
     await models.Address.update(
       {
@@ -245,7 +252,7 @@ export async function updateOrCreateAddressByCommunity(
         transaction,
       },
     );
-    log.trace(
+    console.log(
       `Updated address activity. Address: ${addressInstance.address}, Community: ${addressInstance.community_id}`,
     );
   }
@@ -254,7 +261,7 @@ export async function updateOrCreateAddressByCommunity(
 }
 
 export async function addressUpdatesAndEmitEvents(
-  payload: z.infer<(typeof SignIn)['input']>,
+  payload: z.infer<(typeof SignIn)['input']> & { hex?: string },
   verificationData: {
     verification_token: string;
     verification_token_expires: Date;
@@ -273,8 +280,10 @@ export async function addressUpdatesAndEmitEvents(
         user_id: user.id!,
         community_id: payload.community_id,
         address: payload.address,
-        wallet_id: WalletId.Privy,
+        wallet_id: payload.wallet_id,
         ...verificationData,
+        block_info: payload.block_info,
+        hex: payload.hex,
       },
       transaction,
     );
@@ -288,7 +297,7 @@ export async function addressUpdatesAndEmitEvents(
 }
 
 export async function signInUser(
-  payload: z.infer<(typeof SignIn)['input']>,
+  payload: z.infer<(typeof SignIn)['input']> & { hex?: string },
   verificationData: {
     verification_token: string;
     verification_token_expires: Date;
@@ -317,7 +326,7 @@ export async function signInUser(
     );
 
     // TODO: this does not seem to be used on client?
-    firstCommunity = !!(await models.Address.findOne({
+    firstCommunity = !(await models.Address.findOne({
       where: {
         community_id: { [Op.ne]: payload.community_id },
         address: payload.address,
