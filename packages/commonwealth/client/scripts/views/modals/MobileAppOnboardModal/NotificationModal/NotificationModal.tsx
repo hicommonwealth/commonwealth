@@ -7,6 +7,7 @@ import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 // eslint-disable-next-line max-len
 import { IOSModal } from 'views/components/IOSModal/IOSModal';
+// eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 import './NotificationModal.scss';
 
