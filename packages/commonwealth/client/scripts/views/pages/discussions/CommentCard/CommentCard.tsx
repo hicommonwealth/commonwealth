@@ -8,6 +8,7 @@ import {
   deserializeCanvas,
   verify,
 } from '@hicommonwealth/shared';
+import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
@@ -15,7 +16,6 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
@@ -133,7 +133,8 @@ export const CommentCard = ({
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
+
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
@@ -215,11 +216,6 @@ export const CommentCard = ({
     createCommentRef.current = createComment;
   }, [createComment]);
 
-  const generateCommentRef = useRef(generateComment);
-  useEffect(() => {
-    generateCommentRef.current = generateComment;
-  }, [generateComment]);
-
   const onStreamingCompleteRef = useRef(onStreamingComplete);
   useEffect(() => {
     onStreamingCompleteRef.current = onStreamingComplete;
@@ -248,13 +244,15 @@ export const CommentCard = ({
           .filter(Boolean)
           .join('\n\n');
 
-        await generateCommentRef.current(contextText || '', (text) => {
-          if (mounted) {
-            // Append incoming chunks so the full comment is built up
-            accumulatedText += text;
-            setStreamingText(accumulatedText);
-            finalText = accumulatedText;
-          }
+        await generateCompletion(contextText || '', {
+          stream: true,
+          onChunk: (chunk) => {
+            if (mounted) {
+              accumulatedText += chunk;
+              setStreamingText(accumulatedText);
+              finalText = accumulatedText;
+            }
+          },
         });
 
         if (mounted && finalText) {
@@ -296,6 +294,7 @@ export const CommentCard = ({
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
+    generateCompletion,
   ]);
 
   useEffect(() => {

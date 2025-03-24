@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -67,19 +67,37 @@ const CommentEditor = ({
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
 
   const handleCommentWithAI = () => {
     setIsSubmitDisabled(true);
     let text = '';
     setContentDelta(text);
-    generateComment('userText', (x) => {
-      text += `${x}`;
-      text = text.trim();
-      setContentDelta(text);
-    })
-      .catch(console.error)
-      .finally(() => setIsSubmitDisabled(false));
+
+    generateCompletion(
+      isReplying
+        ? 'Generate a thoughtful reply comment'
+        : 'Generate a thoughtful comment',
+      {
+        stream: true,
+        onError: (error) => {
+          console.error('Error generating AI comment:', error);
+          notifyError('Failed to generate AI comment');
+          setIsSubmitDisabled(false);
+        },
+        onChunk: (chunk) => {
+          text += chunk;
+          text = text.trim();
+          setContentDelta(text);
+        },
+        onComplete: () => {
+          setIsSubmitDisabled(false);
+        },
+      },
+    ).catch((error) => {
+      console.error('Failed to generate comment:', error);
+      setIsSubmitDisabled(false);
+    });
   };
 
   const handleEnhancedSubmit = async () => {

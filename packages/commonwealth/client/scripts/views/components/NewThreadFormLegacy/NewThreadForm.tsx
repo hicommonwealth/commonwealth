@@ -40,7 +40,6 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
 import { useAiCompletion } from 'state/api/ai';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
@@ -139,7 +138,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     topicId: threadTopic?.id,
   });
 
-  const { generateComment } = useGenerateCommentText();
   const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -392,7 +390,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       await generateCompletion(
         `Create a detailed thread based on this context: ${context?.join('\n')}`,
         {
-          model: 'openai/gpt-4o',
           stream: true,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
@@ -407,15 +404,18 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         },
       );
 
-      // Generate title using generateComment
-      await generateComment(
+      // Generate title using generateCompletion
+      await generateCompletion(
         `Generate a single-line, concise title (max 100 characters) 
         without quotes or punctuation at the end based on the body: ${bodyAccumulatedRef.current}`,
-        (chunk: string) => {
-          const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
-          setThreadTitle((prev) =>
-            prev === '' ? cleanChunk : prev + cleanChunk,
-          );
+        {
+          stream: true,
+          onChunk: (chunk) => {
+            const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
+            setThreadTitle((prev) =>
+              prev === '' ? cleanChunk : prev + cleanChunk,
+            );
+          },
         },
       );
     } catch (error) {

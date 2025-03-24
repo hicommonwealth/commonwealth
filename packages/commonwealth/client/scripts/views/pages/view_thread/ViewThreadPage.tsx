@@ -26,7 +26,7 @@ import React, {
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
@@ -96,7 +96,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [streamingTitle, setStreamingTitle] = useState('');
 
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -305,50 +305,57 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     let fullTitle = '';
 
     try {
-      await generateComment(
+      await generateCompletion(
         `Based on this thread content, generate a concise 2-6 word title. Content: ${thread.body}`,
-        (chunk) => {
-          const chunkStr =
-            typeof chunk === 'string' ? chunk : String(chunk || '');
-          const cleanChunk = chunkStr
-            .replace(/["']/g, '')
-            .replace(/[.!?]$/, '');
-          fullTitle = (fullTitle + cleanChunk).slice(0, 100);
-          setStreamingTitle(fullTitle);
+        {
+          stream: true,
+          onError: (error) => {
+            console.error('Error generating title:', error);
+            notifyError('Failed to generate title');
+            setIsGeneratingTitle(false);
+          },
+          onChunk: (chunk) => {
+            const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
+            fullTitle = (fullTitle + cleanChunk).slice(0, 100);
+            setStreamingTitle(fullTitle);
+          },
+          onComplete: async () => {
+            if (fullTitle.trim() && thread.id && thread.canvasMsgId) {
+              try {
+                const input = await buildUpdateThreadInput({
+                  address: activeAccount.address,
+                  communityId: communityId || '',
+                  threadId: thread.id,
+                  threadMsgId: thread.canvasMsgId,
+                  newTitle: fullTitle.trim(),
+                  newBody: thread.body,
+                });
+
+                await editThread(input);
+                setDraftTitle(fullTitle.trim());
+              } catch (error) {
+                console.error('Error updating title:', error);
+                notifyError('Failed to update title');
+              }
+            }
+            setIsGeneratingTitle(false);
+          },
         },
       );
-
-      if (fullTitle.trim()) {
-        if (!thread.id || !thread.canvasMsgId) {
-          return;
-        }
-
-        const input = await buildUpdateThreadInput({
-          address: activeAccount.address,
-          communityId: communityId || '',
-          threadId: thread.id,
-          threadMsgId: thread.canvasMsgId,
-          newTitle: fullTitle.trim(),
-          newBody: thread.body,
-        });
-
-        await editThread(input);
-        setDraftTitle(fullTitle.trim());
-      }
     } catch (error) {
+      console.error('Error in title generation:', error);
       notifyError('Failed to generate title');
-    } finally {
       setIsGeneratingTitle(false);
     }
   }, [
+    user.activeAccount,
     thread?.body,
     thread?.id,
     thread?.canvasMsgId,
-    communityId,
-    user.activeAccount,
-    generateComment,
-    editThread,
     isGeneratingTitle,
+    generateCompletion,
+    communityId,
+    editThread,
   ]);
 
   // Add effect to trigger title generation when thread is loaded without a title

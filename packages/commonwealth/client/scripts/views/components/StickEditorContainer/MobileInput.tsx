@@ -3,7 +3,7 @@ import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import app from 'state';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -38,7 +38,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
   const stickyCommentReset = useActiveStickCommentReset();
 
   const communityId = app.activeChainId() || '';
@@ -155,7 +155,14 @@ export const MobileInput = (props: MobileInputProps) => {
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
-          aiPromise = generateComment(submittedText);
+          aiPromise = generateCompletion(
+            isReplying
+              ? `Generate a thoughtful reply to ${replyingToAuthor || 'the comment'}`
+              : 'Generate a thoughtful comment',
+            {
+              stream: false,
+            },
+          );
         }
         // Call the actual comment submission logic passed in as a prop.
         const commentId = await handleSubmitComment();

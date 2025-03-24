@@ -40,7 +40,7 @@ export const useAiCompletion = () => {
           },
           body: JSON.stringify({
             prompt,
-            model: options?.model || 'gpt-4o', // Default model
+            model: options?.model || 'gpt-4o',
             temperature: options?.temperature,
             maxTokens: options?.maxTokens,
             stream: streamMode,
