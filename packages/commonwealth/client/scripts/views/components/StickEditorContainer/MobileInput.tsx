@@ -4,6 +4,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -21,6 +22,7 @@ export type MobileInputProps = CommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
+  parentCommentText?: string;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -33,6 +35,8 @@ export const MobileInput = (props: MobileInputProps) => {
     onCancel,
     onAiReply,
     aiCommentsToggleEnabled,
+    parentCommentText,
+    thread: originalThread,
   } = props;
 
   const { mode } = useContext(StickCommentContext);
@@ -155,15 +159,16 @@ export const MobileInput = (props: MobileInputProps) => {
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
-          //
-          aiPromise = generateCompletion(
-            isReplying
-              ? `Generate a thoughtful reply to ${replyingToAuthor || 'the comment'}`
-              : 'Generate a thoughtful comment',
-            {
-              stream: false,
-            },
-          );
+          const context = `
+          Thread: ${originalThread?.title || ''}
+          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+          `;
+
+          const prompt = generateCommentPrompt(context);
+
+          aiPromise = generateCompletion(prompt, {
+            stream: false,
+          });
         }
         // Call the actual comment submission logic passed in as a prop.
         const commentId = await handleSubmitComment();
