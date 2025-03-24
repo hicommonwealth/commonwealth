@@ -41,6 +41,10 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { useAiCompletion } from 'state/api/ai';
+import {
+  generateThreadPrompt,
+  generateTitlePrompt,
+} from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -59,6 +63,7 @@ import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 interface NewThreadFormProps {
@@ -132,7 +137,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const { data: recentThreads } = useFetchThreadsQuery({
     queryType: 'bulk',
-    limit: 3,
+    limit: 2,
     communityId: selectedCommunityId,
     apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
     topicId: threadTopic?.id,
@@ -381,40 +386,38 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
 
-    const context = recentThreads?.map((thread) => {
-      return `Title: ${thread.title}\nBody: ${thread.body}`;
-    });
+    const context = recentThreads
+      ?.map((thread) => {
+        return `Title: ${thread.title}
+              \n Body: ${thread.body}
+              \n Topic: ${thread.topic?.name || 'N/A'}
+              \n Community: ${thread.communityName || 'N/A'}`;
+      })
+      .join('\n\n');
 
     try {
-      // Generate thread body using generateCompletion
-      await generateCompletion(
-        `Create a detailed thread based on this context: ${context?.join('\n')}`,
-        {
-          stream: true,
-          onError: (error) => {
-            console.error('Error generating AI thread:', error);
-            notifyError('Failed to generate AI thread content');
-          },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
-            setThreadContentDelta(
-              createDeltaFromText(bodyAccumulatedRef.current),
-            );
-          },
-        },
-      );
+      const prompt = generateThreadPrompt(context);
 
-      // Generate title using generateCompletion
+      await generateCompletion(prompt, {
+        stream: true,
+        onError: (error) => {
+          console.error('Error generating AI thread:', error);
+          notifyError('Failed to generate AI thread content');
+        },
+        onChunk: (chunk) => {
+          bodyAccumulatedRef.current += chunk;
+          setThreadContentDelta(
+            createDeltaFromText(bodyAccumulatedRef.current),
+          );
+        },
+      });
+
       await generateCompletion(
-        `Generate a single-line, concise title (max 100 characters) 
-        without quotes or punctuation at the end based on the body: ${bodyAccumulatedRef.current}`,
+        generateTitlePrompt(bodyAccumulatedRef.current),
         {
-          stream: true,
-          onChunk: (chunk) => {
-            const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
-            setThreadTitle((prev) =>
-              prev === '' ? cleanChunk : prev + cleanChunk,
-            );
+          stream: false,
+          onComplete(fullText) {
+            setThreadTitle(fullText);
           },
         },
       );
