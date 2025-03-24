@@ -84,8 +84,8 @@ export const useAiCompletion = () => {
               if (buffer.length > 0) {
                 accumulatedText += buffer;
                 setCompletion(accumulatedText);
-                options?.onChunk?.(buffer);
               }
+
               options?.onComplete?.(accumulatedText);
               break;
             }
@@ -100,7 +100,7 @@ export const useAiCompletion = () => {
 
             buffer += chunk;
 
-            // Process and update UI immediately
+            // Process chunk - only send the current chunk to onChunk, not the accumulated text
             accumulatedText += chunk;
             setCompletion(accumulatedText);
             options?.onChunk?.(chunk);

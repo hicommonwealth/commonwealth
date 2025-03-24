@@ -398,7 +398,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     try {
       const prompt = generateThreadPrompt(context);
 
-      await generateCompletion(prompt, {
+      const threadContent = await generateCompletion(prompt, {
         stream: true,
         onError: (error) => {
           console.error('Error generating AI thread:', error);
@@ -412,15 +412,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         },
       });
 
-      await generateCompletion(
-        generateTitlePrompt(bodyAccumulatedRef.current),
-        {
-          stream: false,
-          onComplete(fullText) {
-            setThreadTitle(fullText);
-          },
+      await generateCompletion(generateTitlePrompt(threadContent), {
+        stream: false,
+        onComplete(fullText) {
+          setThreadTitle(fullText);
         },
-      );
+      });
     } catch (error) {
       console.error('Error generating AI thread:', error);
       notifyError('Failed to generate AI thread');
