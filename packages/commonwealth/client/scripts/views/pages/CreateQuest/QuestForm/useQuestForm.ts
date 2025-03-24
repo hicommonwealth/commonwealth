@@ -353,6 +353,23 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           notifyError('Failed to update quest! Please fix form errors');
           return;
         }
+        if (error.includes('invalid topic url')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) =>
+              form.config?.with_optional_topic_id &&
+              form.values.contentIdScope === QuestActionContentIdScope.Topic &&
+              error.includes(form.values?.contentLink?.trim()),
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentLink: `Invalid topic link.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
+          return;
+        }
         notifyError(`Failed to ${mode} quest!`);
       }
     };
