@@ -52,7 +52,7 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
   return (
     <>
       {!showCombineBarOnly ? (
-        <div className="governance-vote">
+        <div className="VotingResultView">
           <div className="header">
             <CWText type="h5" fontWeight="semiBold">
               Result
@@ -145,35 +145,38 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
           </div>
         </div>
       ) : (
-        <div className="combined-progress">
-          <div className="progress-bar">
-            {
-              voteOptions?.reduce(
-                (acc, option, index) => {
-                  const percentage = parseFloat(option.percentage || '0');
-                  const leftPosition = acc.prevLeft || 0;
-                  const combinedColor = getCombinedBarColor(
-                    option.label,
-                    index,
-                  );
+        <div className="combined-bar-container">
+          <div className="combined-progress">
+            <div className="progress-bar">
+              {
+                voteOptions?.reduce(
+                  (acc, option, index) => {
+                    const percentage = parseFloat(option.percentage || '0');
+                    const leftPosition = acc.prevLeft || 0;
+                    const combinedColor = getCombinedBarColor(
+                      option.label,
+                      index,
+                    );
 
-                  acc.elements.push(
-                    <div
-                      key={option.label}
-                      className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
-                      style={{
-                        width: `${percentage}%`,
-                        left: `${leftPosition}%`,
-                        backgroundColor: combinedColor,
-                      }}
-                    />,
-                  );
-                  acc.prevLeft = (acc.prevLeft || 0) + percentage;
-                  return acc;
-                },
-                { elements: [] as JSX.Element[], prevLeft: 0 },
-              ).elements
-            }
+                    acc.elements.push(
+                      <div
+                        key={option.label}
+                        className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
+                        style={{
+                          width: `${percentage}%`,
+                          left: `${leftPosition}%`,
+                          backgroundColor: combinedColor,
+                          height: '7px',
+                        }}
+                      />,
+                    );
+                    acc.prevLeft = (acc.prevLeft || 0) + percentage;
+                    return acc;
+                  },
+                  { elements: [] as JSX.Element[], prevLeft: 0 },
+                ).elements
+              }
+            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 @import '../../../styles/shared.scss';
 
-.governance-vote {
+.VotingResultView {
   display: flex;
   flex-direction: column;
   width: 248px;
@@ -51,12 +51,11 @@
   }
 
   .combined-progress {
-    margin: 16px 0 30px; // Increased bottom margin to make space for labels
-
+    margin: 16px 0 30px;
     .progress-bar {
       height: 7px;
       position: relative;
-      overflow: visible; // Changed to visible to show labels
+      overflow: visible;
     }
 
     .progress-container {
@@ -88,5 +87,37 @@
     margin-left: 8px;
     font-family: 'NeueHaasUnica';
     color: $neutral-500;
+  }
+}
+
+.combined-bar-container {
+  display: flex;
+  width: 100%;
+  .combined-progress {
+    margin: 4px 0 12px;
+    width: 100%;
+    .progress-bar {
+      height: 7px;
+      position: relative;
+      overflow: visible;
+      .progress {
+        height: 7px solid;
+      }
+    }
+
+    .progress-container {
+      position: absolute;
+      height: 100%;
+
+      .vote-value {
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+        font-family: 'NeueHaasUnica';
+        font-weight: 600;
+      }
+    }
   }
 }
