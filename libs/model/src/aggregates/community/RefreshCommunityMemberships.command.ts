@@ -3,14 +3,11 @@ import * as schemas from '@hicommonwealth/schemas';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
-import type {
-  AddressAttributes,
-  GroupAttributes,
-  MembershipRejectReason,
-} from '../../models';
+import type { AddressAttributes, GroupAttributes } from '../../models';
 import {
   tokenBalanceCache,
   type Balances,
@@ -23,7 +20,7 @@ const log = logger(import.meta);
 type ComputedMembership = {
   group_id: number;
   address_id: number;
-  reject_reason: MembershipRejectReason | null;
+  reject_reason: z.infer<typeof schemas.MembershipRejectReason>;
   last_checked: Date;
 };
 

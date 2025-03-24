@@ -1,6 +1,8 @@
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { GroupPermission } from './group-permission.schemas';
+import { Address } from './user.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -72,6 +74,31 @@ export const Group = z.object({
   requirements: z.array(Requirement),
   is_system_managed: z.boolean().optional(),
 
+  // associations
+  GroupPermissions: z.array(GroupPermission).optional(),
+
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+});
+
+export const MembershipRejectReason = z
+  .object({
+    message: z.string(),
+    requirement: z.object({
+      data: z.any(),
+      rule: z.string(),
+    }),
+  })
+  .array()
+  .optional();
+
+export const Membership = z.object({
+  group_id: z.number(),
+  address_id: z.number(),
+  reject_reason: MembershipRejectReason,
+  last_checked: z.date(),
+
+  // associations
+  group: Group.optional(),
+  address: Address.optional(),
 });
