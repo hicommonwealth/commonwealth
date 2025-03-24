@@ -12,6 +12,7 @@ export const SignIn = {
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
+    privyIdentityToken: z.string().optional(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),

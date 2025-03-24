@@ -58,6 +58,7 @@ export type AbiType = Record<string, unknown>[];
 
 export enum WalletId {
   Magic = 'magic',
+  Privy = 'privy',
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',

@@ -86,6 +86,10 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         allowNull: false,
         defaultValue: 0,
       },
+      privy_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

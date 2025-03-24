@@ -10,7 +10,7 @@ import {
 } from '@hicommonwealth/shared';
 import { afterAll, describe, expect, it } from 'vitest';
 import { tester } from '../../src';
-import { SignIn } from '../../src/aggregates/user/SignIn.command';
+import { SignIn } from '../../src/aggregates/user/signIn/SignIn.command';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';

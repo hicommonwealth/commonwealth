@@ -52,6 +52,9 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
+  PRIVY_FLAG,
+  PRIVY_APP_ID,
+  PRIVY_APP_SECRET,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -179,6 +182,11 @@ export const config = configure(
     },
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
+    },
+    PRIVY: {
+      FLAG_ENABLED: PRIVY_FLAG === 'true',
+      APP_ID: PRIVY_APP_ID,
+      APP_SECRET: PRIVY_APP_SECRET,
     },
   },
   z.object({
@@ -400,5 +408,14 @@ export const config = configure(
           'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
+    PRIVY: z
+      .object({
+        FLAG_ENABLED: z.boolean(),
+        APP_ID: z.string().optional(),
+        APP_SECRET: z.string().optional(),
+      })
+      .refine(
+        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
+      ),
   }),
 );
