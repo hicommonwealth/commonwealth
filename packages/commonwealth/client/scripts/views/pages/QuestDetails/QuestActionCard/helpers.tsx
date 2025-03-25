@@ -37,6 +37,7 @@ export const actionCopies = {
       <>
         XP rewarded to participants after any of these tweet metrics are met.
         <br />
+        {/* TODO: update this to only show counts > 0 */}
         {likes} Likes, {retweets} Retweets or {replies} Replies.
       </>
     ),

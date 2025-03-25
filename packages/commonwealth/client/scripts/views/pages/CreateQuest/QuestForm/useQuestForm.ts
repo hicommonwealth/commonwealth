@@ -144,7 +144,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
             parseInt(`${subForm.values.rewardAmount}`, 10),
-            parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+            parseInt(`${subForm.values.creatorRewardAmount || 0}`, 10),
           ),
         }),
         ...(subForm.values.contentLink &&
@@ -169,6 +169,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           subForm.values.noOfRetweets ||
           subForm.values.noOfReplies) && {
           tweet_engagement_caps: {
+            // TODO: update platform to allow any 1 of these values
             likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
             retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
@@ -238,9 +239,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const subFormErrors = validateSubForms();
-
-    // TODO: remove
-    console.log('values => ', { values, subFormErrors, questActionSubForms });
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
@@ -328,6 +326,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             }
             setQuestActionSubForms([...tempForm]);
           }
+          // TODO: handle Tweet with url not found errors
           notifyError('Failed to update quest! Please fix form errors');
           return;
         }

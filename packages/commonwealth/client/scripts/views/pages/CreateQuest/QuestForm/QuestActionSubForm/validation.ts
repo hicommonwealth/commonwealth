@@ -7,7 +7,6 @@ import {
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
   numberValidationSchema,
-  numberValidationSchemaOptional,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
@@ -45,65 +44,99 @@ export const buildQuestSubFormValidationSchema = (
 
   if (!needsExtension) return questSubFormValidationSchema;
 
-  const baseSchema = questSubFormValidationSchema.extend({
-    ...(requiresCreatorPoints && {
-      creatorRewardAmount: numberNonDecimalValidationSchema,
-    }),
-    ...(allowsOptionalContentId && {
-      contentLink: linkValidationSchema.optional,
-    }),
-    ...(requiresTwitterEngagement && {
-      contentLink: linkValidationSchema.required.refine(
-        (url) => {
-          // validate twitter tweet URL
-          const twitterRegex = /https:\/\/x\.com\/\w+\/status\/\d+/;
-          return twitterRegex.test(url);
-        },
-        {
-          message: VALIDATION_MESSAGES.TWITTER_TWEET_FORMAT,
-        },
-      ),
-      // TODO: fix validations
-      noOfLikes: numberValidationSchemaOptional.optional(),
-      noOfRetweets: numberValidationSchemaOptional.optional(),
-      noOfReplies: numberValidationSchemaOptional.optional(),
-    }),
-  });
+  let baseSchema = questSubFormValidationSchema;
 
   if (requiresCreatorPoints) {
-    baseSchema.refine(
-      (data) => {
-        try {
-          const creatorRewardAmount = numberValidationSchema.parse(
-            data.creatorRewardAmount,
-          );
-          const rewardAmount = numberValidationSchema.parse(data.rewardAmount);
-          // verify creatorRewardAmount is less or equal to rewardAmount
-          return (
-            parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
-          );
-        } catch {
-          return false;
-        }
-      },
-      {
-        message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
-        path: ['creatorRewardAmount'],
-      },
-    );
+    // TODO: this works, needs zod type fix
+    baseSchema = baseSchema
+      .extend({
+        creatorRewardAmount: numberNonDecimalValidationSchema.required,
+      })
+      .refine(
+        (data) => {
+          try {
+            const creatorRewardAmount = numberValidationSchema.required.parse(
+              data.creatorRewardAmount,
+            );
+            const rewardAmount = numberValidationSchema.required.parse(
+              data.rewardAmount,
+            );
+            // verify creatorRewardAmount is less or equal to rewardAmount
+            return (
+              parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
+            );
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
+          path: ['creatorRewardAmount'],
+        },
+      );
   }
-
+  if (allowsOptionalContentId) {
+    baseSchema = baseSchema.extend({
+      contentLink: linkValidationSchema.optional,
+    });
+  }
   if (requiresTwitterEngagement) {
-    // TODO: fix validation
-    baseSchema.refine(
-      (data) => {
-        return data.noOfLikes || data.noOfRetweets || data.noOfReplies;
-      },
-      {
-        message: 'One of Likes, Retweets, or Replies count must be provided.',
-        path: [],
-      },
-    );
+    // TODO: this works, needs zod type fix
+    baseSchema = baseSchema
+      .extend({
+        contentLink: linkValidationSchema.required.refine(
+          (url) => {
+            // validate twitter tweet URL
+            const twitterRegex = /https:\/\/x\.com\/\w+\/status\/\d+/;
+            return twitterRegex.test(url);
+          },
+          {
+            message: VALIDATION_MESSAGES.TWITTER_TWEET_FORMAT,
+          },
+        ),
+        noOfLikes: numberNonDecimalValidationSchema.optional,
+        noOfRetweets: numberNonDecimalValidationSchema.optional,
+        noOfReplies: numberNonDecimalValidationSchema.optional,
+      })
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfLikes'],
+        },
+      )
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfReplies'],
+        },
+      )
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfRetweets'],
+        },
+      );
   }
 
   return baseSchema;

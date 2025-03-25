@@ -70,4 +70,12 @@
     gap: 24px;
     align-items: flex-start;
   }
+
+  .MessageRow {
+    gap: 4px;
+
+    .feedback-message-text.Text {
+      text-align: left !important;
+    }
+  }
 }

@@ -138,9 +138,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 ),
                 contentLink: buildURLFromContentId(action.content_id || ''),
                 // TODO: fix associations in platform to work
-                noOfLikes: (action as any)?.QuestTweet?.like_cap || 0,
-                noOfRetweets: (action as any)?.QuestTweet?.retweet_cap || 0,
-                noOfReplies: (action as any)?.QuestTweet?.replies_cap || 0,
+                noOfLikes: `${(action as any)?.QuestTweet?.like_cap || 0}`,
+                noOfRetweets: `${(action as any)?.QuestTweet?.retweet_cap || 0}`,
+                noOfReplies: `${(action as any)?.QuestTweet?.replies_cap || 0}`,
               })) as any, // TODO: fix type
             }}
           />
