@@ -357,6 +357,13 @@ describe.only('SignIn Lifecycle', async () => {
   });
 
   describe('transfer ownership', () => {
+    getPrivyUserMock.mockImplementation(() => {
+      return Promise.resolve(fullPrivyUserMock);
+    });
+    getPrivyUserByIdTokenMock.mockImplementation(() => {
+      return Promise.resolve(partialPrivyUserMock);
+    });
+
     it.each(chains)(
       'should transfer $seed.chain_base $wallet address ownership',
       async ({ id, wallet, seed }) => {
@@ -410,6 +417,9 @@ describe.only('SignIn Lifecycle', async () => {
             auth: await verifyAddress(ref.community_id, ref.address),
           },
         };
+        console.log(
+          `Testing transfer of address ${ref.address} from user ${ref.actor.user.id} to user ${actor2.user.id}`,
+        );
         const transferred = await command(SignIn(), {
           actor: actor2,
           payload: {
@@ -417,6 +427,7 @@ describe.only('SignIn Lifecycle', async () => {
             community_id: ref.community_id,
             wallet_id: wallet,
             session: serializeCanvas(ref.session),
+            privyIdentityToken: 'fake_identity_token',
           },
         });
         expect(transferred).to.not.be.null;
@@ -443,27 +454,31 @@ describe.only('SignIn Lifecycle', async () => {
     );
   });
   //
-  // describe('assert all events in lifecycle', () => {
-  //   it('should assert all events in lifecycle', async () => {
-  //     const events = await models.Outbox.findAll({});
-  //     expect(events.map((e) => e.event_name)).toEqual([
-  //       'CommunityJoined',
-  //       'WalletLinked',
-  //       'UserCreated',
-  //       'CommunityJoined',
-  //       'WalletLinked',
-  //       'UserCreated',
-  //       'CommunityJoined',
-  //       'WalletLinked',
-  //       'UserCreated',
-  //       'CommunityJoined',
-  //       'WalletLinked',
-  //       'UserCreated',
-  //       'AddressOwnershipTransferred',
-  //       'AddressOwnershipTransferred',
-  //       'AddressOwnershipTransferred',
-  //       'AddressOwnershipTransferred',
-  //     ]);
-  //   });
-  // });
+  describe('assert all events in lifecycle', () => {
+    it('should assert all events in lifecycle', async () => {
+      const events = await models.Outbox.findAll({});
+      expect(events.map((e) => e.event_name)).toEqual([
+        'CommunityJoined',
+        'WalletLinked',
+        'UserCreated',
+        'CommunityJoined',
+        'WalletLinked',
+        'UserCreated',
+        'CommunityJoined',
+        'WalletLinked',
+        'UserCreated',
+        'CommunityJoined',
+        'WalletLinked',
+        'UserCreated',
+        'CommunityJoined',
+        'WalletLinked',
+        'UserCreated',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+      ]);
+    });
+  });
 });

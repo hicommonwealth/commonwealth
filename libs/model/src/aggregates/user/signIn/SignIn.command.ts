@@ -63,6 +63,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ? actor.user.id
         : (existingHexUserId ?? null);
       let user: UserAttributes | undefined | null;
+      console.log(`>>>>>> User id found: ${user_id}`);
       if (user_id) {
         user = await models.User.findOne({
           where: {
@@ -90,7 +91,10 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       };
       if (wallet_id === WalletId.Privy) {
         res = await signInPrivy({
-          payload,
+          payload: {
+            ...payload,
+            address: encodedAddress,
+          },
           verificationData: {
             verification_token,
             verification_token_expires,
@@ -98,17 +102,18 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           signedInUser: user,
         });
       } else {
-        res = await signInUser(
-          {
+        res = await signInUser({
+          payload: {
             ...payload,
             address: encodedAddress,
             hex,
           },
-          {
+          verificationData: {
             verification_token,
             verification_token_expires,
           },
-        );
+          signedInUser: user,
+        });
       }
 
       const addr = await models.Address.scope('withPrivateData').findOne({

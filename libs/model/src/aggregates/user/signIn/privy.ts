@@ -107,11 +107,11 @@ export async function signInPrivy({
     });
   }
 
-  return await signInUser(
+  return await signInUser({
     payload,
     verificationData,
     privyUser,
     verifiedSsoInfo,
-    user,
-  );
+    signedInUser: user,
+  });
 }

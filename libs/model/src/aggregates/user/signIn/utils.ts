@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { User as PrivyUser } from '@privy-io/server-auth';
-import { Op, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
@@ -15,7 +15,7 @@ export async function findUserByAddressOrHex(
   searchTerm: { address: string } | { hex: string },
   transaction: Transaction,
 ): Promise<UserAttributes | null> {
-  console.log(`findAddressesByAddressOrHex: ${JSON.stringify(searchTerm)}`);
+  console.log(`findUserByAddressOrHex: ${JSON.stringify(searchTerm)}`);
   const users = await models.sequelize.query(
     `
       WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
@@ -156,24 +156,31 @@ export async function findOrCreateUser({
   };
 }
 
-export async function signInUser(
-  payload: z.infer<(typeof SignIn)['input']> & { hex?: string },
+export async function signInUser({
+  payload,
+  verificationData,
+  privyUser,
+  verifiedSsoInfo,
+  signedInUser,
+}: {
+  payload: z.infer<(typeof SignIn)['input']> & { hex?: string };
   verificationData: {
     verification_token: string;
     verification_token_expires: Date;
-  },
-  privyUser?: PrivyUser,
-  verifiedSsoInfo?: VerifiedUserInfo,
-  signedInUser?: UserAttributes | null,
-) {
-  let userData: Awaited<ReturnType<typeof findOrCreateUser>> | undefined;
+  };
+  privyUser?: PrivyUser;
+  verifiedSsoInfo?: VerifiedUserInfo;
+  signedInUser?: UserAttributes | null;
+}) {
   let addressCount = 1;
   let transferredUser = false;
   let address: AddressAttributes | undefined,
     newAddress = false;
+  let foundOrCreatedUser: UserAttributes | undefined;
+  let newUser = false;
 
   await models.sequelize.transaction(async (transaction) => {
-    userData = await findOrCreateUser({
+    const userRes = await findOrCreateUser({
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
       referrer_address: payload.referrer_address,
@@ -181,13 +188,18 @@ export async function signInUser(
       hex: payload.hex,
       transaction,
     });
+    foundOrCreatedUser = userRes.user;
+    newUser = userRes.newUser;
 
     // if signed-in user is not the same as user derived from address/hex/sso
     // and the user is not new then transfer ownership to the signed-in user
+    console.log(
+      `Should transfer address? SignedInUserId: ${signedInUser?.id}, User.id: ${foundOrCreatedUser.id}, newUser: ${newUser}`,
+    );
     if (
       signedInUser &&
-      signedInUser?.id !== userData.user.id &&
-      !userData.newUser
+      signedInUser?.id !== foundOrCreatedUser.id &&
+      !newUser
     ) {
       await models.Address.update(
         {
@@ -195,18 +207,15 @@ export async function signInUser(
         },
         {
           where: {
-            id: {
-              [Op.in]: (userData.user.Addresses as AddressAttributes[])
-                .filter((a) => a.address === payload.address)
-                .map((a) => a.id!),
-            },
+            // TODO: this doesn't support transfer of addresses via SSO
+            address: payload.address,
           },
           transaction,
         },
       );
       transferredUser = true;
       console.log(
-        `Addresses ${payload.address} transferred from user ${userData.user.id} to user ${signedInUser.id}`,
+        `Addresses ${payload.address} transferred from user ${foundOrCreatedUser.id} to user ${signedInUser.id}`,
       );
     }
 
@@ -215,7 +224,7 @@ export async function signInUser(
       defaults: {
         community_id: payload.community_id,
         address: payload.address,
-        user_id: signedInUser?.id ?? userData.user.id,
+        user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
         hex: payload.hex,
         wallet_id: payload.wallet_id,
         verification_token: verificationData.verification_token,
@@ -232,13 +241,13 @@ export async function signInUser(
     });
 
     await emitSignInEvents({
-      newUser: userData.newUser,
-      user: signedInUser || userData.user,
+      newUser,
+      user: signedInUser || foundOrCreatedUser,
       transferredUser,
       address,
       newAddress,
       transaction,
-      originalUserId: transferredUser ? userData.user.id : undefined,
+      originalUserId: transferredUser ? foundOrCreatedUser.id : undefined,
     });
 
     addressCount = await models.Address.count({
@@ -249,7 +258,15 @@ export async function signInUser(
     });
   });
 
-  if (!userData || !address) throw new Error('Failed to sign in user');
+  if (!address || !foundOrCreatedUser)
+    throw new Error('Failed to sign in user');
 
-  return { ...userData, address, newAddress, addressCount, transferredUser };
+  return {
+    user: signedInUser || foundOrCreatedUser,
+    newUser,
+    address,
+    newAddress,
+    addressCount,
+    transferredUser,
+  };
 }
