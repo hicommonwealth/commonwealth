@@ -1,7 +1,8 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { deserializeCanvas } from '@hicommonwealth/shared';
+import { BalanceSourceType, deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
+import { tokenBalanceCache } from 'model/src/services';
 import { Op } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -56,8 +57,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
       const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
-      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
-        .user.auth as VerifiedAddress;
+      const {
+        base,
+        encodedAddress,
+        chain_node_id,
+        ss58Prefix,
+        hex,
+        existingHexUserId,
+      } = actor.user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
       let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
@@ -162,17 +169,26 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: addr.created_at!,
               },
             });
-          (new_address || !wallet_found) &&
+          if (new_address || !wallet_found) {
+            const balances = chain_node_id
+              ? await tokenBalanceCache.getBalances({
+                  addresses: [addr.address],
+                  balanceSourceType: BalanceSourceType.ETHNative, // TODO: support other balance sources
+                  sourceOptions: { evmChainId: chain_node_id }, // TODO: is this the right chain node?
+                })
+              : { [addr.address]: '0' };
             events.push({
               event_name: 'WalletLinked',
               event_payload: {
                 user_id: addr.user_id!,
                 new_user,
                 wallet_id: wallet_id,
+                balance: Number(balances[addr.address]),
                 community_id,
                 created_at: addr.created_at!,
               },
             });
+          }
           new_user &&
             events.push({
               event_name: 'UserCreated',

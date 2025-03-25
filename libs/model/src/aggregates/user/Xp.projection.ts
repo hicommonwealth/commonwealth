@@ -117,6 +117,7 @@ async function recordXpsForQuest(
     sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
     goal_id?: number; // community goals
+    threshold?: number; // rewards when threshold over configured meta value
   },
 ) {
   const shared_with_address =
@@ -137,7 +138,8 @@ async function recordXpsForQuest(
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
           (scoped === 'sso' && id !== scope?.sso) ||
-          (scoped === 'goal' && +id !== scope?.goal_id)
+          (scoped === 'goal' && +id !== scope?.goal_id) ||
+          (scoped === 'threshold' && +id > (scope?.threshold || 0))
         )
           continue;
       }
@@ -487,6 +489,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.user_id,
           payload.created_at,
           action_metas,
+          undefined,
+          { threshold: payload.balance },
         );
       },
       SSOLinked: async ({ payload }) => {
