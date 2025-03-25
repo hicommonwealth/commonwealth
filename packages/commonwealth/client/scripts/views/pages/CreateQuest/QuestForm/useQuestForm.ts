@@ -65,6 +65,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   ...(form?.creatorRewardAmount && {
                     creatorRewardAmount: form.creatorRewardAmount,
                   }),
+                  ...(doesActionAllowTwitterTweetURL(chosenAction) && {
+                    noOfLikes: form.noOfLikes || 0,
+                    noOfRetweets: form.noOfRetweets || 0,
+                    noOfReplies: form.noOfReplies || 0,
+                  }),
                   participationLimit: form.participationLimit,
                   participationPeriod: form.participationPeriod,
                   participationTimesPerPeriod: form.participationTimesPerPeriod,

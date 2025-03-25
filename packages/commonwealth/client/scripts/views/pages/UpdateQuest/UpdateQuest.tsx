@@ -2,7 +2,6 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { doesActionAllowThreadId, doesActionAllowTopicId } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -18,13 +17,10 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
-import {
-  QuestAction,
-  QuestActionContentIdScope,
-} from '../CreateQuest/QuestForm/QuestActionSubForm';
+import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import {
   buildURLFromContentId,
-  ContentIdType,
+  inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
 import './UpdateQuest.scss';
 
@@ -136,22 +132,16 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
                 instructionsLink: action.instructions_link,
-                contentIdScope: action.content_id
-                  ? action.content_id.split(':')[0] === 'topic'
-                    ? QuestActionContentIdScope.Topic
-                    : QuestActionContentIdScope.Thread
-                  : doesActionAllowTopicId(action.event_name as QuestAction)
-                    ? QuestActionContentIdScope.Topic
-                    : doesActionAllowThreadId(action.event_name as QuestAction)
-                      ? QuestActionContentIdScope.Thread
-                      : undefined,
-                contentLink: action.content_id
-                  ? buildURLFromContentId(
-                      action.content_id.split(':')[1],
-                      action.content_id.split(':')[0] as ContentIdType,
-                    )
-                  : action.content_id,
-              })),
+                contentIdScope: inferContentIdTypeFromContentId(
+                  action.event_name as QuestAction,
+                  action.content_id || undefined,
+                ),
+                contentLink: buildURLFromContentId(action.content_id || ''),
+                // TODO: fix associations in platform to work
+                noOfLikes: (action as any)?.QuestTweet?.like_cap || 0,
+                noOfRetweets: (action as any)?.QuestTweet?.retweet_cap || 0,
+                noOfReplies: (action as any)?.QuestTweet?.replies_cap || 0,
+              })) as any, // TODO: fix type
             }}
           />
         )}
