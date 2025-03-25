@@ -1,7 +1,7 @@
 import { ServerError, type Command } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
   deployNamespace,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -22,8 +22,7 @@ export function CreateBotNamespace(): Command<
     auth: [],
     body: async ({ payload }) => {
       const { name, description, icon_url, admin_address, chain_id } = payload;
-      const namespaceFactory =
-        cp.factoryContracts[chain_id as cp.ValidChains].factory;
+      mustBeProtocolChainId(chain_id);
 
       const node = await models.ChainNode.scope('withPrivateData').findOne({
         where: {
@@ -36,11 +35,13 @@ export function CreateBotNamespace(): Command<
         throw new ServerError('Contest bot private key not set!');
 
       const namespaceAddress = await deployNamespace(
-        namespaceFactory,
         name,
         admin_address,
         admin_address,
-        node.private_url!,
+        {
+          rpc: node.private_url!,
+          eth_chain_id: chain_id,
+        },
         config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       );
 
@@ -75,7 +76,6 @@ export function CreateBotNamespace(): Command<
         directory_page_enabled: false,
         snapshot_spaces: [],
         stages_enabled: true,
-        allow_tokenized_threads: false,
       });
       return {
         community,

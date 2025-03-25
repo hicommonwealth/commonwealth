@@ -1,9 +1,9 @@
 import {
   ChainBase,
-  WalletId,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
   getSessionSigners,
+  WalletId,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
@@ -30,14 +30,14 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/RewardsPage/types';
 import { mobileTabParam } from '../../pages/RewardsPage/utils';
 import { useCommunityStake } from '../CommunityStake';
-import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+import UserMenuItem from './UserMenuItem';
 
 const resetWalletConnectSession = async () => {
   /**

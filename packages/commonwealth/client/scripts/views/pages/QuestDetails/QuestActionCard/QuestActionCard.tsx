@@ -4,6 +4,10 @@ import {
 } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { roundDecimalsOrReturnWhole } from 'helpers/number';
+import {
+  doesActionRequireRewardShare,
+  doesActionRewardShareForReferrer,
+} from 'helpers/quest';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -13,13 +17,8 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
 import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
 import './QuestActionCard.scss';
 
-// TODO: fix types with schemas.Events keys
 const actionCopies = {
   title: {
     ['CommunityCreated']: 'Create a community',

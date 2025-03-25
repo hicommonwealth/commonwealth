@@ -31,6 +31,7 @@ export const seedDb = async () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           emailNotificationInterval: 'never' as any,
           profile: {},
+          tier: 1,
         }),
       ),
     );
@@ -138,7 +139,6 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: testnetNode.id!,
-          allow_tokenized_threads: false,
         },
         {
           id: 'yearn',
@@ -150,7 +150,6 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
-          allow_tokenized_threads: false,
         },
         {
           id: 'sushi',
@@ -163,7 +162,6 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
-          allow_tokenized_threads: false,
         },
         {
           id: 'edgeware',
@@ -176,7 +174,6 @@ export const seedDb = async () => {
           base: ChainBase.Substrate,
           ss58_prefix: 7,
           chain_node_id: edgewareNode.id!,
-          allow_tokenized_threads: false,
         },
         {
           id: 'ethereum',
@@ -189,7 +186,6 @@ export const seedDb = async () => {
           type: ChainType.Chain,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
-          allow_tokenized_threads: false,
         },
         {
           id: 'osmosis',
@@ -202,7 +198,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: osmosisNode.id!,
           bech32_prefix: 'osmo',
-          allow_tokenized_threads: false,
         },
         {
           id: 'csdk-beta',
@@ -215,7 +210,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkBetaNode.id!,
           bech32_prefix: 'cosmos',
-          allow_tokenized_threads: false,
         },
         {
           id: 'csdk',
@@ -228,7 +222,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkV1Node.id!,
           bech32_prefix: 'cosmos',
-          allow_tokenized_threads: false,
         },
         {
           id: 'common-protocol',
@@ -243,7 +236,6 @@ export const seedDb = async () => {
           chain_node_id: 1263,
           namespace: 'IanSpace',
           namespace_address: ZERO_ADDRESS,
-          allow_tokenized_threads: false,
         },
         {
           id: 'csdk-beta-local',
@@ -256,7 +248,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkBetaLocalNode.id!,
           bech32_prefix: 'cosmos',
-          allow_tokenized_threads: false,
         },
         {
           id: 'csdk-v1-local',
@@ -269,7 +260,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkV1LocalNode.id!,
           bech32_prefix: 'cosmos',
-          allow_tokenized_threads: false,
         },
         {
           id: 'evmos-dev-local',
@@ -282,7 +272,6 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: ethermintLocalNode.id!,
           bech32_prefix: 'cosmos',
-          allow_tokenized_threads: false,
         },
       ].map((x) => ({
         ...x,
@@ -302,63 +291,51 @@ export const seedDb = async () => {
         {
           community_id: 'sushi',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'edgeware',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'ethereum',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'alex',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'osmosis',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'csdk-beta',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'csdk',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'yearn',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'csdk-beta-local',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'csdk-v1-local',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           community_id: 'evmos-dev-local',
           name: 'General',
-          allow_tokenized_threads: false,
         },
         {
           name: 'Test Topic',
           description: 'A topic made for testing',
           community_id: 'ethereum',
-          allow_tokenized_threads: false,
         },
       ].map((t) => ({
         description: '',

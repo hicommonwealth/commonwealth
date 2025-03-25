@@ -12,6 +12,7 @@ export const outboxEvents: Events[] = [
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',
+  'CommunityUpdated',
   'CommunityJoined',
   'ContestContentAdded',
   'ContestContentUpvoted',
@@ -34,6 +35,7 @@ export const outboxEvents: Events[] = [
   'FarcasterVoteCreated',
   'FarcasterContestBotMentioned',
   'GroupCreated',
+  'RoleUpdated',
   'OneOffContestManagerDeployed',
   'RecurringContestManagerDeployed',
   'SignUpFlowCompleted',
@@ -64,6 +66,9 @@ export const outboxEvents: Events[] = [
   'TokenPermanentConverted',
   'TokenLockDurationIncreased',
   'NamespaceLinked',
+  'CommunityGoalReached',
+  'TweetEngagementCapReached',
+  'CommunityTagsUpdated',
 ] as const;
 
 export const Outbox = z.union(

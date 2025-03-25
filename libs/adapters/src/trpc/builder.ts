@@ -1,9 +1,4 @@
-import {
-  logger,
-  stats,
-  type AuthStrategies,
-  type User,
-} from '@hicommonwealth/core';
+import { type AuthStrategies, type User } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
@@ -11,8 +6,6 @@ import type { OpenApiMeta } from 'trpc-swagger';
 import { ZodSchema, z } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
-
-const log = logger(import.meta);
 
 const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 export const router = trpc.router;
@@ -89,19 +82,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
       });
     })
     .use(async ({ ctx, rawInput, next }) => {
-      const start = Date.now();
       const result = await next();
-      const latency = Date.now() - start;
-      try {
-        const path = `${ctx.req.method.toUpperCase()} ${ctx.req.path}`;
-        stats().increment('cw.path.called', { path });
-        stats().histogram(`cw.path.latency`, latency, {
-          path,
-          statusCode: ctx.res.statusCode.toString(),
-        });
-      } catch (err) {
-        err instanceof Error && log.error(err.message, err);
-      }
       if (result.ok && outMiddlewares?.length) {
         for (const omw of outMiddlewares) {
           await omw(rawInput, result.data, ctx);

@@ -56,6 +56,7 @@ describe('DatabaseCleaner Tests', async () => {
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
         profile: {},
+        tier: 4,
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({
@@ -71,6 +72,7 @@ describe('DatabaseCleaner Tests', async () => {
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
         profile: {},
+        tier: 4,
       });
       // @ts-expect-error StrictNullChecks
       const address = await models.Address.create({
@@ -88,7 +90,6 @@ describe('DatabaseCleaner Tests', async () => {
         featured_in_sidebar: false,
         featured_in_new_post: false,
         group_ids: [],
-        allow_tokenized_threads: false,
       });
 
       const thread = await models.Thread.create({

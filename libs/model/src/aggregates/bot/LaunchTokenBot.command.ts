@@ -131,7 +131,6 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
           social_links: [],
           directory_page_enabled: false,
           tags: [],
-          allow_tokenized_threads: false,
         },
       });
 

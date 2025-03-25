@@ -1,3 +1,4 @@
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import {
   MAX_TRUNCATED_CONTENT_LENGTH,
@@ -135,13 +136,13 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Community, Outbox, Address } = sequelize.models;
+          const { Outbox, Address } = sequelize.models;
 
-          await Community.increment('lifetime_thread_count', {
-            by: 1,
-            where: { id: thread.community_id },
-            transaction: options.transaction,
-          });
+          await cache().setKey(
+            CacheNamespaces.Community_Thread_Count_Changed,
+            thread.community_id,
+            'true',
+          );
 
           const { topic_id, community_id } = thread.get({
             plain: true,
@@ -169,16 +170,12 @@ export default (
             options.transaction,
           );
         },
-        afterDestroy: async (
-          thread: ThreadInstance,
-          options: Sequelize.InstanceDestroyOptions,
-        ) => {
-          const { Community } = sequelize.models;
-          await Community.decrement('lifetime_thread_count', {
-            by: 1,
-            where: { id: thread.community_id },
-            transaction: options.transaction,
-          });
+        afterDestroy: async (thread: ThreadInstance) => {
+          await cache().setKey(
+            CacheNamespaces.Community_Thread_Count_Changed,
+            thread.community_id,
+            'true',
+          );
         },
       },
     },

@@ -20,8 +20,8 @@ export async function processChainNode(
   evmSource: EvmChainSource,
 ): Promise<void> {
   try {
-    config.WORKERS.EVM_CE_TRACE &&
-      log.warn(
+    config.EVM_CE.LOG_TRACE &&
+      log.debug(
         'Processing:\n' +
           `\tchainNodeId: ${ethChainId}\n` +
           `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,

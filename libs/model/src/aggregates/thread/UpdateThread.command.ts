@@ -314,7 +314,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                 {
                   model: models.User,
                   required: true,
-                  attributes: ['id', 'profile'],
+                  attributes: ['id', 'profile', 'tier'],
                 },
               ],
             },
@@ -325,7 +325,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                 {
                   model: models.User,
                   required: true,
-                  attributes: ['id', 'profile'],
+                  attributes: ['id', 'profile', 'tier'],
                 },
               ],
             },
@@ -341,7 +341,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                     {
                       model: models.User,
                       required: true,
-                      attributes: ['id', 'profile'],
+                      attributes: ['id', 'profile', 'tier'],
                     },
                   ],
                 },
@@ -368,7 +368,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                   include: [
                     {
                       model: models.User,
-                      attributes: ['profile'],
+                      attributes: ['profile', 'tier'],
                     },
                   ],
                 },

@@ -99,6 +99,7 @@ describe('Thread lifecycle', () => {
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
       isAdmin: role === 'admin',
+      tier: 4,
     }));
     const [_community] = await seed('Community', {
       chain_node_id: node!.id!,

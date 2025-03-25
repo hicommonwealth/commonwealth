@@ -1,7 +1,14 @@
-import { InvalidActor, InvalidInput, type Command } from '@hicommonwealth/core';
+import {
+  CacheNamespaces,
+  InvalidActor,
+  InvalidInput,
+  cache,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 import { emitEvent } from '../../utils/utils';
@@ -15,7 +22,7 @@ export const JoinCommunityErrors = {
 export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
   return {
     ...schemas.JoinCommunity,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ actor, payload }) => {
       const { community_id } = payload;
@@ -107,22 +114,26 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await models.Community.increment('profile_count', {
-            by: 1,
-            where: { id: community_id },
-            transaction,
-          });
+          await cache().setKey(
+            CacheNamespaces.Community_Profile_Count_Changed,
+            community_id,
+            'true',
+          );
 
-          await emitEvent(models.Outbox, [
-            {
-              event_name: 'CommunityJoined',
-              event_payload: {
-                community_id,
-                user_id: actor.user.id!,
-                created_at: created.created_at!,
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'CommunityJoined',
+                event_payload: {
+                  community_id,
+                  user_id: actor.user.id!,
+                  created_at: created.created_at!,
+                },
               },
-            },
-          ]);
+            ],
+            transaction,
+          );
 
           return created.id!;
         },

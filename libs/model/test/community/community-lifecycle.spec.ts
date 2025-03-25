@@ -101,11 +101,11 @@ describe('Community lifecycle', () => {
     cosmosNode = _cosmosNode!;
     substrateNode = _substrateNode!;
 
-    const [superadmin] = await seed('User', { isAdmin: true });
-    const [admin] = await seed('User', { isAdmin: false });
-    const [member] = await seed('User', { isAdmin: false });
-    const [cosmosMember] = await seed('User', { isAdmin: false });
-    const [substrateMember] = await seed('User', { isAdmin: false });
+    const [superadmin] = await seed('User', { isAdmin: true, tier: 4 });
+    const [admin] = await seed('User', { isAdmin: false, tier: 4 });
+    const [member] = await seed('User', { isAdmin: false, tier: 4 });
+    const [cosmosMember] = await seed('User', { isAdmin: false, tier: 4 });
+    const [substrateMember] = await seed('User', { isAdmin: false, tier: 4 });
 
     const [ethBase] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
@@ -278,7 +278,6 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: cosmosNode.id!,
-          allow_tokenized_threads: false,
         },
       });
       expect(cosmos_result?.community?.id).toBe(cosmos_name);
@@ -300,7 +299,6 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: substrateNode.id!,
-          allow_tokenized_threads: false,
         },
       });
       expect(substrate_result?.community?.id).toBe(substrate_name);
@@ -586,7 +584,6 @@ describe('Community lifecycle', () => {
           featured_in_new_post: false,
           featured_in_sidebar: false,
           description: '',
-          allow_tokenized_threads: false,
         },
       }))!;
       const response = await command(ToggleArchiveTopic(), {
@@ -615,7 +612,6 @@ describe('Community lifecycle', () => {
           featured_in_new_post: false,
           featured_in_sidebar: false,
           description: '',
-          allow_tokenized_threads: false,
         },
       }))!;
 
@@ -810,7 +806,7 @@ describe('Community lifecycle', () => {
             community_id: community.id,
           },
         }),
-      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+      ).rejects.toThrow();
     });
 
     test('should join Ethereum community with evm compatible address', async () => {

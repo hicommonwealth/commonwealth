@@ -10,7 +10,7 @@ import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
-import { authTopic } from '../../middleware';
+import { authTopic, tiered } from '../../middleware';
 import { verifyThreadSignature } from '../../middleware/canvas';
 import { mustBeAuthorized } from '../../middleware/guards';
 import { getThreadSearchVector } from '../../models/thread';
@@ -86,6 +86,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
     auth: [
       authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
+      tiered({ creates: true }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address } = mustBeAuthorized(actor, context);

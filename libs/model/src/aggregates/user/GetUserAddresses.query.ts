@@ -25,7 +25,7 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
         include: [
           {
             model: models.User,
-            attributes: ['id', 'profile', 'created_at'],
+            attributes: ['id', 'profile', 'created_at', 'tier'],
             required: true,
           },
         ],
