@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 
 import { SolanaSigner } from '@canvas-js/chain-solana';
@@ -41,7 +42,7 @@ class BackpackWebWalletController implements IWebWallet<string> {
     return SOLANA_MAINNET_CHAIN_ID;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
