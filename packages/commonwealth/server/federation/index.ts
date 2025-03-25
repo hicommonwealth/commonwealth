@@ -6,44 +6,56 @@ class Client {
   heads: string[];
   baseUrl: string;
 
-  constructor(rootUrl: string) {
+  constructor() {
     this.clock = 0;
     this.heads = [];
-    this.baseUrl = rootUrl;
   }
-  async applyCanvasSignedData(path: string, canvasSignedData: string) {
-    const response = await fetch(`${this.baseUrl}/action`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: canvasSignedData,
-    });
-
-    const result = await response.json();
-
-    if (
-      !result.success ||
-      result.result.clock === undefined ||
-      result.result.heads === undefined
-    ) {
-      throw new Error(result.error || 'Failed to apply canvas signed data');
+  async applyCanvasSignedData(path: string, canvasSignedData?: string) {
+    if (!canvasSignedData) {
+      return;
     }
 
-    this.clock = result.result.clock;
-    this.heads = result.result.heads;
+    try {
+      const response = await fetch(`${BASE_URL}/action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/dag-json',
+        },
+        body: canvasSignedData,
+      });
 
-    return { session: result.result.session, action: result.result.action };
+      const result = await response.json();
+
+      if (
+        !result.success ||
+        result.result.clock === undefined ||
+        result.result.heads === undefined
+      ) {
+        throw new Error(result.error || 'Failed to apply canvas signed data');
+      }
+
+      this.clock = result.result.clock;
+      this.heads = result.result.heads;
+
+      return { session: result.result.session, action: result.result.action };
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
   async getClock(): Promise<{ clock: number; heads: string[] }> {
-    const response = await fetch(`${this.baseUrl}/clock`);
-    const result = await response.json();
+    try {
+      const response = await fetch(`${BASE_URL}/clock`);
+      const result = await response.json();
 
-    this.clock = result.clock;
-    this.heads = result.heads;
-    return { clock: this.clock, heads: this.heads };
+      this.clock = result.clock;
+      this.heads = result.heads;
+      return { clock: this.clock, heads: this.heads };
+    } catch (err) {
+      console.log('could not fetch latest clock from canvas service');
+      return { clock: this.clock, heads: this.heads };
+    }
   }
 }
 
-export const client = new Client(BASE_URL);
-export const applyCanvasSignedData = client.applyCanvasSignedData;
+export const client = new Client();

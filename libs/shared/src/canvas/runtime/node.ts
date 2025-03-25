@@ -10,7 +10,8 @@ export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async (
   config: { LIBP2P_PRIVATE_KEY?: string },
-  logger: { info: (message: string, extra: any) => void },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  logger: { info: (message: string, extra?: any) => void },
 ): Promise<{ app: Canvas; libp2p: Libp2p | null }> => {
   const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??

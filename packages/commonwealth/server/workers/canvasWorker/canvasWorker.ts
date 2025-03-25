@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
-import { parse } from '@ipld/dag-json';
+import { decode } from '@ipld/dag-json';
 import cors from 'cors';
 import express from 'express';
 import { config } from '../../config';
@@ -26,8 +26,14 @@ if (libp2p) {
 
 log.info('starting express server...');
 const server = express();
+
 server.use(cors());
-server.use(express.json());
+server.use(
+  express.raw({
+    type: 'application/dag-json',
+    limit: '10mb',
+  }),
+);
 
 server.get('/clock', async (req, res) => {
   const [clock, heads] = await app.messageLog.getClock();
@@ -35,8 +41,19 @@ server.get('/clock', async (req, res) => {
 });
 
 server.post('/action', async (req, res) => {
+  if (req.body === undefined) {
+    throw new Error('no action data');
+  }
   try {
-    const data = parse(req.body) as CanvasSignedData;
+    const data = decode(req.body) as CanvasSignedData;
+    if (
+      data.actionMessage === undefined ||
+      data.actionMessageSignature === undefined ||
+      data.sessionMessage === undefined ||
+      data.sessionMessageSignature === undefined
+    ) {
+      throw new Error('invalid action data');
+    }
 
     let appliedSessionId: string | null = null;
     let appliedActionId: string | null = null;
