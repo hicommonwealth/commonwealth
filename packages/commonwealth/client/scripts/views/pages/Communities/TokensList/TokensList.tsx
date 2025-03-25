@@ -1,4 +1,4 @@
-import { TokenView } from '@hicommonwealth/schemas';
+import { PinnedTokenWithPrices, TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import clsx from 'clsx';
@@ -121,12 +121,15 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
 
   const handleCTAClick = (
     mode: TradingMode,
-    token: z.infer<typeof TokenWithCommunity>,
+    token:
+      | z.infer<typeof TokenWithCommunity>
+      | z.infer<typeof PinnedTokenWithPrices>,
   ) => {
+    const isPinnedToken = 'community_indexer_id' in token;
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
-        mode: mode,
+        mode: isPinnedToken ? TradingMode.Swap : mode,
         token: token,
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
@@ -156,12 +159,12 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => {
+          {launchpadTokens.map((token) => {
             const pricing = calculateTokenPricing(
               token as z.infer<typeof TokenView>,
               ethToUsdRate,
             );
-
+            console.log('token', token);
             return (
               <TokenCard
                 key={token.name}
@@ -171,6 +174,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                 pricePercentage24HourChange={
                   pricing.pricePercentage24HourChange
                 }
+                isPinnedToken={false}
                 marketCap={{
                   current: pricing.marketCapCurrent,
                   goal: pricing.marketCapGoal,
@@ -188,6 +192,44 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                       handleCTAClick(
                         mode,
                         token as z.infer<typeof TokenWithCommunity>,
+                      );
+                    },
+                  });
+                  openAuthModalOrTriggerCallback();
+                }}
+                onCardBodyClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: token.community_id,
+                  })
+                }
+              />
+            );
+          })}
+          {pinnedTokens.map((token) => {
+            console.log('pinned token', token);
+            return (
+              <TokenCard
+                key={token.name}
+                name={token.name}
+                symbol={token.symbol}
+                price={0}
+                pricePercentage24HourChange={0}
+                isPinnedToken={true}
+                marketCap={{
+                  current: 0,
+                  goal: 0,
+                  isCapped: false,
+                }}
+                mode={TradingMode.Swap}
+                iconURL={token.icon_url || ''}
+                onCTAClick={(mode) => {
+                  register({
+                    cb: () => {
+                      handleCTAClick(
+                        mode,
+                        token as z.infer<typeof PinnedTokenWithPrices>,
                       );
                     },
                   });

@@ -126,6 +126,9 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
           );
           temp.prices = foundPrice?.prices;
         }
+        if (t.community_indexer_id) {
+          temp.community_id = t.community_indexer_id;
+        }
         return { ...temp };
       });
 

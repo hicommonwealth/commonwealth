@@ -6,6 +6,7 @@ import PricePercentageChange from 'client/scripts/views/components/TokenCard/Pri
 import { TokenCardProps } from 'client/scripts/views/components/TokenCard/TokenCard';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { TradingMode } from 'client/scripts/views/modals/TradeTokenModel';
 import clsx from 'clsx';
 import React from 'react';
 import { smartTrim } from 'shared/utils';
@@ -21,6 +22,7 @@ const TreandingToken = ({
   symbol,
   iconURL,
   pricePercentage24HourChange,
+  isPinnedToken,
   mode,
   className,
   onCardBodyClick,
@@ -79,7 +81,7 @@ const TreandingToken = ({
           buttonWidth="full"
           buttonHeight="sm"
           buttonType="primary"
-          onClick={() => onCTAClick?.(mode)}
+          onClick={() => onCTAClick?.(isPinnedToken ? TradingMode.Swap : mode)}
         />
       </div>
     </div>

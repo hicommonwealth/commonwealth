@@ -9,6 +9,7 @@ export const PinnedToken = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   ChainNode: ChainNode.optional(),
+  community_indexer_id: z.string().optional(),
 });
 
 export const PinnedTokenView = PinnedToken.extend({
