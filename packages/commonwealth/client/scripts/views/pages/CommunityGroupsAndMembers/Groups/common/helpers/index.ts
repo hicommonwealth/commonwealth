@@ -85,7 +85,7 @@ export const makeGroupDataBaseAPIPayload = (
         rule: 'threshold',
         data: {
           threshold: convertRequirementAmountFromTokensToWei(
-            x.requirementType as any,
+            x.requirementType,
             // @ts-expect-error StrictNullChecks
             x.requirementAmount,
           ),
