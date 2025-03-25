@@ -1,11 +1,7 @@
 import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { buildQuestSubFormValidationSchema } from './QuestActionSubForm/validation';
+import { QuestActionSubFormFields } from './QuestActionSubForm';
 import { questFormValidationSchema } from './validation';
-
-export type QuestActionSubFormValues = ReturnType<
-  typeof buildQuestSubFormValidationSchema
->;
 
 export type QuestFormProps =
   | {
@@ -20,6 +16,6 @@ export type QuestFormProps =
         participation_period?: QuestParticipationPeriod;
         participation_times_per_period?: number;
       } & {
-        subForms: QuestActionSubFormValues[];
+        subForms: QuestActionSubFormFields[];
       };
     };

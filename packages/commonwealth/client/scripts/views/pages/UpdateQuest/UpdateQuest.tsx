@@ -131,7 +131,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
-                instructionsLink: action.instructions_link,
+                instructionsLink: action.instructions_link || '',
                 contentIdScope: inferContentIdTypeFromContentId(
                   action.event_name as QuestAction,
                   action.content_id || undefined,
@@ -141,7 +141,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 noOfLikes: `${(action as any)?.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${(action as any)?.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${(action as any)?.QuestTweet?.replies_cap || 0}`,
-              })) as any, // TODO: 11391 fix type
+              })),
             }}
           />
         )}

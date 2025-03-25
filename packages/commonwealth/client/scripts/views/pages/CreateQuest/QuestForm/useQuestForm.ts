@@ -50,29 +50,29 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
-              const form = subForm as any; // TODO: 11391 fix type
-              const chosenAction = form.action as QuestAction;
+              const chosenAction = subForm.action as QuestAction;
               const allowsContentId = doesActionAllowContentId(chosenAction);
 
               return {
                 id: index + 1,
                 values: {
                   action: chosenAction,
-                  instructionsLink: form.instructionsLink || '',
-                  contentIdScope: form.contentIdScope,
-                  contentLink: form.contentLink || '',
-                  rewardAmount: form.rewardAmount,
-                  ...(form?.creatorRewardAmount && {
-                    creatorRewardAmount: form.creatorRewardAmount,
+                  instructionsLink: subForm.instructionsLink || '',
+                  contentIdScope: subForm.contentIdScope,
+                  contentLink: subForm.contentLink || '',
+                  rewardAmount: subForm.rewardAmount,
+                  ...(subForm?.creatorRewardAmount && {
+                    creatorRewardAmount: subForm.creatorRewardAmount,
                   }),
                   ...(doesActionAllowTwitterTweetURL(chosenAction) && {
-                    noOfLikes: form.noOfLikes || 0,
-                    noOfRetweets: form.noOfRetweets || 0,
-                    noOfReplies: form.noOfReplies || 0,
+                    noOfLikes: subForm.noOfLikes || 0,
+                    noOfRetweets: subForm.noOfRetweets || 0,
+                    noOfReplies: subForm.noOfReplies || 0,
                   }),
-                  participationLimit: form.participationLimit,
-                  participationPeriod: form.participationPeriod,
-                  participationTimesPerPeriod: form.participationTimesPerPeriod,
+                  participationLimit: subForm.participationLimit,
+                  participationPeriod: subForm.participationPeriod,
+                  participationTimesPerPeriod:
+                    subForm.participationTimesPerPeriod,
                 },
                 errors: {},
                 config: {
@@ -88,7 +88,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     allowsContentId &&
                     doesActionAllowTwitterTweetURL(chosenAction),
                 },
-              } as any; // TODO: 11391 fix type
+              };
             }),
           ]);
         }
