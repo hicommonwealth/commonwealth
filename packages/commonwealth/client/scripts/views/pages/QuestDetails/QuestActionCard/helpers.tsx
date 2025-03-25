@@ -21,8 +21,8 @@ export const actionCopies = {
     ['CommentUpvoted']: () => '',
     ['WalletLinked']: () => '',
     ['SSOLinked']: () => '',
-    // TODO: display this same copy in quest creation form for this action
-    ['TweetEngagement']: () => `Requires Twitter/X linked to profile.`,
+    ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires Twitter/X linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
   },
   explainer: {
     ['CommunityCreated']: () => '',
@@ -37,7 +37,7 @@ export const actionCopies = {
       <>
         XP rewarded to participants after any of these tweet metrics are met.
         <br />
-        {/* TODO: update this to only show counts > 0 */}
+        {/* TODO: 11391 update this to only show counts > 0 */}
         {likes} Likes, {retweets} Retweets or {replies} Replies.
       </>
     ),

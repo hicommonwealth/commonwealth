@@ -18,6 +18,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
 import {
   QuestAction,
@@ -333,6 +334,13 @@ const QuestActionSubForm = ({
           },
         })}
         customError={errors?.action}
+        instructionalMessage={
+          (defaultValues?.action === 'TweetEngagement' &&
+            actionCopies.pre_reqs[defaultValues?.action as QuestAction](
+              'admin',
+            )) ||
+          ''
+        }
       />
 
       <div
