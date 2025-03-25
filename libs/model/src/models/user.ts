@@ -97,7 +97,10 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       updatedAt: 'updated_at',
       tableName: 'Users',
       underscored: false,
-      indexes: [{ fields: ['email'], unique: true }],
+      indexes: [
+        { fields: ['email'], unique: true },
+        { fields: ['privy_id'], unique: true },
+      ],
       defaultScope: {
         attributes: {
           exclude: [

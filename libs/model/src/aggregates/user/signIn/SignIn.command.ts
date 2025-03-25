@@ -59,6 +59,17 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         .user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
+      const user_id = was_signed_in
+        ? actor.user.id
+        : (existingHexUserId ?? null);
+      let user: UserAttributes | undefined | null;
+      if (user_id) {
+        user = await models.User.findOne({
+          where: {
+            id: user_id,
+          },
+        });
+      }
 
       await verifySessionSignature(
         deserializeCanvas(session),
@@ -78,14 +89,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         user: UserAttributes;
       };
       if (wallet_id === WalletId.Privy) {
-        res = await signInPrivy(
+        res = await signInPrivy({
           payload,
-          {
+          verificationData: {
             verification_token,
             verification_token_expires,
           },
-          actor,
-        );
+          signedInUser: user,
+        });
       } else {
         res = await signInUser(
           {
@@ -115,10 +126,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ],
       });
       mustExist('Address', addr);
-
-      const user_id = was_signed_in
-        ? actor.user.id
-        : (existingHexUserId ?? null);
 
       return {
         ...addr.toJSON(),

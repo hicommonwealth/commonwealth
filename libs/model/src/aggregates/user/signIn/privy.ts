@@ -1,4 +1,4 @@
-import { Actor, InvalidActor, logger } from '@hicommonwealth/core';
+import { InvalidActor, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import {
@@ -37,14 +37,18 @@ export function mapPrivyTypeToWalletSso(
   return walletSsoSource;
 }
 
-export async function signInPrivy(
-  payload: z.infer<(typeof schemas.SignIn)['input']>,
+export async function signInPrivy({
+  payload,
+  verificationData,
+  signedInUser,
+}: {
+  payload: z.infer<(typeof schemas.SignIn)['input']>;
   verificationData: {
     verification_token: string;
     verification_token_expires: Date;
-  },
-  actor: Actor,
-): Promise<{
+  };
+  signedInUser?: UserAttributes | null;
+}): Promise<{
   newUser: boolean;
   newAddress: boolean;
   addressCount: number;
@@ -54,52 +58,53 @@ export async function signInPrivy(
   log.trace('Signing in with Privy');
 
   if (!payload.privyIdentityToken)
-    throw new InvalidActor(actor, 'Privy ID token is required');
+    throw new InvalidActor(
+      { user: { email: '' } },
+      'Privy ID token is required',
+    );
 
   let privyUser: PrivyUser;
   try {
     privyUser = await getPrivyUserByIdToken(payload.privyIdentityToken);
   } catch (e) {
     console.error(e);
-    throw new InvalidActor(actor, 'Invalid Privy identity token');
+    throw new InvalidActor(
+      { user: { email: '' } },
+      'Invalid Privy identity token',
+    );
   }
 
-  const user = await models.User.findOne({
-    where: {
-      privy_id: privyUser.id,
-    },
-    include: [
-      {
-        model: models.Address,
-        required: false,
-        where: {
-          address: payload.address,
-        },
+  let user: UserAttributes | undefined | null = signedInUser;
+  if (!user) {
+    user = await models.User.findOne({
+      where: {
+        privy_id: privyUser.id,
       },
-    ],
-  });
+    });
+  }
 
-  // First time signing in with Privy (existing or new user)
+  // First time signing in with Privy SSO (existing or new user)
   // Over time, only new users will go down this path
   let verifiedSsoInfo: VerifiedUserInfo | undefined = undefined;
-  if (!user) {
+  if (
+    (!user || !user.privy_id) &&
+    privyUser.wallet?.walletClientType === 'privy'
+  ) {
     log.trace(
       'Existing privy user not found, creating new user: ' + privyUser.id,
     );
-    if (privyUser.wallet?.walletClientType === 'privy') {
-      // TODO: linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
-      //  this extra call to Privy
-      const fullPrivyUser = await getPrivyUserById(privyUser.id);
-      const linkedAccount = fullPrivyUser.linkedAccounts.find(
-        (a) => a.type === 'wallet' && a.address === payload.address,
-      );
-      if (!linkedAccount) throw new Error('No linked account found');
-      verifiedSsoInfo = await getVerifiedUserInfo({
-        privyUser: fullPrivyUser,
-        walletSsoSource: mapPrivyTypeToWalletSso(linkedAccount.type),
-        token: '', // TODO: how to get token from Privy?
-      });
-    }
+    // TODO: linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
+    //  this extra call to Privy
+    const fullPrivyUser = await getPrivyUserById(privyUser.id);
+    const linkedAccount = fullPrivyUser.linkedAccounts.find(
+      (a) => a.type === 'wallet' && a.address === payload.address,
+    );
+    if (!linkedAccount) throw new Error('No linked account found');
+    verifiedSsoInfo = await getVerifiedUserInfo({
+      privyUser: fullPrivyUser,
+      walletSsoSource: mapPrivyTypeToWalletSso(linkedAccount.type),
+      token: '', // TODO: how to get token from Privy?
+    });
   }
 
   return await signInUser(
@@ -107,6 +112,6 @@ export async function signInPrivy(
     verificationData,
     privyUser,
     verifiedSsoInfo,
-    user ?? undefined,
+    user,
   );
 }

@@ -25,11 +25,6 @@ import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 const privyTestUserOneDid = 'did:privy:cm8no7aig005zranv3tivdeoj';
 
-const tempPrivyIdToken =
-  'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik5yZ2RpT25UOHpaSzNQTVEzRG10emQwNER3UXFJOF9QSDZEMzNESnZLQW8ifQ.eyJjciI6IjE3NDI4NTMwMjEiLCJsaW5rZWRfYWNjb3VudHMiOiJbe1widHlwZVwiOlwiZW1haWxcIixcImFkZHJlc3NcIjpcInRlc3QtMzYxOUBwcml2eS5pb1wiLFwibHZcIjoxNzQyODUzMDIxfV0iLCJpc3MiOiJwcml2eS5pbyIsImlhdCI6MTc0Mjg1MzAyMSwiYXVkIjoiY204ZXI2bXJtMDBmb3dicXk4YnB3Mzk1NiIsInN1YiI6ImRpZDpwcml2eTpjbThubG90emwwMHhkY3M0NzA3bDhnd29mIiwiZXhwIjoxNzQyODU2NjIxfQ.7MoFzEPIJcnprZXbmpHLBsuCsnjVEY6oDRNCjXFIO3L_wG26HBaia1AbXzGo-0pBganXf7jjmoMij6cyJnNAjA';
-const tempPrivyAccessToken =
-  'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik5yZ2RpT25UOHpaSzNQTVEzRG10emQwNER3UXFJOF9QSDZEMzNESnZLQW8ifQ.eyJzaWQiOiJjbThubG90eDIwMHhiY3M0N3c3Z3N3cHIzIiwiaXNzIjoicHJpdnkuaW8iLCJpYXQiOjE3NDI4NTMwMjEsImF1ZCI6ImNtOGVyNm1ybTAwZm93YnF5OGJwdzM5NTYiLCJzdWIiOiJkaWQ6cHJpdnk6Y204bmxvdHpsMDB4ZGNzNDcwN2w4Z3dvZiIsImV4cCI6MTc0Mjg1NjYyMX0.gfEmzLhiqh7JeZheHsjG4pu-u9TPhIlp1lAwPo8o2BWM0NOAtA9cNIFC7zmJTZ5RY26lMXfNxgjKrqr3R3wuCw';
-
 describe.only('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
@@ -46,10 +41,6 @@ describe.only('SignIn Lifecycle', async () => {
 
   // Update the addresses in the mock privy utils
   const privySignerAddress = await evmSignerPrivy.getWalletAddress();
-
-  console.log(
-    `?????????????????? generated wallet address: ${wallet.address} --- signer address: ${privySignerAddress}`,
-  );
 
   const fullPrivyUserMock: User = {
     id: privyTestUserOneDid,

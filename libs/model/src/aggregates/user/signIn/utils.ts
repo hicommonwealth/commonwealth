@@ -1,6 +1,5 @@
 import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import { WalletId } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -12,79 +11,91 @@ import { emitSignInEvents } from './emitSignInEvents';
 
 const log = logger(import.meta);
 
-/**
- * Finds or creates a user by address. If the address already belongs to a user, it may
- * update the users privy id and return the user. If the address does not belong to a user,
- * it creates and returns a new user.
- */
-export async function findAddressesByAddressOrHex(
+export async function findUserByAddressOrHex(
   searchTerm: { address: string } | { hex: string },
   transaction: Transaction,
-): Promise<AddressAttributes[]> {
+): Promise<UserAttributes | null> {
   console.log(`findAddressesByAddressOrHex: ${JSON.stringify(searchTerm)}`);
-  return await models.Address.findAll({
-    where: {
-      user_id: { [Op.not]: null },
-      ...searchTerm,
+  const users = await models.sequelize.query(
+    `
+      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                        FROM "Addresses"
+                        WHERE user_id IS NOT NULL
+                          AND ${'address' in searchTerm ? 'address=:address' : 'hex=:hex'})
+      SELECT U.*
+      FROM "Users" U
+      WHERE U.id IN (SELECT user_id FROM user_ids)
+    `,
+    {
+      model: models.User,
+      replacements: searchTerm,
+      transaction,
     },
-    include: [
-      {
-        model: models.User,
-        required: true,
-      },
-    ],
-    transaction,
-  });
+  );
+
+  if (users.length > 1)
+    throw new Error(
+      `Multiple users with the same ${Object.keys(searchTerm)[0]} found!`,
+    );
+  if (users.length === 0) return null;
+  return users[0];
 }
 
-/**
- * Similar to findOrCreateUserIdByAddress, but uses oauth info to find a user. This is used
- * to link new Privy users to existing Magic users.
- */
-export async function findAddressesBySso(
+export async function findUserBySso(
   ssoInfo: VerifiedUserInfo,
   transaction: Transaction,
-): Promise<AddressAttributes[]> {
+): Promise<UserAttributes | null> {
   console.log(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
-  let query = `
-    SELECT *
+  let cteQuery = `
+    SELECT DISTINCT(user_id) as user_id
     FROM "Addresses"
-           JOIN "Users" ON "Addresses"."user_id" = "Users"."id"
     WHERE user_id IS NOT NULL
       AND oauth_provider = :oauthProvider
       AND
   `;
 
   if (['github', 'discord', 'twitter'].includes(ssoInfo.provider)) {
-    query += `
+    cteQuery += `
       oauth_username = :oauthUsername;
     `;
   } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
-    query += `
+    cteQuery += `
       oauth_email = :oauthEmail;
     `;
   } else if (['phone_number'].includes(ssoInfo.provider)) {
-    query += `
+    cteQuery += `
       oauth_phone_number = :oauthPhoneNumber;
     `;
   } else {
     throw new Error(`Unsupported OAuth provider: ${ssoInfo.provider}`);
   }
 
-  return await models.sequelize.query(query, {
-    replacements: {
-      oauthProvider: ssoInfo.provider,
-      oauthUsername: ssoInfo.username,
-      oauthEmail: ssoInfo.email,
-      oauthPhoneNumber: ssoInfo.phoneNumber,
+  const users = await models.sequelize.query(
+    `
+      WITH user_ids AS (${cteQuery})
+      SELECT U.*
+      FROM "Users" U
+      WHERE U.id IN (SELECT user_id FROM user_ids);
+    `,
+    {
+      model: models.User,
+      replacements: {
+        oauthProvider: ssoInfo.provider,
+        oauthUsername: ssoInfo.username,
+        oauthEmail: ssoInfo.email,
+        oauthPhoneNumber: ssoInfo.phoneNumber,
+      },
+      transaction,
     },
-    model: models.Address,
-    transaction,
-  });
+  );
+
+  if (users.length > 1)
+    throw new Error('Multiple users with the same oauth info found!');
+  if (users.length === 0) return null;
+  return users[0];
 }
 
 export async function findOrCreateUser({
-  user,
   address,
   transaction,
   ssoInfo,
@@ -92,7 +103,6 @@ export async function findOrCreateUser({
   privyUserId,
   hex,
 }: {
-  user?: UserAttributes;
   address: string;
   transaction: Transaction;
   ssoInfo?: VerifiedUserInfo;
@@ -102,37 +112,18 @@ export async function findOrCreateUser({
 }): Promise<{
   newUser: boolean;
   user: UserAttributes;
-  addresses: AddressAttributes[];
 }> {
-  // Used to simplify signIn flow for Privy
-  if (user) {
-    if (!Array.isArray(user.Addresses))
-      throw new Error('Must join with addresses');
-    return {
-      newUser: false,
-      user,
-      addresses: user.Addresses as AddressAttributes[],
-    };
-  }
-
-  let addresses: AddressAttributes[];
+  let foundUser: UserAttributes | null = null;
   if (ssoInfo) {
-    addresses = await findAddressesBySso(ssoInfo, transaction);
+    foundUser = await findUserBySso(ssoInfo, transaction);
   } else {
-    addresses = await findAddressesByAddressOrHex(
+    foundUser = await findUserByAddressOrHex(
       hex ? { hex } : { address },
       transaction,
     );
   }
 
-  const userIds = new Set(addresses.map((a) => a.user_id));
-  if (userIds.size > 1) {
-    throw new Error(
-      `Multiple users found (userIds: ${Array.from(userIds).join(', ')})`,
-    );
-  }
-
-  if (addresses.length === 0) {
+  if (!foundUser) {
     const user = await models.User.create(
       {
         email: null,
@@ -143,153 +134,25 @@ export async function findOrCreateUser({
       { transaction },
     );
     console.log(`Created new user: ${user.id}`);
-    return { newUser: true, user, addresses };
-  } else if (privyUserId && !addresses[0].User!.privy_id) {
+    return { newUser: true, user };
+  } else if (privyUserId && !foundUser.privy_id) {
     await models.User.update(
       {
         privy_id: privyUserId,
       },
       {
         where: {
-          id: addresses[0].user_id!,
+          id: foundUser.id!,
         },
         transaction,
       },
     );
-    console.log(`Updated user privy id: ${addresses[0].user_id}`);
-  }
-
-  console.log(`Address user object: ${JSON.stringify(addresses[0].User)}`);
-  return {
-    newUser: false,
-    user: addresses[0].User!,
-    addresses,
-  };
-}
-
-type AddressCrudProperties = {
-  community_id: string;
-  address: string;
-  wallet_id: WalletId;
-  verification_token: string;
-  verification_token_expires: Date;
-  block_info?: string | null | undefined;
-  hex?: string | undefined;
-};
-
-/**
- * Updates or creates an address for a user in a community. If the address already belongs to
- * another user, it transfers the address to the new user. If the address already exists and
- * the user is the same, it updates the verification data and last active date.
- */
-export async function upsertAddress({
-  user,
-  addresses,
-  addressAttributes: {
-    community_id,
-    address,
-    wallet_id,
-    verification_token,
-    verification_token_expires,
-    block_info,
-    hex,
-  },
-  transaction,
-}: {
-  user: UserAttributes;
-  addresses: AddressAttributes[];
-  addressAttributes: AddressCrudProperties;
-  transaction: Transaction;
-}) {
-  console.log(
-    'Update or create address by community. User:' +
-      ` ${user.id}, Community: ${community_id}, Address: ${address},` +
-      ` existingAddresses: ${JSON.stringify(addresses.map((a) => [a.address, a.community_id]))}`,
-  );
-  let addressInstance: AddressAttributes | undefined;
-  let lastUserId: number | undefined;
-  for (const currentAddress of addresses) {
-    if (!lastUserId) lastUserId = currentAddress.user_id!;
-    if (currentAddress.user_id !== lastUserId) {
-      throw new Error('Multiple users cannot have the same address');
-    }
-
-    if (
-      currentAddress.community_id === community_id &&
-      currentAddress.address === address
-    )
-      addressInstance = currentAddress;
-    lastUserId = currentAddress.user_id!;
-  }
-
-  let transferredUser = false;
-  if (lastUserId && lastUserId !== user.id!) {
-    console.log(
-      'Transferring address to user: ' + lastUserId + ' -> ' + user.id,
-    );
-    await models.Address.update(
-      {
-        user_id: user.id!,
-        wallet_id,
-      },
-      {
-        where: { address, user_id: lastUserId },
-        transaction,
-      },
-    );
-    transferredUser = true;
-  }
-
-  let newAddress = false;
-  if (!addressInstance) {
-    addressInstance = await models.Address.create(
-      {
-        community_id,
-        user_id: user.id!,
-        address,
-        hex,
-        wallet_id,
-        role: 'member',
-        is_user_default: false,
-        ghost_address: false,
-        is_banned: false,
-        last_active: new Date(),
-        verified: new Date(),
-        verification_token,
-        verification_token_expires,
-        block_info: block_info ?? null,
-      },
-      { transaction },
-    );
-    newAddress = true;
-    console.log(`Created new address: ${addressInstance.id}`);
-  } else {
-    await models.Address.update(
-      {
-        wallet_id,
-        last_active: new Date(),
-        verified: new Date(),
-        verification_token,
-        verification_token_expires,
-        block_info,
-      },
-      {
-        where: {
-          id: addressInstance.id!,
-        },
-        transaction,
-      },
-    );
-    console.log(
-      `Updated address activity. Address: ${addressInstance.address}, Community: ${addressInstance.community_id}`,
-    );
+    console.log(`Updated user privy id: ${foundUser.id}`);
   }
 
   return {
-    address: addressInstance,
-    transferredUser,
-    newAddress,
-    originalUserId: lastUserId,
+    newUser: false,
+    user: foundUser,
   };
 }
 
@@ -301,14 +164,16 @@ export async function signInUser(
   },
   privyUser?: PrivyUser,
   verifiedSsoInfo?: VerifiedUserInfo,
-  user?: UserAttributes,
+  signedInUser?: UserAttributes | null,
 ) {
-  let userData: Awaited<ReturnType<typeof findOrCreateUser>> | undefined,
-    addressData: Awaited<ReturnType<typeof upsertAddress>> | undefined;
-  let addressCount = 0;
+  let userData: Awaited<ReturnType<typeof findOrCreateUser>> | undefined;
+  let addressCount = 1;
+  let transferredUser = false;
+  let address: AddressAttributes | undefined,
+    newAddress = false;
+
   await models.sequelize.transaction(async (transaction) => {
     userData = await findOrCreateUser({
-      user,
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
       referrer_address: payload.referrer_address,
@@ -316,18 +181,64 @@ export async function signInUser(
       hex: payload.hex,
       transaction,
     });
-    addressData = await upsertAddress({
-      ...userData,
-      addressAttributes: {
-        ...payload,
-        ...verificationData,
+
+    // if signed-in user is not the same as user derived from address/hex/sso
+    // and the user is not new then transfer ownership to the signed-in user
+    if (
+      signedInUser &&
+      signedInUser?.id !== userData.user.id &&
+      !userData.newUser
+    ) {
+      await models.Address.update(
+        {
+          user_id: signedInUser.id!,
+        },
+        {
+          where: {
+            id: {
+              [Op.in]: (userData.user.Addresses as AddressAttributes[])
+                .filter((a) => a.address === payload.address)
+                .map((a) => a.id!),
+            },
+          },
+          transaction,
+        },
+      );
+      transferredUser = true;
+      console.log(
+        `Addresses ${payload.address} transferred from user ${userData.user.id} to user ${signedInUser.id}`,
+      );
+    }
+
+    [address, newAddress] = await models.Address.findOrCreate({
+      where: { community_id: payload.community_id, address: payload.address },
+      defaults: {
+        community_id: payload.community_id,
+        address: payload.address,
+        user_id: signedInUser?.id ?? userData.user.id,
+        hex: payload.hex,
+        wallet_id: payload.wallet_id,
+        verification_token: verificationData.verification_token,
+        verification_token_expires: verificationData.verification_token_expires,
+        block_info: payload.block_info ?? null,
+        last_active: new Date(),
+        verified: new Date(),
+        role: 'member',
+        is_user_default: false,
+        ghost_address: false,
+        is_banned: false,
       },
       transaction,
     });
+
     await emitSignInEvents({
-      ...userData,
-      ...addressData,
+      newUser: userData.newUser,
+      user: signedInUser || userData.user,
+      transferredUser,
+      address,
+      newAddress,
       transaction,
+      originalUserId: transferredUser ? userData.user.id : undefined,
     });
 
     addressCount = await models.Address.count({
@@ -338,6 +249,7 @@ export async function signInUser(
     });
   });
 
-  if (!userData || !addressData) throw new Error('Failed to sign in user');
-  return { ...userData, ...addressData, addressCount };
+  if (!userData || !address) throw new Error('Failed to sign in user');
+
+  return { ...userData, address, newAddress, addressCount, transferredUser };
 }
