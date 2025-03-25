@@ -1,4 +1,4 @@
-import { httpLink } from '@trpc/client';
+import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import type { API } from '../../../server/api/internal-router';
 import { userStore } from '../state/ui/user';
@@ -9,7 +9,8 @@ export const BASE_API_PATH = '/api/internal/trpc';
 
 export const trpcClient = trpc.createClient({
   links: [
-    httpLink({
+    // TODO: use env to switch between single and batch
+    httpBatchLink({
       url: BASE_API_PATH,
 
       async headers() {
