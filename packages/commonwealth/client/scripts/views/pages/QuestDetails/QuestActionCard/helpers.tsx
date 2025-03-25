@@ -1,3 +1,4 @@
+import { pluralize } from 'helpers';
 import React from 'react';
 
 export const actionCopies = {
@@ -37,8 +38,9 @@ export const actionCopies = {
       <>
         XP rewarded to participants after any of these tweet metrics are met.
         <br />
-        {/* TODO: 11391 update this to only show counts > 0 */}
-        {likes} Likes, {retweets} Retweets or {replies} Replies.
+        {likes > 0 ? `${pluralize(likes, 'Like')}, ` : ''}
+        {retweets > 0 ? `${pluralize(retweets, 'Retweet')}, ` : ''}
+        {replies > 0 ? `${pluralize(replies, 'Replies')}` : ''}.
       </>
     ),
   },
