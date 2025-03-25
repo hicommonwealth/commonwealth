@@ -225,6 +225,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         // TODO: user mention is not implemented in app
         break;
       }
+      case 'TweetEngagement': {
+        if (actionContentId) {
+          window.open(buildURLFromContentId(actionContentId), '_blank');
+        } else {
+          notifyError(`Linked twitter tweet url is invalid`);
+        }
+        break;
+      }
       default:
         return;
     }
