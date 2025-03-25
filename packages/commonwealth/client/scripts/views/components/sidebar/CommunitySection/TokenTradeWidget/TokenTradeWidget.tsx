@@ -78,10 +78,7 @@ export const TokenTradeWidget = ({
   };
 
   const handleCTAClick = (mode: TradingMode) => {
-    if (!user.isLoggedIn) {
-      setIsAuthModalOpen(true);
-    }
-
+    // Opening modal even if user is not logged in
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
@@ -206,12 +203,7 @@ export const TokenTradeWidget = ({
                   buttonType="secondary"
                   buttonHeight="sm"
                   onClick={() => {
-                    register({
-                      cb: () => {
-                        handleCTAClick(mode);
-                      },
-                    });
-                    openAuthModalOrTriggerCallback();
+                    handleCTAClick(mode);
                   }}
                 />
               ))
@@ -223,12 +215,7 @@ export const TokenTradeWidget = ({
                 buttonType="secondary"
                 buttonHeight="sm"
                 onClick={() => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(TradingMode.Swap);
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
+                  handleCTAClick(TradingMode.Swap);
                 }}
               />
             )}

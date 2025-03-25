@@ -164,15 +164,10 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                 }
                 iconURL={token.icon_url || ''}
                 onCTAClick={(mode) => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(
-                        mode,
-                        token as z.infer<typeof TokenWithCommunity>,
-                      );
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
+                  handleCTAClick(
+                    mode,
+                    token as z.infer<typeof TokenWithCommunity>,
+                  );
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({

@@ -12,8 +12,13 @@
   .token-info {
     display: flex;
     align-items: center;
-    justify-self: flex-start;
+    justify-content: space-between;
     gap: 4px;
+    margin-bottom: 12px;
+
+    .disclaimer {
+      margin-left: auto;
+    }
   }
 
   .Uniswap {
@@ -22,6 +27,23 @@
       box-shadow: none !important;
       margin: auto;
       width: 100%;
+
+      /* If we're on the wrong network, add a semi-transparent overlay */
+      &.disabled-overlay {
+        position: relative;
+        pointer-events: none;
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          z-index: 10;
+        }
+      }
 
       button[color='interactive'] {
         color: $white !important;

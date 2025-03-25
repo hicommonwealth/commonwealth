@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { PinnedTokenWithPrices } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
@@ -30,4 +31,24 @@ export type UniswapTradeTokenModalProps = {
 
 export type UseUniswapTradeModalProps = {
   tradeConfig: UniswapTradingConfig;
+};
+
+export type UniswapWidgetConfig = {
+  isReady: boolean;
+  provider?: Web3Provider;
+  theme: any;
+  tokensList?: UniswapToken[];
+  jsonRpcUrlMap: { [chainId: number]: string[] };
+  defaultTokenAddress: {
+    input: string;
+    output: string;
+  };
+  convenienceFee: {
+    percentage: number;
+    recipient: Record<number, string>;
+  };
+  routerURLs: {
+    default: string;
+  };
+  connectWallet: () => Promise<boolean>;
 };
