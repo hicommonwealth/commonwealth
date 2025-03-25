@@ -25,7 +25,8 @@ export function useReactNativeWebView(): ReactNativeWebView | undefined {
 }
 
 export function isMobileApp(): boolean {
-  return !!window.ReactNativeWebView;
+  //return !!window.ReactNativeWebView;
+  return true;
 }
 
 /**

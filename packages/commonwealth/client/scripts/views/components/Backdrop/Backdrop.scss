@@ -1,0 +1,11 @@
+@import '../../../styles/shared.scss';
+
+.Backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: $white;
+  z-index: 70;
+}
