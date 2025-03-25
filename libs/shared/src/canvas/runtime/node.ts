@@ -4,7 +4,7 @@ import { Libp2p } from 'libp2p';
 import { ConnectionConfig } from 'pg';
 
 import { getSessionSigners } from '../signers';
-import { contractTopic } from './contract';
+import { contract, contractTopic } from './contract';
 
 export const CANVAS_TOPIC = contractTopic;
 
@@ -41,7 +41,9 @@ export const startCanvasNode = async (
       database: url.pathname.slice(1), // remove the leading '/'
       password: url.password,
       port: url.port ? parseInt(url.port) : 5432,
-      ssl: false, // { rejectUnauthorized: false },
+      ssl: path.startsWith('postgres://localhost:5432/')
+        ? false
+        : { rejectUnauthorized: false },
     };
   }
 
