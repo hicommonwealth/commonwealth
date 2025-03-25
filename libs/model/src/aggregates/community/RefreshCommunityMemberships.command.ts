@@ -3,35 +3,31 @@ import * as schemas from '@hicommonwealth/schemas';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
-import type {
-  AddressAttributes,
-  GroupAttributes,
-  MembershipRejectReason,
-} from '../../models';
+import type { AddressAttributes, GroupAttributes } from '../../models';
 import {
   tokenBalanceCache,
   type Balances,
   type OptionsWithBalances,
 } from '../../services';
-import { makeGetBalancesOptions, validateGroupMembership } from '../../utils';
+import {
+  emitEvent,
+  makeGetBalancesOptions,
+  validateGroupMembership,
+} from '../../utils';
 
 const log = logger(import.meta);
 
-type ComputedMembership = {
-  group_id: number;
-  address_id: number;
-  reject_reason: MembershipRejectReason | null;
-  last_checked: Date;
-};
+type Membership = z.infer<typeof schemas.Membership>;
 
 function computeMembership(
   address: AddressAttributes,
   group: GroupAttributes,
   balances: OptionsWithBalances[],
-): ComputedMembership {
+): Membership {
   const { requirements } = group;
   const { isValid, messages } = validateGroupMembership(
     address.address,
@@ -42,19 +38,20 @@ function computeMembership(
   return {
     group_id: group.id!,
     address_id: address.id!,
-    reject_reason: isValid ? null : (messages ?? null),
+    reject_reason: isValid ? undefined : (messages ?? undefined),
     last_checked: new Date(),
   };
 }
 
 // upserts memberships for each combination of address and group
 async function processMemberships(
+  community_id: string,
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
   balances: OptionsWithBalances[],
 ): Promise<[number, number]> {
-  const toCreate = [];
-  const toUpdate = [];
+  const toCreate = [] as Membership[];
+  const toUpdate = [] as Membership[];
   for (const group of groups) {
     for (const address of addresses) {
       const memberships = address.Memberships ?? [];
@@ -75,8 +72,28 @@ async function processMemberships(
       }
     }
   }
-  await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
-    updateOnDuplicate: ['reject_reason', 'last_checked'],
+  if (toCreate.length === 0 && toUpdate.length === 0) return [0, 0];
+
+  await models.sequelize.transaction(async (transaction) => {
+    await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
+      updateOnDuplicate: ['reject_reason', 'last_checked'],
+      transaction,
+    });
+    await emitEvent(
+      models.Outbox,
+      [
+        {
+          event_name: 'MembershipsRefreshed',
+          event_payload: {
+            community_id,
+            created: toCreate,
+            updated: toUpdate,
+            created_at: new Date(),
+          },
+        },
+      ],
+      transaction,
+    );
   });
   return [toCreate.length, toUpdate.length];
 }
@@ -167,6 +184,7 @@ export function RefreshCommunityMemberships(): Command<
         );
 
         const [created, updated] = await processMemberships(
+          community_id,
           groups,
           addresses,
           balances,
