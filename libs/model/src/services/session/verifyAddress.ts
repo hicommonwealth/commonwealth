@@ -9,7 +9,7 @@ import { mustExist } from '../../middleware/guards';
 export type VerifiedAddress = {
   base: ChainBase;
   encodedAddress: string;
-  chain_node_id?: number | null;
+  eth_chain_id?: number | null;
   ss58Prefix?: number | null;
   hex?: string;
   existingHexUserId?: number | null;
@@ -37,6 +37,7 @@ export async function verifyAddress(
 
   const community = await models.Community.findOne({
     where: { id: community_id },
+    include: [{ model: models.ChainNode }],
   });
   mustExist('Community', community);
 
@@ -46,7 +47,7 @@ export async function verifyAddress(
       return {
         base: community.base,
         encodedAddress: address,
-        chain_node_id: community.chain_node_id,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
       };
     }
 
@@ -60,7 +61,7 @@ export async function verifyAddress(
           address,
           currentPrefix: community.ss58_prefix!,
         }),
-        chain_node_id: community.chain_node_id,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
         ss58Prefix: community.ss58_prefix!,
       };
     }
@@ -76,7 +77,7 @@ export async function verifyAddress(
       return {
         base: community.base,
         encodedAddress: address,
-        chain_node_id: community.chain_node_id,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
       };
     }
 
@@ -97,7 +98,7 @@ export async function verifyAddress(
       return {
         base: community.base,
         encodedAddress,
-        chain_node_id: community.chain_node_id,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
         hex: addressHex,
         existingHexUserId: existingHexesSorted.at(0)?.user_id,
       };

@@ -1,3 +1,4 @@
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import {
   QuestParticipationLimit,
@@ -5,6 +6,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import Chance from 'chance';
+import ethers from 'ethers';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
@@ -24,6 +26,7 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
+import * as services from '../../src/services';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
@@ -359,7 +362,12 @@ describe('User lifecycle', () => {
       ]);
 
       // user signs in a referral link, creating a new user and address
-      const new_address = await signIn(community_id, member.address);
+      const new_address = await signIn(
+        new SIWESigner({ chainId: 1 }),
+        community_id,
+        -1, // new user
+        member.address,
+      );
       new_actor = {
         address: new_address!.address,
         user: {
@@ -820,6 +828,70 @@ describe('User lifecycle', () => {
       });
 
       expect(mafter!.xp_points).toBe(mbefore!.xp_points! + 11);
+    });
+
+    it('should award xp points when wallet is linked with a balance', async () => {
+      // setup quest
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          name: 'xp quest for wallet linking',
+          description: chance.sentence(),
+          image_url: chance.url(),
+          start_date: moment().add(2, 'day').toDate(),
+          end_date: moment().add(3, 'day').toDate(),
+          max_xp_to_end: 200,
+          quest_type: 'common',
+        },
+      });
+      // setup quest actions
+      await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest!.id!,
+          action_metas: [
+            {
+              event_name: 'WalletLinked',
+              reward_amount: 13,
+              creator_reward_weight: 0,
+              content_id: `threshold:10`,
+            },
+          ],
+        },
+      });
+      // hack start date to make it active
+      await models.Quest.update(
+        { start_date: moment().subtract(3, 'day').toDate() },
+        { where: { id: quest!.id } },
+      );
+
+      const watermark = new Date();
+      const signer = new SIWESigner({ signer: ethers.Wallet.createRandom() });
+      const did = await signer.getDid();
+      const address = signer.getAddressFromDid(did);
+
+      // make sure address has a balance above threshold
+      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+        [address]: '100',
+      });
+
+      // signin nonmember
+      const result = await signIn(signer, community_id, member.user.id);
+
+      vi.clearAllMocks();
+
+      const before = await models.User.findOne({
+        where: { id: result?.user_id! },
+      });
+
+      // drain the outbox
+      await drainOutbox(['WalletLinked'], Xp, watermark);
+
+      const after = await models.User.findOne({
+        where: { id: result?.user_id! },
+      });
+
+      expect(after!.xp_points).toBe(before?.xp_points! + 13);
     });
   });
 });

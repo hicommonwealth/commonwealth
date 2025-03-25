@@ -2,11 +2,11 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType, deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
-import { tokenBalanceCache } from 'model/src/services';
 import { Op } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
+import { tokenBalanceCache } from '../../services';
 import {
   transferOwnership,
   verifyAddress,
@@ -60,7 +60,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       const {
         base,
         encodedAddress,
-        chain_node_id,
+        eth_chain_id,
         ss58Prefix,
         hex,
         existingHexUserId,
@@ -170,11 +170,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               },
             });
           if (new_address || !wallet_found) {
-            const balances = chain_node_id
+            const balances = eth_chain_id
               ? await tokenBalanceCache.getBalances({
                   addresses: [addr.address],
                   balanceSourceType: BalanceSourceType.ETHNative, // TODO: support other balance sources
-                  sourceOptions: { evmChainId: chain_node_id }, // TODO: is this the right chain node?
+                  sourceOptions: { evmChainId: eth_chain_id }, // TODO: is this the right chain node?
                 })
               : { [addr.address]: '0' };
             events.push({
@@ -183,7 +183,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 user_id: addr.user_id!,
                 new_user,
                 wallet_id: wallet_id,
-                balance: Number(balances[addr.address]),
+                balance: Number(balances[addr.address] ?? 0),
                 community_id,
                 created_at: addr.created_at!,
               },
