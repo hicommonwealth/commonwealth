@@ -325,6 +325,7 @@ async function mustBeAuthorized(
     roles?: Role[];
   },
 ) {
+  console.log({ actor, context, check });
   // System actors are always allowed
   if (actor.is_system_actor) return;
 

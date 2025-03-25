@@ -96,7 +96,7 @@ export const Membership = z.object({
   group_id: z.number(),
   address_id: z.number(),
   reject_reason: MembershipRejectReason,
-  last_checked: z.date(),
+  last_checked: z.coerce.date(),
 
   // associations
   group: Group.optional(),
