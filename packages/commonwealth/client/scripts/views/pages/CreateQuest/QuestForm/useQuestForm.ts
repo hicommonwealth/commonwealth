@@ -331,8 +331,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           if (error.includes('topic with id')) {
             const topicId = error.match(/id "(\d+)"/)[1];
             const tempForm = [...questActionSubForms];
-            const foundSubForm = tempForm.find((form) =>
-              form.values.contentLink?.includes(`discussion/topic/${topicId}`),
+            const foundSubForm = tempForm.find(
+              (form) =>
+                form.config?.with_optional_topic_id &&
+                form.values.contentIdScope ===
+                  QuestActionContentIdScope.Topic &&
+                form.values.contentLink?.includes(`${topicId}`),
             );
             if (foundSubForm) {
               foundSubForm.errors = {
@@ -347,6 +351,23 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             setQuestActionSubForms([...tempForm]);
           }
           notifyError('Failed to update quest! Please fix form errors');
+          return;
+        }
+        if (error.includes('invalid topic url')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) =>
+              form.config?.with_optional_topic_id &&
+              form.values.contentIdScope === QuestActionContentIdScope.Topic &&
+              error.includes(form.values?.contentLink?.trim()),
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentLink: `Invalid topic link.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
           return;
         }
         notifyError(`Failed to ${mode} quest!`);
