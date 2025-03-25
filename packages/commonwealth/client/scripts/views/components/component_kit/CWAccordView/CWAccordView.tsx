@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CWIcon } from '../cw_icons/cw_icon';
 import './CWAccordView.scss';
 interface CWAccordViewProps {
   title: string;
@@ -21,9 +22,13 @@ const CWAccordView = ({
       <div className="accord-container">
         <div className="accord-header" onClick={toggleAccord}>
           <div className="accord-title">{title}</div>
-          <div className={`accord-arrow ${isExpanded ? 'expanded' : ''}`}>
-            {isExpanded ? '▲' : '▼'}
-          </div>
+          <CWIcon
+            iconName={isExpanded ? 'caretDown' : 'caretUp'}
+            iconSize="small"
+            className="caret-icon"
+            weight="bold"
+            onClick={toggleAccord}
+          />
         </div>
       </div>
       {isExpanded && <div className="accord-content">{children}</div>}

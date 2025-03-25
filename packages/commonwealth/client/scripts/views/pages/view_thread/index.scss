@@ -38,6 +38,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  @include smallInclusive {
+    .ContentPageCard.Card {
+      width: 100%;
+    }
+  }
 }
 
 .thread-actions .popover-container {

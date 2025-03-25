@@ -5,6 +5,10 @@
   min-height: 16.5625rem;
   overflow: hidden;
   flex-direction: column;
+  &.isCollapsed {
+    height: 40px;
+    min-height: 40px;
+  }
 
   @include smallInclusive {
     width: 100%;

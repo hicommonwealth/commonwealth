@@ -4,6 +4,10 @@ import {
   MIN_CHARS_TO_SHOW_MORE,
   getThreadUrl,
 } from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
 import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -56,8 +60,10 @@ import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import MetaTags from '../../components/MetaTags';
-import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import {
+  CWContentPage,
+  SidebarComponents,
+} from '../../components/component_kit/CWContentPage';
 import { CWGatedTopicBanner } from '../../components/component_kit/CWGatedTopicBanner';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -66,7 +72,13 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import DetailCard from '../../components/proposals/DetailCard';
+import TimeLineCard from '../../components/proposals/TimeLineCard';
+import VotingResultView from '../../components/proposals/VotingResultView';
 import { getTextFromDelta } from '../../components/react_quill_editor/';
+import ProposalVotesDrawer from '../NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
+import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal';
+import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
@@ -95,8 +107,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [streamingTitle, setStreamingTitle] = useState('');
-
+  const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const { generateComment } = useGenerateCommentText();
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -135,6 +148,60 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const t = data?.at(0);
     return t ? new Thread(t as ThreadView) : undefined;
   }, [data]);
+
+  //  snapshot proposal hook
+  const snapshotLink = thread?.links?.find(
+    (link) => link?.source === 'snapshot',
+  );
+
+  const [snapshotId, proposalId] = snapshotLink?.identifier?.split('/') || [
+    '',
+    '',
+  ];
+
+  const {
+    proposal: snapshotProposal,
+    isLoading: isSnapshotLoading,
+    symbol,
+    votes,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    activeUserAddress,
+    loadVotes,
+    power,
+    threads,
+  } = useSnapshotProposal({
+    identifier: proposalId,
+    snapshotId: snapshotId,
+    enabled: !!snapshotLink,
+  });
+
+  const snapShotVotingResult = React.useMemo(() => {
+    if (!snapshotProposal || !votes) return [];
+    const { choices } = snapshotProposal;
+    const totalVoteCount = totals.sumOfResultsBalance || 0;
+
+    return choices.map((label: string, index: number) => {
+      const voteCount = votes
+        .filter((vote) => vote.choice === index + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      const percentage =
+        totalVoteCount > 0
+          ? ((voteCount / totalVoteCount) * 100).toFixed(2)
+          : '0';
+      const results = voteCount.toFixed(4); // Adjust precision as needed
+
+      return {
+        label,
+        percentage,
+        results,
+      };
+    });
+  }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
+
+  const governanceUrl = `https://snapshot.box/#/s:${snapshotId}/proposal/${proposalId}`;
 
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
@@ -448,11 +515,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
   const isStageDefault = thread && isDefaultStage(app, thread.stage);
 
-  const tabsShouldBePresent =
-    showLinkedProposalOptions ||
-    showLinkedThreadOptions ||
-    pollsData?.length > 0;
-
   const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
     thread?.discord_meta !== null && thread?.discord_meta !== undefined;
@@ -545,6 +607,137 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
+  const sidebarComp = [
+    ...(!isWindowSmallInclusive && snapshotProposal
+      ? [
+          {
+            label: 'Detail',
+            item: (
+              <DetailCard
+                status="snapshot"
+                governanceType="snapshot"
+                publishDate={snapshotProposal?.created}
+                id={proposalId}
+                Threads={threads}
+                scope="dfsf"
+              />
+            ),
+          },
+
+          {
+            label: 'Timeline',
+            item: <TimeLineCard proposalData={snapshotProposal} />,
+          },
+
+          {
+            label: 'Results',
+            item: (
+              <>
+                {!snapshotLink ? (
+                  <></>
+                ) : (
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
+                    governanceUrl={governanceUrl}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]
+      : []),
+    ...(showLinkedProposalOptions || showLinkedThreadOptions
+      ? [
+          {
+            label: 'Links',
+            item: (
+              <div className="cards-column">
+                {showLinkedProposalOptions && (
+                  <LinkedProposalsCard
+                    thread={thread!}
+                    showAddProposalButton={isAuthor || isAdminOrMod}
+                  />
+                )}
+                {showLinkedThreadOptions && (
+                  <LinkedThreadsCard
+                    thread={thread!}
+                    allowLinking={isAuthor || isAdminOrMod}
+                  />
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(isAuthor || isAdmin || hasWebLinks
+      ? [
+          {
+            label: 'Web Links',
+            item: (
+              <div className="cards-column">
+                <LinkedUrlCard
+                  thread={thread!}
+                  allowLinking={isAuthor || isAdminOrMod}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(canCreateSnapshotProposal && !hasSnapshotProposal
+      ? [
+          {
+            label: 'Snapshot',
+            item: (
+              <div className="cards-column">
+                <SnapshotCreationCard
+                  thread={thread!}
+                  allowSnapshotCreation={isAuthor || isAdminOrMod}
+                  onChangeHandler={handleNewSnapshotChange}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(pollsData?.length > 0 ||
+    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(
+                    pollsData?.map((poll) => [poll.id, poll]),
+                  ).values(),
+                ].map((poll: Poll) => {
+                  return (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      isTopicMembershipRestricted={isRestrictedMembership}
+                      showDeleteButton={isAuthor || isAdmin}
+                    />
+                  );
+                })}
+                {isAuthor &&
+                  (!app.chain?.meta?.admin_only_polling || isAdmin) && (
+                    <ThreadPollEditorCard
+                      thread={thread}
+                      threadAlreadyHasPolling={!pollsData?.length}
+                    />
+                  )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+  ];
+  const toggleShowVotesDrawer = (newModalState: boolean) => {
+    setShowVotesDrawer(newModalState);
+  };
   return (
     <StickCommentProvider>
       <MetaTags
@@ -616,15 +809,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       </Helmet>
 
       <CWPageLayout ref={pageRef}>
+        {isWindowSmallInclusive && snapshotProposal && (
+          <TimeLineCard proposalData={snapshotProposal} />
+        )}
         <CWContentPage
-          showTabs={isCollapsedSize && tabsShouldBePresent}
+          showTabs={false}
           contentBodyLabel="Thread"
           showSidebar={
-            showLinkedProposalOptions ||
-            showLinkedThreadOptions ||
-            pollsData?.length > 0 ||
-            isAuthor ||
-            !!hasWebLinks
+            !isWindowSmallInclusive &&
+            (!isWindowSmallInclusive ||
+              !showLinkedProposalOptions ||
+              showLinkedThreadOptions ||
+              pollsData?.length > 0 ||
+              isAuthor ||
+              !!hasWebLinks)
           }
           onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}
@@ -699,6 +897,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
+              {isWindowSmallInclusive && snapshotProposal && (
+                <DetailCard
+                  status="snapshot"
+                  governanceType="snapshot"
+                  publishDate={snapshotProposal?.created}
+                  id={proposalId}
+                  Threads={threads}
+                  scope="dfsf"
+                />
+              )}
+
               {thread && isEditingBody && threadBody ? (
                 <>
                   {/*// TODO editing thread */}
@@ -780,6 +989,48 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : null}
                 </>
               )}
+              {snapshotProposal && (
+                <>
+                  <SnapshotPollCardContainer
+                    activeUserAddress={activeUserAddress}
+                    fetchedPower={!!power}
+                    identifier={proposalId}
+                    proposal={snapshotProposal as SnapshotProposal}
+                    scores={[]}
+                    space={space as SnapshotSpace}
+                    symbol={symbol}
+                    totals={totals}
+                    totalScore={totalScore}
+                    validatedAgainstStrategies={validatedAgainstStrategies}
+                    votes={votes}
+                    loadVotes={async () => loadVotes()}
+                    snapShotVotingResult={snapShotVotingResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                  />
+                  {isWindowSmallInclusive && (
+                    <VotingResultView
+                      voteOptions={snapShotVotingResult}
+                      showCombineBarOnly={false}
+                      governanceUrl={governanceUrl}
+                    />
+                  )}
+                  <ProposalVotesDrawer
+                    header="Votes"
+                    votes={votes}
+                    choices={snapshotProposal?.choices}
+                    isOpen={showVotesDrawer}
+                    setIsOpen={setShowVotesDrawer}
+                  />
+                </>
+              )}
+
+              {isWindowSmallInclusive && (
+                <div className="mobile-sidebar">
+                  {sidebarComp.map((view) => (
+                    <div key={view.label}>{view.item}</div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           comments={
@@ -823,98 +1074,140 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }
           editingDisabled={isTopicInContest}
           sidebarComponents={
-            [
-              ...(showLinkedProposalOptions || showLinkedThreadOptions
-                ? [
-                    {
-                      label: 'Links',
-                      item: (
-                        <div className="cards-column">
-                          {showLinkedProposalOptions && (
-                            <LinkedProposalsCard
-                              thread={thread!}
-                              showAddProposalButton={isAuthor || isAdminOrMod}
-                            />
-                          )}
-                          {showLinkedThreadOptions && (
-                            <LinkedThreadsCard
-                              thread={thread!}
-                              allowLinking={isAuthor || isAdminOrMod}
-                            />
-                          )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(isAuthor || isAdmin || hasWebLinks
-                ? [
-                    {
-                      label: 'Web Links',
-                      item: (
-                        <div className="cards-column">
-                          <LinkedUrlCard
-                            thread={thread!}
-                            allowLinking={isAuthor || isAdminOrMod}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(canCreateSnapshotProposal && !hasSnapshotProposal
-                ? [
-                    {
-                      label: 'Snapshot',
-                      item: (
-                        <div className="cards-column">
-                          <SnapshotCreationCard
-                            thread={thread!}
-                            allowSnapshotCreation={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleNewSnapshotChange}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(pollsData?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
-                ? [
-                    {
-                      label: 'Polls',
-                      item: (
-                        <div className="cards-column">
-                          {[
-                            ...new Map(
-                              pollsData?.map((poll) => [poll.id, poll]),
-                            ).values(),
-                          ].map((poll: Poll) => {
-                            return (
-                              <ThreadPollCard
-                                poll={poll}
-                                key={poll.id}
-                                isTopicMembershipRestricted={
-                                  isRestrictedMembership
-                                }
-                                showDeleteButton={isAuthor || isAdmin}
-                              />
-                            );
-                          })}
-                          {isAuthor &&
-                            (!app.chain?.meta?.admin_only_polling ||
-                              isAdmin) && (
-                              <ThreadPollEditorCard
-                                thread={thread}
-                                threadAlreadyHasPolling={!pollsData?.length}
-                              />
-                            )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-            ] as SidebarComponents
+            sidebarComp as unknown as SidebarComponents
+            // [
+            //   ...(snapshotProposal
+            //     ? [
+            //         {
+            //           label: 'Detail',
+            //           item: (
+            //             <DetailCard
+            //               status="snapshot"
+            //               governanceType="snapshot"
+            //               publishDate={snapshotProposal?.created}
+            //               id={proposalId}
+            //               Threads={threads}
+            //               scope="dfsf"
+            //             />
+            //           ),
+            //         },
+
+            //         {
+            //           label: 'Timeline',
+            //           // @ts-expect-error <StrictNullChecks/>
+
+            //           item: <TimeLineCard proposalData={snapshotProposal} />,
+            //         },
+
+            //         {
+            //           label: 'Results',
+            //           item: (
+            //             <>
+            //               {!snapshotLink ? (
+            //                 <></>
+            //               ) : (
+            //                 <VotingResultView
+            //                   voteOptions={snapShotVotingResult}
+            //                   showCombineBarOnly={false}
+            //                   governanceUrl={governanceUrl}
+            //                 />
+            //               )}
+            //             </>
+            //           ),
+            //         },
+            //       ]
+            //     : []),
+            //   ...(showLinkedProposalOptions || showLinkedThreadOptions
+            //     ? [
+            //         {
+            //           label: 'Links',
+            //           item: (
+            //             <div className="cards-column">
+            //               {showLinkedProposalOptions && (
+            //                 <LinkedProposalsCard
+            //                   thread={thread!}
+            //                   showAddProposalButton={isAuthor || isAdminOrMod}
+            //                 />
+            //               )}
+            //               {showLinkedThreadOptions && (
+            //                 <LinkedThreadsCard
+            //                   thread={thread!}
+            //                   allowLinking={isAuthor || isAdminOrMod}
+            //                 />
+            //               )}
+            //             </div>
+            //           ),
+            //         },
+            //       ]
+            //     : []),
+            //   ...(isAuthor || isAdmin || hasWebLinks
+            //     ? [
+            //         {
+            //           label: 'Web Links',
+            //           item: (
+            //             <div className="cards-column">
+            //               <LinkedUrlCard
+            //                 thread={thread!}
+            //                 allowLinking={isAuthor || isAdminOrMod}
+            //               />
+            //             </div>
+            //           ),
+            //         },
+            //       ]
+            //     : []),
+            //   ...(canCreateSnapshotProposal && !hasSnapshotProposal
+            //     ? [
+            //         {
+            //           label: 'Snapshot',
+            //           item: (
+            //             <div className="cards-column">
+            //               <SnapshotCreationCard
+            //                 thread={thread!}
+            //                 allowSnapshotCreation={isAuthor || isAdminOrMod}
+            //                 onChangeHandler={handleNewSnapshotChange}
+            //               />
+            //             </div>
+            //           ),
+            //         },
+            //       ]
+            //     : []),
+            //   ...(pollsData?.length > 0 ||
+            //   (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+            //     ? [
+            //         {
+            //           label: 'Polls',
+            //           item: (
+            //             <div className="cards-column">
+            //               {[
+            //                 ...new Map(
+            //                   pollsData?.map((poll) => [poll.id, poll]),
+            //                 ).values(),
+            //               ].map((poll: Poll) => {
+            //                 return (
+            //                   <ThreadPollCard
+            //                     poll={poll}
+            //                     key={poll.id}
+            //                     isTopicMembershipRestricted={
+            //                       isRestrictedMembership
+            //                     }
+            //                     showDeleteButton={isAuthor || isAdmin}
+            //                   />
+            //                 );
+            //               })}
+            //               {isAuthor &&
+            //                 (!app.chain?.meta?.admin_only_polling ||
+            //                   isAdmin) && (
+            //                   <ThreadPollEditorCard
+            //                     thread={thread}
+            //                     threadAlreadyHasPolling={!pollsData?.length}
+            //                   />
+            //                 )}
+            //             </div>
+            //           ),
+            //         },
+            //       ]
+            //     : []),
+            // ] as unknown as SidebarComponents
           }
         />
       </CWPageLayout>

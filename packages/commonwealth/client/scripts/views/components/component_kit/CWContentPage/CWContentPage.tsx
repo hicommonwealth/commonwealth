@@ -36,6 +36,7 @@ export type SidebarComponents = [
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
+  item?: ContentPageSidebarItem,
 ];
 
 type ContentPageProps = {

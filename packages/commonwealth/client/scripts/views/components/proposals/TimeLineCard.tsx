@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 import { AnyProposal } from 'client/scripts/models/types';
@@ -62,48 +62,62 @@ const TimeLineCard = ({
   proposalData: SnapshotProposal | AnyProposal;
 }) => {
   const timelineEvents = getTimelineEvents(proposalData);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   return (
-    <div className="TimeLineCard">
+    <div className={clsx('TimeLineCard', { isCollapsed: isCollapsed })}>
       <div className="header">
         <CWText type="h5" fontWeight="semiBold">
           TimeLineCard
         </CWText>
+        <CWIcon
+          iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+          iconSize="small"
+          className="caret-icon"
+          weight="bold"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        />
       </div>
-      <div className="rb-container">
-        <ul className="rb">
-          {timelineEvents.map((event, index) => (
-            <li
-              key={index}
-              className={`rb-item ${index === timelineEvents.length - 1 ? 'last_item' : ''}`}
-            >
-              <div
-                className={clsx('timeline-dot', {
-                  last_item: index === timelineEvents.length - 1,
-                })}
+      {!isCollapsed && (
+        <div className="rb-container">
+          <ul className="rb">
+            {timelineEvents.map((event, index) => (
+              <li
+                key={index}
+                className={`rb-item ${index === timelineEvents.length - 1 ? 'last_item' : ''}`}
               >
-                <CWIcon
-                  className={event.type}
-                  iconName={event.iconName as IconName}
-                  iconSize="large"
-                  fill="red"
-                />
-              </div>
-              <div className="right-container">
-                <div className="timestamp">
-                  <CWText type="h5" fontWeight="regular">
-                    {event.date}
-                  </CWText>
+                <div
+                  className={clsx('timeline-dot', {
+                    last_item: index === timelineEvents.length - 1,
+                  })}
+                >
+                  <CWIcon
+                    className={event.type}
+                    iconName={event.iconName as IconName}
+                    iconSize="large"
+                    fill="red"
+                  />
                 </div>
-                <div className={clsx('item-title', event.type)}>
-                  <CWText type="b2" fontWeight="regular" className={event.type}>
-                    {event.title}
-                  </CWText>
+                <div className="right-container">
+                  <div className="timestamp">
+                    <CWText type="h5" fontWeight="regular">
+                      {event.date}
+                    </CWText>
+                  </div>
+                  <div className={clsx('item-title', event.type)}>
+                    <CWText
+                      type="b2"
+                      fontWeight="regular"
+                      className={event.type}
+                    >
+                      {event.title}
+                    </CWText>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
