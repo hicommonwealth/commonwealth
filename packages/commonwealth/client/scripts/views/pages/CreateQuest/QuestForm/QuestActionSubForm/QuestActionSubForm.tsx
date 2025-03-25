@@ -51,6 +51,7 @@ const QuestActionSubForm = ({
     'CommentUpvoted',
     'WalletLinked',
     'SSOLinked',
+    'TweetEngagement',
   ]
     .map((event) => ({
       value: event as QuestAction,
@@ -67,50 +68,67 @@ const QuestActionSubForm = ({
       sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
       sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
+      twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
       commentId: 'Comment Link (optional)',
       topicId: 'Topic Link (optional)',
+      twitterTweetUrl: 'Tweet URL',
     },
   };
 
   const getContentIdInputLabel = () => {
     if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
-      if (config?.with_optional_thread_id)
+      if (config?.with_optional_thread_id) {
         return contentIdInputConfig.labels.threadId;
-      if (config?.with_optional_comment_id)
+      }
+      if (config?.with_optional_comment_id) {
         return contentIdInputConfig.labels.commentId;
+      }
     }
     if (
       config?.with_optional_topic_id ||
       defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
-    )
+    ) {
       return contentIdInputConfig.labels.topicId;
+    }
+
+    if (config?.with_required_twitter_tweet_link) {
+      return contentIdInputConfig.labels.twitterTweetUrl;
+    }
 
     return 'Content Id';
   };
 
   const getContentIdInputPlaceholder = () => {
     if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
-      if (config?.with_optional_thread_id)
+      if (config?.with_optional_thread_id) {
         return contentIdInputConfig.placeholders.sampleThreadLink;
-      if (config?.with_optional_comment_id)
+      }
+      if (config?.with_optional_comment_id) {
         return contentIdInputConfig.placeholders.sampleCommentLink;
+      }
     }
     if (
       config?.with_optional_topic_id ||
       defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
-    )
+    ) {
       return contentIdInputConfig.placeholders.sampleTopicLink;
+    }
+
+    if (config?.with_required_twitter_tweet_link) {
+      return contentIdInputConfig.placeholders.twitterTweetUrl;
+    }
 
     return 'Content Id';
   };
 
-  const withOptionalContentId =
+  const allowsContentId =
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
-    config?.with_optional_topic_id;
+    config?.with_optional_topic_id ||
+    config?.with_required_twitter_tweet_link;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -368,6 +386,51 @@ const QuestActionSubForm = ({
         )}
       </div>
 
+      {config?.with_required_twitter_tweet_link && (
+        <div className="grid-row cols-3">
+          <CWTextInput
+            key={`noOfLikes-${defaultValues?.action}`}
+            name="noOfLikes"
+            label="Likes Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfLikes !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfLikes,
+            })}
+            onInput={(e) => onChange?.({ noOfLikes: e?.target?.value?.trim() })}
+            customError={errors?.noOfLikes}
+          />
+          <CWTextInput
+            key={`noOfRetweets-${defaultValues?.action}`}
+            name="noOfRetweets"
+            label="Retweets Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfRetweets !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfRetweets,
+            })}
+            onInput={(e) =>
+              onChange?.({ noOfRetweets: e?.target?.value?.trim() })
+            }
+            customError={errors?.noOfRetweets}
+          />
+          <CWTextInput
+            key={`noOfReplies-${defaultValues?.action}`}
+            name="noOfReplies"
+            label="Replies Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfReplies !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfReplies,
+            })}
+            onInput={(e) =>
+              onChange?.({ noOfReplies: e?.target?.value?.trim() })
+            }
+            customError={errors?.noOfReplies}
+          />
+        </div>
+      )}
+
       {config?.with_optional_thread_id && (
         <div className="content-id-type-selector">
           <CWText type="caption">Action Scope</CWText>
@@ -408,13 +471,8 @@ const QuestActionSubForm = ({
         </div>
       )}
 
-      <div
-        className={clsx(
-          'grid-row',
-          withOptionalContentId ? 'cols-2' : 'cols-1',
-        )}
-      >
-        {withOptionalContentId && (
+      <div className={clsx('grid-row', allowsContentId ? 'cols-2' : 'cols-1')}>
+        {allowsContentId && (
           <CWTextInput
             key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
             name="contentLink"

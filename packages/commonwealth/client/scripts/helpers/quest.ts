@@ -12,7 +12,6 @@ export type QuestAction = z.infer<typeof QuestActionMeta>;
 export type XPLog = z.infer<typeof XpLogView>;
 
 export const doesActionRequireRewardShare = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return (
     action === 'CommunityCreated' ||
     action === 'CommunityJoined' ||
@@ -21,42 +20,41 @@ export const doesActionRequireRewardShare = (action: QuestActionType) => {
 };
 
 export const doesActionRewardShareForReferrer = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return action === 'CommunityCreated' || action === 'CommunityJoined';
 };
 
 export const doesActionRewardShareForCreator = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return action === 'CommentUpvoted';
 };
 
 export const doesActionAllowContentId = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return (
     action === 'ThreadCreated' ||
     action === 'CommentCreated' ||
     action === 'CommentUpvoted' ||
-    action === 'ThreadUpvoted'
+    action === 'ThreadUpvoted' ||
+    action === 'TweetEngagement'
   );
 };
 
 export const doesActionAllowThreadId = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return action === 'CommentCreated' || action === 'ThreadUpvoted';
 };
 
 export const doesActionAllowCommentId = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return action === 'CommentUpvoted';
 };
 
 export const doesActionAllowTopicId = (action: QuestActionType) => {
-  // These are inferred from libs/model/src/user/Xp.projection.ts
   return (
     action === 'ThreadCreated' ||
     action === 'CommentCreated' ||
     action === 'ThreadUpvoted'
   );
+};
+
+export const doesActionAllowTwitterTweetURL = (action: QuestActionType) => {
+  return action === 'TweetEngagement';
 };
 
 const convertTimeRemainingToLabel = ({

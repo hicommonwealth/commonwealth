@@ -4,6 +4,7 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionAllowTwitterTweetURL,
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -137,6 +138,8 @@ const useQuestActionMultiFormsState = ({
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
+      const allowsTwitterTweetUrl =
+        allowsContentId && doesActionAllowTwitterTweetURL(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -146,6 +149,8 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
           allowsContentId && doesActionAllowThreadId(chosenAction),
+        with_required_twitter_tweet_link:
+          allowsContentId && doesActionAllowTwitterTweetURL(chosenAction),
       };
 
       // reset errors/values if action doesn't require creator points
@@ -166,11 +171,31 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
+      // set fixed contentIdScope per certain actions
+      if (updateBody.action === 'TweetEngagement') {
+        updatedSubForms[index].values.contentIdScope =
+          QuestActionContentIdScope.TwitterTweet;
+      }
+
       // set/reset default values/config if action allows content link
       if (allowsContentId) {
-        updatedSubForms[index].values.contentIdScope = allowsTopicId
-          ? QuestActionContentIdScope.Topic
-          : QuestActionContentIdScope.Thread;
+        updatedSubForms[index].values.contentIdScope =
+          updateBody.contentIdScope ||
+          updatedSubForms[index].values.contentIdScope ||
+          QuestActionContentIdScope.Thread;
+
+        if (
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Topic &&
+            !allowsTopicId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.TwitterTweet &&
+            !allowsTwitterTweetUrl)
+        ) {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Thread;
+        }
+
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdScope: undefined,

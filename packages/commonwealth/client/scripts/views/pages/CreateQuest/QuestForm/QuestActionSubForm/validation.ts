@@ -7,6 +7,7 @@ import {
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
   numberValidationSchema,
+  numberValidationSchemaOptional,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
@@ -30,13 +31,17 @@ const questSubFormValidationSchema = z.object({
 export const buildQuestSubFormValidationSchema = (
   config?: QuestActionSubFormConfig,
 ) => {
-  const allowsContentId =
+  const allowsOptionalContentId =
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
+  const requiresTwitterEngagement = config?.with_required_twitter_tweet_link;
   const requiresCreatorPoints = config?.requires_creator_points;
 
-  const needsExtension = requiresCreatorPoints || allowsContentId;
+  const needsExtension =
+    requiresCreatorPoints ||
+    allowsOptionalContentId ||
+    requiresTwitterEngagement;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -44,8 +49,24 @@ export const buildQuestSubFormValidationSchema = (
     ...(requiresCreatorPoints && {
       creatorRewardAmount: numberNonDecimalValidationSchema,
     }),
-    ...(allowsContentId && {
+    ...(allowsOptionalContentId && {
       contentLink: linkValidationSchema.optional,
+    }),
+    ...(requiresTwitterEngagement && {
+      contentLink: linkValidationSchema.required.refine(
+        (url) => {
+          // validate twitter tweet URL
+          const twitterRegex = /https:\/\/x\.com\/\w+\/status\/\d+/;
+          return twitterRegex.test(url);
+        },
+        {
+          message: VALIDATION_MESSAGES.TWITTER_TWEET_FORMAT,
+        },
+      ),
+      // TODO: fix validations
+      noOfLikes: numberValidationSchemaOptional.optional(),
+      noOfRetweets: numberValidationSchemaOptional.optional(),
+      noOfReplies: numberValidationSchemaOptional.optional(),
     }),
   });
 
@@ -68,6 +89,19 @@ export const buildQuestSubFormValidationSchema = (
       {
         message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
         path: ['creatorRewardAmount'],
+      },
+    );
+  }
+
+  if (requiresTwitterEngagement) {
+    // TODO: fix validation
+    baseSchema.refine(
+      (data) => {
+        return data.noOfLikes || data.noOfRetweets || data.noOfReplies;
+      },
+      {
+        message: 'One of Likes, Retweets, or Replies count must be provided.',
+        path: [],
       },
     );
   }

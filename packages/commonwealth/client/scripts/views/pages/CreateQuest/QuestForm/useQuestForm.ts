@@ -7,6 +7,7 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionAllowTwitterTweetURL,
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -24,11 +25,7 @@ import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
 import { buildContentIdFromURL } from './helpers';
-import {
-  QuestActionSubFormValuesWithContentLink,
-  QuestActionSubFormValuesWithCreatorPoints,
-  QuestFormProps,
-} from './types';
+import { QuestFormProps } from './types';
 import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
@@ -53,31 +50,24 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
-              const chosenAction = subForm.action as QuestAction;
+              const form = subForm as any; // TODO: fix type
+              const chosenAction = form.action as QuestAction;
               const allowsContentId = doesActionAllowContentId(chosenAction);
 
               return {
                 id: index + 1,
                 values: {
                   action: chosenAction,
-                  instructionsLink: subForm.instructionsLink || '',
-                  contentIdScope: (
-                    subForm as QuestActionSubFormValuesWithContentLink
-                  ).contentIdScope,
-                  contentLink:
-                    (subForm as QuestActionSubFormValuesWithContentLink)
-                      .contentLink || '',
-                  rewardAmount: subForm.rewardAmount,
-                  ...((subForm as QuestActionSubFormValuesWithCreatorPoints)
-                    ?.creatorRewardAmount && {
-                    creatorRewardAmount: (
-                      subForm as QuestActionSubFormValuesWithCreatorPoints
-                    ).creatorRewardAmount,
+                  instructionsLink: form.instructionsLink || '',
+                  contentIdScope: form.contentIdScope,
+                  contentLink: form.contentLink || '',
+                  rewardAmount: form.rewardAmount,
+                  ...(form?.creatorRewardAmount && {
+                    creatorRewardAmount: form.creatorRewardAmount,
                   }),
-                  participationLimit: subForm.participationLimit,
-                  participationPeriod: subForm.participationPeriod,
-                  participationTimesPerPeriod:
-                    subForm.participationTimesPerPeriod,
+                  participationLimit: form.participationLimit,
+                  participationPeriod: form.participationPeriod,
+                  participationTimesPerPeriod: form.participationTimesPerPeriod,
                 },
                 errors: {},
                 config: {
@@ -89,8 +79,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     allowsContentId && doesActionAllowThreadId(chosenAction),
                   with_optional_comment_id:
                     allowsContentId && doesActionAllowCommentId(chosenAction),
+                  with_required_twitter_tweet_link:
+                    allowsContentId &&
+                    doesActionAllowTwitterTweetURL(chosenAction),
                 },
-              };
+              } as any; // TODO: fix type
             }),
           ]);
         }
@@ -138,6 +131,58 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
+  const buildActionMetasPayload = async () => {
+    return await Promise.all(
+      questActionSubForms.map(async (subForm) => ({
+        event_name: subForm.values.action as QuestAction,
+        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        ...(subForm.values.creatorRewardAmount && {
+          creator_reward_weight: calculateRemainingPercentageChangeFractional(
+            parseInt(`${subForm.values.rewardAmount}`, 10),
+            parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+          ),
+        }),
+        ...(subForm.values.contentLink &&
+          (subForm.config?.with_optional_comment_id ||
+            subForm.config?.with_optional_thread_id ||
+            subForm.config?.with_optional_topic_id ||
+            subForm.config?.with_required_twitter_tweet_link) && {
+            content_id: await buildContentIdFromURL(
+              subForm.values.contentLink,
+              subForm.values?.contentIdScope ===
+                QuestActionContentIdScope.Thread
+                ? subForm.config?.with_optional_comment_id
+                  ? 'comment'
+                  : 'thread'
+                : subForm.values?.contentIdScope ===
+                    QuestActionContentIdScope.Topic
+                  ? 'topic'
+                  : 'tweet_url',
+            ),
+          }),
+        ...((subForm.values.noOfLikes ||
+          subForm.values.noOfRetweets ||
+          subForm.values.noOfReplies) && {
+          tweet_engagement_caps: {
+            likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
+            retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
+            replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
+          },
+        }),
+        participation_limit: subForm.values.participationLimit,
+        participation_period: subForm.values
+          .participationPeriod as QuestParticipationPeriod,
+        participation_times_per_period: parseInt(
+          `${subForm.values.participationTimesPerPeriod}`,
+        ),
+        ...(subForm.values.instructionsLink && {
+          instructions_link: subForm.values.instructionsLink.trim(),
+        }),
+        amount_multiplier: 0,
+      })),
+    );
+  };
+
   const handleCreateQuest = async (
     values: z.infer<typeof questFormValidationSchema>,
   ) => {
@@ -151,49 +196,13 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
-      quest_type: 'common',
+      quest_type: 'channel', // TODO: make this configurable via UI
     });
 
     if (quest && quest.id) {
       await updateQuest({
         quest_id: quest.id,
-        action_metas: await Promise.all(
-          questActionSubForms.map(async (subForm) => ({
-            event_name: subForm.values.action as QuestAction,
-            reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-            ...(subForm.values.creatorRewardAmount && {
-              creator_reward_weight:
-                calculateRemainingPercentageChangeFractional(
-                  parseInt(`${subForm.values.rewardAmount}`, 10),
-                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-                ),
-            }),
-            ...(subForm.values.contentLink &&
-              (subForm.config?.with_optional_comment_id ||
-                subForm.config?.with_optional_thread_id ||
-                subForm.config?.with_optional_topic_id) && {
-                content_id: await buildContentIdFromURL(
-                  subForm.values.contentLink,
-                  subForm.values?.contentIdScope ===
-                    QuestActionContentIdScope.Thread
-                    ? subForm.config?.with_optional_comment_id
-                      ? 'comment'
-                      : 'thread'
-                    : 'topic',
-                ),
-              }),
-            participation_limit: subForm.values.participationLimit,
-            participation_period: subForm.values
-              .participationPeriod as QuestParticipationPeriod,
-            participation_times_per_period: parseInt(
-              `${subForm.values.participationTimesPerPeriod}`,
-            ),
-            ...(subForm.values.instructionsLink && {
-              instructions_link: subForm.values.instructionsLink.trim(),
-            }),
-            amount_multiplier: 0,
-          })),
-        ),
+        action_metas: await buildActionMetasPayload(),
       });
     }
   };
@@ -218,47 +227,15 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || null, // send null to remove community association
-      action_metas: await Promise.all(
-        questActionSubForms.map(async (subForm) => ({
-          event_name: subForm.values.action as QuestAction,
-          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-          ...(subForm.values.creatorRewardAmount && {
-            creator_reward_weight: calculateRemainingPercentageChangeFractional(
-              parseInt(`${subForm.values.rewardAmount}`, 10),
-              parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-            ),
-          }),
-          ...(subForm.values.contentLink &&
-            (subForm.config?.with_optional_comment_id ||
-              subForm.config?.with_optional_thread_id ||
-              subForm.config?.with_optional_topic_id) && {
-              content_id: await buildContentIdFromURL(
-                subForm.values.contentLink,
-                subForm.values?.contentIdScope ===
-                  QuestActionContentIdScope.Thread
-                  ? subForm.config?.with_optional_comment_id
-                    ? 'comment'
-                    : 'thread'
-                  : 'topic',
-              ),
-            }),
-          participation_limit: subForm.values.participationLimit,
-          participation_period: subForm.values
-            .participationPeriod as QuestParticipationPeriod,
-          participation_times_per_period: parseInt(
-            `${subForm.values.participationTimesPerPeriod}`,
-          ),
-          ...(subForm.values.instructionsLink && {
-            instructions_link: subForm.values.instructionsLink.trim(),
-          }),
-          amount_multiplier: 0,
-        })),
-      ),
+      action_metas: await buildActionMetasPayload(),
     });
   };
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const subFormErrors = validateSubForms();
+
+    // TODO: remove
+    console.log('values => ', { values, subFormErrors, questActionSubForms });
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;

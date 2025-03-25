@@ -72,6 +72,19 @@ export const numberValidationSchema = z
     { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );
 
+// TODO: fix validation
+export const numberValidationSchemaOptional = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => {
+      const intVal = parseInt(value, 10);
+      if (intVal.toString().trim() === '') return false;
+      return !isNaN(intVal) && intVal.toString() === value.trim();
+    },
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
+  );
+
 // non decimal number
 export const numberNonDecimalValidationSchema = numberValidationSchema.refine(
   (value) => {
