@@ -8,6 +8,3 @@ export const ChainNodeSchema = z.object({
 });
 
 export type ChainNode = z.infer<typeof ChainNodeSchema>;
-
-// We can remove this if not needed
-export const TodoChainNodeCommands = z.object({});
