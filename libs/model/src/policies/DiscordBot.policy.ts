@@ -94,7 +94,6 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
             community_id: topic.community_id,
             topic_id: topic.id!,
             title: payload.title,
-            is_linking_token: false,
             body:
               '[Go to Discord post](https://discord.com/channels/' +
               `${payload.guild_id}/${payload.channel_id}) \n\n` +
@@ -124,7 +123,6 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           actor: await getActor(),
           payload: {
             thread_id: thread.id!,
-            is_linking_token: false,
             body:
               '[Go to Discord post](https://discord.com/channels/' +
               `${payload.guild_id}/${payload.channel_id}) \n\n` +
@@ -144,7 +142,6 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           payload: {
             thread_id: thread.id!,
             title: payload.title,
-            is_linking_token: false,
           },
         });
       },

@@ -112,7 +112,6 @@ describe.skip('Check Contests', () => {
           pinned: false,
           read_only: false,
           topic_id: topicId,
-          is_linking_token: false,
           contestManagers: [
             {
               contest_address: contestAddress,

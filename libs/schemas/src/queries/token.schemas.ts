@@ -23,7 +23,7 @@ export const GetToken = {
   input: z
     .object({
       community_id: z.string().optional(),
-      thread_id: z.string().optional(),
+      thread_id: z.number().optional(),
       with_stats: z.boolean().optional(),
     })
     .refine(

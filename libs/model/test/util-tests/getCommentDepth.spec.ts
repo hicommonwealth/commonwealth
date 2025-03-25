@@ -39,7 +39,6 @@ describe('getCommentDepth', () => {
       search: getThreadSearchVector('Testing', ''),
       reaction_weights_sum: '0',
       topic_id: topic!.id!,
-      is_linking_token: false,
     });
     let comment: CommentInstance | undefined;
     for (let i = 0; i < maxDepth; i++) {
