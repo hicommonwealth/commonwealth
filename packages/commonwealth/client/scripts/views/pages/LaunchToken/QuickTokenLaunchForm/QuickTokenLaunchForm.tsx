@@ -405,9 +405,11 @@ export const QuickTokenLaunchForm = ({
           {...(generatedTokenIdea?.chunkingField && {
             focusField: generatedTokenIdea.chunkingField,
           })}
-          {...(generatedTokenIdea?.token && {
-            forceFormValues: generatedTokenIdea?.token,
-          })}
+          forceFormValues={{
+            ...generatedTokenIdea?.token,
+            description:
+              initialIdeaPrompt || generatedTokenIdea?.token?.description || '',
+          }}
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
