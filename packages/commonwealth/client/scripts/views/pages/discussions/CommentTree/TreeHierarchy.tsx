@@ -230,7 +230,9 @@ export const TreeHierarchy = ({
                     onReply={() => {
                       onCommentReplyStart(comment.id, index);
                     }}
-                    onAIReply={() => handleGenerateAIReply(comment.id)}
+                    onAIReply={() => {
+                      return handleGenerateAIReply(comment.id);
+                    }}
                     onDelete={() => onDelete(comment)}
                     isSpam={!!comment.marked_as_spam_at}
                     onSpamToggle={() => onSpamToggle(comment)}
@@ -320,6 +322,7 @@ export const TreeHierarchy = ({
                       canComment={canComment}
                       isReplying={!!isReplyingToCommentId}
                       replyingToAuthor={comment.profile_name}
+                      parentCommentText={comment.body}
                       onCancel={() => {
                         onEditCancel(comment, false);
                       }}

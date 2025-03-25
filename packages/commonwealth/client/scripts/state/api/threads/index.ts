@@ -7,7 +7,6 @@ import useDeleteThreadMutation from './deleteThread';
 import useDeleteThreadLinksMutation from './deleteThreadLinks';
 import useEditThreadMutation from './editThread';
 import useFetchThreadsQuery from './fetchThreads';
-import { useGenerateThreadText } from './generateThreadText';
 import useGetThreadPollsQuery from './getThreadPolls';
 import useGetThreadsByIdQuery from './getThreadsById';
 import useGetThreadsByLinkQuery from './getThreadsByLink';
@@ -23,7 +22,6 @@ export {
   useDeleteThreadReactionMutation,
   useEditThreadMutation,
   useFetchThreadsQuery,
-  useGenerateThreadText,
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
   useGetThreadsByLinkQuery,
