@@ -4,9 +4,9 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 
 export const trpcRouter = trpc.router({
   createComment: trpc.command(Comment.CreateComment, trpc.Tag.Comment, [
-    // trpc.fireAndForget(async (input, _, ctx) => {
-    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-    // }),
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
     trpc.fireAndForget(async (_, __, ctx) => {
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
@@ -16,17 +16,17 @@ export const trpcRouter = trpc.router({
     ]),
   ]),
   updateComment: trpc.command(Comment.UpdateComment, trpc.Tag.Comment, [
-    // trpc.fireAndForget(async (input, _, ctx) => {
-    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-    // }),
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
   ]),
   createCommentReaction: trpc.command(
     Comment.CreateCommentReaction,
     trpc.Tag.Reaction,
     [
-      // trpc.fireAndForget(async (input, _, ctx) => {
-      //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-      // }),
+      trpc.fireAndForget(async (input, _, ctx) => {
+        await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      }),
       trpc.fireAndForget(async (_, __, ctx) => {
         await middleware.incrementUserCount(ctx.actor.user.id!, 'upvotes');
       }),
