@@ -130,6 +130,7 @@ export async function findOrCreateUser({
         profile: {},
         referred_by_address: referrer_address ?? null,
         privy_id: privyUserId ?? null,
+        tier: 1,
       },
       { transaction },
     );

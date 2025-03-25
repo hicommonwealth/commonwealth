@@ -126,7 +126,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           {
             model: models.User,
             required: true,
-            attributes: ['id', 'email', 'profile'],
+            attributes: ['id', 'email', 'profile', 'tier'],
           },
         ],
       });
