@@ -1,3 +1,4 @@
+import FrameSDK from '@farcaster/frame-sdk';
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
@@ -105,6 +106,8 @@ const ModalBase = ({
   isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
+
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
 
@@ -384,13 +387,43 @@ const ModalBase = ({
                   else render wallets/SSO's list based on activeTabIndex
                 */}
 
+                {accounts.length > 0 && (
+                  <div>
+                    Accounts from FrameSDK.wallet.ethProvider.request
+                    <br />
+                    <br />
+                    {accounts.map((account) => (
+                      <div key={account}>{account}</div>
+                    ))}
+                  </div>
+                )}
+
                 {farcasterContext ? (
-                  <AuthButton
-                    type="farcaster"
-                    onClick={() => {
-                      void handleFarcasterFrameSignIn().catch(console.error);
-                    }}
-                  />
+                  <>
+                    <AuthButton
+                      type="farcaster"
+                      onClick={() => {
+                        void handleFarcasterFrameSignIn().catch(console.error);
+                      }}
+                    />
+
+                    <br />
+                    <br />
+                    <br />
+
+                    <button
+                      onClick={async () => {
+                        const accts = await FrameSDK.wallet.ethProvider.request(
+                          {
+                            method: 'eth_requestAccounts',
+                          },
+                        );
+                        setAccounts(accts);
+                      }}
+                    >
+                      Test button
+                    </button>
+                  </>
                 ) : (
                   (activeTabIndex === 0 ||
                     (activeTabIndex === 1 &&
