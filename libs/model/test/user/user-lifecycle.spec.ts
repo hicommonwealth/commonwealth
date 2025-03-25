@@ -881,17 +881,17 @@ describe('User lifecycle', () => {
       vi.clearAllMocks();
 
       const before = await models.User.findOne({
-        where: { id: result?.user_id! },
+        where: { id: result!.user_id! },
       });
 
       // drain the outbox
       await drainOutbox(['WalletLinked'], Xp, watermark);
 
       const after = await models.User.findOne({
-        where: { id: result?.user_id! },
+        where: { id: result!.user_id! },
       });
 
-      expect(after!.xp_points).toBe(before?.xp_points! + 13);
+      expect(after!.xp_points).toBe(before!.xp_points! + 13);
     });
   });
 });
