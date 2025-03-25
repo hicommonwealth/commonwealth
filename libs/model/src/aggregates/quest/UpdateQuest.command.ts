@@ -100,7 +100,8 @@ async function updateChannelQuest(
       throw new InvalidInput('TweetEngagement action must have a Tweet url');
     const [, ...rest] = actionMeta.content_id.split(':'); // this has been validated by the schema
     const tweetUrl = rest.join(':');
-    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetUrl));
+    const tweetId = tweetUrl.split('/').at(-1)!;
+    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetId));
     mustExist(`Tweet engagement caps`, actionMeta.tweet_engagement_caps);
 
     await models.sequelize.transaction(async (transaction) => {
@@ -114,7 +115,7 @@ async function updateChannelQuest(
       );
       await models.QuestTweets.upsert(
         {
-          tweet_id: tweetUrl.split('/').at(-1)!,
+          tweet_id: tweetId,
           tweet_url: tweetUrl,
           quest_action_meta_id: actionMetaInstance.id!,
           like_cap: actionMeta.tweet_engagement_caps!.likes,
