@@ -3,9 +3,11 @@ import {
   commonProtocol,
   getErc20TokenInfo,
   getLaunchpadTokenCreatedTransaction,
+  getTransaction,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
@@ -64,6 +66,34 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           icon_url: icon_url ?? null,
         },
       });
+
+      const { tx } = await getTransaction({
+        rpc: chainNode.private_url || chainNode.url,
+        txHash: transaction_hash,
+      });
+      // Update tokenized thread with token if exists.
+      await models.sequelize.query(
+        `
+        UPDATE "Threads"
+        SET launchpad_token_address = :launchpadTokenAddress, is_linking_token = false
+        WHERE id = (
+            SELECT id FROM "Threads" t 
+            JOIN "Addresses" a ON a.id = t.address_id
+            WHERE a.address = :creatorAddress
+            ORDER BY created_at DESC 
+            WHERE is_linking_token = true
+            LIMIT 1
+        );
+      `,
+        {
+          replacements: {
+            launchpadTokenAddress:
+              tokenData.parsedArgs.tokenAddress.toLowerCase(),
+            creatorAddress: tx.from,
+          },
+          type: QueryTypes.SELECT,
+        },
+      );
 
       return token!.toJSON() as unknown as z.infer<typeof TokenView>;
     },
