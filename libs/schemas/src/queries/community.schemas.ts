@@ -90,6 +90,7 @@ export const GetCommunity = {
   input: z.object({
     id: z.string(),
     include_node_info: z.boolean().optional(),
+    include_groups: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
@@ -206,6 +207,14 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetTopicById = {
+  input: z.object({
+    topic_id: z.number(),
+  }),
+  // TODO: fix type
+  output: z.any(),
 };
 
 export const GetPinnedTokens = {

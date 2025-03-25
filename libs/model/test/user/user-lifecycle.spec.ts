@@ -377,6 +377,12 @@ describe('User lifecycle', () => {
         },
       });
 
+      // upgrade tier for testing
+      await models.User.update(
+        { tier: 4 },
+        { where: { id: new_address!.user_id! } },
+      );
+
       // drain the outbox to award xp points
       await drainOutbox(
         [
@@ -409,9 +415,10 @@ describe('User lifecycle', () => {
       // accumulating xp points
       // - 28 from the first test
       // - 28 from the second test
+      expect(member_profile?.xp_points).to.equal(28 + 28);
       // - 10 from the referral when new user joined the community
       // - 4 from the referral on a sign-up flow completed
-      expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4);
+      expect(member_profile?.xp_referrer_points).to.equal(10 + 4);
 
       // expect xp points awarded to user joining the community
       const new_user_profile = await query(GetUserProfile(), {
@@ -641,7 +648,8 @@ describe('User lifecycle', () => {
         actor: member,
         payload: {},
       });
-      expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4 + 20);
+      expect(member_profile?.xp_points).to.equal(28 + 28 + 20);
+      expect(member_profile?.xp_referrer_points).to.equal(10 + 4);
     });
 
     it('should end quest when max_xp_to_end is reached', async () => {

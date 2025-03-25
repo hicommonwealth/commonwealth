@@ -40,6 +40,7 @@ export const ProfileTags = z.object({
 
 export const User = z.object({
   id: PG_INT.optional(),
+  tier: z.number().int().min(0).max(5),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
@@ -60,6 +61,7 @@ export const User = z.object({
     .describe('Number of referrals that have earned ETH'),
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
+  xp_referrer_points: PG_INT.default(0).nullish(),
   privy_id: z.string().max(255).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),

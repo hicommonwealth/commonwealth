@@ -6,13 +6,76 @@ import {
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { z } from 'zod';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/helpers';
+import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
 export type QuestAction = z.infer<typeof QuestActionMeta>;
 export type XPLog = z.infer<typeof XpLogView>;
+
+export const doesActionRequireRewardShare = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'CommunityCreated' ||
+    action === 'CommunityJoined' ||
+    action === 'CommentUpvoted'
+  );
+};
+
+export const doesActionRewardShareForReferrer = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommunityCreated' || action === 'CommunityJoined';
+};
+
+export const doesActionRewardShareForCreator = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowContentId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'CommentUpvoted' ||
+    action === 'ThreadUpvoted'
+  );
+};
+
+export const doesActionAllowThreadId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentCreated' || action === 'ThreadUpvoted';
+};
+
+export const doesActionAllowCommentId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowTopicId = (action: QuestActionType) => {
+  // These are inferred from libs/model/src/user/Xp.projection.ts
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'ThreadUpvoted'
+  );
+};
+
+const convertTimeRemainingToLabel = ({
+  days,
+  hours,
+  minutes,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+}) => {
+  if (Math.abs(days) > 0)
+    return `${Math.abs(days)} day${Math.abs(days) ? 's' : ''}`;
+  if (Math.abs(hours) > 0)
+    return `${Math.abs(hours)} hour${Math.abs(hours) ? 's' : ''}`;
+  if (Math.abs(minutes) > 0)
+    return `${Math.abs(minutes)} minute${Math.abs(minutes) ? 's' : ''}`;
+  return ``;
+};
 
 export const calculateQuestTimelineLabel = ({
   startDate,
@@ -25,8 +88,10 @@ export const calculateQuestTimelineLabel = ({
   const isEnded = moment().isSameOrAfter(moment(endDate));
   const startHoursRemaining = moment(startDate).diff(moment(), 'hours');
   const startDaysRemaining = moment(startDate).diff(moment(), 'days');
+  const startMinutesRemaining = moment(startDate).diff(moment(), 'minutes');
   const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
   const endDaysRemaining = moment(endDate).diff(moment(), 'days');
+  const endMinutesRemaining = moment(endDate).diff(moment(), 'minutes');
   const endYearsRemaining = moment(endDate).diff(moment(), 'years');
 
   if (isEnded) {
@@ -38,21 +103,11 @@ export const calculateQuestTimelineLabel = ({
     return `Ongoing`;
   }
 
-  if (isStarted) {
-    return `Ends in
-            ${
-              endHoursRemaining <= 24
-                ? `${endHoursRemaining} hours`
-                : `${endDaysRemaining} day${endDaysRemaining ? 's' : ''}`
-            }`;
-  }
-
-  // else it yet to start
-  return `Starts in ${
-    startHoursRemaining <= 24
-      ? `${startHoursRemaining} hour${startHoursRemaining > 1 ? 's' : ''}`
-      : `${startDaysRemaining} day${startDaysRemaining > 1 ? 's' : ''}`
-  }`;
+  return `${isStarted ? 'Ends' : 'Starts'} in ${convertTimeRemainingToLabel({
+    days: Math.abs(isStarted ? endDaysRemaining : startDaysRemaining),
+    hours: Math.abs(isStarted ? endHoursRemaining : startHoursRemaining),
+    minutes: Math.abs(isStarted ? endMinutesRemaining : startMinutesRemaining),
+  })}`;
 };
 
 export const calculateTotalXPForQuestActions = ({

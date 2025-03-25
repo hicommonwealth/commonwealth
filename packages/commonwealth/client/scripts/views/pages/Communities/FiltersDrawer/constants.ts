@@ -46,6 +46,28 @@ export const sortOrderLabelsToDirectionsMap = {
   [CommunitySortDirections.Descending]: 'DESC',
 };
 
-export const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20', // only allowing ERC20 for now
-);
+export const communityNetworks: string[] = Object.keys(ChainNetwork)
+  .filter((val) =>
+    [
+      'ArbitrumMainnet',
+      'Arthera',
+      'Avalanche',
+      'Base',
+      'Blast',
+      'BSC',
+      'Celo',
+      'Core',
+      'ERC20',
+      'EthereumMainnet',
+      'Fantom',
+      'FuseMainnet',
+      'Gnosis',
+      'Harmony',
+      'HorizenEON',
+      'Linea',
+      'Optimism',
+      'Polygon',
+      'Soneium',
+    ].includes(val),
+  )
+  .sort((a, b) => a.localeCompare(b));

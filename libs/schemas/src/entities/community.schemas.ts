@@ -3,6 +3,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityGoalTypes,
   DefaultPage,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -85,6 +86,25 @@ export const ExtendedCommunity = Community.extend({
     }),
   ),
   communityBanner: z.string().nullish(),
+});
+
+export const CommunityGoalMeta = z.object({
+  id: PG_INT.optional(), // auto-generated (ง •̀_•́)ง
+  name: z.string(),
+  description: z.string(),
+  type: z.enum(CommunityGoalTypes),
+  target: z.number(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
+});
+
+export const CommunityGoalReached = z.object({
+  community_goal_meta_id: PG_INT,
+  community_id: z.string(),
+  created_at: z.coerce.date().optional(), // optional (ง •̀_•́)ง
+  reached_at: z.coerce.date().nullish(),
+
+  // associations
+  meta: CommunityGoalMeta.optional(),
 });
 
 // aliases
