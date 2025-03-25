@@ -62,5 +62,6 @@ export interface CompletionResponse {
   completion: string;
   error?: string;
   status?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: any;
 }

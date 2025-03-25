@@ -13,7 +13,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
-import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
@@ -30,7 +29,6 @@ import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
-  useEditThreadMutation,
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
@@ -159,14 +157,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
-
-  const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId,
-    threadId: Number(threadId),
-    threadMsgId: thread?.canvasMsgId || '',
-    currentStage: thread?.stage || ThreadStage.Discussion,
-    currentTopicId: thread?.topic?.id || 0,
-  });
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
