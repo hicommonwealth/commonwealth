@@ -90,6 +90,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [draftTitle, setDraftTitle] = useState('');
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
+  const initalAiCommentPosted = useRef(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -167,13 +168,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       }
 
       // Only generate AI comment if there are no existing comments
-      if (thread?.numberOfComments && thread.numberOfComments > 0) {
+      if (
+        (thread?.numberOfComments && thread.numberOfComments > 0) ||
+        initalAiCommentPosted.current
+      ) {
         return;
       }
 
       // Using await to satisfy the linter requirement
       await Promise.resolve();
+
       setStreamingReplyIds([mainThreadId]);
+      initalAiCommentPosted.current = true;
     },
     [aiCommentsToggleEnabled, user.activeAccount, thread],
   );

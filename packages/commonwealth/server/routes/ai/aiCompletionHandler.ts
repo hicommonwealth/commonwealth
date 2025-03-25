@@ -93,6 +93,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             if (res.flush) res.flush();
           }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (streamError: any) {
         console.error('Streaming error:', streamError);
 
@@ -142,12 +143,12 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           }),
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const completion =
           await openai.chat.completions.create(completionConfig);
 
         const responseText = completion.choices[0]?.message?.content || '';
         res.json({ completion: responseText });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (completionError: any) {
         console.error('Completion error:', completionError);
 
@@ -168,6 +169,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         });
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Error calling AI API:', error);
 

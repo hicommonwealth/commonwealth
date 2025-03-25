@@ -2,7 +2,9 @@
  * Extract OpenRouter-specific error information
  */
 function extractOpenRouterError(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): { code: number; message: string; metadata?: any } | null {
   // Check OpenRouter API error format
   if (error.error?.code && error.error?.message) {
