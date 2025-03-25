@@ -1,22 +1,91 @@
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import * as privyUtils from '../../src/aggregates/user/signIn/privyUtils';
+
+const getPrivyUserMock = vi.spyOn(privyUtils, 'getPrivyUserById');
+const getPrivyUserByIdTokenMock = vi.spyOn(privyUtils, 'getPrivyUserByIdToken');
+
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { command, dispose, type Actor } from '@hicommonwealth/core';
 import {
   CANVAS_TOPIC,
   ChainBase,
-  // TEST_BLOCK_INFO_STRING,
-  WalletId,
   getSessionSigners,
   serializeCanvas,
+  // TEST_BLOCK_INFO_STRING,
+  WalletId,
 } from '@hicommonwealth/shared';
-import { afterAll, describe, expect, it } from 'vitest';
+import { User } from '@privy-io/server-auth';
 import { SignIn } from '../../src/aggregates/user/signIn/SignIn.command';
 import { models } from '../../src/database';
 import { verifyAddress } from '../../src/services/session';
 import { CommunitySeedOptions, seedCommunity } from '../utils';
 
+const privyTestUserOneDid = 'did:privy:cm8no7aig005zranv3tivdeoj';
+
+const fullPrivyUserMock: User = {
+  id: privyTestUserOneDid,
+  createdAt: new Date('2025-03-24T19:49:09.000Z'),
+  isGuest: false,
+  linkedAccounts: [
+    {
+      type: 'wallet',
+      address: '',
+      chainType: 'ethereum',
+      walletClientType: 'metamask',
+      latestVerifiedAt: new Date('2025-03-24T19:49:09.000Z'),
+    },
+  ],
+  wallet: {
+    address: '',
+    chainType: 'ethereum',
+    walletClientType: 'metamask',
+    latestVerifiedAt: new Date('2025-03-24T19:49:09.000Z'),
+  },
+} as unknown as User;
+
+const partialPrivyUserMock: User = {
+  id: privyTestUserOneDid,
+  createdAt: '2025-03-24T23:00:41.000Z',
+  isGuest: false,
+  linkedAccounts: [
+    {
+      type: 'wallet',
+      address: '',
+      chainType: 'ethereum',
+      walletClientType: 'metamask',
+      latestVerifiedAt: '2025-03-24T23:00:41.000Z',
+    },
+  ],
+  wallet: {
+    address: '',
+    chainType: 'ethereum',
+    walletClientType: 'metamask',
+    latestVerifiedAt: '2025-03-24T23:00:41.000Z',
+  },
+} as unknown as User;
+
+const tempPrivyIdToken =
+  'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik5yZ2RpT25UOHpaSzNQTVEzRG10emQwNER3UXFJOF9QSDZEMzNESnZLQW8ifQ.eyJjciI6IjE3NDI4NTMwMjEiLCJsaW5rZWRfYWNjb3VudHMiOiJbe1widHlwZVwiOlwiZW1haWxcIixcImFkZHJlc3NcIjpcInRlc3QtMzYxOUBwcml2eS5pb1wiLFwibHZcIjoxNzQyODUzMDIxfV0iLCJpc3MiOiJwcml2eS5pbyIsImlhdCI6MTc0Mjg1MzAyMSwiYXVkIjoiY204ZXI2bXJtMDBmb3dicXk4YnB3Mzk1NiIsInN1YiI6ImRpZDpwcml2eTpjbThubG90emwwMHhkY3M0NzA3bDhnd29mIiwiZXhwIjoxNzQyODU2NjIxfQ.7MoFzEPIJcnprZXbmpHLBsuCsnjVEY6oDRNCjXFIO3L_wG26HBaia1AbXzGo-0pBganXf7jjmoMij6cyJnNAjA';
+const tempPrivyAccessToken =
+  'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik5yZ2RpT25UOHpaSzNQTVEzRG10emQwNER3UXFJOF9QSDZEMzNESnZLQW8ifQ.eyJzaWQiOiJjbThubG90eDIwMHhiY3M0N3c3Z3N3cHIzIiwiaXNzIjoicHJpdnkuaW8iLCJpYXQiOjE3NDI4NTMwMjEsImF1ZCI6ImNtOGVyNm1ybTAwZm93YnF5OGJwdzM5NTYiLCJzdWIiOiJkaWQ6cHJpdnk6Y204bmxvdHpsMDB4ZGNzNDcwN2w4Z3dvZiIsImV4cCI6MTc0Mjg1NjYyMX0.gfEmzLhiqh7JeZheHsjG4pu-u9TPhIlp1lAwPo8o2BWM0NOAtA9cNIFC7zmJTZ5RY26lMXfNxgjKrqr3R3wuCw';
+
 describe.only('SignIn Lifecycle', async () => {
+  let evmSignerAddress: string;
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
+
+  // Update the addresses in the mock privy utils
+  evmSignerAddress = await evmSigner.getWalletAddress();
+  for (const user of [fullPrivyUserMock, partialPrivyUserMock]) {
+    if ('wallet' in user) {
+      user.wallet!.address = evmSignerAddress;
+    }
+    for (const linkedAccount of user.linkedAccounts) {
+      if ('address' in linkedAccount) {
+        linkedAccount.address = evmSignerAddress;
+      }
+    }
+  }
 
   const refs = {} as Record<
     ChainBase,
@@ -33,6 +102,10 @@ describe.only('SignIn Lifecycle', async () => {
     await dispose()();
   });
 
+  afterEach(async () => {
+    vi.clearAllMocks();
+  });
+
   const chains = [
     {
       signer: evmSigner,
@@ -42,6 +115,18 @@ describe.only('SignIn Lifecycle', async () => {
         roles: ['admin'],
         chain_node: { eth_chain_id: 1 },
       },
+    },
+    {
+      signer: evmSigner,
+      wallet: WalletId.Privy,
+      seed: {
+        chain_base: ChainBase.Ethereum,
+        roles: ['admin'],
+        chain_node: { eth_chain_id: 8453 },
+      },
+      first_community: false,
+      user_created: false,
+      address_created: false,
     },
     {
       signer: cosmosSigner,
@@ -72,16 +157,28 @@ describe.only('SignIn Lifecycle', async () => {
         chain_node: {},
       },
     },
+    // TODO: add Privy Solana
   ] as Array<{
     signer: SessionSigner;
     wallet: WalletId;
     seed: CommunitySeedOptions;
+    first_community?: boolean;
+    user_created?: boolean;
   }>;
 
   describe.only('create addresses and users', () => {
+    // TODO: add some kind of indicator above for sso vs wallet Privy
+    //  return different mocks based on that in order to test findAddressBySso
+    //  OR: create separate test suite for SSO tests
+    getPrivyUserMock.mockImplementation(() => {
+      return Promise.resolve(fullPrivyUserMock);
+    });
+    getPrivyUserByIdTokenMock.mockImplementation(() => {
+      return Promise.resolve(partialPrivyUserMock);
+    });
     it.each(chains)(
-      'should create $seed.chain_base address and new user',
-      async ({ signer, wallet, seed }) => {
+      'should create $seed.chain_base $wallet address and new user',
+      async ({ signer, wallet, seed, first_community, user_created }) => {
         const { payload } = await signer.newSession(CANVAS_TOPIC);
         const { community } = await seedCommunity(seed);
         const address =
@@ -111,6 +208,7 @@ describe.only('SignIn Lifecycle', async () => {
             community_id: ref.community_id,
             wallet_id: wallet,
             session: serializeCanvas(ref.session),
+            privyIdentityToken: 'fake_identity_token',
           },
         });
         ref.actor.user.id = addr!.user_id!;
@@ -124,8 +222,8 @@ describe.only('SignIn Lifecycle', async () => {
         expect(addr!.verified).to.be.not.null;
 
         expect(addr!.was_signed_in).to.be.false;
-        expect(addr!.first_community).to.be.true;
-        expect(addr!.user_created).to.be.true;
+        expect(addr!.first_community).to.equal(first_community ?? true);
+        expect(addr!.user_created).to.equal(user_created ?? true);
         expect(addr!.address_created).to.be.true;
         expect(addr!.User).to.not.be.null;
         expect(addr!.User!.id).to.be.not.null;
@@ -141,37 +239,38 @@ describe.only('SignIn Lifecycle', async () => {
     );
   });
 
-  // describe('signin existing addresses', () => {
-  //   it.each(chains)(
-  //     'should sign existing $seed.chain_base address',
-  //     async ({ wallet, seed }) => {
-  //       const ref = refs[seed.chain_base!];
-  //
-  //       const addr = await command(SignIn(), {
-  //         actor: ref.actor,
-  //         payload: {
-  //           address: ref.address,
-  //           community_id: ref.community_id,
-  //           wallet_id: wallet,
-  //           session: serializeCanvas(ref.session),
-  //         },
-  //       });
-  //
-  //       expect(addr!).to.not.be.null;
-  //       expect(addr!.User).to.be.not.null;
-  //       expect(addr!.was_signed_in).to.be.true;
-  //       expect(addr!.first_community).to.be.false;
-  //       expect(addr!.user_created).to.be.false;
-  //       expect(addr!.address_created).to.be.false;
-  //
-  //       // check community profile count is still 1
-  //       const c = await models.Community.findOne({
-  //         where: { id: ref.community_id },
-  //       });
-  //       expect(c?.profile_count).to.be.equal(1);
-  //     },
-  //   );
-  // });
+  describe('signin existing addresses', () => {
+    it.each(chains)(
+      'should sign existing $seed.chain_base $wallet address',
+      async ({ wallet, seed }) => {
+        const ref = refs[seed.chain_base!];
+
+        const addr = await command(SignIn(), {
+          actor: ref.actor,
+          payload: {
+            address: ref.address,
+            community_id: ref.community_id,
+            wallet_id: wallet,
+            session: serializeCanvas(ref.session),
+            privyIdentityToken: 'fake_identity_token',
+          },
+        });
+
+        expect(addr!).to.not.be.null;
+        expect(addr!.User).to.be.not.null;
+        expect(addr!.was_signed_in).to.be.true;
+        expect(addr!.first_community).to.be.false;
+        expect(addr!.user_created).to.be.false;
+        expect(addr!.address_created).to.be.false;
+
+        // check community profile count is still 1
+        const c = await models.Community.findOne({
+          where: { id: ref.community_id },
+        });
+        expect(c?.profile_count).to.be.equal(1);
+      },
+    );
+  });
   //
   // const invalidAddresses = [
   //   { base: ChainBase.Ethereum, wallet: WalletId.Keplr },

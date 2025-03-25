@@ -55,8 +55,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       if (!actor.user.id || !actor.user.auth) throw Error('Invalid address');
 
       const { wallet_id, session } = payload;
-      const { base, encodedAddress, ss58Prefix, hex } = actor.user
-        .auth as VerifiedAddress;
+      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
+        .user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
 
@@ -74,7 +74,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       let res: {
         newUser: boolean;
         newAddress: boolean;
-        firstCommunity: boolean;
+        addressCount: number;
         user: UserAttributes;
       };
       if (wallet_id === WalletId.Privy) {
@@ -86,7 +86,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           },
           actor,
         );
-        return;
       } else {
         res = await signInUser(
           {
@@ -116,6 +115,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ],
       });
       mustExist('Address', addr);
+
+      const user_id = was_signed_in
+        ? actor.user.id
+        : (existingHexUserId ?? null);
+
       return {
         ...addr.toJSON(),
         community_base: base,
@@ -123,7 +127,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         was_signed_in,
         user_created: res.newUser,
         address_created: res.newAddress,
-        first_community: res.firstCommunity,
+        // TODO: this does not seem to be used on client?
+        first_community: !(user_id || res.addressCount > 1),
       };
     },
   };

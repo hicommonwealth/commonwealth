@@ -5,18 +5,33 @@ import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { emitEvent } from '../../../utils/utils';
 
-export async function emitSignInEvents(
-  triggers: { newAddress: boolean; newUser: boolean; transferredUser: boolean },
-  addressInstance: AddressAttributes,
-  user: UserAttributes,
-  transaction: Transaction,
-  originalAddressOwnerUserId?: number,
-) {
-  const { community_id, address, created_at, wallet_id } = addressInstance;
+export async function emitSignInEvents({
+  newAddress,
+  newUser,
+  transferredUser,
+  address: addressInstance,
+  user,
+  transaction,
+  originalUserId,
+}: {
+  newAddress: boolean;
+  newUser: boolean;
+  transferredUser: boolean;
+  address: AddressAttributes;
+  user: UserAttributes;
+  transaction: Transaction;
+  originalUserId?: number;
+}) {
+  const {
+    community_id,
+    address: address,
+    created_at,
+    wallet_id,
+  } = addressInstance;
   const { referred_by_address: referrer_address } = user;
   const events = [] as Array<schemas.EventPairs>;
 
-  if (triggers.newAddress) {
+  if (newAddress) {
     events.push({
       event_name: 'CommunityJoined',
       event_payload: {
@@ -36,7 +51,7 @@ export async function emitSignInEvents(
         event_name: 'WalletLinked',
         event_payload: {
           user_id: user.id!,
-          new_user: triggers.newUser,
+          new_user: newUser,
           wallet_id: wallet_id!,
           community_id,
           created_at: created_at!,
@@ -45,7 +60,7 @@ export async function emitSignInEvents(
     }
   }
 
-  if (triggers.newUser)
+  if (newUser)
     events.push({
       event_name: 'UserCreated',
       event_payload: {
@@ -57,22 +72,24 @@ export async function emitSignInEvents(
       },
     });
 
-  if (triggers.transferredUser && originalAddressOwnerUserId) {
-    const originalOwner = await models.User.findByPk(
-      originalAddressOwnerUserId,
-    );
+  if (transferredUser && originalUserId) {
+    const originalOwner = await models.User.findByPk(originalUserId);
     events.push({
       event_name: 'AddressOwnershipTransferred',
       event_payload: {
         community_id,
         address,
         user_id: user.id!,
-        old_user_id: originalAddressOwnerUserId,
+        old_user_id: originalUserId,
         old_user_email: originalOwner?.email,
         created_at: new Date(),
       },
     });
   }
 
+  console.log(
+    'Emitting Sign In Events: ',
+    events.map((e) => e.event_name).join(','),
+  );
   await emitEvent(models.Outbox, events, transaction);
 }
