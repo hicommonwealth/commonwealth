@@ -126,7 +126,6 @@ describe('User lifecycle', () => {
           kind: 'discussion',
           stage: '',
           read_only: false,
-          is_linking_token: false,
         },
       });
       const comment = await command(CreateComment(), {
@@ -291,7 +290,6 @@ describe('User lifecycle', () => {
           kind: 'discussion',
           stage: '',
           read_only: false,
-          is_linking_token: false,
         },
       });
       const comment = await command(CreateComment(), {
@@ -639,7 +637,6 @@ describe('User lifecycle', () => {
           kind: 'discussion',
           stage: '',
           read_only: false,
-          is_linking_token: false,
         },
       });
 
@@ -710,7 +707,6 @@ describe('User lifecycle', () => {
           kind: 'discussion',
           stage: '',
           read_only: false,
-          is_linking_token: false,
         },
       });
       await command(CreateComment(), {

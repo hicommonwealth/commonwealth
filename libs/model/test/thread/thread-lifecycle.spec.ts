@@ -80,7 +80,6 @@ describe('Thread lifecycle', () => {
     canvas_msg_id: '',
     canvas_signed_data: '',
     read_only: false,
-    is_linking_token: false,
   };
   const payload = {
     ...payloadBase,
@@ -341,7 +340,6 @@ describe('Thread lifecycle', () => {
         body: chance.paragraph({ sentences: 50 }),
         canvas_msg_id: '',
         canvas_signed_data: '',
-        is_linking_token: false,
       };
       let updated = await command(UpdateThread(), {
         actor: actors.admin,
@@ -385,7 +383,6 @@ describe('Thread lifecycle', () => {
 
     test('should add collaborators', async () => {
       const body = {
-        is_linking_token: false,
         collaborators: {
           toAdd: [
             addresses.member.id!,
@@ -407,7 +404,6 @@ describe('Thread lifecycle', () => {
 
     test('should remove collaborator', async () => {
       const body = {
-        is_linking_token: false,
         collaborators: {
           toRemove: [addresses.banned.id!],
         },
@@ -427,7 +423,6 @@ describe('Thread lifecycle', () => {
         command(UpdateThread(), {
           actor: actors.member,
           payload: {
-            is_linking_token: false,
             thread_id: thread.id!,
             collaborators: {
               toAdd: [addresses.banned.id!],
@@ -443,7 +438,6 @@ describe('Thread lifecycle', () => {
         command(UpdateThread(), {
           actor: actors.member,
           payload: {
-            is_linking_token: false,
             thread_id: thread.id!,
             collaborators: {
               toRemove: [addresses.banned.id!],
@@ -458,7 +452,6 @@ describe('Thread lifecycle', () => {
         command(UpdateThread(), {
           actor: actors.admin,
           payload: {
-            is_linking_token: false,
             thread_id: thread.id!,
             collaborators: {
               toAdd: [999999999],
@@ -470,7 +463,6 @@ describe('Thread lifecycle', () => {
 
     test('should patch admin or moderator attributes', async () => {
       const body = {
-        is_linking_token: false,
         pinned: true,
         spam: true,
       };
@@ -509,7 +501,6 @@ describe('Thread lifecycle', () => {
             thread_id: thread.id!,
             pinned: false,
             spam: false,
-            is_linking_token: false,
           },
         }),
       ).rejects.toThrowError('Must be admin or moderator');
@@ -521,7 +512,6 @@ describe('Thread lifecycle', () => {
         archived: false,
         stage: community.custom_stages.at(0),
         topic_id: thread.topic_id!,
-        is_linking_token: false,
       };
       const updated = await command(UpdateThread(), {
         actor: actors.admin,
@@ -543,7 +533,6 @@ describe('Thread lifecycle', () => {
           payload: {
             thread_id: thread.id!,
             stage: 'invalid',
-            is_linking_token: false,
           },
         }),
       ).rejects.toThrowError(UpdateThreadErrors.InvalidStage);
@@ -557,7 +546,6 @@ describe('Thread lifecycle', () => {
             thread_id: thread.id!,
             locked: true,
             archived: true,
-            is_linking_token: false,
           },
         }),
       ).rejects.toThrowError('Must be admin, moderator, or author');
@@ -570,7 +558,6 @@ describe('Thread lifecycle', () => {
           payload: {
             thread_id: thread.id!,
             title: 'new title',
-            is_linking_token: false,
           },
         }),
       ).rejects.toThrowError(InvalidActor);
