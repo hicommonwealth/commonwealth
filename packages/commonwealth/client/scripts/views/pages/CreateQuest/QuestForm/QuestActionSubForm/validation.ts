@@ -47,7 +47,7 @@ export const buildQuestSubFormValidationSchema = (
   let baseSchema = questSubFormValidationSchema;
 
   if (requiresCreatorPoints) {
-    // TODO: this works, needs zod type fix
+    // TODO: 11391 this works, needs zod type fix
     baseSchema = baseSchema
       .extend({
         creatorRewardAmount: numberNonDecimalValidationSchema.required,
@@ -81,7 +81,7 @@ export const buildQuestSubFormValidationSchema = (
     });
   }
   if (requiresTwitterEngagement) {
-    // TODO: this works, needs zod type fix
+    // TODO: 11391 this works, needs zod type fix
     baseSchema = baseSchema
       .extend({
         contentLink: linkValidationSchema.required.refine(

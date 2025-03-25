@@ -50,7 +50,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (initialValues?.subForms?.length > 0) {
           setQuestActionSubForms([
             ...initialValues.subForms.map((subForm, index) => {
-              const form = subForm as any; // TODO: fix type
+              const form = subForm as any; // TODO: 11391 fix type
               const chosenAction = form.action as QuestAction;
               const allowsContentId = doesActionAllowContentId(chosenAction);
 
@@ -88,7 +88,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     allowsContentId &&
                     doesActionAllowTwitterTweetURL(chosenAction),
                 },
-              } as any; // TODO: fix type
+              } as any; // TODO: 11391 fix type
             }),
           ]);
         }
@@ -169,7 +169,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           subForm.values.noOfRetweets ||
           subForm.values.noOfReplies) && {
           tweet_engagement_caps: {
-            // TODO: update platform to allow any 1 of these values
+            // TODO: 11391 update platform to allow any 1 of these values
             likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
             retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
@@ -202,7 +202,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
-      quest_type: 'channel', // TODO: make this configurable via UI
+      quest_type: 'channel', // TODO: 11391 make this configurable via UI
     });
 
     if (quest && quest.id) {
@@ -326,7 +326,19 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             }
             setQuestActionSubForms([...tempForm]);
           }
-          // TODO: handle Tweet with url not found errors
+          if (error.includes('tweet with url')) {
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find((form) =>
+              error.includes(form.values.contentLink),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentLink: `Invalid tweet url. Ensure tweet exists on twitter.`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
           notifyError('Failed to update quest! Please fix form errors');
           return;
         }
