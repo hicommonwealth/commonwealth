@@ -69,6 +69,8 @@ export enum WalletId {
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
+  Backpack = 'backpack',
+  Solflare = 'solflare',
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
 }
@@ -160,5 +162,12 @@ export enum CommunityType {
   Basic = 'basic',
 }
 
-export const CommunityGoalTypes = ['members', 'threads'] as const;
+export const CommunityGoalTypes = [
+  'groups',
+  'members',
+  'moderators',
+  'social-links',
+  'tags',
+  'threads',
+] as const;
 export type CommunityGoalType = (typeof CommunityGoalTypes)[number];

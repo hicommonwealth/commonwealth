@@ -344,6 +344,8 @@ export const customIconLookup = {
   metamask: CustomIcons.CWMetaMask,
   near: CustomIcons.CWNearWallet,
   phantom: CustomIcons.CWPhantom,
+  backpack: CustomIcons.CWBackpack,
+  solflare: CustomIcons.CWSolflare,
   polkadot: CustomIcons.CWPolkadot,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,

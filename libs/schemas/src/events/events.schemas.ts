@@ -1,5 +1,6 @@
 import {
   CommunityGoalTypes,
+  Roles,
   WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
@@ -104,8 +105,17 @@ export const events = {
   }),
 
   GroupCreated: z.object({
-    groupId: z.string(),
-    userId: z.string(),
+    community_id: z.string(),
+    group_id: z.number(),
+    creator_user_id: z.number(),
+    created_at: z.coerce.date(),
+  }),
+
+  RoleUpdated: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({
@@ -122,6 +132,14 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     referrer_address: z.string().optional(),
+    social_links: z.array(z.string()).optional(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityUpdated: z.object({
+    community_id: z.string(),
+    user_id: z.number(),
+    social_links: z.array(z.string().nullish()).optional(),
     created_at: z.coerce.date(),
   }),
 
@@ -504,5 +522,11 @@ export const events = {
     like_cap_reached: z.boolean().optional(),
     retweet_cap_reached: z.boolean().optional(),
     reply_cap_reached: z.boolean().optional(),
+  }),
+
+  CommunityTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_ids: z.array(z.number()),
+    created_at: z.coerce.date(),
   }),
 } as const;

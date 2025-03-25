@@ -198,7 +198,9 @@ async function findAddress(
       user_id: actor.user.id,
       address: actor.address,
       community_id,
-      role: { [Op.in]: roles },
+      [Op.or]: author_address_id
+        ? [{ role: { [Op.in]: roles } }, { id: author_address_id }]
+        : [{ role: { [Op.in]: roles } }],
       verified: { [Op.ne]: null },
       // TODO: check verification token expiration
     },
