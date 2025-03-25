@@ -92,6 +92,11 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     handleSubmitComment: handleEnhancedSubmit,
     onAiReply: handleAiReply,
     streamingReplyIds,
+    onCommentCreated: (commentId: number, hasAI: boolean) => {
+      if (hasAI) {
+        handleAiReply(commentId);
+      }
+    },
   };
 
   return (

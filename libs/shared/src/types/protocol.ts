@@ -69,6 +69,8 @@ export enum WalletId {
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
+  Backpack = 'backpack',
+  Solflare = 'solflare',
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
 }

@@ -79,6 +79,7 @@ export const buildContentIdFromURL = async (
       (t) => t.name.toLowerCase().trim() === topicName.toLowerCase().trim(),
     );
     if (foundTopic) return `${idType}:${foundTopic.id}`;
+    throw new Error(`invalid topic url ${url}`);
   }
   if (idType === 'tweet_url') {
     return `${idType}:${url}`;

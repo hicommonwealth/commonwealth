@@ -106,6 +106,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
@@ -174,4 +175,8 @@ export const trpcRouter = trpc.router({
   getPinnedTokens: trpc.query(Community.GetPinnedTokens, trpc.Tag.Community),
   pinToken: trpc.command(Community.PinToken, trpc.Tag.Community),
   unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
+  updateCommunityTags: trpc.command(
+    Community.UpdateCommunityTags,
+    trpc.Tag.Community,
+  ),
 });
