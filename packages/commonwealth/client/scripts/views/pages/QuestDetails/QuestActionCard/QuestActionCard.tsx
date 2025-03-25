@@ -101,7 +101,7 @@ const QuestActionCard = ({
                   {actionCopies.pre_reqs[questAction.event_name]()}
                 </CWText>
                 <CWText type="caption">
-                  {/* TODO: 11391 use likes etc counts from platform, when it is updated to return them */}
+                  {/* TODO: 11391 platform - use likes etc counts from platform, when it is updated to return them */}
                   {actionCopies.explainer[questAction.event_name](8, 2, 3)}
                 </CWText>
               </>

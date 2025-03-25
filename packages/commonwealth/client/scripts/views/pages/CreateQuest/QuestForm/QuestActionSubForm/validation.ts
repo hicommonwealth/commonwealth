@@ -47,7 +47,6 @@ export const buildQuestSubFormValidationSchema = (
   let baseSchema = questSubFormValidationSchema;
 
   if (requiresCreatorPoints) {
-    // TODO: 11391 this works, needs zod type fix
     baseSchema = baseSchema
       .extend({
         creatorRewardAmount: numberNonDecimalValidationSchema.required,
@@ -73,15 +72,14 @@ export const buildQuestSubFormValidationSchema = (
           message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
           path: ['creatorRewardAmount'],
         },
-      );
+      ) as unknown as typeof baseSchema;
   }
   if (allowsOptionalContentId) {
     baseSchema = baseSchema.extend({
       contentLink: linkValidationSchema.optional,
-    });
+    }) as unknown as typeof baseSchema;
   }
   if (requiresTwitterEngagement) {
-    // TODO: 11391 this works, needs zod type fix
     baseSchema = baseSchema
       .extend({
         contentLink: linkValidationSchema.required.refine(
@@ -136,7 +134,7 @@ export const buildQuestSubFormValidationSchema = (
             'One of Likes, Retweets, or Replies count must be greater than 0.',
           path: ['noOfRetweets'],
         },
-      );
+      ) as unknown as typeof baseSchema;
   }
 
   return baseSchema;

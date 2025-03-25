@@ -169,7 +169,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           subForm.values.noOfRetweets ||
           subForm.values.noOfReplies) && {
           tweet_engagement_caps: {
-            // TODO: 11391 update platform to allow any 1 of these values
+            // TODO: 11391 platform - update platform to allow any 1 of these values
             likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
             retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
