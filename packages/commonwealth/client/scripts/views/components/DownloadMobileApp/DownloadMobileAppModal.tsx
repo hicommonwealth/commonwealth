@@ -1,5 +1,9 @@
 import React from 'react';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import {
+  CWModal,
+  CWModalBody,
+  CWModalHeader,
+} from 'views/components/component_kit/new_designs/CWModal';
 import { DownloadMobileAppContent } from 'views/components/DownloadMobileApp/DownloadMobileAppContent';
 
 type DownloadMobileAppModal = {
@@ -11,9 +15,16 @@ export const DownloadMobileAppModal = (props: DownloadMobileAppModal) => {
   return (
     <CWModal
       size="small"
-      content={<DownloadMobileAppContent />}
+      content={
+        <>
+          <CWModalHeader label="Download Mobile App" onModalClose={onClose} />
+          <CWModalBody>
+            <DownloadMobileAppContent />
+          </CWModalBody>
+        </>
+      }
       onClose={onClose}
       open={true}
-    />
+    ></CWModal>
   );
 };
