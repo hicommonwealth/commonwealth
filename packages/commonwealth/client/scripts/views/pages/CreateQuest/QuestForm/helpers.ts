@@ -39,7 +39,6 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_url':
       return QuestActionContentIdScope.DiscordServer;
-    // TODO: 11643 check/fix this for comment scope
     default:
       return QuestActionContentIdScope.Thread;
   }
