@@ -10,13 +10,13 @@ const log = logger(import.meta);
  * Debounces community refreshes
  */
 export function debounceRefresh(
-  fn: (community_id: string, ...args: any[]) => void,
+  fn: (community_id: string, group_id?: number) => Promise<void>,
   delay: number,
-): (community_id: string, ...args: any[]) => void {
+): (community_id: string, group_id?: number) => void {
   const timeouts = new Map<string, NodeJS.Timeout>();
   const timestamps = new Map<string, number>();
 
-  return (community_id: string, ...args: any[]) => {
+  return (community_id: string, group_id?: number) => {
     const now = Date.now();
 
     // make sure to only keep 20 timeouts to avoid the maps to grow too large
@@ -32,8 +32,8 @@ export function debounceRefresh(
     timeouts.has(community_id) && clearTimeout(timeouts.get(community_id)!);
     timeouts.set(
       community_id,
-      setTimeout(() => {
-        fn(community_id, ...args);
+      setTimeout(async () => {
+        await fn(community_id, group_id);
         // clean up after execution
         timeouts.delete(community_id);
         timestamps.delete(community_id);
@@ -43,9 +43,10 @@ export function debounceRefresh(
   };
 }
 
-export const refreshProfileCount = debounceRefresh((community_id: string) => {
-  models.sequelize.query(
-    `
+export const refreshProfileCount = debounceRefresh(
+  async (community_id: string) => {
+    await models.sequelize.query(
+      `
 UPDATE "Communities" C
 SET profile_count = (
     SELECT COUNT(*) 
@@ -54,16 +55,19 @@ SET profile_count = (
 )
 WHERE C.id = :community_id;
     `,
-    { replacements: { community_id } },
-  );
-}, 10_000);
+      { replacements: { community_id } },
+    );
+  },
+  10_000,
+);
 
 export const refreshMemberships = debounceRefresh(
-  (community_id: string, group_id?: number) =>
-    command(RefreshCommunityMemberships(), {
+  async (community_id: string, group_id?: number) => {
+    await command(RefreshCommunityMemberships(), {
       actor: systemActor({}),
       payload: { community_id, group_id },
-    }),
+    });
+  },
   10_000,
 );
 
