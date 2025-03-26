@@ -95,12 +95,7 @@ export const trpcRouter = trpc.router({
   ]),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
-  getMemberships: trpc.query(
-    Community.GetMemberships,
-    trpc.Tag.Community,
-    undefined,
-    [({ community_id }) => refreshMemberships(community_id)],
-  ),
+  getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
     trpc.Tag.Community,

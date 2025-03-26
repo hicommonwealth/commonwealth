@@ -355,6 +355,7 @@ export const DeleteCommunity = {
 export const RefreshCommunityMemberships = {
   input: z.object({
     community_id: z.string(),
+    address: z.string().optional(),
     group_id: PG_INT.optional(),
   }),
   output: z.object({

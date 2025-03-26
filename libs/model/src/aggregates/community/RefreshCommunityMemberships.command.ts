@@ -162,7 +162,7 @@ export function RefreshCommunityMemberships(): Command<
     ...schemas.RefreshCommunityMemberships,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { community_id, group_id } = payload;
+      const { community_id, address, group_id } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },
@@ -180,11 +180,13 @@ export function RefreshCommunityMemberships(): Command<
       let totalEmitted = 0;
       let totalProcessed = 0;
 
-      const totalAddresses = await models.Address.count({
-        where: { community_id, verified: { [Op.ne]: null } },
-      });
+      const totalAddresses = address
+        ? 1
+        : await models.Address.count({
+            where: { community_id, verified: { [Op.ne]: null } },
+          });
 
-      await paginateAddresses(community_id, 0, async (addresses) => {
+      const refresh = async (addresses: AddressAttributes[]) => {
         const pageStartedAt = Date.now();
 
         const getBalancesOptions = makeGetBalancesOptions(
@@ -223,7 +225,20 @@ export function RefreshCommunityMemberships(): Command<
 
         log.info(`Refreshed "${community_id}" memberships (${(Date.now() - pageStartedAt) / 1000}s)
   addresses=${totalProcessed}/${totalAddresses}, created=${created}, updated=${updated}, emitted=${emitted}`);
-      });
+      };
+
+      if (address) {
+        const addr = await models.Address.findOne({
+          where: { community_id, address },
+          attributes: ['id', 'address'],
+          include: {
+            model: models.Membership,
+            as: 'Memberships',
+            required: false,
+          },
+        });
+        addr && (await refresh([addr]));
+      } else await paginateAddresses(community_id, 0, refresh);
 
       log.info(
         `Finished refreshing "${community_id}" memberships (${(Date.now() - communityStartedAt) / 1000}s)

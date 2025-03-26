@@ -1,8 +1,10 @@
-import { Query } from '@hicommonwealth/core';
+import { command, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../../database';
+import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { RefreshCommunityMemberships } from './RefreshCommunityMemberships.command';
 
 export function GetMemberships(): Query<typeof schemas.GetMemberships> {
   return {
@@ -28,13 +30,11 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
         ],
       });
 
-      // TODO: shouldn't refresh (mutate) in a query... this is eventually consistent
-      // const memberships = await refreshMembershipsForAddress(
-      //   this.models,
-      //   address,
-      //   groups,
-      //   true, // use fresh balances
-      // );
+      // TODO: just to avoid more changes, but we should resolve stale community memberships in a separate job
+      await command(RefreshCommunityMemberships(), {
+        actor: systemActor({}),
+        payload: { community_id, address },
+      });
 
       const memberships = await models.Membership.findAll({
         where: {
