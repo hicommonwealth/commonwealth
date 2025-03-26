@@ -102,11 +102,10 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       </div>
       <div className="searchbar">
         <CWSearchBar />
-      </div>
-
-      <div>
         <DownloadMobileApp />
       </div>
+
+      <div></div>
       <div className="header-right">
         <div
           className={clsx('DesktopMenuContainerParent', {

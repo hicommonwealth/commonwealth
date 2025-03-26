@@ -22,7 +22,7 @@ export const DownloadMobileAppContent = () => {
         <CWTooltip
           placement="top"
           content="Link copied to clipboard!"
-          renderTrigger={(handleInteraction, isTooltipOpen) => {
+          renderTrigger={(handleInteraction) => {
             return (
               <CWTextInput
                 fullWidth

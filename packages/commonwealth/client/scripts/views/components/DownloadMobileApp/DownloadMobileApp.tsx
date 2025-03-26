@@ -8,6 +8,8 @@ export const DownloadMobileApp = () => {
   return (
     <>
       <CWButton
+        buttonType="secondary"
+        buttonHeight="sm"
         label="Download Mobile App"
         onClick={() => setModalActive(true)}
       />
