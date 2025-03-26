@@ -7,6 +7,7 @@ export enum BalanceSourceType {
   CW20 = 'cw20',
   CW721 = 'cw721',
   SPL = 'spl',
+  SOLNFT = 'meta',
 }
 
 export enum BalanceType {
@@ -29,7 +30,7 @@ export type ContractSource = {
 };
 
 export type SolanaSource = {
-  source_type: BalanceSourceType.SPL;
+  source_type: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
   solana_network: string;
   contract_address: string;
 };

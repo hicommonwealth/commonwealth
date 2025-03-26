@@ -7,6 +7,8 @@ export const TOKENS = {
 
 export const SPL_SPECIFICATION = 'spl';
 
+export const SOL_NFT_SPECIFICATION = 'meta';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -40,6 +42,7 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
+  { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
 ];
 
 export const conditionTypes = [

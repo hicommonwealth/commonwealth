@@ -105,6 +105,12 @@ function _thresholdCheck(
         chainId = thresholdData.source.solana_network.toString();
         break;
       }
+      case 'meta': {
+        balanceSourceType = BalanceSourceType.SOLNFT;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -178,6 +184,7 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL:
             return b.options.mintAddress == contractAddress;
           default:

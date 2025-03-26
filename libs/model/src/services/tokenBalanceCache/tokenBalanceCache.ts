@@ -32,7 +32,10 @@ export async function getBalances(
       options.balanceSourceType === BalanceSourceType.CW721
     ) {
       balances = await getCosmosBalances(options, ttl);
-    } else if (options.balanceSourceType == BalanceSourceType.SPL) {
+    } else if (
+      options.balanceSourceType == BalanceSourceType.SPL ||
+      options.balanceSourceType == BalanceSourceType.SOLNFT
+    ) {
       balances = await getSolanaBalances(options, ttl);
     } else {
       balances = await getEvmBalances(options, ttl);

@@ -73,7 +73,7 @@ export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
 };
 
 export type GetSPLBalancesOptions = {
-  balanceSourceType: BalanceSourceType.SPL;
+  balanceSourceType: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
   addresses: string[];
   mintAddress: string;
   solanaNetwork?: string;

@@ -18,7 +18,7 @@ const ContractSource = z.object({
 });
 
 const SolanaSource = z.object({
-  source_type: z.enum([BalanceSourceType.SPL]),
+  source_type: z.enum([BalanceSourceType.SPL, BalanceSourceType.SOLNFT]),
   solana_network: z.string(),
   contract_address: z.string().regex(/^[a-zA-Z0-9]{32,44}$/),
 });
