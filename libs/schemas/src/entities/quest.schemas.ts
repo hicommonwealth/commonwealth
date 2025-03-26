@@ -100,7 +100,7 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_url:https:\/\/discord\.(com\/invite\/|gg\/?)\w+)/,
       )
       .optional()
       .nullish(),

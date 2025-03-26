@@ -2,12 +2,18 @@ import axios from 'axios';
 import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionAllowTwitterTweetURL,
-} from 'client/scripts/helpers/quest';
+  doesActionRequireDiscordServerURL,
+  doesActionRequireTwitterTweetURL,
+} from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 
-export type ContentIdType = 'comment' | 'thread' | 'topic' | 'tweet_url';
+export type ContentIdType =
+  | 'comment'
+  | 'thread'
+  | 'topic'
+  | 'tweet_url'
+  | 'discord_server_url';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -16,8 +22,10 @@ export const inferContentIdTypeFromContentId = (
   if (!contentId) {
     if (doesActionAllowTopicId(action as QuestAction))
       return QuestActionContentIdScope.Topic;
-    if (doesActionAllowTwitterTweetURL(action as QuestAction))
+    if (doesActionRequireTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
+    if (doesActionRequireDiscordServerURL(action as QuestAction))
+      return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
     return undefined;
@@ -29,6 +37,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     case 'tweet_url':
       return QuestActionContentIdScope.TwitterTweet;
+    case 'discord_server_url':
+      return QuestActionContentIdScope.DiscordServer;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -84,6 +94,9 @@ export const buildContentIdFromURL = async (
   if (idType === 'tweet_url') {
     return `${idType}:${url}`;
   }
+  if (idType === 'discord_server_url') {
+    return `${idType}:${url}`;
+  }
 };
 
 export const buildURLFromContentId = (contentId: string, withParams = {}) => {
@@ -101,6 +114,7 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'comment')
     return `${origin}/discussion/comment/${idOrURL}${params}`;
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }

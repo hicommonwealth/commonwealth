@@ -12,4 +12,5 @@ export const VALIDATION_MESSAGES = {
     `Must be atleast ${differenceValue} apart from ${fieldName}`,
   GITHUB_FORMAT: 'Invalid GitHub URL',
   TWITTER_TWEET_FORMAT: `Invalid Tweet URL`,
+  DISCORD_SERVER_FORMAT: `Invalid Discord Server URL`,
 };

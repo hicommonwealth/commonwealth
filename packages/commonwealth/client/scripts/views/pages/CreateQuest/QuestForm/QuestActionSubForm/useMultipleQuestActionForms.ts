@@ -4,8 +4,9 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionAllowTwitterTweetURL,
+  doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
+  doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
@@ -139,7 +140,9 @@ const useQuestActionMultiFormsState = ({
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
       const allowsTwitterTweetUrl =
-        allowsContentId && doesActionAllowTwitterTweetURL(chosenAction);
+        allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
+      const requiresDiscordServerURL =
+        doesActionRequireDiscordServerURL(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -149,8 +152,9 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
           allowsContentId && doesActionAllowThreadId(chosenAction),
-        with_required_twitter_tweet_link:
-          allowsContentId && doesActionAllowTwitterTweetURL(chosenAction),
+        requires_twitter_tweet_link:
+          allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
+        requires_discord_server_url: requiresDiscordServerURL,
       };
 
       // reset errors/values if action doesn't require creator points
@@ -172,9 +176,20 @@ const useQuestActionMultiFormsState = ({
       }
 
       // set fixed contentIdScope per certain actions
-      if (updateBody.action === 'TweetEngagement') {
-        updatedSubForms[index].values.contentIdScope =
-          QuestActionContentIdScope.TwitterTweet;
+      switch (updateBody.action) {
+        case 'TweetEngagement': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.TwitterTweet;
+          break;
+        }
+        case 'CommonDiscordServerJoined': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.DiscordServer;
+          break;
+        }
+        default: {
+          break;
+        }
       }
 
       // set/reset default values/config if action allows content link
@@ -190,7 +205,10 @@ const useQuestActionMultiFormsState = ({
             !allowsTopicId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.TwitterTweet &&
-            !allowsTwitterTweetUrl)
+            !allowsTwitterTweetUrl) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.DiscordServer &&
+            !requiresDiscordServerURL)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;
