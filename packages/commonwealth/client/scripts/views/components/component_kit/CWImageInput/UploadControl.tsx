@@ -15,6 +15,7 @@ export const UploadControl = ({
   hookToForm,
   imageURL,
   withAIImageGeneration,
+  aiGeneratedImageSize = '256x256',
   disabled,
   loading,
   imageBehavior = ImageBehavior.Circle,
@@ -257,9 +258,10 @@ export const UploadControl = ({
             disabled={areActionsDisabled}
             onClick={() => {
               imagePrompt.trim() &&
-                generateImage({ prompt: imagePrompt.trim() }).catch(
-                  console.error,
-                );
+                generateImage({
+                  prompt: imagePrompt.trim(),
+                  size: aiGeneratedImageSize,
+                }).catch(console.error);
             }}
           />
         </div>

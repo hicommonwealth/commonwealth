@@ -27,6 +27,7 @@ export type UploadControlProps = {
   canSwitchBetweenProcessedImages?: boolean;
   processedImages?: ImageProcessed[];
   withAIImageGeneration?: boolean;
+  aiGeneratedImageSize?: '1024x1024' | '512x512' | '256x256';
   disabled?: boolean;
   loading?: boolean;
   name?: string;
