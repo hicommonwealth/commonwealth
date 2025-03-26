@@ -36,6 +36,7 @@ type QuickTokenLaunchFormProps = {
   onCommunityCreated: (communityId: string) => void;
   initialIdeaPrompt?: string;
   generateIdeaOnMount?: boolean;
+  isSmallScreen?: boolean;
 };
 
 const MAX_IDEAS_LIMIT = 5;
@@ -45,6 +46,7 @@ export const QuickTokenLaunchForm = ({
   onCommunityCreated,
   initialIdeaPrompt,
   generateIdeaOnMount = false,
+  isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
@@ -455,7 +457,7 @@ export const QuickTokenLaunchForm = ({
                       >
                         <CWButton
                           iconLeft="brain"
-                          label="Randomize"
+                          label={isSmallScreen ? 'Random' : 'Randomize'}
                           containerClassName="ml-auto"
                           type="button"
                           disabled={
@@ -473,7 +475,7 @@ export const QuickTokenLaunchForm = ({
                 ) : (
                   <CWButton
                     iconLeft="brain"
-                    label="Randomize"
+                    label={isSmallScreen ? 'Random' : 'Randomize'}
                     containerClassName="ml-auto"
                     type="button"
                     disabled={
@@ -488,8 +490,9 @@ export const QuickTokenLaunchForm = ({
                 )}
 
                 <TokenLaunchButton
-                  buttonWidth="wide"
+                  buttonWidth="narrow"
                   buttonType="submit"
+                  buttonLabel={isSmallScreen ? 'Launch' : 'Launch Token'}
                   disabled={
                     isProcessingProfileImage ||
                     isCreatingQuickToken ||
