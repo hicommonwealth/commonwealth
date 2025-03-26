@@ -15,10 +15,7 @@ if (process.env.OPENAI_API_KEY) {
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (e) {
-    log.error(
-      'OpenAI initialization failed: ' +
-        (e instanceof Error ? e.message : String(e)),
-    );
+    log.error('OpenAI initialization failed', e);
   }
 } else {
   log.warn(
@@ -49,8 +46,7 @@ const generateImageHandler = async (
     const imageUrl = await generateImage(description, openai);
     return success(res, { imageUrl });
   } catch (e) {
-    const errorMsg = e instanceof Error ? e.message : String(e);
-    log.error('Problem generating image: ' + errorMsg);
+    log.error('Problem generating image', e);
     throw new ServerError('Problem Generating Image!', e);
   }
 };
