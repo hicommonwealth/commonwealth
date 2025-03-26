@@ -1,6 +1,7 @@
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useState } from 'react';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import React, { useEffect, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -28,6 +29,7 @@ export const TokenLaunchDrawer = ({
   generateIdeaOnMount = false,
 }: TokenLaunchDrawerProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
+  const { isWindowMediumInclusive } = useBrowserWindow({});
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -36,6 +38,18 @@ export const TokenLaunchDrawer = ({
   });
 
   const [createdCommunityId, setCreatedCommunityId] = useState<string>();
+
+  // Manage drawer state at root level
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('token-launch-drawer-open');
+    } else {
+      document.body.classList.remove('token-launch-drawer-open');
+    }
+    return () => {
+      document.body.classList.remove('token-launch-drawer-open');
+    };
+  }, [isOpen]);
 
   const handleDrawerCloseTrigger = () => {
     if (createdCommunityId) {
@@ -70,6 +84,7 @@ export const TokenLaunchDrawer = ({
               onCommunityCreated={setCreatedCommunityId}
               initialIdeaPrompt={initialIdeaPrompt}
               generateIdeaOnMount={generateIdeaOnMount}
+              isSmallScreen={isWindowMediumInclusive}
             />
           )}
         </div>
