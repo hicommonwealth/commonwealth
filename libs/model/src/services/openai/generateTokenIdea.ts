@@ -69,10 +69,6 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
 };
 
 const generateImageWithRunware = async (prompt: string) => {
-  if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
-    throw new Error(TokenErrors.RunwareNotConfigured);
-  }
-
   console.log('Generating token image with Runware model: runware:100@1');
   const response = await fetch('https://api.runware.ai/v1/images/generations', {
     method: 'POST',
@@ -178,10 +174,13 @@ const generateTokenIdea = async function* ({
     // generate image url and send the generated url to the client (to save time on s3 upload)
     let imageUrl: string;
     console.log(
-      `Using image generation service: ${config.IMAGE_GENERATION.USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
+      `Using image generation service: ${config.IMAGE_GENERATION.FLAG_USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
     );
 
-    if (config.IMAGE_GENERATION.USE_RUNWARE) {
+    if (config.IMAGE_GENERATION.FLAG_USE_RUNWARE) {
+      if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
+        throw new Error(TokenErrors.RunwareNotConfigured);
+      }
       imageUrl = await generateImageWithRunware(
         TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
       );

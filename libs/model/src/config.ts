@@ -52,7 +52,7 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
-  USE_RUNWARE,
+  FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
 } = process.env;
 
@@ -183,7 +183,7 @@ export const config = configure(
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
     IMAGE_GENERATION: {
-      USE_RUNWARE: USE_RUNWARE === 'true' || false,
+      FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
     },
   },
@@ -407,7 +407,7 @@ export const config = configure(
         ),
     }),
     IMAGE_GENERATION: z.object({
-      USE_RUNWARE: z.boolean().optional(),
+      FLAG_USE_RUNWARE: z.boolean().optional(),
       RUNWARE_API_KEY: z.string().optional(),
     }),
   }),

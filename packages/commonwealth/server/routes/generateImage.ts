@@ -4,7 +4,7 @@ import {
   blobStorage,
   logger,
 } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { DB, config } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
@@ -47,7 +47,7 @@ const generateImageWithRunware = async (description: string) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.RUNWARE_API_KEY}`,
+      Authorization: `Bearer ${config.IMAGE_GENERATION.RUNWARE_API_KEY}`,
     },
     body: JSON.stringify([
       {
@@ -101,7 +101,7 @@ const generateImage = async (
   }
 
   // Check OpenAI initialization if we're not using Runware
-  if (process.env.USE_RUNWARE !== 'true' && !openai) {
+  if (!config.IMAGE_GENERATION.FLAG_USE_RUNWARE && !openai) {
     log.error('OpenAI not initialized and Runware not enabled');
     throw new ServerError('OpenAI not initialized');
   }
@@ -109,9 +109,12 @@ const generateImage = async (
   let image;
   try {
     log.info(
-      `Using image generation service: ${process.env.USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
+      `Using image generation service: ${config.IMAGE_GENERATION.FLAG_USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
     );
-    if (process.env.USE_RUNWARE === 'true') {
+    if (config.IMAGE_GENERATION.FLAG_USE_RUNWARE) {
+      if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
+        throw new ServerError('Runware API key not configured');
+      }
       image = await generateImageWithRunware(description);
     } else {
       image = await generateImageWithOpenAI(description);
