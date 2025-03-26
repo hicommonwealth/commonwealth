@@ -24,9 +24,9 @@ export const actionCopies = {
     ['WalletLinked']: () => '',
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
-      `Requires Twitter/X linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
+      `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['CommonDiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
-      `Requires Discord linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
+      `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
   },
   explainer: {
     ['CommunityCreated']: () => '',
