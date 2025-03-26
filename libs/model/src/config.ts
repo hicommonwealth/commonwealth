@@ -52,6 +52,8 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
+  USE_RUNWARE,
+  RUNWARE_API_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -179,6 +181,10 @@ export const config = configure(
     },
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
+    },
+    IMAGE_GENERATION: {
+      USE_RUNWARE: USE_RUNWARE === 'false',
+      RUNWARE_API_KEY: RUNWARE_API_KEY,
     },
   },
   z.object({
@@ -399,6 +405,10 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
+    }),
+    IMAGE_GENERATION: z.object({
+      USE_RUNWARE: z.boolean().optional(),
+      RUNWARE_API_KEY: z.string().optional(),
     }),
   }),
 );

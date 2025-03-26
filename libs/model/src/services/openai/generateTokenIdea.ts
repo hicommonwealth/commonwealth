@@ -43,6 +43,7 @@ const TokenErrors = {
   IdeaPromptVoilatesSecurityPolicy:
     'provided `ideaPrompt` voilates content security policy',
   ImageGenerationFailure: 'failed to generate image for token idea',
+  RunwareNotConfigured: 'Runware API key not configured',
 };
 
 // we have to maintain this to have "conversational" context with OpenAI
@@ -50,6 +51,7 @@ const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
   [];
 
 const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
+  console.log('Sending prompt to OpenAI:', prompt);
   convoHistory.push({ role: 'user', content: prompt }); // user msg
 
   const response = await openai.chat.completions.create({
@@ -58,19 +60,25 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   });
   convoHistory.push(response.choices[0].message); // assistant msg
 
-  return (response.choices[0].message.content || 'NO_RESPONSE').replace(
+  const result = (response.choices[0].message.content || 'NO_RESPONSE').replace(
     /^"|"$/g, // sometimes openAI adds `"` at the start/end of the response + tweaking the prompt also doesn't help
     '',
   );
+  console.log('Received response from OpenAI:', result);
+  return result;
 };
 
 const generateImageWithRunware = async (prompt: string) => {
+  if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
+    throw new Error(TokenErrors.RunwareNotConfigured);
+  }
+
   console.log('Generating token image with Runware model: runware:100@1');
   const response = await fetch('https://api.runware.ai/v1/images/generations', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.RUNWARE_API_KEY}`,
+      Authorization: `Bearer ${config.IMAGE_GENERATION.RUNWARE_API_KEY}`,
     },
     body: JSON.stringify([
       {
@@ -115,7 +123,9 @@ const generateTokenIdea = async function* ({
   ideaPrompt,
 }: GenerateTokenIdeaProps): AsyncGenerator {
   if (!config.OPENAI.API_KEY) {
+    console.error(TokenErrors.OpenAINotConfigured);
     yield { error: TokenErrors.OpenAINotConfigured };
+    return;
   }
 
   const openai = new OpenAI({
@@ -124,7 +134,9 @@ const generateTokenIdea = async function* ({
   });
 
   if (!openai) {
+    console.error(TokenErrors.OpenAIInitFailed);
     yield { error: TokenErrors.OpenAIInitFailed };
+    return;
   }
 
   let tokenName = '';
@@ -165,8 +177,11 @@ const generateTokenIdea = async function* ({
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
     let imageUrl: string;
-    console.log(`USE_RUNWARE environment variable: ${process.env.USE_RUNWARE}`);
-    if (process.env.USE_RUNWARE === 'true') {
+    console.log(
+      `Using image generation service: ${config.IMAGE_GENERATION.USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
+    );
+
+    if (config.IMAGE_GENERATION.USE_RUNWARE) {
       imageUrl = await generateImageWithRunware(
         TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
       );
@@ -178,6 +193,7 @@ const generateTokenIdea = async function* ({
     }
 
     // upload image to s3 and then send finalized imageURL
+    console.log('Uploading generated image to S3');
     const resp = await fetch(imageUrl);
     const buffer = await resp.buffer();
     const compressedBuffer = await compressServerImage(buffer);
@@ -187,9 +203,12 @@ const generateTokenIdea = async function* ({
       content: compressedBuffer,
       contentType: 'image/png',
     });
+    console.log('Successfully uploaded image to S3:', url);
+
     yield 'event: imageURL\n';
     yield `data: ${url}\n\n`;
   } catch (e) {
+    console.error('Error in generateTokenIdea:', e);
     let error = TokenErrors.RequestFailed;
 
     if (
@@ -199,7 +218,6 @@ const generateTokenIdea = async function* ({
       if (ideaPrompt && !tokenName) {
         error = TokenErrors.IdeaPromptVoilatesSecurityPolicy;
       } else {
-        // this usually happens in the image generation calls
         error = TokenErrors.ImageGenerationFailure;
       }
     }

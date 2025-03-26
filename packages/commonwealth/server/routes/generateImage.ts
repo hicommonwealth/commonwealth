@@ -1,4 +1,9 @@
-import { AppError, ServerError, blobStorage } from '@hicommonwealth/core';
+import {
+  AppError,
+  ServerError,
+  blobStorage,
+  logger,
+} from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
@@ -7,6 +12,7 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 let openai: OpenAI | undefined = undefined;
+const log = logger(import.meta);
 
 if (process.env.OPENAI_API_KEY) {
   try {
@@ -16,10 +22,13 @@ if (process.env.OPENAI_API_KEY) {
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (e) {
-    console.error('OpenAI initialization failed.', e);
+    log.error(
+      'OpenAI initialization failed: ' +
+        (e instanceof Error ? e.message : String(e)),
+    );
   }
 } else {
-  console.warn(
+  log.warn(
     'OpenAI key not configured. You will be unable to generate images on client.',
   );
 }
@@ -33,7 +42,7 @@ type generateImageResp = {
 };
 
 const generateImageWithRunware = async (description: string) => {
-  console.log('Generating image with Runware model: runware:100@1');
+  log.info('Generating image with Runware model: runware:100@1');
   const response = await fetch('https://api.runware.ai/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -57,22 +66,18 @@ const generateImageWithRunware = async (description: string) => {
 
   if (!response.ok) {
     const error = new Error(`Runware API error: ${response.statusText}`);
-    console.error('Runware API error:', error);
+    log.error('Runware API error: ' + error.message);
     throw error;
   }
 
   const data = await response.json();
-  console.log('Successfully generated image with Runware', data);
+  log.info('Successfully generated image with Runware');
   return data.data[0].imageURL;
 };
 
 const generateImageWithOpenAI = async (description: string) => {
-  if (!openai) {
-    throw new ServerError('OpenAI not initialized');
-  }
-
-  console.log('Generating image with OpenAI model: dall-e-2');
-  const response = await openai.images.generate({
+  log.info('Generating image with OpenAI model: dall-e-2');
+  const response = await openai!.images.generate({
     model: 'dall-e-2',
     n: 1,
     prompt: description,
@@ -80,7 +85,7 @@ const generateImageWithOpenAI = async (description: string) => {
     response_format: 'url',
   });
 
-  console.log('Successfully generated image with OpenAI');
+  log.info('Successfully generated image with OpenAI');
   return response.data[0].url;
 };
 
@@ -95,23 +100,30 @@ const generateImage = async (
     throw new AppError('No description provided');
   }
 
+  // Check OpenAI initialization if we're not using Runware
+  if (process.env.USE_RUNWARE !== 'true' && !openai) {
+    log.error('OpenAI not initialized and Runware not enabled');
+    throw new ServerError('OpenAI not initialized');
+  }
+
   let image;
   try {
-    console.log(`USE_RUNWARE environment variable: ${process.env.USE_RUNWARE}`);
+    log.info(
+      `Using image generation service: ${process.env.USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
+    );
     if (process.env.USE_RUNWARE === 'true') {
       image = await generateImageWithRunware(description);
     } else {
       image = await generateImageWithOpenAI(description);
     }
   } catch (e) {
-    console.error(
-      'Problem generating image:',
-      e instanceof Error ? e : new Error(String(e)),
-    );
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    log.error('Problem generating image: ' + errorMsg);
     throw new ServerError('Problem Generating Image!', e);
   }
 
   try {
+    log.info('Uploading generated image to S3');
     const resp = await fetch(image);
     const buffer = await resp.buffer();
     const { url } = await blobStorage().upload({
@@ -120,8 +132,11 @@ const generateImage = async (
       content: buffer,
       contentType: 'image/png',
     });
+    log.info('Successfully uploaded image to S3: ' + url);
     return success(res, { imageUrl: url });
   } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    log.error('Problem uploading image: ' + errorMsg);
     throw new ServerError('Problem uploading image!', e);
   }
 };
