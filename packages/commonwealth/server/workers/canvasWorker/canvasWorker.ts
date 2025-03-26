@@ -35,12 +35,16 @@ server.use(
   }),
 );
 
-server.get('/clock', async (req, res) => {
-  const [clock, heads] = await app.messageLog.getClock();
-  res.json({ clock, heads });
+server.get('/clock', (req, res, next) => {
+  app.messageLog
+    .getClock()
+    .then(([clock, heads]) => {
+      res.json({ clock, heads });
+    })
+    .catch(next);
 });
 
-server.post('/action', async (req, res) => {
+server.post('/action', (req, res) => {
   if (req.body === undefined) {
     throw new Error('no action data');
   }
@@ -62,51 +66,62 @@ server.post('/action', async (req, res) => {
       publicKey: data.sessionMessage.payload.publicKey,
     });
 
-    // apply session
-    try {
-      const encodedSessionMessage = app.messageLog.encode(
-        data.sessionMessageSignature,
-        data.sessionMessage,
-      );
-      if (!(await app.messageLog.has(encodedSessionMessage.id))) {
-        const { id: idSession } = await app.insert(
-          data.sessionMessageSignature,
-          data.sessionMessage,
-        );
-        appliedSessionId = idSession;
-      }
-    } catch (err) {
-      log.warn(`could not apply canvas session: ${err.stack}`);
-    }
+    // Convert the async parts to use promises and pass errors to next
+    Promise.resolve()
+      .then(async () => {
+        // apply session
+        try {
+          const encodedSessionMessage = app.messageLog.encode(
+            data.sessionMessageSignature,
+            data.sessionMessage,
+          );
+          if (!(await app.messageLog.has(encodedSessionMessage.id))) {
+            const { id: idSession } = await app.insert(
+              data.sessionMessageSignature,
+              data.sessionMessage,
+            );
+            appliedSessionId = idSession;
+          }
+        } catch (err) {
+          log.warn(`could not apply canvas session: ${err.stack}`);
+        }
 
-    // apply action
-    try {
-      const encodedActionMessage = app.messageLog.encode(
-        data.actionMessageSignature,
-        data.actionMessage,
-      );
-      if (!(await app.messageLog.has(encodedActionMessage.id))) {
-        const { id: idAction } = await app.insert(
-          data.actionMessageSignature,
-          data.actionMessage,
-        );
-        appliedActionId = idAction;
-      }
-    } catch (err) {
-      log.warn(`could not apply canvas action: ${err.stack}`);
-    }
+        // apply action
+        try {
+          const encodedActionMessage = app.messageLog.encode(
+            data.actionMessageSignature,
+            data.actionMessage,
+          );
+          if (!(await app.messageLog.has(encodedActionMessage.id))) {
+            const { id: idAction } = await app.insert(
+              data.actionMessageSignature,
+              data.actionMessage,
+            );
+            appliedActionId = idAction;
+          }
+        } catch (err) {
+          log.warn(`could not apply canvas action: ${err.stack}`);
+        }
 
-    const [clock, heads] = await app.messageLog.getClock();
+        const [clock, heads] = await app.messageLog.getClock();
 
-    res.json({
-      success: true,
-      result: {
-        session: appliedSessionId,
-        action: appliedActionId,
-        clock,
-        heads,
-      },
-    });
+        res.json({
+          success: true,
+          result: {
+            session: appliedSessionId,
+            action: appliedActionId,
+            clock,
+            heads,
+          },
+        });
+      })
+      .catch((err) => {
+        log.error('Error processing canvas request', err);
+        res.status(400).json({
+          success: false,
+          error: err.message,
+        });
+      });
   } catch (err) {
     log.error('Error processing canvas request', err);
     res.status(400).json({
@@ -116,9 +131,15 @@ server.post('/action', async (req, res) => {
   }
 });
 
-server.listen(PORT, async () => {
-  const [clock, heads] = await app.messageLog.getClock();
-  log.info(
-    `started express server on port ${PORT}, clock: ${clock} (${heads.length})`,
-  );
+server.listen(PORT, () => {
+  app.messageLog
+    .getClock()
+    .then(([clock, heads]) => {
+      log.info(
+        `started express server on port ${PORT}, clock: ${clock} (${heads.length})`,
+      );
+    })
+    .catch((err) => {
+      log.error('Error getting clock', err);
+    });
 });
