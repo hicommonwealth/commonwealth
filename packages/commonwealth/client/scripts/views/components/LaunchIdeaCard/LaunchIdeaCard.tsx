@@ -37,9 +37,6 @@ const LaunchIdeaCard = ({
           }
         />
         <div className="cta-elements">
-          <CWText className="randomize-cta-text">
-            Try our randomizer button to launch tokens fast!
-          </CWText>
           <span className="ml-auto" />
           <div className="buttons">
             <CWButton
