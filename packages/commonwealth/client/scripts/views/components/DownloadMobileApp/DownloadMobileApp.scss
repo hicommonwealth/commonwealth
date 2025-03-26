@@ -1,0 +1,14 @@
+@import '../../../styles/shared';
+
+.DownloadMobileAppButton {
+  .btn-border {
+    border: none !important;
+  }
+
+  button {
+    background-color: $primary-500 !important;
+  }
+  button * {
+    color: $white !important;
+  }
+}
