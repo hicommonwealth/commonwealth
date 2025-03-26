@@ -1,26 +1,18 @@
 import React from 'react';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { DownloadMobileAppContent } from 'views/components/DownloadMobileApp/DownloadMobileAppContent';
 
-// <CWModal
-//   size="large"
-//   content={
-//     <ThreadPreviewModal
-//       isThreadModalOpen={isThreadModalOpen}
-//       onClose={() => setIsThreadModalOpen(false)}
-//       images={extractImages(selectedThread?.body)}
-//       thread={selectedThread}
-//     />
-//   }
-//   onClose={closeModal}
-//   open={isThreadModalOpen}
-// />
+type DownloadMobileAppModal = {
+  onClose: () => void;
+};
 
-export const DownloadMobileAppModal = () => {
+export const DownloadMobileAppModal = (props: DownloadMobileAppModal) => {
+  const { onClose } = props;
   return (
     <CWModal
       size="large"
-      content={<div>This is the modal</div>}
-      onClose={() => {}}
+      content={<DownloadMobileAppContent />}
+      onClose={onClose}
       open={true}
     />
   );
