@@ -41,6 +41,7 @@ export function CreateUnverifiedUser(): Policy<typeof inputs, ZodUndefined> {
                 name: generateUsername('', 2),
                 avatar_url: null, // TODO: random avatar
               },
+              tier: 0,
             },
             { transaction },
           );

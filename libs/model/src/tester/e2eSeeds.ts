@@ -55,6 +55,7 @@ export const e2eTestEntities = async function (
                     avatar_url: `testAvatarUrl${-i - 1}`,
                     email: `test${-i - 1}@gmail.com`,
                   },
+                  tier: 4,
                 },
               })
             )[0],

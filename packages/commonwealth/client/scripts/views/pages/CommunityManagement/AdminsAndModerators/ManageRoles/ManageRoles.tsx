@@ -1,6 +1,6 @@
 import { AddressRole } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { notifyError } from 'controllers/app/notifications';
+import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -27,30 +27,18 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
+  const { mutateAsync: updateRole } = useUpdateRoleMutation();
 
   const removeRole = async (role: AddressRole) => {
-    try {
-      const res = await axios.post(`${SERVER_URL}/upgradeMember`, {
-        community_id: app.activeChainId(),
-        new_role: 'member',
-        address: role.address,
-        jwt: user.jwt,
-      });
-
-      if (res.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${res.data.status}`);
-      }
-
-      const roleData = res.data.result;
-      const newRole: AddressRole = {
-        address: roleData.address,
-        role: roleData.role,
-      };
-      onRoleUpdate(role, newRole);
-    } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to alter role.';
-      notifyError(errMsg);
-    }
+    const result = await updateRole({
+      community_id: app.activeChainId()!,
+      address: role.address,
+      role: 'member',
+    });
+    onRoleUpdate(role, {
+      address: result.address!,
+      role: result.role!,
+    });
   };
 
   const handleDeleteRole = async (role: AddressRole) => {

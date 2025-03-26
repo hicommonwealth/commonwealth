@@ -10,6 +10,11 @@
   min-height: $global-header-height;
   padding: 0 12px;
 
+  body.token-launch-drawer-open & {
+    position: fixed;
+    z-index: 0;
+  }
+
   .header-left.desktop {
     padding-left: 68px;
   }

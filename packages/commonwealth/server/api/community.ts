@@ -1,6 +1,11 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
-import { Community, models, refreshProfileCount } from '@hicommonwealth/model';
+import {
+  Community,
+  middleware,
+  models,
+  refreshProfileCount,
+} from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -9,6 +14,9 @@ import { config } from '../config';
 
 export const trpcRouter = trpc.router({
   createCommunity: trpc.command(Community.CreateCommunity, trpc.Tag.Community, [
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
+    }),
     trpc.trackAnalytics([
       MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
       (output) => ({
@@ -98,6 +106,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
@@ -166,4 +175,8 @@ export const trpcRouter = trpc.router({
   getPinnedTokens: trpc.query(Community.GetPinnedTokens, trpc.Tag.Community),
   pinToken: trpc.command(Community.PinToken, trpc.Tag.Community),
   unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
+  updateCommunityTags: trpc.command(
+    Community.UpdateCommunityTags,
+    trpc.Tag.Community,
+  ),
 });

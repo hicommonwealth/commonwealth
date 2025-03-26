@@ -1,5 +1,4 @@
 import useEditCommunityBannerMutation from './editCommunityBanner';
-import useEditCommunityTagsMutation from './editCommunityTags';
 import useFetchCommunitiesQuery from './fetchCommunities';
 import useFetchRelatedCommunitiesQuery from './fetchRelatedCommunities';
 import useGetCommunityByIdQuery from './getCommuityById';
@@ -11,10 +10,10 @@ import useToggleCommunityStarMutation from './toggleCommunityStar';
 import useUnpinTokenFromCommunityMutation from './unpinTokenFromCommunity';
 import useUpdateCommunityMutation from './updateCommunity';
 import useUpdateCustomDomainMutation from './updateCustomDomain';
+import { useUpdateRoleMutation } from './updateRole';
 
 export {
   useEditCommunityBannerMutation,
-  useEditCommunityTagsMutation,
   useFetchCommunitiesQuery,
   useFetchRelatedCommunitiesQuery,
   useGetCommunityByIdQuery,
@@ -26,4 +25,5 @@ export {
   useUnpinTokenFromCommunityMutation,
   useUpdateCommunityMutation,
   useUpdateCustomDomainMutation,
+  useUpdateRoleMutation,
 };

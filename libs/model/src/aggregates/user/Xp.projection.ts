@@ -116,6 +116,7 @@ async function recordXpsForQuest(
     comment_id?: number;
     sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
+    goal_id?: number; // community goals
   },
 ) {
   const shared_with_address =
@@ -135,7 +136,8 @@ async function recordXpsForQuest(
           (scoped === 'topic' && +id !== scope?.topic_id) ||
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
-          (scoped === 'sso' && id !== scope?.sso)
+          (scoped === 'sso' && id !== scope?.sso) ||
+          (scoped === 'goal' && +id !== scope?.goal_id)
         )
           continue;
       }
@@ -515,6 +517,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           address.user_id!,
           payload.created_at,
           action_metas,
+        );
+      },
+      CommunityGoalReached: async ({ payload }) => {
+        // find the admin of the community (TODO: project on community creation, using proxy in the meantime)
+        const address = await models.Address.findOne({
+          where: { community_id: payload.community_id, role: 'admin' },
+          order: ['created_at'],
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'CommunityGoalReached',
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+          undefined,
+          { goal_id: payload.community_goal_meta_id },
         );
       },
       TwitterCommonMentioned: async ({ payload }) => {

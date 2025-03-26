@@ -1,15 +1,17 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
-import { Reaction, Thread } from '@hicommonwealth/model';
+import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
+import { middleware, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { applyCanvasSignedData } from '../federation';
 
 const log = logger(import.meta);
 
 export const trpcRouter = trpc.router({
   createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
-    trpc.fireAndForget(async (input, _, ctx) => {
-      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    // trpc.fireAndForget(async (input, _, ctx) => {
+    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    // }),
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
@@ -17,9 +19,9 @@ export const trpcRouter = trpc.router({
     ]),
   ]),
   updateThread: trpc.command(Thread.UpdateThread, trpc.Tag.Thread, [
-    trpc.fireAndForget(async (input, _, ctx) => {
-      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-    }),
+    // trpc.fireAndForget(async (input, _, ctx) => {
+    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    // }),
     trpc.trackAnalytics((input) =>
       Promise.resolve(
         input.stage !== undefined
@@ -32,8 +34,11 @@ export const trpcRouter = trpc.router({
     Thread.CreateThreadReaction,
     trpc.Tag.Reaction,
     [
-      trpc.fireAndForget(async (input, _, ctx) => {
-        await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      // trpc.fireAndForget(async (input, _, ctx) => {
+      //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      // }),
+      trpc.fireAndForget(async (_, __, ctx) => {
+        await middleware.incrementUserCount(ctx.actor.user.id!, 'upvotes');
       }),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,
@@ -42,9 +47,9 @@ export const trpcRouter = trpc.router({
     ],
   ),
   deleteThread: trpc.command(Thread.DeleteThread, trpc.Tag.Thread, [
-    trpc.fireAndForget(async (input, _, ctx) => {
-      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-    }),
+    // trpc.fireAndForget(async (input, _, ctx) => {
+    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    // }),
     trpc.fireAndForget(async () => {
       await cache().deleteKey(
         CacheNamespaces.Query_Response,
@@ -53,9 +58,9 @@ export const trpcRouter = trpc.router({
     }),
   ]),
   deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [
-    trpc.fireAndForget(async (input, _, ctx) => {
-      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
-    }),
+    // trpc.fireAndForget(async (input, _, ctx) => {
+    //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    // }),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
   getThreadsByIds: trpc.query(

@@ -25,19 +25,9 @@ import {
   getChainNodeUrl,
   publishCast,
 } from '../../utils';
+import { findActiveContestManager } from '../../utils/findActiveContestManager';
 
 const log = logger(import.meta);
-
-export class MissingContestManager extends Error {
-  constructor(
-    message: string,
-    public readonly namespace: string,
-    public readonly contest_address: string,
-  ) {
-    super(message);
-    this.name = 'Missing Contest Manager';
-  }
-}
 
 const inputs = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
@@ -85,7 +75,7 @@ async function createInitialContest(
   );
 
   const { startTime, endTime } = await getContestStatus(
-    url,
+    { rpc: url, eth_chain_id: ethChainId },
     contest_address,
     isOneOff,
   );
@@ -144,6 +134,7 @@ async function createInitialContest(
 }
 
 type ContestDetails = {
+  eth_chain_id: number;
   url: string;
   prize_percentage: number;
   payout_structure: number[];
@@ -158,7 +149,8 @@ async function getContestDetails(
 ): Promise<ContestDetails | undefined> {
   const [result] = await models.sequelize.query<ContestDetails>(
     `
-        select cn.private_url,
+        select CN.eth_chain_id,
+               cn.private_url,
                cn.url,
                cm.prize_percentage,
                cm.payout_structure,
@@ -192,8 +184,10 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
+    cp.mustBeProtocolChainId(details.eth_chain_id);
+
     const { scores, contestBalance } = await getContestScore(
-      details.url,
+      { eth_chain_id: details.eth_chain_id, rpc: details.url },
       contest_address,
       details.prize_percentage,
       details.payout_structure,
@@ -220,6 +214,16 @@ export function Contests(): Projection<typeof inputs> {
     inputs,
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -231,6 +235,16 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       OneOffContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -241,14 +255,8 @@ export function Contests(): Projection<typeof inputs> {
         );
 
         // if bot-created farcaster contest, notify author
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-          },
-        });
-        mustExist('Contest Manager', contestManager);
 
-        if (contestManager.farcaster_author_cast_hash) {
+        if (contestManager?.farcaster_author_cast_hash) {
           await publishCast(
             contestManager.farcaster_author_cast_hash,
             ({ username }) => {
@@ -256,6 +264,7 @@ export function Contests(): Projection<typeof inputs> {
                 payoutStructure: [winner1, winner2, winner3],
                 voterShare,
               } = DEFAULT_CONTEST_BOT_PARAMS;
+              // eslint-disable-next-line max-len
               return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
             },
             {
@@ -274,12 +283,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-            environment: config.APP_ENV,
-          },
-        });
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
         if (!contestManager) {
           log.warn(
             `ContestManager not found for contest ${payload.contest_address}`,
@@ -341,6 +347,12 @@ export function Contests(): Projection<typeof inputs> {
             },
           ],
         });
+        if (!add_action) {
+          log.warn(
+            `ContestAction not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
 
         let calculated_voting_weight: string | undefined;
 

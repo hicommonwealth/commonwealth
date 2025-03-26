@@ -4,8 +4,10 @@ import {
   COMMUNITY_NAME_REGEX,
   ChainBase,
   ChainType,
+  CommunityGoalTypes,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  Roles,
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -15,7 +17,9 @@ import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
+import { Tags } from '../entities/tag.schemas';
 import { Topic } from '../entities/topic.schemas';
+import { Address } from '../entities/user.schemas';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -331,6 +335,16 @@ export const DeleteAllAddresses = {
   context: AuthContext,
 };
 
+export const UpdateRole = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+  }),
+  output: Address.partial(),
+  context: AuthContext,
+};
+
 export const DeleteCommunity = {
   input: z.object({
     community_id: z.string(),
@@ -407,4 +421,24 @@ export const UnpinToken = {
 export const IndexCommunities = {
   input: z.object({}),
   output: z.object({}),
+};
+export const SetReachedGoal = {
+  input: z.object({
+    community_id: z.string(),
+    community_goal_meta_id: z.number(),
+    goal_type: z.enum(CommunityGoalTypes),
+  }),
+  output: z.object({}),
+};
+
+export const UpdateCommunityTags = {
+  input: z.object({
+    community_id: z.string(),
+    tag_ids: z.array(z.number()),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    tags: z.array(Tags),
+  }),
+  context: AuthContext,
 };
