@@ -73,7 +73,6 @@ const generateTokenIdea = async function* ({
   if (!config.OPENAI.API_KEY) {
     log.error(TokenErrors.OpenAINotConfigured);
     yield { error: TokenErrors.OpenAINotConfigured };
-    return;
   }
 
   const openai = new OpenAI({
@@ -84,7 +83,6 @@ const generateTokenIdea = async function* ({
   if (!openai) {
     log.error(TokenErrors.OpenAIInitFailed);
     yield { error: TokenErrors.OpenAIInitFailed };
-    return;
   }
 
   let tokenName = '';
