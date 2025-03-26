@@ -602,8 +602,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'MembershipsRefreshed',
         );
         await Promise.all(
-          [...payload.created, ...payload.updated]
-            .filter((m) => !m.reject_reason)
+          payload.membership
+            .filter((m) => !m.rejected)
             .map(async ({ address_id, group_id }) => {
               const user_id = await getUserByAddressId(address_id);
               if (user_id)

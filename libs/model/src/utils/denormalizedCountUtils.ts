@@ -1,11 +1,50 @@
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError, command, logger } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
+import { RefreshCommunityMemberships } from '../aggregates/community';
 import { models } from '../database';
+import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
 
-export const refreshProfileCount = async (community_id: string) => {
-  await models.sequelize.query(
+/*
+ * Debounces community refreshes
+ */
+export function debounceRefresh(
+  fn: (community_id: string, ...args: any[]) => void,
+  delay: number,
+): (community_id: string, ...args: any[]) => void {
+  const timeouts = new Map<string, NodeJS.Timeout>();
+  const timestamps = new Map<string, number>();
+
+  return (community_id: string, ...args: any[]) => {
+    const now = Date.now();
+
+    // make sure to only keep 20 timeouts to avoid the maps to grow too large
+    if (timeouts.size > 20) {
+      for (const [key, timestamp] of timestamps) {
+        if (now - timestamp > delay * 2) {
+          timeouts.delete(key);
+          timestamps.delete(key);
+        }
+      }
+    }
+
+    timeouts.has(community_id) && clearTimeout(timeouts.get(community_id)!);
+    timeouts.set(
+      community_id,
+      setTimeout(() => {
+        fn(community_id, ...args);
+        // clean up after execution
+        timeouts.delete(community_id);
+        timestamps.delete(community_id);
+      }, delay),
+    );
+    timestamps.set(community_id, now);
+  };
+}
+
+export const refreshProfileCount = debounceRefresh((community_id: string) => {
+  models.sequelize.query(
     `
 UPDATE "Communities" C
 SET profile_count = (
@@ -17,7 +56,16 @@ WHERE C.id = :community_id;
     `,
     { replacements: { community_id } },
   );
-};
+}, 10_000);
+
+export const refreshMemberships = debounceRefresh(
+  (community_id: string, group_id?: number) =>
+    command(RefreshCommunityMemberships(), {
+      actor: systemActor({}),
+      payload: { community_id, group_id },
+    }),
+  10_000,
+);
 
 // TODO: check if we need a maintenance policy for this
 export async function assertAddressOwnership(address: string) {

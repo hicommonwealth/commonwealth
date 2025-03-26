@@ -9,7 +9,6 @@ import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
-import { Membership } from '../entities/group.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -533,8 +532,14 @@ export const events = {
 
   MembershipsRefreshed: z.object({
     community_id: z.string(),
-    created: Membership.array(),
-    updated: Membership.array(),
+    membership: z
+      .object({
+        group_id: z.number(),
+        address_id: z.number(),
+        created: z.boolean(),
+        rejected: z.boolean().optional(),
+      })
+      .array(),
     created_at: z.coerce.date(),
   }),
 } as const;

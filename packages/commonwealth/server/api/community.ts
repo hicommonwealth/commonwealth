@@ -1,9 +1,9 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { command } from '@hicommonwealth/core';
 import {
   Community,
   middleware,
   models,
+  refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
 import {
@@ -76,14 +76,8 @@ export const trpcRouter = trpc.router({
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (_, output, ctx) => {
-      await command(Community.RefreshCommunityMemberships(), {
-        actor: ctx.actor,
-        payload: {
-          community_id: output.id!,
-          group_id: output.groups?.at(0)?.id,
-        },
-      });
+    trpc.fireAndForget(async (_, output) => {
+      await refreshMemberships(output.id!, output.groups?.at(0)?.id);
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_GROUP,
@@ -91,15 +85,9 @@ export const trpcRouter = trpc.router({
     ]),
   ]),
   updateGroup: trpc.command(Community.UpdateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (input, output, ctx) => {
+    trpc.fireAndForget(async (input, output) => {
       if (input.requirements?.length || input.metadata?.required_requirements)
-        await command(Community.RefreshCommunityMemberships(), {
-          actor: ctx.actor,
-          payload: {
-            community_id: output.community_id!,
-            group_id: output.id,
-          },
-        });
+        await refreshMemberships(output.community_id!, output.id);
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.UPDATE_GROUP,
@@ -108,7 +96,16 @@ export const trpcRouter = trpc.router({
   ]),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
-  getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
+  getMemberships: trpc.query(
+    Community.GetMemberships,
+    trpc.Tag.Community,
+    undefined,
+    [
+      trpc.fireAndForget(async ({ community_id }) => {
+        await refreshMemberships(community_id);
+      }),
+    ],
+  ),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
     trpc.Tag.Community,
