@@ -202,7 +202,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
-      quest_type: 'channel', // TODO: 11391 make this configurable via UI
+      quest_type: 'common',
     });
 
     if (quest && quest.id) {

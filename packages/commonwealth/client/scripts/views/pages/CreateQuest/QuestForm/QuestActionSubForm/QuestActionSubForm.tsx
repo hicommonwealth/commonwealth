@@ -53,6 +53,7 @@ const QuestActionSubForm = ({
     'WalletLinked',
     'SSOLinked',
     'TweetEngagement',
+    'CommonDiscordServerJoined',
   ]
     .map((event) => ({
       value: event as QuestAction,

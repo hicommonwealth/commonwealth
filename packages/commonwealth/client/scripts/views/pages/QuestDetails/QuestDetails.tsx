@@ -231,6 +231,11 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'CommonDiscordServerJoined': {
+        // TODO: 11643 add platform change to store discord url or if its not going to change
+        // then can be hardcoded here
+        break;
+      }
       default:
         return;
     }
