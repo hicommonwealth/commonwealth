@@ -55,9 +55,7 @@ async function updateQuestInstance(
 async function updateChannelQuest(
   eventName: 'TweetEngagement',
   quest: QuestInstance,
-  actionMetas:
-    | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>[]
-    | undefined,
+  actionMetas: z.infer<typeof schemas.ActionMetaInput>[] | undefined,
   payload: z.infer<(typeof schemas.UpdateQuest)['input']>,
 ) {
   if (quest.quest_type !== 'channel') return;

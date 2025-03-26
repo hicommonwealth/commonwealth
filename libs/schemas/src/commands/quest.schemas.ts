@@ -19,6 +19,16 @@ export const CreateQuest = {
   context: AuthContext,
 };
 
+export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
+  tweet_engagement_caps: z
+    .object({
+      likes: z.number().positive().max(100),
+      retweets: z.number().positive().max(100),
+      replies: z.number().positive().max(100),
+    })
+    .optional(),
+});
+
 export const UpdateQuest = {
   input: z.object({
     quest_id: z.number(),
@@ -29,7 +39,7 @@ export const UpdateQuest = {
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
     max_xp_to_end: z.number().optional(),
-    action_metas: z.array(QuestActionMeta.omit({ quest_id: true })).optional(),
+    action_metas: z.array(ActionMetaInput).optional(),
   }),
   output: QuestView,
   context: AuthContext,

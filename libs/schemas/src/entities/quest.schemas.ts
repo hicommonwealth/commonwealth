@@ -104,13 +104,6 @@ export const QuestActionMeta = z
       )
       .optional()
       .nullish(),
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().positive().max(100),
-        retweets: z.number().positive().max(100),
-        replies: z.number().positive().max(100),
-      })
-      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
