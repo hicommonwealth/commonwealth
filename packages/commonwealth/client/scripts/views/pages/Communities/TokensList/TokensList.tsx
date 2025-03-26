@@ -2,14 +2,12 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
-import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
-import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -37,7 +35,6 @@ type TokensListProps = {
 };
 
 const TokensList = ({ filters, hideHeader }: TokensListProps) => {
-  const user = useUserStore();
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -47,9 +44,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { register, trigger } = useDeferredConditionTriggerCallback({
-    shouldRunTrigger: user.isLoggedIn,
-  });
 
   const {
     data: tokensList,
@@ -91,14 +85,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
-    }
-  };
-
-  const openAuthModalOrTriggerCallback = () => {
-    if (user.isLoggedIn) {
-      trigger();
-    } else {
-      setIsAuthModalOpen(!user.isLoggedIn);
     }
   };
 

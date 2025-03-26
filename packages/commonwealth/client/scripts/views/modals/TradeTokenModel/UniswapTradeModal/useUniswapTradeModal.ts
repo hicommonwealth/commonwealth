@@ -12,7 +12,6 @@ import {
 } from 'client/scripts/utils/magicNetworkUtils';
 import WebWalletController from 'controllers/app/web_wallets';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import { Magic } from 'magic-sdk';
 import NodeInfo from 'models/NodeInfo';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
@@ -116,7 +115,6 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
     [chainId: number]: string[];
   }>({});
   const [isMagicConfigured, setIsMagicConfigured] = useState(false);
-  const [magicInstance, setMagicInstance] = useState<Magic | null>(null);
 
   // Use cached nodes - only fetch once
   const nodes = fetchCachedNodes();
@@ -165,7 +163,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
           // Attempt to get user info to test authentication
           try {
-            const userInfo = await magic.user.getInfo();
+            await magic.user.getInfo();
           } catch (userError) {
             try {
               // Try to show the Magic UI to prompt login
@@ -178,7 +176,6 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
           // Wrap the Magic provider in an ethers Web3Provider
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
 
-          setMagicInstance(magic);
           setEthersProvider(ethersCompatibleProvider);
           setIsMagicConfigured(true);
         } catch (error) {
@@ -261,12 +258,11 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
         // Ensure user is logged in for this network
         try {
           // Try to get user info first
-          const userInfo = await magic.user.getInfo();
+          await magic.user.getInfo();
 
           // User is already logged in, set up provider
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
 
-          setMagicInstance(magic);
           setEthersProvider(ethersCompatibleProvider);
           setIsMagicConfigured(true);
           return true;
@@ -280,7 +276,6 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
               magic.rpcProvider,
             );
 
-            setMagicInstance(magic);
             setEthersProvider(ethersCompatibleProvider);
             setIsMagicConfigured(true);
             return true;

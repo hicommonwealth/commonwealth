@@ -88,7 +88,7 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
               console.error(error);
               notifyError('Transaction failed. Please try again.');
             }}
-            onTxSuccess={(hash) => notifySuccess('Transaction successful!')}
+            onTxSuccess={() => notifySuccess('Transaction successful!')}
           />
         )}
       </div>
