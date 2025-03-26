@@ -96,6 +96,7 @@ async function getSingleSPLBalance(
 
     // Filter NFTs belonging to the specific collection
     const collectionNFTs = nfts.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (nft: any) => nft.collection?.key.toBase58() === nftId.toBase58(),
     );
 
