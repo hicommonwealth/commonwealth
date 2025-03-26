@@ -98,7 +98,7 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.labels.topicId;
     }
 
-    if (config?.with_required_twitter_tweet_link) {
+    if (config?.requires_twitter_tweet_link) {
       return contentIdInputConfig.labels.twitterTweetUrl;
     }
 
@@ -125,8 +125,7 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.sampleTopicLink;
     }
 
-    // TODO: 11643, rename var to requires_twitter_tweet_link
-    if (config?.with_required_twitter_tweet_link) {
+    if (config?.requires_twitter_tweet_link) {
       return contentIdInputConfig.placeholders.twitterTweetUrl;
     }
 
@@ -141,7 +140,7 @@ const QuestActionSubForm = ({
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
-    config?.with_required_twitter_tweet_link ||
+    config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_url;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
@@ -407,7 +406,7 @@ const QuestActionSubForm = ({
         )}
       </div>
 
-      {config?.with_required_twitter_tweet_link && (
+      {config?.requires_twitter_tweet_link && (
         <div className="grid-row cols-3">
           <CWTextInput
             key={`noOfLikes-${defaultValues?.action}`}

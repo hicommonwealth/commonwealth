@@ -34,7 +34,7 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
-  const requiresTwitterEngagement = config?.with_required_twitter_tweet_link;
+  const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerURL = config?.requires_discord_server_url;
   const requiresCreatorPoints = config?.requires_creator_points;
 

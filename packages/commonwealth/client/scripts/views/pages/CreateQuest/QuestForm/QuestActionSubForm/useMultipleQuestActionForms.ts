@@ -4,9 +4,9 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionAllowTwitterTweetURL,
   doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
+  doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
@@ -140,7 +140,7 @@ const useQuestActionMultiFormsState = ({
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
       const allowsTwitterTweetUrl =
-        allowsContentId && doesActionAllowTwitterTweetURL(chosenAction);
+        allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerURL =
         doesActionRequireDiscordServerURL(chosenAction);
 
@@ -152,8 +152,8 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
           allowsContentId && doesActionAllowThreadId(chosenAction),
-        with_required_twitter_tweet_link:
-          allowsContentId && doesActionAllowTwitterTweetURL(chosenAction),
+        requires_twitter_tweet_link:
+          allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_url: requiresDiscordServerURL,
       };
 

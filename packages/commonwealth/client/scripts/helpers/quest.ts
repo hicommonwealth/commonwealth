@@ -54,8 +54,7 @@ export const doesActionAllowTopicId = (action: QuestActionType) => {
   );
 };
 
-// TODO: 11643 rename to require
-export const doesActionAllowTwitterTweetURL = (action: QuestActionType) => {
+export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
   return action === 'TweetEngagement';
 };
 

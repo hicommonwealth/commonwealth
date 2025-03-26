@@ -52,7 +52,7 @@ export type QuestActionSubFormConfig = {
   with_optional_topic_id: boolean;
   with_optional_thread_id: boolean;
   with_optional_comment_id: boolean;
-  with_required_twitter_tweet_link: boolean;
+  requires_twitter_tweet_link: boolean;
   requires_discord_server_url: boolean;
 };
 

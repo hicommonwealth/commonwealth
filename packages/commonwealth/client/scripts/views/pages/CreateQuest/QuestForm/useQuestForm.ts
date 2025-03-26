@@ -7,9 +7,9 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionAllowTwitterTweetURL,
   doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
+  doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -65,7 +65,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   ...(subForm?.creatorRewardAmount && {
                     creatorRewardAmount: subForm.creatorRewardAmount,
                   }),
-                  ...(doesActionAllowTwitterTweetURL(chosenAction) && {
+                  ...(doesActionRequireTwitterTweetURL(chosenAction) && {
                     noOfLikes: subForm.noOfLikes || 0,
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
@@ -85,9 +85,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     allowsContentId && doesActionAllowThreadId(chosenAction),
                   with_optional_comment_id:
                     allowsContentId && doesActionAllowCommentId(chosenAction),
-                  with_required_twitter_tweet_link:
+                  requires_twitter_tweet_link:
                     allowsContentId &&
-                    doesActionAllowTwitterTweetURL(chosenAction),
+                    doesActionRequireTwitterTweetURL(chosenAction),
                   requires_discord_server_url:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
@@ -170,7 +170,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             (subForm.config?.with_optional_comment_id ||
               subForm.config?.with_optional_thread_id ||
               subForm.config?.with_optional_topic_id ||
-              subForm.config?.with_required_twitter_tweet_link ||
+              subForm.config?.requires_twitter_tweet_link ||
               subForm.config?.requires_discord_server_url) && {
               content_id: await buildContentIdFromURL(
                 subForm.values.contentLink,

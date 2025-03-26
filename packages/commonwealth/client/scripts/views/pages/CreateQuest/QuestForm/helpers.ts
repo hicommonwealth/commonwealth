@@ -2,8 +2,8 @@ import axios from 'axios';
 import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionAllowTwitterTweetURL,
   doesActionRequireDiscordServerURL,
+  doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
@@ -22,7 +22,7 @@ export const inferContentIdTypeFromContentId = (
   if (!contentId) {
     if (doesActionAllowTopicId(action as QuestAction))
       return QuestActionContentIdScope.Topic;
-    if (doesActionAllowTwitterTweetURL(action as QuestAction))
+    if (doesActionRequireTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
     if (doesActionRequireDiscordServerURL(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
