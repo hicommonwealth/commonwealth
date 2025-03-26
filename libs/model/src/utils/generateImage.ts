@@ -85,10 +85,8 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
       imageUrl = await generateImageWithOpenAI(prompt, openai);
     }
   } catch (e) {
-    log.error(
-      'Error generating image:',
-      e instanceof Error ? e : new Error(String(e)),
-    );
+    // Pass error directly to preserve stack trace
+    log.error('Error generating image:', e instanceof Error ? e : undefined);
     throw new Error(ImageGenerationErrors.ImageGenerationFailure);
   }
 
@@ -105,9 +103,10 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
     });
     return url;
   } catch (e) {
+    // Pass error directly to preserve stack trace
     log.error(
       'Error uploading image to S3:',
-      e instanceof Error ? e : new Error(String(e)),
+      e instanceof Error ? e : undefined,
     );
     throw new Error(ImageGenerationErrors.UploadFailed);
   }
