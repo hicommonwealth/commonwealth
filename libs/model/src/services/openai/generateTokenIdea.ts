@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { OpenAI } from 'openai';
 import {
   ChatCompletionMessage,
@@ -48,8 +49,10 @@ const TokenErrors = {
 const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
   [];
 
+const log = logger(import.meta);
+
 const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
-  console.log('Sending prompt to OpenAI:', prompt);
+  log.info(`Sending prompt to OpenAI: ${prompt}`);
   convoHistory.push({ role: 'user', content: prompt }); // user msg
 
   const response = await openai.chat.completions.create({
@@ -62,7 +65,7 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
     /^"|"$/g, // sometimes openAI adds `"` at the start/end of the response + tweaking the prompt also doesn't help
     '',
   );
-  console.log('Received response from OpenAI:', result);
+  log.info(`Received response from OpenAI: ${result}`);
   return result;
 };
 
@@ -70,7 +73,7 @@ const generateTokenIdea = async function* ({
   ideaPrompt,
 }: GenerateTokenIdeaProps): AsyncGenerator {
   if (!config.OPENAI.API_KEY) {
-    console.error(TokenErrors.OpenAINotConfigured);
+    log.error(TokenErrors.OpenAINotConfigured);
     yield { error: TokenErrors.OpenAINotConfigured };
     return;
   }
@@ -81,7 +84,7 @@ const generateTokenIdea = async function* ({
   });
 
   if (!openai) {
-    console.error(TokenErrors.OpenAIInitFailed);
+    log.error(TokenErrors.OpenAIInitFailed);
     yield { error: TokenErrors.OpenAIInitFailed };
     return;
   }
@@ -131,7 +134,10 @@ const generateTokenIdea = async function* ({
     yield 'event: imageURL\n';
     yield `data: ${imageUrl}\n\n`;
   } catch (e) {
-    console.error('Error in generateTokenIdea:', e);
+    log.error(
+      'Error in generateTokenIdea',
+      e instanceof Error ? e : new Error(String(e)),
+    );
     let error = TokenErrors.RequestFailed;
 
     if (

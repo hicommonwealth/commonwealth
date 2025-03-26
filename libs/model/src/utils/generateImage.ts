@@ -1,9 +1,11 @@
-import { blobStorage } from '@hicommonwealth/core';
+import { blobStorage, logger } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import { compressServerImage } from './imageCompression';
+
+const log = logger(import.meta);
 
 export const ImageGenerationErrors = {
   OpenAINotConfigured: 'OpenAI key not configured',
@@ -15,7 +17,7 @@ export const ImageGenerationErrors = {
 };
 
 const generateImageWithRunware = async (prompt: string) => {
-  console.log('Generating image with Runware model: runware:100@1');
+  log.info('Generating image with Runware model: runware:100@1');
   const response = await fetch('https://api.runware.ai/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -39,17 +41,17 @@ const generateImageWithRunware = async (prompt: string) => {
 
   if (!response.ok) {
     const error = new Error(`Runware API error: ${response.statusText}`);
-    console.error('Runware API error:', error);
+    log.error('Runware API error:', error);
     throw error;
   }
 
   const data = await response.json();
-  console.log('Successfully generated image with Runware');
+  log.info('Successfully generated image with Runware');
   return data.data[0].imageURL;
 };
 
 const generateImageWithOpenAI = async (prompt: string, openai: OpenAI) => {
-  console.log('Generating image with OpenAI model: dall-e-3');
+  log.info('Generating image with OpenAI model: dall-e-3');
   const imageResponse = await openai.images.generate({
     prompt,
     size: '1024x1024',
@@ -57,7 +59,7 @@ const generateImageWithOpenAI = async (prompt: string, openai: OpenAI) => {
     n: 1,
     response_format: 'url',
   });
-  console.log('Successfully generated image with OpenAI');
+  log.info('Successfully generated image with OpenAI');
   return imageResponse.data[0].url || '';
 };
 
@@ -75,7 +77,7 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
   // Generate image
   let imageUrl: string;
   try {
-    console.log(
+    log.info(
       `Using image generation service: ${config.IMAGE_GENERATION.FLAG_USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
     );
 
@@ -91,13 +93,16 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
       imageUrl = await generateImageWithOpenAI(prompt, openai);
     }
   } catch (e) {
-    console.error('Error generating image:', e);
+    log.error(
+      'Error generating image:',
+      e instanceof Error ? e : new Error(String(e)),
+    );
     throw new Error(ImageGenerationErrors.ImageGenerationFailure);
   }
 
   // Upload to S3
   try {
-    console.log('Uploading generated image to S3');
+    log.info('Uploading generated image to S3');
     const resp = await fetch(imageUrl);
     const buffer = await resp.buffer();
     const compressedBuffer = await compressServerImage(buffer);
@@ -107,10 +112,13 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
       content: compressedBuffer,
       contentType: 'image/png',
     });
-    console.log('Successfully uploaded image to S3:', url);
+    log.info(`Successfully uploaded image to S3: ${url}`);
     return url;
   } catch (e) {
-    console.error('Error uploading image to S3:', e);
+    log.error(
+      'Error uploading image to S3:',
+      e instanceof Error ? e : new Error(String(e)),
+    );
     throw new Error(ImageGenerationErrors.UploadFailed);
   }
 };
