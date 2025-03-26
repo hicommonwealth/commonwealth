@@ -65,9 +65,9 @@ const TimeLineCard = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <div className={clsx('TimeLineCard', { isCollapsed: isCollapsed })}>
-      <div className="header">
+      <div className="timeline-header">
         <CWText type="h5" fontWeight="semiBold">
-          TimeLineCard
+          Timeline
         </CWText>
         <CWIcon
           iconName={isCollapsed ? 'caretDown' : 'caretUp'}

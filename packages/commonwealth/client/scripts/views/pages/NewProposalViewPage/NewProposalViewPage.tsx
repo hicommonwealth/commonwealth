@@ -164,9 +164,6 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
   const shareUrl = window.location.href;
   return (
     <CWPageLayout>
-      {isWindowSmallInclusive && (
-        <TimeLineCard proposalData={proposal?.data || snapshotProposal} />
-      )}
       <CWContentPage
         showSkeleton={!proposal && !snapshotProposal}
         title={title}
@@ -178,23 +175,6 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
         shareUrl={shareUrl}
         body={() => (
           <>
-            {isWindowSmallInclusive && (
-              <DetailCard
-                status={
-                  queryType === 'cosmos'
-                    ? // @ts-expect-error <StrictNullChecks/>
-                      proposal?.status
-                    : snapshotProposal?.state
-                }
-                // @ts-expect-error <StrictNullChecks/>
-                governanceType={queryType}
-                // @ts-expect-error <StrictNullChecks/>
-                publishDate={createdAt}
-                id={identifier}
-                Threads={threads}
-                scope={scope}
-              />
-            )}
             {(description || snapshotProposal?.body) && (
               <CWAccordView title="Description" defaultOpen={true}>
                 <MarkdownViewerWithFallback
@@ -227,6 +207,29 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
                   </div>
                 )}
               </CWAccordView>
+            )}
+            {isWindowSmallInclusive && (
+              <>
+                <TimeLineCard
+                  proposalData={proposal?.data || snapshotProposal}
+                />
+
+                <DetailCard
+                  status={
+                    queryType === 'cosmos'
+                      ? // @ts-expect-error <StrictNullChecks/>
+                        proposal?.status
+                      : snapshotProposal?.state
+                  }
+                  // @ts-expect-error <StrictNullChecks/>
+                  governanceType={queryType}
+                  // @ts-expect-error <StrictNullChecks/>
+                  publishDate={createdAt}
+                  id={identifier}
+                  Threads={threads}
+                  scope={scope}
+                />
+              </>
             )}
             {queryType === 'cosmos' ? (
               <>
@@ -282,7 +285,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
           </>
         )}
         showSidebar={isWindowSmallInclusive ? false : true}
-        sidebarComponents={[
+        proposalDetailSidebar={[
           {
             label: 'Links',
             item: (

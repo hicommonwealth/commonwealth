@@ -50,7 +50,7 @@ export const LinkedProposalsCard = ({
   const [snapshotUrl, setSnapshotUrl] = useState('');
   const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { data: domain } = useFetchCustomDomainQuery();
 
   const initialSnapshotLinks = useMemo(
@@ -103,6 +103,7 @@ export const LinkedProposalsCard = ({
     <>
       <CWContentPageCard
         header="Linked Proposals"
+        showCollapsedIcon={true}
         content={
           initialSnapshotLinks.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">

@@ -59,7 +59,7 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
             <CWText type="h5" fontWeight="semiBold">
               Result
             </CWText>
-            <CWText type="h5" fontWeight="semiBold">
+            <CWText type="b2" fontWeight="regular">
               {formatVoteCount(totalVotes)} Votes
             </CWText>
             <CWIcon

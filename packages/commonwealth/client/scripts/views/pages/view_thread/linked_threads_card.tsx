@@ -44,6 +44,7 @@ export const LinkedThreadsCard = ({
     <>
       <CWContentPageCard
         header="Linked Discussions"
+        showCollapsedIcon={true}
         content={
           linkedThreadIds.length > 0 && isLoading ? (
             <div className="spinner-container">

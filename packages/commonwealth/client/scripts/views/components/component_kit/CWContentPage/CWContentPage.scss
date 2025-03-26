@@ -21,12 +21,6 @@
       flex-direction: column;
       gap: 8px;
 
-      .title-container {
-        display: flex;
-        flex-direction: row;
-        gap: 4px;
-        align-items: center;
-      }
       .header-info-row {
         align-items: center;
         display: flex;
@@ -53,6 +47,12 @@
         }
       }
     }
+
+    .action-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
   }
 }
 
@@ -74,6 +74,21 @@
       gap: 16px;
       width: 100%;
       max-width: 300px;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      align-items: center;
+      max-width: 300px;
+      width: 248px;
+
+      .left-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+      }
     }
   }
 

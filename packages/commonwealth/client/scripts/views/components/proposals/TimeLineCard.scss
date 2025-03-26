@@ -14,7 +14,7 @@
     width: 100%;
     margin-bottom: 10px;
   }
-  .header {
+  .timeline-header {
     display: flex;
     height: 40px;
     border: 2px solid #eeedef;
@@ -28,13 +28,13 @@
   .rb-container {
     display: flex;
     width: 100%;
-    padding: 16px;
+    padding: 16px 16px 0px 16px;
     gap: 8px;
     border-radius: 0px 0px 5px 5px;
     border: 2px solid #e6e5e7;
     flex-direction: column;
     ul.rb {
-      padding: 0;
+      padding: 8px 0px 0px 0px;
       display: inline-block;
 
       li {

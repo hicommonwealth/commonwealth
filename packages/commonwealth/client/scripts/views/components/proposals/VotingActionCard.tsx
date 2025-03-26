@@ -62,7 +62,7 @@ const VotingActionCard: React.FC<VotingActionCardProps> = ({
               }}
               className="ViewActivity"
             >
-              ViewActivity
+              View Activity
             </CWText>
           </div>
         </div>
