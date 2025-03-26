@@ -14,6 +14,16 @@
     margin-top: auto;
   }
 
+  .tokenize-toggle {
+    display: flex;
+    flex-direction: column;
+
+    .token-toggle-header {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
   .social-links {
     display: flex;
     flex-direction: column;

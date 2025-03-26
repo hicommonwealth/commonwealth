@@ -14,6 +14,7 @@ import { CommunityType } from 'views/components/component_kit/new_designs/CWComm
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import './CommunityInformationForm.scss';
 import {
   BASE_ID,
@@ -125,6 +126,7 @@ const CommunityInformationForm = ({
           }
         })(),
       }),
+      tokenizeCommunity: initialValues?.tokenizeCommunity ?? true,
     };
   };
 
@@ -201,6 +203,25 @@ const CommunityInformationForm = ({
         imageBehavior={ImageBehavior.Circle}
         withAIImageGeneration
       />
+
+      <div className="tokenize-toggle">
+        <div className="token-toggle-header">
+          <CWText type="h5">Tokenization</CWText>
+          <CWToggle name="tokenizeCommunity" hookToForm size="small" />
+        </div>
+        <CWText type="buttonSm" fontWeight="regular">
+          All threads created in selected communities will be minted as an ERC20
+          token and able to be bought and sold by members of the community.
+        </CWText>
+        <CWText type="caption">
+          Tokenization is enabled by default. You can change this later in Admin
+          Capabilities under Integrations.
+        </CWText>
+        <CWText type="caption">
+          If you have a community token you would like to use, add it in Admin
+          Capabilities under Integrations.
+        </CWText>
+      </div>
 
       {withSocialLinks ? (
         <>
