@@ -183,7 +183,7 @@ export const config = configure(
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
     IMAGE_GENERATION: {
-      USE_RUNWARE: USE_RUNWARE === 'false',
+      USE_RUNWARE: USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
     },
   },
