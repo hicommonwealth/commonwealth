@@ -38,7 +38,7 @@ export async function getBalances(
     ) {
       balances = await getSolanaBalances(options, ttl);
     } else {
-      balances = await getEvmBalances(options, ttl);
+      balances = await getEvmBalances(options as GetEvmBalancesOptions, ttl);
     }
   } catch (e) {
     const chainId =
