@@ -17,11 +17,11 @@
   .Copy {
     cursor: pointer;
 
-    * .text-input-icon,
+    * .text-input-icon svg,
     input,
     input * {
       cursor: pointer;
-      background: $neutral-100;
+      background: $neutral-100 !important;
     }
   }
 }
