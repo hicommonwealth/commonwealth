@@ -1,9 +1,17 @@
+@import '../../../styles/shared.scss';
+
 .DownloadMobileAppContent {
   .Background {
     text-align: center;
 
     p {
       margin: 12px;
+    }
+  }
+
+  .Copy {
+    input {
+      background: $neutral-100;
     }
   }
 }
