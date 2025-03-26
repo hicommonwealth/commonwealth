@@ -49,6 +49,7 @@ async function processMemberships(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
   balances: OptionsWithBalances[],
+  force_refresh = false,
 ): Promise<[number, number, number]> {
   const toCreate = [] as Membership[];
   const toUpdate = [] as Membership[];
@@ -67,7 +68,7 @@ async function processMemberships(
           config.MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
-        if (moment().isAfter(expiresAt)) {
+        if (moment().isAfter(expiresAt) || force_refresh) {
           const updated = computeMembership(address, group, balances);
           toUpdate.push(updated);
           // make sure we only emit actual changes to membership, not just refreshed dates
@@ -186,7 +187,10 @@ export function RefreshCommunityMemberships(): Command<
             where: { community_id, verified: { [Op.ne]: null } },
           });
 
-      const refresh = async (addresses: AddressAttributes[]) => {
+      const refresh = async (
+        addresses: AddressAttributes[],
+        force_refresh = false,
+      ) => {
         const pageStartedAt = Date.now();
 
         const getBalancesOptions = makeGetBalancesOptions(
@@ -216,6 +220,7 @@ export function RefreshCommunityMemberships(): Command<
           groups,
           addresses,
           balances,
+          force_refresh,
         );
 
         totalCreated += created;
@@ -237,7 +242,7 @@ export function RefreshCommunityMemberships(): Command<
             required: false,
           },
         });
-        addr && (await refresh([addr]));
+        addr && (await refresh([addr], true)); // force refresh even if the membership is not expired
       } else await paginateAddresses(community_id, 0, refresh);
 
       log.info(

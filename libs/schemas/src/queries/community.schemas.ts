@@ -102,7 +102,6 @@ export const GetMemberships = {
     community_id: z.string(),
     address: z.string(),
     topic_id: z.number().optional(),
-    force_refresh: z.boolean().optional(),
   }),
   output: z
     .object({
