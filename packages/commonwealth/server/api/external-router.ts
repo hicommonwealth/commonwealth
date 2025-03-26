@@ -41,6 +41,7 @@ const {
   deleteGroup,
   joinCommunity,
   banAddress,
+  updateRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -117,6 +118,7 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  updateRole,
   toggleCommentSpam,
   createToken,
   createTrade,

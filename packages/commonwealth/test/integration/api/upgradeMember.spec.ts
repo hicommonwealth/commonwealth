@@ -2,20 +2,29 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
-import { Errors } from '../../../server/routes/upgradeMember';
-import { post } from '../../util/httpUtils';
 
 chai.use(chaiHttp);
 
 describe('upgradeMember Integration Tests', () => {
   let jwtToken;
   let server: TestServer;
+  let community_id: string;
+  let address: string;
 
   beforeAll(async () => {
     server = await testServer();
+    community_id = server.e2eTestEntities.testAddresses[0].community_id;
+    address = server.e2eTestEntities.testAddresses[0].address;
   });
 
   afterAll(async () => {
@@ -33,77 +42,56 @@ describe('upgradeMember Integration Tests', () => {
   });
 
   test('should return an error response if there is an invalid role specified', async () => {
-    const invalidRequest = {
-      jwt: jwtToken,
-      author_chain: server.e2eTestEntities.testAddresses[0].community_id,
-      chain: server.e2eTestEntities.testAddresses[0].community_id,
-      new_role: 'invalid role',
-      address: server.e2eTestEntities.testAddresses[0].address,
-    };
-
-    const response = await post(
-      '/api/upgradeMember',
-      invalidRequest,
-      true,
-      server.app,
-    );
-
-    chai.assert.equal(response.status, 400);
-    chai.assert.equal(response.error, Errors.InvalidRole);
+    const response = await chai
+      .request(server.app)
+      .post('/api/v1/UpdateRole')
+      .set('Accept', 'application/json')
+      .set('address', address)
+      .send({
+        jwt: jwtToken,
+        community_id,
+        address,
+        role: 'invalid role',
+      });
+    expect(response.body.message).toBe('Input validation failed');
   });
 
   test('should return an error response if an invalid address is specified', async () => {
-    const invalidRequest = {
-      jwt: jwtToken,
-      author_chain: server.e2eTestEntities.testAddresses[0].community_id,
-      chain: server.e2eTestEntities.testAddresses[0].community_id,
-      new_role: 'member',
-      address: true,
-    };
-
-    const response = await post(
-      '/api/upgradeMember',
-      invalidRequest,
-      true,
-      server.app,
-    );
-
-    chai.assert.equal(response.status, 400);
-    chai.assert.equal(response.error, Errors.InvalidAddress);
+    const response = await chai
+      .request(server.app)
+      .post('/api/v1/UpdateRole')
+      .set('Accept', 'application/json')
+      .set('address', address)
+      .send({
+        jwt: jwtToken,
+        community_id: server.e2eTestEntities.testAddresses[0].community_id,
+        address: true,
+        role: 'member',
+      });
+    expect(response.body.message).toBe('Input validation failed');
   });
 
   test('should upgrade member and return a success response', async () => {
     await server.models.Address.update(
-      {
+      { role: 'admin' },
+      { where: { id: server.e2eTestEntities.testAddresses[0].id } },
+    );
+    const response = await chai
+      .request(server.app)
+      .post('/api/v1/UpdateRole')
+      .set('Accept', 'application/json')
+      .set('address', address)
+      .send({
+        jwt: jwtToken,
+        community_id: server.e2eTestEntities.testAddresses[0].community_id,
+        address: server.e2eTestEntities.testAddresses[1].address,
         role: 'admin',
-      },
-      {
-        where: {
-          id: server.e2eTestEntities.testAddresses[0].id,
-        },
-      },
-    );
-    const validRequest = {
-      jwt: jwtToken,
-      author_chain: server.e2eTestEntities.testAddresses[0].community_id,
-      chain: server.e2eTestEntities.testAddresses[0].community_id,
-      new_role: 'admin',
-      address: server.e2eTestEntities.testAddresses[1].address,
-    };
+      });
+    expect(response.status).toBe(200);
 
-    const response = await post(
-      '/api/upgradeMember',
-      validRequest,
-      false,
-      server.app,
-    );
-
-    chai.assert.equal(response.status, 'Success');
-    const address = await server.models.Address.findOne({
+    const addr = await server.models.Address.findOne({
       where: { id: server.e2eTestEntities.testAddresses[1].id },
     });
-
-    // @ts-expect-error StrictNullChecks
-    chai.assert.equal(address.role, 'admin');
+    expect(addr!.role).toBe('admin');
   });
 });

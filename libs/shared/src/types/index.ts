@@ -1,3 +1,4 @@
+export * from './ai';
 export * from './notification';
 export * from './proposal';
 export * from './protocol';

@@ -12,6 +12,8 @@ import { useEffect } from 'react';
  * WARNING! BE VERY CAREFUL when using this callback.
  *
  * The react-hooks eslint rules do not properly handle the dependency array.
+ *
+ * @deprecated Avoid using as this encourage incorrect hook usage/memoization.
  */
 const useNecessaryEffect = (cb: () => any, deps: any[]) => {
   useEffect(() => {

@@ -35,6 +35,7 @@ export const outboxEvents: Events[] = [
   'FarcasterVoteCreated',
   'FarcasterContestBotMentioned',
   'GroupCreated',
+  'RoleUpdated',
   'OneOffContestManagerDeployed',
   'RecurringContestManagerDeployed',
   'SignUpFlowCompleted',
@@ -67,6 +68,7 @@ export const outboxEvents: Events[] = [
   'NamespaceLinked',
   'CommunityGoalReached',
   'TweetEngagementCapReached',
+  'CommunityTagsUpdated',
 ] as const;
 
 export const Outbox = z.union(

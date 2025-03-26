@@ -142,8 +142,6 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
-  const isCompleted = gainedXP === totalUserXP;
-
   const handleActionStart = (
     actionName: QuestAction,
     actionContentId?: string,
@@ -304,6 +302,8 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isSiteAdmin = Permissions.isSiteAdmin();
 
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
+
+  const isCompleted = gainedXP === totalUserXP && isStarted;
 
   return (
     <CWPageLayout>

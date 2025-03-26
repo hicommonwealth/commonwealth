@@ -6,10 +6,6 @@ interface LocalAISettingsStore {
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
-  updateFeatureFlags: (
-    aiCommentsToggleEnabled: boolean,
-    aiInteractionsToggleEnabled: boolean,
-  ) => void;
 }
 
 export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
@@ -30,18 +26,6 @@ export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
         setAICommentsToggleEnabled: (enabled) => {
           set(() => {
             return { aiCommentsToggleEnabled: enabled };
-          });
-        },
-
-        updateFeatureFlags: (
-          aiCommentsToggleEnabled,
-          aiInteractionsToggleEnabled,
-        ) => {
-          set(() => {
-            return {
-              aiCommentsToggleEnabled,
-              aiInteractionsToggleEnabled,
-            };
           });
         },
       }),

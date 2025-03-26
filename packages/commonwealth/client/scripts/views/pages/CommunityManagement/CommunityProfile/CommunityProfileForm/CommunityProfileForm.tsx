@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { useUpdateCommunityTags } from 'client/scripts/state/api/communities/editCommunityTags';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -9,7 +10,6 @@ import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,
-  useEditCommunityTagsMutation,
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
@@ -66,7 +66,7 @@ const CommunityProfileForm = () => {
     });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
-  const { mutateAsync: editTags } = useEditCommunityTagsMutation();
+  const { mutateAsync: updateTags } = useUpdateCommunityTags();
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
   });
@@ -140,9 +140,9 @@ const CommunityProfileForm = () => {
     try {
       setIsSubmitting(true);
 
-      await editTags({
-        communityId: community.id,
-        tagIds: preferenceTags
+      await updateTags({
+        community_id: community.id,
+        tag_ids: preferenceTags
           .filter((pt) => pt.isSelected)
           .map((pt) => pt.item.id),
       });

@@ -59,6 +59,25 @@
       gap: 8px;
       justify-content: flex-end;
       width: 100%;
+      align-items: center;
+      flex-wrap: wrap;
+
+      @include smallInclusive {
+        flex-wrap: wrap;
+
+        .ai-toggle-wrapper {
+          order: 1;
+        }
+        .ThreadAction {
+          order: 2;
+        }
+        .cancel-button {
+          order: 3;
+        }
+        .post-button {
+          order: 4;
+        }
+      }
     }
   }
 

@@ -11,8 +11,10 @@ const inputs = {
   CommunityCreated: events.CommunityCreated,
   CommunityUpdated: events.CommunityUpdated,
   CommunityJoined: events.CommunityJoined,
+  CommunityTagsUpdated: events.CommunityTagsUpdated,
   GroupCreated: events.GroupCreated,
   ThreadCreated: events.ThreadCreated,
+  RoleUpdated: events.RoleUpdated,
 };
 
 async function findOpenGoals(community_id: string, type: CommunityGoalType) {
@@ -91,6 +93,17 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
         }
       },
 
+      CommunityTagsUpdated: async ({ payload }) => {
+        const { community_id } = payload;
+        const goals = await findOpenGoals(community_id, 'tags');
+        if (goals.length) {
+          const tags = await models.CommunityTags.count({
+            where: { community_id },
+          });
+          await setReachedGoal(goals, tags);
+        }
+      },
+
       GroupCreated: async ({ payload }) => {
         const { community_id } = payload;
         const goals = await findOpenGoals(community_id, 'groups');
@@ -110,6 +123,19 @@ export function CommunityGoalsPolicy(): Policy<typeof inputs> {
             where: { community_id, deleted_at: { [Op.is]: null } },
           });
           await setReachedGoal(goals, threads);
+        }
+      },
+
+      RoleUpdated: async ({ payload }) => {
+        const { community_id, role } = payload;
+        if (role === 'moderator') {
+          const goals = await findOpenGoals(community_id, 'moderators');
+          if (goals.length) {
+            const moderators = await models.Address.count({
+              where: { community_id, role },
+            });
+            await setReachedGoal(goals, moderators);
+          }
         }
       },
     },

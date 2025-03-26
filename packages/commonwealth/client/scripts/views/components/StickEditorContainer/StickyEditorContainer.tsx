@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
 import React from 'react';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -11,6 +12,7 @@ import './StickyEditorContainer.scss';
 interface StickyEditorContainerProps extends CommentEditorProps {
   topic?: Topic;
   parentType: ContentType;
+  thread?: Thread;
 }
 
 export const StickyEditorContainer = ({
