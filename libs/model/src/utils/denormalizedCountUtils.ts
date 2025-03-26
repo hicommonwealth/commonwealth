@@ -12,7 +12,7 @@ const log = logger(import.meta);
 export function debounceRefresh(
   fn: (community_id: string, group_id?: number) => Promise<void>,
   delay: number,
-): (community_id: string, group_id?: number) => void {
+): (community_id: string, group_id?: number) => Promise<void> {
   const timeouts = new Map<string, NodeJS.Timeout>();
   const timestamps = new Map<string, number>();
 
@@ -41,6 +41,7 @@ export function debounceRefresh(
       }, delay),
     );
     timestamps.set(community_id, now);
+    return Promise.resolve();
   };
 }
 

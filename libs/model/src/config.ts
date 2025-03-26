@@ -62,7 +62,7 @@ const DEFAULTS = {
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
   DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
-  MEMBERSHIP_REFRESH_BATCH_SIZE: '100',
+  MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
 };
 
