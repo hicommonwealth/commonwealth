@@ -10,37 +10,41 @@ const log = logger(import.meta);
  * Debounces community refreshes
  */
 export function debounceRefresh(
-  fn: (community_id: string, group_id?: number) => Promise<void>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fn: (...args: any[]) => Promise<void>,
   delay: number,
-): (community_id: string, group_id?: number) => Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): (...args: any[]) => Promise<void> {
   const timeouts = new Map<string, NodeJS.Timeout>();
   const timestamps = new Map<string, number>();
 
-  return (community_id: string, group_id?: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (...args: any[]) => {
     const now = Date.now();
+    const key = JSON.stringify(args);
 
     // make sure to only keep 20 timeouts to avoid the maps to grow too large
     if (timeouts.size > 20) {
-      for (const [key, timestamp] of timestamps) {
-        if (now - timestamp > delay * 2) {
-          timeouts.delete(key);
-          timestamps.delete(key);
+      for (const [k, t] of timestamps) {
+        if (now - t > delay * 2) {
+          timeouts.delete(k);
+          timestamps.delete(k);
         }
       }
     }
 
-    timeouts.has(community_id) && clearTimeout(timeouts.get(community_id)!);
+    timeouts.has(key) && clearTimeout(timeouts.get(key)!);
     timeouts.set(
-      community_id,
+      key,
       setTimeout(() => {
-        void fn(community_id, group_id).then(() => {
+        void fn(args).then(() => {
           // clean up after execution
-          timeouts.delete(community_id);
-          timestamps.delete(community_id);
+          timeouts.delete(key);
+          timestamps.delete(key);
         });
       }, delay),
     );
-    timestamps.set(community_id, now);
+    timestamps.set(key, now);
     return Promise.resolve();
   };
 }
