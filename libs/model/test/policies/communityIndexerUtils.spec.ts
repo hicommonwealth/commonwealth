@@ -47,6 +47,7 @@ describe('generateUniqueId', () => {
         name: 'Test User',
       },
       isAdmin: testActor.user.isAdmin,
+      tier: 0,
     });
   });
 
