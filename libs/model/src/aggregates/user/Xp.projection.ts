@@ -606,18 +606,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'MembershipsRefreshed',
         );
         await Promise.all(
-          [...payload.created, ...payload.updated]
-            .filter((m) => !m.reject_reason)
-            .map(async ({ address_id, group_id }) => {
-              const user_id = await getUserByAddressId(address_id);
-              if (user_id)
-                await recordXpsForQuest(
-                  user_id,
-                  payload.created_at,
-                  action_metas,
-                  undefined,
-                  { group_id },
-                );
+          payload.membership
+            .filter((m) => !m.rejected)
+            .map(async ({ user_id, group_id }) => {
+              await recordXpsForQuest(
+                user_id,
+                payload.created_at,
+                action_metas,
+                undefined,
+                { group_id },
+              );
             }),
         );
       },

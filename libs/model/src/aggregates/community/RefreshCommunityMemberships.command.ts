@@ -49,9 +49,17 @@ async function processMemberships(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
   balances: OptionsWithBalances[],
-): Promise<[number, number]> {
+  force_refresh = false,
+): Promise<[number, number, number]> {
   const toCreate = [] as Membership[];
   const toUpdate = [] as Membership[];
+  const toEmit = [] as Array<{
+    group_id: number;
+    address_id: number;
+    user_id: number;
+    created: boolean;
+    rejected: boolean;
+  }>;
   for (const group of groups) {
     for (const address of addresses) {
       const memberships = address.Memberships ?? [];
@@ -61,41 +69,57 @@ async function processMemberships(
           config.MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
-        if (moment().isAfter(expiresAt)) {
+        if (moment().isAfter(expiresAt) || force_refresh) {
           const updated = computeMembership(address, group, balances);
           toUpdate.push(updated);
+          // make sure we only emit actual changes to membership, not just refreshed dates
+          if (!!updated.reject_reason !== !!found.reject_reason)
+            toEmit.push({
+              group_id: updated.group_id,
+              address_id: updated.address_id,
+              user_id: address.user_id!,
+              created: false,
+              rejected: !!updated.reject_reason,
+            });
         }
       } else {
         // membership does not exist, create
         const created = computeMembership(address, group, balances);
         toCreate.push(created);
+        toEmit.push({
+          group_id: created.group_id,
+          address_id: created.address_id,
+          user_id: address.user_id!,
+          created: true,
+          rejected: !!created.reject_reason,
+        });
       }
     }
   }
-  if (toCreate.length === 0 && toUpdate.length === 0) return [0, 0];
+  if (toCreate.length === 0 && toUpdate.length === 0) return [0, 0, 0];
 
   await models.sequelize.transaction(async (transaction) => {
     await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
       updateOnDuplicate: ['reject_reason', 'last_checked'],
       transaction,
     });
-    await emitEvent(
-      models.Outbox,
-      [
-        {
-          event_name: 'MembershipsRefreshed',
-          event_payload: {
-            community_id,
-            created: toCreate,
-            updated: toUpdate,
-            created_at: new Date(),
+    if (toEmit.length)
+      await emitEvent(
+        models.Outbox,
+        [
+          {
+            event_name: 'MembershipsRefreshed',
+            event_payload: {
+              community_id,
+              membership: toEmit,
+              created_at: new Date(),
+            },
           },
-        },
-      ],
-      transaction,
-    );
+        ],
+        transaction,
+      );
   });
-  return [toCreate.length, toUpdate.length];
+  return [toCreate.length, toUpdate.length, toEmit.length];
 }
 
 // paginates through all active addresses within the community
@@ -108,9 +132,10 @@ async function paginateAddresses(
     where: {
       community_id,
       verified: { [Op.ne]: null },
+      user_id: { [Op.ne]: null },
       id: { [Op.gt]: minAddressId },
     },
-    attributes: ['id', 'address'],
+    attributes: ['id', 'address', 'user_id'],
     include: {
       model: models.Membership,
       as: 'Memberships',
@@ -135,8 +160,6 @@ async function paginateAddresses(
   );
 }
 
-// TODO: This can be a long running process, let's think about refactoring into a process manager (policy) that calls
-// this command as RefreshCommunityMembershipsBatch, keeping track of position in the refresh process
 export function RefreshCommunityMemberships(): Command<
   typeof schemas.RefreshCommunityMemberships
 > {
@@ -144,21 +167,34 @@ export function RefreshCommunityMemberships(): Command<
     ...schemas.RefreshCommunityMemberships,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { community_id, group_id } = payload;
+      const { community_id, address, group_id } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },
       });
-      log.info(
-        `Paginating addresses in ${groups.length} groups in ${community_id}...`,
-      );
+      if (groups.length === 0)
+        return {
+          community_id,
+          created: 0,
+          updated: 0,
+        };
 
       const communityStartedAt = Date.now();
       let totalCreated = 0;
       let totalUpdated = 0;
-      let totalAddresses = 0;
+      let totalEmitted = 0;
+      let totalProcessed = 0;
 
-      await paginateAddresses(community_id, 0, async (addresses) => {
+      const totalAddresses = address
+        ? 1
+        : await models.Address.count({
+            where: { community_id, verified: { [Op.ne]: null } },
+          });
+
+      const refresh = async (
+        addresses: AddressAttributes[],
+        force_refresh = false,
+      ) => {
         const pageStartedAt = Date.now();
 
         const getBalancesOptions = makeGetBalancesOptions(
@@ -183,30 +219,39 @@ export function RefreshCommunityMemberships(): Command<
           }),
         );
 
-        const [created, updated] = await processMemberships(
+        const [created, updated, emitted] = await processMemberships(
           community_id,
           groups,
           addresses,
           balances,
+          force_refresh,
         );
 
         totalCreated += created;
         totalUpdated += updated;
-        totalAddresses += addresses.length;
+        totalEmitted += emitted;
+        totalProcessed += addresses.length;
 
-        log.info(
-          `Created ${created} and updated ${updated} memberships in ${community_id} across ${
-            addresses.length
-          } addresses in ${(Date.now() - pageStartedAt) / 1000}s`,
-        );
-      });
+        log.info(`Refreshed "${community_id}" memberships (${(Date.now() - pageStartedAt) / 1000}s)
+  addresses=${totalProcessed}/${totalAddresses}, created=${created}, updated=${updated}, emitted=${emitted}`);
+      };
+
+      if (address) {
+        const addr = await models.Address.findOne({
+          where: { community_id, address, user_id: { [Op.ne]: null } },
+          attributes: ['id', 'address', 'user_id'],
+          include: {
+            model: models.Membership,
+            as: 'Memberships',
+            required: false,
+          },
+        });
+        addr && (await refresh([addr], true)); // force refresh even if the membership is not expired
+      } else await paginateAddresses(community_id, 0, refresh);
 
       log.info(
-        `Created ${totalCreated} and updated ${totalUpdated} total memberships in ${
-          community_id
-        } across ${totalAddresses} addresses in ${
-          (Date.now() - communityStartedAt) / 1000
-        }s`,
+        `Finished refreshing "${community_id}" memberships (${(Date.now() - communityStartedAt) / 1000}s)
+  total-addresses=${totalProcessed}, total-created=${totalCreated}, total-updated=${totalUpdated}, total-emitted=${totalEmitted}`,
       );
 
       return { community_id, created: totalCreated, updated: totalUpdated };

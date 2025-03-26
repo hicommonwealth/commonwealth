@@ -1,9 +1,9 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { command } from '@hicommonwealth/core';
 import {
   Community,
   middleware,
   models,
+  refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
 import {
@@ -76,31 +76,18 @@ export const trpcRouter = trpc.router({
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (_, output, ctx) => {
-      await command(Community.RefreshCommunityMemberships(), {
-        actor: ctx.actor,
-        payload: {
-          community_id: output.id!,
-          group_id: output.groups?.at(0)?.id,
-        },
-      });
-    }),
+    (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_GROUP,
       (output) => ({ community: output.id }),
     ]),
   ]),
   updateGroup: trpc.command(Community.UpdateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (input, output, ctx) => {
+    (input, output) => {
       if (input.requirements?.length || input.metadata?.required_requirements)
-        await command(Community.RefreshCommunityMemberships(), {
-          actor: ctx.actor,
-          payload: {
-            community_id: output.community_id!,
-            group_id: output.id,
-          },
-        });
-    }),
+        return refreshMemberships(output.community_id!, output.id);
+      return Promise.resolve();
+    },
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.UPDATE_GROUP,
       (output) => ({ community: output.community_id }),
@@ -147,18 +134,12 @@ export const trpcRouter = trpc.router({
   ),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
   deleteAddress: trpc.command(Community.DeleteAddress, trpc.Tag.Community, [
-    trpc.fireAndForget(async (_, output) => {
-      await refreshProfileCount(output.community_id);
-    }),
+    (_, output) => refreshProfileCount(output.community_id),
   ]),
   deleteAllAddresses: trpc.command(
     Community.DeleteAllAddresses,
     trpc.Tag.Community,
-    [
-      trpc.fireAndForget(async (_, output) => {
-        await refreshProfileCount(output.community_id);
-      }),
-    ],
+    [(_, output) => refreshProfileCount(output.community_id)],
   ),
   deleteCommunity: trpc.command(Community.DeleteCommunity, trpc.Tag.Community),
   refreshCommunityMemberships: trpc.command(
