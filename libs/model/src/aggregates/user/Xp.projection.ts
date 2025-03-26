@@ -115,6 +115,7 @@ async function recordXpsForQuest(
     thread_id?: number;
     comment_id?: number;
     group_id?: number;
+    wallet?: string;
     sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
     goal_id?: number; // community goals
@@ -139,6 +140,7 @@ async function recordXpsForQuest(
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
           (scoped === 'group' && +id !== scope?.group_id) ||
+          (scoped === 'wallet' && id !== scope?.wallet) ||
           (scoped === 'sso' && id !== scope?.sso) ||
           (scoped === 'goal' && +id !== scope?.goal_id) ||
           (scoped === 'threshold' && +id > (scope?.threshold || 0))
@@ -492,7 +494,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload.created_at,
           action_metas,
           undefined,
-          { threshold: payload.balance },
+          {
+            wallet: payload.wallet_id,
+            threshold: payload.balance,
+          },
         );
       },
       SSOLinked: async ({ payload }) => {
