@@ -35,12 +35,14 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
   const requiresTwitterEngagement = config?.with_required_twitter_tweet_link;
+  const requiresDiscordServerURL = config?.requires_discord_server_url;
   const requiresCreatorPoints = config?.requires_creator_points;
 
   const needsExtension =
     requiresCreatorPoints ||
     allowsOptionalContentId ||
-    requiresTwitterEngagement;
+    requiresTwitterEngagement ||
+    requiresDiscordServerURL;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -135,6 +137,20 @@ export const buildQuestSubFormValidationSchema = (
           path: ['noOfRetweets'],
         },
       ) as unknown as typeof baseSchema;
+  }
+  if (requiresDiscordServerURL) {
+    baseSchema = baseSchema.extend({
+      contentLink: linkValidationSchema.required.refine(
+        (url) => {
+          // validate discord server URL
+          const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
+          return discordRegex.test(url);
+        },
+        {
+          message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
+        },
+      ),
+    }) as unknown as typeof baseSchema;
   }
 
   return baseSchema;

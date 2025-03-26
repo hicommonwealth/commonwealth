@@ -12,6 +12,7 @@ export enum QuestActionContentIdScope {
   Topic = 'topic',
   Thread = 'thread',
   TwitterTweet = 'twitter_tweet',
+  DiscordServer = 'discord_server',
 }
 
 export type QuestActionSubFormErrors = {
@@ -52,6 +53,7 @@ export type QuestActionSubFormConfig = {
   with_optional_thread_id: boolean;
   with_optional_comment_id: boolean;
   with_required_twitter_tweet_link: boolean;
+  requires_discord_server_url: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

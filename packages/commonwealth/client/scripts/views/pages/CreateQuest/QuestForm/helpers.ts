@@ -3,11 +3,17 @@ import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionAllowTwitterTweetURL,
-} from 'client/scripts/helpers/quest';
+  doesActionRequireDiscordServerURL,
+} from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 
-export type ContentIdType = 'comment' | 'thread' | 'topic' | 'tweet_url';
+export type ContentIdType =
+  | 'comment'
+  | 'thread'
+  | 'topic'
+  | 'tweet_url'
+  | 'discord_server_url';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -18,6 +24,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     if (doesActionAllowTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
+    if (doesActionRequireDiscordServerURL(action as QuestAction))
+      return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
     return undefined;
@@ -29,6 +37,9 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     case 'tweet_url':
       return QuestActionContentIdScope.TwitterTweet;
+    case 'discord_server_url':
+      return QuestActionContentIdScope.DiscordServer;
+    // TODO: 11643 check/fix this for comment scope
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -84,6 +95,9 @@ export const buildContentIdFromURL = async (
   if (idType === 'tweet_url') {
     return `${idType}:${url}`;
   }
+  if (idType === 'discord_server_url') {
+    return `${idType}:${url}`;
+  }
 };
 
 export const buildURLFromContentId = (contentId: string, withParams = {}) => {
@@ -101,6 +115,7 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'comment')
     return `${origin}/discussion/comment/${idOrURL}${params}`;
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
