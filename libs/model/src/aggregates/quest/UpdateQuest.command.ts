@@ -14,7 +14,6 @@ import { QuestInstance } from '../../models/quest';
 import {
   GraphileTaskNames,
   removeJob,
-  rescheduleJobs,
   scheduleTask,
 } from '../../services/graphileWorker';
 import { getDelta, tweetExists } from '../../utils';
@@ -104,14 +103,36 @@ async function updateChannelQuest(
 
     await models.sequelize.transaction(async (transaction) => {
       await updateQuestInstance(quest, payload, transaction);
-      const [actionMetaInstance, created] = await models.QuestActionMeta.upsert(
+
+      const existingActionMeta = await models.QuestActionMeta.findOne({
+        where: {
+          quest_id: quest.id!,
+        },
+        transaction,
+      });
+      if (existingActionMeta) {
+        await models.QuestTweets.destroy({
+          where: {
+            quest_action_meta_id: existingActionMeta.id!,
+          },
+          transaction,
+        });
+        await existingActionMeta.destroy({ transaction });
+        if (quest.scheduled_job_id) {
+          await removeJob({
+            jobId: quest.scheduled_job_id,
+            transaction,
+          });
+        }
+      }
+      const actionMetaInstance = await models.QuestActionMeta.create(
         {
           ...actionMeta,
           quest_id: quest.id!,
         },
         { transaction },
       );
-      await models.QuestTweets.upsert(
+      await models.QuestTweets.create(
         {
           tweet_id: tweetId,
           tweet_url: tweetUrl,
@@ -122,35 +143,18 @@ async function updateChannelQuest(
         },
         { transaction },
       );
-      if (created) {
-        const job = await scheduleTask(
-          GraphileTaskNames.AwardTwitterQuestXp,
-          {
-            quest_id: quest.id!,
-            quest_ended: true,
-          },
-          {
-            transaction,
-          },
-        );
-        quest.scheduled_job_id = job.id;
-        await quest.save({ transaction });
-      }
-
-      // If quest end date is updated then reschedule the job
-      if (
-        quest.end_date !== payload.end_date &&
-        !created &&
-        quest.scheduled_job_id
-      ) {
-        await rescheduleJobs({
-          jobIds: [quest.scheduled_job_id],
-          options: {
-            runAt: payload.end_date,
-          },
+      const job = await scheduleTask(
+        GraphileTaskNames.AwardTwitterQuestXp,
+        {
+          quest_id: quest.id!,
+          quest_ended: true,
+        },
+        {
           transaction,
-        });
-      }
+        },
+      );
+      quest.scheduled_job_id = job.id;
+      await quest.save({ transaction });
     });
   }
 }
