@@ -28,11 +28,11 @@ const TOKEN_AI_PROMPTS_CONFIG = {
       or emojis. Restrict your answer to between 3 and 6 characters.`,
   description: `
       Provide a description for the token. Make it funny and keep it in the vein of ironic, sardonic, twitter personae.
-      There are no emoji restrictions. Keep the description to 3 sentences. DO NOT BE OVERLY POSITIVE about global 
-      phenomenon, only the asset itself. Restrict your answer to between 1 and 3 sentences and less than 180 characters.
+      There are no emoji restrictions. Keep the description to 2 sentences. DO NOT BE OVERLY POSITIVE about global 
+      phenomenon, only the asset itself. Restrict your answer to between 1 or 2 sentences and less than 180 characters.
     `,
   image: (name: string, symbol: string) => `
-      Please create an image for a web3 token named "${name}", having a symbol of "${symbol}". 
+      Please create an image for a web3 token called "${name}" with symbol "${symbol}". 
     `,
 };
 
@@ -62,6 +62,53 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
     /^"|"$/g, // sometimes openAI adds `"` at the start/end of the response + tweaking the prompt also doesn't help
     '',
   );
+};
+
+const generateImageWithRunware = async (prompt: string) => {
+  console.log('Generating token image with Runware model: runware:100@1');
+  const response = await fetch('https://api.runware.ai/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.RUNWARE_API_KEY}`,
+    },
+    body: JSON.stringify([
+      {
+        taskType: 'imageInference',
+        taskUUID: uuidv4(),
+        positivePrompt: prompt,
+        width: 256,
+        height: 256,
+        model: 'runware:100@1',
+        numberResults: 1,
+        outputType: 'URL',
+        outputFormat: 'PNG',
+      },
+    ]),
+  });
+
+  if (!response.ok) {
+    const error = new Error(`Runware API error: ${response.statusText}`);
+    console.error('Runware API error:', error);
+    throw error;
+  }
+
+  const data = await response.json();
+  console.log('Successfully generated token image with Runware', data);
+  return data.data[0].imageURL;
+};
+
+const generateImageWithOpenAI = async (prompt: string, openai: OpenAI) => {
+  console.log('Generating token image with OpenAI model: dall-e-3');
+  const imageResponse = await openai.images.generate({
+    prompt,
+    size: '1024x1024',
+    model: 'dall-e-3',
+    n: 1,
+    response_format: 'url',
+  });
+  console.log('Successfully generated token image with OpenAI');
+  return imageResponse.data[0].url || '';
 };
 
 const generateTokenIdea = async function* ({
@@ -117,14 +164,18 @@ const generateTokenIdea = async function* ({
     yield `data: ${tokenDescription}\n\n`;
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
-    const imageResponse = await openai.images.generate({
-      prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
-      size: '1024x1024',
-      model: 'dall-e-3',
-      n: 1,
-      response_format: 'url',
-    });
-    const imageUrl = imageResponse.data[0].url || '';
+    let imageUrl: string;
+    console.log(`USE_RUNWARE environment variable: ${process.env.USE_RUNWARE}`);
+    if (process.env.USE_RUNWARE === 'true') {
+      imageUrl = await generateImageWithRunware(
+        TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
+      );
+    } else {
+      imageUrl = await generateImageWithOpenAI(
+        TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
+        openai,
+      );
+    }
 
     // upload image to s3 and then send finalized imageURL
     const resp = await fetch(imageUrl);
