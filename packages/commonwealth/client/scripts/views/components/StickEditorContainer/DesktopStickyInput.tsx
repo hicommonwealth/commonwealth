@@ -4,11 +4,18 @@ import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
+import { CommunityCreationForm } from './CommunityCreationForm/CommunityCreationForm';
 import './DesktopStickyInput.scss';
 import { useStickComment } from './context/StickCommentProvider';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
-  const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
+  const {
+    isReplying,
+    replyingToAuthor,
+    onCancel,
+    handleSubmitComment,
+    initialPrompt,
+  } = props;
   const { mode, isExpanded, setIsExpanded } = useStickComment();
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
@@ -99,6 +106,15 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     },
   };
 
+  // Placeholder text based on mode
+  const getPlaceholderText = () => {
+    if (mode === 'thread') return 'Create a thread...';
+    if (mode === 'community') return 'Create a community...';
+    return replyingToAuthor
+      ? `Reply to ${replyingToAuthor}...`
+      : 'Write a comment...';
+  };
+
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
@@ -107,13 +123,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
             <input
               type="text"
               className="form-control"
-              placeholder={
-                mode === 'thread'
-                  ? 'Create a thread...'
-                  : replyingToAuthor
-                    ? `Reply to ${replyingToAuthor}...`
-                    : 'Write a comment...'
-              }
+              placeholder={getPlaceholderText()}
               onClick={handleFocused}
             />
           </div>
@@ -122,6 +132,12 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
         <div className="DesktopStickyInputExpanded">
           {mode === 'thread' ? (
             <NewThreadForm onCancel={handleCancel} />
+          ) : mode === 'community' ? (
+            <CommunityCreationForm
+              onCancel={handleCancel}
+              initialPrompt={initialPrompt}
+              generateOnMount={!!initialPrompt}
+            />
           ) : (
             <CommentEditor {...editorProps} />
           )}

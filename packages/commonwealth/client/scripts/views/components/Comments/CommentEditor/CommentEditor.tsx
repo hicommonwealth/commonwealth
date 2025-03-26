@@ -41,6 +41,23 @@ export type CommentEditorProps = {
   streamingReplyIds?: number[];
   thread?: Thread;
   parentCommentText?: string;
+  initialPrompt?: string;
+  comment?: Comment;
+  parentComment?: Comment | null;
+  proposal?: IChainProposal;
+  canReply?: boolean;
+  isProposalVoteComment?: boolean;
+  isEditing?: boolean;
+  replyToCommunity?: string;
+  replyingToAddress?: Address;
+  nodeUrl?: string;
+  onCancelReplyToSelection?: (e?: React.MouseEvent) => void;
+  onResetThread?: (shouldResetEditor?: boolean) => void;
+  onSave?: (comment: Comment) => void;
+  onReactionsUpdate?: (response: boolean) => void;
+  fromSticky?: boolean;
+  parentBackgroundColor?: string;
+  setAICommentsToggleEnabled?: (value: boolean) => void;
 };
 
 const CommentEditor = ({
@@ -61,6 +78,24 @@ const CommentEditor = ({
   onCommentCreated,
   thread,
   parentCommentText,
+  initialPrompt,
+  comment,
+  parentComment,
+  proposal,
+  canReply,
+  isProposalVoteComment,
+  isEditing,
+  replyToCommunity,
+  replyingToAddress,
+  replyingToAuthor,
+  nodeUrl,
+  onCancelReplyToSelection,
+  onResetThread,
+  onSave,
+  onReactionsUpdate,
+  fromSticky,
+  parentBackgroundColor,
+  setAICommentsToggleEnabled,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const {
