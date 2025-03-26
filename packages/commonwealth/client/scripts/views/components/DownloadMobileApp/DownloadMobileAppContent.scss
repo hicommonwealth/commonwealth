@@ -10,7 +10,11 @@
   }
 
   .Copy {
-    input {
+    cursor: pointer;
+
+    input,
+    input * {
+      cursor: pointer;
       background: $neutral-100;
     }
   }

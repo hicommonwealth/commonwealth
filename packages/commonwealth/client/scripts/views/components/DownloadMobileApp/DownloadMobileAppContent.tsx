@@ -1,6 +1,7 @@
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import ShareSection from '../ShareSection';
 import './DownloadMobileAppContent.scss';
 
@@ -18,13 +19,23 @@ export const DownloadMobileAppContent = () => {
       </div>
 
       <div className="Copy">
-        <CWTextInput
-          fullWidth
-          type="text"
-          value="FIXME"
-          readOnly
-          onClick={() => {}}
-          iconRight={<CWIcon iconName="linkPhosphor" />}
+        <CWTooltip
+          placement="top"
+          content="Link copied to clipboard!"
+          renderTrigger={(handleInteraction, isTooltipOpen) => {
+            return (
+              <CWTextInput
+                fullWidth
+                type="text"
+                value="FIXME"
+                readOnly
+                onClick={(event) => {
+                  handleInteraction(event);
+                }}
+                iconRight={<CWIcon iconName="linkPhosphor" />}
+              />
+            );
+          }}
         />
       </div>
 
