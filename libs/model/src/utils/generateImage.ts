@@ -40,7 +40,7 @@ const generateImageWithRunware = async (prompt: string) => {
 
   if (!response.ok) {
     const error = new Error(`Runware API error: ${response.statusText}`);
-    log.error('Runware API error:', error);
+    log.error('Runware API error', error);
     throw error;
   }
 
@@ -85,8 +85,7 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
       imageUrl = await generateImageWithOpenAI(prompt, openai);
     }
   } catch (e) {
-    // Pass error directly to preserve stack trace
-    log.error('Error generating image:', e instanceof Error ? e : undefined);
+    log.error('Error generating image', e as Error);
     throw new Error(ImageGenerationErrors.ImageGenerationFailure);
   }
 
@@ -103,11 +102,7 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
     });
     return url;
   } catch (e) {
-    // Pass error directly to preserve stack trace
-    log.error(
-      'Error uploading image to S3:',
-      e instanceof Error ? e : undefined,
-    );
+    log.error('Error uploading image to S3', e as Error);
     throw new Error(ImageGenerationErrors.UploadFailed);
   }
 };

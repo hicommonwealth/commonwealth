@@ -132,8 +132,7 @@ const generateTokenIdea = async function* ({
     yield 'event: imageURL\n';
     yield `data: ${imageUrl}\n\n`;
   } catch (e) {
-    // Pass error directly to preserve stack trace
-    log.error('Error in generateTokenIdea', e instanceof Error ? e : undefined);
+    log.error('Error in generateTokenIdea', e as Error);
     let error = TokenErrors.RequestFailed;
 
     if (
