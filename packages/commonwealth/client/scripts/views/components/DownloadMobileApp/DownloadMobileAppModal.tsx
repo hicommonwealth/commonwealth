@@ -10,7 +10,7 @@ export const DownloadMobileAppModal = (props: DownloadMobileAppModal) => {
   const { onClose } = props;
   return (
     <CWModal
-      size="large"
+      size="small"
       content={<DownloadMobileAppContent />}
       onClose={onClose}
       open={true}
