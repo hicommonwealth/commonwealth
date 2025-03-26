@@ -94,17 +94,20 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
-            {questAction.event_name === 'TweetEngagement' && (
+            {(questAction.event_name === 'TweetEngagement' ||
+              questAction.event_name === 'CommonDiscordServerJoined') && (
               <>
                 <CWDivider />
                 <CWText type="caption" fontWeight="semiBold">
                   {actionCopies.pre_reqs[questAction.event_name]()}
                 </CWText>
-                <CWText type="caption">
-                  {/* TODO: 11391 platform - use likes etc counts from platform when getQuest/getQuests apis
-                  get updated to return them */}
-                  {actionCopies.explainer[questAction.event_name](8, 2, 3)}
-                </CWText>
+                {questAction.event_name === 'TweetEngagement' && (
+                  <CWText type="caption">
+                    {/* TODO: 11391 platform - use likes etc counts from platform when getQuest/getQuests apis
+                    get updated to return them */}
+                    {actionCopies.explainer[questAction.event_name](8, 2, 3)}
+                  </CWText>
+                )}
               </>
             )}
             {!hideShareSplit &&

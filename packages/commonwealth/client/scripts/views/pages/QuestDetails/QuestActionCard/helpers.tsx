@@ -25,7 +25,8 @@ export const actionCopies = {
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Twitter/X linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
-    ['CommonDiscordServerJoined']: '',
+    ['CommonDiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires Discord linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
   },
   explainer: {
     ['CommunityCreated']: () => '',
