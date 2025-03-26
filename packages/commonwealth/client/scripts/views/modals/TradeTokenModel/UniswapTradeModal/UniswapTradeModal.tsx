@@ -144,7 +144,7 @@ const UniswapTradeModal = ({
                               label="Switch to Base"
                               buttonHeight="sm"
                               buttonType="secondary"
-                              onClick={promptNetworkSwitch}
+                              onClick={() => void promptNetworkSwitch()}
                             />
                           </>
                         )}
