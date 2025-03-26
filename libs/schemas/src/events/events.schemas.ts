@@ -536,6 +536,7 @@ export const events = {
       .object({
         group_id: z.number(),
         address_id: z.number(),
+        user_id: z.number(),
         created: z.boolean(),
         rejected: z.boolean().optional(),
       })

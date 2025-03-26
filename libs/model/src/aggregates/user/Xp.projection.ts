@@ -604,17 +604,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await Promise.all(
           payload.membership
             .filter((m) => !m.rejected)
-            .map(async ({ address_id, group_id }) => {
-              // TODO: this could be expensive, but to implement in bulk is a bit tricky
-              const user_id = await getUserByAddressId(address_id);
-              if (user_id)
-                await recordXpsForQuest(
-                  user_id,
-                  payload.created_at,
-                  action_metas,
-                  undefined,
-                  { group_id },
-                );
+            .map(async ({ user_id, group_id }) => {
+              await recordXpsForQuest(
+                user_id,
+                payload.created_at,
+                action_metas,
+                undefined,
+                { group_id },
+              );
             }),
         );
       },

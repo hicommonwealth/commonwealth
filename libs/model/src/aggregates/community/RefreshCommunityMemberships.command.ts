@@ -56,6 +56,7 @@ async function processMemberships(
   const toEmit = [] as Array<{
     group_id: number;
     address_id: number;
+    user_id: number;
     created: boolean;
     rejected: boolean;
   }>;
@@ -76,6 +77,7 @@ async function processMemberships(
             toEmit.push({
               group_id: updated.group_id,
               address_id: updated.address_id,
+              user_id: address.user_id!,
               created: false,
               rejected: !!updated.reject_reason,
             });
@@ -87,6 +89,7 @@ async function processMemberships(
         toEmit.push({
           group_id: created.group_id,
           address_id: created.address_id,
+          user_id: address.user_id!,
           created: true,
           rejected: !!created.reject_reason,
         });
@@ -129,9 +132,10 @@ async function paginateAddresses(
     where: {
       community_id,
       verified: { [Op.ne]: null },
+      user_id: { [Op.ne]: null },
       id: { [Op.gt]: minAddressId },
     },
-    attributes: ['id', 'address'],
+    attributes: ['id', 'address', 'user_id'],
     include: {
       model: models.Membership,
       as: 'Memberships',
@@ -234,8 +238,8 @@ export function RefreshCommunityMemberships(): Command<
 
       if (address) {
         const addr = await models.Address.findOne({
-          where: { community_id, address },
-          attributes: ['id', 'address'],
+          where: { community_id, address, user_id: { [Op.ne]: null } },
+          attributes: ['id', 'address', 'user_id'],
           include: {
             model: models.Membership,
             as: 'Memberships',
