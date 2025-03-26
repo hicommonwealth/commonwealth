@@ -32,11 +32,12 @@ export function debounceRefresh(
     timeouts.has(community_id) && clearTimeout(timeouts.get(community_id)!);
     timeouts.set(
       community_id,
-      setTimeout(async () => {
-        await fn(community_id, group_id);
-        // clean up after execution
-        timeouts.delete(community_id);
-        timestamps.delete(community_id);
+      setTimeout(() => {
+        fn(community_id, group_id).then(() => {
+          // clean up after execution
+          timeouts.delete(community_id);
+          timestamps.delete(community_id);
+        });
       }, delay),
     );
     timestamps.set(community_id, now);
