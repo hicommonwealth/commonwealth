@@ -32,8 +32,25 @@ export function validateGroupMembership(
     isValid: true,
     messages: [],
   };
-  let allowListOverride = false;
+
   let numRequirementsMet = 0;
+
+  // Check for allowlist first - if present and user is in it, they automatically pass
+  const allowlistRequirement = requirements.find((r) => r.rule === 'allow');
+  if (allowlistRequirement) {
+    const allowlistCheck = _allowlistCheck(
+      userAddress,
+      allowlistRequirement.data as AllowlistData,
+    );
+    if (allowlistCheck.result) {
+      // If user is in the allowlist, they automatically pass all requirements
+      return {
+        isValid: true,
+        messages: [],
+        numRequirementsMet: requirements.length,
+      };
+    }
+  }
 
   requirements.forEach((requirement) => {
     let checkResult: { result: boolean; message: string };
@@ -43,13 +60,11 @@ export function validateGroupMembership(
         break;
       }
       case 'allow': {
+        // Already checked above, skip here since we handle allowlist at the start
         checkResult = _allowlistCheck(
           userAddress,
           requirement.data as AllowlistData,
         );
-        if (checkResult.result) {
-          allowListOverride = true;
-        }
         break;
       }
       default:
@@ -71,11 +86,6 @@ export function validateGroupMembership(
       });
     }
   });
-
-  if (allowListOverride) {
-    // allow if address is whitelisted
-    return { isValid: true };
-  }
 
   if (numRequiredRequirements) {
     if (numRequirementsMet >= numRequiredRequirements) {
