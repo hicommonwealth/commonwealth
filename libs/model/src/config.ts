@@ -409,6 +409,6 @@ export const config = configure(
     IMAGE_GENERATION: z.object({
       FLAG_USE_RUNWARE: z.boolean().optional(),
       RUNWARE_API_KEY: z.string().optional(),
-    }),
+    }).refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
   }),
 );
