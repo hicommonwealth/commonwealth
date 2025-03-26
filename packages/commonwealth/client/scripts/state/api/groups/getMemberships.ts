@@ -11,7 +11,6 @@ interface RefreshMembershipProps {
   community_id: string;
   address: string;
   topic_id?: number;
-  force_refresh?: boolean;
   enabled?: boolean;
 }
 
@@ -26,7 +25,6 @@ export const useGetMembershipsQuery = ({
   community_id,
   address,
   topic_id,
-  force_refresh = true,
   enabled = true,
 }: RefreshMembershipProps) => {
   return trpc.community.getMemberships.useQuery(
@@ -34,7 +32,6 @@ export const useGetMembershipsQuery = ({
       community_id,
       address,
       topic_id,
-      force_refresh,
     },
     { enabled, cacheTime: REFRESH_MEMBERSHIP_STALE_TIME },
   );
