@@ -10,6 +10,7 @@ const MOCK_TOKEN_ID = 1234;
 const testActor: Actor = {
   address: '0x1234567890123456789012345678901234567890',
   user: {
+    id: 100,
     isAdmin: true,
     email: 'test@test.com',
   },
@@ -33,6 +34,7 @@ describe('generateUniqueId', () => {
     community_indexer_id: 'clanker',
     chain_node_id: 1,
     tags: [],
+    user_id: testActor.user.id,
   };
 
   beforeAll(async () => {
