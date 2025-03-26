@@ -17,7 +17,6 @@ export const ImageGenerationErrors = {
 };
 
 const generateImageWithRunware = async (prompt: string) => {
-  log.info('Generating image with Runware model: runware:100@1');
   const response = await fetch('https://api.runware.ai/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -46,12 +45,10 @@ const generateImageWithRunware = async (prompt: string) => {
   }
 
   const data = await response.json();
-  log.info('Successfully generated image with Runware');
   return data.data[0].imageURL;
 };
 
 const generateImageWithOpenAI = async (prompt: string, openai: OpenAI) => {
-  log.info('Generating image with OpenAI model: dall-e-3');
   const imageResponse = await openai.images.generate({
     prompt,
     size: '1024x1024',
@@ -59,7 +56,6 @@ const generateImageWithOpenAI = async (prompt: string, openai: OpenAI) => {
     n: 1,
     response_format: 'url',
   });
-  log.info('Successfully generated image with OpenAI');
   return imageResponse.data[0].url || '';
 };
 
@@ -77,10 +73,6 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
   // Generate image
   let imageUrl: string;
   try {
-    log.info(
-      `Using image generation service: ${config.IMAGE_GENERATION.FLAG_USE_RUNWARE ? 'Runware' : 'OpenAI'}`,
-    );
-
     if (config.IMAGE_GENERATION.FLAG_USE_RUNWARE) {
       if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
         throw new Error(ImageGenerationErrors.RunwareNotConfigured);
@@ -102,7 +94,6 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
 
   // Upload to S3
   try {
-    log.info('Uploading generated image to S3');
     const resp = await fetch(imageUrl);
     const buffer = await resp.buffer();
     const compressedBuffer = await compressServerImage(buffer);
@@ -112,7 +103,6 @@ export const generateImage = async (prompt: string, openai?: OpenAI) => {
       content: compressedBuffer,
       contentType: 'image/png',
     });
-    log.info(`Successfully uploaded image to S3: ${url}`);
     return url;
   } catch (e) {
     log.error(

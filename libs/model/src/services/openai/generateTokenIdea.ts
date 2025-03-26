@@ -52,7 +52,6 @@ const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
 const log = logger(import.meta);
 
 const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
-  log.info(`Sending prompt to OpenAI: ${prompt}`);
   convoHistory.push({ role: 'user', content: prompt }); // user msg
 
   const response = await openai.chat.completions.create({
@@ -65,7 +64,6 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
     /^"|"$/g, // sometimes openAI adds `"` at the start/end of the response + tweaking the prompt also doesn't help
     '',
   );
-  log.info(`Received response from OpenAI: ${result}`);
   return result;
 };
 
