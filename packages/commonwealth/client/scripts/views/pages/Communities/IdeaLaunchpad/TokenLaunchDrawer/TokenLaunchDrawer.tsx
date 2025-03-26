@@ -1,12 +1,12 @@
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useEffect, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -29,15 +29,7 @@ export const TokenLaunchDrawer = ({
   generateIdeaOnMount = false,
 }: TokenLaunchDrawerProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const { isWindowMediumInclusive } = useBrowserWindow({});
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -85,23 +77,6 @@ export const TokenLaunchDrawer = ({
       >
         <div className="gradiant-container">
           <CWDrawerTopBar onClose={handleDrawerCloseTrigger} />
-          <div className="button-container">
-            <span className="counter">1 / 1</span>
-            <CWButton
-              iconLeft="brain"
-              label={isMobile ? 'Random' : 'Randomize'}
-              onClick={() => {
-                /* existing click handler */
-              }}
-            />
-            <CWButton
-              iconLeft="rocketLaunch"
-              label={isMobile ? 'Launch' : 'Launch Token'}
-              onClick={() => {
-                /* existing click handler */
-              }}
-            />
-          </div>
 
           {isOpen && (
             <QuickTokenLaunchForm
@@ -109,6 +84,7 @@ export const TokenLaunchDrawer = ({
               onCommunityCreated={setCreatedCommunityId}
               initialIdeaPrompt={initialIdeaPrompt}
               generateIdeaOnMount={generateIdeaOnMount}
+              isSmallScreen={isWindowMediumInclusive}
             />
           )}
         </div>
