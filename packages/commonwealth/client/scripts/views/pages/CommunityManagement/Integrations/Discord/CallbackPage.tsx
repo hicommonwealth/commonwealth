@@ -25,11 +25,8 @@ const CallbackPage = () => {
         guild_id: guildId,
         verification_token: stateJSON.verification_token,
       })
-        .then((res) => {
-          const idParam = res.discordConfigId
-            ? `?discordConfigId=${res.discordConfigId}`
-            : '';
-
+        .then(() => {
+          const idParam = `?discordConfigId=${stateJSON.cw_chain_id}`;
           if (stateJSON.redirect_domain) {
             window.location.href =
               `${stateJSON.redirect_domain}/${redirectPath}` + `${idParam}`;

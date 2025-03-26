@@ -12,7 +12,6 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Wallets)
     .withOne(db.ApiKey, {
-      targetKey: 'id',
       onDelete: 'CASCADE',
     })
     .withMany(db.XpLog, {
@@ -41,6 +40,7 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
     })
     .withOne(db.QuestTweets, {
+      targetKey: 'id',
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -99,14 +99,11 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
-    .withOne(db.DiscordBotConfig, {
-      targetKey: 'discord_config_id',
-      onDelete: 'CASCADE',
-    })
     .withOne(db.User, {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
     })
+    .withOne(db.DiscordBotConfig)
     .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     .withMany(db.ContestManager, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     .withMany(db.PinnedToken, {

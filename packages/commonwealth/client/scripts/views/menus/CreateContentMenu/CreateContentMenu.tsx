@@ -12,6 +12,7 @@ import type { NavigateOptions, To } from 'react-router-dom';
 import app from 'state';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
+import useGetDiscordBotConfig from 'state/api/discord/getDiscordBotConfig';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -51,6 +52,7 @@ const getCreateContentMenuItems = (
   createDiscordBotConfig?: ReturnType<
     typeof useCreateDiscordBotConfigMutation
   >['mutateAsync'],
+  discordBotConnected: boolean = false,
 ): PopoverMenuItem[] => {
   const showSnapshotOptions =
     userStore.getState() && !!app.chain?.meta?.snapshot_spaces?.length;
@@ -117,7 +119,7 @@ const getCreateContentMenuItems = (
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
     const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-    const botNotConnected = app.chain.meta?.discord_config_id === null;
+    const botNotConnected = !discordBotConnected;
 
     if (isAdmin && botNotConnected) {
       return [
@@ -201,6 +203,10 @@ export const CreateContentSidebar = ({
 
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
+  const { data: discordBotConfig } = useGetDiscordBotConfig({
+    community_id: app.chain.meta.id,
+    apiEnabled: !!app.chain.meta.id,
+  });
 
   const launchpadEnabled = useFlag('launchpad');
 
@@ -232,6 +238,7 @@ export const CreateContentSidebar = ({
         navigate,
         launchpadEnabled,
         createDiscordBotConfig,
+        !!discordBotConfig,
       )}
     />
   );
@@ -253,9 +260,19 @@ export const CreateContentPopover = () => {
     return;
   }
 
+  const { data: discordBotConfig } = useGetDiscordBotConfig({
+    community_id: app.chain.meta.id,
+    apiEnabled: !!app.chain.meta.id,
+  });
+
   return (
     <PopoverMenu
-      menuItems={getCreateContentMenuItems(navigate, launchpadEnabled)}
+      menuItems={getCreateContentMenuItems(
+        navigate,
+        launchpadEnabled,
+        undefined,
+        !!discordBotConfig,
+      )}
       className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip

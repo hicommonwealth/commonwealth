@@ -30,7 +30,6 @@ export const SetDiscordBotConfig = {
   }),
   output: z.object({
     message: z.string(),
-    discordConfigId: z.number().nullish(),
   }),
   context: AuthContext,
 };

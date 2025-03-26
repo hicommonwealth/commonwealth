@@ -11,6 +11,7 @@ type UseGetCommunityByIdProps = {
   id: string;
   includeNodeInfo?: boolean;
   includeGroups?: boolean;
+  includeDiscordBotConfig?: boolean;
   enabled?: boolean;
 };
 
@@ -163,6 +164,7 @@ const useGetCommunityByIdQuery = ({
   id,
   includeNodeInfo = false,
   includeGroups = false,
+  includeDiscordBotConfig = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
   return trpc.community.getCommunity.useQuery(
@@ -170,6 +172,7 @@ const useGetCommunityByIdQuery = ({
       id,
       include_node_info: includeNodeInfo,
       include_groups: includeGroups,
+      include_discord_bot_config: includeDiscordBotConfig,
     },
     {
       staleTime: COMMUNITIY_STALE_TIME,

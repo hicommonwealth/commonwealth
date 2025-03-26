@@ -83,7 +83,6 @@ describe('Contests projection lifecycle', () => {
           id: community_id,
           namespace_address: namespace,
           chain_node_id: chainNodes[0]!.id,
-          discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,
           Addresses: [

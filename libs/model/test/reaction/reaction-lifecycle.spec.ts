@@ -24,7 +24,6 @@ describe('Reactions lifecycle', () => {
       {
         id: communityId,
         chain_node_id: chain!.id,
-        discord_config_id: undefined,
         lifetime_thread_count: 0,
         profile_count: 1,
         Addresses: [

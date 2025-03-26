@@ -33,13 +33,14 @@ const Discord = () => {
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId,
+    includeDiscordBotConfig: true,
     enabled: !!communityId,
   });
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
   });
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
-    community?.discord_config_id ? 'connected' : 'none',
+    community?.DiscordBotConfig ? 'connected' : 'none',
   );
 
   const { mutateAsync: createDiscordBotConfig } =
@@ -54,10 +55,6 @@ const Discord = () => {
     return new URLSearchParams(window.location.search);
   }, []);
 
-  if (queryParams.has('discordConfigId')) {
-    // @ts-expect-error <StrictNullChecks/>
-    app.chain.meta.discordConfigId = queryParams.get('discordConfigId');
-  }
   const [isDiscordWebhooksEnabled, setIsDiscordWebhooksEnabled] = useState(
     community?.discord_bot_webhooks_enabled,
   );
@@ -76,7 +73,7 @@ const Discord = () => {
   } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {
-    if (community?.discord_config_id) {
+    if (community?.DiscordBotConfig) {
       setConnectionStatus('connected');
     }
   }, [community]);

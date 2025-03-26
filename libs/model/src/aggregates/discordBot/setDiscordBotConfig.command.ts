@@ -42,22 +42,15 @@ export function SetDiscordBotConfig(): Command<
         throw new InvalidInput(Errors.TokenExpired);
 
       const existingCommunityWithGuildConnected =
-        await models.DiscordBotConfig.findAll({ where: { guild_id } });
+        await models.DiscordBotConfig.findOne({ where: { guild_id } });
 
       const communityInstance = await models.Community.findOne({
         where: { id: community_id },
       });
       if (!communityInstance) throw new InvalidState(Errors.CommunityNotFound);
 
-      if (
-        existingCommunityWithGuildConnected &&
-        existingCommunityWithGuildConnected.length > 0
-      ) {
+      if (existingCommunityWithGuildConnected) {
         await models.sequelize.transaction(async (transaction) => {
-          // Handle discord already linked to another CW community
-          communityInstance.discord_config_id = null;
-          await communityInstance.save({ transaction });
-
           await models.DiscordBotConfig.destroy({
             where: {
               community_id,
@@ -110,9 +103,6 @@ export function SetDiscordBotConfig(): Command<
           await address.save({ transaction });
         }
 
-        communityInstance.discord_config_id = configEntry.id;
-        await communityInstance.save({ transaction });
-
         await configEntry.update(
           {
             community_id,
@@ -132,7 +122,6 @@ export function SetDiscordBotConfig(): Command<
 
       return {
         message: 'Created a new discord bot config',
-        discordConfigId: communityInstance.discord_config_id,
       };
     },
   };

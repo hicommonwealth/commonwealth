@@ -91,6 +91,7 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
     include_groups: z.boolean().optional(),
+    include_discord_bot_config: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };

@@ -8,6 +8,9 @@ const useRemoveDiscordBotConfigMutation = () => {
       await utils.discordBot.getDiscordChannels.invalidate({
         community_id: variables.community_id,
       });
+      await utils.discordBot.getDiscordBotConfig.invalidate({
+        community_id: variables.community_id,
+      });
     },
   });
 };

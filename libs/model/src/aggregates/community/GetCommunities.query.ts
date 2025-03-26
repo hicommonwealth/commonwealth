@@ -66,7 +66,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           SELECT  "Community"."id",
                   "Community"."chain_node_id",
                   "Community"."name",
-                  "Community"."discord_config_id",
                   "Community"."description",
                   "Community"."token_name",
                   "Community"."social_links",

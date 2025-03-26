@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
+import { DiscordBotConfig } from './discordBotConfig.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
@@ -44,7 +45,6 @@ export const Community = z.object({
   hide_projects: z.boolean().nullish(),
   token_name: z.string().nullish(),
   ce_verbose: z.boolean().nullish(),
-  discord_config_id: PG_INT.nullish(),
   category: z.unknown().nullish(), // Assuming category can be any type
   discord_bot_webhooks_enabled: z.boolean().nullish(),
   directory_page_enabled: z.boolean().default(false),
@@ -75,6 +75,7 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  DiscordBotConfig: DiscordBotConfig.optional(),
 });
 
 export const ExtendedCommunity = Community.extend({

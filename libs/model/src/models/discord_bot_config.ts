@@ -14,12 +14,8 @@ export default (
   sequelize.define<DiscordBotConfigInstance>(
     'DiscordBotConfig',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
       community_id: {
+        primaryKey: true,
         type: Sequelize.STRING,
         allowNull: false,
       },

@@ -22,18 +22,6 @@ export function RemoveDiscordBotConfig(): Command<
       if (!config) throw new InvalidState(Errors.ConfigNotFound);
 
       await models.sequelize.transaction(async (transaction) => {
-        await models.Community.update(
-          {
-            discord_config_id: null,
-            discord_bot_webhooks_enabled: false,
-          },
-          {
-            where: {
-              id: payload.community_id,
-            },
-            transaction,
-          },
-        );
         await models.DiscordBotConfig.destroy({
           where: {
             community_id: payload.community_id,

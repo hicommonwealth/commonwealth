@@ -27,6 +27,12 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
           ],
         },
       ];
+      if (payload.include_discord_bot_config) {
+        include.push({
+          model: models.DiscordBotConfig,
+          required: false,
+        });
+      }
 
       if (payload.include_groups) {
         include.push({

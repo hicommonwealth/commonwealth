@@ -17,39 +17,14 @@ export function CreateDiscordBotConfig(): Command<
         +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000,
       );
 
-      const existing = await models.DiscordBotConfig.findOne({
-        where: {
-          community_id,
-        },
-      });
-
-      if (existing) {
-        const existingConfig = await existing.update(
-          {
-            verification_token,
-            token_expiration,
-          },
-          {
-            where: {
-              community_id,
-            },
-          },
-        );
-
-        await models.Community.update(
-          { discord_config_id: existingConfig.id },
-          { where: { id: community_id } },
-        );
-
-        return { message: 'Updated an existing discord bot config' };
-      }
-
-      await models.DiscordBotConfig.create({
+      const [, created] = await models.DiscordBotConfig.upsert({
         community_id,
         verification_token,
         token_expiration,
       });
 
+      if (!created)
+        return { message: 'Updated an existing discord bot config' };
       return { message: 'Created a new discord bot config' };
     },
   };

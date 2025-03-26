@@ -59,12 +59,13 @@ export const AdminOnboardingSlider = () => {
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
       id: communityId,
+      includeDiscordBotConfig: true,
       enabled: !!communityId,
     });
 
   const integrations = {
     snapshot: (community?.snapshot_spaces || [])?.length > 0,
-    discordBot: community?.discord_config_id !== null,
+    discordBot: !!community?.DiscordBotConfig,
     discordBotWebhooksEnabled: community?.discord_bot_webhooks_enabled,
   };
   const hasAnyIntegration = !!(

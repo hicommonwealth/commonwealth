@@ -55,7 +55,6 @@ export default (
       id: { type: Sequelize.STRING, primaryKey: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community
       name: { type: Sequelize.STRING, allowNull: false },
-      discord_config_id: { type: Sequelize.INTEGER, allowNull: true }, // null if no bot enabled
       description: { type: Sequelize.STRING, allowNull: true },
       token_name: { type: Sequelize.STRING, allowNull: true },
       social_links: {
