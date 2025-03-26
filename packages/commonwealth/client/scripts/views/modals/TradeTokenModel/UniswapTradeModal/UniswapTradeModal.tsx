@@ -2,6 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { BASE_CHAIN_ID, BASE_GOERLI_CHAIN_ID } from 'helpers/constants';
 import React, { useEffect, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -79,7 +80,8 @@ const UniswapTradeModal = ({
 
         // Get target chain ID for Base network
         const baseChainId = Object.keys(uniswapWidget.jsonRpcUrlMap).find(
-          (id) => Number(id) === 8453 || Number(id) === 84531,
+          (id) =>
+            Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
         ); // Base mainnet or testnet
 
         const baseChainIdHex = baseChainId
@@ -120,7 +122,8 @@ const UniswapTradeModal = ({
 
     // Find Base chain ID
     const baseChainId = Object.keys(uniswapWidget.jsonRpcUrlMap).find(
-      (id) => Number(id) === 8453 || Number(id) === 84531,
+      (id) =>
+        Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
     );
 
     if (!baseChainId) return;
@@ -295,15 +298,15 @@ const UniswapTradeModal = ({
                       return false; // Return false to prevent the widget from proceeding with its own connection flow
                     }}
                     provider={uniswapWidget.provider}
-                    onError={(error) => {
+                    onError={() => {
                       notifyError(
                         'There was an error with the swap widget. Please try again.',
                       );
                     }}
-                    onTxFail={(error) => {
+                    onTxFail={() => {
                       notifyError('Transaction failed. Please try again.');
                     }}
-                    onTxSuccess={(hash) => {
+                    onTxSuccess={() => {
                       notifySuccess('Transaction successful!');
                     }}
                   />
@@ -329,7 +332,7 @@ const UniswapTradeModal = ({
         showWalletsFor={ChainBase.Ethereum}
         onSuccess={() => {
           // After successful authentication, try to connect the wallet
-          uniswapWidget.connectWallet().catch((error) => {
+          uniswapWidget.connectWallet().catch(() => {
             notifyError('Failed to connect wallet. Please try again.');
           });
         }}
@@ -339,47 +342,3 @@ const UniswapTradeModal = ({
 };
 
 export default UniswapTradeModal;
-
-// Export a standalone NetworkIndicator component for direct embedding
-export const NetworkIndicator = ({
-  currentChain,
-  isWrongNetwork,
-  onSwitchNetwork,
-}: {
-  currentChain: string | null;
-  isWrongNetwork: boolean;
-  onSwitchNetwork: () => void;
-}) => {
-  if (!currentChain) return null;
-
-  return (
-    <div className="network-indicator swap-network-indicator">
-      <CWText type="caption" className="current-network">
-        Current network:
-        <span className={isWrongNetwork ? 'wrong-network' : 'correct-network'}>
-          {' '}
-          {currentChain}
-        </span>
-        {isWrongNetwork && (
-          <>
-            {withTooltip(
-              <CWIcon
-                iconName="warning"
-                iconSize="small"
-                className="warning-icon"
-              />,
-              'Swaps only work on the Base network. Click to switch networks.',
-              true,
-            )}
-            <CWButton
-              label="Switch to Base"
-              buttonHeight="sm"
-              buttonType="secondary"
-              onClick={onSwitchNetwork}
-            />
-          </>
-        )}
-      </CWText>
-    </div>
-  );
-};

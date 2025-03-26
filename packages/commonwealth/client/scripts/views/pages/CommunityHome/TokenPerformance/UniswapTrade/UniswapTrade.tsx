@@ -2,14 +2,15 @@ import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import TokenIcon from 'client/scripts/views/modals/TradeTokenModel/TokenIcon';
 import { UniswapTradeTokenModalProps } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
-import { NetworkIndicator } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/UniswapTradeModal';
 import useUniswapTradeModal from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/useUniswapTradeModal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { BASE_CHAIN_ID, BASE_GOERLI_CHAIN_ID } from 'helpers/constants';
 import React, { useEffect, useState } from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 
 import './UniswapTrade.scss';
 
@@ -47,7 +48,8 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
 
         // Get target chain ID for Base network
         const baseChainId = Object.keys(uniswapWidget.jsonRpcUrlMap).find(
-          (id) => Number(id) === 8453 || Number(id) === 84531,
+          (id) =>
+            Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
         ); // Base mainnet or testnet
 
         const baseChainIdHex = baseChainId
@@ -88,7 +90,8 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
 
     // Find Base chain ID
     const baseChainId = Object.keys(uniswapWidget.jsonRpcUrlMap).find(
-      (id) => Number(id) === 8453 || Number(id) === 84531,
+      (id) =>
+        Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
     );
 
     if (!baseChainId) return;
