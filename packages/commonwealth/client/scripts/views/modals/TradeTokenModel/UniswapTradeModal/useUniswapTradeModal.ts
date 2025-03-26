@@ -152,30 +152,13 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
   // Automatically configure Magic provider for Magic users
   useEffect(() => {
     if (userIsMagicUser && !isMagicConfigured && baseNode?.ethChainId) {
-      const configureMagicProvider = async () => {
+      const configureMagicProvider = () => {
         try {
-          // Use the utility function to get Magic instance for the Base chain
-          if (!baseNode.ethChainId) return;
+          if (!baseNode?.ethChainId) return;
           const magic = getMagicForChain(baseNode.ethChainId);
-          if (!magic) {
-            return;
-          }
+          if (!magic) return;
 
-          // Attempt to get user info to test authentication
-          try {
-            await magic.user.getInfo();
-          } catch (userError) {
-            try {
-              // Try to show the Magic UI to prompt login
-              await magic.wallet.showUI();
-            } catch (uiError) {
-              // Error showing UI, fail silently
-            }
-          }
-
-          // Wrap the Magic provider in an ethers Web3Provider
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
-
           setEthersProvider(ethersCompatibleProvider);
           setIsMagicConfigured(true);
         } catch (error) {
@@ -183,14 +166,14 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
         }
       };
 
-      configureMagicProvider();
+      void configureMagicProvider();
     }
   }, [userIsMagicUser, baseNode, isMagicConfigured]);
 
   // Initialize token list
   useRunOnceOnCondition({
     callback: () => {
-      const handleTokensInit = async () => {
+      const handleTokensInit = () => {
         setIsLoadingInitialState(true);
 
         if (!baseNode?.ethChainId) {
@@ -217,9 +200,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
         setIsLoadingInitialState(false);
       };
 
-      handleTokensInit().catch(() => {
-        setIsLoadingInitialState(false);
-      });
+      handleTokensInit();
     },
     shouldRun: !!baseNode?.ethChainId,
   });
@@ -350,9 +331,13 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
                     console.log(
                       `[Network Debug] New chain ID after switch: ${newChainId}`,
                     );
-                  } catch (directSwitchError: any) {
+                  } catch (directSwitchError: unknown) {
+                    const errorMessage =
+                      directSwitchError instanceof Error
+                        ? directSwitchError.message
+                        : 'Unknown error';
                     console.log(
-                      `[Network Debug] Direct switch failed: ${directSwitchError.message}`,
+                      `[Network Debug] Direct switch failed: ${errorMessage}`,
                     );
                   }
                 }
@@ -368,12 +353,27 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
                     params: [{ chainId: baseChainIdHex }],
                   });
                   console.log('[Network Debug] Successfully switched chain');
-                } catch (switchError: any) {
+                } catch (switchError: unknown) {
+                  const errorMessage =
+                    switchError instanceof Error
+                      ? switchError.message
+                      : 'Unknown error';
+                  const errorCode =
+                    switchError instanceof Error && 'code' in switchError
+                      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (switchError as any).code
+                      : 'unknown';
+
                   console.log(
-                    `[Network Debug] Switch chain error: ${switchError.message}, code: ${switchError.code}`,
+                    `[Network Debug] Switch chain error: ${errorMessage}, code: ${errorCode}`,
                   );
                   // This error code indicates that the chain has not been added to MetaMask
-                  if (switchError.code === 4902) {
+                  if (
+                    switchError instanceof Error &&
+                    'code' in switchError &&
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (switchError as any).code === 4902
+                  ) {
                     console.log(
                       '[Network Debug] Chain not found, attempting to add Base network',
                     );
@@ -408,10 +408,10 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
               } else {
                 console.log('[Network Debug] Already on correct chain');
               }
-            } catch (error: any) {
+            } catch (error: unknown) {
               // Handle network switch errors
               console.log(
-                `[Network Debug] Network switch failed: ${error.message}`,
+                `[Network Debug] Network switch failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
               );
               return false;
             }
@@ -432,10 +432,12 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
             console.log('[Network Debug] Successfully created provider');
             setEthersProvider(ethersCompatibleProvider);
             return true;
-          } catch (enableError: any) {
-            console.log(
-              `[Network Debug] Enable wallet error: ${enableError.message}`,
-            );
+          } catch (enableError: unknown) {
+            const errorMessage =
+              enableError instanceof Error
+                ? enableError.message
+                : 'Unknown error';
+            console.log(`[Network Debug] Enable wallet error: ${errorMessage}`);
             return false;
           }
         } else {
@@ -443,8 +445,10 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
           return false;
         }
       }
-    } catch (error: any) {
-      console.log(`[Network Debug] Unexpected error: ${error.message}`);
+    } catch (error: unknown) {
+      console.log(
+        `[Network Debug] Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
       return false;
     }
   }, [

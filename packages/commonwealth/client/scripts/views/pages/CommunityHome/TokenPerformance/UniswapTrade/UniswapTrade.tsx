@@ -54,12 +54,12 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
       <NetworkIndicator
         currentChain={currentChain}
         isWrongNetwork={isWrongNetwork}
-        onSwitchNetwork={promptNetworkSwitch}
+        onSwitchNetwork={() => void promptNetworkSwitch()}
       />
 
       <div
         className="Uniswap"
-        onClick={isWrongNetwork ? promptNetworkSwitch : undefined}
+        onClick={isWrongNetwork ? () => void promptNetworkSwitch() : undefined}
       >
         {!uniswapWidget.isReady ? (
           <CWCircleMultiplySpinner />

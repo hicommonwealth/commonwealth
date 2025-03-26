@@ -36,6 +36,7 @@ export type UseUniswapTradeModalProps = {
 export type UniswapWidgetConfig = {
   isReady: boolean;
   provider?: Web3Provider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme: any;
   tokensList?: UniswapToken[];
   jsonRpcUrlMap: { [chainId: number]: string[] };

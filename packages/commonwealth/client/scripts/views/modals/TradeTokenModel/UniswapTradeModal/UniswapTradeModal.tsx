@@ -36,6 +36,19 @@ const UniswapTradeModal = ({
       provider: uniswapWidget.provider,
     });
 
+  const handleConnectWallet = () => {
+    if (isWrongNetwork) {
+      void promptNetworkSwitch().then(() => {
+        if (!isWrongNetwork) {
+          setIsAuthModalOpen(true);
+        }
+      });
+      return false;
+    }
+    setIsAuthModalOpen(true);
+    return false;
+  };
+
   // Suppress the React DOM prop warning for fadeAnimation
   useEffect(() => {
     // Save original console.error
@@ -169,18 +182,7 @@ const UniswapTradeModal = ({
                     }
                     // Hide connection UI if user is logged in with Magic
                     hideConnectionUI={isMagicUser && isMagicConfigured}
-                    onConnectWalletClick={async () => {
-                      // Check if we need to switch networks first
-                      if (isWrongNetwork) {
-                        await promptNetworkSwitch();
-                        // If still on wrong network, abort wallet connection
-                        if (isWrongNetwork) return false;
-                      }
-
-                      // Show auth modal instead of connecting directly
-                      setIsAuthModalOpen(true);
-                      return false; // Return false to prevent the widget from proceeding with its own connection flow
-                    }}
+                    onConnectWalletClick={handleConnectWallet}
                     provider={uniswapWidget.provider}
                     onError={() => {
                       notifyError(
@@ -203,7 +205,7 @@ const UniswapTradeModal = ({
                   label="Switch to Base Network"
                   buttonType="primary"
                   buttonAlt="green"
-                  onClick={promptNetworkSwitch}
+                  onClick={() => void promptNetworkSwitch()}
                 />
               )}
             </CWModalFooter>

@@ -13,6 +13,7 @@ export const chainNames: Record<string, string> = {
 
 interface UseNetworkSwitchingProps {
   jsonRpcUrlMap: Record<number, string[]>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   provider?: any;
 }
 
@@ -23,7 +24,7 @@ export function useNetworkSwitching({
   const [currentChain, setCurrentChain] = useState<string | null>(null);
   const [isWrongNetwork, setIsWrongNetwork] = useState(false);
 
-  // Type-safe window.ethereum
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const windowEthereum = window as any;
 
   // Check current network and update state
@@ -34,7 +35,7 @@ export function useNetworkSwitching({
         windowEthereum.ethereum ||
         provider?.provider ||
         (jsonRpcUrlMap && Object.keys(jsonRpcUrlMap).length > 0
-          ? { request: async () => null }
+          ? { request: () => null }
           : null);
 
       if (!activeProvider) return;
@@ -70,7 +71,7 @@ export function useNetworkSwitching({
       }
     };
 
-    checkCurrentNetwork();
+    void checkCurrentNetwork();
   }, [provider, jsonRpcUrlMap, windowEthereum]);
 
   const promptNetworkSwitch = async () => {
@@ -96,9 +97,14 @@ export function useNetworkSwitching({
       // Update status after switching
       setIsWrongNetwork(false);
       setCurrentChain('Base');
-    } catch (switchError: any) {
+    } catch (switchError: unknown) {
       // This error code indicates that the chain has not been added to MetaMask
-      if (switchError.code === 4902) {
+      if (
+        switchError &&
+        typeof switchError === 'object' &&
+        'code' in switchError &&
+        switchError.code === 4902
+      ) {
         try {
           await windowEthereum.ethereum.request({
             method: 'wallet_addEthereumChain',
