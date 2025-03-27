@@ -17,6 +17,17 @@ import { MemberResultsOrderBy } from '../index.types';
 
 import './LeaderboardSection.scss';
 
+interface Member {
+  user_id: number;
+  profile_name: string;
+  avatar_url: string;
+  xp_points: number;
+  xp_referrer_points: number;
+  referral_count: number;
+  referral_eth_earnings: string;
+  addresses: Array<{ address: string }>;
+}
+
 const columns = [
   {
     key: 'rank',
@@ -31,8 +42,8 @@ const columns = [
     sortable: true,
   },
   {
-    key: 'xp',
-    header: 'XP',
+    key: 'aura',
+    header: 'Aura',
     numeric: true,
     sortable: true,
   },
@@ -72,7 +83,7 @@ const LeaderboardSection = () => {
       search: debouncedSearchTerm,
     }),
   });
-
+  console.log('MEMBERS:: ', members);
   const formattedMembers =
     members?.pages?.[0]?.results.map((member, index) => ({
       ...member,
@@ -95,10 +106,12 @@ const LeaderboardSection = () => {
           </div>
         ),
       },
-      xp: {
-        sortValue: member.xp_points,
+      aura: {
+        sortValue: (member.xp_points || 0) + (member.xp_referrer_points || 0),
         customElement: (
-          <div className="table-cell text-right">{member.xp_points}</div>
+          <div className="table-cell text-right">
+            {(member.xp_points || 0) + (member.xp_referrer_points || 0)}
+          </div>
         ),
       },
       referrals: {
