@@ -225,11 +225,19 @@ describe('generateUniqueId', () => {
       },
     });
 
+    {
+      await models.Community.create({
+        id: 'clanker-enumerated-community-already-exists',
+        name: 'Enumerated Community #3',
+        ...baseFields,
+      });
+    }
+
     const result3 = await generateUniqueId('Enumerated Community', 2002);
     expect(result3).toMatchObject({
       error: null,
       id: `clanker-enumerated-community-2002`,
-      name: `Enumerated Community #3`,
+      name: `Enumerated Community #4`,
     });
     await command(CreateCommunity(), {
       actor: testActor,

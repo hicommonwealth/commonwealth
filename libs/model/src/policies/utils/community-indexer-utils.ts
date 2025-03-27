@@ -172,16 +172,16 @@ export async function generateUniqueId(
   }
 
   // check for ID pattern matches
-  const matchingCommunities = await models.Community.findAll({
+  const matchingCommunitiesByName = await models.Community.findAll({
     where: {
-      id: {
-        [Op.regexp]: `^clanker-${kebabCommunityName}-[0-9]+$`,
+      name: {
+        [Op.regexp]: `^${communityName}$|^${communityName} #[1-9][0-9]*$`,
       },
     },
   });
 
   // no matches, return the base ID and name
-  if (matchingCommunities.length === 0) {
+  if (matchingCommunitiesByName.length === 0) {
     return {
       id: newCommunityId,
       name: communityName,
@@ -190,31 +190,20 @@ export async function generateUniqueId(
   }
 
   // if there are matches, generate an enumerated name
-  let suffix = matchingCommunities.length + 1;
-  let numberedCommunityName =
-    suffix > 1 ? `${communityName} #${suffix}` : communityName;
+  const suffix = matchingCommunitiesByName.length + 1;
+  const numberedCommunityName =
+    suffix === 1 ? communityName : `${communityName} #${suffix}`;
 
-  // if the numbered community name already exists, keep incrementing the suffix until we find a unique name
-  let existingNumberedCommunity = await models.Community.findOne({
+  // check for existing community with enumerated name
+  const existingNumberedCommunity = await models.Community.findOne({
     where: { name: numberedCommunityName },
   });
   if (existingNumberedCommunity) {
-    let numAttemptsLeft = 5;
-    while (existingNumberedCommunity && numAttemptsLeft > 0) {
-      suffix++;
-      numberedCommunityName = `${communityName} #${suffix}`;
-      existingNumberedCommunity = await models.Community.findOne({
-        where: { name: numberedCommunityName },
-      });
-      numAttemptsLeft--;
-    }
-    if (existingNumberedCommunity) {
-      return {
-        id: null,
-        name: null,
-        error: `failed to generate unique ID: ${name}`,
-      };
-    }
+    return {
+      id: null,
+      name: null,
+      error: `failed to generate unique ID for community: ${name}`,
+    };
   }
 
   return {
