@@ -4,11 +4,12 @@ import telegramImg from 'assets/img/share/telegram.png';
 import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import useAppStatus from 'hooks/useAppStatus';
-import { useCallback, useMemo } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 interface ShareOption {
   name: string;
-  icon: string;
+  icon: string | ReactNode;
   requiresMobile?: boolean;
   onClick: () => void;
 }
@@ -23,13 +24,14 @@ export function useShareOptions(
   const mobile = isIOS || isAndroid;
 
   const filterPredicate = useCallback(
-    (option: ShareOption) => {
-      if (!option.requiresMobile) {
-        // if there's no requiredMobile then it's always suppoted.
-        return true;
-      }
-
-      return mobile && option.requiresMobile;
+    (option: ShareOption): boolean => {
+      return true;
+      // if (!option.requiresMobile) {
+      //   // if there's no requiredMobile then it's always suppoted.
+      //   return true;
+      // }
+      //
+      // return mobile && option.requiresMobile;
     },
     [mobile],
   );
@@ -73,13 +75,15 @@ export function useShareOptions(
         },
         {
           name: 'Share Via',
-          icon: 'share',
+          icon: <CWIcon iconName="share2" iconSize="xl" />,
           requiresMobile: true,
           onClick: () => {
             navigator.share({ url: url, title, text }).catch(console.error);
           },
         },
-      ].filter(filterPredicate),
+      ].filter(() => {
+        return true;
+      }),
     [filterPredicate, text, title, url],
   );
 }

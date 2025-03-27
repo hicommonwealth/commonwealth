@@ -24,7 +24,12 @@ export const ShareSection = (props: ShareSectionProps) => {
             className="share-option"
             onClick={option.onClick}
           >
-            <img src={option.icon} alt={option.name} className="icon" />
+            {typeof option.icon === 'string' && (
+              <img src={option.icon} alt={option.name} className="icon" />
+            )}
+
+            {typeof option.icon !== 'string' && <>{option.icon}</>}
+
             <CWText type="caption">{option.name}</CWText>
           </div>
         ))}
