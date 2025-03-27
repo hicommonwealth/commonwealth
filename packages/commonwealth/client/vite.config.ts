@@ -51,6 +51,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
+    'process.env.FLAG_TOKENIZED_THREADS': JSON.stringify(
+      env.FLAG_TOKENIZED_THREADS,
+    ),
   };
 
   const config = {

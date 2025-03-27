@@ -34,6 +34,7 @@ const featureFlags = {
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
+  tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

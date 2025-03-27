@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWImageInput,
@@ -45,6 +46,8 @@ const CommunityInformationForm = ({
   isCreatingCommunity,
   submitBtnLabel,
 }: CommunityInformationFormProps) => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
   const [communityName, setCommunityName] = useState(
     initialValues?.communityName || '',
   );
@@ -126,7 +129,9 @@ const CommunityInformationForm = ({
           }
         })(),
       }),
-      tokenizeCommunity: initialValues?.tokenizeCommunity ?? true,
+      tokenizeCommunity: tokenizedThreadsEnabled
+        ? (initialValues?.tokenizeCommunity ?? true)
+        : false,
     };
   };
 
@@ -204,24 +209,27 @@ const CommunityInformationForm = ({
         withAIImageGeneration
       />
 
-      <div className="tokenize-toggle">
-        <div className="token-toggle-header">
-          <CWText type="h5">Tokenization</CWText>
-          <CWToggle name="tokenizeCommunity" hookToForm size="small" />
+      {tokenizedThreadsEnabled && (
+        <div className="tokenize-toggle">
+          <div className="token-toggle-header">
+            <CWText type="h5">Tokenization</CWText>
+            <CWToggle name="tokenizeCommunity" hookToForm size="small" />
+          </div>
+          <CWText type="buttonSm" fontWeight="regular">
+            All threads created in selected communities will be minted as an
+            ERC20 token and able to be bought and sold by members of the
+            community.
+          </CWText>
+          <CWText type="caption">
+            Tokenization is enabled by default. You can change this later in
+            Admin Capabilities under Integrations.
+          </CWText>
+          <CWText type="caption">
+            If you have a community token you would like to use, add it in Admin
+            Capabilities under Integrations.
+          </CWText>
         </div>
-        <CWText type="buttonSm" fontWeight="regular">
-          All threads created in selected communities will be minted as an ERC20
-          token and able to be bought and sold by members of the community.
-        </CWText>
-        <CWText type="caption">
-          Tokenization is enabled by default. You can change this later in Admin
-          Capabilities under Integrations.
-        </CWText>
-        <CWText type="caption">
-          If you have a community token you would like to use, add it in Admin
-          Capabilities under Integrations.
-        </CWText>
-      </div>
+      )}
 
       {withSocialLinks ? (
         <>
