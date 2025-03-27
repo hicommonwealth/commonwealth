@@ -161,6 +161,14 @@ describe('generateUniqueId', () => {
       name: 'a',
     });
 
+    // valid name with special characters
+    const validName = await generateUniqueId('$$$a$b$c$$$', MOCK_TOKEN_ID);
+    expect(validName).toMatchObject({
+      error: null,
+      id: `clanker-a-b-c-${MOCK_TOKEN_ID}`,
+      name: '$$$a$b$c$$$',
+    });
+
     // test typical name
     const result = await generateUniqueId('Test Community', MOCK_TOKEN_ID);
     expect(result.error).toBeNull();
