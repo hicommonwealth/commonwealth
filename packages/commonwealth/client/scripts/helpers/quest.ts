@@ -62,6 +62,10 @@ export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
   return action === 'CommonDiscordServerJoined';
 };
 
+export const doesActionRequireChainEvent = (action: QuestActionType) => {
+  return action === 'XpChainEventCreated';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,

@@ -9,12 +9,14 @@ import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useEffect } from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import CWRepetitionCycleRadioButton, {
   useCWRepetitionCycleRadioButton,
 } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
@@ -54,6 +56,7 @@ const QuestActionSubForm = ({
     'SSOLinked',
     'TweetEngagement',
     'CommonDiscordServerJoined',
+    'XpChainEventCreated',
   ]
     .map((event) => ({
       value: event as QuestAction,
@@ -142,6 +145,13 @@ const QuestActionSubForm = ({
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_url;
+
+  const ethereumChainOptions = fetchCachedNodes()
+    ?.filter((chainNode) => !!chainNode.ethChainId)
+    ?.map((chainNode) => ({
+      value: chainNode.ethChainId as number,
+      label: `${chainNode.name} (${chainNode.ethChainId})`,
+    }));
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -406,6 +416,60 @@ const QuestActionSubForm = ({
           />
         )}
       </div>
+
+      {config?.requires_chain_event && (
+        <>
+          <div className="grid-row cols-2">
+            <CWTextInput
+              key={`contractAddress-${defaultValues?.action}`}
+              name="contractAddress"
+              label="Contract Address"
+              placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F"
+              fullWidth
+              {...(defaultValues?.contractAddress && {
+                defaultValue: defaultValues?.contractAddress,
+              })}
+              onInput={(e) =>
+                onChange?.({ contractAddress: e?.target?.value?.trim() })
+              }
+              customError={errors?.contractAddress}
+            />
+            <CWSelectList
+              key={`contractAddress-${defaultValues?.action}`}
+              name="ethChainId"
+              isClearable={false}
+              label="Ethereum Chain"
+              placeholder="Select a chain"
+              options={ethereumChainOptions}
+              onChange={(newValue) =>
+                newValue && onChange?.({ ethChainId: `${newValue.value}` })
+              }
+              {...(defaultValues?.ethChainId && {
+                value: ethereumChainOptions?.find(
+                  (x) => `${x.value}` === `${defaultValues?.ethChainId}`,
+                ),
+              })}
+              customError={errors?.ethChainId}
+            />
+          </div>
+
+          <div className="grid-row cols-1">
+            <CWTextArea
+              key={`eventSignature-${defaultValues?.action}`}
+              name="eventSignature"
+              label="Event Signature"
+              placeholder="0xd2b4b1d70d7f76d55b524ea788ab85e9ab2d01d99ebbeedfb0b69ab0735bc5c9"
+              {...(defaultValues?.eventSignature && {
+                defaultValue: defaultValues?.eventSignature,
+              })}
+              onInput={(e) =>
+                onChange?.({ eventSignature: e?.target?.value?.trim() })
+              }
+              customError={errors?.eventSignature}
+            />
+          </div>
+        </>
+      )}
 
       {config?.requires_twitter_tweet_link && (
         <div className="grid-row cols-3">

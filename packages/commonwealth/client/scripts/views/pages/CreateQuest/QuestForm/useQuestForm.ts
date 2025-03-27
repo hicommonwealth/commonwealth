@@ -7,6 +7,7 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
   doesActionRequireTwitterTweetURL,
@@ -70,6 +71,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
                   }),
+                  ...(doesActionRequireChainEvent(chosenAction) && {
+                    contractAddress: subForm.contractAddress,
+                    ethChainId: subForm.ethChainId,
+                    eventSignature: subForm.eventSignature,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
@@ -91,6 +97,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_url:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
+                  requires_chain_event:
+                    doesActionRequireChainEvent(chosenAction),
                 },
               };
             }),
@@ -187,6 +195,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
             },
           }),
+          ...(subForm.config?.requires_chain_event &&
+            {
+              // TODO: 11069, how to get data here?
+            }),
           participation_limit: subForm.values.participationLimit,
           participation_period: subForm.values
             .participationPeriod as QuestParticipationPeriod,
