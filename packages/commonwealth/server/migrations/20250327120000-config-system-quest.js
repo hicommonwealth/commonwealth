@@ -11,7 +11,7 @@ module.exports = {
         SET 
           "reward_amount" = 5,
           "creator_reward_weight" = 0,
-          "content_id" = "wallet:metamask"
+          "content_id" = 'wallet:metamask'
         WHERE "id" = -2;
 
         -- TODO: configure other WalletLinked actions scoped to other wallets
