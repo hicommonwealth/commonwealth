@@ -27,11 +27,6 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
     0,
   );
 
-  const totalPercent = voteOptions?.reduce(
-    (sum, option) => sum + parseFloat(option.percentage || '0'),
-    0,
-  );
-
   const getCombinedBarColor = (label: string, index: number) => {
     const negativeLabels = ['No', 'No with Veto'];
 

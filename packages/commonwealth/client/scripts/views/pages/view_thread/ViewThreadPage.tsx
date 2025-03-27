@@ -457,6 +457,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       }
     }
   };
+  const handleSnapshotChangeWrapper = ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    handleNewSnapshotChange({ id, snapshot_title }).catch((error) => {
+      console.error('Failed to handle snapshot change:', error);
+    });
+  };
 
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
@@ -603,7 +614,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 <SnapshotCreationCard
                   thread={thread!}
                   allowSnapshotCreation={isAuthor || isAdminOrMod}
-                  onChangeHandler={handleNewSnapshotChange}
+                  onChangeHandler={handleSnapshotChangeWrapper}
                 />
               </div>
             ),
