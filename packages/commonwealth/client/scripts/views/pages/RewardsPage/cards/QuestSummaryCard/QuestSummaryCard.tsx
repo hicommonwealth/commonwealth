@@ -71,7 +71,7 @@ const QuestSummaryCard = () => {
   return (
     <RewardsCard
       title="Quests"
-      description="XP and tokens earned from your contests, bounties, and posted threads."
+      description="Aura and tokens earned from your contests, bounties, and posted threads."
       icon="trophy"
       onSeeAllClick={handleSeeAllClick}
     >
