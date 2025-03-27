@@ -477,6 +477,22 @@ describe('Thread lifecycle', () => {
       expect(updated?.marked_as_spam_at).toBeDefined;
     });
 
+    test('should update launchpad_token_address and is_linking_token', async () => {
+      const body = {
+        is_linking_token: true,
+        launchpad_token_address: '0x0',
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.is_linking_token).to.eq(true);
+      expect(updated?.launchpad_token_address).to.eq('0x0');
+    });
+
     test('should fail when collaborator actor non admin/moderator', async () => {
       await expect(
         command(UpdateThread(), {
