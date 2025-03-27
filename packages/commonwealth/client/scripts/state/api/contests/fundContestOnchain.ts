@@ -23,6 +23,7 @@ const fundContestOnchain = async ({
     contestAddress,
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
+    ethChainId,
   );
 
   return await contest.deposit(amount, walletAddress);

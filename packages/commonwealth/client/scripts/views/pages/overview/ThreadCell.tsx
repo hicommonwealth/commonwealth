@@ -26,7 +26,7 @@ import {
   getScopePrefix,
   useCommonNavigate,
 } from 'client/scripts/navigation/helpers';
-import { Memberships } from 'client/scripts/state/api/groups/refreshMembership';
+import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
 import { Link } from 'react-router-dom';
 import './ThreadCell.scss';
 

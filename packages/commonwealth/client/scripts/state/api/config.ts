@@ -21,7 +21,6 @@ export const ApiEndpoints = {
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
-  REFRESH_MEMBERSHIP: '/refresh-membership',
   FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
@@ -32,8 +31,6 @@ export const ApiEndpoints = {
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
-  GENERATE_COMMENT: '/generateCommentText',
-  GENERATE_THREAD: '/generateThreadText',
   UPLOAD_FILE: '/getUploadSignature',
 };
 

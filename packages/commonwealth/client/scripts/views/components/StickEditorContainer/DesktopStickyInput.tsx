@@ -92,12 +92,17 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     handleSubmitComment: handleEnhancedSubmit,
     onAiReply: handleAiReply,
     streamingReplyIds,
+    onCommentCreated: (commentId: number, hasAI: boolean) => {
+      if (hasAI) {
+        handleAiReply(commentId);
+      }
+    },
   };
 
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
-        <div className="DesktopStickyInputCollapsed">
+        <div className="DesktopStickyInputCollapsed" onClick={handleFocused}>
           <div className="container">
             <input
               type="text"
@@ -109,7 +114,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                     ? `Reply to ${replyingToAuthor}...`
                     : 'Write a comment...'
               }
-              onClick={handleFocused}
             />
           </div>
         </div>

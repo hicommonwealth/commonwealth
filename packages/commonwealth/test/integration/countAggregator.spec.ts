@@ -1,10 +1,5 @@
 import { RedisCache } from '@hicommonwealth/adapters';
-import {
-  cache,
-  CacheNamespaces,
-  dispose,
-  disposeAdapter,
-} from '@hicommonwealth/core';
+import { cache, CacheNamespaces, dispose } from '@hicommonwealth/core';
 import { tester, type DB } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -17,6 +12,9 @@ describe('Count Aggregator Tests', () => {
   let models: DB;
 
   beforeAll(async () => {
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+    });
     models = await tester.seedDb();
     await models.Thread.create({
       community_id: 'ethereum',
@@ -27,11 +25,6 @@ describe('Count Aggregator Tests', () => {
       search: '',
       address_id: 1,
       view_count: 0,
-    });
-
-    disposeAdapter(cache().name);
-    cache({
-      adapter: new RedisCache('redis://localhost:6379'),
     });
     await cache().ready();
     await cache().deleteNamespaceKeys(

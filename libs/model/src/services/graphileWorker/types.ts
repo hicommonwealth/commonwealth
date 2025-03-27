@@ -1,3 +1,4 @@
+import { events } from '@hicommonwealth/schemas';
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
 import { z, ZodSchema, ZodUndefined } from 'zod';
 
@@ -29,9 +30,6 @@ export const TaskPayloads = {
   CleanSubscriptions: z.object({}),
   CleanChainEventXpSources: z.object({}),
   RunDbMaintenance: z.object({}),
-  AwardTweetEngagementXp: z.object({
-    quest_id: z.number(),
-    quest_end_date: z.coerce.date(),
-  }),
-  CountAggregator: z.undefined(),
+  AwardTweetEngagementXp: events.TweetEngagementCapReached,
+  CountAggregator: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;

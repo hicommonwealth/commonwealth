@@ -12,6 +12,8 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  MembershipRejectReason,
+  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -90,8 +92,30 @@ export const GetCommunity = {
   input: z.object({
     id: z.string(),
     include_node_info: z.boolean().optional(),
+    include_groups: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
+};
+
+export const GetMemberships = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    topic_id: z.number().optional(),
+  }),
+  output: z
+    .object({
+      groupId: z.number(),
+      topics: z
+        .object({
+          id: z.number(),
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        })
+        .array(),
+      isAllowed: z.boolean(),
+      rejectReason: MembershipRejectReason,
+    })
+    .array(),
 };
 
 export const GetCommunityStake = {
@@ -206,6 +230,14 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetTopicById = {
+  input: z.object({
+    topic_id: z.number(),
+  }),
+  // TODO: fix type
+  output: z.any(),
 };
 
 export const GetPinnedTokens = {

@@ -65,9 +65,7 @@ async function awardBatchTweetEngagementXp({
   );
 }
 
-// TODO: 1. add created_at to each metric type
-//  2. sort by created_at and splice according to the cap if cap was reached or according to quest end date
-const awardTweetEngagementXp = async (
+export const awardTweetEngagementXp = async (
   payload: z.infer<typeof TaskPayloads.AwardTweetEngagementXp>,
 ) => {
   const quest = await models.Quest.findOne({
@@ -117,7 +115,10 @@ const awardTweetEngagementXp = async (
     return;
   }
 
-  if (!questTweet.like_xp_awarded) {
+  if (
+    !questTweet.like_xp_awarded &&
+    (payload.quest_ended || payload.like_cap_reached)
+  ) {
     const likes = await getLikingUsers({
       twitterBotConfig: TwitterBotConfigs.Common,
       tweetId: questTweet.tweet_id,
@@ -133,7 +134,10 @@ const awardTweetEngagementXp = async (
     });
   }
 
-  if (!questTweet.reply_xp_awarded) {
+  if (
+    !questTweet.reply_xp_awarded &&
+    (payload.quest_ended || payload.reply_cap_reached)
+  ) {
     const replies = await getReplies({
       twitterBotConfig: TwitterBotConfigs.Common,
       tweetId: questTweet.tweet_id,
@@ -154,7 +158,10 @@ const awardTweetEngagementXp = async (
     });
   }
 
-  if (!questTweet.retweet_xp_awarded) {
+  if (
+    !questTweet.retweet_xp_awarded &&
+    (payload.quest_ended || payload.retweet_cap_reached)
+  ) {
     const retweets = await getRetweets({
       twitterBotConfig: TwitterBotConfigs.Common,
       tweetId: questTweet.tweet_id,

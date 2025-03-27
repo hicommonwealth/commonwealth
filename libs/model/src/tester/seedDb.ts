@@ -31,6 +31,7 @@ export const seedDb = async () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           emailNotificationInterval: 'never' as any,
           profile: {},
+          tier: 1,
         }),
       ),
     );

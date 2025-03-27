@@ -1,6 +1,10 @@
 @import '../../../../styles/shared.scss';
 
 .CWRepetitionCycleRadioButton {
+  input {
+    z-index: 0 !important;
+  }
+
   .repetition-cycle-label {
     display: flex;
     align-items: center;
