@@ -174,7 +174,7 @@ const getVerifiedUserInfoMockFn: typeof getVerifiedUserInfo = ({
   }
 };
 
-describe.only('SignIn Lifecycle', async () => {
+describe('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
