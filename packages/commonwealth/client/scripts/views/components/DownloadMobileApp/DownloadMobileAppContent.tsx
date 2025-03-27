@@ -44,7 +44,7 @@ export const DownloadMobileAppContent = () => {
         />
       </div>
 
-      <ShareSection url="https://common.xyz/download-mobile-app" />
+      <ShareSection url={IOS_APP_STORE_LANDING_URL} />
     </div>
   );
 };

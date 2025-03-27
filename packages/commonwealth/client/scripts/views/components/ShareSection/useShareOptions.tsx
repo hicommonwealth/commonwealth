@@ -5,6 +5,7 @@ import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import useAppStatus from 'hooks/useAppStatus';
 import React, { ReactNode, useCallback, useMemo } from 'react';
+import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 interface ShareOption {
@@ -79,6 +80,14 @@ export function useShareOptions(
           requiresMobile: true,
           onClick: () => {
             navigator.share({ url: url, title, text }).catch(console.error);
+          },
+        },
+        {
+          name: 'Copy Link',
+          icon: <CWIcon iconName="copy" iconSize="xl" />,
+          onClick: () => {
+            // FIXME: add support for referrals here but only for internal URLs.
+            saveToClipboard(url).catch(console.error);
           },
         },
       ].filter(() => {
