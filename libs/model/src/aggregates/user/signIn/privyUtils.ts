@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
 import { PrivyClient } from '@privy-io/server-auth';
+import { config } from '../../../config';
 
 const log = logger(import.meta);
 
