@@ -33,6 +33,10 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     [onCancel, setIsExpanded],
   );
 
+  const handleCancelForCommunity = useCallback(() => {
+    handleCancel(undefined);
+  }, [handleCancel]);
+
   const handleAiReply = useCallback(
     (commentId: number) => {
       if (streamingReplyIds.includes(commentId)) {
@@ -118,7 +122,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
-        <div className="DesktopStickyInputCollapsed">
+        <div className="DesktopStickyInputCollapsed" onClick={handleFocused}>
           <div className="container">
             <input
               type="text"
@@ -134,7 +138,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
             <NewThreadForm onCancel={handleCancel} />
           ) : mode === 'community' ? (
             <CommunityCreationForm
-              onCancel={handleCancel}
+              onCancel={handleCancelForCommunity}
               initialPrompt={initialPrompt}
               generateOnMount={!!initialPrompt}
             />

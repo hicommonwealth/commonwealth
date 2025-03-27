@@ -26,9 +26,9 @@
 
     .cta-elements {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       flex-direction: row;
-      justify-content: end;
+      justify-content: space-between;
       align-items: center;
       gap: 16px;
 
@@ -36,12 +36,25 @@
         padding: 0;
       }
 
+      .PageCounter {
+        flex-shrink: 0;
+      }
+
       @include mediumSmallMid {
-        gap: 12px;
-        flex-direction: column;
+        gap: 8px;
+
+        .CWButton {
+          min-width: auto;
+          padding: 8px 12px;
+        }
 
         > .TokenLaunchButton {
-          margin-left: auto;
+          padding: 0;
+
+          .CWButton {
+            min-width: auto;
+            padding: 8px 12px;
+          }
         }
       }
     }

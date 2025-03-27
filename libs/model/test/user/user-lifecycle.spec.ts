@@ -3,15 +3,18 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { ChainBase, ChainType, WalletSsoSource } from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   CreateComment,
   CreateCommentReaction,
 } from '../../src/aggregates/comment';
-import { CreateCommunity } from '../../src/aggregates/community';
+import {
+  CreateGroup,
+  RefreshCommunityMemberships,
+} from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
@@ -22,7 +25,7 @@ import {
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
-import { emitEvent } from '../../src/utils/utils';
+import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { signIn } from '../utils/sign-in';
@@ -727,12 +730,40 @@ describe('User lifecycle', () => {
       expect(final!.xp_awarded).toBe(37);
     });
 
-    it('should award xp points to scoped actions', async () => {
+    it('should award xp points when memberships are refreshed (user joins group)', async () => {
+      // create group with balance requirements
+      const contract_address = '0x0000000000000000000000000000000000000000';
+      const result = await command(CreateGroup(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          topics: [],
+          metadata: {
+            name: chance.name(),
+            description: chance.sentence(),
+            required_requirements: 1,
+            membership_ttl: 100,
+          },
+          requirements: [
+            {
+              rule: 'threshold',
+              data: {
+                threshold: '100',
+                source: {
+                  source_type: BalanceSourceType.ERC20,
+                  evm_chain_id: chain_node_id,
+                  contract_address,
+                },
+              },
+            },
+          ],
+        },
+      });
       // setup quest
       const quest = await command(CreateQuest(), {
         actor: superadmin,
         payload: {
-          name: 'xp quest with scoped actions',
+          name: 'xp quest for memberships',
           description: chance.sentence(),
           image_url: chance.url(),
           start_date: moment().add(2, 'day').toDate(),
@@ -748,16 +779,10 @@ describe('User lifecycle', () => {
           quest_id: quest!.id!,
           action_metas: [
             {
-              event_name: 'CommunityCreated',
-              reward_amount: 12,
-              creator_reward_weight: 0,
-              content_id: `chain:${chain_node_id}`,
-            },
-            {
-              event_name: 'SSOLinked',
+              event_name: 'MembershipsRefreshed',
               reward_amount: 11,
               creator_reward_weight: 0,
-              content_id: `sso:google`,
+              content_id: `group:${result?.groups?.at(0)?.id}`,
             },
           ],
         },
@@ -770,42 +795,31 @@ describe('User lifecycle', () => {
 
       const watermark = new Date();
 
-      await command(CreateCommunity(), {
-        actor: member,
-        payload: {
-          id: 'scoped-community',
-          name: chance.name(),
-          chain_node_id,
-          type: ChainType.Offchain,
-          default_symbol: 'TEST',
-          base: ChainBase.Ethereum,
-          social_links: [],
-          directory_page_enabled: false,
-          tags: [],
-        },
+      // make sure member passes membership validation
+      vi.spyOn(utils, 'validateGroupMembership').mockImplementation(() => {
+        return { isValid: true, messages: undefined };
       });
 
-      // simulate SSO event
-      await emitEvent(models.Outbox, [
-        {
-          event_name: 'SSOLinked',
-          event_payload: {
-            community_id,
-            user_id: member.user.id!,
-            oauth_provider: WalletSsoSource.Google,
-            new_user: false,
-            created_at: new Date(),
-          },
-        },
-      ]);
+      // trigger command to refresh memberships
+      await command(RefreshCommunityMemberships(), {
+        actor: superadmin,
+        payload: { community_id },
+      });
+
+      vi.clearAllMocks();
+
+      const mbefore = await models.User.findOne({
+        where: { id: member.user.id },
+      });
 
       // drain the outbox
-      await drainOutbox(['CommunityCreated', 'SSOLinked'], Xp, watermark);
+      await drainOutbox(['MembershipsRefreshed'], Xp, watermark);
 
-      const final = await models.Quest.findOne({
-        where: { id: quest!.id },
+      const mafter = await models.User.findOne({
+        where: { id: member.user.id },
       });
-      expect(final!.xp_awarded).toBe(23);
+
+      expect(mafter!.xp_points).toBe(mbefore!.xp_points! + 11);
     });
   });
 });
