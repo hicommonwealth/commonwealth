@@ -356,14 +356,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     body={
                       <div>
                         <CWText type="b2">
-                          Indicates the maximum xp allocation before this quest
-                          is considered complete.
+                          Indicates the maximum Aura allocation before this
+                          quest is considered complete.
                         </CWText>
                         <br />
 
                         <CWText type="b2">
                           The quest automatically transitions to completed
-                          status, if max XP is alloted before quest end date.
+                          status, if max Aura is alloted before quest end date.
                         </CWText>
                       </div>
                     }

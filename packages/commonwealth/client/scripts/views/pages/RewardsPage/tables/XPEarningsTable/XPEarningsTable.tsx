@@ -39,8 +39,8 @@ const columns: CWTableColumnInfo[] = [
     sortable: true,
   },
   {
-    key: 'xpAmount',
-    header: 'XP Amount',
+    key: 'auraAmount',
+    header: 'Aura Amount',
     numeric: true,
     sortable: true,
   },
@@ -97,7 +97,7 @@ export const XPEarningsTable = () => {
         );
       })(),
     },
-    xpAmount: log.xp_points,
+    auraAmount: log.xp_points,
     questLink: {
       customElement: (
         <a
