@@ -1,0 +1,61 @@
+@import '../../../../../styles/shared.scss';
+
+.GovernanceTreassury {
+  width: 270px;
+  padding: 20px;
+  background-color: $white;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .address-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .address {
+        background-color: $neutral-200;
+        border-radius: 6px;
+        color: $neutral-600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100px;
+        gap: 4px;
+        padding-left: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .Icon {
+          width: 16px;
+          height: 16px;
+        }
+
+        .CWIdentificationTag {
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  .card-body {
+    margin-bottom: 20px;
+
+    .price-details {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+}
