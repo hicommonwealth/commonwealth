@@ -12,18 +12,18 @@ import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './DetailCard.scss';
 type DetailCardProps = {
   status: string;
-  scope: string;
+  scope?: string;
   governanceType: string;
   publishDate: moment.Moment | number;
-  id: string;
+  id?: string;
   Threads: { id: number; title: string }[];
 };
 const DetailCard = ({
   status,
-  scope,
+  scope = '',
   governanceType,
   publishDate,
-  id,
+  id = '',
   Threads = [],
 }: DetailCardProps) => {
   const navigate = useNavigate();

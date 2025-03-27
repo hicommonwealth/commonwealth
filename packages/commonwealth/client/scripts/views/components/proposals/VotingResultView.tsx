@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './VotingResultView.scss';
 
 export interface VoteOption {
@@ -30,10 +31,6 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
     (sum, option) => sum + parseFloat(option.percentage || '0'),
     0,
   );
-
-  if (Math.abs(totalPercent - 100) > 1) {
-    console.warn('Vote percentages do not add up to 100%:', totalPercent);
-  }
 
   const getCombinedBarColor = (label: string, index: number) => {
     const negativeLabels = ['No', 'No with Veto'];
@@ -120,22 +117,31 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
                         // Only add to visual elements if percentage is greater than 0
                         if (percentage > 0) {
                           acc.elements.push(
-                            <div
-                              key={option.label}
-                              className="progress-container"
-                              style={{
-                                width: `${percentage}%`,
-                                left: `${leftPosition}%`,
-                              }}
-                            >
-                              <div
-                                className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
-                                style={{
-                                  width: '100%',
-                                  backgroundColor: combinedColor,
-                                }}
-                              />
-                            </div>,
+                            <CWTooltip
+                              key={`tooltip-${option.label}`}
+                              content={`${option.label}: ${percentage}%`}
+                              placement="top"
+                              renderTrigger={(handleInteraction) => (
+                                <div
+                                  key={option.label}
+                                  className="progress-container"
+                                  style={{
+                                    width: `${percentage}%`,
+                                    left: `${leftPosition}%`,
+                                  }}
+                                >
+                                  <div
+                                    className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
+                                    style={{
+                                      width: '100%',
+                                      backgroundColor: combinedColor,
+                                    }}
+                                    onMouseEnter={handleInteraction}
+                                    onMouseLeave={handleInteraction}
+                                  />
+                                </div>
+                              )}
+                            />,
                           );
                         }
 
@@ -172,15 +178,24 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
                         );
 
                         acc.elements.push(
-                          <div
-                            key={option.label}
-                            className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
-                            style={{
-                              width: `${percentage}%`,
-                              left: `${leftPosition}%`,
-                              backgroundColor: combinedColor,
-                              height: '7px',
-                            }}
+                          <CWTooltip
+                            key={`tooltip-${option.label}`}
+                            content={`${option.label}: ${percentage}%`}
+                            placement="top"
+                            renderTrigger={(handleInteraction) => (
+                              <div
+                                key={option.label}
+                                className={`progress ${option.label.toLowerCase().replace(/\s+/g, '-')}-progress`}
+                                style={{
+                                  width: `${percentage}%`,
+                                  left: `${leftPosition}%`,
+                                  backgroundColor: combinedColor,
+                                  height: '7px',
+                                }}
+                                onMouseEnter={handleInteraction}
+                                onMouseLeave={handleInteraction}
+                              />
+                            )}
                           />,
                         );
                         acc.prevLeft = (acc.prevLeft || 0) + percentage;

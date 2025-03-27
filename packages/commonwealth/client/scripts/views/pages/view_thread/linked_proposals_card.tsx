@@ -50,7 +50,6 @@ export const LinkedProposalsCard = ({
   const [snapshotUrl, setSnapshotUrl] = useState('');
   const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { data: domain } = useFetchCustomDomainQuery();
 
   const initialSnapshotLinks = useMemo(

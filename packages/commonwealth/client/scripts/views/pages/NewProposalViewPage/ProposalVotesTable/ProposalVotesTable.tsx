@@ -36,7 +36,7 @@ const columns: CWTableColumnInfo[] = [
 const ProposalVotesTable = ({ votes, choices }: ProposalVotesTableProps) => {
   const tableState = useCWTableState({
     columns: columns,
-    initialSortColumn: 'timestamp',
+    initialSortColumn: 'choice',
     initialSortDirection: APIOrderDirection.Desc,
   });
 

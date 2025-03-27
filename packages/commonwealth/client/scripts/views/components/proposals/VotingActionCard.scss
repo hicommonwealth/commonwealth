@@ -1,11 +1,16 @@
 @import '../../../styles/shared.scss';
-.poll-container {
+.VotingActionCard {
   background: #f7f7f7;
   gap: 16px;
   border-radius: 6px;
   padding: 16px;
   display: flex;
   flex-direction: column;
+  .voting-action-card-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
   .governance-vote {
     width: 100%;
     border: none;

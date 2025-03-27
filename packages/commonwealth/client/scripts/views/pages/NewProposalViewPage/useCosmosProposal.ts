@@ -1,3 +1,5 @@
+import { LinkSource } from 'client/scripts/models/Thread';
+import { useGetThreadsByLinkQuery } from 'client/scripts/state/api/threads';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import app from 'state';
@@ -13,6 +15,7 @@ import type { AnyProposal } from '../../../models/types';
 
 interface UseCosmosProposalProps {
   proposalId: string;
+  enabledApi?: boolean;
 }
 
 interface ProposalMetadata {
@@ -21,7 +24,10 @@ interface ProposalMetadata {
   summary?: string;
 }
 
-export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
+export const useCosmosProposal = ({
+  proposalId,
+  enabledApi = true,
+}: UseCosmosProposalProps) => {
   const [proposal, setProposal] = useState<AnyProposal | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -32,7 +38,7 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
     error: cosmosError,
     isFetching: isFetchingCosmos,
   } = useCosmosProposalQuery({
-    isApiReady: !!app.chain?.apiInitialized,
+    isApiReady: !!(app.chain?.apiInitialized && enabledApi),
     proposalId,
   });
 
@@ -41,6 +47,15 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
 
     useCosmosProposalMetadataQuery(proposal || null);
 
+  const { data: threadsData } = useGetThreadsByLinkQuery({
+    communityId: app.activeChainId() || '',
+    link: {
+      source: LinkSource.Proposal,
+      identifier: proposalId,
+    },
+    enabled: !!(app.activeChainId() && proposalId),
+  });
+  const threads = threadsData || [];
   const { data: poolData } = usePoolParamsQuery();
   const poolValue = poolData ? +poolData : undefined;
 
@@ -102,5 +117,6 @@ export const useCosmosProposal = ({ proposalId }: UseCosmosProposalProps) => {
     votes,
     tally,
     deposits,
+    threads,
   };
 };

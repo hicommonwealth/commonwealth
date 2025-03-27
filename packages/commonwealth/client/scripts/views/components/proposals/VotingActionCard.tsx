@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import './VotingActionCard.scss';
 import VotingResultView, { VoteOption } from './VotingResultView';
@@ -35,6 +36,7 @@ const VotingActionCard: React.FC<VotingActionCardProps> = ({
   defaultVotingOption,
 }) => {
   const [selectedOption, setSelectedOption] = useState(defaultVotingOption);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const handleVoteClick = () => {
     if (selectedOption && canVote && !hasVoted) {
       type === 'cosmos' ? onVote(selectedOption) : onVote([selectedOption]);
@@ -46,54 +48,67 @@ const VotingActionCard: React.FC<VotingActionCardProps> = ({
     }
   }, [defaultVotingOption]);
   return (
-    <div className="poll-container">
-      <CWText type="h5" fontWeight="semiBold">
-        Actions
-      </CWText>
-      <div className="poll-box">
-        <div className="poll-header">
-          <CWText>POLL</CWText>
-          <div className="timeline">
-            <CWText>{timeRemaining}</CWText>
-
-            <CWText
-              onClick={() => {
-                toggleShowVotesDrawer(true);
-              }}
-              className="ViewActivity"
-            >
-              View Activity
-            </CWText>
-          </div>
-        </div>
-        <CWText type="b2" className="poll-title">
-          Do you support this proposal?
+    <div className="VotingActionCard">
+      <div className="voting-action-card-header ">
+        <CWText type="h5" fontWeight="semiBold">
+          Actions
         </CWText>
+        <CWIcon
+          iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+          iconSize="small"
+          className="caret-icon"
+          weight="bold"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        />
+      </div>
+      {!isCollapsed && (
+        <>
+          <div className="poll-box">
+            <div className="poll-header">
+              <CWText>POLL</CWText>
+              <div className="timeline">
+                <CWText>{timeRemaining}</CWText>
 
-        <div className="voting-options">
-          {options.map((option) => (
+                <CWText
+                  onClick={() => {
+                    toggleShowVotesDrawer(true);
+                  }}
+                  className="ViewActivity"
+                >
+                  View Activity
+                </CWText>
+              </div>
+            </div>
+            <CWText type="b2" className="poll-title">
+              Do you support this proposal?
+            </CWText>
+
+            <div className="voting-options">
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  className={`option ${selectedOption === option.value ? 'selected' : ''}`}
+                  onClick={() => setSelectedOption(option.value)}
+                  disabled={!canVote || hasVoted}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
             <button
-              key={option.value}
-              className={`option ${selectedOption === option.value ? 'selected' : ''}`}
-              onClick={() => setSelectedOption(option.value)}
+              className="vote-button"
+              onClick={handleVoteClick}
               disabled={!canVote || hasVoted}
             >
-              {option.label}
+              Vote
             </button>
-          ))}
-        </div>
-        <button
-          className="vote-button"
-          onClick={handleVoteClick}
-          disabled={!canVote || hasVoted}
-        >
-          Vote
-        </button>
-      </div>
-      <CWText type="h5" fontWeight="semiBold">
-        Results
-      </CWText>
-      <VotingResultView voteOptions={votingOption} showCombineBarOnly />
+          </div>
+          <CWText type="h5" fontWeight="semiBold">
+            Results
+          </CWText>
+          <VotingResultView voteOptions={votingOption} showCombineBarOnly />
+        </>
+      )}
     </div>
   );
 };

@@ -62,6 +62,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
     description,
     isLoading,
     error: cosmosError,
+    threads: cosmosThreads,
   } = useCosmosProposal({ proposalId });
 
   const {
@@ -226,26 +227,28 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
                   // @ts-expect-error <StrictNullChecks/>
                   publishDate={createdAt}
                   id={identifier}
-                  Threads={threads}
+                  Threads={queryType === 'cosmos' ? cosmosThreads : threads}
                   scope={scope}
                 />
               </>
             )}
             {queryType === 'cosmos' ? (
               <>
-                <VotingActions
-                  onModalClose={onModalClose}
-                  // @ts-expect-error <StrictNullChecks/>
-                  proposal={proposal}
-                  toggleVotingModal={toggleVotingModal}
-                  votingModalOpen={votingModalOpen}
-                  redrawProposals={redrawProposals}
-                  proposalRedrawState={proposalRedrawState}
-                  toggleShowVotesDrawer={toggleShowVotesDrawer}
-                />
-                {isWindowSmallInclusive && (
-                  // @ts-expect-error <StrictNullChecks/>
-                  <VotingResults proposal={proposal} />
+                {proposal && (
+                  <>
+                    <VotingActions
+                      onModalClose={onModalClose}
+                      proposal={proposal}
+                      toggleVotingModal={toggleVotingModal}
+                      votingModalOpen={votingModalOpen}
+                      redrawProposals={redrawProposals}
+                      proposalRedrawState={proposalRedrawState}
+                      toggleShowVotesDrawer={toggleShowVotesDrawer}
+                    />
+                    {isWindowSmallInclusive && (
+                      <VotingResults proposal={proposal} />
+                    )}
+                  </>
                 )}
               </>
             ) : (
@@ -301,7 +304,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={createdAt}
                 id={identifier}
-                Threads={threads}
+                Threads={queryType === 'cosmos' ? cosmosThreads : threads}
                 scope={scope}
               />
             ),

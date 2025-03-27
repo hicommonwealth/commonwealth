@@ -325,11 +325,6 @@ export const CWContentPage = ({
           {mainBody}
           {showSidebar && (
             <div className="sidebar">
-              {proposalDetailSidebar &&
-                proposalDetailSidebar.map((c) => (
-                  // @ts-expect-error <StrictNullChecks/>
-                  <React.Fragment key={c.label}>{c.item}</React.Fragment>
-                ))}
               {showActionIcon && (
                 <div className="actions">
                   <div className="left-container">
@@ -338,7 +333,7 @@ export const CWContentPage = ({
                       iconSize="medium"
                       weight="bold"
                     />
-                    <CWText type="h4" fontWeight="bold">
+                    <CWText type="h5" fontWeight="semiBold">
                       Actions
                     </CWText>
                   </div>
@@ -353,6 +348,11 @@ export const CWContentPage = ({
               )}
               {!isCollapsed &&
                 sidebarComponents?.map((c) => (
+                  // @ts-expect-error <StrictNullChecks/>
+                  <React.Fragment key={c.label}>{c.item}</React.Fragment>
+                ))}
+              {proposalDetailSidebar &&
+                proposalDetailSidebar.map((c) => (
                   // @ts-expect-error <StrictNullChecks/>
                   <React.Fragment key={c.label}>{c.item}</React.Fragment>
                 ))}

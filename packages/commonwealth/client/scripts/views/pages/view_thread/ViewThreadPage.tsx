@@ -8,7 +8,10 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
+import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { Thread, ThreadView } from 'client/scripts/models/Thread';
+import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
@@ -71,8 +74,11 @@ import {
 import DetailCard from '../../components/proposals/DetailCard';
 import TimeLineCard from '../../components/proposals/TimeLineCard';
 import VotingResultView from '../../components/proposals/VotingResultView';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/voting_results';
 import { getTextFromDelta } from '../../components/react_quill_editor/';
 import ProposalVotesDrawer from '../NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
+import { useCosmosProposal } from '../NewProposalViewPage/useCosmosProposal';
 import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { CommentTree } from '../discussions/CommentTree';
@@ -105,13 +111,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
   const initalAiCommentPosted = useRef(false);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-
+  useInitChainIfNeeded(app);
   const user = useUserStore();
   const commentsRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const forceRerender = useForceRerender();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -147,6 +156,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const snapshotLink = thread?.links?.find(
     (link) => link?.source === 'snapshot',
   );
+  const proposalLink = thread?.links?.find(
+    (link) => link?.source === LinkSource.Proposal,
+  );
 
   const [snapshotId, proposalId] = snapshotLink?.identifier?.split('/') || [
     '',
@@ -170,6 +182,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     snapshotId: snapshotId,
     enabled: !!snapshotLink,
   });
+
+  const { proposal, threads: cosmosThreads } = useCosmosProposal({
+    // @ts-expect-error <StrictNullChecks/>
+    proposalId: proposalLink?.identifier,
+    enabledApi: !!proposalLink,
+  });
+  useEffect(() => {
+    proposal?.isFetched?.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched?.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
 
   const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
@@ -620,26 +645,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : []),
   ];
 
+  const governanceType = proposal
+    ? 'cosmos'
+    : snapshotProposal
+      ? 'snapshot'
+      : '';
+  // @ts-expect-error <StrictNullChecks/>
+  const status = snapshotProposal?.state || proposal?.status;
+
   const proposalDetailSidebar = [
-    ...(!isWindowSmallInclusive && snapshotProposal
+    ...(!isWindowSmallInclusive && (snapshotProposal || proposal)
       ? [
           {
             label: 'Detail',
             item: (
               <DetailCard
-                status="snapshot"
-                governanceType="snapshot"
-                publishDate={snapshotProposal?.created}
-                id={proposalId}
-                Threads={threads}
-                scope="dfsf"
+                status={status}
+                governanceType={governanceType}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={snapshotProposal?.created || proposal.createdAt}
+                id={proposalId || proposalLink?.identifier}
+                Threads={threads || cosmosThreads}
+                scope={thread?.communityId}
               />
             ),
           },
 
           {
             label: 'Timeline',
-            item: <TimeLineCard proposalData={snapshotProposal} />,
+            item: (
+              <TimeLineCard proposalData={snapshotProposal || proposal?.data} />
+            ),
           },
 
           {
@@ -647,7 +683,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             item: (
               <>
                 {!snapshotLink ? (
-                  <></>
+                  <VotingResults proposal={proposal as AnyProposal} />
                 ) : (
                   <VotingResultView
                     voteOptions={snapShotVotingResult}
@@ -663,6 +699,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   ];
   const toggleShowVotesDrawer = (newModalState: boolean) => {
     setShowVotesDrawer(newModalState);
+  };
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
   };
   return (
     <StickCommentProvider>
@@ -900,20 +943,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )}
           subBody={
             <>
-              {isWindowSmallInclusive && snapshotProposal && (
+              {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
                   <DetailCard
-                    status="snapshot"
-                    governanceType="snapshot"
-                    publishDate={snapshotProposal?.created}
-                    id={proposalId}
-                    Threads={threads}
-                    scope="dfsf"
+                    status={status}
+                    governanceType={governanceType}
+                    publishDate={
+                      // @ts-expect-error <StrictNullChecks/>
+                      snapshotProposal?.created || proposal.createdAt
+                    }
+                    id={proposalId || proposalLink?.identifier}
+                    Threads={threads || cosmosThreads}
+                    scope={thread?.communityId}
                   />
-                  <TimeLineCard proposalData={snapshotProposal} />
+                  <TimeLineCard
+                    proposalData={snapshotProposal || proposal?.data}
+                  />
                 </>
               )}
-              {snapshotProposal && (
+              {snapshotProposal ? (
                 <>
                   <SnapshotPollCardContainer
                     activeUserAddress={activeUserAddress}
@@ -945,14 +993,33 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     isOpen={showVotesDrawer}
                     setIsOpen={setShowVotesDrawer}
                   />
-                  {isWindowSmallInclusive && (
-                    <div className="action-cards">
-                      {sidebarComponent.map((view) => (
-                        <div key={view.label}>{view.item}</div>
-                      ))}
-                    </div>
+                </>
+              ) : (
+                <>
+                  {proposal && (
+                    <>
+                      <VotingActions
+                        onModalClose={onModalClose}
+                        proposal={proposal}
+                        toggleVotingModal={toggleVotingModal}
+                        votingModalOpen={votingModalOpen}
+                        redrawProposals={redrawProposals}
+                        proposalRedrawState={proposalRedrawState}
+                        toggleShowVotesDrawer={toggleShowVotesDrawer}
+                      />
+                      {isWindowSmallInclusive && (
+                        <VotingResults proposal={proposal} />
+                      )}
+                    </>
                   )}
                 </>
+              )}
+              {isWindowSmallInclusive && (
+                <div className="action-cards">
+                  {sidebarComponent.map((view) => (
+                    <div key={view.label}>{view.item}</div>
+                  ))}
+                </div>
               )}
             </>
           }
