@@ -12,6 +12,7 @@ interface CreateCommunityProps {
   iconUrl: string;
   socialLinks: string[];
   tokenName?: string;
+  tokenizeCommunity: boolean;
 }
 
 export const buildCreateCommunityInput = ({
@@ -21,6 +22,7 @@ export const buildCreateCommunityInput = ({
   description,
   iconUrl,
   socialLinks,
+  tokenizeCommunity,
   tokenName,
   chainNodeId,
 }: CreateCommunityProps) => {
@@ -36,6 +38,7 @@ export const buildCreateCommunityInput = ({
     default_symbol: nameToSymbol,
     token_name: tokenName,
     chain_node_id: chainNodeId,
+    allow_tokenized_threads: tokenizeCommunity,
   };
 };
 

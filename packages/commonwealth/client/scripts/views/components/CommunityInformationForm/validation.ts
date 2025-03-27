@@ -20,6 +20,7 @@ export const baseCommunityInformationFormValidationSchema = z.object({
   communityProfileImageURL: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  tokenizeCommunity: z.boolean().default(true),
 });
 
 export const communityChainValidation = z.object({

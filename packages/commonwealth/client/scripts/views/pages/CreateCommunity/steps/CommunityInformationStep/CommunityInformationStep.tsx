@@ -62,6 +62,7 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
+        tokenizeCommunity: values.tokenizeCommunity,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
