@@ -146,6 +146,13 @@ export async function generateUniqueId(
     };
   }
   const [kebabCommunityName, communityName] = formattedResult;
+  if (!kebabCommunityName.length) {
+    return {
+      id: null,
+      name: null,
+      error: `invalid community name: original="${name}"`,
+    };
+  }
 
   // assume clanker community ID is unique since token ID is unique
   const newCommunityId = `clanker-${kebabCommunityName}-${clankerTokenId}`;

@@ -1,11 +1,13 @@
-import { Actor, command } from '@hicommonwealth/core';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { Actor, command, dispose } from '@hicommonwealth/core';
+import { BalanceType, ChainBase, ChainType } from '@hicommonwealth/shared';
+import { seed } from 'model/src/tester';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateCommunity } from '../../src/aggregates/community';
 import { models } from '../../src/database';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
 
 const MOCK_TOKEN_ID = 1234;
+const MOCK_TOKEN_ADDRESS = '0x2345678901234567890123456789012345678901';
 
 const testActor: Actor = {
   address: '0x1234567890123456789012345678901234567890',
@@ -35,6 +37,7 @@ describe('generateUniqueId', () => {
     chain_node_id: 1,
     tags: [],
     user_id: testActor.user.id,
+    token_address: MOCK_TOKEN_ADDRESS,
   };
 
   beforeAll(async () => {
@@ -51,10 +54,32 @@ describe('generateUniqueId', () => {
       isAdmin: testActor.user.isAdmin,
       tier: 0,
     });
+    // create seed dummy community
+    await models.ChainNode.create({
+      id: baseFields.chain_node_id,
+      name: 'Test Chain Node',
+      url: 'test-url',
+      balance_type: BalanceType.Ethereum,
+      eth_chain_id: 1,
+    });
+    await seed('Community', {
+      id: 'dummy',
+      name: 'Dummy Community',
+      Addresses: [
+        {
+          address: testActor.address!,
+          user_id: testActor.user.id,
+          community_id: 'dummy',
+          role: 'admin',
+          verified: true,
+        },
+      ],
+      ...baseFields,
+    });
   });
 
-  beforeEach(async () => {
-    await models.Community.destroy({ where: {} });
+  afterAll(async () => {
+    await dispose()();
   });
 
   it('should handle invalid input names', async () => {
@@ -75,14 +100,56 @@ describe('generateUniqueId', () => {
     });
 
     // test invalid name
-    const invalidName = await generateUniqueId('👍', MOCK_TOKEN_ID);
-    expect(invalidName).toMatchObject({
-      error: 'invalid community name: original="👍"',
-      id: null,
-      name: null,
-    });
-    expect(invalidName.id).toBeNull();
-    expect(invalidName.name).toBeNull();
+    {
+      const invalidName = await generateUniqueId('👍', MOCK_TOKEN_ID);
+      expect(invalidName).toMatchObject({
+        error: 'invalid community name: original="👍"',
+        id: null,
+        name: null,
+      });
+      expect(invalidName.id).toBeNull();
+      expect(invalidName.name).toBeNull();
+    }
+    {
+      const invalidName = await generateUniqueId('!@#$%^&*()', MOCK_TOKEN_ID);
+      expect(invalidName).toMatchObject({
+        error: 'invalid community name: original="!@#$%^&*()"',
+        id: null,
+        name: null,
+      });
+      expect(invalidName.id).toBeNull();
+      expect(invalidName.name).toBeNull();
+    }
+    {
+      const invalidName = await generateUniqueId('$$$', MOCK_TOKEN_ID);
+      expect(invalidName).toMatchObject({
+        error: 'invalid community name: original="$$$"',
+        id: null,
+        name: null,
+      });
+      expect(invalidName.id).toBeNull();
+      expect(invalidName.name).toBeNull();
+    }
+    {
+      const invalidName = await generateUniqueId('あいうえお', MOCK_TOKEN_ID);
+      expect(invalidName).toMatchObject({
+        error: 'invalid community name: original="あいうえお"',
+        id: null,
+        name: null,
+      });
+      expect(invalidName.id).toBeNull();
+      expect(invalidName.name).toBeNull();
+    }
+    {
+      const invalidName = await generateUniqueId('你好', MOCK_TOKEN_ID);
+      expect(invalidName).toMatchObject({
+        error: 'invalid community name: original="你好"',
+        id: null,
+        name: null,
+      });
+      expect(invalidName.id).toBeNull();
+      expect(invalidName.name).toBeNull();
+    }
   });
 
   it('should generate base ID when no conflicts exist', async () => {
@@ -120,54 +187,49 @@ describe('generateUniqueId', () => {
   });
 
   it('should generate enumerated community names', async () => {
-    await command(CreateCommunity(), {
-      actor: testActor,
-      payload: {
-        id: `clanker-test-community-55`,
-        name: 'Test Community',
-        ...baseFields,
-      },
-    });
-    await command(CreateCommunity(), {
-      actor: testActor,
-      payload: {
-        id: `clanker-test-community-66`,
-        name: 'Test Community #2',
-        ...baseFields,
-      },
-    });
-    await command(CreateCommunity(), {
-      actor: testActor,
-      payload: {
-        id: `clanker-test-community-77`,
-        name: 'Test Community #3',
-        ...baseFields,
-      },
-    });
-    await command(CreateCommunity(), {
-      actor: testActor,
-      payload: {
-        id: `clanker-test-community-88`,
-        name: 'Test Community #4',
-        ...baseFields,
-      },
-    });
-
-    // add similarly name community with different kebab case name
-    await command(CreateCommunity(), {
-      actor: testActor,
-      payload: {
-        id: `clanker-test-community-foobar-99`,
-        name: 'Test CommunityFOOBAR',
-        ...baseFields,
-      },
-    });
-
-    const result = await generateUniqueId('Test Community', 100);
-    expect(result).toMatchObject({
+    const result1 = await generateUniqueId('Enumerated Community', 2000);
+    expect(result1).toMatchObject({
       error: null,
-      id: `clanker-test-community-100`,
-      name: 'Test Community #5',
+      id: `clanker-enumerated-community-2000`,
+      name: `Enumerated Community`,
+    });
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: result1.id!,
+        name: result1.name!,
+        ...baseFields,
+      },
+    });
+
+    const result2 = await generateUniqueId('Enumerated Community', 2001);
+    expect(result2).toMatchObject({
+      error: null,
+      id: `clanker-enumerated-community-2001`,
+      name: `Enumerated Community #2`,
+    });
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: result2.id!,
+        name: result2.name!,
+        ...baseFields,
+      },
+    });
+
+    const result3 = await generateUniqueId('Enumerated Community', 2002);
+    expect(result3).toMatchObject({
+      error: null,
+      id: `clanker-enumerated-community-2002`,
+      name: `Enumerated Community #3`,
+    });
+    await command(CreateCommunity(), {
+      actor: testActor,
+      payload: {
+        id: result3.id!,
+        name: result3.name!,
+        ...baseFields,
+      },
     });
   });
 
