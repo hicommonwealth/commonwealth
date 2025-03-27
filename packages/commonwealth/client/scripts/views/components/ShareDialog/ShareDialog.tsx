@@ -5,21 +5,22 @@ import {
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { DownloadMobileAppContent } from 'views/components/DownloadMobileApp/DownloadMobileAppContent';
-import './DownloadMobileAppModal.scss';
+import { ShareSectionProps } from '../ShareSection';
 
-type DownloadMobileAppModal = {
+type ShareDialogProps = ShareSectionProps & {
   onClose: () => void;
 };
 
-export const DownloadMobileAppModal = (props: DownloadMobileAppModal) => {
-  const { onClose } = props;
+export const ShareDialog = (props: ShareDialogProps) => {
+  const { onClose, title } = props;
+
   return (
     <CWModal
       size="small"
       className="DownloadMobileAppModal"
       content={
         <>
-          <CWModalHeader label="Download Mobile App" onModalClose={onClose} />
+          <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
           <CWModalBody>
             <DownloadMobileAppContent />
           </CWModalBody>

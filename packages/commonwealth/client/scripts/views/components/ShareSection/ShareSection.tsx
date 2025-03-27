@@ -3,7 +3,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
-type ShareSectionProps = {
+export type ShareSectionProps = {
   url: string;
   title?: string;
   text?: string;
