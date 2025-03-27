@@ -13,6 +13,12 @@ export const SignIn = {
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
     privyIdentityToken: z.string().optional(),
+    privySsoOAuthToken: z
+      .string()
+      .optional()
+      .describe(
+        'The OAuth token of the SSO service the user signed in with e.g. Google, Github, etc.',
+      ),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),

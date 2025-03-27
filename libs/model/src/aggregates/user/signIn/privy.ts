@@ -93,17 +93,18 @@ export async function signInPrivy({
     log.trace(
       'Existing privy user not found, creating new user: ' + privyUser.id,
     );
-    // TODO: linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
+    // TODO: existing linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
     //  this extra call to Privy
     const fullPrivyUser = await getPrivyUserById(privyUser.id);
     const linkedAccount = fullPrivyUser.linkedAccounts.find(
       (a) => a.type === 'wallet' && a.address === payload.address,
     );
     if (!linkedAccount) throw new Error('No linked account found');
+    if (!payload.privySsoOAuthToken) throw new Error('Missing OAuth token');
     verifiedSsoInfo = await getVerifiedUserInfo({
       privyUser: fullPrivyUser,
       walletSsoSource: mapPrivyTypeToWalletSso(linkedAccount.type),
-      token: '', // TODO: how to get token from Privy?
+      token: payload.privySsoOAuthToken,
     });
   }
 

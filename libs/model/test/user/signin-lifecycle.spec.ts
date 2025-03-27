@@ -1,88 +1,178 @@
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
-import * as privyUtils from '../../src/aggregates/user/signIn/privyUtils';
-
-const getPrivyUserMock = vi.spyOn(privyUtils, 'getPrivyUserById');
-const getPrivyUserByIdTokenMock = vi.spyOn(privyUtils, 'getPrivyUserByIdToken');
-
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
-import { command, dispose, type Actor } from '@hicommonwealth/core';
+import { type Actor, command, dispose } from '@hicommonwealth/core';
 import { generateWallet } from '@hicommonwealth/evm-protocols';
+import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
   CANVAS_TOPIC,
   ChainBase,
   getSessionSigners,
   serializeCanvas,
-  // TEST_BLOCK_INFO_STRING,
   WalletId,
+  WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { User } from '@privy-io/server-auth';
+import {
+  Google,
+  GoogleOAuthWithMetadata,
+  User,
+  WalletWithMetadata,
+} from '@privy-io/server-auth';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import * as privyUtils from '../../src/aggregates/user/signIn/privyUtils';
 import { SignIn } from '../../src/aggregates/user/signIn/SignIn.command';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import * as tester from '../../src/tester';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
+const getPrivyUserMock = vi.spyOn(privyUtils, 'getPrivyUserById');
+const getPrivyUserByIdTokenMock = vi.spyOn(privyUtils, 'getPrivyUserByIdToken');
+
 const privyTestUserOneDid = 'did:privy:cm8no7aig005zranv3tivdeoj';
 
-describe.only('SignIn Lifecycle', async () => {
-  const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
-    await getSessionSigners();
-
+async function createEvmSigner(ethChainId: number) {
   const wallet = await generateWallet();
-  const evmSignerPrivy = new SIWESigner({
+  return new SIWESigner({
     signer: {
       getAddress: () => Promise.resolve(wallet.address),
       signMessage: (message: string) =>
         Promise.resolve(wallet.signMessage({ message })),
     },
-    chainId: 8453,
+    chainId: ethChainId,
   });
+}
 
-  // Update the addresses in the mock privy utils
-  const privySignerAddress = await evmSignerPrivy.getWalletAddress();
+function generateSsoPrivyUserData(address: string, provider: 'google') {
+  const subject = '123';
+  const email = 'test@gmail.com';
+  const name = 'Test User';
+  const dates = {
+    verifiedAt: new Date(),
+    firstVerifiedAt: new Date(),
+    latestVerifiedAt: new Date(),
+  };
+  return {
+    linkedAccounts: [
+      {
+        address,
+        type: 'wallet',
+        imported: false,
+        delegated: false,
+        ...dates,
+        chainType: 'ethereum' as const,
+        walletClientType: 'privy',
+        connectorType: 'embedded',
+      },
+      {
+        subject,
+        email,
+        name,
+        type: `${provider}_oauth`,
+        ...dates,
+      },
+    ] as [WalletWithMetadata, GoogleOAuthWithMetadata],
+    wallet: {
+      address,
+      chainType: 'ethereum' as const,
+      walletClientType: 'privy',
+      connectorType: 'embedded',
+      imported: false,
+      delegated: false,
+      ...dates,
+    } as Omit<WalletWithMetadata, 'type'>,
+    [provider]: {
+      subject,
+      email,
+      name,
+    } as Google,
+  };
+}
 
-  const fullPrivyUserMock: User = {
-    id: privyTestUserOneDid,
-    createdAt: new Date('2025-03-24T19:49:09.000Z'),
-    isGuest: false,
+function generateExternalWalletPrivyUserData(
+  address: string,
+  wallet: 'metamask',
+) {
+  const dates = {
+    verifiedAt: new Date(),
+    firstVerifiedAt: new Date(),
+    latestVerifiedAt: new Date(),
+  };
+  return {
     linkedAccounts: [
       {
         type: 'wallet',
-        address: privySignerAddress,
-        chainType: 'ethereum',
-        walletClientType: 'metamask',
-        latestVerifiedAt: new Date('2025-03-24T19:49:09.000Z'),
+        address,
+        chainType: 'ethereum' as const,
+        walletClientType: wallet,
+        ...dates,
       },
-    ],
+    ] as [WalletWithMetadata],
     wallet: {
-      address: privySignerAddress,
-      chainType: 'ethereum',
-      walletClientType: 'metamask',
-      latestVerifiedAt: new Date('2025-03-24T19:49:09.000Z'),
-    },
-  } as unknown as User;
+      address,
+      chainType: 'ethereum' as const,
+      walletClientType: wallet,
+      ...dates,
+    } as Omit<WalletWithMetadata, 'type'>,
+  };
+}
 
-  const partialPrivyUserMock: User = {
-    id: privyTestUserOneDid,
-    createdAt: '2025-03-24T23:00:41.000Z',
+async function createPrivyUser(
+  signer: SIWESigner,
+  provider: 'externalWallet' | 'google',
+): Promise<User> {
+  const address = await signer.getWalletAddress();
+  const did = `did:privy:${Array.from(
+    crypto.getRandomValues(new Uint8Array(16)),
+  )
+    .map((b) => b.toString(36).padStart(2, '0'))
+    .join('')
+    .substring(0, 25)}`;
+
+  return {
+    id: did,
+    createdAt: new Date(),
     isGuest: false,
-    linkedAccounts: [
-      {
-        type: 'wallet',
-        address: privySignerAddress,
-        chainType: 'ethereum',
-        walletClientType: 'metamask',
-        latestVerifiedAt: '2025-03-24T23:00:41.000Z',
-      },
-    ],
-    wallet: {
-      address: privySignerAddress,
-      chainType: 'ethereum',
-      walletClientType: 'metamask',
-      latestVerifiedAt: '2025-03-24T23:00:41.000Z',
-    },
-  } as unknown as User;
+    customMetadata: {},
+    ...(provider === 'externalWallet'
+      ? generateExternalWalletPrivyUserData(address, 'metamask')
+      : generateSsoPrivyUserData(address, provider)),
+  } as User;
+}
+
+const getVerifiedUserInfoMock: typeof getVerifiedUserInfo = ({
+  privyUser,
+  walletSsoSource,
+  token,
+}: {
+  privyUser?: User;
+  walletSsoSource: string;
+  token?: string;
+}) => {
+  if (!privyUser) throw new Error('Only Privy supported in the Mock');
+
+  switch (walletSsoSource) {
+    case 'google':
+      return Promise.resolve({
+        provider: WalletSsoSource.Google,
+        email: privyUser.google?.email,
+        emailVerified: true,
+      });
+    default:
+      throw new Error(`Unsupported SSO provider: ${walletSsoSource}`);
+  }
+};
+
+describe.only('SignIn Lifecycle', async () => {
+  const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
+    await getSessionSigners();
+
+  const mmPrivySigner = await createEvmSigner(8453);
+  const externalWalletPrivyUser = await createPrivyUser(
+    mmPrivySigner,
+    'externalWallet',
+  );
+  const googlePrivySigner = await createEvmSigner(84532);
+  const googlePrivyUser = await createPrivyUser(googlePrivySigner, 'google');
 
   afterAll(async () => {
     await dispose()();
@@ -111,13 +201,25 @@ describe.only('SignIn Lifecycle', async () => {
     },
     {
       id: 'privy-evm-metamask',
-      signer: evmSignerPrivy,
+      signer: mmPrivySigner,
       wallet: WalletId.Privy,
       seed: {
         chain_base: ChainBase.Ethereum,
         roles: ['admin'],
         chain_node: { eth_chain_id: 8453 },
       },
+      privyUser: externalWalletPrivyUser,
+    },
+    {
+      id: 'privy-evm-google',
+      signer: googlePrivySigner,
+      wallet: WalletId.Privy,
+      seed: {
+        chain_base: ChainBase.Ethereum,
+        roles: ['admin'],
+        chain_node: { eth_chain_id: 84532 },
+      },
+      privyUser: googlePrivyUser,
     },
     {
       id: 'native-cosmos-keplr',
@@ -157,6 +259,7 @@ describe.only('SignIn Lifecycle', async () => {
     signer: SessionSigner;
     wallet: WalletId;
     seed: CommunitySeedOptions;
+    privyUser?: User;
   }>;
 
   const refs = {} as Record<
@@ -171,18 +274,17 @@ describe.only('SignIn Lifecycle', async () => {
   >;
 
   describe('create addresses and users', () => {
-    // TODO: add some kind of indicator above for sso vs wallet Privy
-    //  return different mocks based on that in order to test findAddressBySso
-    //  OR: create separate test suite for SSO tests
-    getPrivyUserMock.mockImplementation(() => {
-      return Promise.resolve(fullPrivyUserMock);
-    });
-    getPrivyUserByIdTokenMock.mockImplementation(() => {
-      return Promise.resolve(partialPrivyUserMock);
-    });
     it.each(chains)(
-      'should create $seed.chain_base $wallet address and new user',
-      async ({ id, signer, wallet, seed }) => {
+      'should create $seed.chain_base $wallet address and new user (id: $id)',
+      async ({ id, signer, wallet, seed, privyUser }) => {
+        if (privyUser) {
+          getPrivyUserMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getPrivyUserByIdTokenMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+        }
         const { payload } = await signer.newSession(CANVAS_TOPIC);
         const { community } = await seedCommunity(seed);
         const address =
@@ -357,16 +459,18 @@ describe.only('SignIn Lifecycle', async () => {
   });
 
   describe('transfer ownership', () => {
-    getPrivyUserMock.mockImplementation(() => {
-      return Promise.resolve(fullPrivyUserMock);
-    });
-    getPrivyUserByIdTokenMock.mockImplementation(() => {
-      return Promise.resolve(partialPrivyUserMock);
-    });
-
     it.each(chains)(
-      'should transfer $seed.chain_base $wallet address ownership',
-      async ({ id, wallet, seed }) => {
+      'should transfer $seed.chain_base $wallet address ownership (id: $id)',
+      async ({ id, wallet, seed, privyUser }) => {
+        if (privyUser) {
+          getPrivyUserMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getPrivyUserByIdTokenMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+        }
+
         const ref = refs[id];
 
         // create a second community and have ref.actor join it
