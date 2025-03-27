@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import shape2Url from 'assets/img/shapes/shape2.svg';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   BaseMixpanelPayload,
@@ -37,6 +39,7 @@ const AdminContestsPage = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
+  const judgeContestEnabled = useFlag('judgeContest');
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -114,6 +117,10 @@ const AdminContestsPage = () => {
 
   const goToLaunchCommonContest = () => {
     navigate(`/manage/contests/launch?type=${ContestType.Common}`);
+  };
+
+  const goToCreateTopicPage = () => {
+    navigate('/manage/topics');
   };
 
   // Check if there are any contests (active or finished)
@@ -201,28 +208,42 @@ const AdminContestsPage = () => {
           </>
         ) : contestView === ContestView.TypeSelection ? (
           <div className="type-selection-list">
-            <EmptyCard
-              img={commonUrl}
-              title="Launch on Common"
-              subtitle={
-                hasAtLeastOneWeightedVotingTopic
-                  ? 'Setting up a contest just takes a few minutes and can be a huge boost to your community.'
-                  : `For weighted contests, you need at least one topic with weighted voting enabled. 
-                    You can still proceed to set up your contest.`
-              }
-              button={{
-                label: 'Launch Common contest',
-                handler: goToLaunchCommonContest,
-              }}
-            />
+            {judgeContestEnabled || hasAtLeastOneWeightedVotingTopic ? (
+              <EmptyCard
+                img={commonUrl}
+                title="Launch on Common"
+                subtitle={
+                  hasAtLeastOneWeightedVotingTopic
+                    ? `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
+                    : `For weighted contests, you need at least one topic with weighted voting enabled. 
+You can still proceed to set up your contest.`
+                }
+                button={{
+                  label: 'Launch Common contest',
+                  handler: goToLaunchCommonContest,
+                }}
+              />
+            ) : (
+              <EmptyCard
+                img={shape2Url}
+                title="Launch on Common"
+                subtitle={`You must have at least one topic with weighted voting enabled to run contest.
+Setting up a contest just takes a few minutes and can be a huge boost to your community.`}
+                button={{
+                  label: 'Create a topic',
+                  handler: goToCreateTopicPage,
+                }}
+              />
+            )}
 
             <EmptyCard
               img={farcasterUrl}
               title="Launch on Farcaster"
               subtitle={
                 community?.namespace
-                  ? 'Share your contest on Farcaster'
-                  : 'You need a namespace for your community to run Farcaster contests. Set one up first.'
+                  ? `Share your contest on Farcaster`
+                  : `You need a namespace for your community to run Farcaster contests.
+Set one up first.`
               }
               button={{
                 label: community?.namespace
