@@ -9,6 +9,11 @@ type ShareSectionProps = {
   text?: string;
 };
 
+/**
+ * Create a share section for sharing content.
+ *
+ * Title and text are only supported on certain providers.
+ */
 export const ShareSection = (props: ShareSectionProps) => {
   const { url, title, text } = props;
 
