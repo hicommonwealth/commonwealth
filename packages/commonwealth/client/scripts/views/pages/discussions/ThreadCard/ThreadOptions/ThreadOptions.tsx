@@ -14,6 +14,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
+import ShareButton from 'views/components/ShareButton';
 import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -158,6 +159,15 @@ export const ThreadOptions = ({
             linkToShare={shareEndpoint}
             buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
           />
+
+          {shareEndpoint && (
+            <ShareButton
+              url={shareEndpoint}
+              title={thread.title}
+              text={thread.body}
+              buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
+            />
+          )}
 
           {userStore.id > 0 && (
             <ToggleThreadSubscribe
