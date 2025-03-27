@@ -131,8 +131,8 @@ export const CommunityMember = z.object({
       avatar_url: z.string().nullish(),
     })
     .nullish(),
-  referral_count: PG_INT.default(0).nullish(),
-  referral_eth_earnings: z.number().nullish(),
-  xp_points: PG_INT.default(0).nullish(),
-  xp_referrer_points: PG_INT.default(0).nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number(),
+  xp_points: PG_INT.default(0),
+  xp_referrer_points: PG_INT.default(0),
 });

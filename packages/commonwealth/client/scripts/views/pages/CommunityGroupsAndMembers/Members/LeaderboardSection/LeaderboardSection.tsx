@@ -83,7 +83,7 @@ const LeaderboardSection = () => {
       search: debouncedSearchTerm,
     }),
   });
-  console.log('MEMBERS:: ', members);
+
   const formattedMembers =
     members?.pages?.[0]?.results.map((member, index) => ({
       ...member,
