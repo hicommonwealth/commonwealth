@@ -29,6 +29,7 @@ type CreateCommentProps = {
   onCancel?: (event: React.MouseEvent) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   aiCommentsToggleEnabled?: boolean;
+  parentCommentText?: string;
 };
 
 export const CreateComment = ({
@@ -43,6 +44,7 @@ export const CreateComment = ({
   onCancel,
   onCommentCreated,
   aiCommentsToggleEnabled = false,
+  parentCommentText,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -184,6 +186,8 @@ export const CreateComment = ({
       tooltipText={tooltipText}
       isReplying={isReplying}
       replyingToAuthor={replyingToAuthor}
+      thread={rootThread}
+      parentCommentText={parentCommentText}
     />
   ) : (
     <ArchiveMsg archivedAt={rootThread.archivedAt!} />

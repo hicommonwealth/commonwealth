@@ -35,12 +35,12 @@ import writeUserSetting from '../routes/writeUserSetting';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 
-import { generateThreadText, type DB } from '@hicommonwealth/model';
+import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
-import { generateCommentText, generateTokenIdea } from '@hicommonwealth/model';
+import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import generateImage from '../routes/generateImage';
+import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -63,6 +63,7 @@ import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
+import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
@@ -72,7 +73,6 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
@@ -424,7 +424,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
-    generateImage.bind(this, models),
+    generateImageHandler.bind(this, models),
   );
 
   registerRoute(
@@ -448,74 +448,6 @@ function setupRouter(
       const ideaGenerator = generateTokenIdea({ ideaPrompt });
 
       for await (const chunk of ideaGenerator) {
-        if ((chunk as { error?: string }).error) {
-          return res.end(
-            JSON.stringify({
-              status: 'failure',
-              message: (chunk as { error?: string }).error,
-            }) + '\n',
-          );
-        }
-
-        res.write(chunk);
-        res.flush();
-      }
-
-      return res.end();
-    },
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/generateThreadText',
-    rateLimiterMiddleware({
-      routerNamespace: 'generateThreadText',
-      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
-    }),
-    passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Transfer-Encoding', 'chunked');
-      const userText =
-        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
-      const threadGenerator = generateThreadText({ userText });
-
-      for await (const chunk of threadGenerator) {
-        if ((chunk as { error?: string }).error) {
-          return res.end(
-            JSON.stringify({
-              status: 'failure',
-              message: (chunk as { error?: string }).error,
-            }) + '\n',
-          );
-        }
-
-        res.write(chunk);
-        res.flush();
-      }
-
-      return res.end();
-    },
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/generateCommentText',
-    rateLimiterMiddleware({
-      routerNamespace: 'generateCommentText',
-      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
-    }),
-    passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Transfer-Encoding', 'chunked');
-      const userText =
-        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
-      const commentGenerator = generateCommentText({ userText });
-
-      for await (const chunk of commentGenerator) {
         if ((chunk as { error?: string }).error) {
           return res.end(
             JSON.stringify({
@@ -578,16 +510,6 @@ function setupRouter(
     communityStats.bind(this, models),
   );
 
-  // Group routes
-  registerRoute(
-    router,
-    'put',
-    '/refresh-membership',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    refreshMembershipHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'get',
@@ -604,6 +526,14 @@ function setupRouter(
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));
+
+  registerRoute(
+    router,
+    'post',
+    '/aicompletion',
+    passport.authenticate('jwt', { session: false }),
+    aiCompletionHandler,
+  );
 
   // proxies
   setupCosmosProxy(router, cacheDecorator);

@@ -1,3 +1,4 @@
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
 import {
   AllowlistData,
   BalanceSourceType,
@@ -5,12 +6,12 @@ import {
   ThresholdData,
 } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
-import type { MembershipRejectReason } from '../models/membership';
+import { z } from 'zod';
 import type { OptionsWithBalances } from '../services';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
-  messages?: MembershipRejectReason;
+  messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
 };
 
@@ -74,7 +75,7 @@ export function validateGroupMembership(
 
   if (allowListOverride) {
     // allow if address is whitelisted
-    return { isValid: true };
+    return { isValid: true, messages: undefined };
   }
 
   if (numRequiredRequirements) {

@@ -55,6 +55,8 @@ const {
   PRIVY_FLAG,
   PRIVY_APP_ID,
   PRIVY_APP_SECRET,
+  FLAG_USE_RUNWARE,
+  RUNWARE_API_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -187,6 +189,10 @@ export const config = configure(
       FLAG_ENABLED: PRIVY_FLAG === 'true',
       APP_ID: PRIVY_APP_ID,
       APP_SECRET: PRIVY_APP_SECRET,
+    },
+    IMAGE_GENERATION: {
+      FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
+      RUNWARE_API_KEY: RUNWARE_API_KEY,
     },
   },
   z.object({
@@ -417,5 +423,11 @@ export const config = configure(
       .refine(
         (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
       ),
+    IMAGE_GENERATION: z
+      .object({
+        FLAG_USE_RUNWARE: z.boolean().optional(),
+        RUNWARE_API_KEY: z.string().optional(),
+      })
+      .refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
   }),
 );
