@@ -58,16 +58,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
-      console.log(
-        `Payload address: ${payload.address} vs Encoded address: ${encodedAddress}`,
-      );
-
       const was_signed_in = actor.user.id > 0;
       const user_id = was_signed_in
         ? actor.user.id
         : (existingHexUserId ?? null);
       let user: UserAttributes | undefined | null;
-      console.log(`>>>>>> User id found: ${user_id}`);
       if (user_id) {
         user = await models.User.findOne({
           where: {

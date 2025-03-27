@@ -76,8 +76,6 @@ export async function signInPrivy({
     );
   }
 
-  // Sanity check
-  console.log('Payload address: ' + payload.address);
   const userOwnsAddress = privyUser.linkedAccounts.some((a) => {
     if (a.type === 'wallet' && a.address === payload.address) return true;
   });
@@ -91,15 +89,9 @@ export async function signInPrivy({
     });
   }
 
-  console.log(
-    `Privy sign in data: user.privy_id = ${user?.privy_id}, userOwnsAddress = ${userOwnsAddress}, privyUser.wallet?.walletClientType = ${privyUser.wallet?.walletClientType}`,
-  );
-  console.log(
-    'WHAT THE FUCK:',
-    !user,
-    !user?.privy_id,
-    !userOwnsAddress,
-    privyUser.wallet?.walletClientType === 'privy',
+  log.trace(
+    `Privy sign in data: user.privy_id = ${user?.privy_id},` +
+      ` userOwnsAddress = ${userOwnsAddress}, privyUser.wallet?.walletClientType = ${privyUser.wallet?.walletClientType}`,
   );
   // First time signing in with Privy SSO (existing or new user)
   // OR transferring old SSO address to new Privy user

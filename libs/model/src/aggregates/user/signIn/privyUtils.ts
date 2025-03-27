@@ -12,12 +12,12 @@ export const privyClient = new PrivyClient(
 
 export async function getPrivyUserById(id: string) {
   const user = await privyClient.getUserById(id);
-  console.log(`getPrivyUserById: ${JSON.stringify(user, null, 2)}`);
+  log.trace(`getPrivyUserById: ${JSON.stringify(user, null, 2)}`);
   return user;
 }
 
 export async function getPrivyUserByIdToken(idToken: string) {
   const user = await privyClient.getUser({ idToken });
-  console.log(`getPrivyUserByIdToken: ${JSON.stringify(user, null, 2)}`);
+  log.trace(`getPrivyUserByIdToken: ${JSON.stringify(user, null, 2)}`);
   return user;
 }

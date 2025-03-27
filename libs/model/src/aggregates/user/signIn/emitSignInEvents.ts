@@ -87,7 +87,7 @@ export async function emitSignInEvents({
     });
   }
 
-  console.log(
+  log.trace(
     'Emitting Sign In Events: ',
     events.map((e) => e.event_name).join(','),
   );

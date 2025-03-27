@@ -37,7 +37,7 @@ export async function findUserByAddressOrHex(
   searchTerm: { address: string } | { hex: string },
   transaction: Transaction,
 ): Promise<UserAttributes | null> {
-  console.log(`findUserByAddressOrHex: ${JSON.stringify(searchTerm)}`);
+  log.trace(`findUserByAddressOrHex: ${JSON.stringify(searchTerm)}`);
   const users = await models.sequelize.query(
     `
       WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
@@ -67,7 +67,7 @@ export async function findUserBySso(
   ssoInfo: VerifiedUserInfo,
   transaction: Transaction,
 ): Promise<UserAttributes | null> {
-  console.log(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
+  log.trace(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
   const users = await models.sequelize.query(
     `
       WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
@@ -136,7 +136,7 @@ export async function findOrCreateUser({
       },
       { transaction },
     );
-    console.log(`Created new user: ${user.id}`);
+    log.trace(`Created new user: ${user.id}`);
     return { newUser: true, user };
   } else if (privyUserId && !foundUser.privy_id && !signedInUser?.privy_id) {
     // Existing user signing in with Privy for the first time
@@ -151,7 +151,7 @@ export async function findOrCreateUser({
         transaction,
       },
     );
-    console.log(`Updated user privy id: ${foundUser.id}`);
+    log.trace(`Updated user privy id: ${foundUser.id}`);
   } else if (privyUserId && foundUser && !foundUser.privy_id) {
     // Signed in Privy user connecting an address owned by another user
     // sanity check
@@ -220,7 +220,7 @@ async function transferAddressOwnership({
         },
       );
     }
-    console.log(
+    log.trace(
       `Addresses ${address} transferred from user ${foundUser.id} to user ${signedInUser.id}`,
     );
     return true;
