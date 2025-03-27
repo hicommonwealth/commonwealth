@@ -1,10 +1,14 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import { BalanceType, ChainBase, ChainType } from '@hicommonwealth/shared';
 import { seed } from 'model/src/tester';
+import { emitEvent } from 'model/src/utils/utils';
+import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateCommunity } from '../../src/aggregates/community';
 import { models } from '../../src/database';
+import { CommunityIndexerWorker } from '../../src/policies';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
+import { drainOutbox } from '../utils';
 
 const MOCK_TOKEN_ID = 1234;
 const MOCK_TOKEN_ADDRESS = '0x2345678901234567890123456789012345678901';
@@ -259,5 +263,70 @@ describe('generateUniqueId', () => {
       id: `clanker-test-community-123-${MOCK_TOKEN_ID}`,
       name: 'Test & Community @ 123!',
     });
+  });
+
+  it('should handle duplicate named consecutive tokens', async () => {
+    await emitEvent(models.Outbox, [
+      {
+        event_name: 'ClankerTokenFound',
+        event_payload: {
+          id: 996,
+          name: '$kull',
+          pair: '',
+          type: 'proxy',
+          symbol: '$💀',
+          img_url: '',
+          tx_hash:
+            '0x18c9fa160213cbb953a98da45b29962d55536873f16f63ac36fe8db5a83c330b',
+          cast_hash: '0x4694b500cf55de0e3185f534f77bf2a232a3fa74',
+          created_at: new Date('2024-11-14T07:00:15.348Z'),
+          presale_id: '',
+          pool_address: '0x169C5834cB358E76BF64907c24E7666000464B8E',
+          requestor_fid: 195117,
+          contract_address: '0x0f090B9e83B56841612f8E91F336650eFb3f8274',
+        },
+      },
+    ]);
+
+    await emitEvent(models.Outbox, [
+      {
+        event_name: 'ClankerTokenFound',
+        event_payload: {
+          id: 997,
+          name: '$kull',
+          pair: '',
+          type: 'proxy',
+          symbol: '$💀',
+          img_url: '',
+          tx_hash:
+            '0x55c74823b5d98878ae277cbb1ffb5daf9ddbaf43b8c6398bdf1c79ccd3af7103',
+          cast_hash: '0xf3bd0187b74ae0897c4136b732b4b41c558bd9b6',
+          created_at: new Date('2024-11-14T07:02:57.620Z'),
+          presale_id: '',
+          pool_address: '0x454891dE1059D6df1A02DeFdD973F0a87aF42447',
+          requestor_fid: 195117,
+          contract_address: '0x0b8A44312C30892ec9d313A75d20141682E52ED1',
+        },
+      },
+    ]);
+
+    const numCommunitiesBefore = await models.Community.count();
+
+    await drainOutbox(['ClankerTokenFound'], CommunityIndexerWorker);
+
+    const numCommunitiesAfter = await models.Community.count();
+    expect(numCommunitiesAfter).toBe(numCommunitiesBefore + 2);
+
+    const communities = await models.Community.findAll({
+      where: {
+        name: {
+          [Op.like]: '%$kull%',
+        },
+      },
+      order: [['created_at', 'ASC']],
+    });
+    expect(communities.length).toBe(2);
+    expect(communities[0].name).toBe('$kull');
+    expect(communities[1].name).toBe('$kull #2');
   });
 });
