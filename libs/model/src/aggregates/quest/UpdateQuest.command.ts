@@ -207,6 +207,11 @@ async function updateCommonQuest(
                 : [],
             });
             mustExist(`Comment with id "${id}"`, comment);
+          } else if (content === 'group') {
+            const group = await models.Group.findOne({
+              where: c_id ? { id: +id, community_id: c_id } : { id: +id },
+            });
+            mustExist(`Group with id "${id}"`, group);
           } else if (content === 'goal') {
             if (!c_id)
               throw new InvalidInput(

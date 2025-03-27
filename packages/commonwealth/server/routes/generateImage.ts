@@ -1,18 +1,10 @@
-import {
-  AppError,
-  ServerError,
-  blobStorage,
-  logger,
-} from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
-import fetch from 'node-fetch';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { DB, generateImage } from '@hicommonwealth/model';
 import { OpenAI } from 'openai';
-import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 let openai: OpenAI | undefined = undefined;
-
 const log = logger(import.meta);
 
 if (process.env.OPENAI_API_KEY) {
@@ -23,7 +15,7 @@ if (process.env.OPENAI_API_KEY) {
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (e) {
-    log.error('OpenAI initialization failed.', e);
+    log.error('OpenAI initialization failed', e);
   }
 } else {
   log.warn(
@@ -39,49 +31,24 @@ type generateImageResp = {
   imageUrl: string;
 };
 
-const generateImage = async (
+const generateImageHandler = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>,
 ) => {
   const { description } = req.body;
 
-  if (!openai) {
-    throw new ServerError('OpenAI not initialized');
-  }
-
   if (!description) {
     throw new AppError('No description provided');
   }
 
-  let image;
   try {
-    const response = await openai.images.generate({
-      model: 'dall-e-2',
-      n: 1,
-      prompt: description,
-      size: '256x256',
-      response_format: 'url',
-    });
-
-    image = response.data[0].url;
+    const imageUrl = await generateImage(description, openai);
+    return success(res, { imageUrl });
   } catch (e) {
+    log.error('Problem generating image', e);
     throw new ServerError('Problem Generating Image!', e);
-  }
-
-  try {
-    const resp = await fetch(image);
-    const buffer = await resp.buffer();
-    const { url } = await blobStorage().upload({
-      key: `${uuidv4()}.png`,
-      bucket: 'assets',
-      content: buffer,
-      contentType: 'image/png',
-    });
-    return success(res, { imageUrl: url });
-  } catch (e) {
-    throw new ServerError('Problem uploading image!', e);
   }
 };
 
-export default generateImage;
+export default generateImageHandler;
