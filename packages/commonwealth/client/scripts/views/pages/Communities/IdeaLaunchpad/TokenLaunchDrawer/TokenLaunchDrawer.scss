@@ -1,8 +1,12 @@
 @import '../../../../../styles/shared.scss';
 
 .TokenLaunchDrawer {
+  position: relative;
+  z-index: 1000;
+
   .Drawer.filter-drawer {
     background: $white;
+    z-index: 1001;
 
     @include extraSmall {
       padding-bottom: 0px !important;
@@ -11,6 +15,7 @@
     .DrawerTopBar {
       padding: 0;
       margin-left: -36px;
+      z-index: 1002;
 
       @include mediumSmallMid {
         margin-left: -26px;

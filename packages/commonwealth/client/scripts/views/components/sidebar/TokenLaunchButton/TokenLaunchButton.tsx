@@ -20,6 +20,7 @@ type TokenLaunchButtonProps = {
   buttonHeight?: ButtonHeight;
   buttonWidth?: ButtonWidth;
   buttonType?: 'reset' | 'submit' | 'button';
+  buttonLabel?: string;
   disabled?: boolean;
   onClick?: () => void;
 };
@@ -28,6 +29,7 @@ const TokenLaunchButton = ({
   buttonHeight,
   buttonWidth,
   buttonType = 'button',
+  buttonLabel = 'Launch Token',
   disabled,
   onClick,
 }: TokenLaunchButtonProps) => {
@@ -52,9 +54,9 @@ const TokenLaunchButton = ({
   return (
     <div className="TokenLaunchButton">
       <CWButton
-        label="Launch Token"
+        label={buttonLabel}
         buttonHeight={buttonHeight || 'med'}
-        buttonWidth={buttonWidth || 'full'}
+        buttonWidth={buttonWidth || 'narrow'}
         iconLeft="rocketLaunch"
         type={buttonType}
         disabled={disabled}

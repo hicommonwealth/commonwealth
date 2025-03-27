@@ -102,7 +102,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
-        <div className="DesktopStickyInputCollapsed">
+        <div className="DesktopStickyInputCollapsed" onClick={handleFocused}>
           <div className="container">
             <input
               type="text"
@@ -114,7 +114,6 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                     ? `Reply to ${replyingToAuthor}...`
                     : 'Write a comment...'
               }
-              onClick={handleFocused}
             />
           </div>
         </div>

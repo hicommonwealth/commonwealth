@@ -2,16 +2,20 @@
 
 .PageCounter {
   display: flex;
-  flex-direction: row;
-  width: fit-content;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 
   .counter {
-    display: flex;
+    min-width: 40px;
+    text-align: center;
 
-    .Text {
-      color: $neutral-500;
+    @include smallInclusive {
+      min-width: 30px;
     }
+  }
+
+  @include smallInclusive {
+    gap: 4px;
   }
 }

@@ -51,13 +51,13 @@ const CommunityHome = () => {
           </div>
         </div>
         <TokenPerformance />
-        <ActiveContestList isCommunityHomePage />
-        <CommunityTransactions />
-        {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList
           query={useFetchGlobalActivityQuery}
           communityIdFilter={chain}
         />
+        <ActiveContestList isCommunityHomePage />
+        <CommunityTransactions />
+        {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <CWModal
           size="small"
           content={

@@ -6,6 +6,10 @@
   padding-top: 20px;
   padding-bottom: 20px;
 
+  body.token-launch-drawer-open & {
+    z-index: 1;
+  }
+
   @include extraSmall {
     padding-inline: 16px;
     padding-top: 0; // because of the breadcrumbs being in static position on mobile
@@ -14,6 +18,10 @@
   .layout-container {
     margin: 0 auto;
     max-width: 1040px;
+
+    body.token-launch-drawer-open & {
+      z-index: 1;
+    }
 
     @include mediumSmall {
       max-width: 792px;

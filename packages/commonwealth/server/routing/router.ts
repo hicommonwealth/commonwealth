@@ -40,7 +40,7 @@ import setAddressWallet from '../routes/setAddressWallet';
 
 import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import generateImage from '../routes/generateImage';
+import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -425,7 +425,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
-    generateImage.bind(this, models),
+    generateImageHandler.bind(this, models),
   );
 
   registerRoute(
