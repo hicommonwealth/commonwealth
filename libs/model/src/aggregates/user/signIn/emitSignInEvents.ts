@@ -1,9 +1,12 @@
+import { logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { emitEvent } from '../../../utils/utils';
+
+const log = logger(import.meta);
 
 export async function emitSignInEvents({
   newAddress,
@@ -88,8 +91,7 @@ export async function emitSignInEvents({
   }
 
   log.trace(
-    'Emitting Sign In Events: ',
-    events.map((e) => e.event_name).join(','),
+    `Emitting Sign In Events: ${events.map((e) => e.event_name).join(',')}`,
   );
   await emitEvent(models.Outbox, events, transaction);
 }

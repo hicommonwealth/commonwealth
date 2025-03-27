@@ -1,5 +1,8 @@
+import { logger } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import { PrivyClient } from '@privy-io/server-auth';
+
+const log = logger(import.meta);
 
 // NOTE: this file is separate from privy.ts for mocking purposes
 // i.e. we can import these functions and mock them before importing
