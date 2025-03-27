@@ -7,9 +7,12 @@ import {
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
+import {
+  getPreviewImageUrl,
+  getRenderedTitle,
+} from '../../aggregates/webhook/util';
 import { config } from '../../config';
 import { models } from '../../database';
-import { getPreviewImageUrl, getRenderedTitle } from '../../webhook/util';
 import { getProfileUrl, getThreadUrl } from '../utils/utils';
 
 const log = logger(import.meta);

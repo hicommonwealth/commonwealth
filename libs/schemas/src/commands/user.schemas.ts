@@ -1,6 +1,7 @@
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContext } from '../context';
+import { AuthContext, VerifiedContext } from '../context';
 import { Address, User } from '../entities';
 
 export const SignIn = {
@@ -34,12 +35,16 @@ export const SignIn = {
 };
 
 export const UpdateUser = {
-  input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({
+  input: User.omit({
+    is_welcome_onboard_flow_complete: true,
+    tier: true,
+  }).extend({
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
   }),
   output: User,
+  context: VerifiedContext,
 };
 
 export const GetNewContent = {
@@ -54,6 +59,7 @@ export const CreateApiKey = {
   output: z.object({
     api_key: z.string(),
   }),
+  context: VerifiedContext,
 };
 
 export const GetApiKey = {
@@ -69,4 +75,17 @@ export const DeleteApiKey = {
   output: z.object({
     deleted: z.boolean(),
   }),
+  context: VerifiedContext,
+};
+
+export const DistributeSkale = {
+  input: z.object({
+    address: z.string(),
+    eth_chain_id: z
+      .number()
+      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
+        message: `eth_chain_id must be a Skale chain Id`,
+      }),
+  }),
+  output: z.object({}),
 };

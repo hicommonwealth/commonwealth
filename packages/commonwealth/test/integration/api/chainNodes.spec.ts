@@ -22,7 +22,7 @@ describe('ChainNode Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
+      userAttributes: { email: '', id: 1, isAdmin: true, profile: {}, tier: 4 },
     }) as UserInstance;
     const resp = await controller.createChainNode({
       user,

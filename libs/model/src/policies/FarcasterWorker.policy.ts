@@ -2,8 +2,8 @@ import { command, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '..';
-import { CreateBotContest } from '../bot/CreateBotContest.command';
-import { UpdateContestManagerFrameHashes } from '../contest/UpdateContestManagerFrameHashes.command';
+import { CreateBotContest } from '../aggregates/bot/CreateBotContest.command';
+import { UpdateContestManagerFrameHashes } from '../aggregates/contest/UpdateContestManagerFrameHashes.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterContentUrl, getChainNodeUrl } from '../utils';
@@ -95,6 +95,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         const contestManagers = [
           {
             url: getChainNodeUrl(community.ChainNode!),
+            eth_chain_id: community.ChainNode!.eth_chain_id!,
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -192,6 +193,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         const contestManagers = contestActions.map((ca) => ({
           url: getChainNodeUrl(community.ChainNode!),
+          eth_chain_id: community.ChainNode!.eth_chain_id!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));

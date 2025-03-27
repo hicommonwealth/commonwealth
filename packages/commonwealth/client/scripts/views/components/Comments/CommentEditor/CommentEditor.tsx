@@ -4,9 +4,11 @@ import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
+import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useState } from 'react';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import React, { useState } from 'react';
+import { useAiCompletion } from 'state/api/ai';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -26,18 +28,19 @@ export type CommentEditorProps = {
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
   disabled: boolean;
-  onCancel: (e: React.MouseEvent) => void;
+  onCancel: (e: React.MouseEvent | undefined) => void;
   author: Account;
   editorValue: string;
   shouldFocus?: boolean;
   tooltipText?: string;
   isReplying?: boolean;
   aiCommentsToggleEnabled?: boolean;
-  setAICommentsToggleEnabled?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   replyingToAuthor?: string;
   streamingReplyIds?: number[];
+  thread?: Thread;
+  parentCommentText?: string;
 };
 
 const CommentEditor = ({
@@ -54,41 +57,55 @@ const CommentEditor = ({
   tooltipText,
   isReplying,
   aiCommentsToggleEnabled: initialAiStreaming,
-  setAICommentsToggleEnabled: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
+  thread,
+  parentCommentText,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const {
     aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
     aiInteractionsToggleEnabled,
+    setAICommentsToggleEnabled,
   } = useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
-  const effectiveSetAiStreaming =
-    onAiStreamingChange ?? setAICommentsToggleEnabled;
 
-  const handleAiToggle = useCallback(() => {
-    if (effectiveSetAiStreaming) {
-      effectiveSetAiStreaming(!effectiveAiStreaming);
-    }
-  }, [effectiveAiStreaming, effectiveSetAiStreaming]);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
 
   const handleCommentWithAI = () => {
     setIsSubmitDisabled(true);
     let text = '';
     setContentDelta(text);
-    generateComment('userText', (x) => {
-      text += `${x}`;
-      text = text.trim();
-      setContentDelta(text);
-    })
-      .catch(console.error)
-      .finally(() => setIsSubmitDisabled(false));
+
+    const context = `
+    Thread: ${thread?.title || ''}
+    ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+    `;
+
+    const prompt = generateCommentPrompt(context);
+
+    generateCompletion(prompt, {
+      stream: true,
+      onError: (error) => {
+        console.error('Error generating AI comment:', error);
+        notifyError('Failed to generate AI comment');
+        setIsSubmitDisabled(false);
+      },
+      onChunk: (chunk) => {
+        text += chunk;
+        text = text.trim();
+        setContentDelta(text);
+      },
+      onComplete: () => {
+        setIsSubmitDisabled(false);
+      },
+    }).catch((error) => {
+      console.error('Failed to generate comment:', error);
+      setIsSubmitDisabled(false);
+    });
   };
 
   const handleEnhancedSubmit = async () => {
@@ -192,32 +209,8 @@ const CommentEditor = ({
             />
           </CWText>
         </div>
-        <div className="attribution-right-content">
-          {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-            <div className="ai-toggle-wrapper">
-              <CWToggle
-                className="ai-toggle"
-                checked={effectiveAiStreaming === true}
-                onChange={handleAiToggle}
-                icon="sparkle"
-                size="xs"
-                iconColor="#757575"
-              />
-              <span className="label">AI</span>
-            </div>
-          )}
-        </div>
+
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
-      <div className="ml-auto">
-        {effectiveAiStreaming && (
-          <CWThreadAction
-            action="ai-reply"
-            label={`Generate AI ${!isReplying ? 'Comment' : 'Reply'}`}
-            disabled={isSubmitDisabled}
-            onClick={handleCommentWithAI}
-          />
-        )}
       </div>
       <ReactQuillEditor
         className="editor"
@@ -230,9 +223,42 @@ const CommentEditor = ({
       />
       <div className="form-bottom">
         <div className="form-buttons">
-          <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           <CWButton
-            buttonWidth="wide"
+            buttonType="tertiary"
+            containerClassName="cancel-button"
+            onClick={onCancel}
+            label="Cancel"
+          />
+          <div className="attribution-right-content">
+            <div className="ml-auto">
+              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                <CWThreadAction
+                  action="ai-reply"
+                  label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
+                  disabled={isSubmitDisabled}
+                  onClick={handleCommentWithAI}
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="ai-toggle-wrapper">
+            <CWToggle
+              className="ai-toggle"
+              icon="sparkle"
+              iconColor="#757575"
+              checked={aiCommentsToggleEnabled}
+              onChange={() => {
+                setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+              }}
+            />
+            <CWText type="caption" className="toggle-label">
+              AI auto reply
+            </CWText>
+          </div>
+          <CWButton
+            containerClassName="post-button"
+            buttonWidth="narrow"
             disabled={disabled || isSubmitDisabled}
             onClick={() => void handleEnhancedSubmit()}
             label="Post"

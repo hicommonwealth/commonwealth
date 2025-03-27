@@ -1,4 +1,4 @@
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import { useGetMembershipsQuery } from 'client/scripts/state/api/groups/getMemberships';
 import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -76,10 +76,10 @@ export const DiscussionSection = ({
     apiEnabled: !!communityId,
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId,
+  const { data: memberships = [] } = useGetMembershipsQuery({
+    community_id: communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!communityId,
+    enabled: !!communityId,
   });
   const isTopicGated = (topicId: number) =>
     !!memberships.find((membership) =>
@@ -153,7 +153,7 @@ export const DiscussionSection = ({
         );
       },
       displayData: null,
-      leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+      leftIcon: <CWIcon iconName="houseSimple" iconSize="small" />,
     },
     {
       title: 'All',

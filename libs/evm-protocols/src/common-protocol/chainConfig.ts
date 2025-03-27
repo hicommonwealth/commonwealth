@@ -10,6 +10,7 @@ export enum ValidChains {
   Arbitrum = 42161,
   BSC = 56,
   SKALE_TEST = 974399131,
+  // SKALE = 1564830818,
   Anvil = 31337,
 }
 
@@ -22,11 +23,17 @@ export function isValidChain(chainId: number): chainId is ValidChains {
   return Object.values(ValidChains).includes(chainId);
 }
 
+export function mustBeProtocolChainId(
+  ethChainId?: number | null | undefined,
+): asserts ethChainId is ValidChains {
+  if (!ethChainId || !Object.values(ValidChains).includes(ethChainId)) {
+    throw new Error(`${ethChainId} is not a valid protocol eth chain id`);
+  }
+}
+
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
-export const CREATE_CONTEST_TOPIC =
-  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 type factoryContractsType = {
   [key in ValidChains]: {

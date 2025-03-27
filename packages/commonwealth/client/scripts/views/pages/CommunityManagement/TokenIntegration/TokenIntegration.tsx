@@ -1,5 +1,4 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
@@ -19,7 +18,6 @@ import './TokenIntegration.scss';
 
 const TokenIntegration = () => {
   const communityId = app.activeChainId() || '';
-  const uniswapTradeEnabled = useFlag('uniswapTrade');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -49,7 +47,6 @@ const TokenIntegration = () => {
   const isEthCommunity = app?.chain?.meta?.base === ChainBase.Ethereum;
 
   if (
-    !uniswapTradeEnabled ||
     !isEthCommunity ||
     // if a community already has a launchpad token, don't allow pinning
     communityLaunchpadToken

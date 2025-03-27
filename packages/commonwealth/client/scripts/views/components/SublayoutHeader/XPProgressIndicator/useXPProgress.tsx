@@ -1,3 +1,4 @@
+import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
@@ -25,6 +26,7 @@ const useXPProgress = () => {
       limit: 40,
       end_after: moment().startOf('week').toDate(),
       start_before: moment().endOf('week').toDate(),
+      include_system_quests: false, // dont show system quests in xp progression bar
       enabled: user.isLoggedIn && xpEnabled,
     });
 
@@ -39,17 +41,13 @@ const useXPProgress = () => {
             (accumulator, currentValue) => accumulator + currentValue,
             0,
           ) || 0;
-      const totalUserXP =
-        (quest.action_metas || [])
-          ?.map(
-            (action) =>
-              action.reward_amount -
-              action.creator_reward_weight * action.reward_amount,
-          )
-          .reduce(
-            (accumulator, currentValue) => accumulator + currentValue,
-            0,
-          ) || 0;
+
+      const totalUserXP = calculateTotalXPForQuestActions({
+        questActions: (quest.action_metas as QuestAction[]) || [],
+        isUserReferred: !!user.referredByAddress,
+        questStartDate: new Date(quest.start_date),
+        questEndDate: new Date(quest.end_date),
+      });
       return {
         ...quest,
         gainedXP,

@@ -4,12 +4,12 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
-import { models } from '../../src/database';
 import {
   CreateCommentSubscription,
   DeleteCommentSubscription,
   GetCommentSubscriptions,
-} from '../../src/subscription';
+} from '../../src/aggregates/subscription';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 
 describe('Comment subscription lifecycle', () => {
@@ -36,6 +36,7 @@ describe('Comment subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
+          verified: new Date(),
         },
       ],
       topics: [{}],
@@ -62,7 +63,7 @@ describe('Comment subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: undefined,
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

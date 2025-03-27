@@ -65,8 +65,8 @@ export const contestCard = frames(async (ctx) => {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            flexGrow: 1,
+            padding: '0px',
+            height: '80%',
           }}
         >
           {contestManager.description && (
@@ -91,6 +91,17 @@ export const contestCard = frames(async (ctx) => {
               {endTime.toLocaleString(undefined, {
                 timeZoneName: 'longGeneric',
               })}
+            </p>
+          )}
+
+          {contestManager.ticker && (
+            <p
+              style={{
+                fontSize: '30px',
+                lineHeight: '1.2',
+              }}
+            >
+              Weighted voting using {contestManager.ticker}
             </p>
           )}
 

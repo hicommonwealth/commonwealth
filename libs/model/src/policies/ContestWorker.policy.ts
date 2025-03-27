@@ -9,9 +9,9 @@ import { events } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
-import { GetActiveContestManagers } from '../contest';
-import { SetContestEnded } from '../contest/SetContestEnded.command';
-import { SetContestEnding } from '../contest/SetContestEnding.command';
+import { GetActiveContestManagers } from '../aggregates/contest';
+import { SetContestEnded } from '../aggregates/contest/SetContestEnded.command';
+import { SetContestEnding } from '../aggregates/contest/SetContestEnding.command';
 import { systemActor } from '../middleware';
 import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {
@@ -64,12 +64,13 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const activeContestManagersWithoutVote = await models.sequelize.query<{
           url: string;
+          eth_chain_id: number;
           private_url: string;
           contest_address: string;
           content_id: number;
         }>(
           `
-              SELECT cn.private_url, cn.url, cm.contest_address, added.content_id
+              SELECT cn.private_url, cn.url, cn.eth_chain_id, cm.contest_address, added.content_id
               FROM "Communities" c
                        JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                        JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -122,10 +123,11 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
 
         const contestManagers = activeContestManagersWithoutVote.map(
-          ({ contest_address, content_id }) => ({
+          ({ contest_address, content_id, eth_chain_id }) => ({
             url: chainNodeUrl,
             contest_address,
             content_id,
+            eth_chain_id,
           }),
         );
 
@@ -210,6 +212,7 @@ const rolloverContests = async () => {
     throw new ServerError('WEB3 private key not set!');
 
   const activeContestManagersPassedEndTime = await models.sequelize.query<{
+    eth_chain_id: number;
     contest_address: string;
     interval: number;
     prize_percentage: number;
@@ -220,6 +223,7 @@ const rolloverContests = async () => {
   }>(
     `
 SELECT
+  cn.eth_chain_id,
   cm.contest_address,
   cm.interval,
   coalesce(cm.prize_percentage, 0) as prize_percentage,
@@ -252,6 +256,7 @@ FROM
   const promiseResults = await Promise.allSettled(
     activeContestManagersPassedEndTime.map(
       async ({
+        eth_chain_id,
         url,
         private_url,
         contest_address,
@@ -264,6 +269,7 @@ FROM
         await command(SetContestEnded(), {
           actor: systemActor({}),
           payload: {
+            eth_chain_id,
             contest_address,
             contest_id,
             prize_percentage,

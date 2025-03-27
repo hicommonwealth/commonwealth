@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
+import { distributeSkale } from 'utils/skaleUtils';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -39,6 +40,8 @@ abstract class ContractBase {
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
+
+          await distributeSkale(this.wallet.accounts[0], chainId);
         }
 
         this.web3 = new Web3(provider);

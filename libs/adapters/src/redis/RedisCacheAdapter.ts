@@ -251,16 +251,26 @@ export class RedisCache implements Cache {
    * @param namespace The namespace of the key to increment.
    * @param key The key whose value is to be incremented.
    * @param increment The amount by which the key's value should be incremented.
+   * @param duration Optional duration for the key to live in the cache. (in seconds)
    * @returns The new value of the key after the increment.
    */
   public async incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment = 1,
+    duration?: number,
   ): Promise<number | null> {
     if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      if (duration) {
+        const multi = this._client.multi();
+        multi.incrBy(finalKey, increment);
+        multi.expire(finalKey, duration, 'NX');
+        const [incr] = (await multi.exec()) as [number, boolean];
+        return incr;
+      }
+      // plain increment
       return await this._client.incrBy(finalKey, increment);
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;
@@ -414,6 +424,31 @@ export class RedisCache implements Cache {
       return this._client.del(finalKey);
     } catch (e) {
       return 0;
+    }
+  }
+
+  /**
+   * Returns the paginated matching namespace:keys in the namespace.
+   * @param namespace The prefix to check for keys in.
+   * @param cursor Start index of the scan.
+   * @param count How many keys to return.
+   * @returns The cursor pointing to the next pagination and the keys scanned.
+   */
+  public async scan(
+    namespace: CacheNamespaces,
+    cursor: number,
+    count: number,
+  ): Promise<{ cursor: number; keys: string[] } | null> {
+    if (!this.isReady()) return null;
+    try {
+      return this._client.scan(cursor, {
+        MATCH: `${namespace}*`,
+        COUNT: count,
+      });
+    } catch (e) {
+      const msg = 'An error occurred while running scan';
+      this._log.error(msg, e as Error);
+      return null;
     }
   }
 

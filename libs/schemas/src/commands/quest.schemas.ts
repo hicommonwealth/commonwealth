@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
-import { PG_INT } from '../utils';
 
 const QuestView = Quest.omit({ scheduled_job_id: true });
 
@@ -22,10 +21,10 @@ export const CreateQuest = {
 
 export const UpdateQuest = {
   input: z.object({
-    quest_id: PG_INT,
+    quest_id: z.number(),
     name: z.string().optional(),
     description: z.string().optional(),
-    community_id: z.string().optional(),
+    community_id: z.string().optional().nullable(),
     image_url: z.string().optional(),
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
@@ -37,13 +36,13 @@ export const UpdateQuest = {
 };
 
 export const DeleteQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };
 
 export const CancelQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };

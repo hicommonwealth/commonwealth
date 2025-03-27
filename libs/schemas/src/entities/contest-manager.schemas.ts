@@ -79,10 +79,11 @@ export const ContestManager = z
       .describe('Vote weight multiplier'),
     farcaster_author_cast_hash: z
       .string()
-      .optional()
+      .nullish()
       .describe(
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
     environment: ContestManagerEnvironmentsSchema.optional(),
+    deleted_at: z.coerce.date().nullish().describe('Soft deletion timestamp'),
   })
   .describe('On-Chain Contest Manager');
