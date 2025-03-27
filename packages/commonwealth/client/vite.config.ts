@@ -51,6 +51,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
+    'process.env.FLAG_PRIVY': JSON.stringify(env.FLAG_PRIVY),
   };
 
   const config = {
@@ -89,6 +90,7 @@ export default defineConfig(({ mode }) => {
       (env.NODE_ENV || '').trim() === 'test'
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
+    'process.env.PRIVY_APP_ID': JSON.stringify(env.PRIVY_APP_ID),
   };
 
   return {

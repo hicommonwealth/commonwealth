@@ -52,6 +52,9 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
+  PRIVY_FLAG,
+  PRIVY_APP_ID,
+  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
 } = process.env;
@@ -181,6 +184,11 @@ export const config = configure(
     },
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
+    },
+    PRIVY: {
+      FLAG_ENABLED: PRIVY_FLAG === 'true',
+      APP_ID: PRIVY_APP_ID,
+      APP_SECRET: PRIVY_APP_SECRET,
     },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
@@ -406,9 +414,20 @@ export const config = configure(
           'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
-    IMAGE_GENERATION: z.object({
-      FLAG_USE_RUNWARE: z.boolean().optional(),
-      RUNWARE_API_KEY: z.string().optional(),
-    }).refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
+    PRIVY: z
+      .object({
+        FLAG_ENABLED: z.boolean(),
+        APP_ID: z.string().optional(),
+        APP_SECRET: z.string().optional(),
+      })
+      .refine(
+        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
+      ),
+    IMAGE_GENERATION: z
+      .object({
+        FLAG_USE_RUNWARE: z.boolean().optional(),
+        RUNWARE_API_KEY: z.string().optional(),
+      })
+      .refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
   }),
 );

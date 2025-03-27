@@ -96,6 +96,10 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         allowNull: false,
         defaultValue: 0,
       },
+      privy_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -103,7 +107,10 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       updatedAt: 'updated_at',
       tableName: 'Users',
       underscored: false,
-      indexes: [{ fields: ['email'], unique: true }],
+      indexes: [
+        { fields: ['email'], unique: true },
+        { fields: ['privy_id'], unique: true },
+      ],
       defaultScope: {
         attributes: {
           exclude: [

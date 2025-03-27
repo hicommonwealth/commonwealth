@@ -11,6 +11,6 @@ export * from './GetUserReferralFees.query';
 export * from './GetUserReferrals.query';
 export * from './GetXps.query';
 export * from './SearchUserProfiles.query';
-export * from './SignIn.command';
+export * from './signIn/SignIn.command';
 export * from './UpdateUser.command';
 export * from './Xp.projection';

@@ -12,6 +12,26 @@ export const SignIn = {
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
+    privy: z
+      .object({
+        identityToken: z.string(),
+        ssoOAuthToken: z
+          .string()
+          .optional()
+          .describe(
+            'The OAuth token of the SSO service the user signed in with e.g. Google, Github, etc.',
+          ),
+        ssoProvider: z
+          .union([
+            z.literal('google_oauth'),
+            z.literal('github_oauth'),
+            z.literal('discord_oauth'),
+            z.literal('apple_oauth'),
+            z.literal('twitter_oauth'),
+          ])
+          .optional(),
+      })
+      .optional(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),

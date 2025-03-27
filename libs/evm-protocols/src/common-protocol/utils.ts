@@ -6,20 +6,21 @@ import {
   Chain,
   ContractEventName,
   ContractFunctionName,
-  DecodeEventLogParameters,
-  DecodeEventLogReturnType,
-  Hex,
-  TransactionExecutionError,
   createPublicClient,
   createWalletClient,
   decodeEventLog,
+  DecodeEventLogParameters,
+  DecodeEventLogReturnType,
   getAddress,
+  Hex,
   http,
   publicActions,
+  TransactionExecutionError,
 } from 'viem';
 import {
   english,
   generateMnemonic,
+  generatePrivateKey,
   mnemonicToAccount,
   privateKeyToAccount,
 } from 'viem/accounts';
@@ -369,4 +370,9 @@ export async function sendTransaction({
 
     throw e;
   }
+}
+
+export function generateWallet() {
+  const privateKey = generatePrivateKey();
+  return privateKeyToAccount(privateKey);
 }
