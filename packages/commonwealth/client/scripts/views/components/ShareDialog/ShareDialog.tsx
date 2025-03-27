@@ -5,10 +5,12 @@ import {
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { DownloadMobileAppContent } from 'views/components/DownloadMobileApp/DownloadMobileAppContent';
-import { ShareSectionProps } from '../ShareSection';
 
-type ShareDialogProps = ShareSectionProps & {
+type ShareDialogProps = {
   onClose: () => void;
+  url: string;
+  title?: string;
+  text?: string;
 };
 
 export const ShareDialog = (props: ShareDialogProps) => {
