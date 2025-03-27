@@ -292,7 +292,7 @@ const QuestDetails = ({ id }: { id: number }) => {
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));

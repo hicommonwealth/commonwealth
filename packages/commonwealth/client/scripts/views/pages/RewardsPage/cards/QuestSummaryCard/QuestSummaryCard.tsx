@@ -52,7 +52,7 @@ const QuestSummaryCard = () => {
   });
 
   const handleSeeAllClick = () => {
-    navigate('/explore');
+    navigate('/explore?tab=quests');
   };
 
   const handleCTAClick = (questId: number, communityId?: string) => {
