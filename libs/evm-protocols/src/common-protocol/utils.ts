@@ -372,7 +372,7 @@ export async function sendTransaction({
   }
 }
 
-export async function generateWallet() {
+export function generateWallet() {
   const privateKey = generatePrivateKey();
   return privateKeyToAccount(privateKey);
 }

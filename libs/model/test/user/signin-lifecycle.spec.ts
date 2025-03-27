@@ -35,7 +35,7 @@ const getVerifiedUserInfoMock = vi.spyOn(
 );
 
 async function createEvmSigner(ethChainId: number) {
-  const wallet = await generateWallet();
+  const wallet = generateWallet();
   return new SIWESigner({
     signer: {
       getAddress: () => Promise.resolve(wallet.address),
@@ -155,7 +155,6 @@ async function createPrivyUser(
 const getVerifiedUserInfoMockFn: typeof getVerifiedUserInfo = ({
   privyUser,
   walletSsoSource,
-  token,
 }: {
   privyUser?: User;
   walletSsoSource: string;
@@ -675,7 +674,7 @@ describe.only('SignIn Lifecycle', async () => {
           actor: {
             user: {
               id: ref.actor.user.id!,
-              email: privyUser?.google?.email!,
+              email: privyUser!.google!.email!,
               auth: await verifyAddress(community2!.id!, addr2!.address),
             },
             address: addr2!.address,
