@@ -1,16 +1,18 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { getShareOptions } from 'views/components/ShareSection/getShareOptions';
+import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
 type ShareSectionProps = {
-  permalink: string;
+  url: string;
+  title?: string;
+  text?: string;
 };
 
 export const ShareSection = (props: ShareSectionProps) => {
-  const { permalink } = props;
+  const { url, title, text } = props;
 
-  const shareOptions = getShareOptions(permalink);
+  const shareOptions = useShareOptions(url, title, text);
 
   return (
     <div className="ShareSection">

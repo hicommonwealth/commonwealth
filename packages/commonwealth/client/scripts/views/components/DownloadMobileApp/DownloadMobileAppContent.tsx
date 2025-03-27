@@ -44,7 +44,7 @@ export const DownloadMobileAppContent = () => {
         />
       </div>
 
-      <ShareSection permalink="https://common.xyz/download-mobile-app" />
+      <ShareSection url="https://common.xyz/download-mobile-app" />
     </div>
   );
 };
