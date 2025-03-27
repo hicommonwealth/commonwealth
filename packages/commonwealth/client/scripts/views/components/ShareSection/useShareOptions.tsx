@@ -4,7 +4,9 @@ import telegramImg from 'assets/img/share/telegram.png';
 import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import useAppStatus from 'hooks/useAppStatus';
+import { useFlag } from 'hooks/useFlag';
 import React, { ReactNode, useCallback, useMemo } from 'react';
+import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
@@ -21,21 +23,38 @@ export function useShareOptions(
   text?: string,
 ): ShareOption[] {
   const { isIOS, isAndroid } = useAppStatus();
+  const referralsEnabled = useFlag('referrals');
+  const user = useUserStore();
 
   const mobile = isIOS || isAndroid;
 
   const filterPredicate = useCallback(
     (option: ShareOption): boolean => {
-      return true;
-      // if (!option.requiresMobile) {
-      //   // if there's no requiredMobile then it's always suppoted.
-      //   return true;
-      // }
-      //
-      // return mobile && option.requiresMobile;
+      if (!option.requiresMobile) {
+        // if there's no requiredMobile then it's always supported.
+        return true;
+      }
+
+      return mobile && option.requiresMobile;
     },
     [mobile],
   );
+
+  const handleCopy = useCallback(() => {
+    async function doAsync() {
+      if (referralsEnabled && url.startsWith('https://common.xyz/')) {
+        const refLink =
+          // TODO: @Marcin to check address access (referral link creation) + related changes in this file
+          url +
+          (user.activeAccount ? `?refcode=${user.activeAccount.address}` : '');
+        await saveToClipboard(refLink, true);
+      } else {
+        await saveToClipboard(url, true);
+      }
+    }
+
+    doAsync().catch(console.error);
+  }, [referralsEnabled, url, user.activeAccount]);
 
   return useMemo(
     () =>
@@ -75,6 +94,13 @@ export function useShareOptions(
           onClick: () => window.open(`mailto:?body=${encodeURIComponent(url)}`),
         },
         {
+          name: 'Copy Link',
+          icon: <CWIcon iconName="copy" iconSize="xl" />,
+          onClick: () => {
+            handleCopy();
+          },
+        },
+        {
           name: 'Share Via',
           icon: <CWIcon iconName="share2" iconSize="xl" />,
           requiresMobile: true,
@@ -82,17 +108,7 @@ export function useShareOptions(
             navigator.share({ url: url, title, text }).catch(console.error);
           },
         },
-        {
-          name: 'Copy Link',
-          icon: <CWIcon iconName="copy" iconSize="xl" />,
-          onClick: () => {
-            // FIXME: add support for referrals here but only for internal URLs.
-            saveToClipboard(url).catch(console.error);
-          },
-        },
-      ].filter(() => {
-        return true;
-      }),
-    [filterPredicate, text, title, url],
+      ].filter(filterPredicate),
+    [filterPredicate, handleCopy, text, title, url],
   );
 }
