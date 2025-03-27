@@ -87,6 +87,8 @@ export enum WalletSsoSource {
   Email = 'email',
   Farcaster = 'farcaster',
   SMS = 'SMS',
+
+  // TODO: remove
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 

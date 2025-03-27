@@ -18,17 +18,21 @@ import {
   WalletWithMetadata,
 } from '@privy-io/server-auth';
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { mapPrivyTypeToWalletSso } from '../../src/aggregates/user/signIn/privy';
 import * as privyUtils from '../../src/aggregates/user/signIn/privyUtils';
 import { SignIn } from '../../src/aggregates/user/signIn/SignIn.command';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import * as tester from '../../src/tester';
+import * as ssoVerificationUtils from '../../src/utils/oauth/getVerifiedUserInfo';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 const getPrivyUserMock = vi.spyOn(privyUtils, 'getPrivyUserById');
 const getPrivyUserByIdTokenMock = vi.spyOn(privyUtils, 'getPrivyUserByIdToken');
-
-const privyTestUserOneDid = 'did:privy:cm8no7aig005zranv3tivdeoj';
+const getVerifiedUserInfoMock = vi.spyOn(
+  ssoVerificationUtils,
+  'getVerifiedUserInfo',
+);
 
 async function createEvmSigner(ethChainId: number) {
   const wallet = await generateWallet();
@@ -42,10 +46,14 @@ async function createEvmSigner(ethChainId: number) {
   });
 }
 
-function generateSsoPrivyUserData(address: string, provider: 'google') {
-  const subject = '123';
-  const email = 'test@gmail.com';
-  const name = 'Test User';
+function generateSsoPrivyUserData(
+  address: string,
+  provider: SupportedTestProviders,
+  data?: { subject?: string; email?: string; name?: string },
+) {
+  const subject = data?.subject ?? crypto.randomUUID();
+  const email = data?.email ?? `${crypto.randomUUID()}@gmail.com`;
+  const name = data?.name ?? crypto.randomUUID();
   const dates = {
     verifiedAt: new Date(),
     firstVerifiedAt: new Date(),
@@ -67,7 +75,7 @@ function generateSsoPrivyUserData(address: string, provider: 'google') {
         subject,
         email,
         name,
-        type: `${provider}_oauth`,
+        type: provider,
         ...dates,
       },
     ] as [WalletWithMetadata, GoogleOAuthWithMetadata],
@@ -80,7 +88,7 @@ function generateSsoPrivyUserData(address: string, provider: 'google') {
       delegated: false,
       ...dates,
     } as Omit<WalletWithMetadata, 'type'>,
-    [provider]: {
+    [mapPrivyTypeToWalletSso(provider)]: {
       subject,
       email,
       name,
@@ -116,17 +124,22 @@ function generateExternalWalletPrivyUserData(
   };
 }
 
-async function createPrivyUser(
-  signer: SIWESigner,
-  provider: 'externalWallet' | 'google',
-): Promise<User> {
-  const address = await signer.getWalletAddress();
-  const did = `did:privy:${Array.from(
-    crypto.getRandomValues(new Uint8Array(16)),
-  )
+type SupportedTestProviders = 'google_oauth';
+
+function generatePrivyId() {
+  return `did:privy:${Array.from(crypto.getRandomValues(new Uint8Array(16)))
     .map((b) => b.toString(36).padStart(2, '0'))
     .join('')
     .substring(0, 25)}`;
+}
+
+async function createPrivyUser(
+  signer: SIWESigner,
+  provider: 'externalWallet' | SupportedTestProviders,
+  data?: { subject?: string; email?: string; name?: string },
+): Promise<User> {
+  const address = await signer.getWalletAddress();
+  const did = generatePrivyId();
 
   return {
     id: did,
@@ -135,11 +148,11 @@ async function createPrivyUser(
     customMetadata: {},
     ...(provider === 'externalWallet'
       ? generateExternalWalletPrivyUserData(address, 'metamask')
-      : generateSsoPrivyUserData(address, provider)),
+      : generateSsoPrivyUserData(address, provider, data)),
   } as User;
 }
 
-const getVerifiedUserInfoMock: typeof getVerifiedUserInfo = ({
+const getVerifiedUserInfoMockFn: typeof getVerifiedUserInfo = ({
   privyUser,
   walletSsoSource,
   token,
@@ -171,8 +184,12 @@ describe.only('SignIn Lifecycle', async () => {
     mmPrivySigner,
     'externalWallet',
   );
+
   const googlePrivySigner = await createEvmSigner(84532);
-  const googlePrivyUser = await createPrivyUser(googlePrivySigner, 'google');
+  const googlePrivyUser = await createPrivyUser(
+    googlePrivySigner,
+    'google_oauth',
+  );
 
   afterAll(async () => {
     await dispose()();
@@ -187,7 +204,8 @@ describe.only('SignIn Lifecycle', async () => {
     | 'privy-evm-metamask'
     | 'native-cosmos-keplr'
     | 'native-substrate-polkadot'
-    | 'native-solana-phantom';
+    | 'native-solana-phantom'
+    | 'privy-evm-google';
   const chains = [
     {
       id: 'native-evm-metamask',
@@ -219,6 +237,7 @@ describe.only('SignIn Lifecycle', async () => {
         roles: ['admin'],
         chain_node: { eth_chain_id: 84532 },
       },
+      provider: 'google_oauth',
       privyUser: googlePrivyUser,
     },
     {
@@ -260,6 +279,7 @@ describe.only('SignIn Lifecycle', async () => {
     wallet: WalletId;
     seed: CommunitySeedOptions;
     privyUser?: User;
+    provider?: SupportedTestProviders;
   }>;
 
   const refs = {} as Record<
@@ -276,7 +296,7 @@ describe.only('SignIn Lifecycle', async () => {
   describe('create addresses and users', () => {
     it.each(chains)(
       'should create $seed.chain_base $wallet address and new user (id: $id)',
-      async ({ id, signer, wallet, seed, privyUser }) => {
+      async ({ id, signer, wallet, seed, privyUser, provider }) => {
         if (privyUser) {
           getPrivyUserMock.mockImplementation(() => {
             return Promise.resolve(privyUser);
@@ -284,6 +304,7 @@ describe.only('SignIn Lifecycle', async () => {
           getPrivyUserByIdTokenMock.mockImplementation(() => {
             return Promise.resolve(privyUser);
           });
+          getVerifiedUserInfoMock.mockImplementation(getVerifiedUserInfoMockFn);
         }
         const { payload } = await signer.newSession(CANVAS_TOPIC);
         const { community } = await seedCommunity(seed);
@@ -314,7 +335,11 @@ describe.only('SignIn Lifecycle', async () => {
             community_id: ref.community_id,
             wallet_id: wallet,
             session: serializeCanvas(ref.session),
-            privyIdentityToken: 'fake_identity_token',
+            privy: {
+              identityToken: 'fake_identity_token',
+              ssoOAuthToken: 'fake_sso_oauth_token',
+              ssoProvider: provider,
+            },
           },
         });
         ref.actor.user.id = addr!.user_id!;
@@ -347,8 +372,17 @@ describe.only('SignIn Lifecycle', async () => {
 
   describe('signin existing addresses', () => {
     it.each(chains)(
-      'should sign existing $seed.chain_base $wallet address',
-      async ({ id, wallet, seed }) => {
+      'should sign existing $seed.chain_base $wallet address (id: $id)',
+      async ({ id, wallet, provider, privyUser }) => {
+        if (privyUser) {
+          getPrivyUserMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getPrivyUserByIdTokenMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getVerifiedUserInfoMock.mockImplementation(getVerifiedUserInfoMockFn);
+        }
         const ref = refs[id];
 
         const addr = await command(SignIn(), {
@@ -358,7 +392,11 @@ describe.only('SignIn Lifecycle', async () => {
             community_id: ref.community_id,
             wallet_id: wallet,
             session: serializeCanvas(ref.session),
-            privyIdentityToken: 'fake_identity_token',
+            privy: {
+              identityToken: 'fake_identity_token',
+              ssoOAuthToken: 'fake_sso_oauth_token',
+              ssoProvider: provider,
+            },
           },
         });
 
@@ -459,16 +497,23 @@ describe.only('SignIn Lifecycle', async () => {
   });
 
   describe('transfer ownership', () => {
-    it.each(chains)(
+    it.each(chains.filter((c) => !c.provider))(
       'should transfer $seed.chain_base $wallet address ownership (id: $id)',
-      async ({ id, wallet, seed, privyUser }) => {
+      async ({ id, wallet, seed, privyUser, provider }) => {
+        let externalSigner2: SIWESigner | undefined;
         if (privyUser) {
+          externalSigner2 = await createEvmSigner(8453);
+          const externalWalletPrivyUser2 = await createPrivyUser(
+            externalSigner2,
+            provider ?? 'externalWallet',
+          );
           getPrivyUserMock.mockImplementation(() => {
-            return Promise.resolve(privyUser);
+            return Promise.resolve(externalWalletPrivyUser2);
           });
           getPrivyUserByIdTokenMock.mockImplementation(() => {
-            return Promise.resolve(privyUser);
+            return Promise.resolve(externalWalletPrivyUser2);
           });
+          getVerifiedUserInfoMock.mockImplementation(getVerifiedUserInfoMockFn);
         }
 
         const ref = refs[id];
@@ -488,21 +533,32 @@ describe.only('SignIn Lifecycle', async () => {
           role: 'member',
           wallet_id: wallet,
           hex: 'hex',
+          ...(privyUser && provider === 'google_oauth'
+            ? {
+                oauth_provider: 'google',
+                oauth_email: privyUser.google?.email,
+                oauth_email_verified: true,
+              }
+            : {}),
         });
 
         // create a second address/user combo
         // using seeds b/c signer is not creating a new address
-        const address2 = ref.address
-          .split('')
-          .map((c, i) =>
-            i === ref.address.length - 1
-              ? String.fromCharCode(c.charCodeAt(0) + 1)
-              : c,
-          )
-          .join(''); // just increment last char of ref.address to keep format
+        const address2 = externalSigner2
+          ? await externalSigner2.getWalletAddress()
+          : ref.address
+              .split('')
+              .map((c, i) =>
+                i === ref.address.length - 1
+                  ? String.fromCharCode(c.charCodeAt(0) + 1)
+                  : c,
+              )
+              .join(''); // just increment last char of ref.address to keep format
         const [user2] = await tester.seed('User', {
           id: ref.actor.user.id! + 1000,
           profile: { name: 'user2' },
+          // Only set this when testing transferring of addresses via Privy
+          privy_id: privyUser ? generatePrivyId() : null,
         });
         const [addr2] = await tester.seed('Address', {
           community_id: ref.community_id,
@@ -531,7 +587,11 @@ describe.only('SignIn Lifecycle', async () => {
             community_id: ref.community_id,
             wallet_id: wallet,
             session: serializeCanvas(ref.session),
-            privyIdentityToken: 'fake_identity_token',
+            privy: {
+              identityToken: 'fake_identity_token',
+              ssoOAuthToken: 'fake_sso_oauth_token',
+              ssoProvider: provider,
+            },
           },
         });
         expect(transferred).to.not.be.null;
@@ -556,33 +616,112 @@ describe.only('SignIn Lifecycle', async () => {
         expect(c?.profile_count).to.be.equal(1);
       },
     );
+
+    it.each(chains.filter((c) => c.provider))(
+      'should transfer $seed.chain_base $wallet address ownership (id: $id)',
+      async ({ id, wallet, seed, privyUser, provider }) => {
+        // Transfer address from 2nd user to existing ref user
+        // Reversal needed since 2nd address cannot be owned by Privy user
+
+        const externalSigner2 = await createEvmSigner(8453);
+
+        // simulate Privy SSO sign in
+        privyUser!.wallet!.walletClientType = 'privy';
+        getPrivyUserMock.mockImplementation(() => {
+          return Promise.resolve(privyUser!);
+        });
+        getPrivyUserByIdTokenMock.mockImplementation(() => {
+          return Promise.resolve(privyUser!);
+        });
+        getVerifiedUserInfoMock.mockImplementation(getVerifiedUserInfoMockFn);
+
+        const ref = refs[id];
+
+        // create a second community and have 2nd user join it
+        const [community2] = await tester.seed('Community', {
+          chain_node_id: ref.chain_node_id,
+          base: seed.chain_base,
+          active: true,
+          profile_count: 0,
+          topics: [],
+        });
+        const [user2] = await tester.seed('User', {
+          id: ref.actor.user.id! + 1000,
+          profile: { name: 'user2' },
+        });
+        const [addr2] = await tester.seed('Address', {
+          community_id: community2!.id,
+          address: await externalSigner2.getWalletAddress(),
+          user_id: user2!.id,
+          role: 'member',
+          wallet_id: WalletId.Magic,
+          hex: null,
+          ...(privyUser && provider === 'google_oauth'
+            ? {
+                oauth_provider: 'google',
+                oauth_email: privyUser.google?.email,
+                oauth_email_verified: true,
+              }
+            : {}),
+        });
+
+        // have user 1 sign in with address of user 2
+        console.log(
+          `Testing transfer of address ${addr2!.address} from user ${ref.actor.user.id} to user ${user2!.id}`,
+        );
+        const { payload: session } =
+          await externalSigner2.newSession(CANVAS_TOPIC);
+        const transferred = await command(SignIn(), {
+          actor: {
+            user: {
+              id: ref.actor.user.id!,
+              email: privyUser?.google?.email!,
+              auth: await verifyAddress(community2!.id!, addr2!.address),
+            },
+            address: addr2!.address,
+          },
+          payload: {
+            address: addr2!.address,
+            community_id: addr2!.community_id,
+            wallet_id: wallet,
+            session: serializeCanvas(session),
+            privy: {
+              identityToken: 'fake_identity_token',
+              ssoOAuthToken: 'fake_sso_oauth_token',
+              ssoProvider: provider,
+            },
+          },
+        });
+        expect(transferred).to.not.be.null;
+        expect(transferred!.was_signed_in).to.be.true;
+        expect(transferred!.address).to.be.equal(addr2!.address);
+
+        // check that user 1 now owns 2 address
+        // 1 original created on sign in and 1 transferred from user 2
+        const addresses = await models.Address.findAll({
+          where: { user_id: ref.actor.user.id },
+        });
+        expect(addresses.length).to.be.equal(2);
+
+        const user2Addresses = await models.Address.findAll({
+          where: { user_id: user2!.id },
+        });
+        expect(user2Addresses.length).to.be.equal(0);
+      },
+    );
   });
-  //
+
   describe('assert all events in lifecycle', () => {
     it('should assert all events in lifecycle', async () => {
       const events = await models.Outbox.findAll({});
-      expect(events.map((e) => e.event_name)).toEqual([
-        'CommunityJoined',
-        'WalletLinked',
-        'UserCreated',
-        'CommunityJoined',
-        'WalletLinked',
-        'UserCreated',
-        'CommunityJoined',
-        'WalletLinked',
-        'UserCreated',
-        'CommunityJoined',
-        'WalletLinked',
-        'UserCreated',
-        'CommunityJoined',
-        'WalletLinked',
-        'UserCreated',
-        'AddressOwnershipTransferred',
-        'AddressOwnershipTransferred',
-        'AddressOwnershipTransferred',
-        'AddressOwnershipTransferred',
-        'AddressOwnershipTransferred',
-      ]);
+      const expectedEvents = [];
+      for (let i = 0; i < chains.length; i++) {
+        expectedEvents.push('CommunityJoined', 'WalletLinked', 'UserCreated');
+      }
+      for (let i = 0; i < chains.length; i++) {
+        expectedEvents.push('AddressOwnershipTransferred');
+      }
+      expect(events.map((e) => e.event_name)).toEqual(expectedEvents);
     });
   });
 });

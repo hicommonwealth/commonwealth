@@ -57,7 +57,9 @@ export async function signInPrivy({
   if (payload.wallet_id !== WalletId.Privy) throw new Error('Invalid wallet');
   log.trace('Signing in with Privy');
 
-  if (!payload.privyIdentityToken)
+  if (!payload.privy) throw new Error('Missing privy object in payload');
+
+  if (!payload.privy.identityToken)
     throw new InvalidActor(
       { user: { email: '' } },
       'Privy ID token is required',
@@ -65,7 +67,7 @@ export async function signInPrivy({
 
   let privyUser: PrivyUser;
   try {
-    privyUser = await getPrivyUserByIdToken(payload.privyIdentityToken);
+    privyUser = await getPrivyUserByIdToken(payload.privy.identityToken);
   } catch (e) {
     console.error(e);
     throw new InvalidActor(
@@ -73,6 +75,12 @@ export async function signInPrivy({
       'Invalid Privy identity token',
     );
   }
+
+  // Sanity check
+  console.log('Payload address: ' + payload.address);
+  const userOwnsAddress = privyUser.linkedAccounts.some((a) => {
+    if (a.type === 'wallet' && a.address === payload.address) return true;
+  });
 
   let user: UserAttributes | undefined | null = signedInUser;
   if (!user) {
@@ -83,11 +91,22 @@ export async function signInPrivy({
     });
   }
 
+  console.log(
+    `Privy sign in data: user.privy_id = ${user?.privy_id}, userOwnsAddress = ${userOwnsAddress}, privyUser.wallet?.walletClientType = ${privyUser.wallet?.walletClientType}`,
+  );
+  console.log(
+    'WHAT THE FUCK:',
+    !user,
+    !user?.privy_id,
+    !userOwnsAddress,
+    privyUser.wallet?.walletClientType === 'privy',
+  );
   // First time signing in with Privy SSO (existing or new user)
+  // OR transferring old SSO address to new Privy user
   // Over time, only new users will go down this path
   let verifiedSsoInfo: VerifiedUserInfo | undefined = undefined;
   if (
-    (!user || !user.privy_id) &&
+    (!user || !user.privy_id || !userOwnsAddress) &&
     privyUser.wallet?.walletClientType === 'privy'
   ) {
     log.trace(
@@ -96,15 +115,12 @@ export async function signInPrivy({
     // TODO: existing linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
     //  this extra call to Privy
     const fullPrivyUser = await getPrivyUserById(privyUser.id);
-    const linkedAccount = fullPrivyUser.linkedAccounts.find(
-      (a) => a.type === 'wallet' && a.address === payload.address,
-    );
-    if (!linkedAccount) throw new Error('No linked account found');
-    if (!payload.privySsoOAuthToken) throw new Error('Missing OAuth token');
+    if (!payload.privy.ssoOAuthToken) throw new Error('Missing OAuth token');
+    if (!payload.privy.ssoProvider) throw new Error('Missing OAuth provider');
     verifiedSsoInfo = await getVerifiedUserInfo({
       privyUser: fullPrivyUser,
-      walletSsoSource: mapPrivyTypeToWalletSso(linkedAccount.type),
-      token: payload.privySsoOAuthToken,
+      walletSsoSource: mapPrivyTypeToWalletSso(payload.privy.ssoProvider),
+      token: payload.privy.ssoOAuthToken,
     });
   }
 

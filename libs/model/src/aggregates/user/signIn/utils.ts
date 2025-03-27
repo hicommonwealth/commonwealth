@@ -11,6 +11,28 @@ import { emitSignInEvents } from './emitSignInEvents';
 
 const log = logger(import.meta);
 
+export function constructFindAddressBySsoQueryFilter(
+  ssoInfo: VerifiedUserInfo,
+) {
+  let query = `
+    WHERE user_id IS NOT NULL
+      AND oauth_provider = :oauthProvider
+      AND
+  `;
+
+  if (['github', 'discord', 'twitter'].includes(ssoInfo.provider)) {
+    query += ` oauth_username = :oauthUsername`;
+  } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
+    query += `oauth_email = :oauthEmail`;
+  } else if (['phone_number'].includes(ssoInfo.provider)) {
+    query += `oauth_phone_number = :oauthPhoneNumber`;
+  } else {
+    throw new Error(`Unsupported OAuth provider: ${ssoInfo.provider}`);
+  }
+
+  return query;
+}
+
 export async function findUserByAddressOrHex(
   searchTerm: { address: string } | { hex: string },
   transaction: Transaction,
@@ -46,33 +68,10 @@ export async function findUserBySso(
   transaction: Transaction,
 ): Promise<UserAttributes | null> {
   console.log(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
-  let cteQuery = `
-    SELECT DISTINCT(user_id) as user_id
-    FROM "Addresses"
-    WHERE user_id IS NOT NULL
-      AND oauth_provider = :oauthProvider
-      AND
-  `;
-
-  if (['github', 'discord', 'twitter'].includes(ssoInfo.provider)) {
-    cteQuery += `
-      oauth_username = :oauthUsername;
-    `;
-  } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
-    cteQuery += `
-      oauth_email = :oauthEmail;
-    `;
-  } else if (['phone_number'].includes(ssoInfo.provider)) {
-    cteQuery += `
-      oauth_phone_number = :oauthPhoneNumber;
-    `;
-  } else {
-    throw new Error(`Unsupported OAuth provider: ${ssoInfo.provider}`);
-  }
-
   const users = await models.sequelize.query(
     `
-      WITH user_ids AS (${cteQuery})
+      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                        FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
       SELECT U.*
       FROM "Users" U
       WHERE U.id IN (SELECT user_id FROM user_ids);
@@ -102,6 +101,7 @@ export async function findOrCreateUser({
   referrer_address,
   privyUserId,
   hex,
+  signedInUser,
 }: {
   address: string;
   transaction: Transaction;
@@ -109,11 +109,12 @@ export async function findOrCreateUser({
   referrer_address?: string | null;
   privyUserId?: string;
   hex?: string;
+  signedInUser?: UserAttributes | null;
 }): Promise<{
   newUser: boolean;
   user: UserAttributes;
 }> {
-  let foundUser: UserAttributes | null = null;
+  let foundUser: UserAttributes | null;
   if (ssoInfo) {
     foundUser = await findUserBySso(ssoInfo, transaction);
   } else {
@@ -124,6 +125,7 @@ export async function findOrCreateUser({
   }
 
   if (!foundUser) {
+    // New user signing in (Privy or native wallet)
     const user = await models.User.create(
       {
         email: null,
@@ -136,7 +138,8 @@ export async function findOrCreateUser({
     );
     console.log(`Created new user: ${user.id}`);
     return { newUser: true, user };
-  } else if (privyUserId && !foundUser.privy_id) {
+  } else if (privyUserId && !foundUser.privy_id && !signedInUser?.privy_id) {
+    // Existing user signing in with Privy for the first time
     await models.User.update(
       {
         privy_id: privyUserId,
@@ -149,12 +152,80 @@ export async function findOrCreateUser({
       },
     );
     console.log(`Updated user privy id: ${foundUser.id}`);
+  } else if (privyUserId && foundUser && !foundUser.privy_id) {
+    // Signed in Privy user connecting an address owned by another user
+    // sanity check
+    if (privyUserId !== signedInUser?.privy_id) {
+      throw new Error('Invalid Privy user id');
+    }
+    return {
+      newUser: false,
+      user: foundUser,
+    };
   }
 
   return {
     newUser: false,
     user: foundUser,
   };
+}
+
+async function transferAddressOwnership({
+  foundUser,
+  newUser,
+  ssoInfo,
+  address,
+  signedInUser,
+  transaction,
+}: {
+  foundUser: UserAttributes;
+  newUser: boolean;
+  address?: string;
+  ssoInfo?: VerifiedUserInfo;
+  signedInUser?: UserAttributes | null;
+  transaction: Transaction;
+}) {
+  if (signedInUser && !newUser && signedInUser?.id !== foundUser.id) {
+    if (ssoInfo) {
+      await models.sequelize.query(
+        `
+          WITH addresses AS (SELECT id
+                             FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
+          UPDATE "Addresses"
+          SET user_id = :signedInUserId
+          FROM addresses
+          WHERE addresses.id = "Addresses".id
+        `,
+        {
+          transaction,
+          replacements: {
+            signedInUserId: signedInUser.id!,
+            oauthProvider: ssoInfo.provider,
+            oauthUsername: ssoInfo.username,
+            oauthEmail: ssoInfo.email,
+            oauthPhoneNumber: ssoInfo.phoneNumber,
+          },
+        },
+      );
+    } else {
+      await models.Address.update(
+        {
+          user_id: signedInUser.id!,
+        },
+        {
+          where: {
+            address,
+          },
+          transaction,
+        },
+      );
+    }
+    console.log(
+      `Addresses ${address} transferred from user ${foundUser.id} to user ${signedInUser.id}`,
+    );
+    return true;
+  }
+  return false;
 }
 
 export async function signInUser({
@@ -188,37 +259,21 @@ export async function signInUser({
       privyUserId: privyUser?.id,
       hex: payload.hex,
       transaction,
+      signedInUser,
     });
     foundOrCreatedUser = userRes.user;
     newUser = userRes.newUser;
 
     // if signed-in user is not the same as user derived from address/hex/sso
     // and the user is not new then transfer ownership to the signed-in user
-    console.log(
-      `Should transfer address? SignedInUserId: ${signedInUser?.id}, User.id: ${foundOrCreatedUser.id}, newUser: ${newUser}`,
-    );
-    if (
-      signedInUser &&
-      signedInUser?.id !== foundOrCreatedUser.id &&
-      !newUser
-    ) {
-      await models.Address.update(
-        {
-          user_id: signedInUser.id!,
-        },
-        {
-          where: {
-            // TODO: this doesn't support transfer of addresses via SSO
-            address: payload.address,
-          },
-          transaction,
-        },
-      );
-      transferredUser = true;
-      console.log(
-        `Addresses ${payload.address} transferred from user ${foundOrCreatedUser.id} to user ${signedInUser.id}`,
-      );
-    }
+    transferredUser = await transferAddressOwnership({
+      foundUser: foundOrCreatedUser,
+      address: payload.address,
+      ssoInfo: verifiedSsoInfo,
+      newUser,
+      signedInUser,
+      transaction,
+    });
 
     [address, newAddress] = await models.Address.findOrCreate({
       where: { community_id: payload.community_id, address: payload.address },
