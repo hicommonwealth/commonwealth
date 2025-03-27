@@ -1142,3 +1142,12 @@ export const CWPara = ({
     </svg>
   );
 };
+
+export const CWPrivy = ({
+  componentType,
+  iconSize,
+  className,
+  ...otherProps
+}: CustomIconProps) => {
+  return <svg></svg>;
+};
