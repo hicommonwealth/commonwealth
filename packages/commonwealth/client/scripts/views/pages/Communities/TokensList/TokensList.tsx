@@ -150,7 +150,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
               token as z.infer<typeof TokenView>,
               ethToUsdRate,
             );
-            console.log('token', token);
             return (
               <TokenCard
                 key={token.name}
@@ -205,15 +204,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                 mode={TradingMode.Swap}
                 iconURL={token.icon_url || ''}
                 onCTAClick={(mode) => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(
-                        mode,
-                        token as z.infer<typeof PinnedTokenWithPrices>,
-                      );
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
+                  // TODO: implement
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({
