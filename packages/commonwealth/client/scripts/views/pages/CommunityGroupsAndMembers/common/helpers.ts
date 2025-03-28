@@ -13,7 +13,7 @@ const converter = (
     | 'eth_native'
     | 'cosmos_native'
     | 'spl'
-    | 'meta',
+    | 'metaplex',
   amount: string,
   converterFunc: typeof weiToTokens | typeof tokensToWei,
 ) => {
@@ -47,7 +47,7 @@ export const convertRequirementAmountFromWeiToTokens = (
     | 'eth_native'
     | 'cosmos_native'
     | 'spl'
-    | 'meta',
+    | 'metaplex',
   amount: string,
 ) => {
   return converter(requirementType, amount?.trim(), weiToTokens);
@@ -60,7 +60,7 @@ export const convertRequirementAmountFromTokensToWei = (
     | 'eth_native'
     | 'cosmos_native'
     | 'spl'
-    | 'meta',
+    | 'metaplex',
   amount: string,
 ) => {
   return converter(requirementType, amount.trim(), tokensToWei);

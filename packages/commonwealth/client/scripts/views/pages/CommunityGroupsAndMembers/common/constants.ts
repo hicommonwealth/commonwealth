@@ -7,7 +7,7 @@ export const TOKENS = {
 
 export const SPL_SPECIFICATION = 'spl';
 
-export const SOL_NFT_SPECIFICATION = 'meta';
+export const SOL_NFT_SPECIFICATION = 'metaplex';
 
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',

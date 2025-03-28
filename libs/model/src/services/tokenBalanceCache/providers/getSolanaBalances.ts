@@ -13,7 +13,6 @@ export async function getSolanaBalances(
   ttl?: number,
 ) {
   const cachedBalances = await getCachedBalances(options, options.addresses);
-  console.log(options);
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       balance_type: 'solana',

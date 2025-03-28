@@ -158,7 +158,6 @@ export function makeGetBalancesOptions(
           case BalanceSourceType.SPL: {
             const castedSource = requirement.data.source as SolanaSource;
             const existingOptions = allOptions.find((opt) => {
-              console.log(castedSource);
               const castedOpt = opt as GetSPLBalancesOptions;
               return (
                 castedOpt.balanceSourceType === castedSource.source_type &&

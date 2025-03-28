@@ -7,7 +7,7 @@ export enum BalanceSourceType {
   CW20 = 'cw20',
   CW721 = 'cw721',
   SPL = 'spl',
-  SOLNFT = 'meta',
+  SOLNFT = 'metaplex',
 }
 
 export enum BalanceType {

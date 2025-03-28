@@ -105,7 +105,7 @@ function _thresholdCheck(
         chainId = thresholdData.source.solana_network.toString();
         break;
       }
-      case 'meta': {
+      case 'metaplex': {
         balanceSourceType = BalanceSourceType.SOLNFT;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.solana_network.toString();
