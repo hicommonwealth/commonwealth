@@ -27,6 +27,7 @@ export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
     <>
       <CWContentPageCard
         header="Web Links"
+        showCollapsedIcon={true}
         content={
           <div className="LinkedThreadsCard">
             {linkedUrls.length > 0 ? (

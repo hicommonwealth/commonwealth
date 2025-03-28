@@ -135,12 +135,15 @@ export const NewSnapshotProposalForm = ({
         space: snapshotId,
       });
       const scoreResponse = await getScore(
+        // @ts-expect-error <StrictNullChecks/>
         snapshotSpace,
         user.activeAccount?.address || '',
       );
       const firstKey = Object.keys(scoreResponse?.[0])?.[0];
       setUserScore(scoreResponse[0][firstKey]);
       setSpace(snapshotSpace);
+      // @ts-expect-error <StrictNullChecks/>
+
       setMembers(snapshotSpace.members);
       setSnapshotScoresFetched(true);
       setLoading(false);
