@@ -1,0 +1,60 @@
+@import '../../../../../styles/shared.scss';
+
+.CommunityCreationForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 16px;
+  gap: 16px;
+
+  &.creating {
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .prompt-input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .community-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .community-form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  }
+
+  .cta-elements {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+
+    .mr-auto {
+      margin-right: auto;
+    }
+
+    .ml-auto {
+      margin-left: auto;
+    }
+  }
+
+  .cancel-button {
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+}
