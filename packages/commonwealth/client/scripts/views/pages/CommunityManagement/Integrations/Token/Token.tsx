@@ -22,11 +22,13 @@ const Token = () => {
     });
 
   const { data: communityTokens } = useGetPinnedTokensByCommunityId({
-    community_ids: [communityId],
+    community_ids: communityId,
     with_chain_node: true,
     enabled: !!communityId,
+    limit: 10,
+    cursor: 1,
   });
-  const communityPinnedToken = communityTokens?.results?.[0];
+  const communityPinnedToken = communityTokens?.pages?.[0]?.results?.[0];
   const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
 
