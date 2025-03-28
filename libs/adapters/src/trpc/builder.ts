@@ -3,7 +3,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
 import type { OpenApiMeta } from 'trpc-swagger';
-import { ZodSchema, z } from 'zod';
+import { ZodSchema } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
 
@@ -17,15 +17,21 @@ const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
 
 const authenticate = async <Input extends ZodSchema>(
   req: Request,
-  rawInput: z.infer<Input>,
+  rawInput: Input extends ZodSchema<infer T> ? T : any,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
 ) => {
+  console.log('TRPC1: authenticate started', authStrategy.type);
+
   // Bypass when user is already authenticated via JWT or token
   // Authentication overridden at router level e.g. external-router.ts
   if (req.user && authStrategy.type !== 'custom') return;
 
   try {
     if (authStrategy.type === 'authtoken') {
+      console.log(
+        'TRPC2: authenticating with authtoken',
+        req.headers['authorization'],
+      );
       switch (req.headers['authorization']) {
         case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
           req.user = {
@@ -40,15 +46,20 @@ const authenticate = async <Input extends ZodSchema>(
           };
           break;
         default:
+          console.log('TRPC3: Invalid authorization token');
           throw new Error('Not authenticated');
       }
     } else if (authStrategy.type === 'custom') {
+      console.log('TRPC4: authenticating with custom strategy');
       req.user = await authStrategy.userResolver(rawInput, req.user as User);
     } else {
+      console.log('TRPC5: authenticating with passport', authStrategy.type);
       await passport.authenticate(authStrategy.type, { session: false });
     }
+    console.log('TRPC6: authentication successful, user ID:', req.user?.id);
     if (!req.user) throw new Error('Not authenticated');
   } catch (error) {
+    console.log('TRPC7: authentication error', error);
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
       code: 'UNAUTHORIZED',

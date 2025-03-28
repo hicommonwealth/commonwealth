@@ -50,12 +50,18 @@ export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
+  console.log('SA1: storeActiveAccount called with account', account.address);
   user.setData({ activeAccount: account });
   !user.accounts.some((a) => isSameAccount(a, account)) &&
     user.setData({ accounts: [...user.accounts, account] });
+  console.log(
+    'SA2: storeActiveAccount completed, accounts count:',
+    user.accounts.length,
+  );
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
+  console.log('SA3: setActiveAccount called', account.address);
   const community = app.activeChainId();
   try {
     const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
@@ -66,16 +72,24 @@ export async function setActiveAccount(account: Account): Promise<void> {
       auth: true,
     });
 
+    console.log('SA4: setDefaultRole response', response.status);
+
     if (response.data.status !== 'Success') {
+      console.log('SA-ERROR: setDefaultRole unsuccessful', response.data);
       throw Error(`Unsuccessful status: ${response.status}`);
     }
 
+    console.log('SA5: Storing active account', account.address);
     storeActiveAccount(account);
+    console.log('SA6: setActiveAccount completed successfully');
   } catch (err) {
     // Failed to set the user's active address to this account.
     // This might be because this address isn't `verified`,
     // so we don't show an error here.
-    console.error(err?.response?.data?.error || err?.message);
+    console.log(
+      'SA-ERROR: setActiveAccount failed',
+      err?.response?.data?.error || err?.message,
+    );
     notifyError('Could not set active account');
   }
 }
@@ -111,6 +125,7 @@ export async function completeClientLogin(account: Account) {
 export async function updateActiveAddresses(chainId: string) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
+  console.log('UA1: updateActiveAddresses started for chainId', chainId);
   userStore.getState().setData({
     accounts: userStore
       .getState()
@@ -123,18 +138,23 @@ export async function updateActiveAddresses(chainId: string) {
       })
       .filter((addr) => addr),
   });
+  console.log('UA2: Filtered accounts for chainId', chainId);
 
   // select the address that the new chain should be initialized with
   const memberAddresses = userStore.getState().accounts.filter((account) => {
     return account.community.id === chainId;
   });
+  console.log('UA3: Found memberAddresses count', memberAddresses.length);
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
+    console.log('UA4: Single member address found, setting as active');
     await setActiveAccount(memberAddresses[0]);
   } else if (userStore.getState().accounts.length === 0) {
     // no addresses - preview the community
+    console.log('UA5: No accounts found, preview mode');
   } else {
+    console.log('UA6: Multiple addresses found, selecting by last used time');
     // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed = [
       ...(userStore
@@ -146,6 +166,10 @@ export async function updateActiveAddresses(chainId: string) {
       if (!b.lastActive) return -1; // move b towards end
       return 1; // move a towards end
     });
+    console.log(
+      'UA7: Sorted addresses count',
+      communityAddressesSortedByLastUsed.length,
+    );
 
     // From the sorted adddress in the current community, find an address which has an active session key
     let foundAddressWithActiveSessionKey: AddressInfo | null = null;
@@ -165,6 +189,10 @@ export async function updateActiveAddresses(chainId: string) {
 
       if (session !== null) {
         foundAddressWithActiveSessionKey = communityAccount;
+        console.log(
+          'UA8: Found address with active session',
+          communityAccount.address,
+        );
         break;
       }
     }
@@ -174,22 +202,29 @@ export async function updateActiveAddresses(chainId: string) {
       foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
 
     if (addressToUse) {
+      console.log('UA9: Using address', addressToUse.address);
       const account = userStore.getState().accounts.find((a) => {
         return (
           a.community.id === addressToUse.community.id &&
           a.address === addressToUse.address
         );
       });
-      if (account) await setActiveAccount(account);
+      if (account) {
+        console.log('UA10: Setting active account', account.address);
+        await setActiveAccount(account);
+      }
     }
   }
+  console.log('UA11: updateActiveAddresses completed');
 }
 
 // called from the server, which returns public keys
 export function updateActiveUser(data) {
+  console.log('UAU1: updateActiveUser called', data?.loggedIn);
   const user = userStore.getState();
 
   if (!data || data.loggedIn === false) {
+    console.log('UAU2: User not logged in, resetting user data');
     user.setData({
       id: 0,
       email: '',
@@ -210,6 +245,7 @@ export function updateActiveUser(data) {
       xpReferrerPoints: 0,
     });
   } else {
+    console.log('UAU3: User logged in, updating user data');
     const addresses = data.addresses.map(
       (a) =>
         new AddressInfo({
@@ -226,6 +262,8 @@ export function updateActiveUser(data) {
           lastActive: a.last_active,
         }),
     );
+
+    console.log('UAU4: Mapped addresses count', addresses.length);
 
     user.setData({
       id: data.id || 0,
@@ -250,6 +288,7 @@ export function updateActiveUser(data) {
       xpPoints: data?.xp_points,
       xpReferrerPoints: data?.xp_referrer_points,
     });
+    console.log('UAU5: User data updated successfully');
   }
 }
 

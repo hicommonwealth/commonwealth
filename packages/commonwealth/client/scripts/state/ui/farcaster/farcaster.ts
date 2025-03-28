@@ -14,6 +14,8 @@ type SignInResult = {
 interface FarcasterStore {
   farcasterContext: Context.FrameContext | null;
   setFarcasterFrameContext: (context: Context.FrameContext) => void;
+  redirected: boolean;
+  setRedirected: (redirected: boolean) => void;
   signInToFarcasterFrame: () => Promise<{
     result: SignInResult;
     privateKey: Uint8Array;
@@ -24,6 +26,8 @@ export const farcasterStore = createStore<FarcasterStore>()(
   devtools((set) => ({
     farcasterContext: null,
     setFarcasterFrameContext: (context) => set({ farcasterContext: context }),
+    redirected: false,
+    setRedirected: (redirected) => set({ redirected }),
     signInToFarcasterFrame: async () => {
       // Generate a valid alphanumeric nonce
       const { nonce, privateKey } =

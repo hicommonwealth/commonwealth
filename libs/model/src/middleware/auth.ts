@@ -136,6 +136,7 @@ async function findPoll(actor: Actor, poll_id: number) {
 async function findVerifiedAddress(
   actor: Actor,
 ): Promise<{ address: AddressInstance }> {
+  console.log('AUTH1: findVerifiedAddress started', actor.user?.id);
   if (!actor.address)
     throw new InvalidActor(actor, 'Must provide an address to authorize');
 
@@ -149,9 +150,12 @@ async function findVerifiedAddress(
     },
   });
 
+  console.log('AUTH3: Address verification result', address?.id);
+
   if (address) {
     // fire and forget address activity tracking
     address.last_active = new Date();
+    console.log('AUTH4: Updating address last_active timestamp');
     void address.save();
     return { address };
   }
@@ -410,7 +414,9 @@ export function authVerified() {
   return async (
     ctx: Context<typeof VerifiedContextInput, typeof VerifiedContext>,
   ) => {
+    console.log('AUTH7: authVerified check started', ctx.actor.user?.id);
     const { address } = await findVerifiedAddress(ctx.actor);
+    console.log('AUTH8: authVerified completed with address', address.id);
     (ctx as { context: VerifiedContext }).context = { address };
   };
 }

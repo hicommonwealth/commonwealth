@@ -56,17 +56,27 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
       const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
+
+      console.log(
+        'SIB1: SignIn command started with community_id',
+        community_id,
+      );
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
       let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
 
+      console.log(
+        'SIB2: Verifying session signature for address',
+        encodedAddress,
+      );
       await verifySessionSignature(
         deserializeCanvas(session),
         encodedAddress,
         ss58Prefix,
       );
+      console.log('SIB3: Session signature verified successfully');
 
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
@@ -77,6 +87,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       const { user_created, address_created, first_community } =
         await models.sequelize.transaction(async (transaction) => {
           // is same address found in a different community?
+          console.log(
+            'SIB4: Checking if this is first community or address already verified',
+          );
           const is_first_community = !(
             user_id ||
             (await models.Address.findOne({
@@ -88,16 +101,22 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               transaction,
             }))
           );
+          console.log('SIB5: First community check result', is_first_community);
 
           /* If address doesn't have an associated user, create one!
           - NOTE: magic strategy is the other place (when using email)
           */
           let new_user = false;
           if (!user_id) {
+            console.log(
+              'SIB6: No user_id, checking for existing address with user_id',
+            );
             const existing = await models.Address.findOne({
               where: { address: encodedAddress, user_id: { [Op.ne]: null } },
             });
+            console.log('SIB7: Existing address check result', existing?.id);
             if (!existing) {
+              console.log('SIB8: Creating new user');
               const user = await models.User.create(
                 {
                   email: null,
@@ -108,11 +127,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 { transaction },
               );
               if (!user) throw new Error('Failed to create user');
+              console.log('SIB9: User created with ID', user.id);
               user_id = user.id!;
               new_user = true;
             } else user_id = existing.user_id!;
+            console.log('SIB10: Using existing user with ID', user_id);
           }
 
+          console.log('SIB11: Finding or creating address for user', user_id);
           const [addr, new_address] = await models.Address.findOrCreate({
             where: { community_id, address: encodedAddress },
             defaults: {
@@ -133,12 +155,21 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             },
             transaction,
           });
+          console.log(
+            'SIB12: Address find/create result, new:',
+            new_address,
+            'addressId:',
+            addr.id,
+          );
 
+          console.log('SIB13: Checking if address belongs to another user');
           let wallet_found = undefined;
           if (!new_address) {
+            console.log('SIB14: Address exists, checking for wallet');
             wallet_found = await models.Address.findOne({
               where: { user_id, wallet_id },
             });
+            console.log('SIB15: Wallet found result', wallet_found?.id);
             addr.user_id = user_id;
             addr.wallet_id = wallet_id;
             addr.verification_token = verification_token;
@@ -151,6 +182,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
           const transferredUser = await transferOwnership(addr, transaction);
 
+          console.log('SIB16: Building events');
           const events = [] as Array<schemas.EventPairs>;
           new_address &&
             events.push({
@@ -162,6 +194,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: addr.created_at!,
               },
             });
+          console.log('SIB17: Checking for new address or wallet');
           (new_address || !wallet_found) &&
             events.push({
               event_name: 'WalletLinked',
@@ -173,6 +206,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: addr.created_at!,
               },
             });
+          console.log('SIB18: Checking for new user');
           new_user &&
             events.push({
               event_name: 'UserCreated',
@@ -184,6 +218,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 referrer_address,
               },
             });
+          console.log('SIB19: Checking for transferred address');
           transferredUser &&
             events.push({
               event_name: 'AddressOwnershipTransferred',
@@ -196,8 +231,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: new Date(),
               },
             });
+          console.log('SIB20: Emitting events');
           await emitEvent(models.Outbox, events, transaction);
-
+          console.log('SIB21: Transaction complete');
           return {
             user_created: new_user,
             address_created: !!new_address,
@@ -205,6 +241,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           };
         });
 
+      console.log('SIB22: Finding address with user data');
       const addr = await models.Address.scope('withPrivateData').findOne({
         where: { community_id, address: encodedAddress, user_id },
         include: [
@@ -215,7 +252,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           },
         ],
       });
+      console.log('SIB23: Found address with user data', addr?.id);
       mustExist('Address', addr);
+      console.log('SIB24: SignIn command completed successfully');
       return {
         ...addr.toJSON(),
         community_base: base,

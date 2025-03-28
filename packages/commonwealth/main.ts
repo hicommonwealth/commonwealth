@@ -116,8 +116,11 @@ export async function main(
 
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
-      res.set('X-Frame-Options', 'DENY');
-      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      // Allow framing from warpcast.com and all its subdomains
+      res.set(
+        'Content-Security-Policy',
+        "frame-ancestors 'self' https://warpcast.com https://*.warpcast.com",
+      );
       next();
     });
 

@@ -24,13 +24,13 @@ export function buildFarcasterManifest() {
     },
     frame: {
       version: `1`,
-      name: `Commonwealth`,
+      name: `Common`,
       iconUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/public/brand_assets/common-white.png`,
       homeUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}`,
       imageUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/public/brand_assets/common-white.png`,
-      buttonTitle: `Check out Commonwealth`,
+      buttonTitle: `Check out Common`,
       splashImageUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/public/brand_assets/common-white.png`,
-      splashBackgroundColor: `#ffffff`,
+      splashBackgroundColorshBackgroundColor: `#ffffff`,
       // eslint-disable-next-line max-len
       webhookUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/api/integration/farcaster/contests/NotificationsWebhook`,
     },

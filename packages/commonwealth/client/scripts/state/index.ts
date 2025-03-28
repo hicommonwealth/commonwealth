@@ -99,6 +99,9 @@ export async function initAppState(
     // it is either user object or undefined
     const userResponse = statusRes.result.user;
 
+    console.log('1 userResponse', userResponse);
+    axios.post(`${SERVER_URL}/logger`, { error: userResponse });
+
     // update the login status
     updateActiveUser(userResponse);
 
