@@ -322,6 +322,11 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models),
   );
 
+  registerRoute(router, 'post', '/logger', (req, res) => {
+    console.log('[server-logger]', JSON.stringify(req.body));
+    res.json({ status: 'Success' });
+  });
+
   // tags
   registerRoute(
     router,
