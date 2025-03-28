@@ -13,10 +13,11 @@ type ShareDialogProps = {
   title?: string;
   text?: string;
   dialogTitle: string;
+  shareType: 'thread';
 };
 
 export const ShareDialog = (props: ShareDialogProps) => {
-  const { onClose, title } = props;
+  const { onClose, title, shareType } = props;
 
   return (
     <ResponsiveDialog onClose={onClose}>
@@ -24,8 +25,8 @@ export const ShareDialog = (props: ShareDialogProps) => {
         <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
         <CWModalBody>
           <CWText>
-            For every referral, you ll soon get offchain and onchain rewards,
-            like fees from trades, swaps, and transactions they make on Common
+            When you share this link for this {shareType} you will also get
+            referral bonuses for any user that signs up.
           </CWText>
 
           <ShareSection {...props} />

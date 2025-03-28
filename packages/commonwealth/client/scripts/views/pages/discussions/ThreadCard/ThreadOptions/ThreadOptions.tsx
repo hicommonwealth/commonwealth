@@ -15,7 +15,6 @@ import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import ShareButton from 'views/components/ShareButton';
-import { SharePopover } from 'views/components/SharePopover';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
@@ -154,17 +153,12 @@ export const ThreadOptions = ({
             />
           )}
 
-          <SharePopover
-            // @ts-expect-error <StrictNullChecks/>
-            linkToShare={shareEndpoint}
-            buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
-          />
-
           {shareEndpoint && (
             <ShareButton
               url={shareEndpoint}
               title={thread.title}
               text={thread.body}
+              shareType="thread"
               buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
             />
           )}
