@@ -1,4 +1,5 @@
-import React from 'react';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import React, { useState } from 'react';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import {
   CWModal,
@@ -14,12 +15,16 @@ type ShareDialogProps = {
   text?: string;
 };
 
-const isMobile = false;
-
 export const ShareDialog = (props: ShareDialogProps) => {
   const { onClose, title } = props;
+  const [resizing, setResizing] = useState(false);
 
-  if (isMobile) {
+  const { isWindowExtraSmall } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
+  });
+
+  if (isWindowExtraSmall) {
     return (
       <CWDrawer
         size="auto"
