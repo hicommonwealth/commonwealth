@@ -1,64 +1,61 @@
-// import { logger } from '@hicommonwealth/core';
-// import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
+const PORT = process.env.CANVAS_WS_PORT || 3333;
+const BASE_URL = `http://localhost:${PORT}`;
 
-// const log = logger(import.meta);
-// export const { app: canvas, libp2p } = await startCanvasNode(config);
+class Client {
+  clock: number;
+  heads: string[];
+  baseUrl: string;
 
-// if (libp2p) {
-//   log.info(
-//     'canvas: started libp2p with multiaddrs: ' +
-//       libp2p
-//         .getMultiaddrs()
-//         .map((m) => m.toString())
-//         .join(', '),
-//   );
-// }
+  constructor() {
+    this.clock = 0;
+    this.heads = [];
+  }
+  async applyCanvasSignedData(path: string, canvasSignedData?: string) {
+    if (!canvasSignedData) {
+      return;
+    }
 
-// export const applyCanvasSignedData = async (
-//   path: string,
-//   canvas_signed_data?: string,
-// ) => {
-// if (!canvas_signed_data) return;
-// const data = parse(canvas_signed_data) as CanvasSignedData;
-//
-// let appliedSessionId: string | null = null;
-// let appliedActionId: string | null = null;
-//
-// log.trace('applying canvas signed data', {
-//   path,
-//   publicKey: data.sessionMessage.payload.publicKey,
-// });
-// try {
-//   const encodedSessionMessage = canvas.messageLog.encode(
-//     data.sessionMessageSignature,
-//     data.sessionMessage,
-//   );
-//   if (!(await canvas.messageLog.has(encodedSessionMessage.id))) {
-//     const { id: idSession } = await canvas.insert(
-//       data.sessionMessageSignature,
-//       data.sessionMessage,
-//     );
-//     appliedSessionId = idSession;
-//   }
-// } catch (err) {
-//   log.warn(`could not apply canvas session: ${err.stack}`);
-// }
-//
-// try {
-//   const encodedActionMessage = canvas.messageLog.encode(
-//     data.actionMessageSignature,
-//     data.actionMessage,
-//   );
-//   if (!(await canvas.messageLog.has(encodedActionMessage.id))) {
-//     const { id: idAction } = await canvas.insert(
-//       data.actionMessageSignature,
-//       data.actionMessage,
-//     );
-//     appliedActionId = idAction;
-//   }
-// } catch (err) {
-//   log.warn(`could not apply canvas action: ${err.stack}`);
-// }
-//
-// return { session: appliedSessionId, action: appliedActionId };
-// };
+    try {
+      const response = await fetch(`${BASE_URL}/action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/dag-json',
+        },
+        body: canvasSignedData,
+      });
+
+      const result = await response.json();
+
+      if (
+        !result.success ||
+        result.result.clock === undefined ||
+        result.result.heads === undefined
+      ) {
+        throw new Error(result.error || 'Failed to apply canvas signed data');
+      }
+
+      this.clock = result.result.clock;
+      this.heads = result.result.heads;
+
+      return { session: result.result.session, action: result.result.action };
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  async getClock(): Promise<{ clock: number; heads: string[] }> {
+    try {
+      const response = await fetch(`${BASE_URL}/clock`);
+      const result = await response.json();
+
+      this.clock = result.clock;
+      this.heads = result.heads;
+      return { clock: this.clock, heads: this.heads };
+    } catch (err) {
+      console.log('could not fetch latest clock from canvas service');
+      return { clock: this.clock, heads: this.heads };
+    }
+  }
+}
+
+export const client = new Client();
