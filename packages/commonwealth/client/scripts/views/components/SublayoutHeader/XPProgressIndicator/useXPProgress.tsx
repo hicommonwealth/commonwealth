@@ -6,7 +6,7 @@ import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import './XPProgressIndicator.scss';
 
-const WEEKLY_XP_GOAL = 400; // Hardcoded in client per product spec.
+const WEEKLY_XP_GOAL = 100; // Hardcoded in client per product spec.
 
 const useXPProgress = () => {
   const xpEnabled = useFlag('xp');
