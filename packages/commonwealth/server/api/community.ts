@@ -1,6 +1,11 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { command } from '@hicommonwealth/core';
-import { Community, models, refreshProfileCount } from '@hicommonwealth/model';
+import {
+  Community,
+  middleware,
+  models,
+  refreshMemberships,
+  refreshProfileCount,
+} from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -9,6 +14,9 @@ import { config } from '../config';
 
 export const trpcRouter = trpc.router({
   createCommunity: trpc.command(Community.CreateCommunity, trpc.Tag.Community, [
+    trpc.fireAndForget(async (_, __, ctx) => {
+      await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
+    }),
     trpc.trackAnalytics([
       MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
       (output) => ({
@@ -68,37 +76,26 @@ export const trpcRouter = trpc.router({
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (_, output, ctx) => {
-      await command(Community.RefreshCommunityMemberships(), {
-        actor: ctx.actor,
-        payload: {
-          community_id: output.id!,
-          group_id: output.groups?.at(0)?.id,
-        },
-      });
-    }),
+    (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_GROUP,
       (output) => ({ community: output.id }),
     ]),
   ]),
   updateGroup: trpc.command(Community.UpdateGroup, trpc.Tag.Community, [
-    trpc.fireAndForget(async (input, output, ctx) => {
+    (input, output) => {
       if (input.requirements?.length || input.metadata?.required_requirements)
-        await command(Community.RefreshCommunityMemberships(), {
-          actor: ctx.actor,
-          payload: {
-            community_id: output.community_id!,
-            group_id: output.id,
-          },
-        });
-    }),
+        return refreshMemberships(output.community_id!, output.id);
+      return Promise.resolve();
+    },
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.UPDATE_GROUP,
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
+  getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
   createStakeTransaction: trpc.command(
     Community.CreateStakeTransaction,
     trpc.Tag.Community,
@@ -112,6 +109,7 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
+  getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,
@@ -136,18 +134,12 @@ export const trpcRouter = trpc.router({
   ),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
   deleteAddress: trpc.command(Community.DeleteAddress, trpc.Tag.Community, [
-    trpc.fireAndForget(async (_, output) => {
-      await refreshProfileCount(output.community_id);
-    }),
+    (_, output) => refreshProfileCount(output.community_id),
   ]),
   deleteAllAddresses: trpc.command(
     Community.DeleteAllAddresses,
     trpc.Tag.Community,
-    [
-      trpc.fireAndForget(async (_, output) => {
-        await refreshProfileCount(output.community_id);
-      }),
-    ],
+    [(_, output) => refreshProfileCount(output.community_id)],
   ),
   deleteCommunity: trpc.command(Community.DeleteCommunity, trpc.Tag.Community),
   refreshCommunityMemberships: trpc.command(
@@ -165,4 +157,8 @@ export const trpcRouter = trpc.router({
   getPinnedTokens: trpc.query(Community.GetPinnedTokens, trpc.Tag.Community),
   pinToken: trpc.command(Community.PinToken, trpc.Tag.Community),
   unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
+  updateCommunityTags: trpc.command(
+    Community.UpdateCommunityTags,
+    trpc.Tag.Community,
+  ),
 });

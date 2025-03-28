@@ -25,13 +25,13 @@ export function GetXps(): Query<typeof schemas.GetXps> {
           model: models.User,
           required: true,
           as: 'user',
-          attributes: ['profile'],
+          attributes: ['profile', 'tier'],
         },
         {
           model: models.User,
           as: 'creator',
           required: false,
-          attributes: ['profile'],
+          attributes: ['profile', 'tier'],
         },
         {
           model: models.QuestActionMeta,

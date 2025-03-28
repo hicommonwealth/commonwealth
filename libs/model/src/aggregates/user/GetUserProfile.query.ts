@@ -18,6 +18,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         where: { id: user_id },
         attributes: [
           'profile',
+          'tier',
           'referred_by_address',
           'referral_count',
           'referral_eth_earnings',

@@ -40,6 +40,7 @@ export const ProfileTags = z.object({
 
 export const User = z.object({
   id: PG_INT.optional(),
+  tier: z.number().int().min(0).max(5),
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
@@ -131,6 +132,8 @@ export const CommunityMember = z.object({
       avatar_url: z.string().nullish(),
     })
     .nullish(),
-  referral_count: PG_INT.default(0).nullish(),
-  referral_eth_earnings: z.number().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number(),
+  xp_points: PG_INT.default(0),
+  xp_referrer_points: PG_INT.default(0),
 });

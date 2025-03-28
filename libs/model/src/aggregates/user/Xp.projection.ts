@@ -114,8 +114,10 @@ async function recordXpsForQuest(
     topic_id?: number;
     thread_id?: number;
     comment_id?: number;
+    group_id?: number;
     sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
+    goal_id?: number; // community goals
   },
 ) {
   const shared_with_address =
@@ -135,7 +137,9 @@ async function recordXpsForQuest(
           (scoped === 'topic' && +id !== scope?.topic_id) ||
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
-          (scoped === 'sso' && id !== scope?.sso)
+          (scoped === 'group' && +id !== scope?.group_id) ||
+          (scoped === 'sso' && id !== scope?.sso) ||
+          (scoped === 'goal' && +id !== scope?.goal_id)
         )
           continue;
       }
@@ -517,6 +521,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
         );
       },
+      CommunityGoalReached: async ({ payload }) => {
+        // find the admin of the community (TODO: project on community creation, using proxy in the meantime)
+        const address = await models.Address.findOne({
+          where: { community_id: payload.community_id, role: 'admin' },
+          order: ['created_at'],
+        });
+        if (!address) return;
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'CommunityGoalReached',
+        );
+        await recordXpsForQuest(
+          address.user_id!,
+          payload.created_at,
+          action_metas,
+          undefined,
+          { goal_id: payload.community_goal_meta_id },
+        );
+      },
       TwitterCommonMentioned: async ({ payload }) => {
         const address = await models.Address.findOne({
           where: {
@@ -572,6 +595,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
         if (!action_meta) return;
         await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
+      },
+      MembershipsRefreshed: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'MembershipsRefreshed',
+        );
+        await Promise.all(
+          payload.membership
+            .filter((m) => !m.rejected)
+            .map(async ({ user_id, group_id }) => {
+              await recordXpsForQuest(
+                user_id,
+                payload.created_at,
+                action_metas,
+                undefined,
+                { group_id },
+              );
+            }),
+        );
       },
     },
   };

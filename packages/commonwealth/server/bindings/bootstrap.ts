@@ -12,11 +12,13 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityGoalsPolicy,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
   FarcasterWorker,
+  TwitterEngagementPolicy,
   User,
   models,
 } from '@hicommonwealth/model';
@@ -97,13 +99,22 @@ export async function bootstrapBindings(
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
 
-  // @timolegros can we automate subscriptions by iterating
-  // over the rascal consumer map?... we can add retry strategies to the map
   const createUnverifiedUserSubRes =
     await brokerInstance.subscribe(CreateUnverifiedUser);
   checkSubscriptionResponse(
     createUnverifiedUserSubRes,
     CreateUnverifiedUser.name,
+  );
+
+  const twitterEngSubRes = await brokerInstance.subscribe(
+    TwitterEngagementPolicy,
+  );
+  checkSubscriptionResponse(twitterEngSubRes, TwitterEngagementPolicy.name);
+  const createCommunityGoalsSubRes =
+    await brokerInstance.subscribe(CommunityGoalsPolicy);
+  checkSubscriptionResponse(
+    createCommunityGoalsSubRes,
+    CommunityGoalsPolicy.name,
   );
 }
 

@@ -95,6 +95,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         const contestManagers = [
           {
             url: getChainNodeUrl(community.ChainNode!),
+            eth_chain_id: community.ChainNode!.eth_chain_id!,
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -192,6 +193,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         const contestManagers = contestActions.map((ca) => ({
           url: getChainNodeUrl(community.ChainNode!),
+          eth_chain_id: community.ChainNode!.eth_chain_id!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));

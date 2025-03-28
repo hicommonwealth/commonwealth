@@ -142,7 +142,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                             'address', A.address,
                             'lastActive', A.last_active::text,
                             'avatarUrl', editor_profiles.profile->>'avatar_url'
-                          )
+                          ),
+                          'tier', editor_profiles.tier
                         )
                     )))
                 ELSE '[]'::json

@@ -12,7 +12,7 @@ const IdeaLaunchpad = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const launchpadEnabled = useFlag('launchpad');
 
-  const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>();
+  const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>('');
   const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
     useState(false);
   const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
@@ -34,10 +34,11 @@ const IdeaLaunchpad = () => {
   return (
     <>
       <LaunchIdeaCard
+        ideaPrompt={initialIdeaPrompt}
+        onIdeaPromptChange={setInitialIdeaPrompt}
         onRandomizeClick={(ideaPrompt) => {
           register({
-            cb: (prompt: string) => {
-              setInitialIdeaPrompt(prompt);
+            cb: () => {
               setShouldGenerateIdeaOnDrawerOpen(true);
               setIsTokenLaunchDrawerOpen(true);
             },
