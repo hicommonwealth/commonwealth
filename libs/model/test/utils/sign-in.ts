@@ -8,6 +8,13 @@ import {
 import { SignIn } from '../../src/aggregates/user';
 import { verifyAddress } from '../../src/services/session';
 
+export async function randSigner() {
+  const signer = new SIWESigner({});
+  const did = await signer.getDid();
+  const address = signer.getAddressFromDid(did);
+  return { signer, address };
+}
+
 export async function signIn(
   evmSigner: SIWESigner,
   community_id: string,
