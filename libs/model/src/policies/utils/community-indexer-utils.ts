@@ -1,6 +1,5 @@
 import { blobStorage, command, logger } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ClankerToken } from '@hicommonwealth/schemas';
 import {
@@ -11,6 +10,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
+import { getPrivateWalletAddress } from 'model/src/utils/getPrivateWalletAddress';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { uuidV4 } from 'web3-utils';
@@ -285,13 +285,9 @@ export async function createCommunityFromClankerToken(
   });
   mustExist('Chain Node', chainNode);
 
-  const web3 = commonProtocol.createPrivateEvmClient({
-    rpc: chainNode.private_url!,
-    privateKey: config.WEB3.PRIVATE_KEY,
-  });
   const adminAddress = await models.Address.findOne({
     where: {
-      address: web3.eth.defaultAccount!,
+      address: getPrivateWalletAddress(),
     },
   });
   mustExist('Admin Address', adminAddress);

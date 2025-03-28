@@ -79,7 +79,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
       });
-      if (community)
+      if (community) {
         if (community.id === id) {
           throw new InvalidInput(CreateCommunityErrors.CommunityIDExists);
         } else if (community.name === name) {
@@ -87,6 +87,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         } else if (community.redirect === id) {
           throw new InvalidInput(CreateCommunityErrors.CommunityRedirectExists);
         }
+      }
       if (community_indexer_id && !token_address) {
         throw new InvalidInput(CreateCommunityErrors.TokenAddressRequired);
       }

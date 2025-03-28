@@ -39,7 +39,12 @@ export const CreateCommunity = {
     icon_url: z
       .string()
       .url()
-      .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
+      .superRefine(async (val, ctx) => {
+        if (val.startsWith('http://commonblob.com')) {
+          return;
+        }
+        await checkIconSize(val, ctx);
+      })
       .optional(),
     social_links: z.array(z.string().url()).default([]),
     tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method

@@ -326,7 +326,7 @@ describe('generateUniqueId', () => {
     const communities = await models.Community.findAll({
       where: {
         name: {
-          [Op.like]: '%$kull%',
+          [Op.like]: '$kull%',
         },
       },
       order: [['created_at', 'ASC']],
@@ -334,5 +334,72 @@ describe('generateUniqueId', () => {
     expect(communities.length).toBe(2);
     expect(communities[0].name).toBe('$kull');
     expect(communities[1].name).toBe('$kull #2');
+  });
+
+  it('should handle duplicate named consecutive tokens #2', async () => {
+    await emitEvent(models.Outbox, [
+      {
+        event_name: 'ClankerTokenFound',
+        event_payload: {
+          id: 1313,
+          name: 'Lumina',
+          pair: '',
+          type: 'proxy',
+          symbol: 'LUMN',
+          img_url:
+            'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/0359034e-a3c9-4ef4-4ef3-6361c9dd6500/original',
+          tx_hash:
+            '0x996437754016a6a21255e734c964def95d42fd04640551512cf9633f5404a9f8',
+          cast_hash: '0x624b9f4acc1ba506337f53502e0d2f545a36d20c',
+          created_at: new Date('2024-11-15T06:38:41.205Z'),
+          presale_id: '',
+          pool_address: '0x8d100A452791420f3212D5f865EF660c4A43e800',
+          requestor_fid: 849144,
+          contract_address: '0x1dED470b34A86068d8e67E25412eEA0ef063705a',
+        },
+      },
+    ]);
+
+    await emitEvent(models.Outbox, [
+      {
+        event_name: 'ClankerTokenFound',
+        event_payload: {
+          id: 1318,
+          name: 'Lumina',
+          pair: '',
+          type: 'proxy',
+          symbol: 'LUMN',
+          img_url:
+            'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/dbf124b0-e198-49bf-c89c-52fa98296600/original',
+          tx_hash:
+            '0x0960251cd84037264ee6bca6cc67fa5d37d551d2f53ec45da48a335ba6b217c4',
+          cast_hash: '0xf91a63ae3601cac03567967796d674877da4a834',
+          created_at: new Date('2024-11-15T06:42:19.475Z'),
+          presale_id: '',
+          pool_address: '0xB6C7a5cd2F2b192a9fa2046B35D36B760fc99039',
+          requestor_fid: 849144,
+          contract_address: '0x409C0ffB7fA501035a70a8B5beC7682e1Aecea31',
+        },
+      },
+    ]);
+
+    const numCommunitiesBefore = await models.Community.count();
+
+    await drainOutbox(['ClankerTokenFound'], CommunityIndexerWorker);
+
+    const numCommunitiesAfter = await models.Community.count();
+    expect(numCommunitiesAfter).toBe(numCommunitiesBefore + 2);
+
+    const communities = await models.Community.findAll({
+      where: {
+        name: {
+          [Op.like]: 'Lumina%',
+        },
+      },
+      order: [['created_at', 'ASC']],
+    });
+    expect(communities.length).toBe(2);
+    expect(communities[0].name).toBe('Lumina');
+    expect(communities[1].name).toBe('Lumina #2');
   });
 });
