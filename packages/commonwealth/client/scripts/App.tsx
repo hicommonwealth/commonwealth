@@ -10,6 +10,7 @@ import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
+import { Mava } from 'views/components/Mava';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
@@ -28,6 +29,7 @@ const App = () => {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <Mava />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
               <OpenFeatureProvider client={undefined}>
