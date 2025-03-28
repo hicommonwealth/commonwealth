@@ -2,13 +2,14 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../../database';
+import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
 import { decodeContent, emitEvent, getDelta, updateTags } from '../../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
     ...schemas.UpdateUser,
-    auth: [],
+    auth: [authVerified()],
     body: async ({ actor, payload }) => {
       // comparing number to string since command convention requires string id
       if (actor.user.id != payload.id)

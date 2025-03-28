@@ -8,7 +8,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
-import { authThread } from '../../middleware';
+import { authThread, tiered } from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
 import {
@@ -33,6 +33,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
         action: schemas.PermissionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
+      tiered({ creates: true }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address, thread } = mustBeAuthorizedThread(actor, context);

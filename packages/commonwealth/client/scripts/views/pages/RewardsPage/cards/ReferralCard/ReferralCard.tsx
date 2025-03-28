@@ -11,11 +11,12 @@ import {
 import RewardsCard from '../../RewardsCard';
 import Trend from '../Trend';
 
+import useUserStore from 'state/ui/user';
 import './ReferralCard.scss';
 
 enum ReferralTabs {
   Total = 'Total',
-  XP = 'XP',
+  XP = 'Aura',
 }
 
 interface ReferralCardProps {
@@ -39,6 +40,7 @@ const ReferralCard = ({
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   return (
     <RewardsCard
@@ -76,11 +78,9 @@ const ReferralCard = ({
           {currentTab === ReferralTabs.XP && (
             <div className="xp-body">
               <CWText fontWeight="bold" type="h4">
-                {123456} XP
+                {user.xpReferrerPoints} Aura&nbsp;
+                <CWText type="caption">earned from referrals</CWText>
               </CWText>
-              {!isLoading && (trendValue || trendValue === 0) && (
-                <Trend value={trendValue} />
-              )}
             </div>
           )}
         </div>

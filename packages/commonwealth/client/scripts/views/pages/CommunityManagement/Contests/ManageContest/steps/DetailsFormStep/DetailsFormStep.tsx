@@ -66,7 +66,7 @@ const DetailsFormStep = ({
   isFarcasterContest,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const judgeContestEnabled = useFlag('judgeContest');
 
   const [payoutStructure, setPayoutStructure] = useState<
     ContestFormData['payoutStructure']
@@ -110,20 +110,34 @@ const DetailsFormStep = ({
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
-  const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting)
-    .map((t) => ({
-      value: t.id,
-      label: t.name,
-      weightedVoting: t.weighted_voting,
-      helpText: weightedVotingValueToLabel(t.weighted_voting!),
-      tokenAddress: t.token_address,
-    }));
+  const filteredTopics = (topicsData || []).filter(
+    (t) => t.name.toLowerCase() !== 'general',
+  );
+
+  const availableTopics = judgeContestEnabled
+    ? filteredTopics.map((t) => ({
+        value: t.id,
+        label: t.name,
+        weightedVoting: t.weighted_voting,
+        helpText: t.weighted_voting
+          ? weightedVotingValueToLabel(t.weighted_voting)
+          : 'Judged',
+        tokenAddress: t.token_address,
+      }))
+    : filteredTopics
+        .filter((t) => t.weighted_voting)
+        .map((t) => ({
+          value: t.id,
+          label: t.name,
+          weightedVoting: t.weighted_voting,
+          helpText: weightedVotingValueToLabel(t.weighted_voting!),
+          tokenAddress: t.token_address,
+        }));
 
   const getInitialValues = () => {
     return {
       contestName: contestFormData?.contestName,
-      contestTopic: weightedTopics.find(
+      contestTopic: availableTopics.find(
         (t) => t.value === contestFormData?.contestTopic?.value,
       ),
       contestDescription: contestFormData?.contestDescription,
@@ -182,22 +196,20 @@ const DetailsFormStep = ({
       return;
     }
 
-    const selectedTopic = (weightedTopics || []).find(
+    const selectedTopic = (availableTopics || []).find(
       (t) => t.value === values?.contestTopic?.value,
     );
-    const feeType =
-      farcasterContestEnabled && isFarcasterContest
+    const feeType = isFarcasterContest
+      ? ContestFeeType.DirectDeposit
+      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
         ? ContestFeeType.DirectDeposit
-        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
-          ? ContestFeeType.DirectDeposit
-          : ContestFeeType.CommunityStake;
+        : ContestFeeType.CommunityStake;
 
-    const contestRecurring =
-      farcasterContestEnabled && isFarcasterContest
+    const contestRecurring = isFarcasterContest
+      ? ContestRecurringType.No
+      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
         ? ContestRecurringType.No
-        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
-          ? ContestRecurringType.No
-          : ContestRecurringType.Yes;
+        : ContestRecurringType.Yes;
 
     const formData: ContestFormData = {
       contestName: values.contestName,
@@ -294,7 +306,7 @@ const DetailsFormStep = ({
                     placeholder="Select topic"
                     isClearable={false}
                     isSearchable={false}
-                    options={[...weightedTopics, createNewTopicOption]}
+                    options={[...availableTopics, createNewTopicOption]}
                     isDisabled={editMode}
                     components={{
                       Option: (originalProps) =>
@@ -307,14 +319,20 @@ const DetailsFormStep = ({
                         return navigate('/manage/topics');
                       }
 
-                      if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
+                      if (
+                        t?.weightedVoting === TopicWeightedVoting.ERC20 ||
+                        // Non-weighted topic for judge nominated contests
+                        !t?.weightedVoting
+                      ) {
                         const token = topicsData?.find(
-                          (topic) => topic.id === t.value,
+                          (topic) => topic.id === t?.value,
                         )?.token_address;
                         setTokenValue(token || '');
                         setValue('feeType', ContestFeeType.DirectDeposit);
                         setValue('contestRecurring', ContestRecurringType.No);
-                      } else {
+                      } else if (
+                        t?.weightedVoting === TopicWeightedVoting.Stake
+                      ) {
                         setValue('feeType', ContestFeeType.CommunityStake);
                         setValue('contestRecurring', ContestRecurringType.Yes);
                       }
@@ -343,7 +361,7 @@ const DetailsFormStep = ({
                 />
               </div>
 
-              {farcasterContestEnabled && isFarcasterContest && (
+              {isFarcasterContest && (
                 <div className="contest-section contest-section-description">
                   <CWText type="h4">
                     Describe your contest<CWText type="b1"> (optional)</CWText>
@@ -382,9 +400,10 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              {weightedTopics.find(
-                (t) => t.value === watch('contestTopic')?.value,
-              )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
+              {watch('contestTopic')?.weightedVoting ===
+                TopicWeightedVoting.ERC20 ||
+              // Non-weighted topic for judge nominated contests
+              !watch('contestTopic')?.weightedVoting ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>
@@ -417,9 +436,8 @@ const DetailsFormStep = ({
                     disabled={editMode}
                   />
                 </>
-              ) : weightedTopics.find(
-                  (t) => t.value === watch('contestTopic')?.value,
-                )?.weightedVoting === TopicWeightedVoting.Stake ? (
+              ) : watch('contestTopic')?.weightedVoting ===
+                TopicWeightedVoting.Stake ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>

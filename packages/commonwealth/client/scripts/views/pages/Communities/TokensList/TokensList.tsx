@@ -2,14 +2,12 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
-import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
-import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -33,10 +31,10 @@ const TokenWithCommunity = TokenView.extend({
 
 type TokensListProps = {
   filters: CommunityFilters;
+  hideHeader?: boolean;
 };
 
-const TokensList = ({ filters }: TokensListProps) => {
-  const user = useUserStore();
+const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -46,9 +44,6 @@ const TokensList = ({ filters }: TokensListProps) => {
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { register, trigger } = useDeferredConditionTriggerCallback({
-    shouldRunTrigger: user.isLoggedIn,
-  });
 
   const {
     data: tokensList,
@@ -93,14 +88,6 @@ const TokensList = ({ filters }: TokensListProps) => {
     }
   };
 
-  const openAuthModalOrTriggerCallback = () => {
-    if (user.isLoggedIn) {
-      trigger();
-    } else {
-      setIsAuthModalOpen(!user.isLoggedIn);
-    }
-  };
-
   const handleCTAClick = (
     mode: TradingMode,
     token: z.infer<typeof TokenWithCommunity>,
@@ -119,7 +106,7 @@ const TokensList = ({ filters }: TokensListProps) => {
 
   return (
     <div className="TokensList">
-      <CWText type="h2">Tokens</CWText>
+      {!hideHeader && <CWText type="h2">Tokens</CWText>}
       {isInitialLoading || isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
@@ -163,15 +150,10 @@ const TokensList = ({ filters }: TokensListProps) => {
                 }
                 iconURL={token.icon_url || ''}
                 onCTAClick={(mode) => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(
-                        mode,
-                        token as z.infer<typeof TokenWithCommunity>,
-                      );
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
+                  handleCTAClick(
+                    mode,
+                    token as z.infer<typeof TokenWithCommunity>,
+                  );
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({

@@ -17,10 +17,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import {
-  useCreateThreadMutation,
-  useGenerateThreadText,
-} from 'state/api/threads';
+import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -43,13 +40,19 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { useGenerateCommentText } from 'client/scripts/state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
+import {
+  generateThreadPrompt,
+  generateThreadTitlePrompt,
+} from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
+import { CWText } from '../component_kit/cw_text';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
+import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -60,6 +63,7 @@ import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 interface NewThreadFormProps {
@@ -72,7 +76,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const user = useUserStore();
 
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const {
+    aiInteractionsToggleEnabled,
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+  } = useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   useAppStatus();
@@ -129,14 +137,13 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const { data: recentThreads } = useFetchThreadsQuery({
     queryType: 'bulk',
-    limit: 3,
+    limit: 2,
     communityId: selectedCommunityId,
     apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
     topicId: threadTopic?.id,
   });
 
-  const { generateComment } = useGenerateCommentText();
-  const { generateThread } = useGenerateThreadText();
+  const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const hasTopicOngoingContest =
@@ -356,7 +363,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadTitle('');
     setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
-    onCancel?.(e) || navigate('/discussions');
+
+    if (location.search.includes('cancel')) {
+      navigate(`/contests/${location.search.split('cancel=')[1]}`);
+    } else {
+      onCancel?.(e) || navigate('/discussions');
+    }
   };
 
   const showBanner =
@@ -374,33 +386,43 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
 
-    const context = recentThreads?.map((thread) => {
-      return `Title: ${thread.title}\nBody: ${thread.body}`;
-    });
+    const context = recentThreads
+      ?.map((thread) => {
+        return `Title: ${thread.title}
+              \n Body: ${thread.body}
+              \n Topic: ${thread.topic?.name || 'N/A'}
+              \n Community: ${thread.communityName || 'N/A'}`;
+      })
+      .join('\n\n');
 
     try {
-      const body = await generateThread(
-        `Context: ${context.join('\n')}`,
-        (chunk: string) => {
+      const prompt = generateThreadPrompt(context);
+
+      const threadContent = await generateCompletion(prompt, {
+        stream: true,
+        onError: (error) => {
+          console.error('Error generating AI thread:', error);
+          notifyError('Failed to generate AI thread content');
+        },
+        onChunk: (chunk) => {
           bodyAccumulatedRef.current += chunk;
           setThreadContentDelta(
             createDeltaFromText(bodyAccumulatedRef.current),
           );
         },
-      );
+      });
 
-      await generateComment(
-        `Generate a single-line, concise title (max 100 characters) 
-        without quotes or punctuation at the end based on the body: ${body}`,
-        (chunk: string) => {
-          const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
-          setThreadTitle((prev) =>
-            prev === '' ? cleanChunk : prev + cleanChunk,
-          );
+      const titlePrompt = generateThreadTitlePrompt(threadContent);
+
+      await generateCompletion(titlePrompt, {
+        stream: false,
+        onComplete(fullText) {
+          setThreadTitle(fullText);
         },
-      );
+      });
     } catch (error) {
       console.error('Error generating AI thread:', error);
+      notifyError('Failed to generate AI thread');
     } finally {
       setIsGenerating(false);
     }
@@ -618,19 +640,34 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   onClick={handleCancel}
                   tabIndex={3}
                   label="Cancel"
-                  containerClassName="no-pad"
+                  containerClassName="no-pad cancel-button"
                 />
 
                 {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
                   <CWThreadAction
                     action="ai-reply"
-                    label="Draft with AI"
+                    label="Draft thread with AI"
                     onClick={(e) => {
                       e.preventDefault();
                       handleGenerateAIThread().catch(console.error);
                     }}
                   />
                 )}
+
+                <div className="ai-toggle-wrapper">
+                  <CWToggle
+                    className="ai-toggle"
+                    icon="sparkle"
+                    iconColor="#757575"
+                    checked={aiCommentsToggleEnabled}
+                    onChange={() => {
+                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                    }}
+                  />
+                  <CWText type="caption" className="toggle-label">
+                    AI initial comment
+                  </CWText>
+                </div>
 
                 <CWButton
                   label="Create"
@@ -639,7 +676,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     handleNewThreadCreation().catch(console.error);
                   }}
                   tabIndex={4}
-                  containerClassName="no-pad"
+                  containerClassName="no-pad create-button"
                 />
               </div>
 

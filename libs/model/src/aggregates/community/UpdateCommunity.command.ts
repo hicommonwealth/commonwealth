@@ -1,11 +1,11 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { checkSnapshotObjectExists } from '../../services';
+import { checkSnapshotObjectExists, commonProtocol } from '../../services';
+import { emitEvent } from '../../utils/utils';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:
@@ -41,6 +41,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         custom_stages,
         namespace,
         transactionHash,
+        allow_tokenized_threads,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -116,8 +117,27 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       social_links?.length && (community.social_links = social_links);
       hide_projects !== undefined && (community.hide_projects = hide_projects);
       custom_stages && (community.custom_stages = custom_stages);
+      allow_tokenized_threads &&
+        (community.allow_tokenized_threads = allow_tokenized_threads);
 
-      await community.save();
+      await models.sequelize.transaction(async (transaction) => {
+        await community.save({ transaction });
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: 'CommunityUpdated',
+              event_payload: {
+                community_id: community.id,
+                user_id: actor.user.id!,
+                social_links: social_links?.length ? social_links : undefined,
+                created_at: new Date(),
+              },
+            },
+          ],
+          transaction,
+        );
+      });
       return community.toJSON();
     },
   };

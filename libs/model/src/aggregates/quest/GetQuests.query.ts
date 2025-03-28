@@ -57,6 +57,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
           Q.end_date, 
           Q.updated_at, 
           Q.created_at,
+          Q.quest_type,
           count(*) OVER () AS total,
           CASE WHEN max(QAS.id) IS NOT NULL THEN
             json_agg(json_strip_nulls(json_build_object(

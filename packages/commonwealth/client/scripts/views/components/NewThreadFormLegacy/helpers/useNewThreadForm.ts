@@ -39,7 +39,11 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (restoredDraft?.topicId) {
       return topicsForSelector.find((t) => t.id === restoredDraft.topicId);
     }
-    return topicsForSelector.find((t) => t.name.includes('General')) || null;
+    return (
+      topicsForSelector.find(
+        (t) => t.name.includes('General') || t.order === 1,
+      ) || null
+    );
   }, [topicIdFromUrl, restoredDraft, topicsForSelector]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(

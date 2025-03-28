@@ -254,7 +254,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const voteWeight =
     isTopicWeighted && voteBalance
       ? prettyVoteWeight(
-          formatDecimalToWei(voteBalance),
+          formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
           topicObj!.token_decimals,
           topicObj!.weighted_voting,
           topicObj!.vote_weight_multiplier || 1,
@@ -426,24 +426,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 ),
               }}
             />
-            <WithDefaultStickyComment>
-              {user.isLoggedIn && user.activeAccount && (
-                <StickyEditorContainer
-                  parentType={ContentType.Thread}
-                  canComment={true}
-                  handleSubmitComment={handleCreateThread}
-                  errorMsg=""
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  disabled={false}
-                  onCancel={handleCancel}
-                  author={user.activeAccount}
-                  editorValue={getTextFromDelta(threadContentDelta)}
-                  tooltipText=""
-                  topic={topicObj}
-                />
-              )}
-            </WithDefaultStickyComment>
           </>
         ) : selectedView === VIEWS[1].value ? (
           <OverviewPage
@@ -502,6 +484,25 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             overscan={50}
           />
         )}
+
+        <WithDefaultStickyComment>
+          {user.isLoggedIn && user.activeAccount && (
+            <StickyEditorContainer
+              parentType={ContentType.Thread}
+              canComment={true}
+              handleSubmitComment={handleCreateThread}
+              errorMsg=""
+              contentDelta={threadContentDelta}
+              setContentDelta={setThreadContentDelta}
+              disabled={false}
+              onCancel={handleCancel}
+              author={user.activeAccount}
+              editorValue={getTextFromDelta(threadContentDelta)}
+              tooltipText=""
+              topic={topicObj}
+            />
+          )}
+        </WithDefaultStickyComment>
 
         <StickyCommentElementSelector />
       </CWPageLayout>

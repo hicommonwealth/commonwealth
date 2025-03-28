@@ -4,7 +4,6 @@ export type WelcomeOnboardModalProps = {
 };
 
 export enum WelcomeOnboardModalSteps {
-  Notifications = 'Notifications',
   PersonalInformation = 'PersonalInformation',
   TermsOfServices = 'TermsOfServices',
   Preferences = 'Preferences',

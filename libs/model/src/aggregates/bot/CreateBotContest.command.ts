@@ -8,6 +8,7 @@ import {
   commonProtocol as cp,
   deployERC20Contest,
   getTokenAttributes,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import { config, publishCast } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -88,31 +89,40 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
         return;
       }
 
+      mustBeProtocolChainId(community.ChainNode!.eth_chain_id!);
+
       // use short duration for testnet contests
       const contestDurationSecs =
         community.ChainNode!.eth_chain_id === cp.ValidChains.SepoliaBase
           ? 60 * 60
           : 60 * 60 * 24 * 7;
 
-      const namespaceFactory =
-        cp.factoryContracts[
-          community!.ChainNode!.eth_chain_id as cp.ValidChains
-        ].factory;
-
       if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
         throw new ServerError('Contest bot private key not set!');
 
-      const contestAddress = await deployERC20Contest({
-        privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
-        namespaceName: botNamespace!,
-        contestInterval: contestDurationSecs,
-        winnerShares: contestMetadata.payoutStructure,
-        voteToken: contestMetadata.tokenAddress,
-        voterShare: contestMetadata.voterShare,
-        exchangeToken: contestMetadata.tokenAddress,
-        namespaceFactory,
-        rpc: community!.ChainNode!.private_url!,
-      });
+      let contestAddress: string;
+      try {
+        contestAddress = await deployERC20Contest({
+          chain: {
+            rpc: community!.ChainNode!.private_url!,
+            eth_chain_id: community.ChainNode!.eth_chain_id,
+          },
+          privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+          namespaceName: botNamespace!,
+          contestInterval: contestDurationSecs,
+          winnerShares: contestMetadata.payoutStructure,
+          voteToken: contestMetadata.tokenAddress,
+          voterShare: contestMetadata.voterShare,
+          exchangeToken: contestMetadata.tokenAddress,
+        });
+      } catch (e) {
+        e instanceof Error
+          ? log.error('Failed to deploy ERC20 contest', e)
+          : log.error(`Failed to deploy ERC20 contest: ${e}`);
+
+        throw new InvalidState('Failed to deploy ERC20 Contest');
+      }
+
       mustExist('Deployed Contest', contestAddress);
 
       await models.sequelize.transaction(async (transaction) => {

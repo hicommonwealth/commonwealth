@@ -26,6 +26,7 @@ import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStake
 
 import { CWDivider } from '../../../../components/component_kit/cw_divider';
 import ContestsList from '../ContestsList';
+import EmptyContestsList from '../EmptyContestsList';
 import { ContestType, ContestView } from '../types';
 import useCommunityContests from '../useCommunityContests';
 import FeeManagerBanner from './FeeManagerBanner';
@@ -33,12 +34,12 @@ import FeeManagerBanner from './FeeManagerBanner';
 import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
-  const farcasterContestEnabled = useFlag('farcasterContest');
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
+  const judgeContestEnabled = useFlag('judgeContest');
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -114,127 +115,145 @@ const AdminContestsPage = () => {
     navigate(`/manage/contests/launch?type=${ContestType.Farcaster}`);
   };
 
+  const goToLaunchCommonContest = () => {
+    navigate(`/manage/contests/launch?type=${ContestType.Common}`);
+  };
+
+  const goToCreateTopicPage = () => {
+    navigate('/manage/topics');
+  };
+
+  // Check if there are any contests (active or finished)
+  const hasNoContests =
+    !isContestDataLoading &&
+    contestsData.active.length === 0 &&
+    contestsData.finished.length === 0;
+
   return (
     <CWPageLayout>
       <div className="AdminContestsPage">
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {contestView === ContestView.List && isContestAvailable && (
-            <CWButton
-              iconLeft="plusPhosphor"
-              label="Create contest"
-              onClick={handleCreateContestClicked}
-            />
-          )}
+          {contestView === ContestView.List &&
+            isContestAvailable &&
+            !hasNoContests && (
+              <CWButton
+                iconLeft="plusPhosphor"
+                label="Create contest"
+                onClick={handleCreateContestClicked}
+              />
+            )}
         </div>
 
         {contestView === ContestView.List ? (
           <>
-            {showBanner && (
-              <FeeManagerBanner
-                feeManagerBalance={feeManagerBalance}
-                isLoading={isFeeManagerBalanceLoading}
-              />
-            )}
-            <CWText type="h3" className="mb-12">
-              Active Contests
-            </CWText>
-            {!isContestAvailable && !contestsData.active.length ? (
-              <CWText>No active contests available</CWText>
+            {hasNoContests ? (
+              <EmptyContestsList onSetContestView={setContestView} />
             ) : (
-              <ContestsList
-                contests={contestsData.active}
-                isAdmin={isAdmin}
-                isLoading={isContestDataLoading}
-                isContestAvailable={isContestAvailable}
-                onSetContestView={setContestView}
-                community={{
-                  id: community?.id || '',
-                  name: community?.name || '',
-                  iconUrl: community?.icon_url || '',
-                  ethChainId,
-                  chainNodeUrl,
-                }}
-              />
-            )}
+              <>
+                {showBanner && (
+                  <FeeManagerBanner
+                    feeManagerBalance={feeManagerBalance}
+                    isLoading={isFeeManagerBalanceLoading}
+                  />
+                )}
+                <CWText type="h3" className="mb-12">
+                  Active Contests
+                </CWText>
+                {!isContestAvailable && !contestsData.active.length ? (
+                  <CWText>No active contests available</CWText>
+                ) : (
+                  <ContestsList
+                    contests={contestsData.active}
+                    isAdmin={isAdmin}
+                    isLoading={isContestDataLoading}
+                    isContestAvailable={isContestAvailable}
+                    onSetContestView={setContestView}
+                    community={{
+                      id: community?.id || '',
+                      name: community?.name || '',
+                      iconUrl: community?.icon_url || '',
+                      ethChainId,
+                      chainNodeUrl,
+                    }}
+                  />
+                )}
 
-            <CWDivider className="ended" />
-            <CWText type="h3" className="mb-12">
-              Previous Contests
-            </CWText>
-            {isContestAvailable && contestsData.finished.length === 0 ? (
-              <CWText>No previous contests available</CWText>
-            ) : (
-              <ContestsList
-                contests={contestsData.finished}
-                isAdmin={isAdmin}
-                isLoading={isContestDataLoading}
-                isContestAvailable={isContestAvailable}
-                displayAllRecurringContests
-                onSetContestView={setContestView}
-                community={{
-                  id: community?.id || '',
-                  name: community?.name || '',
-                  iconUrl: community?.icon_url || '',
-                  ethChainId,
-                  chainNodeUrl,
-                }}
-              />
+                <CWDivider className="ended" />
+                <CWText type="h3" className="mb-12">
+                  Previous Contests
+                </CWText>
+                {isContestAvailable && contestsData.finished.length === 0 ? (
+                  <CWText>No previous contests available</CWText>
+                ) : (
+                  <ContestsList
+                    contests={contestsData.finished}
+                    isAdmin={isAdmin}
+                    isLoading={isContestDataLoading}
+                    isContestAvailable={isContestAvailable}
+                    displayAllRecurringContests
+                    onSetContestView={setContestView}
+                    community={{
+                      id: community?.id || '',
+                      name: community?.name || '',
+                      iconUrl: community?.icon_url || '',
+                      ethChainId,
+                      chainNodeUrl,
+                    }}
+                  />
+                )}
+              </>
             )}
           </>
         ) : contestView === ContestView.TypeSelection ? (
           <div className="type-selection-list">
-            {hasAtLeastOneWeightedVotingTopic ? (
+            {judgeContestEnabled || hasAtLeastOneWeightedVotingTopic ? (
               <EmptyCard
                 img={commonUrl}
                 title="Launch on Common"
-                subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
+                subtitle={
+                  hasAtLeastOneWeightedVotingTopic
+                    ? `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
+                    : `For weighted contests, you need at least one topic with weighted voting enabled. 
+You can still proceed to set up your contest.`
+                }
                 button={{
                   label: 'Launch Common contest',
-                  handler: () =>
-                    navigate(
-                      `/manage/contests/launch?type=${ContestType.Common}`,
-                    ),
+                  handler: goToLaunchCommonContest,
                 }}
               />
             ) : (
               <EmptyCard
                 img={shape2Url}
-                title="You must have at least one topic with weighted voting enabled to run contest"
-                subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
+                title="Launch on Common"
+                subtitle={`You must have at least one topic with weighted voting enabled to run contest.
+Setting up a contest just takes a few minutes and can be a huge boost to your community.`}
                 button={{
                   label: 'Create a topic',
-                  handler: () => navigate('/manage/topics'),
+                  handler: goToCreateTopicPage,
                 }}
               />
             )}
 
-            {!farcasterContestEnabled ? null : community?.namespace ? (
-              <EmptyCard
-                img={farcasterUrl}
-                title="Launch on Farcaster"
-                subtitle="Share your contest on Farcastr platform"
-                button={{
-                  label: 'Launch Farcaster contest',
-                  handler: () => {
-                    goToLaunchFarcasterContest();
-                  },
-                }}
-              />
-            ) : (
-              <EmptyCard
-                img={farcasterUrl}
-                title="You must have namespace reserved for your community to run farcaster contest"
-                subtitle="Share your contest on Farcastr platform"
-                button={{
-                  label: 'Create a namespace',
-                  handler: () => {
-                    setContestView(ContestView.NamespaceEnablemenement);
-                  },
-                }}
-              />
-            )}
+            <EmptyCard
+              img={farcasterUrl}
+              title="Launch on Farcaster"
+              subtitle={
+                community?.namespace
+                  ? `Share your contest on Farcaster`
+                  : `You need a namespace for your community to run Farcaster contests.
+Set one up first.`
+              }
+              button={{
+                label: community?.namespace
+                  ? 'Launch Farcaster contest'
+                  : 'Create a namespace',
+                handler: community?.namespace
+                  ? goToLaunchFarcasterContest
+                  : () => setContestView(ContestView.NamespaceEnablemenement),
+              }}
+            />
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
           <CommunityStakeStep

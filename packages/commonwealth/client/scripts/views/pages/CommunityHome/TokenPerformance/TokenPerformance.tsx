@@ -46,7 +46,7 @@ const TokenPerformance = () => {
     <div className="TokenPerformance">
       <div className="heading-container">
         <CWText type="h2">Token Performance</CWText>
-        <Link to="/explore">
+        <Link to="/explore" className="see-all-link">
           <div className="link-right">
             <CWText className="link">See top movers</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />

@@ -1,9 +1,9 @@
-import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForCreator,
   doesActionRewardShareForReferrer,
-} from '../../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
+} from 'helpers/quest';
+import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
 
 export const getTagConfigForRewardType = ({
   action,
