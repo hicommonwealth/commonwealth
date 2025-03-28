@@ -46,6 +46,9 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
     });
 
     // Expose formMethods to parent components using ref
+    // Note: this doesn't expose watchers/subscribers, i.e ref.watch(`field_name`) would act
+    // as a getter, and not a subscriber. For subscriber based functions, the callback signature
+    // will work as a proper subscriber i.e ref.watch((values) => values.field_name).
     useImperativeHandle(ref, () => formMethods);
 
     useEffect(() => {
