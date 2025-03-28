@@ -10,7 +10,7 @@ type ShareButtonProps = {
 };
 
 export const ShareButton = (props: ShareButtonProps) => {
-  const { buttonLabel } = props;
+  const { buttonLabel, title } = props;
 
   const [dialogActive, setDialogActive] = useState(false);
 
@@ -27,7 +27,11 @@ export const ShareButton = (props: ShareButtonProps) => {
       />
 
       {dialogActive && (
-        <ShareDialog onClose={() => setDialogActive(false)} {...props} />
+        <ShareDialog
+          {...props}
+          dialogTitle={`Share ${title}`}
+          onClose={() => setDialogActive(false)}
+        />
       )}
     </>
   );

@@ -1,62 +1,36 @@
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import React, { useState } from 'react';
-import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
+import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
-  CWModal,
   CWModalBody,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import ShareSection from 'views/components/ShareSection';
+import { ResponsiveDialog } from './ResponsiveDialog';
 
 type ShareDialogProps = {
   onClose: () => void;
   url: string;
   title?: string;
   text?: string;
+  dialogTitle: string;
 };
 
 export const ShareDialog = (props: ShareDialogProps) => {
   const { onClose, title } = props;
-  const [resizing, setResizing] = useState(false);
-
-  const { isWindowExtraSmall } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
-
-  if (isWindowExtraSmall) {
-    return (
-      <CWDrawer
-        size="auto"
-        direction="bottom"
-        className="InviteLinkDrawer"
-        open={true}
-        onClose={onClose}
-      >
-        <>
-          <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
-          <CWModalBody>
-            <ShareSection {...props} />
-          </CWModalBody>
-        </>
-      </CWDrawer>
-    );
-  }
 
   return (
-    <CWModal
-      size="small"
-      className="DownloadMobileAppModal"
-      content={
-        <>
-          <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
-          <CWModalBody>
-            <ShareSection {...props} />
-          </CWModalBody>
-        </>
-      }
-      onClose={onClose}
-      open={true}
-    />
+    <ResponsiveDialog onClose={onClose}>
+      <>
+        <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
+        <CWModalBody>
+          <CWText>
+            For every referral, you ll soon get offchain and onchain rewards,
+            like fees from trades, swaps, and transactions they make on Common
+          </CWText>
+
+          <ShareSection {...props} />
+        </CWModalBody>
+      </>
+    </ResponsiveDialog>
   );
 };
