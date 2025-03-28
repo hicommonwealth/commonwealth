@@ -1,5 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { ShareOptionComponent } from 'views/components/ShareSection/ShareOptionComponent';
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
@@ -19,24 +20,20 @@ export const ShareSection = (props: ShareSectionProps) => {
 
   const shareOptions = useShareOptions(url, title, text);
 
+  const block0 = shareOptions.slice(0, 5);
+  const block1 = shareOptions.slice(5, 9);
+
   return (
     <div className="ShareSection">
       <CWText fontWeight="bold">Share to</CWText>
       <div className="share-options">
-        {shareOptions.map((option) => (
-          <div
-            key={option.name}
-            className="share-option"
-            onClick={option.onClick}
-          >
-            {typeof option.icon === 'string' && (
-              <img src={option.icon} alt={option.name} className="icon" />
-            )}
-
-            {typeof option.icon !== 'string' && <>{option.icon}</>}
-
-            <CWText type="caption">{option.name}</CWText>
-          </div>
+        {block0.map((option, idx) => (
+          <ShareOptionComponent key={idx} {...option} />
+        ))}
+      </div>
+      <div className="share-options">
+        {block1.map((option, idx) => (
+          <ShareOptionComponent key={idx} {...option} />
         ))}
       </div>
     </div>

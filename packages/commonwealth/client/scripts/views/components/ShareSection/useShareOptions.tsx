@@ -5,17 +5,11 @@ import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import useAppStatus from 'hooks/useAppStatus';
 import { useFlag } from 'hooks/useFlag';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-
-interface ShareOption {
-  name: string;
-  icon: string | ReactNode;
-  requiresMobile?: boolean;
-  onClick: () => void;
-}
+import { ShareOption } from './ShareOption';
 
 export function useShareOptions(
   url: string,
