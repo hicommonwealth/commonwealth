@@ -1,5 +1,6 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { command } from '@hicommonwealth/core';
+import { generateWallet } from '@hicommonwealth/evm-protocols';
 import {
   CANVAS_TOPIC,
   WalletId,
@@ -8,11 +9,16 @@ import {
 import { SignIn } from '../../src/aggregates/user';
 import { verifyAddress } from '../../src/services/session';
 
-export async function randSigner() {
-  const signer = new SIWESigner({});
-  const did = await signer.getDid();
-  const address = signer.getAddressFromDid(did);
-  return { signer, address };
+export async function createSIWESigner(ethChainId?: number) {
+  const wallet = generateWallet();
+  return new SIWESigner({
+    signer: {
+      getAddress: () => Promise.resolve(wallet.address),
+      signMessage: (message: string) =>
+        Promise.resolve(wallet.signMessage({ message })),
+    },
+    chainId: ethChainId,
+  });
 }
 
 export async function signIn(

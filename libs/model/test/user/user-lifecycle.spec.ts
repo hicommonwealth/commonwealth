@@ -30,7 +30,7 @@ import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
-import { randSigner, signIn } from '../utils/sign-in';
+import { createSIWESigner, signIn } from '../utils/sign-in';
 
 const chance = new Chance();
 
@@ -865,7 +865,8 @@ describe('User lifecycle', () => {
       );
 
       const watermark = new Date();
-      const { signer, address } = await randSigner();
+      const signer = await createSIWESigner();
+      const address = await signer.getWalletAddress();
 
       // make sure address has a balance above threshold
       vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
