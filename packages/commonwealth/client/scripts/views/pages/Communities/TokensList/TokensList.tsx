@@ -203,7 +203,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                 }}
                 mode={TradingMode.Swap}
                 iconURL={token.icon_url || ''}
-                onCTAClick={(mode) => {
+                onCTAClick={() => {
                   // TODO: implement
                 }}
                 onCardBodyClick={() =>
