@@ -6,7 +6,6 @@ import {
 } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import ethers from 'ethers';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
@@ -31,7 +30,7 @@ import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
-import { signIn } from '../utils/sign-in';
+import { createSIWESigner, signIn } from '../utils/sign-in';
 
 const chance = new Chance();
 
@@ -866,9 +865,8 @@ describe('User lifecycle', () => {
       );
 
       const watermark = new Date();
-      const signer = new SIWESigner({ signer: ethers.Wallet.createRandom() });
-      const did = await signer.getDid();
-      const address = signer.getAddressFromDid(did);
+      const signer = await createSIWESigner();
+      const address = await signer.getWalletAddress();
 
       // make sure address has a balance above threshold
       vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({

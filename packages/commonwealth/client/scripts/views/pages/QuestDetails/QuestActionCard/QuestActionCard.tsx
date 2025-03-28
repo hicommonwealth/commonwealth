@@ -120,17 +120,17 @@ const QuestActionCard = ({
                 <CWText type="caption" className="xp-shares">
                   <span className="creator-share">
                     {creatorXP.percentage}% (
-                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
+                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} Aura)
                   </span>
                   &nbsp; shared with{' '}
                   {actionCopies.shares[questAction.event_name]}. Your share ={' '}
-                  {Math.abs(questAction.reward_amount - creatorXP.value)} XP
+                  {Math.abs(questAction.reward_amount - creatorXP.value)} Aura
                   {isRepeatableQuest ? ` / attempt` : ''}
                 </CWText>
               )}
             <div className="points-row">
               <CWTag
-                label={`${questAction.reward_amount} XP${isRepeatableQuest ? ` / attempt` : ''}`}
+                label={`${questAction.reward_amount} Aura${isRepeatableQuest ? ` / attempt` : ''}`}
                 type="proposal"
               />
               {isRepeatableQuest &&

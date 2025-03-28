@@ -170,6 +170,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               },
             });
           if (new_address || !wallet_found) {
+            // TODO: review how to get balances for unstable chains
+            // at the moment, if fetching balances fails, the internal try-catch will log and return empty balances
             const balances = eth_chain_id
               ? await tokenBalanceCache.getBalances({
                   addresses: [addr.address],
