@@ -97,7 +97,6 @@ export function useShareOptions(
         {
           name: 'Share Via',
           icon: <CWIcon iconName="share2" iconSize="xl" />,
-          requiresMobile: true,
           onClick: () => {
             navigator.share({ url: url, title, text }).catch(console.error);
           },

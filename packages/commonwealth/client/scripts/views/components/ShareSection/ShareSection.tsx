@@ -35,6 +35,9 @@ export const ShareSection = (props: ShareSectionProps) => {
         {block1.map((option, idx) => (
           <ShareOptionComponent key={idx} {...option} />
         ))}
+        <div className="share-option" />
+        <div className="share-option" />
+        <div className="share-option" />
       </div>
     </div>
   );
