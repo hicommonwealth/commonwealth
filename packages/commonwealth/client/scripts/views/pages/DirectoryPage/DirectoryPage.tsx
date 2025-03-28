@@ -23,15 +23,14 @@ import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import './DirectoryPage.scss';
-import DirectorySettingsModal from './DirectorySettingsModal';
+import DirectorySettingsDrawer from './DirectorySettingsDrawer';
 
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
-  const [isDirectorySettingsModalOpen, setIsDirectorySettingsModalOpen] =
+  const [isDirectorySettingsDrawerOpen, setIsDirectorySettingsDrawerOpen] =
     useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
@@ -216,7 +215,7 @@ const DirectoryPage = () => {
                   iconLeft="gear"
                   buttonType="secondary"
                   label="Directory Settings"
-                  onClick={() => setIsDirectorySettingsModalOpen(true)}
+                  onClick={() => setIsDirectorySettingsDrawerOpen(true)}
                 />
               )}
             </div>
@@ -233,7 +232,11 @@ const DirectoryPage = () => {
           tableData={filteredTableData}
           selectedViewType={selectedViewType}
         />
-        {isDirectorySettingsModalOpen && isAdmin && (
+        <DirectorySettingsDrawer
+          isOpen={isDirectorySettingsDrawerOpen}
+          onClose={() => setIsDirectorySettingsDrawerOpen(false)}
+        />
+        {/* {isDirectorySettingsModalOpen && isAdmin && (
           <CWModal
             size="small"
             content={
@@ -249,7 +252,7 @@ const DirectoryPage = () => {
             open={true}
             onClose={() => setIsDirectorySettingsModalOpen(false)}
           />
-        )}
+        )} */}
       </div>
     </CWPageLayout>
   );
