@@ -4,11 +4,11 @@ import {
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { getPrivateWalletAddress } from 'model/src/utils/getPrivateWalletAddress';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { createOnchainContestVote } from '../../policies/utils/contest-utils';
+import { getPrivateWalletAddress } from '../../utils/getPrivateWalletAddress';
 import { emitEvent, getChainNodeUrl } from '../../utils/utils';
 
 const log = logger(import.meta);
