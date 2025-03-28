@@ -147,7 +147,7 @@ const QuestActionSubForm = ({
     config?.requires_discord_server_url;
 
   const ethereumChainOptions = fetchCachedNodes()
-    ?.filter((chainNode) => !!chainNode.ethChainId)
+    ?.filter((chainNode) => !!chainNode.ethChainId && chainNode.alchemyMetadata)
     ?.map((chainNode) => ({
       value: chainNode.ethChainId as number,
       label: `${chainNode.name} (${chainNode.ethChainId})`,
