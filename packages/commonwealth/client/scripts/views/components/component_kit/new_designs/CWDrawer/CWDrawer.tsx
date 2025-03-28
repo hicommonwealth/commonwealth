@@ -50,6 +50,7 @@ export const CWDrawer = ({
       direction={direction}
       enableOverlay={true}
       overlayOpacity={overlayOpacity}
+      style={{ zIndex: 100000000 }}
       className={clsx(ComponentType.Drawer, className, {
         'bottom-drawer': direction === 'bottom',
       })}
