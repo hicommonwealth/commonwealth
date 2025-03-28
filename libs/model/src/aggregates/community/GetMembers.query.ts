@@ -110,6 +110,7 @@ function membersSqlWithoutSearch(
       WITH T AS (SELECT profile_count as total FROM "Communities" WHERE id = :community_id)
       SELECT
         U.id AS user_id,
+        U.tier,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
@@ -164,6 +165,7 @@ function membersSqlWithSearch(
       WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
       SELECT
         U.id AS user_id,
+        U.tier,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
