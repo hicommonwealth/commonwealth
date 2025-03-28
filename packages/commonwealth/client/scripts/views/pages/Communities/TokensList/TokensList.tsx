@@ -208,7 +208,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
             );
           })}
           {pinnedTokens.map((token) => {
-            console.log('pinned token', token);
             return (
               <TokenCard
                 key={token.name}
