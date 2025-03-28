@@ -77,7 +77,7 @@ const CommunityPreviewCard = ({
       >
         {isExploreMode ? (
           <CWText type="h4" className="explore-label">
-            {customExploreText || 'Explore communities'}{' '}
+            {customExploreText || 'Explore communitie'}{' '}
             <CWIcon iconName="arrowRightPhosphor" />
           </CWText>
         ) : (
