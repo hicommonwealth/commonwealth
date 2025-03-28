@@ -44,7 +44,7 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
-  isContestAvailable: boolean;
+  isContestAvailable?: boolean;
   onSetContestView?: (type: ContestView) => void;
   displayAllRecurringContests?: boolean;
   community?: {
@@ -60,8 +60,6 @@ const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
-  isContestAvailable,
-  onSetContestView,
   displayAllRecurringContests = false,
   community,
 }: ContestsListProps) => {
