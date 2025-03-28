@@ -10,7 +10,6 @@ import {
 import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
-import { getPrivateWalletAddress } from 'model/src/utils/getPrivateWalletAddress';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { uuidV4 } from 'web3-utils';
@@ -19,6 +18,7 @@ import { CreateCommunity } from '../../aggregates/community/CreateCommunity.comm
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { getPrivateWalletAddress } from '../../utils/getPrivateWalletAddress';
 import { compressServerImage } from '../../utils/imageCompression';
 
 const log = logger(import.meta);
