@@ -1,7 +1,12 @@
 import { uniqBy } from 'lodash';
 import React, { useState } from 'react';
 
+import { formatAddressShort } from 'helpers';
+import app from 'state';
+import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
+import ShareSection from 'views/components/ShareSection';
+import { generatePermalink } from 'views/modals/InviteLinkModal/utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -11,12 +16,6 @@ import {
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
-import { getShareOptions } from './utils';
-
-import { formatAddressShort } from 'helpers';
-import app from 'state';
-import useUserStore from 'state/ui/user';
-
 import './InviteLinkModal.scss';
 
 interface InviteLinkModalProps {
@@ -47,11 +46,11 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
     communityId ? `/${communityId}/discussions` : '/dashboard'
   }?refcode=${refCode}`;
 
+  const permalink = generatePermalink(!!communityId, inviteLink);
+
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
   };
-
-  const shareOptions = getShareOptions(!!communityId, inviteLink);
 
   return (
     <div className="InviteLinkModal">
@@ -92,21 +91,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
               iconRight={<CWIcon iconName="copy" />}
             />
 
-            <div className="share-section">
-              <CWText fontWeight="bold">Share to</CWText>
-              <div className="share-options">
-                {shareOptions.map((option) => (
-                  <div
-                    key={option.name}
-                    className="share-option"
-                    onClick={option.onClick}
-                  >
-                    <img src={option.icon} alt={option.name} className="icon" />
-                    <CWText type="caption">{option.name}</CWText>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ShareSection url={permalink} />
           </>
         </div>
       </CWModalBody>
