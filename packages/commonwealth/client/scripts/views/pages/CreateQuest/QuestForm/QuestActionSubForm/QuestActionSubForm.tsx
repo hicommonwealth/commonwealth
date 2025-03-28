@@ -150,8 +150,9 @@ const QuestActionSubForm = ({
     ?.filter((chainNode) => !!chainNode.ethChainId && chainNode.alchemyMetadata)
     ?.map((chainNode) => ({
       value: chainNode.ethChainId as number,
-      label: `${chainNode.name} (${chainNode.ethChainId})`,
-    }));
+      label: `${chainNode.name} - ${chainNode.ethChainId}`,
+    }))
+    ?.sort((a, b) => a.label.localeCompare(b.label));
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({

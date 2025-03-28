@@ -274,7 +274,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'create') {
           await handleCreateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate('/explore');
+          navigate('/explore?tab=quests');
         }
         if (mode === 'update') {
           await handleUpdateQuest(values);
