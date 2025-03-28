@@ -1,20 +1,23 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { BalanceType, ChainBase, ChainType } from '@hicommonwealth/shared';
-import { seed } from 'model/src/tester';
-import { emitEvent } from 'model/src/utils/utils';
 import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateCommunity } from '../../src/aggregates/community';
 import { models } from '../../src/database';
 import { CommunityIndexerWorker } from '../../src/policies';
 import { generateUniqueId } from '../../src/policies/utils/community-indexer-utils';
+import { seed } from '../../src/tester';
+import { getPrivateWalletAddress } from '../../src/utils/getPrivateWalletAddress';
+import { emitEvent } from '../../src/utils/utils';
 import { drainOutbox } from '../utils';
 
 const MOCK_TOKEN_ID = 1234;
 const MOCK_TOKEN_ADDRESS = '0x2345678901234567890123456789012345678901';
 
 const testActor: Actor = {
-  address: '0x1234567890123456789012345678901234567890',
+  // get address from web3 private key
+  address: getPrivateWalletAddress(),
   user: {
     id: 100,
     isAdmin: true,
@@ -61,10 +64,10 @@ describe('generateUniqueId', () => {
     // create seed dummy community
     await models.ChainNode.create({
       id: baseFields.chain_node_id,
-      name: 'Test Chain Node',
+      name: 'Base',
       url: 'test-url',
       balance_type: BalanceType.Ethereum,
-      eth_chain_id: 1,
+      eth_chain_id: commonProtocol.ValidChains.Base,
     });
     await seed('Community', {
       id: 'dummy',
@@ -79,6 +82,9 @@ describe('generateUniqueId', () => {
         },
       ],
       ...baseFields,
+    });
+    await models.Tags.create({
+      name: 'Clanker',
     });
   });
 

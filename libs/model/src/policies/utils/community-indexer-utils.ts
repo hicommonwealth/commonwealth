@@ -171,17 +171,15 @@ export async function generateUniqueId(
     };
   }
 
-  // check for ID pattern matches
-  const matchingCommunitiesByName = await models.Community.findAll({
+  // check if the exact name exists
+  const exactNameExists = await models.Community.findOne({
     where: {
-      name: {
-        [Op.regexp]: `^${communityName}$|^${communityName} #[1-9][0-9]*$`,
-      },
+      name: communityName,
     },
   });
 
-  // no matches, return the base ID and name
-  if (matchingCommunitiesByName.length === 0) {
+  // if the exact name doesn't exist, we can use it
+  if (!exactNameExists) {
     return {
       id: newCommunityId,
       name: communityName,
@@ -189,26 +187,49 @@ export async function generateUniqueId(
     };
   }
 
-  // if there are matches, generate an enumerated name
-  const suffix = matchingCommunitiesByName.length + 1;
-  const numberedCommunityName =
-    suffix === 1 ? communityName : `${communityName} #${suffix}`;
-
-  // check for existing community with enumerated name
-  const existingNumberedCommunity = await models.Community.findOne({
-    where: { name: numberedCommunityName },
+  // find all communities with this name pattern (name or name #X)
+  const allNameMatches = await models.Community.findAll({
+    where: {
+      name: {
+        [Op.regexp]: `^${communityName}$|^${communityName} #[0-9]+$`,
+      },
+    },
   });
-  if (existingNumberedCommunity) {
+
+  // find the highest existing #
+  let highestSuffix = 1;
+  for (const community of allNameMatches) {
+    const match = community.name.match(`^${communityName} #([0-9]+)$`);
+    if (match) {
+      const suffix = parseInt(match[1], 10);
+      if (suffix > highestSuffix) {
+        highestSuffix = suffix;
+      }
+    }
+  }
+
+  // use the next available suffix
+  const nextSuffix = highestSuffix + 1;
+  const newName = `${communityName} #${nextSuffix}`;
+
+  // check if the generated name already exists
+  const nameExists = await models.Community.findOne({
+    where: {
+      name: newName,
+    },
+  });
+
+  if (nameExists) {
     return {
       id: null,
       name: null,
-      error: `failed to generate unique ID for community: ${name}`,
+      error: `failed to generate unique name for community: ${name}`,
     };
   }
 
   return {
     id: newCommunityId,
-    name: numberedCommunityName,
+    name: newName,
     error: null,
   };
 }

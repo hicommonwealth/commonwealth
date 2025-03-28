@@ -16,8 +16,11 @@ import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
+  CommunityIDExists: 'The ID for this community already exists',
   CommunityNameExists:
     'The name for this community already exists, please choose another name',
+  CommunityRedirectExists:
+    'The redirect for this community already exists, please choose another redirect',
   InvalidEthereumChainId: 'Ethereum chain ID not provided or unsupported',
   CosmosChainNameRequired:
     'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
@@ -77,8 +80,13 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
       });
       if (community)
-        throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
-
+        if (community.id === id) {
+          throw new InvalidInput(CreateCommunityErrors.CommunityIDExists);
+        } else if (community.name === name) {
+          throw new InvalidInput(CreateCommunityErrors.CommunityNameExists);
+        } else if (community.redirect === id) {
+          throw new InvalidInput(CreateCommunityErrors.CommunityRedirectExists);
+        }
       if (community_indexer_id && !token_address) {
         throw new InvalidInput(CreateCommunityErrors.TokenAddressRequired);
       }
