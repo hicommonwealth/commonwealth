@@ -4,10 +4,8 @@ import clsx from 'clsx';
 import { formatAddressShort } from 'helpers';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
-import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
-import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -37,7 +35,6 @@ interface TokenTradeWidgetProps {
 export const TokenTradeWidget = ({
   currency = SupportedCurrencies.USD,
 }: TokenTradeWidgetProps) => {
-  const user = useUserStore();
   const currencySymbol = currencyNameToSymbolMap[currency];
 
   const { communityToken, isLoadingToken, isPinnedToken } =
@@ -50,9 +47,6 @@ export const TokenTradeWidget = ({
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { register, trigger } = useDeferredConditionTriggerCallback({
-    shouldRunTrigger: user.isLoggedIn,
-  });
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
@@ -69,19 +63,8 @@ export const TokenTradeWidget = ({
         )
       : null;
 
-  const openAuthModalOrTriggerCallback = () => {
-    if (user.isLoggedIn) {
-      trigger();
-    } else {
-      setIsAuthModalOpen(!user.isLoggedIn);
-    }
-  };
-
   const handleCTAClick = (mode: TradingMode) => {
-    if (!user.isLoggedIn) {
-      setIsAuthModalOpen(true);
-    }
-
+    // Opening modal even if user is not logged in
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
@@ -206,12 +189,7 @@ export const TokenTradeWidget = ({
                   buttonType="secondary"
                   buttonHeight="sm"
                   onClick={() => {
-                    register({
-                      cb: () => {
-                        handleCTAClick(mode);
-                      },
-                    });
-                    openAuthModalOrTriggerCallback();
+                    handleCTAClick(mode);
                   }}
                 />
               ))
@@ -223,12 +201,7 @@ export const TokenTradeWidget = ({
                 buttonType="secondary"
                 buttonHeight="sm"
                 onClick={() => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(TradingMode.Swap);
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
+                  handleCTAClick(TradingMode.Swap);
                 }}
               />
             )}
