@@ -21,7 +21,12 @@ export const ShareDialog = (props: ShareDialogProps) => {
 
   return (
     <ResponsiveDialog onClose={onClose}>
-      <>
+      <div
+        onClick={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
+        }}
+      >
         <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
         <CWModalBody>
           <CWText>
@@ -31,7 +36,7 @@ export const ShareDialog = (props: ShareDialogProps) => {
 
           <ShareSection {...props} />
         </CWModalBody>
-      </>
+      </div>
     </ResponsiveDialog>
   );
 };

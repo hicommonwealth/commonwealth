@@ -22,6 +22,7 @@ const CWModalHeader: FC<CWModalHeaderProps> = ({
 }) => {
   const handleModalClose = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     onModalClose();
   };
 
