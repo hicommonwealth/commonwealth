@@ -46,6 +46,7 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  COMMUNITY_INDEXER_CRON,
   TWITTER_APP_BEARER_TOKEN,
   TWITTER_CONSUMER_KEY,
   TWITTER_CONSUMER_SECRET,
@@ -171,6 +172,9 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
+    COMMUNITY_INDEXER: {
+      CRON: COMMUNITY_INDEXER_CRON,
     },
     TWITTER: {
       APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
@@ -389,6 +393,9 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
         ),
+    }),
+    COMMUNITY_INDEXER: z.object({
+      CRON: z.coerce.string().optional(),
     }),
     TWITTER: z.object({
       APP_BEARER_TOKEN: z.string().optional(),

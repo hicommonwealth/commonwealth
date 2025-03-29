@@ -63,6 +63,8 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
             [Op.or]: [{ role: 'admin' }, { role: 'moderator' }],
           },
           attributes: ['address', 'role'],
+          limit: 300,
+          order: [['created_at', 'DESC']],
         }),
         models.Thread.count({
           where: {

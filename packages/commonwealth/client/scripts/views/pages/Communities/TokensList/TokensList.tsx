@@ -1,5 +1,6 @@
-import { TokenView } from '@hicommonwealth/schemas';
+import { PinnedTokenWithPrices, TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import { useFlag } from 'hooks/useFlag';
@@ -47,7 +48,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
 
   const {
     data: tokensList,
-    isInitialLoading,
+    isInitialLoading: isLoadingLaunchpadTokens,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -72,7 +73,23 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     })(),
     enabled: launchpadEnabled,
   });
-  const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+  const launchpadTokens = (tokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  // fetch pinned tokens
+  const { data: pinnedTokensList, isInitialLoading: isLoadingPinnedTokens } =
+    useGetPinnedTokensByCommunityId({
+      cursor: 1,
+      limit: 8,
+      with_chain_node: true,
+      with_price: true,
+    });
+  const pinnedTokens = (pinnedTokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  const tokens = [...launchpadTokens, ...pinnedTokens];
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
@@ -90,12 +107,15 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
 
   const handleCTAClick = (
     mode: TradingMode,
-    token: z.infer<typeof TokenWithCommunity>,
+    token:
+      | z.infer<typeof TokenWithCommunity>
+      | z.infer<typeof PinnedTokenWithPrices>,
   ) => {
+    const isPinnedToken = 'community_indexer_id' in token;
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
-        mode: mode,
+        mode: isPinnedToken ? TradingMode.Swap : mode,
         token: token,
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
@@ -107,7 +127,9 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      {isInitialLoading || isLoadingETHToCurrencyRate ? (
+      {isLoadingLaunchpadTokens ||
+      isLoadingPinnedTokens ||
+      isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
@@ -123,12 +145,11 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => {
+          {launchpadTokens.map((token) => {
             const pricing = calculateTokenPricing(
               token as z.infer<typeof TokenView>,
               ethToUsdRate,
             );
-
             return (
               <TokenCard
                 key={token.name}
@@ -138,6 +159,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                 pricePercentage24HourChange={
                   pricing.pricePercentage24HourChange
                 }
+                isPinnedToken={false}
                 marketCap={{
                   current: pricing.marketCapCurrent,
                   goal: pricing.marketCapGoal,
@@ -154,6 +176,35 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
                     mode,
                     token as z.infer<typeof TokenWithCommunity>,
                   );
+                }}
+                onCardBodyClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: token.community_id,
+                  })
+                }
+              />
+            );
+          })}
+          {pinnedTokens.map((token) => {
+            return (
+              <TokenCard
+                key={token.name}
+                name={token.name}
+                symbol={token.symbol}
+                price={0}
+                pricePercentage24HourChange={0}
+                isPinnedToken={true}
+                marketCap={{
+                  current: 0,
+                  goal: 0,
+                  isCapped: false,
+                }}
+                mode={TradingMode.Swap}
+                iconURL={token.icon_url || ''}
+                onCTAClick={() => {
+                  // TODO: implement
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({

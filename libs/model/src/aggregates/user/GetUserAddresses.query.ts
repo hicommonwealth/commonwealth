@@ -29,6 +29,8 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
             required: true,
           },
         ],
+        limit: 300,
+        order: [['created_at', 'DESC']],
       });
 
       return _addresses.map((address) => ({
