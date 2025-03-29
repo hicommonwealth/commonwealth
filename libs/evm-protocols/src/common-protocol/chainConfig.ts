@@ -111,12 +111,13 @@ export const factoryContracts = {
     chainId: 974399131,
   },
   [ValidChains.Anvil]: {
-    factory: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
-    communityStake: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-    launchpad: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
-    lpBondingCurve: '0xc5a5C42992dECbae36851359345FE25997F5C42d',
-    tokenCommunityManager: '0x851356ae760d987E095750cCeb3bC6014560891C',
-    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE', // TODO: Double check this address
+    factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
+    communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
+    launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
+    lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
+    tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
+    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;
