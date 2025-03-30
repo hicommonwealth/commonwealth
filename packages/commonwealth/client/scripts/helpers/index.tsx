@@ -175,40 +175,6 @@ export function renderMultilineText(text: string) {
   return paragraphs.map((p, index) => <p key={index}>{p}</p>);
 }
 
-// This function renders text with bolded text. Just wrap which words/sentences
-// you want to be bolded with **. Example: **Bold**
-export function renderMultilineTextWithBold(text: string) {
-  if (!text) return;
-
-  const paragraphs = text
-    .split('\n')
-    .map((p) => {
-      // Get the raw whitespace at the start of the line
-      const indentation = p.match(/^\s+/)?.[0] || '';
-      // Convert spaces/tabs to non-breaking spaces to preserve indentation
-      const preservedIndent = indentation
-        .replace(/ /g, '\u00A0')
-        .replace(/\t/g, '\u00A0\u00A0');
-      return preservedIndent + p.trim();
-    })
-    .filter((p) => p !== '');
-
-  return paragraphs.map((paragraph, index) => {
-    const parts = paragraph.split(/(\*\*.*?\*\*)/g);
-
-    return (
-      <p key={index} style={{ whiteSpace: 'pre-wrap' }}>
-        {parts.map((part, partIndex) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={partIndex}>{part.slice(2, -2)}</strong>;
-          }
-          return part;
-        })}
-      </p>
-    );
-  });
-}
-
 /*
  * blocknum helpers
  */
