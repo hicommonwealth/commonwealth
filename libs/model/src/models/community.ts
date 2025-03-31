@@ -153,6 +153,10 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
+      primary_token_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',
