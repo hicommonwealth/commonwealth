@@ -64,6 +64,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   ),
         "community_CTE" AS (
           SELECT  "Community"."id",
+                  "Community"."tier",
                   "Community"."chain_node_id",
                   "Community"."name",
                   "Community"."discord_config_id",

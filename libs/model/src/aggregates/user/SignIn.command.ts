@@ -1,11 +1,12 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { deserializeCanvas } from '@hicommonwealth/shared';
+import { BalanceSourceType, deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
+import { tokenBalanceCache } from '../../services';
 import {
   transferOwnership,
   verifyAddress,
@@ -56,13 +57,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
       const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
-
-      console.log(
-        'SIB1: SignIn command started with community_id',
-        community_id,
-      );
-      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
-        .user.auth as VerifiedAddress;
+      const {
+        base,
+        encodedAddress,
+        eth_chain_id,
+        ss58Prefix,
+        hex,
+        existingHexUserId,
+      } = actor.user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
       let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
@@ -194,19 +196,28 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: addr.created_at!,
               },
             });
-          console.log('SIB17: Checking for new address or wallet');
-          (new_address || !wallet_found) &&
+          if (new_address || !wallet_found) {
+            // TODO: review how to get balances for unstable chains
+            // at the moment, if fetching balances fails, the internal try-catch will log and return empty balances
+            const balances = eth_chain_id
+              ? await tokenBalanceCache.getBalances({
+                  addresses: [addr.address],
+                  balanceSourceType: BalanceSourceType.ETHNative, // TODO: support other balance sources
+                  sourceOptions: { evmChainId: eth_chain_id }, // TODO: is this the right chain node?
+                })
+              : { [addr.address]: '0' };
             events.push({
               event_name: 'WalletLinked',
               event_payload: {
                 user_id: addr.user_id!,
                 new_user,
                 wallet_id: wallet_id,
+                balance: Number(balances[addr.address] ?? 0),
                 community_id,
                 created_at: addr.created_at!,
               },
             });
-          console.log('SIB18: Checking for new user');
+          }
           new_user &&
             events.push({
               event_name: 'UserCreated',
