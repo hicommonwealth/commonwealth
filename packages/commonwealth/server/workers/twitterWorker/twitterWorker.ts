@@ -100,9 +100,24 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
               required: true,
               where: {
                 [Op.or]: [
-                  { like_xp_awarded: false },
-                  { reply_xp_awarded: false },
-                  { retweet_xp_awarded: false },
+                  {
+                    [Op.and]: [
+                      { like_xp_awarded: false },
+                      { like_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { reply_xp_awarded: false },
+                      { replies_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { retweet_xp_awarded: false },
+                      { retweet_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
                 ],
               },
               // Rotates through tweets so that all tweets are updated eventually
@@ -145,7 +160,10 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
 
       if (!queryTweet) throw new Error('Tweet not found');
 
-      if (queryTweet.like_cap !== queryTweet.num_likes) {
+      if (
+        queryTweet.like_cap !== 0 &&
+        queryTweet.like_cap !== queryTweet.num_likes
+      ) {
         tweetUpdates.num_likes.push({
           newValue:
             t.public_metrics.like_count >= queryTweet.like_cap!
@@ -156,7 +174,10 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
         capReachedEvent.event_payload.like_cap_reached = true;
       }
 
-      if (queryTweet.replies_cap !== queryTweet.num_replies) {
+      if (
+        queryTweet.replies_cap !== 0 &&
+        queryTweet.replies_cap !== queryTweet.num_replies
+      ) {
         tweetUpdates.num_replies.push({
           newValue:
             t.public_metrics.reply_count >= queryTweet.replies_cap!
@@ -167,7 +188,10 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
         capReachedEvent.event_payload.reply_cap_reached = true;
       }
 
-      if (queryTweet.retweet_cap !== queryTweet.num_retweets) {
+      if (
+        queryTweet.retweet_cap !== 0 &&
+        queryTweet.retweet_cap !== queryTweet.num_retweets
+      ) {
         tweetUpdates.num_retweets.push({
           newValue:
             t.public_metrics.retweet_count >= queryTweet.retweet_cap!

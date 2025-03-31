@@ -22,11 +22,14 @@ export const CreateQuest = {
 export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
   tweet_engagement_caps: z
     .object({
-      likes: z.number().positive().max(100),
-      retweets: z.number().positive().max(100),
-      replies: z.number().positive().max(100),
+      likes: z.number().gte(0).max(100),
+      retweets: z.number().gte(0).max(100),
+      replies: z.number().gte(0).max(100),
     })
-    .optional(),
+    .optional()
+    .refine(
+      (data) => !(data && !data.likes && !data.retweets && !data.replies),
+    ),
 });
 
 export const UpdateQuest = {

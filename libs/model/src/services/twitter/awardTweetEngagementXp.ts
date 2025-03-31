@@ -103,11 +103,15 @@ export const awardTweetEngagementXp = async (
     quest.action_metas![0].QuestTweet!,
   );
 
-  if (
-    questTweet.like_xp_awarded &&
-    questTweet.reply_xp_awarded &&
-    questTweet.retweet_xp_awarded
-  ) {
+  const awardedLikeXp = questTweet.like_xp_awarded || questTweet.like_cap === 0;
+
+  const awardedReplyXp =
+    questTweet.reply_xp_awarded || questTweet.replies_cap === 0;
+
+  const awardedRetweetXp =
+    questTweet.retweet_xp_awarded || questTweet.retweet_cap === 0;
+
+  if (awardedLikeXp && awardedReplyXp && awardedRetweetXp) {
     log.info(`Quest tweet already awarded xp: ${payload.quest_id}`, {
       quest_id: payload.quest_id,
       quest_tweet_id: questTweet.tweet_id,
@@ -115,10 +119,7 @@ export const awardTweetEngagementXp = async (
     return;
   }
 
-  if (
-    !questTweet.like_xp_awarded &&
-    (payload.quest_ended || payload.like_cap_reached)
-  ) {
+  if (!awardedLikeXp && (payload.quest_ended || payload.like_cap_reached)) {
     const likes = await getLikingUsers({
       twitterBotConfig: TwitterBotConfigs.Common,
       tweetId: questTweet.tweet_id,
@@ -134,10 +135,7 @@ export const awardTweetEngagementXp = async (
     });
   }
 
-  if (
-    !questTweet.reply_xp_awarded &&
-    (payload.quest_ended || payload.reply_cap_reached)
-  ) {
+  if (!awardedReplyXp && (payload.quest_ended || payload.reply_cap_reached)) {
     const replies = await getReplies({
       twitterBotConfig: TwitterBotConfigs.Common,
       tweetId: questTweet.tweet_id,
@@ -159,7 +157,7 @@ export const awardTweetEngagementXp = async (
   }
 
   if (
-    !questTweet.retweet_xp_awarded &&
+    !awardedRetweetXp &&
     (payload.quest_ended || payload.retweet_cap_reached)
   ) {
     const retweets = await getRetweets({
