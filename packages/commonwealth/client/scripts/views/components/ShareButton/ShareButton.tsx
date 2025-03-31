@@ -27,14 +27,13 @@ export const ShareButton = (props: ShareButtonProps) => {
         }}
       />
 
-      {dialogActive && (
-        <ShareDialog
-          {...props}
-          dialogTitle={`Share ${title}`}
-          shareType={shareType}
-          onClose={() => setDialogActive(false)}
-        />
-      )}
+      <ShareDialog
+        {...props}
+        open={dialogActive}
+        dialogTitle={`Share ${title}`}
+        shareType={shareType}
+        onClose={() => setDialogActive(false)}
+      />
     </>
   );
 };

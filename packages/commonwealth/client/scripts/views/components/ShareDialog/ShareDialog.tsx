@@ -10,6 +10,7 @@ import { ResponsiveDialog } from './ResponsiveDialog';
 type ShareDialogProps = {
   onClose: () => void;
   url: string;
+  open: boolean;
   title?: string;
   text?: string;
   dialogTitle: string;
@@ -17,10 +18,10 @@ type ShareDialogProps = {
 };
 
 export const ShareDialog = (props: ShareDialogProps) => {
-  const { onClose, title, shareType } = props;
+  const { onClose, title, shareType, open } = props;
 
   return (
-    <ResponsiveDialog onClose={onClose}>
+    <ResponsiveDialog onClose={onClose} open={open}>
       <div
         onClick={(event) => {
           event.stopPropagation();

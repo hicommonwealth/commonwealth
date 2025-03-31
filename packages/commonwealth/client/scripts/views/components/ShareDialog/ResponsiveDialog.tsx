@@ -7,10 +7,11 @@ import './ResponsiveDialog.scss';
 type ResponsiveDialogProps = {
   children: ReactNode;
   onClose: () => void;
+  open: boolean;
 };
 
 export const ResponsiveDialog = (props: ResponsiveDialogProps) => {
-  const { onClose, children } = props;
+  const { onClose, children, open } = props;
   const [resizing, setResizing] = useState(false);
 
   const { isWindowExtraSmall } = useBrowserWindow({
@@ -24,7 +25,7 @@ export const ResponsiveDialog = (props: ResponsiveDialogProps) => {
         size="auto"
         direction="bottom"
         className="ResponsiveDialog"
-        open={true}
+        open={open}
         onClose={onClose}
       >
         <>{children}</>
@@ -38,7 +39,7 @@ export const ResponsiveDialog = (props: ResponsiveDialogProps) => {
       className="ResponsiveDialog"
       content={<>{children}</>}
       onClose={onClose}
-      open={true}
+      open={open}
     />
   );
 };
