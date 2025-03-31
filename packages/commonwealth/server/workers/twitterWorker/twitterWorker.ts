@@ -81,7 +81,6 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
     const quests = await models.Quest.findAll({
@@ -280,6 +279,14 @@ async function main() {
           ),
       );
     });
+
+    await pollTweetMetrics(TwitterBotConfigs.Common);
+    setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      pollTweetMetrics,
+      config.TWITTER.WORKER_POLL_INTERVAL,
+      TwitterBotConfigs.Common,
+    );
 
     isServiceHealthy = true;
     log.info('Twitter Worker started');
