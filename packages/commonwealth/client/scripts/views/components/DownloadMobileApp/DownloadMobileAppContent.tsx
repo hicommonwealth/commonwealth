@@ -12,7 +12,7 @@ export const DownloadMobileAppContent = () => {
   return (
     <div className="DownloadMobileAppContent">
       <div className="Background">
-        <img src={AppStoreQRCode} />
+        <img src={AppStoreQRCode} alt="App Store QR Code" />
 
         <p>
           <i>Scan QR Code on your device to go to the App Store.</i>

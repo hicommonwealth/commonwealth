@@ -23,7 +23,6 @@ import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import ShareButton from 'views/components/ShareButton';
-import { SharePopover } from 'views/components/SharePopover';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
@@ -460,12 +459,11 @@ export const CommentCard = ({
                   </>
                 )}
 
-                <SharePopover linkToShare={shareURL} buttonLabel="Share" />
-
                 <ShareButton
                   url={shareURL}
                   title={undefined}
                   shareType="comment"
+                  buttonLabel="Share"
                 />
 
                 {!isThreadArchived && replyBtnVisible && (
