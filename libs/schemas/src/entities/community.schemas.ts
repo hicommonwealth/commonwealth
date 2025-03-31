@@ -16,10 +16,13 @@ import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
+export const COMMUNITY_TIER = z.number().int().min(0).max(3);
+
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
   id: z.string(),
   name: z.string(),
+  tier: COMMUNITY_TIER,
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),

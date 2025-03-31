@@ -167,6 +167,8 @@ export const ThreadView = Thread.extend({
   associatedContests: z.array(ContestView).nullish(),
   topic: TopicView.optional(),
   topic_id: PG_INT.optional(),
+  is_linking_token: z.boolean().optional(),
+  launchpad_token_address: z.string().optional(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),

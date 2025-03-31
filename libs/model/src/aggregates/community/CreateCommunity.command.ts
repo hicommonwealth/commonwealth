@@ -121,6 +121,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             id,
             name,
+            tier: 0,
             default_symbol,
             icon_url,
             description,

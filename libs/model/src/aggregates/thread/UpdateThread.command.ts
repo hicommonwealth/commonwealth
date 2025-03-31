@@ -224,6 +224,9 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
                 ),
               }
             : {};
+        const tokenAddress = payload.launchpad_token_address && {
+          launchpad_token_address: payload.launchpad_token_address,
+        };
         await thread.update(
           {
             // TODO: body should be set to truncatedBody once client renders content_url
@@ -232,7 +235,9 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
             ...ownerPatch,
             last_edited: new Date(),
             ...searchUpdate,
+            ...tokenAddress,
             content_url: contentUrl,
+            is_linking_token: payload.is_linking_token,
           },
           { transaction },
         );

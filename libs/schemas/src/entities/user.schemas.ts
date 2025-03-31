@@ -38,9 +38,10 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
+export const USER_TIER = z.number().int().min(0).max(5);
 export const User = z.object({
   id: PG_INT.optional(),
-  tier: z.number().int().min(0).max(5),
+  tier: USER_TIER,
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
@@ -112,6 +113,7 @@ export const SsoToken = z.object({
 
 export const CommunityMember = z.object({
   user_id: PG_INT,
+  tier: USER_TIER,
   profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   addresses: z.array(

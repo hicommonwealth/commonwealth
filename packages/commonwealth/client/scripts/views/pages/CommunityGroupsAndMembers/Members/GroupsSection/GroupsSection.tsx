@@ -66,6 +66,7 @@ const GroupsSection = ({
                           `${
                             r?.data?.source?.evm_chain_id ||
                             r?.data?.source?.cosmos_chain_id ||
+                            r?.data?.source?.solana_network ||
                             ''
                           }`,
                       )
