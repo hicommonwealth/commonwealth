@@ -42,6 +42,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         namespace,
         transactionHash,
         allow_tokenized_threads,
+        primary_token_address,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -119,6 +120,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       custom_stages && (community.custom_stages = custom_stages);
       allow_tokenized_threads &&
         (community.allow_tokenized_threads = allow_tokenized_threads);
+      primary_token_address &&
+        (community.primary_token_address = primary_token_address);
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });

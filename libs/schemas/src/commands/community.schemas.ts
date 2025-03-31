@@ -47,6 +47,7 @@ export const CreateCommunity = {
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
     allow_tokenized_threads: z.boolean().optional(),
+    primary_token_address: z.string().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
