@@ -23,8 +23,9 @@
         outline: none;
         background: transparent;
         text-overflow: ellipsis;
+        outline: none;
+
         &:focus-visible {
-          border: 1px solid $primary-300;
           outline: none;
         }
       }

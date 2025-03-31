@@ -2,7 +2,7 @@ import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
-import { UserProfile } from '../entities/user.schemas';
+import { USER_TIER, UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
 import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
@@ -28,6 +28,7 @@ type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
 
 export const UserProfileView = z.object({
   userId: PG_INT,
+  tier: USER_TIER,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView) as ZodType<

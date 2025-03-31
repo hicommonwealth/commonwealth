@@ -56,6 +56,28 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
+  backpack: {
+    icon: {
+      name: 'backpack',
+      isCustom: true,
+    },
+    label: 'Backpack',
+    description: {
+      text: 'Solana Communities',
+      hasBackground: false,
+    },
+  },
+  solflare: {
+    icon: {
+      name: 'solflare',
+      isCustom: true,
+    },
+    label: 'Solflare',
+    description: {
+      text: 'Solana Communities',
+      hasBackground: false,
+    },
+  },
   polkadot: {
     icon: {
       name: 'polkadot',

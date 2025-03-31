@@ -1,3 +1,4 @@
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
 import {
   AllowlistData,
   BalanceSourceType,
@@ -5,12 +6,12 @@ import {
   ThresholdData,
 } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
-import type { MembershipRejectReason } from '../models/membership';
+import { z } from 'zod';
 import type { OptionsWithBalances } from '../services';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
-  messages?: MembershipRejectReason;
+  messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
 };
 
@@ -74,7 +75,7 @@ export function validateGroupMembership(
 
   if (allowListOverride) {
     // allow if address is whitelisted
-    return { isValid: true };
+    return { isValid: true, messages: undefined };
   }
 
   if (numRequiredRequirements) {
@@ -102,7 +103,13 @@ function _thresholdCheck(
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.evm_chain_id.toString();
+        chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
+      case 'metaplex': {
+        balanceSourceType = BalanceSourceType.SOLNFT;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.solana_network.toString();
         break;
       }
       case 'erc20': {
@@ -178,6 +185,7 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL:
             return b.options.mintAddress == contractAddress;
           default:

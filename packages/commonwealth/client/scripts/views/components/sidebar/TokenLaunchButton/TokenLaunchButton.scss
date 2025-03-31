@@ -4,7 +4,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 0;
+  max-width: fit-content;
 
   .btn-border {
     border: 0 !important;
@@ -19,13 +20,22 @@
       rgba(255, 16, 0, 1) 59%,
       rgba(255, 16, 0, 1) 100%
     );
+    min-width: auto;
+    width: auto;
+  }
+
+  @include mediumSmallInclusive {
+    .Button {
+      min-width: auto;
+      width: auto;
+      padding: 8px 16px !important;
+    }
   }
 
   @include extraSmall {
-    padding: 8px !important;
     .Button {
       font-size: 0.875rem !important;
-      padding: 4px 18px !important;
+      padding: 4px 16px !important;
       width: auto !important;
     }
   }

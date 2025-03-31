@@ -36,7 +36,7 @@ const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
         </CWText>
         <div className="xp-row">
           <CWTag
-            label={`${quest.xpPoints.gained > 0 ? `${quest.xpPoints.gained} / ` : ''}${quest.xpPoints.total} XP`}
+            label={`${quest.xpPoints.gained > 0 ? `${quest.xpPoints.gained} / ` : ''}${quest.xpPoints.total} Aura`}
             type="proposal"
           />
           <CWText

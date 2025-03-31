@@ -426,24 +426,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 ),
               }}
             />
-            <WithDefaultStickyComment>
-              {user.isLoggedIn && user.activeAccount && (
-                <StickyEditorContainer
-                  parentType={ContentType.Thread}
-                  canComment={true}
-                  handleSubmitComment={handleCreateThread}
-                  errorMsg=""
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  disabled={false}
-                  onCancel={handleCancel}
-                  author={user.activeAccount}
-                  editorValue={getTextFromDelta(threadContentDelta)}
-                  tooltipText=""
-                  topic={topicObj}
-                />
-              )}
-            </WithDefaultStickyComment>
           </>
         ) : selectedView === VIEWS[1].value ? (
           <OverviewPage
@@ -502,6 +484,25 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             overscan={50}
           />
         )}
+
+        <WithDefaultStickyComment>
+          {user.isLoggedIn && user.activeAccount && (
+            <StickyEditorContainer
+              parentType={ContentType.Thread}
+              canComment={true}
+              handleSubmitComment={handleCreateThread}
+              errorMsg=""
+              contentDelta={threadContentDelta}
+              setContentDelta={setThreadContentDelta}
+              disabled={false}
+              onCancel={handleCancel}
+              author={user.activeAccount}
+              editorValue={getTextFromDelta(threadContentDelta)}
+              tooltipText=""
+              topic={topicObj}
+            />
+          )}
+        </WithDefaultStickyComment>
 
         <StickyCommentElementSelector />
       </CWPageLayout>
