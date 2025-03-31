@@ -170,13 +170,12 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               },
             });
           if (new_address || !wallet_found) {
-            // TODO: review how to get balances for unstable chains
-            // at the moment, if fetching balances fails, the internal try-catch will log and return empty balances
+            // getBalances try-catch logs and returns empty balances on failures
             const balances = eth_chain_id
               ? await tokenBalanceCache.getBalances({
                   addresses: [addr.address],
-                  balanceSourceType: BalanceSourceType.ETHNative, // TODO: support other balance sources
-                  sourceOptions: { evmChainId: eth_chain_id }, // TODO: is this the right chain node?
+                  balanceSourceType: BalanceSourceType.ETHNative,
+                  sourceOptions: { evmChainId: eth_chain_id },
                 })
               : { [addr.address]: '0' };
             events.push({
@@ -185,7 +184,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 user_id: addr.user_id!,
                 new_user,
                 wallet_id: wallet_id,
-                balance: Number(balances[addr.address] ?? 0),
+                balance: balances[addr.address] || '0',
                 community_id,
                 created_at: addr.created_at!,
               },
