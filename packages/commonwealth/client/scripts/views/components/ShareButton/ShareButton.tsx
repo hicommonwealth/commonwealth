@@ -7,7 +7,7 @@ type ShareButtonProps = {
   title?: string;
   text?: string;
   buttonLabel?: string;
-  shareType: 'thread';
+  shareType: 'thread' | 'comment';
 };
 
 export const ShareButton = (props: ShareButtonProps) => {

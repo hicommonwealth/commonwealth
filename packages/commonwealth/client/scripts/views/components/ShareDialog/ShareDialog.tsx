@@ -14,7 +14,7 @@ type ShareDialogProps = {
   title?: string;
   text?: string;
   dialogTitle: string;
-  shareType: 'thread';
+  shareType: 'thread' | 'comment';
 };
 
 export const ShareDialog = (props: ShareDialogProps) => {
@@ -28,7 +28,10 @@ export const ShareDialog = (props: ShareDialogProps) => {
           event.preventDefault();
         }}
       >
-        <CWModalHeader label={`Share ${title}`} onModalClose={onClose} />
+        <CWModalHeader
+          label={`Share ${title ? title : shareType}`}
+          onModalClose={onClose}
+        />
         <CWModalBody>
           <CWText>
             When you share this link for this {shareType} you will also get
