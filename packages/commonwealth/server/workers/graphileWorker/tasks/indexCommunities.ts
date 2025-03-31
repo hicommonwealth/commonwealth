@@ -1,10 +1,13 @@
 import { command } from '@hicommonwealth/core';
 import { Community, GraphileTask, TaskPayloads } from '@hicommonwealth/model';
-import { systemActor } from 'node_modules/@hicommonwealth/model/src/middleware';
 
 const indexCommunities = async () => {
   await command(Community.IndexCommunities(), {
-    actor: systemActor({}),
+    actor: {
+      user: { id: 0, email: 'system@common.im' },
+      address: '0x0',
+      is_system_actor: true,
+    },
     payload: {},
   });
 };
