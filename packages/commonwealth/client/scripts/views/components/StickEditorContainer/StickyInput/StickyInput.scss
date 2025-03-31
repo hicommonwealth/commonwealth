@@ -305,7 +305,7 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @include mediumSmall {
     padding: 8px;
 
     .input-row {
@@ -328,7 +328,7 @@
     }
   }
 
-  @media (max-width: 480px) {
+  @include extraSmall {
     .input-row {
       .text-input-container {
         .mention-dropdown {

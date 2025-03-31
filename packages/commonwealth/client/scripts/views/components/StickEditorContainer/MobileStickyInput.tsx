@@ -12,7 +12,8 @@ import './MobileStickyInput.scss';
 import StickyInput from './StickyInput';
 import { StickCommentContext } from './context/StickCommentProvider';
 
-const newStickyInput = true;
+// because it is just a UI for now, this is not real flag yet
+const newStickyInput = false;
 
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;

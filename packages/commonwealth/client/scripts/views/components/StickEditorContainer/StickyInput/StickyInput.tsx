@@ -3,48 +3,9 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import CWTextInput from 'views/components/component_kit/new_designs/CWTextInput/CWTextInput';
 import './StickyInput.scss';
+import { MENTION_ITEMS, ModelItem, MODELS, ThreadItem, THREADS } from './utils';
 
 export type ThreadMentionTagType = 'threadMention' | 'modelMention';
-
-interface ThreadItem {
-  id: string;
-  label: string;
-}
-
-interface ModelItem {
-  id: string;
-  label: string;
-}
-
-const MODELS: ModelItem[] = [
-  { id: 'claude-3-7-sonnet', label: 'Claude 3.7 Sonnet' },
-  { id: 'claude-3-opus', label: 'Claude 3 Opus' },
-  { id: 'claude', label: 'Claude' },
-  { id: 'gpt-4o', label: 'GPT-4o' },
-  { id: 'gemini-pro', label: 'Gemini Pro' },
-];
-
-const THREADS: ThreadItem[] = [
-  {
-    id: 'thread-1',
-    label: 'Thread 1',
-  },
-  { id: 'thread-2', label: 'Thread 2' },
-  { id: 'thread-3', label: 'Thread 3' },
-];
-
-const MENTION_ITEMS = [
-  ...THREADS.map((thread) => ({
-    id: thread.id,
-    name: thread.label,
-    type: 'thread' as const,
-  })),
-  ...MODELS.map((model) => ({
-    id: model.id,
-    name: model.label,
-    type: 'model' as const,
-  })),
-];
 
 const StickyInput = () => {
   const [inputValue, setInputValue] = useState('');
