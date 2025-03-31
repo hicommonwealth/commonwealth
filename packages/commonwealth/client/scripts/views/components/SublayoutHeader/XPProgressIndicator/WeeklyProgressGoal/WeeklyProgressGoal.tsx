@@ -24,10 +24,10 @@ const WeeklyProgressGoal = ({
     <div className={clsx('WeeklyProgressGoal', className)}>
       <div className="header">
         <CWText type="caption" fontWeight="semiBold">
-          Weekly XP Goal
+          Weekly Aura Target
         </CWText>
         <CWText type="caption" fontWeight="semiBold">
-          {progress.current} / {progress.target} XP
+          {progress.current} / {progress.target} Aura
         </CWText>
       </div>
       <progress className="progress-bar" value={currentProgress} max={100} />

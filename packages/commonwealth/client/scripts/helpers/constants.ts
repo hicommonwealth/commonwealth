@@ -14,3 +14,7 @@ export enum APIOrderBy {
 }
 
 export const DEFAULT_CHAIN = 'edgeware';
+
+export const BASE_CHAIN_ID = 8453;
+export const BASE_GOERLI_CHAIN_ID = 84531;
+export const BASE_SEPOLIA_CHAIN_ID = 84532;

@@ -20,6 +20,7 @@ import {
 import {
   english,
   generateMnemonic,
+  generatePrivateKey,
   mnemonicToAccount,
   privateKeyToAccount,
 } from 'viem/accounts';
@@ -369,4 +370,9 @@ export async function sendTransaction({
 
     throw e;
   }
+}
+
+export function generateWallet() {
+  const privateKey = generatePrivateKey();
+  return privateKeyToAccount(privateKey);
 }

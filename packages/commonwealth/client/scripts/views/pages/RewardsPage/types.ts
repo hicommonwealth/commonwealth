@@ -14,7 +14,7 @@ export enum MobileTabType {
 export enum TableType {
   Referrals = 'Referrals',
   TokenTXHistory = 'Token TX History',
-  XPEarnings = 'XP Earnings',
+  XPEarnings = 'Your Aura',
 }
 
 export const enum TabParam {

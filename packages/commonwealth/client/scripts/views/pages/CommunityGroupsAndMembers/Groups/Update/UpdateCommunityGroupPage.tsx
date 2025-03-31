@@ -109,13 +109,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 value: `${
                   requirement.data.source.cosmos_chain_id ||
                   requirement.data.source.evm_chain_id ||
+                  requirement.data.source.solana_network ||
                   0
                 }`,
                 label: chainTypes?.find(
                   (chain) =>
                     chain.value ==
                     (requirement.data.source.cosmos_chain_id ||
-                      requirement.data.source.evm_chain_id),
+                      requirement.data.source.evm_chain_id ||
+                      requirement.data.source.solana_network),
                 )?.label,
               },
               requirementContractAddress:

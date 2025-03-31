@@ -96,7 +96,7 @@ const QuestCard = ({
         <div className="quest-list">
           <div className="quest">
             <CWText fontWeight="medium">Complete All Tasks</CWText>
-            <CWText fontWeight="medium">{xpPoints} XP</CWText>
+            <CWText fontWeight="medium">{xpPoints} Aura</CWText>
           </div>
         </div>
 

@@ -8,6 +8,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
+  SOL_NFT_SPECIFICATION,
   SPL_SPECIFICATION,
   TOKENS,
   chainTypes,
@@ -31,11 +32,14 @@ const RequirementSubForm = ({
     requirementType === TOKENS.COSMOS_TOKEN ||
     requirementType === CW_SPECIFICATIONS.CW_721 ||
     requirementType === CW_SPECIFICATIONS.CW_20;
-  const isSPLRequirement = requirementType === SPL_SPECIFICATION;
+  const isSPLRequirement =
+    requirementType === SPL_SPECIFICATION ||
+    requirementType === SOL_NFT_SPECIFICATION;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
     [SPL_SPECIFICATION]: 'Using 6 decimal precision',
+    [SOL_NFT_SPECIFICATION]: 'Using 6 decimal precision',
     [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
     [ERC_SPECIFICATIONS.ERC_721]: '',
     [CW_SPECIFICATIONS.CW_721]: '',
@@ -68,11 +72,12 @@ const RequirementSubForm = ({
                     ...Object.values(CW_SPECIFICATIONS),
                   ].includes(x.value)
                 : app.chain.base === ChainBase.Solana
-                ? [SPL_SPECIFICATION].includes(x.value)
-                : [
-                    TOKENS.EVM_TOKEN,
-                    ...Object.values(ERC_SPECIFICATIONS),
-                  ].includes(x.value),
+                  ? [SPL_SPECIFICATION].includes(x.value) ||
+                    [SOL_NFT_SPECIFICATION].includes(x.value)
+                  : [
+                      TOKENS.EVM_TOKEN,
+                      ...Object.values(ERC_SPECIFICATIONS),
+                    ].includes(x.value),
             )
             .map((requirement) => ({
               label: requirement.label,
@@ -131,8 +136,8 @@ const RequirementSubForm = ({
                   (isCosmosRequirement
                     ? 'cosmos'
                     : isSPLRequirement
-                    ? 'solana'
-                    : 'ethereum'),
+                      ? 'solana'
+                      : 'ethereum'),
               )
               ?.map((chainType) => ({
                 label: chainType.label,

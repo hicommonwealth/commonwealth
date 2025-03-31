@@ -51,6 +51,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
+    'process.env.FLAG_JUDGE_CONTEST': JSON.stringify(env.FLAG_JUDGE_CONTEST),
   };
 
   const config = {

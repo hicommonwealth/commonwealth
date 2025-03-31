@@ -221,7 +221,6 @@ export async function evmBalanceFetcherBatching(
         abiInput: ['uint256[]'],
         data: data.result,
       });
-      console.log('>>>>>>>>>>>>>>>>>>', balances);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = String((<number[]>balances)[i])),
       );

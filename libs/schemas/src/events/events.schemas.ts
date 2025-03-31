@@ -430,6 +430,7 @@ export const events = {
     new_user: z.boolean(),
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
+    balance: z.number(),
     created_at: z.coerce.date(),
   }),
 
@@ -527,6 +528,20 @@ export const events = {
   CommunityTagsUpdated: z.object({
     community_id: z.string(),
     tag_ids: z.array(z.number()),
+    created_at: z.coerce.date(),
+  }),
+
+  MembershipsRefreshed: z.object({
+    community_id: z.string(),
+    membership: z
+      .object({
+        group_id: z.number(),
+        address_id: z.number(),
+        user_id: z.number(),
+        created: z.boolean(),
+        rejected: z.boolean().optional(),
+      })
+      .array(),
     created_at: z.coerce.date(),
   }),
 } as const;

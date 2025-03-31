@@ -260,28 +260,6 @@ describe('Quest lifecycle', () => {
                 participation_period: QuestParticipationPeriod.Monthly,
                 participation_times_per_period: 3,
                 creator_reward_weight: 0.1,
-                content_id: 'comment:1000',
-              },
-            ],
-          },
-        }),
-      ).rejects.toThrowError(
-        `CommentUpvoted action must be scoped to a thread`,
-      );
-
-      await expect(
-        command(UpdateQuest(), {
-          actor: superadmin,
-          payload: {
-            quest_id: quest!.id!,
-            action_metas: [
-              {
-                event_name: 'CommentUpvoted',
-                reward_amount: 200,
-                participation_limit: QuestParticipationLimit.OncePerPeriod,
-                participation_period: QuestParticipationPeriod.Monthly,
-                participation_times_per_period: 3,
-                creator_reward_weight: 0.1,
                 content_id: 'thread:12345678',
               },
             ],

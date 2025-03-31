@@ -73,7 +73,6 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
@@ -509,16 +508,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  // Group routes
-  registerRoute(
-    router,
-    'put',
-    '/refresh-membership',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    refreshMembershipHandler.bind(this, serverControllers),
   );
 
   registerRoute(

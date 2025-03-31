@@ -1,12 +1,58 @@
-import { ServerError, logger } from '@hicommonwealth/core';
+import { ServerError, command, logger } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
+import { RefreshCommunityMemberships } from '../aggregates/community';
 import { models } from '../database';
+import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
 
-export const refreshProfileCount = async (community_id: string) => {
-  await models.sequelize.query(
-    `
+/*
+ * Debounces community refreshes
+ */
+export function debounceRefresh(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fn: (...args: any[]) => Promise<void>,
+  delay: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): (...args: any[]) => Promise<void> {
+  const timeouts = new Map<string, NodeJS.Timeout>();
+  const timestamps = new Map<string, number>();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (...args: any[]) => {
+    const now = Date.now();
+    const key = JSON.stringify(args);
+
+    // make sure to only keep 20 timeouts to avoid the maps to grow too large
+    if (timeouts.size > 20) {
+      for (const [k, t] of timestamps) {
+        if (now - t > delay * 2) {
+          timeouts.delete(k);
+          timestamps.delete(k);
+        }
+      }
+    }
+
+    timeouts.has(key) && clearTimeout(timeouts.get(key)!);
+    timeouts.set(
+      key,
+      setTimeout(() => {
+        void fn(args).then(() => {
+          // clean up after execution
+          timeouts.delete(key);
+          timestamps.delete(key);
+        });
+      }, delay),
+    );
+    timestamps.set(key, now);
+    return Promise.resolve();
+  };
+}
+
+export const refreshProfileCount = debounceRefresh(
+  async (community_id: string) => {
+    await models.sequelize.query(
+      `
 UPDATE "Communities" C
 SET profile_count = (
     SELECT COUNT(*) 
@@ -15,9 +61,21 @@ SET profile_count = (
 )
 WHERE C.id = :community_id;
     `,
-    { replacements: { community_id } },
-  );
-};
+      { replacements: { community_id } },
+    );
+  },
+  10_000,
+);
+
+export const refreshMemberships = debounceRefresh(
+  async (community_id: string, group_id?: number) => {
+    await command(RefreshCommunityMemberships(), {
+      actor: systemActor({}),
+      payload: { community_id, group_id },
+    });
+  },
+  10_000,
+);
 
 // TODO: check if we need a maintenance policy for this
 export async function assertAddressOwnership(address: string) {

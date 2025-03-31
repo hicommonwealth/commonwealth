@@ -24,7 +24,7 @@ const Quests = ({
   const navigate = useCommonNavigate();
 
   const handleSeeAllQuests = () => {
-    navigate('/explore', {}, null);
+    navigate('/explore?tab=quests', {}, null);
   };
 
   const handleQuestCTAClick = (questId: number, communityId?: string) => {

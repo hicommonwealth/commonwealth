@@ -71,7 +71,7 @@ const QuestList = ({
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   if (!xpEnabled || (isLoadingXPProgression && user.isLoggedIn)) return <></>;

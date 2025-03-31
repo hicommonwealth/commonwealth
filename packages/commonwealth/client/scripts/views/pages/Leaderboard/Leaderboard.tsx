@@ -18,7 +18,7 @@ const Leaderboard = () => {
   return (
     <CWPageLayout>
       <section className="Leaderboard">
-        <CWText type="h2">XP Leaderboard</CWText>
+        <CWText type="h2">Aura Leaderboard</CWText>
         <section className="body">
           <section className="left">
             <XPTable />
