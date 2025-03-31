@@ -1,7 +1,8 @@
-import { Command, InvalidInput } from '@hicommonwealth/core';
+import { Command, InvalidInput, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import {
@@ -17,6 +18,8 @@ import {
   scheduleTask,
 } from '../../services/graphileWorker';
 import { getDelta, tweetExists } from '../../utils';
+
+const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 async function updateQuestInstance(
   quest: QuestInstance,
@@ -143,6 +146,7 @@ async function updateChannelQuest(
         },
         { transaction },
       );
+      log.trace(`Created quest tweet ${tweetId} for quest ${quest.id}`);
       const job = await scheduleTask(
         GraphileTaskNames.AwardTwitterQuestXp,
         {
@@ -150,9 +154,11 @@ async function updateChannelQuest(
           quest_ended: true,
         },
         {
+          runAt: quest.end_date,
           transaction,
         },
       );
+      log.trace(`Scheduled job ${job.id} for quest ${quest.id}`);
       quest.scheduled_job_id = job.id;
       await quest.save({ transaction });
     });

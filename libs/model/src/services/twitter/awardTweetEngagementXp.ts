@@ -3,7 +3,7 @@ import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
-import { QuestActionMetaAttributes } from '../../models/quest';
+import { QuestActionMetaAttributes, QuestAttributes } from '../../models/quest';
 import { GraphileTask, TaskPayloads } from '../graphileWorker';
 import { getLikingUsers } from './api/getLikingUsers';
 import { getReplies } from './api/getReplies';
@@ -13,10 +13,12 @@ import { TwitterBotConfigs } from './twitter.config';
 const log = logger(import.meta);
 
 async function awardBatchTweetEngagementXp({
+  quest,
   action_meta,
   twitterUsernames,
   transaction,
 }: {
+  quest: QuestAttributes;
   action_meta: QuestActionMetaAttributes;
   twitterUsernames: string[];
   transaction: Transaction;
@@ -31,6 +33,7 @@ async function awardBatchTweetEngagementXp({
       oauth_username: {
         [Op.in]: Array.from(new Set(twitterUsernames)),
       },
+      ...(quest.community_id ? { community_id: quest.community_id } : {}),
     },
   });
 
@@ -75,6 +78,7 @@ export const awardTweetEngagementXp = async (
     include: [
       {
         model: models.QuestActionMeta,
+        as: 'action_metas',
         required: true,
         include: [
           {
@@ -126,6 +130,7 @@ export const awardTweetEngagementXp = async (
     });
     await models.sequelize.transaction(async (transaction) => {
       await awardBatchTweetEngagementXp({
+        quest,
         action_meta: quest.action_metas![0],
         twitterUsernames: likes.map((like) => like.username),
         transaction,
@@ -142,6 +147,7 @@ export const awardTweetEngagementXp = async (
     });
     await models.sequelize.transaction(async (transaction) => {
       await awardBatchTweetEngagementXp({
+        quest,
         action_meta: quest.action_metas![0],
         twitterUsernames: replies
           .filter(
@@ -166,6 +172,7 @@ export const awardTweetEngagementXp = async (
     });
     await models.sequelize.transaction(async (transaction) => {
       await awardBatchTweetEngagementXp({
+        quest,
         action_meta: quest.action_metas![0],
         twitterUsernames: retweets.map((retweet) => retweet.username),
         transaction,
