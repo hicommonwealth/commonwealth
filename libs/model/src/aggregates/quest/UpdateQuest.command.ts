@@ -165,15 +165,6 @@ async function updateCommonQuest(
     const c_id = community_id || quest.community_id;
     await Promise.all(
       action_metas.map(async (action_meta) => {
-        // enforce comment upvoted action is scoped to a thread
-        if (
-          action_meta.event_name === 'CommentUpvoted' &&
-          !action_meta.content_id?.startsWith('thread:')
-        ) {
-          throw new InvalidInput(
-            'CommentUpvoted action must be scoped to a thread',
-          );
-        }
         if (action_meta.content_id) {
           // make sure content_id exists
           const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema

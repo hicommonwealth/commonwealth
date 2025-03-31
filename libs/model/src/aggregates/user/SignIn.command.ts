@@ -1,11 +1,12 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { deserializeCanvas } from '@hicommonwealth/shared';
+import { BalanceSourceType, deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
+import { tokenBalanceCache } from '../../services';
 import {
   transferOwnership,
   verifyAddress,
@@ -56,8 +57,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
       const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
-      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
-        .user.auth as VerifiedAddress;
+      const {
+        base,
+        encodedAddress,
+        eth_chain_id,
+        ss58Prefix,
+        hex,
+        existingHexUserId,
+      } = actor.user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
       let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
@@ -162,17 +169,27 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 created_at: addr.created_at!,
               },
             });
-          (new_address || !wallet_found) &&
+          if (new_address || !wallet_found) {
+            // getBalances try-catch logs and returns empty balances on failures
+            const balances = eth_chain_id
+              ? await tokenBalanceCache.getBalances({
+                  addresses: [addr.address],
+                  balanceSourceType: BalanceSourceType.ETHNative,
+                  sourceOptions: { evmChainId: eth_chain_id },
+                })
+              : { [addr.address]: '0' };
             events.push({
               event_name: 'WalletLinked',
               event_payload: {
                 user_id: addr.user_id!,
                 new_user,
                 wallet_id: wallet_id,
+                balance: balances[addr.address] || '0',
                 community_id,
                 created_at: addr.created_at!,
               },
             });
+          }
           new_user &&
             events.push({
               event_name: 'UserCreated',

@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { models } from '../../../database';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
+import { __get_solnft_balances } from './get_solnft_balances';
 import { __get_spl_balances } from './get_spl_balances';
 
 const log = logger(import.meta);
@@ -11,11 +13,10 @@ export async function getSolanaBalances(
   ttl?: number,
 ) {
   const cachedBalances = await getCachedBalances(options, options.addresses);
-
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       balance_type: 'solana',
-      name: 'Solana Mainnet',
+      name: options.solanaNetwork ?? 'Solana Mainnet',
     },
   });
   if (!chainNode) {
@@ -23,7 +24,10 @@ export async function getSolanaBalances(
     log.error(msg, undefined);
     return {};
   }
-  const freshBalances: Balances = await __get_spl_balances(chainNode, options);
+  const freshBalances: Balances =
+    options.balanceSourceType === BalanceSourceType.SPL
+      ? await __get_spl_balances(chainNode, options)
+      : await __get_solnft_balances(chainNode, options);
 
   await cacheBalances(options, freshBalances, ttl);
 
