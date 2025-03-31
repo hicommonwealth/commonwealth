@@ -33,13 +33,16 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
 
-      return models.Vote.create({
-        poll_id: payload.poll_id,
-        address: address.address,
-        author_community_id: address.community_id,
-        community_id: poll.community_id,
-        option: payload.option,
+      const [vote] = await models.Vote.findOrCreate({
+        where: {
+          poll_id: payload.poll_id,
+          address: address.address,
+          author_community_id: address.community_id,
+          community_id: poll.community_id,
+          option: payload.option,
+        },
       });
+      return vote.toJSON();
     },
   };
 }
