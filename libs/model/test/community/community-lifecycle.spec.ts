@@ -944,9 +944,15 @@ describe('Community lifecycle', () => {
   });
   describe('namespace', () => {
     test('should set namespace creator address on NamespaceDeployed event', async () => {
+      const namespaceAddress =
+        '0x1235761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`;
+
+      const namespaceCreatorAddress =
+        '0x2345761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`;
+
       await models.Community.update(
         {
-          namespace_address: '0x1234',
+          namespace_address: namespaceAddress,
         },
         {
           where: {
@@ -960,11 +966,11 @@ describe('Community lifecycle', () => {
           hash: '0xf26c4aeb50fb6350e280c2443b086ef8034a8c81ea49f7483862c928541468dc',
           miner: '0x4200000000000000000000000000000000000011',
           nonce: '0x0000000000000000',
-          number: BigInt('27208156'),
-          gasLimit: BigInt('112000000'),
+          number: '27208156',
+          gasLimit: '112000000',
           logsBloom:
             '0xeb31f7dabdd3d8b9ceebf798ee0bfb46f7f5febf3dfbdfcf62c706aeabff9f57df7afbee17b8fdbe3e5afe5ffec77ffe63fddebfd5bf72ceeeebf6fff7bca7dee56feebee7ffce5ed3cddfeff76efbbc85dffdeddefdcaff37fafdd0bff9ff6ff7ec7ef5bedcb7e2f1e6dfeeff6eddbff76fff63acffdfec77feda5ef7bfb6fa76976be7ddf97e5b47afcfbfb74f0edf6dfbd76bedfdeca8f0ffdf7e74f5f53e9fcbfff7eab5bcdaeff0d3773fedd4cf7d97fd7b22df7d7f9dff67dffdfec9d7cc777d7fefcb6d6fbdebdeffaffb15da5ebaf35ef77cff3efb79dfdeeefcefe7c77699f94dfffbf7f9f76feedf87eff4fbf6defe7f726edaff57cf54eeefee7f',
-          timestamp: BigInt('1741205659'),
+          timestamp: '1741205659',
           parentHash:
             '0x3ae6e694f44c7827c498abdb8bbfbcd75ef88dc7fb382681aa87da2cbc2b2708',
         },
@@ -978,7 +984,7 @@ describe('Community lifecycle', () => {
           logIndex: 701,
           blockHash:
             '0xf26c4aeb50fb6350e280c2443b086ef8034a8c81ea49f7483862c928541468dc',
-          blockNumber: BigInt('27208156'),
+          blockNumber: '27208156',
           transactionHash:
             '0x1b4523eddb2ad5904b8b0b5b9ae4cf3d5b6d4853c6dccf1c9a0d118f2c3abc38',
           transactionIndex: 357,
@@ -988,9 +994,8 @@ describe('Community lifecycle', () => {
           _signature: '0x' as `0x${string}`,
           _feeManager:
             '0x7485761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`,
-          nameSpaceAddress: '0x1234' as `0x${string}`,
-          _namespaceDeployer:
-            '0x7485761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`,
+          nameSpaceAddress: namespaceAddress as `0x${string}`,
+          _namespaceDeployer: namespaceCreatorAddress as `0x${string}`,
         },
         eventSource: {
           ethChainId: 8453,
@@ -1002,7 +1007,7 @@ describe('Community lifecycle', () => {
       await emitEvent(models.Outbox, [
         {
           event_name: 'NamespaceDeployed',
-          event_payload: namespaceDeployedPayload,
+          event_payload: namespaceDeployedPayload as any,
         },
       ]);
       await drainOutbox(['NamespaceDeployed'], ChainEventPolicy);
@@ -1012,7 +1017,12 @@ describe('Community lifecycle', () => {
           id: community.id,
         },
       });
-      expect(communityAfterNamespaceDeployed?.namespace_address).toBe('0x1234');
+      expect(communityAfterNamespaceDeployed?.namespace_address).toBe(
+        namespaceAddress,
+      );
+      expect(communityAfterNamespaceDeployed?.namespace_creator_address).toBe(
+        namespaceCreatorAddress,
+      );
     });
   });
 });
