@@ -34,6 +34,7 @@ export function mustBeProtocolChainId(
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
+export const NOMINATION_FEE = 0.00005;
 
 type factoryContractsType = {
   [key in ValidChains]: {
@@ -44,6 +45,7 @@ type factoryContractsType = {
     tokenCommunityManager?: string;
     referralFeeManager?: string;
     veBridge?: string;
+    communityNomination?: string;
     chainId: number;
   };
 };

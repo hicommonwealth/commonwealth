@@ -307,6 +307,7 @@ class NamespaceFactory extends ContractBase {
     voterShare: number,
     walletAddress: string,
     exchangeToken: string,
+    judgeId: number,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
@@ -321,6 +322,7 @@ class NamespaceFactory extends ContractBase {
           winnerShares,
           voterShare,
           exchangeToken,
+          judgeId,
         )
         .send({
           from: walletAddress,
