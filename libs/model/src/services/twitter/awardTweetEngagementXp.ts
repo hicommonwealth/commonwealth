@@ -2,6 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models, sequelize } from '../../database';
 import { QuestActionMetaAttributes, QuestAttributes } from '../../models/quest';
 import { GraphileTask, TaskPayloads } from '../graphileWorker';
@@ -10,7 +11,7 @@ import { getReplies } from './api/getReplies';
 import { getRetweets } from './api/getRetweets';
 import { TwitterBotConfigs } from './twitter.config';
 
-const log = logger(import.meta);
+const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 async function awardBatchTweetEngagementXp({
   quest,
@@ -24,7 +25,9 @@ async function awardBatchTweetEngagementXp({
   transaction: Transaction;
 }) {
   const addresses = await models.Address.findAll({
-    attributes: ['id', 'user_id', 'oauth_username'],
+    attributes: [
+      [sequelize.fn('DISTINCT', sequelize.col('user_id')), 'user_id'],
+    ],
     where: {
       user_id: {
         [Op.ne]: null,
@@ -36,6 +39,7 @@ async function awardBatchTweetEngagementXp({
       ...(quest.community_id ? { community_id: quest.community_id } : {}),
     },
   });
+  const userIds = addresses.map((address) => address.user_id!);
 
   const x =
     (action_meta.amount_multiplier ?? 0) > 0
@@ -45,8 +49,8 @@ async function awardBatchTweetEngagementXp({
 
   const now = new Date();
   await models.XpLog.bulkCreate(
-    addresses.map((address) => ({
-      user_id: address.user_id!,
+    userIds.map((userId) => ({
+      user_id: userId!,
       xp_points: reward_amount,
       action_meta_id: action_meta.id!,
       event_created_at: action_meta.created_at!,
@@ -54,6 +58,7 @@ async function awardBatchTweetEngagementXp({
     })),
     { transaction },
   );
+  log.trace(`Awarding ${reward_amount} xp to ${addresses.length} users`);
 
   await models.User.update(
     {
@@ -61,7 +66,7 @@ async function awardBatchTweetEngagementXp({
     },
     {
       where: {
-        id: { [Op.in]: addresses.map((address) => address.user_id!) },
+        id: { [Op.in]: userIds },
       },
       transaction,
     },
@@ -95,17 +100,10 @@ export const awardTweetEngagementXp = async (
     return;
   }
 
-  if (quest.end_date > new Date()) {
-    log.error(`Quest not ended yet: ${payload.quest_id}`);
-    return;
-  }
-
   if (quest.action_metas!.length > 1) {
     log.error(`Quest has multiple action metas: ${payload.quest_id}`);
   }
-  const questTweet = models.QuestTweets.build(
-    quest.action_metas![0].QuestTweet!,
-  );
+  const questTweet = quest.action_metas![0].QuestTweet!;
 
   const awardedLikeXp = questTweet.like_xp_awarded || questTweet.like_cap === 0;
 
@@ -136,7 +134,17 @@ export const awardTweetEngagementXp = async (
         transaction,
       });
       questTweet.like_xp_awarded = true;
-      await questTweet.save({ transaction });
+      await models.QuestTweets.update(
+        {
+          like_xp_awarded: true,
+        },
+        {
+          where: {
+            tweet_id: questTweet.tweet_id,
+          },
+          transaction,
+        },
+      );
     });
   }
 
@@ -158,7 +166,17 @@ export const awardTweetEngagementXp = async (
         transaction,
       });
       questTweet.reply_xp_awarded = true;
-      await questTweet.save({ transaction });
+      await models.QuestTweets.update(
+        {
+          reply_xp_awarded: true,
+        },
+        {
+          where: {
+            tweet_id: questTweet.tweet_id,
+          },
+          transaction,
+        },
+      );
     });
   }
 
@@ -178,7 +196,17 @@ export const awardTweetEngagementXp = async (
         transaction,
       });
       questTweet.retweet_xp_awarded = true;
-      await questTweet.save({ transaction });
+      await models.QuestTweets.update(
+        {
+          retweet_xp_awarded: true,
+        },
+        {
+          where: {
+            tweet_id: questTweet.tweet_id,
+          },
+          transaction,
+        },
+      );
     });
   }
 };

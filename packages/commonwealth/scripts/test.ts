@@ -1,14 +1,17 @@
-import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { TwitterBotName } from '@hicommonwealth/shared';
+import { dispose, handleEvent } from '@hicommonwealth/core';
+import { TwitterEngagementPolicy } from '@hicommonwealth/model';
 
 async function main() {
-  const res = await models.TwitterCursor.create({
-    bot_name: TwitterBotName.ContestBot,
-    last_polled_timestamp: BigInt(new Date().getTime()),
-  });
+  // const tweetId = '1906530981198086394';
+  const policy = TwitterEngagementPolicy();
+  const event = {
+    name: 'TweetEngagementCapReached' as const,
+    payload: { quest_id: 5, quest_ended: false, like_cap_reached: true },
+  };
 
-  console.log(res.toJSON());
+  const res = await handleEvent(policy, event);
+
+  console.log('\n\nSuccess Res: ', res);
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
