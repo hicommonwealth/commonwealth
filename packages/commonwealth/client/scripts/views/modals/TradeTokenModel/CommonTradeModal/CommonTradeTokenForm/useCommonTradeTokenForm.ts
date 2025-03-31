@@ -1,10 +1,9 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';
+import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';
 import { TradingMode } from '../../types';
@@ -37,10 +36,7 @@ const useCommonTradeTokenForm = ({
   const [selectedAddress, setSelectedAddress] = useState<string>();
 
   // base chain node info
-  const nodes = fetchCachedNodes();
-  const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
-  ) as NodeInfo; // this is expected to exist
+  const baseNode = app.chain.meta.ChainNode as NodeInfo;
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
