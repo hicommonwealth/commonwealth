@@ -4,7 +4,7 @@ import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
-import { decodeContent, getDelta } from '../../utils';
+import { decodeContent, emitEvent, getDelta, updateTags } from '../../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
