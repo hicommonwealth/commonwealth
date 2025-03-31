@@ -235,6 +235,11 @@ const DirectoryPage = () => {
         <DirectorySettingsDrawer
           isOpen={isDirectorySettingsDrawerOpen}
           onClose={() => setIsDirectorySettingsDrawerOpen(false)}
+          filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+          selectedCommunities={selectedCommunities}
+          setSelectedCommunities={setSelectedCommunities}
         />
         {/* {isDirectorySettingsModalOpen && isAdmin && (
           <CWModal

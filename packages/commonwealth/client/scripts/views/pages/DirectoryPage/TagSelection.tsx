@@ -13,7 +13,10 @@ type TagSelectionProps = {
   setSelectedTags: (tags: string[]) => void;
 };
 
-const TagSelection = ({ selectedTags, setSelectedTags }: TagSelectionProps) => {
+const TagSelection = ({
+  selectedTags = [],
+  setSelectedTags,
+}: TagSelectionProps) => {
   const { preferenceTags } = usePreferenceTags();
   const [searchTerm, setSearchTerm] = useState('');
 

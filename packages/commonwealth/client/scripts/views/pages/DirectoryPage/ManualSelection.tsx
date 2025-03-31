@@ -21,6 +21,7 @@ const ManualSelection = ({
   const [localSelectedCommunities, setLocalSelectedCommunities] = useState<
     string[]
   >([]);
+  console.log('filteredRelatedCommunitiesData', filteredRelatedCommunitiesData);
 
   useEffect(() => {
     setLocalSelectedCommunities(selectedCommunities);
@@ -92,14 +93,14 @@ const ManualSelection = ({
           Search for specific communities to add to the directory - members can
           see them regardless of their tags.
         </CWText>
-        {localSelectedCommunities.length > 0 && (
+        {selectedCommunities?.length > 0 && (
           <CWText className="added-text" fontWeight="medium">
             Added Communities
           </CWText>
         )}
 
         <div className="selected-communities">
-          {localSelectedCommunities.map((communityName) => (
+          {selectedCommunities?.map((communityName) => (
             <CWTag
               key={communityName}
               label={communityName}
