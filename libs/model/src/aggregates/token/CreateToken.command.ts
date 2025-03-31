@@ -3,7 +3,6 @@ import {
   commonProtocol,
   getErc20TokenInfo,
   getLaunchpadTokenCreatedTransaction,
-  getTransaction,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
@@ -77,11 +76,6 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       }
 
       // If token launch is a tokenized thread, link to thread
-      const { tx } = await getTransaction({
-        rpc: chainNode.private_url || chainNode.url,
-        txHash: transaction_hash,
-      });
-      // Update tokenized thread with token if exists.
       await models.sequelize.query(
         `
         UPDATE "Threads"
@@ -92,7 +86,6 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           replacements: {
             launchpadTokenAddress:
               tokenData.parsedArgs.tokenAddress.toLowerCase(),
-            creatorAddress: tx.from,
             threadId: tokenInfo.name,
           },
           type: QueryTypes.SELECT,
