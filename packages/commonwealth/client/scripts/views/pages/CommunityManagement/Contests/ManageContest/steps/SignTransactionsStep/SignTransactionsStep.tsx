@@ -85,8 +85,11 @@ const SignTransactionsStep = ({
     contestFormData.contestRecurring === ContestRecurringType.Yes;
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
+  const judgeContestFlag = useFlag('judgeContest');
   const isJudgedContest =
-    !isContestRecurring && !contestFormData?.contestTopic?.value;
+    !isContestRecurring &&
+    !contestFormData?.contestTopic?.value &&
+    judgeContestFlag;
 
   const devContest = useFlag('contestDev');
 
@@ -211,7 +214,28 @@ const SignTransactionsStep = ({
   };
 
   const getActionSteps = (): ActionStepsProps['steps'] => {
+    const judgeTokenStep = isJudgedContest
+      ? [
+          {
+            label: 'Register and mint judge tokens',
+            state: launchContestData.state,
+            errorText: launchContestData.errorText,
+            actionButton: {
+              label:
+                launchContestData.state === 'completed' ? 'Signed' : 'Sign',
+              disabled:
+                launchContestData.state === 'loading' ||
+                launchContestData.state === 'completed',
+              onClick: () => {
+                console.log('Registering ID101 and minting judge tokens');
+              },
+            },
+          },
+        ]
+      : [];
+
     return [
+      ...judgeTokenStep,
       {
         label: isDirectDepositSelected
           ? 'Launch contest'
