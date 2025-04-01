@@ -82,12 +82,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
 
-      let res: {
-        newUser: boolean;
-        newAddress: boolean;
-        addressCount: number;
-        user: UserAttributes;
-      };
+      let res: Awaited<ReturnType<typeof signInPrivy>>;
       if (wallet_id === WalletId.Privy) {
         res = await signInPrivy({
           payload: {

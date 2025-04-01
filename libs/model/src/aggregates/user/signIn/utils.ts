@@ -114,15 +114,9 @@ export async function findOrCreateUser({
   newUser: boolean;
   user: UserAttributes;
 }> {
-  let foundUser: UserAttributes | null;
-  if (ssoInfo) {
-    foundUser = await findUserBySso(ssoInfo, transaction);
-  } else {
-    foundUser = await findUserByAddressOrHex(
-      hex ? { hex } : { address },
-      transaction,
-    );
-  }
+  const foundUser = ssoInfo
+    ? await findUserBySso(ssoInfo, transaction)
+    : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
   if (!foundUser) {
     // New user signing in (Privy or native wallet)
