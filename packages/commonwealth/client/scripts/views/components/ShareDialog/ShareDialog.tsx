@@ -4,8 +4,8 @@ import {
   CWModalBody,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
+import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
 import ShareSection from 'views/components/ShareSection';
-import { ResponsiveDialog } from './ResponsiveDialog';
 
 type ShareDialogProps = {
   onClose: () => void;
@@ -21,7 +21,7 @@ export const ShareDialog = (props: ShareDialogProps) => {
   const { onClose, title, shareType, open } = props;
 
   return (
-    <ResponsiveDialog onClose={onClose} open={open}>
+    <CWResponsiveDialog onClose={onClose} open={open}>
       <div
         onClick={(event) => {
           event.stopPropagation();
@@ -41,6 +41,6 @@ export const ShareDialog = (props: ShareDialogProps) => {
           <ShareSection {...props} />
         </CWModalBody>
       </div>
-    </ResponsiveDialog>
+    </CWResponsiveDialog>
   );
 };
