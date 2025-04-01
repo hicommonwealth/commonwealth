@@ -140,10 +140,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
-                // TODO: 11069, get these from get quest api
-                contractAddress: ``,
-                ethChainId: ``,
-                eventSignature: ``,
+                contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
+                ethChainId: `${action.ChainEventXpSource?.chain_node_id || ''}`,
+                eventSignature: `${action.ChainEventXpSource?.event_signature || ''}`,
               })),
             }}
           />

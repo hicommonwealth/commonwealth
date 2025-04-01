@@ -189,16 +189,18 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             subForm.values.noOfRetweets ||
             subForm.values.noOfReplies) && {
             tweet_engagement_caps: {
-              // TODO: 11391 platform - update platform to allow any 1 of these values
               likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
               retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
               replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
             },
           }),
-          ...(subForm.config?.requires_chain_event &&
-            {
-              // TODO: 11069, how to get data here?
-            }),
+          ...(subForm.config?.requires_chain_event && {
+            chain_event: {
+              contract_address: subForm.values.contractAddress!,
+              eth_chain_id: parseInt(`${subForm.values.ethChainId}`, 10),
+              event_signature: subForm.values.eventSignature!,
+            },
+          }),
           participation_limit: subForm.values.participationLimit,
           participation_period: subForm.values
             .participationPeriod as QuestParticipationPeriod,

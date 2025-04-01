@@ -30,6 +30,13 @@ export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
     .refine(
       (data) => !(data && !data.likes && !data.retweets && !data.replies),
     ),
+  chain_event: z
+    .object({
+      eth_chain_id: z.number(),
+      contract_address: z.string(),
+      event_signature: z.string(),
+    })
+    .optional(),
 });
 
 export const UpdateQuest = {
