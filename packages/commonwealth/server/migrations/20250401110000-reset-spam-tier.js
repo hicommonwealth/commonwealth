@@ -6,6 +6,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
+        ALTER TABLE "Communities" ALTER COLUMN "spam_tier_level" SET DEFAULT -1;
         UPDATE "Communities" SET "spam_tier_level" = -1;
         `,
         { transaction },
