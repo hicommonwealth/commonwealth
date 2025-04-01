@@ -14,7 +14,7 @@ import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
-import { Address, USER_TIER } from './user.schemas';
+import { Address } from './user.schemas';
 
 export const COMMUNITY_TIER = z.number().int().min(0).max(3);
 
@@ -23,7 +23,7 @@ export const Community = z.object({
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
-  spam_tier_level: USER_TIER,
+  spam_tier_level: z.number().int().min(-1).max(2),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
