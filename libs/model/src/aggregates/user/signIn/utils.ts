@@ -40,13 +40,13 @@ export async function findUserByAddressOrHex(
   log.trace(`findUserByAddressOrHex: ${JSON.stringify(searchTerm)}`);
   const users = await models.sequelize.query(
     `
-      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
-                        FROM "Addresses"
-                        WHERE user_id IS NOT NULL
-                          AND ${'address' in searchTerm ? 'address=:address' : 'hex=:hex'})
-      SELECT U.*
-      FROM "Users" U
-      WHERE U.id IN (SELECT user_id FROM user_ids)
+        WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                          FROM "Addresses"
+                          WHERE user_id IS NOT NULL
+                            AND ${'address' in searchTerm ? 'address=:address' : 'hex=:hex'})
+        SELECT U.*
+        FROM "Users" U
+        WHERE U.id IN (SELECT user_id FROM user_ids)
     `,
     {
       model: models.User,
@@ -70,11 +70,11 @@ export async function findUserBySso(
   log.trace(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
   const users = await models.sequelize.query(
     `
-      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
-                        FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
-      SELECT U.*
-      FROM "Users" U
-      WHERE U.id IN (SELECT user_id FROM user_ids);
+        WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                          FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
+        SELECT U.*
+        FROM "Users" U
+        WHERE U.id IN (SELECT user_id FROM user_ids);
     `,
     {
       model: models.User,
@@ -118,50 +118,61 @@ export async function findOrCreateUser({
     ? await findUserBySso(ssoInfo, transaction)
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
-  if (!foundUser) {
-    // New user signing in (Privy or native wallet)
-    const user = await models.User.create(
-      {
-        email: null,
-        profile: {},
-        referred_by_address: referrer_address ?? null,
-        privy_id: privyUserId ?? null,
-        tier: 1,
-      },
-      { transaction },
-    );
-    log.trace(`Created new user: ${user.id}`);
-    return { newUser: true, user };
-  } else if (privyUserId && !foundUser.privy_id && !signedInUser?.privy_id) {
-    // Existing user signing in with Privy for the first time
+  const updatePrivyId = async (userId: number) => {
     await models.User.update(
-      {
-        privy_id: privyUserId,
-      },
+      { privy_id: privyUserId },
       {
         where: {
-          id: foundUser.id!,
+          id: userId,
         },
         transaction,
       },
     );
-    log.trace(`Updated user privy id: ${foundUser.id}`);
-  } else if (privyUserId && foundUser && !foundUser.privy_id) {
-    // Signed in Privy user connecting an address owned by another user
-    // sanity check
-    if (privyUserId !== signedInUser?.privy_id) {
-      throw new Error('Invalid Privy user id');
-    }
+  };
+
+  if (privyUserId && signedInUser && !signedInUser.privy_id)
+    await updatePrivyId(signedInUser.id!);
+  if (privyUserId && foundUser && !signedInUser && !foundUser.privy_id)
+    await updatePrivyId(foundUser.id!);
+
+  // Signed-in user signing in with another users address (address transfer) OR
+  // Signed-out user signing in with an address they own
+  if (
+    foundUser &&
+    ((signedInUser && foundUser.id !== signedInUser.id) || !signedInUser)
+  ) {
     return {
       newUser: false,
       user: foundUser,
     };
   }
 
-  return {
-    newUser: false,
-    user: foundUser,
-  };
+  // Signed-in user signing in with an address they already own OR
+  // Signed-in user signing in with a new address
+  if (
+    signedInUser &&
+    ((foundUser && foundUser.id === signedInUser.id) || !foundUser)
+  ) {
+    return {
+      newUser: false,
+      user: signedInUser,
+    };
+  }
+
+  // New user signing in (Privy or native wallet)
+  // if (!foundUser && !signedInUser)
+  const user = await models.User.create(
+    {
+      email: null,
+      profile: {},
+      referred_by_address: referrer_address ?? null,
+      privy_id: privyUserId ?? null,
+      tier: 1,
+    },
+    { transaction },
+  );
+  log.trace(`Created new user: ${user.id}`);
+  return { newUser: true, user };
 }
 
 async function transferAddressOwnership({
@@ -183,12 +194,12 @@ async function transferAddressOwnership({
     if (ssoInfo) {
       await models.sequelize.query(
         `
-          WITH addresses AS (SELECT id
-                             FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
-          UPDATE "Addresses"
-          SET user_id = :signedInUserId
-          FROM addresses
-          WHERE addresses.id = "Addresses".id
+            WITH addresses AS (SELECT id
+                               FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
+            UPDATE "Addresses"
+            SET user_id = :signedInUserId
+            FROM addresses
+            WHERE addresses.id = "Addresses".id
         `,
         {
           transaction,

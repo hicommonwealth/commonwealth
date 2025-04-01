@@ -1,7 +1,6 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
-import { generateWallet } from '@hicommonwealth/evm-protocols';
 import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
   CANVAS_TOPIC,
@@ -26,6 +25,7 @@ import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import * as tester from '../../src/tester';
 import * as ssoVerificationUtils from '../../src/utils/oauth/getVerifiedUserInfo';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
+import { createSIWESigner } from '../utils/sign-in';
 
 const getPrivyUserMock = vi.spyOn(privyUtils, 'getPrivyUserById');
 const getPrivyUserByIdTokenMock = vi.spyOn(privyUtils, 'getPrivyUserByIdToken');
@@ -33,18 +33,6 @@ const getVerifiedUserInfoMock = vi.spyOn(
   ssoVerificationUtils,
   'getVerifiedUserInfo',
 );
-
-async function createEvmSigner(ethChainId: number) {
-  const wallet = generateWallet();
-  return new SIWESigner({
-    signer: {
-      getAddress: () => Promise.resolve(wallet.address),
-      signMessage: (message: string) =>
-        Promise.resolve(wallet.signMessage({ message })),
-    },
-    chainId: ethChainId,
-  });
-}
 
 function generateSsoPrivyUserData(
   address: string,
@@ -178,13 +166,13 @@ describe('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
-  const mmPrivySigner = await createEvmSigner(8453);
+  const mmPrivySigner = await createSIWESigner(8453);
   const externalWalletPrivyUser = await createPrivyUser(
     mmPrivySigner,
     'externalWallet',
   );
 
-  const googlePrivySigner = await createEvmSigner(84532);
+  const googlePrivySigner = await createSIWESigner(84532);
   const googlePrivyUser = await createPrivyUser(
     googlePrivySigner,
     'google_oauth',
@@ -401,6 +389,7 @@ describe('SignIn Lifecycle', async () => {
 
         expect(addr!).to.not.be.null;
         expect(addr!.User).to.be.not.null;
+        expect(addr!.User!.id).to.equal(ref.actor.user.id!);
         expect(addr!.was_signed_in).to.be.true;
         expect(addr!.first_community).to.be.false;
         expect(addr!.user_created).to.be.false;
@@ -411,6 +400,58 @@ describe('SignIn Lifecycle', async () => {
           where: { id: ref.community_id },
         });
         expect(c?.profile_count).to.be.equal(1);
+      },
+    );
+  });
+
+  describe('Connect new addresses for existing signed in users', () => {
+    // Only test evm for now
+    it.each(chains.filter((c) => c.id.includes('evm')))(
+      'should sign new addresses for existing $seed.chain_base $wallet users (id: $id)',
+      async ({ id, wallet, provider, privyUser }) => {
+        if (privyUser) {
+          getPrivyUserMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getPrivyUserByIdTokenMock.mockImplementation(() => {
+            return Promise.resolve(privyUser);
+          });
+          getVerifiedUserInfoMock.mockImplementation(getVerifiedUserInfoMockFn);
+        }
+        const ref = refs[id];
+
+        const newSigner = await createSIWESigner();
+        const { payload: newSession } =
+          await newSigner.newSession(CANVAS_TOPIC);
+        const newAddress = await newSigner.getWalletAddress();
+
+        const addr = await command(SignIn(), {
+          actor: {
+            user: {
+              ...ref.actor.user,
+              auth: await verifyAddress(ref.community_id, newAddress),
+            },
+          },
+          payload: {
+            address: newAddress,
+            community_id: ref.community_id,
+            wallet_id: wallet,
+            session: serializeCanvas(newSession),
+            privy: {
+              identityToken: 'fake_identity_token',
+              ssoOAuthToken: 'fake_sso_oauth_token',
+              ssoProvider: provider,
+            },
+          },
+        });
+
+        expect(addr!).to.not.be.null;
+        expect(addr!.User).to.be.not.null;
+        expect(addr!.User!.id).to.equal(ref.actor.user.id!);
+        expect(addr!.was_signed_in).to.be.true;
+        expect(addr!.first_community).to.be.false;
+        expect(addr!.user_created).to.be.false;
+        expect(addr!.address_created).to.be.true;
       },
     );
   });
@@ -501,7 +542,7 @@ describe('SignIn Lifecycle', async () => {
       async ({ id, wallet, seed, privyUser, provider }) => {
         let externalSigner2: SIWESigner | undefined;
         if (privyUser) {
-          externalSigner2 = await createEvmSigner(8453);
+          externalSigner2 = await createSIWESigner(8453);
           const externalWalletPrivyUser2 = await createPrivyUser(
             externalSigner2,
             provider ?? 'externalWallet',
@@ -597,7 +638,6 @@ describe('SignIn Lifecycle', async () => {
         expect(transferred!.was_signed_in).to.be.true;
         expect(transferred!.address).to.be.equal(ref.address);
 
-        // check that user 2 now owns 3 addresses from user 1
         // the address from the EVM addresses were transferred (privy + MM)
         const addresses = await models.Address.findAll({
           where: { address: ref.address },
@@ -622,7 +662,7 @@ describe('SignIn Lifecycle', async () => {
         // Transfer address from 2nd user to existing ref user
         // Reversal needed since 2nd address cannot be owned by Privy user
 
-        const externalSigner2 = await createEvmSigner(8453);
+        const externalSigner2 = await createSIWESigner(8453);
 
         // simulate Privy SSO sign in
         privyUser!.wallet!.walletClientType = 'privy';
@@ -700,7 +740,7 @@ describe('SignIn Lifecycle', async () => {
         const addresses = await models.Address.findAll({
           where: { user_id: ref.actor.user.id },
         });
-        expect(addresses.length).to.be.equal(2);
+        expect(addresses.length).to.be.equal(3);
 
         const user2Addresses = await models.Address.findAll({
           where: { user_id: user2!.id },
@@ -716,6 +756,13 @@ describe('SignIn Lifecycle', async () => {
       const expectedEvents = [];
       for (let i = 0; i < chains.length; i++) {
         expectedEvents.push('CommunityJoined', 'WalletLinked', 'UserCreated');
+      }
+      for (
+        let i = 0;
+        i < chains.filter((c) => c.id.includes('evm')).length;
+        i++
+      ) {
+        expectedEvents.push('CommunityJoined');
       }
       for (let i = 0; i < chains.length; i++) {
         expectedEvents.push('AddressOwnershipTransferred');
