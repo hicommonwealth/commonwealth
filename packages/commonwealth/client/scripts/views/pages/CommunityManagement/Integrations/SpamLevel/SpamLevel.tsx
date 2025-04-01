@@ -114,6 +114,7 @@ const SpamLevel = () => {
         disabled={
           spamTierLevel === community?.spam_tier_level || isLoadingCommunity
         }
+        // eslint-disable-next-line
         onClick={onSaveChanges}
       />
     </section>
