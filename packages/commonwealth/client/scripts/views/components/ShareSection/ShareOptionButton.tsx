@@ -2,7 +2,7 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ShareOption } from './ShareOption';
 
-export const ShareOptionComponent = (props: ShareOption) => {
+export const ShareOptionButton = (props: ShareOption) => {
   const { name, icon, onClick } = props;
 
   return (

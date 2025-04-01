@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ShareOptionComponent } from 'views/components/ShareSection/ShareOptionComponent';
+import { ShareOptionButton } from 'views/components/ShareSection/ShareOptionButton';
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
@@ -28,12 +28,12 @@ export const ShareSection = (props: ShareSectionProps) => {
       <CWText fontWeight="bold">Share to</CWText>
       <div className="share-options">
         {block0.map((option, idx) => (
-          <ShareOptionComponent key={idx} {...option} />
+          <ShareOptionButton key={idx} {...option} />
         ))}
       </div>
       <div className="share-options">
         {block1.map((option, idx) => (
-          <ShareOptionComponent key={idx} {...option} />
+          <ShareOptionButton key={idx} {...option} />
         ))}
         <div className="share-option" />
         <div className="share-option" />
