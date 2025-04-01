@@ -124,6 +124,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         (community.allow_tokenized_threads = allow_tokenized_threads);
       spam_tier_level !== undefined &&
         (community.spam_tier_level = spam_tier_level);
+      thread_purchase_token &&
+        (community.thread_purchase_token = thread_purchase_token);
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
