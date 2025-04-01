@@ -154,6 +154,10 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
+      thread_purchase_token: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',
