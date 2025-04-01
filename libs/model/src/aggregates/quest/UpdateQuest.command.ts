@@ -194,7 +194,7 @@ async function updateChannelQuest(
       });
       mustExist(`Chain node`, chainNode);
 
-      await models.QuestActionMeta.create(
+      const actionMetaInstance = await models.QuestActionMeta.create(
         {
           ...actionMeta,
           quest_id: quest.id!,
@@ -206,7 +206,7 @@ async function updateChannelQuest(
           chain_node_id: chainNode.id!,
           contract_address: chainEvent.contract_address,
           event_signature: chainEvent.event_signature,
-          quest_action_meta_id: actionMeta.id!,
+          quest_action_meta_id: actionMetaInstance.id!,
           active: true,
         },
         { transaction },
