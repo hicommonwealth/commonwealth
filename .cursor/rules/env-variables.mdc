@@ -60,7 +60,7 @@ const unleashConfig = {
 
 ```typescript
 // Example of accessing config in backend code
-import { config } from '@hicommonwealth/model/src/config';
+import { config } from '@hicommonwealth/model';
 
 // Access environment variables through the config object
 const jwtSecret = config.AUTH.JWT_SECRET;
