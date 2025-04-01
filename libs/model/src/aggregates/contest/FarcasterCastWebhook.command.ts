@@ -162,13 +162,10 @@ const checkVerifiedAddress = async (
 ): Promise<string | null> => {
   // get user verified address
 
-  console.log('payload', payload);
   const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
   const { users } = await client.fetchBulkUsers([payload.data.author!.fid!]);
-  console.log('users', users);
   const verified_address = users[0].verified_addresses.eth_addresses.at(0);
 
-  console.log('verified_address', users[0].verified_addresses);
   if (!verified_address) {
     log.warn('Farcaster verified address not found');
     await publishCast(

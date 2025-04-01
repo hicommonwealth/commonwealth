@@ -6,7 +6,6 @@ import {
   useGetUserReferralFeesQuery,
   useGetUserReferralsQuery,
 } from 'state/api/user';
-import FrameSDK from '@farcaster/frame-sdk';
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
@@ -65,7 +64,6 @@ const RewardsPage = () => {
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
-  const [accounts, setAccounts] = useState<string[]>([]);
   if (!user.isLoggedIn || !rewardsEnabled) {
     return <PageNotFound />;
   }
@@ -76,25 +74,7 @@ const RewardsPage = () => {
         <CWText type="h2" className="header">
           Rewards
         </CWText>
-        <button
-          onClick={async () => {
-            try {
-              const acc = await FrameSDK.wallet.ethProvider.request({
-                method: 'eth_requestAccounts',
-              });
-              setAccounts(acc);
-              console.log('accounts', acc);
-            } catch (error) {
-              setAccounts(error);
-              console.error('error', error);
-            }
-          }}
-        >
-          halo
-        </button>
         {/* visible only on mobile */}
-
-        <pre>{JSON.stringify(accounts, null, 2)}</pre>
         <div className="rewards-button-tabs">
           {Object.values(MobileTabType).map((type) => {
             if (type === MobileTabType.Quests && !xpEnabled) return null;
