@@ -70,6 +70,7 @@ const useDirectoryPageData = ({
         threads: c.lifetime_thread_count,
         iconUrl: c.icon_url,
         id: c.id,
+        tag_ids: c.tag_ids || [],
       })),
     [nodes, relatedCommunities],
   );
