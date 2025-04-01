@@ -43,6 +43,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         transactionHash,
         allow_tokenized_threads,
         spam_tier_level,
+        thread_purchase_token,
       } = payload;
 
       const community = await models.Community.findOne({
