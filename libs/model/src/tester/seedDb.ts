@@ -131,6 +131,8 @@ export const seedDb = async () => {
       [
         {
           id: 'alex',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'ALEX',
           name: 'Alex',
@@ -142,6 +144,8 @@ export const seedDb = async () => {
         },
         {
           id: 'yearn',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'YFI',
           name: 'yearn.finance',
@@ -153,6 +157,8 @@ export const seedDb = async () => {
         },
         {
           id: 'sushi',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'SUSHI',
           name: 'Sushi',
@@ -165,6 +171,8 @@ export const seedDb = async () => {
         },
         {
           id: 'edgeware',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Edgeware,
           default_symbol: 'EDG',
           name: 'Edgeware',
@@ -177,6 +185,8 @@ export const seedDb = async () => {
         },
         {
           id: 'ethereum',
+          tier: 0,
+          spam_tier_level: 0,
           profile_count: 2,
           network: ChainNetwork.Ethereum,
           default_symbol: 'ETH',
@@ -189,6 +199,8 @@ export const seedDb = async () => {
         },
         {
           id: 'osmosis',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'OSMO',
           name: 'Osmosis',
@@ -201,6 +213,8 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-beta',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'Cosmos SDK v0.45.0 devnet',
@@ -213,6 +227,8 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'Cosmos SDK v0.46.11 devnet',
@@ -225,6 +241,8 @@ export const seedDb = async () => {
         },
         {
           id: 'common-protocol',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'cmn',
           name: 'Common Protocol',
@@ -239,6 +257,8 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-beta-local',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'CI: Cosmos SDK v0.45 devnet',
@@ -251,6 +271,8 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-v1-local',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'CI: Cosmos SDK v0.46.11 devnet',
@@ -263,6 +285,8 @@ export const seedDb = async () => {
         },
         {
           id: 'evmos-dev-local',
+          tier: 0,
+          spam_tier_level: 0,
           network: ChainNetwork.Evmos,
           default_symbol: 'STAKE',
           name: 'CI: Ethermint devnet',
