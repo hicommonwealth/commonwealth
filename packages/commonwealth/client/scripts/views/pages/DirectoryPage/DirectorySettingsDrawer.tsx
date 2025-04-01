@@ -23,6 +23,7 @@ type DirectorySettingsDrawerProps = {
   setSelectedTags: (tags: string[]) => void;
   selectedCommunities: string[];
   setSelectedCommunities: (communities: string[]) => void;
+  handleSaveChanges: () => void;
 };
 
 const DirectorySettingsDrawer = ({
@@ -33,13 +34,19 @@ const DirectorySettingsDrawer = ({
   setSelectedTags,
   selectedCommunities,
   setSelectedCommunities,
+  handleSaveChanges,
 }: DirectorySettingsDrawerProps) => {
   const [activeDirectoryDrawerTab, setActiveDirectoryDrawerTab] =
     useState('TagSelection');
 
   return (
     <div className="DirectorySettingsDrawer">
-      <CWDrawer className="directory-settings-drawer" open={isOpen}>
+      <CWDrawer
+        className="directory-settings-drawer"
+        open={isOpen}
+        overlayOpacity={0}
+        onClose={() => onClose()}
+      >
         <CWDrawerTopBar onClose={() => onClose()} />
         <div className="content-container">
           <CWText>Directory Settings</CWText>
@@ -90,7 +97,6 @@ const DirectorySettingsDrawer = ({
             )}
           </div>
           <div className="drawer-buttons">
-            {' '}
             <CWButton
               buttonHeight="sm"
               onClick={() => onClose()}
@@ -102,7 +108,7 @@ const DirectorySettingsDrawer = ({
               type="submit"
               label="Save Changes"
               buttonType="primary"
-              onClick={() => console.log('YOOOOO')}
+              onClick={handleSaveChanges}
             />
           </div>
         </div>

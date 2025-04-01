@@ -25,6 +25,10 @@ import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './DirectoryPage.scss';
 import DirectorySettingsDrawer from './DirectorySettingsDrawer';
+import ShowAddedCommunities from './ShowAddedCommunities';
+import ShowAddedTags from './ShowAddedTags';
+//import { MixpanelCommunityInteractionEvent } from '../../../../../shared/analytics/types';
+//import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
@@ -135,6 +139,23 @@ const DirectoryPage = () => {
     navigate('/createCommunity', {}, null);
   };
 
+  // const { trackAnalytics } = useBrowserAnalyticsTrack({
+  //   payload: {
+  //     event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+  //     isPWA: isAddedToHomeScreen,
+  //   },
+  // });
+
+  //this function needs to be renamed when update query is done
+  const useUpdateCommunitiesDirectoryMutatiion = () => {
+    console.log('this will be removed');
+    setIsDirectorySettingsDrawerOpen(false);
+    // trackAnalytics({
+    //   event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+    //   isPWA: isAddedToHomeScreen,
+    // });
+  };
+
   const isAdmin =
     Permissions.isSiteAdmin() ||
     Permissions.isCommunityAdmin() ||
@@ -220,6 +241,22 @@ const DirectoryPage = () => {
               )}
             </div>
           </div>
+          <div>
+            <ShowAddedTags
+              selectedTags={selectedTags}
+              onRemoveTag={(tag) =>
+                setSelectedTags(selectedTags.filter((t) => t !== tag))
+              }
+            />
+            <ShowAddedCommunities
+              selectedCommunities={selectedCommunities}
+              onRemoveCommunity={(manualCommunity) =>
+                setSelectedCommunities(
+                  selectedCommunities.filter((c) => c !== manualCommunity),
+                )
+              }
+            />
+          </div>
         </div>
 
         <DirectoryPageContent
@@ -240,24 +277,8 @@ const DirectoryPage = () => {
           setSelectedTags={setSelectedTags}
           selectedCommunities={selectedCommunities}
           setSelectedCommunities={setSelectedCommunities}
+          handleSaveChanges={useUpdateCommunitiesDirectoryMutatiion}
         />
-        {/* {isDirectorySettingsModalOpen && isAdmin && (
-          <CWModal
-            size="small"
-            content={
-              <DirectorySettingsModal
-                filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
-                onModalClose={() => setIsDirectorySettingsModalOpen(false)}
-                selectedTags={selectedTags}
-                setSelectedTags={setSelectedTags}
-                selectedCommunities={selectedCommunities}
-                setSelectedCommunities={setSelectedCommunities}
-              />
-            }
-            open={true}
-            onClose={() => setIsDirectorySettingsModalOpen(false)}
-          />
-        )} */}
       </div>
     </CWPageLayout>
   );

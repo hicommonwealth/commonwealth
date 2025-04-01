@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import DirectorySelectorItem from './DirectorySelectorItem';
 import './TagsAndManualSelection.scss';
 
@@ -21,7 +20,6 @@ const ManualSelection = ({
   const [localSelectedCommunities, setLocalSelectedCommunities] = useState<
     string[]
   >([]);
-  console.log('filteredRelatedCommunitiesData', filteredRelatedCommunitiesData);
 
   useEffect(() => {
     setLocalSelectedCommunities(selectedCommunities);
@@ -93,22 +91,6 @@ const ManualSelection = ({
           Search for specific communities to add to the directory - members can
           see them regardless of their tags.
         </CWText>
-        {selectedCommunities?.length > 0 && (
-          <CWText className="added-text" fontWeight="medium">
-            Added Communities
-          </CWText>
-        )}
-
-        <div className="selected-communities">
-          {selectedCommunities?.map((communityName) => (
-            <CWTag
-              key={communityName}
-              label={communityName}
-              type="filter"
-              onCloseClick={() => handleCommunityRemove(communityName)}
-            />
-          ))}
-        </div>
 
         <CWText className="available-text" fontWeight="medium">
           Available Communities

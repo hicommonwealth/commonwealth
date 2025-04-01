@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { usePreferenceTags } from '../../components/PreferenceTags';
 import { SelectedTag } from '../../components/PreferenceTags/types';
 import DirectorySelectorItem from './DirectorySelectorItem';
@@ -43,10 +42,6 @@ const TagSelection = ({
     [selectedTags, setSelectedTags],
   );
 
-  const handleTagRemove = (tagName: string) => {
-    setSelectedTags(selectedTags.filter((t) => t !== tagName));
-  };
-
   const renderItem = useCallback(
     (i: number, tag: SelectedTag) => {
       const isSelected = selectedTags.includes(tag.item.tag);
@@ -78,22 +73,6 @@ const TagSelection = ({
         Communities with any of the selected tags will appear in the directory.
         If no tags are selected, all communities will be shown.
       </CWText>
-      {selectedTags.length > 0 && (
-        <CWText className="added-text" fontWeight="medium">
-          Added Tags
-        </CWText>
-      )}
-
-      <div className="selected-tags">
-        {selectedTags.map((tag) => (
-          <CWTag
-            key={tag}
-            label={tag}
-            type="filter"
-            onCloseClick={() => handleTagRemove(tag)}
-          />
-        ))}
-      </div>
 
       <CWText className="available-text" fontWeight="medium">
         Available Tags
