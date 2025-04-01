@@ -12,6 +12,7 @@ import {
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './SpamLevel.scss';
+import { SpamLevelOptions, SpamLevels } from './utils';
 
 const SpamLevel = () => {
   const communityId = app.activeChainId() || '';
@@ -22,36 +23,42 @@ const SpamLevel = () => {
       includeNodeInfo: false,
     });
 
-  const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
-    communityId: community?.id || '',
-  });
+  const { mutateAsync: updateCommunity, isLoading } =
+    useUpdateCommunityMutation({
+      communityId: community?.id || '',
+    });
 
   const [isEnabled, setIsEnabled] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [spamTierLevel, setSpamTierLevel] = useState(-1);
+  const [spamTierLevel, setSpamTierLevel] = useState<SpamLevels>(
+    SpamLevels.Disabled,
+  );
 
   useRunOnceOnCondition({
     callback: () => {
       const tier =
         typeof community?.spam_tier_level === 'number'
           ? community?.spam_tier_level
-          : -1;
-      setIsEnabled(tier >= 0);
-      setSpamTierLevel(tier >= -1 && tier <= 2 ? tier : -1);
+          : SpamLevels.Disabled;
+      setIsEnabled(tier > SpamLevels.Disabled);
+      setSpamTierLevel(
+        tier >= SpamLevels.Disabled &&
+          tier <= SpamLevels.UsersWithIncompleteProfiles
+          ? tier
+          : SpamLevels.Disabled,
+      );
     },
     shouldRun: !isLoadingCommunity && !!community,
   });
 
   const onSaveChanges = useCallback(async () => {
     if (
-      isSaving ||
+      isLoading ||
       !community?.id ||
       spamTierLevel === community?.spam_tier_level
     )
       return;
 
     try {
-      setIsSaving(true);
       await updateCommunity(
         buildUpdateCommunityInput({
           communityId: community?.id,
@@ -61,22 +68,14 @@ const SpamLevel = () => {
       notifySuccess('Updated auto spam level');
     } catch {
       notifyError('Failed to update auto spam level!');
-    } finally {
-      setIsSaving(false);
     }
   }, [
-    isSaving,
+    isLoading,
     community?.id,
     community?.spam_tier_level,
     spamTierLevel,
     updateCommunity,
   ]);
-
-  const options = [
-    { label: 'Unverified users', value: '0' },
-    { label: 'One week-old users with incomplete profiles', value: '1' },
-    { label: 'Users with incomplete profiles', value: '2' },
-  ];
 
   return (
     <section className="SpamLevel">
@@ -86,7 +85,7 @@ const SpamLevel = () => {
           checked={isEnabled}
           onChange={() => {
             setIsEnabled(!isEnabled);
-            setSpamTierLevel(-1);
+            setSpamTierLevel(isEnabled ? spamTierLevel : SpamLevels.Disabled);
           }}
         />
       </div>
@@ -99,8 +98,8 @@ const SpamLevel = () => {
       {isEnabled && (
         <div>
           <CWSelectList
-            defaultValue={options[spamTierLevel]}
-            options={options}
+            defaultValue={SpamLevelOptions[spamTierLevel]}
+            options={SpamLevelOptions}
             onChange={(item) => {
               item && setSpamTierLevel(+item.value);
             }}
