@@ -1,7 +1,6 @@
 ---
 description: Rules for environment variables and feature flags in Commonwealth
-globs: '**/vite.config.ts, **/feature-flags.ts, **/.env*, **/*.env.js, **/config.ts, **/hooks/useFlag.ts'
-alwaysApply: false
+globs: '**/*'
 ---
 
 # Environment Variables and Feature Flags Guidelines
@@ -104,7 +103,7 @@ export type AvailableFeatureFlag = keyof typeof featureFlags;
 - We use Unleash as our feature flag management system for frontend flags
 - Feature flags can be turned on/off and configured in the Unleash dashboard
 - Unleash allows for gradual rollouts, A/B testing, and environment-specific configurations
-- Access Unleash feature flags using the `useFlag` hook from `@openfeature/react-sdk`
+- Access Unleash feature flags using the `useFlag` hook
 
 ```typescript
 // Example of using the useFlag hook in a React component
