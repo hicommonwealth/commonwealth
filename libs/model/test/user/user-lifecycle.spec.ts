@@ -4,7 +4,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletId } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -874,7 +874,13 @@ describe('User lifecycle', () => {
       });
 
       // signin nonmember
-      const result = await signIn(signer, community_id, member.user.id);
+      const result = await signIn(
+        signer,
+        community_id,
+        member.user.id,
+        undefined,
+        WalletId.Coinbase,
+      );
 
       vi.clearAllMocks();
 
