@@ -68,6 +68,12 @@ const DetailsFormStep = ({
   const navigate = useCommonNavigate();
   const judgeContestEnabled = useFlag('judgeContest');
 
+  const isJudgedContest = (selectedTopic?: {
+    weightedVoting?: TopicWeightedVoting | null;
+  }) => {
+    return !selectedTopic?.weightedVoting && judgeContestEnabled;
+  };
+
   const [payoutStructure, setPayoutStructure] = useState<
     ContestFormData['payoutStructure']
   >(contestFormData?.payoutStructure || initialPayoutStructure);
@@ -135,22 +141,24 @@ const DetailsFormStep = ({
         }));
 
   const getInitialValues = () => {
+    const selectedTopic = availableTopics.find(
+      (t) => t.value === contestFormData?.contestTopic?.value,
+    );
+
     return {
       contestName: contestFormData?.contestName,
-      contestTopic: availableTopics.find(
-        (t) => t.value === contestFormData?.contestTopic?.value,
-      ),
+      contestTopic: selectedTopic,
       contestDescription: contestFormData?.contestDescription,
       contestImage: contestFormData?.contestImage,
       feeType:
         contestFormData?.feeType ||
-        (isFarcasterContest
+        (isFarcasterContest || isJudgedContest(selectedTopic)
           ? ContestFeeType.DirectDeposit
           : ContestFeeType.CommunityStake),
       fundingTokenAddress: contestFormData?.fundingTokenAddress,
       contestRecurring:
         contestFormData?.contestRecurring ||
-        (isFarcasterContest
+        (isFarcasterContest || isJudgedContest(selectedTopic)
           ? ContestRecurringType.No
           : ContestRecurringType.Yes),
     };
@@ -199,17 +207,19 @@ const DetailsFormStep = ({
     const selectedTopic = (availableTopics || []).find(
       (t) => t.value === values?.contestTopic?.value,
     );
-    const feeType = isFarcasterContest
-      ? ContestFeeType.DirectDeposit
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const feeType =
+      isFarcasterContest || isJudgedContest(selectedTopic)
         ? ContestFeeType.DirectDeposit
-        : ContestFeeType.CommunityStake;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestFeeType.DirectDeposit
+          : ContestFeeType.CommunityStake;
 
-    const contestRecurring = isFarcasterContest
-      ? ContestRecurringType.No
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const contestRecurring =
+      isFarcasterContest || isJudgedContest(selectedTopic)
         ? ContestRecurringType.No
-        : ContestRecurringType.Yes;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestRecurringType.No
+          : ContestRecurringType.Yes;
 
     const formData: ContestFormData = {
       contestName: values.contestName,

@@ -88,7 +88,7 @@ const SignTransactionsStep = ({
   const judgeContestFlag = useFlag('judgeContest');
   const isJudgedContest =
     !isContestRecurring &&
-    !contestFormData?.contestTopic?.value &&
+    !contestFormData?.contestTopic?.weightedVoting &&
     judgeContestFlag;
 
   const devContest = useFlag('contestDev');
