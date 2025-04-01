@@ -154,7 +154,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      primary_token_address: {
+      thread_purchase_token: {
         type: Sequelize.STRING,
         allowNull: true,
       },

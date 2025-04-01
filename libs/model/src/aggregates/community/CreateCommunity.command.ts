@@ -66,7 +66,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         token_name,
         chain_node_id,
         allow_tokenized_threads,
-        primary_token_address,
+        thread_purchase_token,
       } = payload;
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -143,7 +143,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             snapshot_spaces: [],
             stages_enabled: true,
             allow_tokenized_threads,
-            primary_token_address,
+            thread_purchase_token,
           },
           { transaction },
         );

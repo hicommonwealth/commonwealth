@@ -14,7 +14,7 @@ export function GetTokenizedThreadsAllowed(): Query<
 
       const result = await models.Community.findOne({
         where: { id: community_id },
-        attributes: ['allow_tokenized_threads', 'primary_token_address'],
+        attributes: ['allow_tokenized_threads', 'thread_purchase_token'],
         include: [
           {
             model: models.Topic,
