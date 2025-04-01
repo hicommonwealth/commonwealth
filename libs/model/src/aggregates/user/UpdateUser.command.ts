@@ -11,6 +11,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
     ...schemas.UpdateUser,
     auth: [authVerified()],
     body: async ({ actor, payload }) => {
+      console.log('UUB1: updateUser command started with user id', payload.id);
       // comparing number to string since command convention requires string id
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
@@ -25,7 +26,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         socials,
         bio: rawBio,
         background_image,
-      } = profile;
+      } = profile || {};
 
       const user = (
         await models.User.findOne({
@@ -73,14 +74,24 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
 
       const update_user = Object.keys(user_delta).length;
       const update_tags = Object.keys(tags_delta).length;
+      console.log(
+        'UUB2: Checking for updates - user:',
+        update_user,
+        'tags:',
+        update_tags,
+      );
 
       if (update_user || update_tags) {
+        console.log('UUB3: Updates detected, starting transaction');
         const updated = await models.sequelize.transaction(
           async (transaction) => {
-            if (update_tags)
+            if (update_tags) {
+              console.log('UUB4: Updating tags');
               await updateTags(tag_ids!, user.id!, 'user_id', transaction);
+            }
 
             if (update_user) {
+              console.log('UUB5: Updating user profile');
               // TODO: utility to deep merge deltas
               const updates = {
                 ...user_delta,
@@ -96,6 +107,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               if (updates.profile.bio === '') {
                 updates.profile.bio = null;
               }
+              console.log('UUB6: Applying updates to user');
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,
@@ -105,6 +117,9 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
 
               // emit sign-up flow completed event when:
               if (updated_user && user_delta.is_welcome_onboard_flow_complete) {
+                console.log(
+                  'UUB7: Welcome onboard flow completed, emitting event',
+                );
                 await emitEvent(
                   models.Outbox,
                   [
@@ -121,15 +136,21 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   transaction,
                 );
               }
+              console.log('UUB8: User update completed');
               return updated_user;
-            } else return user;
+            } else {
+              console.log('UUB9: No user updates, returning original user');
+              return user;
+            }
           },
         );
 
+        console.log('UUB10: Transaction completed successfully');
         return updated;
       }
 
       // nothing changed
+      console.log('UUB11: No changes detected, returning original user');
       return user;
     },
   };

@@ -55,7 +55,6 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -278,10 +277,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } else {
       // log in as the new user
       await initAppState(false);
-      const darkMode = darkModeStore.getState();
-      if (!darkMode.isDarkMode) {
-        darkMode.setDarkMode(true);
-      }
+
       if (app.chain) {
         await updateActiveAddresses(app.activeChainId() || '');
       }
@@ -303,13 +299,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     wallet?: Wallet,
   ) => {
     if (props.withSessionKeyLoginFlow) {
+      console.log('A1: Starting session key login flow');
       await setActiveAccount(account);
+      console.log('A2: Active account set', account);
       notifySuccess('Account verified!');
       await handleSuccess(
         account.address,
         newlyCreated,
         props.isUserFromWebView,
       );
+      console.log('A3: Handle success completed');
       return;
     }
 
@@ -317,8 +316,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Handle Logged in and joining community of different chain base
     if (app.activeChainId() && user.isLoggedIn) {
+      console.log('B1: User logged in and joining different community');
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
+      console.log('B2: Retrieved session from wallet');
       await signIn(session, {
         community_id: account.community.id,
         address: account.address,
@@ -326,19 +327,23 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         block_info: account.validationBlockInfo,
         referrer_address: refcode,
       });
+      console.log('B3: Sign-in completed');
       await onLogInWithAccount(
         account,
         true,
         newlyCreated,
         props.isUserFromWebView,
       );
+      console.log('B4: Login with account completed');
       return;
     }
 
     // Handle Linking vs New Account cases
     if (!linking) {
+      console.log('C1: New account flow - setting primary account');
       setPrimaryAccount(account);
     } else {
+      console.log('C2: Linking flow', account);
       if (newlyCreated) {
         notifyError("This account doesn't exist");
         return;
@@ -352,9 +357,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Handle receiving and caching wallet signature strings
     if (!newlyCreated && !linking) {
+      console.log('D1: Existing account - authenticating');
       try {
         // @ts-expect-error StrictNullChecks
         const session = await getSessionFromWallet(walletToUse);
+        console.log('D2: Retrieved session from wallet');
         await signIn(session, {
           community_id: account.community.id,
           address: account.address,
@@ -362,12 +369,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
+        console.log('D3: Sign-in completed');
         await onLogInWithAccount(
           account,
           true,
           newlyCreated,
           props.isUserFromWebView,
         );
+        console.log('D4: Login with account completed');
       } catch (e) {
         notifyError(`Error verifying account`);
         console.error(`Error verifying account: ${e}`);
@@ -376,15 +385,20 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       if (linking) return;
 
       try {
+        console.log('E1: Creating new account flow - getting session');
         // @ts-expect-error StrictNullChecks
         const session = await signSessionWithAccount(walletToUse, account);
+        console.log('E2: Session obtained with account signature');
         // Can't call authSession now, since chain.base is unknown, so we wait till action
         await props.onSuccess?.(account.address, newlyCreated);
+        console.log('E3: On success callback completed');
 
         // Create the account with default values
-        // await onCreateNewAccount(walletToUse, session, account);
+        console.log('E4: Creating new account');
         await onCreateNewAccount(session, account);
+        console.log('E5: Account created, saving profile information');
         await onSaveProfileInfo(account, newlyCreated);
+        console.log('E6: Profile save completed');
       } catch (e) {
         notifyError(`Error verifying account`);
         console.error(`Error verifying account: ${e}`);
@@ -394,8 +408,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
+    console.log('F1: Starting onCreateNewAccount');
     try {
-      if (session && account)
+      if (session && account) {
+        console.log('F2: Signing in with session and account');
         await signIn(session, {
           address: account.address,
           community_id: account.community.id,
@@ -403,10 +419,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
+      }
+      console.log('F3: Verifying session');
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
+      console.log('F4: Session verified, logging in');
       // @ts-expect-error <StrictNullChecks>
       await onLogInWithAccount(account, false, true);
+      console.log('F5: Login completed, fetching profile');
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
@@ -415,10 +435,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           [account!.profile!.chain],
           [account!.profile!.address],
         );
+      console.log('F6: Profiles fetched', userAddresses?.[0]);
       const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
-        console.log('No profile yet.');
+        console.log('F7: No profile yet.');
       } else {
+        console.log(
+          'F7: Initializing profile with user ID',
+          currentUserAddress.userId,
+        );
         account?.profile?.initialize(
           currentUserAddress.userId,
           currentUserAddress.name,
@@ -429,7 +454,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         );
       }
     } catch (e) {
-      console.log(e);
+      console.log('F-ERROR: Failed to create account', e);
       notifyError('Failed to create account. Please try again.');
     }
   };
@@ -439,20 +464,26 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account?: Account,
     newelyCreated?: boolean,
   ) => {
+    console.log('G1: Starting onSaveProfileInfo', account?.profile?.userId);
     try {
       if (username && account?.profile) {
+        console.log('G2: Updating user profile', username);
         await updateUser({
           id: account.profile.userId,
           profile: {
             name: username.trim(),
           },
         });
+        console.log('G3: Update user completed');
         // we should trigger a redraw emit manually
         NewProfilesController.Instance.isFetched.emit('redraw');
+        console.log('G4: Redraw event emitted');
       }
-      // @ts-expect-error <StrictNullChecks>
-      await handleSuccess(account.profile.address, newelyCreated);
+      console.log('G5: Calling handleSuccess', account?.profile?.address);
+      await handleSuccess(account?.profile?.address, newelyCreated);
+      console.log('G6: handleSuccess completed');
     } catch (e) {
+      console.log('G-ERROR: Failed to save profile info', e);
       notifyError('Failed to save profile info');
       console.error(`Failed to save profile info: ${e}`);
     }
@@ -678,16 +709,23 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     sessionPrivateKey: Uint8Array,
   ) => {
     try {
+      console.log('H1: Starting Farcaster login flow');
       const farcasterWallet = new FarcasterWebWalletController(
         signature,
         message,
         sessionPrivateKey,
       );
+      console.log('H2: Enabling Farcaster wallet');
       await farcasterWallet.enable();
 
+      console.log('H3: Getting session from wallet');
       const session = await getSessionFromWallet(farcasterWallet);
       const chainIdentifier = app.chain?.id || ChainBase.Ethereum;
 
+      console.log(
+        'H4: Signing in with Farcaster wallet',
+        farcasterWallet.accounts[0],
+      );
       const { account, newlyCreated, joinedCommunity } = await signIn(session, {
         address: farcasterWallet.accounts[0],
         community_id: chainIdentifier,
@@ -695,8 +733,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         block_info: null,
       });
 
+      console.log('H5: Sign in completed, newly created:', newlyCreated);
       setIsNewlyCreated(newlyCreated);
+
+      console.log('H6: Verifying account');
       await onAccountVerified(account, newlyCreated, false, farcasterWallet);
+      console.log('H7: Account verification completed');
 
       if (joinedCommunity) {
         trackAnalytics({
@@ -707,6 +749,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
       trackLoginEvent('farcaster', true);
     } catch (err) {
+      console.log('H-ERROR: Farcaster authentication error', err);
       notifyError('Error authenticating with Farcaster');
       console.error('Error authenticating with Farcaster:', err);
     }
