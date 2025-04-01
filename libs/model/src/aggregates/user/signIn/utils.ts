@@ -228,6 +228,7 @@ export async function signInUser({
   privyUser,
   verifiedSsoInfo,
   signedInUser,
+  ethChainId,
 }: {
   payload: z.infer<(typeof SignIn)['input']> & { hex?: string };
   verificationData: {
@@ -237,6 +238,7 @@ export async function signInUser({
   privyUser?: PrivyUser;
   verifiedSsoInfo?: VerifiedUserInfo;
   signedInUser?: UserAttributes | null;
+  ethChainId?: number;
 }) {
   let addressCount = 1;
   let transferredUser = false;
@@ -298,6 +300,7 @@ export async function signInUser({
       newAddress,
       transaction,
       originalUserId: transferredUser ? foundOrCreatedUser.id : undefined,
+      ethChainId,
     });
 
     addressCount = await models.Address.count({

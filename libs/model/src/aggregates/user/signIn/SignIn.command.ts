@@ -55,8 +55,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       if (!actor.user.id || !actor.user.auth) throw Error('Invalid address');
 
       const { wallet_id, session } = payload;
-      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
-        .user.auth as VerifiedAddress;
+      const {
+        base,
+        encodedAddress,
+        ss58Prefix,
+        hex,
+        existingHexUserId,
+        eth_chain_id: ethChainId,
+      } = actor.user.auth as VerifiedAddress;
 
       const was_signed_in = actor.user.id > 0;
       const user_id = was_signed_in
@@ -94,6 +100,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             verification_token_expires,
           },
           signedInUser: user,
+          ethChainId: ethChainId ?? undefined,
         });
       } else {
         res = await signInUser({
@@ -107,6 +114,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             verification_token_expires,
           },
           signedInUser: user,
+          ethChainId: ethChainId ?? undefined,
         });
       }
 

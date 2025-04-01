@@ -41,6 +41,7 @@ export async function signInPrivy({
   payload,
   verificationData,
   signedInUser,
+  ethChainId,
 }: {
   payload: z.infer<(typeof schemas.SignIn)['input']>;
   verificationData: {
@@ -48,6 +49,7 @@ export async function signInPrivy({
     verification_token_expires: Date;
   };
   signedInUser?: UserAttributes | null;
+  ethChainId?: number;
 }): Promise<{
   newUser: boolean;
   newAddress: boolean;
@@ -122,5 +124,6 @@ export async function signInPrivy({
     privyUser,
     verifiedSsoInfo,
     signedInUser: user,
+    ethChainId,
   });
 }

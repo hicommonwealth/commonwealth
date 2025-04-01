@@ -1,9 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
+import { tokenBalanceCache } from '../../../services';
 import { emitEvent } from '../../../utils/utils';
 
 const log = logger(import.meta);
@@ -16,6 +18,7 @@ export async function emitSignInEvents({
   user,
   transaction,
   originalUserId,
+  ethChainId,
 }: {
   newAddress: boolean;
   newUser: boolean;
@@ -24,6 +27,7 @@ export async function emitSignInEvents({
   user: UserAttributes;
   transaction: Transaction;
   originalUserId?: number;
+  ethChainId?: number;
 }) {
   const {
     community_id,
@@ -50,12 +54,22 @@ export async function emitSignInEvents({
       where: { user_id: user.id, wallet_id, address: { [Op.ne]: address } },
     });
     if (!existingWallet) {
+      // getBalances try-catch logs and returns empty balances on failures
+      const balances = ethChainId
+        ? await tokenBalanceCache.getBalances({
+            addresses: [address],
+            balanceSourceType: BalanceSourceType.ETHNative,
+            sourceOptions: { evmChainId: ethChainId },
+          })
+        : { [address]: '0' };
+
       events.push({
         event_name: 'WalletLinked',
         event_payload: {
           user_id: user.id!,
           new_user: newUser,
           wallet_id: wallet_id!,
+          balance: balances[address] || '0',
           community_id,
           created_at: created_at!,
         },
