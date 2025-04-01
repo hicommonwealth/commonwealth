@@ -42,6 +42,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         namespace,
         transactionHash,
         allow_tokenized_threads,
+        spam_tier_level,
+        thread_purchase_token,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -97,6 +99,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
           );
       }
 
+      // TODO: use getDeltas to determine which fields to update
       default_page && (community.default_page = default_page);
       name && (community.name = name);
       description && (community.description = description);
@@ -119,6 +122,9 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       custom_stages && (community.custom_stages = custom_stages);
       allow_tokenized_threads &&
         (community.allow_tokenized_threads = allow_tokenized_threads);
+      spam_tier_level && (community.spam_tier_level = spam_tier_level);
+      thread_purchase_token &&
+        (community.thread_purchase_token = thread_purchase_token);
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });

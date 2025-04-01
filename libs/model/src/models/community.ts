@@ -54,6 +54,7 @@ export default (
     {
       id: { type: Sequelize.STRING, primaryKey: true },
       tier: { type: Sequelize.INTEGER, allowNull: false },
+      spam_tier_level: { type: Sequelize.INTEGER, allowNull: false },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community
       name: { type: Sequelize.STRING, allowNull: false },
       discord_config_id: { type: Sequelize.INTEGER, allowNull: true }, // null if no bot enabled
@@ -152,6 +153,10 @@ export default (
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
+      },
+      thread_purchase_token: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
     },
     {
