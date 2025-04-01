@@ -1,18 +1,3 @@
-// TODO: remove when we remove Contest mappers
-export const ChainEventSigs = {
-  NewContest:
-    'address contest, address namespace, uint256 interval, bool oneOff' as const,
-  NewRecurringContestStarted:
-    'uint256 indexed contestId, uint256 startTime, uint256 endTime' as const,
-  NewSingleContestStarted: 'uint256 startTime, uint256 endTime' as const,
-  ContentAdded:
-    'uint256 indexed contentId, address indexed creator, string url' as const,
-  VoterVotedRecurring:
-    'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
-  VoterVotedOneOff:
-    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
-};
-
 export const EvmEventSignatures = {
   NamespaceFactory: {
     NamespaceDeployed:

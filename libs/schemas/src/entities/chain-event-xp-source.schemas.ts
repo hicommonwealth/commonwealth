@@ -8,8 +8,8 @@ export const ChainEventXpSource = z.object({
   event_signature: z.string(),
   quest_action_meta_id: z.number(),
   active: z.boolean(),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 
   ChainNode: ChainNode.optional(),
 });

@@ -1,6 +1,7 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
 
 export const ChannelQuestEvents = {
   CommonDiscordServerJoined: events.CommonDiscordServerJoined,
@@ -110,6 +111,7 @@ export const QuestActionMeta = z
 
     // associations
     QuestTweet: QuestTweet.optional(),
+    ChainEventXpSource: ChainEventXpSource.optional(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

@@ -7,6 +7,7 @@ import {
   doesActionAllowContentId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
   doesActionRequireTwitterTweetURL,
@@ -70,6 +71,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
                   }),
+                  ...(doesActionRequireChainEvent(chosenAction) && {
+                    contractAddress: subForm.contractAddress,
+                    ethChainId: subForm.ethChainId,
+                    eventSignature: subForm.eventSignature,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
@@ -91,6 +97,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_url:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
+                  requires_chain_event:
+                    doesActionRequireChainEvent(chosenAction),
                 },
               };
             }),
@@ -181,10 +189,16 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             subForm.values.noOfRetweets ||
             subForm.values.noOfReplies) && {
             tweet_engagement_caps: {
-              // TODO: 11391 platform - update platform to allow any 1 of these values
               likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
               retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
               replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
+            },
+          }),
+          ...(subForm.config?.requires_chain_event && {
+            chain_event: {
+              contract_address: subForm.values.contractAddress!,
+              eth_chain_id: parseInt(`${subForm.values.ethChainId}`, 10),
+              event_signature: subForm.values.eventSignature!,
             },
           }),
           participation_limit: subForm.values.participationLimit,
@@ -262,7 +276,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'create') {
           await handleCreateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate('/explore');
+          navigate('/explore?tab=quests');
         }
         if (mode === 'update') {
           await handleUpdateQuest(values);
