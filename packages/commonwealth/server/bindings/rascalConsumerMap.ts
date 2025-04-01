@@ -1,5 +1,6 @@
 import { RoutingKeyTags } from '@hicommonwealth/core';
 import {
+  AutoReplyToSpam,
   ChainEventPolicy,
   CommunityGoalsPolicy,
   Contest,
@@ -20,6 +21,7 @@ export const rascalConsumerMap = [
   FarcasterWorker,
   NotificationsSettingsPolicy,
   CreateUnverifiedUser,
+  AutoReplyToSpam,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
   {

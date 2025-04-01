@@ -1,3 +1,4 @@
+export * from './AutoReplyToSpam.policy';
 export * from './ChainEventCreated.policy';
 export * from './CommunityGoals.policy';
 export * from './ContestWorker.policy';

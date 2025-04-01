@@ -109,6 +109,9 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       });
       mustExist('User', user);
 
+      const marked_as_spam_at =
+        user.tier <= community.spam_tier_level ? new Date() : null;
+
       const topic = await models.Topic.findOne({ where: { id: topic_id } });
       if (topic?.archived_at)
         throw new InvalidState(CreateThreadErrors.ArchivedTopic);
@@ -149,8 +152,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               search: getThreadSearchVector(rest.title, body),
               content_url: contentUrl,
               is_linking_token,
-              marked_as_spam_at:
-                user.tier <= community.spam_tier_level ? new Date() : null,
+              marked_as_spam_at,
             },
             {
               transaction,

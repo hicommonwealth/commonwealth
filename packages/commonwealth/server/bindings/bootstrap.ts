@@ -11,6 +11,7 @@ import {
   stats,
 } from '@hicommonwealth/core';
 import {
+  AutoReplyToSpam,
   ChainEventPolicy,
   CommunityGoalsPolicy,
   Contest,
@@ -105,6 +106,9 @@ export async function bootstrapBindings(
     createUnverifiedUserSubRes,
     CreateUnverifiedUser.name,
   );
+
+  const autoReplyToSpamSubRes = await brokerInstance.subscribe(AutoReplyToSpam);
+  checkSubscriptionResponse(autoReplyToSpamSubRes, AutoReplyToSpam.name);
 
   const twitterEngSubRes = await brokerInstance.subscribe(
     TwitterEngagementPolicy,
