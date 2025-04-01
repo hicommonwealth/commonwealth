@@ -1,6 +1,7 @@
 export * from './decodeContent';
 export * from './denormalizedCountUtils';
 export * from './farcasterUtils';
+export * from './generateImage';
 export * from './generateUnsubscribeLink';
 export * from './getDelta';
 export * from './makeGetBalancesOptions';

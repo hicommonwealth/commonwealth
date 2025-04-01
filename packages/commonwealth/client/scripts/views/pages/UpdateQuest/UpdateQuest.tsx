@@ -137,11 +137,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   action.content_id || undefined,
                 ),
                 contentLink: buildURLFromContentId(action.content_id || ''),
-                // TODO: 11391 platform - fix associations in platform to work + need to update here after based
-                // on returned object
-                noOfLikes: `${(action as any)?.QuestTweet?.like_cap || 0}`,
-                noOfRetweets: `${(action as any)?.QuestTweet?.retweet_cap || 0}`,
-                noOfReplies: `${(action as any)?.QuestTweet?.replies_cap || 0}`,
+                noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
+                noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
+                noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
               })),
             }}
           />

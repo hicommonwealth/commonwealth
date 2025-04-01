@@ -37,6 +37,7 @@ export const QuestEvents = {
   SSOLinked: events.SSOLinked,
   NamespaceLinked: events.NamespaceLinked,
   CommunityGoalReached: events.CommunityGoalReached,
+  MembershipsRefreshed: events.MembershipsRefreshed,
   ...ChannelQuestEvents,
 } as const;
 
@@ -100,17 +101,10 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_url:https:\/\/discord\.(com\/invite\/|gg\/?)\w+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_url:https:\/\/discord\.(com\/invite\/|gg\/?)\w+)/,
       )
       .optional()
       .nullish(),
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().positive().max(100),
-        retweets: z.number().positive().max(100),
-        replies: z.number().positive().max(100),
-      })
-      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
