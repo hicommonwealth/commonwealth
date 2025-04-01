@@ -34,10 +34,12 @@ export function logger(
  * @returns A function that logs SQL queries to the console
  */
 export function composeSequelizeLogger(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   logger: ILogger,
   logLevel: LogLevel = 'trace',
 ) {
   if (logLevel === 'error' || logLevel === 'fatal') {
+    // eslint-disable-next-line no-param-reassign
     logLevel = 'info';
   }
   return (sql: string, timestamp?: number) =>
