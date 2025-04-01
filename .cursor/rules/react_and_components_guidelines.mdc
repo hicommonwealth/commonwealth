@@ -1,9 +1,6 @@
 ---
-description: Rules for React and Component development in Commonwealth
+description: 
 globs: 
-  - "packages/commonwealth/client/**/*.ts"
-  - "packages/commonwealth/client/**/*.tsx"
-  - "packages/commonwealth/client/**/*.scss"
 alwaysApply: false
 ---
 # React & Component Development Guidelines
