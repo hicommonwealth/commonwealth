@@ -87,5 +87,5 @@ export const DistributeSkale = {
         message: `eth_chain_id must be a Skale chain Id`,
       }),
   }),
-  output: z.object({}),
+  output: z.undefined(),
 };

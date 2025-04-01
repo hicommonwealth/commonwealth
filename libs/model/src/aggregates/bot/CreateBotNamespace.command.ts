@@ -58,6 +58,8 @@ export function CreateBotNamespace(): Command<
           .replace(/^-|-$/g, '')
           .toLowerCase(),
         name,
+        tier: 0,
+        spam_tier_level: 1,
         default_symbol: symbol,
         icon_url,
         description,
