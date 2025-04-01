@@ -1,3 +1,7 @@
+import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
@@ -33,8 +37,8 @@ export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
   chain_event: z
     .object({
       eth_chain_id: z.number(),
-      contract_address: z.string(),
-      event_signature: z.string(),
+      contract_address: EVM_ADDRESS_STRICT,
+      event_signature: EVM_EVENT_SIGNATURE_STRICT,
     })
     .optional(),
 });

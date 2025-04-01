@@ -50,6 +50,9 @@ export const EVM_ADDRESS = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 export const EVM_ADDRESS_STRICT = z.custom<`0x${string}`>((val) =>
   /^0x[0-9a-fA-F]{40}$/.test(val as string),
 );
+export const EVM_EVENT_SIGNATURE_STRICT = z.custom<`0x${string}`>((val) =>
+  /^0x[0-9a-fA-F]{64}$/.test(val as string),
+);
 export const EVM_BYTES = z.custom<`0x${string}`>((val) =>
   /^0x[0-9a-fA-F]*$/.test(val as string),
 );
