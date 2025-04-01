@@ -6,6 +6,7 @@ import { IOS_APP_STORE_LANDING_URL } from 'views/components/DownloadMobileApp/Mo
 import ShareSection from '../ShareSection';
 import './DownloadMobileAppContent.scss';
 
+import { CWText } from '../component_kit/cw_text';
 import AppStoreQRCode from './AppStoreQRCode.png';
 
 export const DownloadMobileAppContent = () => {
@@ -14,13 +15,13 @@ export const DownloadMobileAppContent = () => {
       <div className="Background">
         <img src={AppStoreQRCode} alt="App Store QR Code" />
 
-        <p>
+        <CWText>
           <i>Scan QR Code on your device to go to the App Store.</i>
-        </p>
+        </CWText>
 
-        <p>Common now has an app in the App Store!</p>
+        <CWText>Common now has an app in the App Store!</CWText>
 
-        <p>Android coming soon!</p>
+        <CWText>Android coming soon!</CWText>
       </div>
 
       <div className="Copy">
