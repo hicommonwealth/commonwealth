@@ -53,6 +53,7 @@ const QuestActionSubForm = ({
     'WalletLinked',
     'SSOLinked',
     'TweetEngagement',
+    'CommonDiscordServerJoined',
   ]
     .map((event) => ({
       value: event as QuestAction,
@@ -70,12 +71,14 @@ const QuestActionSubForm = ({
       sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
+      discordServerUrl: `https://discord.gg/commonwealth`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
       commentId: 'Comment Link (optional)',
       topicId: 'Topic Link (optional)',
       twitterTweetUrl: 'Tweet URL',
+      discordServerUrl: 'Discord Server URL',
     },
   };
 
@@ -95,8 +98,12 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.labels.topicId;
     }
 
-    if (config?.with_required_twitter_tweet_link) {
+    if (config?.requires_twitter_tweet_link) {
       return contentIdInputConfig.labels.twitterTweetUrl;
+    }
+
+    if (config?.requires_discord_server_url) {
+      return contentIdInputConfig.labels.discordServerUrl;
     }
 
     return 'Content Id';
@@ -118,8 +125,12 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.sampleTopicLink;
     }
 
-    if (config?.with_required_twitter_tweet_link) {
+    if (config?.requires_twitter_tweet_link) {
       return contentIdInputConfig.placeholders.twitterTweetUrl;
+    }
+
+    if (config?.requires_discord_server_url) {
+      return contentIdInputConfig.placeholders.discordServerUrl;
     }
 
     return 'Content Id';
@@ -129,7 +140,8 @@ const QuestActionSubForm = ({
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
-    config?.with_required_twitter_tweet_link;
+    config?.requires_twitter_tweet_link ||
+    config?.requires_discord_server_url;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -335,7 +347,8 @@ const QuestActionSubForm = ({
         })}
         customError={errors?.action}
         instructionalMessage={
-          (defaultValues?.action === 'TweetEngagement' &&
+          ((defaultValues?.action === 'TweetEngagement' ||
+            defaultValues?.action === 'CommonDiscordServerJoined') &&
             actionCopies.pre_reqs[defaultValues?.action as QuestAction](
               'admin',
             )) ||
@@ -394,7 +407,7 @@ const QuestActionSubForm = ({
         )}
       </div>
 
-      {config?.with_required_twitter_tweet_link && (
+      {config?.requires_twitter_tweet_link && (
         <div className="grid-row cols-3">
           <CWTextInput
             key={`noOfLikes-${defaultValues?.action}`}
