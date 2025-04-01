@@ -44,6 +44,10 @@ export function FarcasterUpvoteAction(): Command<
             required: true,
             include: [
               {
+                model: models.Contest,
+                required: true,
+              },
+              {
                 model: models.Community,
                 required: true,
                 include: [
@@ -58,6 +62,12 @@ export function FarcasterUpvoteAction(): Command<
         ],
       });
       mustExist(`Contest Action (${contentUrlWithoutFid})`, addAction);
+      if (new Date() > addAction.ContestManager!.contests![0]!.end_time) {
+        return {
+          type: 'message',
+          message: `Contest has ended`,
+        };
+      }
 
       // ensure that the fid did not vote on this content before
       const voteAction = await models.ContestAction.findOne({
