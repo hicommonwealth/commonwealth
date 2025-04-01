@@ -74,6 +74,7 @@ const RewardsPage = () => {
         <CWText type="h2" className="header">
           Rewards
         </CWText>
+
         {/* visible only on mobile */}
         <div className="rewards-button-tabs">
           {Object.values(MobileTabType).map((type) => {
@@ -89,6 +90,7 @@ const RewardsPage = () => {
             );
           })}
         </div>
+
         {/* on mobile show only one card */}
         <div className="rewards-card-container">
           {(!isWindowSmallInclusive ||
@@ -106,6 +108,7 @@ const RewardsPage = () => {
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
             xpEnabled && <QuestSummaryCard />}
         </div>
+
         <div className="rewards-tab-container">
           <CWTabsRow>
             {Object.values(TableType).map((type) =>
@@ -124,6 +127,7 @@ const RewardsPage = () => {
             )}
           </CWTabsRow>
         </div>
+
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}

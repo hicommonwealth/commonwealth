@@ -335,7 +335,7 @@ const useUserMenuItems = ({
             <CWToggle checked={darkMode.isDarkMode} />
           </div>
         ),
-        onClick: async () => {
+        onClick: () => {
           darkMode.toggleDarkMode();
         },
         preventClosing: true,

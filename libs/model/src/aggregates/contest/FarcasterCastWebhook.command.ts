@@ -161,11 +161,9 @@ const checkVerifiedAddress = async (
   payload: z.infer<typeof schemas.FarcasterCastWebhook.input>,
 ): Promise<string | null> => {
   // get user verified address
-
   const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
   const { users } = await client.fetchBulkUsers([payload.data.author!.fid!]);
   const verified_address = users[0].verified_addresses.eth_addresses.at(0);
-
   if (!verified_address) {
     log.warn('Farcaster verified address not found');
     await publishCast(
