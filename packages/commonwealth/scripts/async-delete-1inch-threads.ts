@@ -9,19 +9,22 @@ async function asyncDelete1inchThreads(batchSize = 10) {
       async (transaction) => {
         const threads = await models.sequelize.query<ThreadAttributes>(
           `
-              SELECT t.id
+              SELECT DISTINCT t.id
               FROM "Threads" t
-                       JOIN "Topics" topic ON topic.community_id = t.community_id
+                JOIN "Topics" topic ON topic.community_id = t.community_id
               WHERE (
-                  topic.id = 2890
-                  AND t.community_id = '1inch'
-                  AND t.created_at > '2025-03-21')
-                  OR (
-                    t.community_id = '1inch'
-                    AND (t.title ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]'
-                    OR t.body ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]')
-                  )
-                  LIMIT :batchSize;
+                topic.id = 2890
+                AND t.community_id = '1inch'
+                AND t.created_at > '2025-03-21'
+              )
+              OR (
+                t.community_id = '1inch'
+                AND (
+                 t.title ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]'
+                 OR t.body ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]'
+                )
+              )
+              LIMIT :batchSize;
           `,
           {
             type: QueryTypes.SELECT,
