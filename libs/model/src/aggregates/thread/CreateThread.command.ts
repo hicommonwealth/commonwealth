@@ -110,7 +110,9 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       mustExist('User', user);
 
       const marked_as_spam_at =
-        user.tier <= community.spam_tier_level ? new Date() : null;
+        address.role === 'member' && user.tier <= community.spam_tier_level
+          ? new Date()
+          : null;
 
       const topic = await models.Topic.findOne({ where: { id: topic_id } });
       if (topic?.archived_at)
