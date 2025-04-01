@@ -35,6 +35,7 @@ const featureFlags = {
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
   privy: buildFlag(process.env.FLAG_PRIVY),
+  judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

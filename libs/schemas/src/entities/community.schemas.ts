@@ -16,10 +16,14 @@ import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
+export const COMMUNITY_TIER = z.number().int().min(0).max(3);
+
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
   id: z.string(),
   name: z.string(),
+  tier: COMMUNITY_TIER,
+  spam_tier_level: z.number().int().min(-1).max(2),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
@@ -58,6 +62,7 @@ export const Community = z.object({
   lifetime_thread_count: PG_INT.optional(),
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
+  thread_purchase_token: z.string().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),

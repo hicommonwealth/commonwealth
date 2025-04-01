@@ -95,6 +95,8 @@ export const e2eTestEntities = async function (
         [
           {
             id: 'cmntest',
+            tier: 0,
+            spam_tier_level: 0,
             chain_node_id: 9999,
             name: 'cmntest',
             network: ChainNetwork.Ethereum,
@@ -109,6 +111,8 @@ export const e2eTestEntities = async function (
           },
           {
             id: 'cmntest2',
+            tier: 0,
+            spam_tier_level: 0,
             chain_node_id: 99999,
             name: 'cmntest2',
             network: ChainNetwork.Ethereum,

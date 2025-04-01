@@ -110,6 +110,7 @@ function membersSqlWithoutSearch(
       WITH T AS (SELECT profile_count as total FROM "Communities" WHERE id = :community_id)
       SELECT
         U.id AS user_id,
+        U.tier,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
@@ -124,6 +125,8 @@ function membersSqlWithoutSearch(
         ) as referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        COALESCE(U.xp_points, 0) AS xp_points,
+        COALESCE(U.xp_referrer_points, 0) AS xp_referrer_points,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
@@ -162,6 +165,7 @@ function membersSqlWithSearch(
       WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
       SELECT
         U.id AS user_id,
+        U.tier,
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
@@ -176,6 +180,8 @@ function membersSqlWithSearch(
         ) AS referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        COALESCE(U.xp_points, 0) AS xp_points,
+        COALESCE(U.xp_referrer_points, 0) AS xp_referrer_points,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
