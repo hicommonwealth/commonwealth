@@ -1,6 +1,7 @@
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
-import { CWDropdown } from 'client/scripts/views/components/component_kit/cw_dropdown';
+import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useCallback, useState } from 'react';
 import app from 'state';
@@ -25,12 +26,18 @@ const SpamLevel = () => {
     communityId: community?.id || '',
   });
 
+  const [isEnabled, setIsEnabled] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [spamTierLevel, setSpamTierLevel] = useState<number>(0);
+  const [spamTierLevel, setSpamTierLevel] = useState(-1);
 
   useRunOnceOnCondition({
     callback: () => {
-      setSpamTierLevel(community?.spam_tier_level || 0);
+      const tier =
+        typeof community?.spam_tier_level === 'number'
+          ? community?.spam_tier_level
+          : -1;
+      setIsEnabled(tier >= 0);
+      setSpamTierLevel(tier >= -1 && tier <= 2 ? tier : -1);
     },
     shouldRun: !isLoadingCommunity && !!community,
   });
@@ -66,35 +73,40 @@ const SpamLevel = () => {
   ]);
 
   const options = [
-    { label: 'Unverified', value: '0' },
-    { label: 'Less than one week old', value: '1' },
-    { label: 'One week old', value: '2' },
-    { label: '3', value: '3' },
+    { label: 'Unverified users', value: '0' },
+    { label: 'One week-old users with incomplete profiles', value: '1' },
+    { label: 'Users with incomplete profiles', value: '2' },
   ];
 
   return (
     <section className="SpamLevel">
       <div className="header">
-        <CWText type="h4">Auto Flag Spam Tier Level</CWText>
+        <CWText type="h4">Auto Flag Spam</CWText>
+        <CWToggle
+          checked={isEnabled}
+          onChange={() => {
+            setIsEnabled(!isEnabled);
+            setSpamTierLevel(-1);
+          }}
+        />
       </div>
-
       <CWText type="b1">
         Automatically flag posts as spam when poster does not meet the specified
         tier level. This is useful for communities that are not yet ready to be
         moderated.
       </CWText>
 
-      <div>
-        <CWDropdown
-          disabled={isLoadingCommunity}
-          initialValue={options[spamTierLevel]}
-          options={options}
-          onSelect={(item) => {
-            setSpamTierLevel(+item.value);
-          }}
-        />
-      </div>
-
+      {isEnabled && (
+        <div>
+          <CWSelectList
+            defaultValue={options[spamTierLevel]}
+            options={options}
+            onChange={(item) => {
+              item && setSpamTierLevel(+item.value);
+            }}
+          />
+        </div>
+      )}
       <CWButton
         containerClassName="action-btn"
         buttonType="secondary"
