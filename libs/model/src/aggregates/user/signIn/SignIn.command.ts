@@ -88,35 +88,23 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
 
-      let res: Awaited<ReturnType<typeof signInPrivy>>;
-      if (wallet_id === WalletId.Privy) {
-        res = await signInPrivy({
-          payload: {
-            ...payload,
-            address: encodedAddress,
-          },
-          verificationData: {
-            verification_token,
-            verification_token_expires,
-          },
-          signedInUser: user,
-          ethChainId: ethChainId ?? undefined,
-        });
-      } else {
-        res = await signInUser({
-          payload: {
-            ...payload,
-            address: encodedAddress,
-            hex,
-          },
-          verificationData: {
-            verification_token,
-            verification_token_expires,
-          },
-          signedInUser: user,
-          ethChainId: ethChainId ?? undefined,
-        });
-      }
+      const args = {
+        payload: {
+          ...payload,
+          address: encodedAddress,
+          hex,
+        },
+        verificationData: {
+          verification_token,
+          verification_token_expires,
+        },
+        signedInUser: user,
+        ethChainId: ethChainId ?? undefined,
+      };
+      const res =
+        wallet_id === WalletId.Privy
+          ? await signInPrivy(args)
+          : await signInUser(args);
 
       const addr = await models.Address.scope('withPrivateData').findOne({
         where: {
