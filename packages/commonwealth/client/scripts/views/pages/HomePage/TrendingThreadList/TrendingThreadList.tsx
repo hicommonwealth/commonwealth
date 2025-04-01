@@ -251,10 +251,14 @@ const TrendingThreadList = ({
 
   if (communityIdFilter) {
     allThreads = Array.isArray(communityThreads)
-      ? communityThreads.slice(0, 3)
+      ? communityThreads
+          .filter((thread) => !thread.marked_as_spam_at)
+          .slice(0, 3)
       : [];
   } else if (feed?.pages) {
-    allThreads = feed.pages.flatMap((page) => page.results || []);
+    allThreads = feed.pages
+      .flatMap((page) => page.results || [])
+      .filter((thread) => !thread.marked_as_spam_at);
   }
   const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 

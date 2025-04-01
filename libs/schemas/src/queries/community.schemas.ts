@@ -12,6 +12,8 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  MembershipRejectReason,
+  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -93,6 +95,27 @@ export const GetCommunity = {
     include_groups: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
+};
+
+export const GetMemberships = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    topic_id: z.number().optional(),
+  }),
+  output: z
+    .object({
+      groupId: z.number(),
+      topics: z
+        .object({
+          id: z.number(),
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        })
+        .array(),
+      isAllowed: z.boolean(),
+      rejectReason: MembershipRejectReason,
+    })
+    .array(),
 };
 
 export const GetCommunityStake = {

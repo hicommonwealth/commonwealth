@@ -48,9 +48,6 @@ export const getTotalContestBalance = async (
     feeManagerAddressPromise,
   ]);
 
-  console.log('contestToken', contestToken);
-  console.log('contestAddress', contestAddress);
-
   let beneficiaryBalancePromise: Promise<bigint> | undefined;
   if (!oneOff && feeManagerAddress) {
     beneficiaryBalancePromise = client.readContract({

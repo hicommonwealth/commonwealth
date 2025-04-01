@@ -27,6 +27,7 @@ type StatusResp = {
   loggedIn?: boolean;
   user?: {
     id: number;
+    tier: number;
     email?: string | null;
     emailVerified?: boolean | null;
     emailInterval?: EmailNotificationInterval;
@@ -115,6 +116,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     user: {
       id: user.id,
+      tier: user.tier,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,

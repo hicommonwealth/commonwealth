@@ -266,7 +266,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           {isDeletionAllowed
             ? 'Deletion would remove this quest and its sub-tasks entirely for every user.'
             : // eslint-disable-next-line max-len
-              `With cancelation, users who earned XP for this quest will retain that XP. However new submissions to this quest won't be allowed and won't reward any XP to users.`}
+              `With cancellation, users who earned any aura for this quest will retain that aura. However new submissions to this quest won't be allowed and won't reward any aura to users.`}
         </>
       ),
       buttons: [
@@ -293,7 +293,7 @@ const QuestDetails = ({ id }: { id: number }) => {
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
@@ -357,14 +357,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     body={
                       <div>
                         <CWText type="b2">
-                          Indicates the maximum xp allocation before this quest
-                          is considered complete.
+                          Indicates the maximum Aura allocation before this
+                          quest is considered complete.
                         </CWText>
                         <br />
 
                         <CWText type="b2">
                           The quest automatically transitions to completed
-                          status, if max XP is alloted before quest end date.
+                          status, if max Aura is alloted before quest end date.
                         </CWText>
                       </div>
                     }
@@ -426,10 +426,10 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Complete tasks to earn XP
+                Create action to earn aura
               </CWText>
               <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} XP`}
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
                 type="proposal"
               />
             </div>
