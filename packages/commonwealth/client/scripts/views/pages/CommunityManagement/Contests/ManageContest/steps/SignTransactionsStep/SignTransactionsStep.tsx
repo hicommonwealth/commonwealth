@@ -10,6 +10,7 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import {
+  useConfigureNominationsMutation,
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
@@ -63,6 +64,11 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const [configureNominationsData, setConfigureNominationsData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
   const { stakeData } = useCommunityStake();
 
   const { mutateAsync: deployRecurringContestOnchainMutation } =
@@ -71,6 +77,8 @@ const SignTransactionsStep = ({
     useDeploySingleERC20ContestOnchainMutation();
   const { mutateAsync: deploySingleJudgedContestOnchainMutation } =
     useDeploySingleJudgedContestOnchainMutation();
+  const { mutateAsync: configureNominationsMutation } =
+    useConfigureNominationsMutation();
 
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
@@ -209,6 +217,41 @@ const SignTransactionsStep = ({
     }
   };
 
+  const configureNominations = async () => {
+    const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+    const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+    const namespaceName = app?.chain?.meta?.namespace || '';
+    const walletAddress = user.activeAccount?.address || '';
+
+    try {
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      await configureNominationsMutation({
+        namespaceName,
+        creatorOnly: true,
+        walletAddress,
+        maxNominations: 5,
+        ethChainId,
+        chainRpc,
+      });
+
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error configuring nominations', error);
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to configure nominations. Please try again.',
+      }));
+    }
+  };
+
   const handleBack = () => {
     onSetLaunchContestStep('DetailsForm');
   };
@@ -218,17 +261,17 @@ const SignTransactionsStep = ({
       ? [
           {
             label: 'Register and mint judge tokens',
-            state: launchContestData.state,
-            errorText: launchContestData.errorText,
+            state: configureNominationsData.state,
+            errorText: configureNominationsData.errorText,
             actionButton: {
               label:
-                launchContestData.state === 'completed' ? 'Signed' : 'Sign',
+                configureNominationsData.state === 'completed'
+                  ? 'Signed'
+                  : 'Sign',
               disabled:
-                launchContestData.state === 'loading' ||
-                launchContestData.state === 'completed',
-              onClick: () => {
-                console.log('Registering ID101 and minting judge tokens');
-              },
+                configureNominationsData.state === 'loading' ||
+                configureNominationsData.state === 'completed',
+              onClick: configureNominations,
             },
           },
         ]
