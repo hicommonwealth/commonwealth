@@ -74,23 +74,19 @@ export function useShareOptions(
           // url+text in URL param: yes
           name: 'Telegram',
           icon: telegramImg,
-          onClick: () => {
-            const data = text + '\n\n' + url;
-
-            return window.open(
+          onClick: () =>
+            window.open(
               `https://t.me/share/url?url=${encodeURIComponent(computeCombinedURLPayload())}`,
-            );
-          },
+            ),
         },
         {
           // url+text in URL param: yes
           name: 'X (Twitter)',
           icon: twitterImg,
-          onClick: () => {
-            return window.open(
+          onClick: () =>
+            window.open(
               `https://twitter.com/intent/tweet?url=${encodeURIComponent(computeCombinedURLPayload())}`,
-            );
-          },
+            ),
         },
         {
           name: 'Warpcast',
