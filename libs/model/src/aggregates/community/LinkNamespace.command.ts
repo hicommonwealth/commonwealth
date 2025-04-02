@@ -24,7 +24,7 @@ async function updateReferralCount(
     (await referrer.update(
       {
         referral_count: models.sequelize.literal(`
-        (SELECT COUNT(DISTINCT referee_address) FROM "Referrals" 
+        (SELECT COUNT(DISTINCT referee_address) FROM "Referrals"
          WHERE referrer_address = ${models.sequelize.escape(referrer_address)})
       `),
       },
@@ -100,7 +100,11 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
       });
       mustExist('Community', community);
 
+      community.namespace_creator_address = deployer_address;
+
       await models.sequelize.transaction(async (transaction) => {
+        await community.save({ transaction });
+
         // create on-chain namespace admin group if not already created
         const GROUP_NAME = 'Namespace Admins';
         if (!log_removed) {

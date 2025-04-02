@@ -132,6 +132,7 @@ describe('Launchpad Lifecycle', () => {
 
     expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be.true;
     expect(results?.symbol).to.equal('DMLND');
+    expect(results?.creator_address).to.equal(actor.address);
   });
 
   test('Get a launchpad trade txn and project it', async () => {
