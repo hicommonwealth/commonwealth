@@ -26,6 +26,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
 import { ActionStepProps } from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { isJudgedContest } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -91,13 +92,8 @@ const SignTransactionsStep = ({
     contestFormData.contestRecurring === ContestRecurringType.Yes;
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
-  const judgeContestFlag = useFlag('judgeContest');
-  const isJudgedContest =
-    !isContestRecurring &&
-    !contestFormData?.contestTopic?.weightedVoting &&
-    judgeContestFlag;
-
   const devContest = useFlag('contestDev');
+  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
 
   const signTransaction = async () => {
     const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
@@ -171,7 +167,7 @@ const SignTransactionsStep = ({
 
       if (isContestRecurring) {
         contestAddress = await deployRecurringContestOnchainMutation(recurring);
-      } else if (isJudgedContest) {
+      } else if (judgedContest) {
         contestAddress =
           await deploySingleJudgedContestOnchainMutation(singleJudged);
       } else {
@@ -274,7 +270,7 @@ const SignTransactionsStep = ({
 
         <ActionSteps
           steps={getActionSteps({
-            isJudgedContest,
+            isJudgedContest: judgedContest,
             configureNominationsData,
             configureNominations,
             isDirectDepositSelected,

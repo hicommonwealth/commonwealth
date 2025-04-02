@@ -1,8 +1,12 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import moment from 'moment';
 import { saveToClipboard } from 'utils/clipboard';
 import { Contest } from './ContestsList';
+
+const client = OpenFeature.getClient();
 
 // checks if contest has ended or if it is cancelled
 export const isContestActive = ({ contest }: { contest: Contest }) => {
@@ -27,4 +31,13 @@ export const copyFarcasterContestFrameUrl = async (contestAddress: string) => {
     notifyError('Failed to copy to clipboard');
     console.error(err);
   }
+};
+
+export const isJudgedContest = (contestTopic?: {
+  weightedVoting?: TopicWeightedVoting | null;
+}): boolean => {
+  const judgeContestEnabled = client.getBooleanValue('judgeContest', false);
+  return (
+    !!judgeContestEnabled && !!contestTopic && !contestTopic.weightedVoting
+  );
 };
