@@ -1,11 +1,11 @@
-import { communityNominationsAbi } from '@hicommonwealth/evm-protocols';
+import { CommunityNominationsAbi } from '@commonxyz/common-protocol-abis';
 import { TransactionReceipt } from 'web3';
 import { NOMINATION_FEE } from '../../../../../../libs/evm-protocols/src/common-protocol';
 import ContractBase from './ContractBase';
 
 class communityNominations extends ContractBase {
   constructor(contractAddress: string, rpc: string) {
-    super(contractAddress, communityNominationsAbi, rpc);
+    super(contractAddress, CommunityNominationsAbi, rpc);
   }
 
   async initialize(

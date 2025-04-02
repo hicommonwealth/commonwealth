@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@commonxyz/common-protocol-abis':
-        specifier: 1.4.7
-        version: 1.4.7
+        specifier: 1.4.9
+        version: 1.4.9
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -3111,8 +3111,8 @@ packages:
   '@coinbase/wallet-sdk@4.0.4':
     resolution: {integrity: sha512-74c040CRnGhfRjr3ArnkAgud86erIqdkPHNt5HR1k9u97uTIZCJww9eGYT67Qf7gHPpGS/xW8Be1D4dvRm63FA==}
 
-  '@commonxyz/common-protocol-abis@1.4.7':
-    resolution: {integrity: sha512-U2SDjgachCwtaCOX0BKNqTaOBMGQxuTRNwmpSldJPnn8cuQojEPu4nUTB0ZMf1btUghEVXKOePe0bqjapZtYsg==}
+  '@commonxyz/common-protocol-abis@1.4.9':
+    resolution: {integrity: sha512-5y4UDq927Ros1ydtsyjeTuA2TqEegh7Nt1y4GyeZmhtA/NRiKQtw/wlpLc+DBpeCFfKpngCqKmtH3JpyRguNRw==}
 
   '@confio/ics23@0.6.8':
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
@@ -22787,7 +22787,7 @@ snapshots:
       preact: 10.23.2
       sha.js: 2.4.11
 
-  '@commonxyz/common-protocol-abis@1.4.7': {}
+  '@commonxyz/common-protocol-abis@1.4.9': {}
 
   '@confio/ics23@0.6.8':
     dependencies:
