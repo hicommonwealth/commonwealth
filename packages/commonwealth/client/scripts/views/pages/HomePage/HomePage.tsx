@@ -1,3 +1,4 @@
+import { ContentType } from '@hicommonwealth/shared';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
@@ -5,6 +6,8 @@ import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer/StickyEditorContainer';
 import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -36,6 +39,12 @@ const HomePage = () => {
     <StickCommentProvider mode="community">
       <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
         <div className="HomePage">
+          <WithDefaultStickyComment>
+            <StickyEditorContainer
+              parentType={ContentType.Thread}
+              handleSubmitComment={async () => 0}
+            />
+          </WithDefaultStickyComment>
           <div className="header-section">
             <div className="description">
               <CWText

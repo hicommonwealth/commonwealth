@@ -95,16 +95,17 @@ const CommentEditor = ({
   onReactionsUpdate,
   fromSticky,
   parentBackgroundColor,
-  setAICommentsToggleEnabled,
+  setAICommentsToggleEnabled: propSetAICommentsToggleEnabled,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const {
     aiCommentsToggleEnabled,
     aiInteractionsToggleEnabled,
-    setAICommentsToggleEnabled,
+    setAICommentsToggleEnabled: hookSetAICommentsToggleEnabled,
   } = useLocalAISettingsStore();
 
-  const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
+  const effectiveSetAICommentsToggleEnabled =
+    propSetAICommentsToggleEnabled || hookSetAICommentsToggleEnabled;
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
@@ -168,13 +169,13 @@ const CommentEditor = ({
       }
 
       if (onCommentCreated) {
-        onCommentCreated(commentId, !!effectiveAiStreaming);
+        onCommentCreated(commentId, !!initialAiStreaming);
       }
 
       // Handle AI streaming and comment jumping asynchronously
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
-        if (effectiveAiStreaming === true && onAiReply) {
+        if (initialAiStreaming === true && onAiReply) {
           Promise.resolve(onAiReply(commentId)).catch((error) => {
             console.error('Failed to trigger AI reply:', error);
             notifyError('Failed to generate AI reply');
@@ -187,7 +188,7 @@ const CommentEditor = ({
             `.comment-${commentId}`,
           );
           if (commentElement) {
-            jumpHighlightComment(commentId, effectiveAiStreaming === true);
+            jumpHighlightComment(commentId, initialAiStreaming === true);
             return true;
           }
           return false;
@@ -284,7 +285,7 @@ const CommentEditor = ({
               iconColor="#757575"
               checked={aiCommentsToggleEnabled}
               onChange={() => {
-                setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                effectiveSetAICommentsToggleEnabled(!aiCommentsToggleEnabled);
               }}
             />
             <CWText type="caption" className="toggle-label">

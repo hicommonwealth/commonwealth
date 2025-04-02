@@ -1,5 +1,9 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import {
+  ChainNetwork,
+  CommunityType,
+  ContentType,
+} from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -10,8 +14,10 @@ import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer/StickyEditorContainer';
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
@@ -39,10 +45,10 @@ import {
   communitySortOptionsLabelToKeysMap,
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
+import { getCommunityCountsString } from './helpers';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
 import TokensList from './TokensList';
-import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
@@ -253,6 +259,12 @@ const CommunitiesPage = () => {
 
   return (
     <StickCommentProvider mode="community">
+      <WithDefaultStickyComment>
+        <StickyEditorContainer
+          parentType={ContentType.Thread}
+          handleSubmitComment={async () => 0}
+        />
+      </WithDefaultStickyComment>
       {/* @ts-expect-error <StrictNullChecks/> */}
       <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
         <div className="CommunitiesPage">
