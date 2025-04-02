@@ -2,7 +2,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
@@ -19,7 +19,10 @@ import useDirectoryPageData, {
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelPageViewEvent,
+} from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -27,8 +30,6 @@ import './DirectoryPage.scss';
 import DirectorySettingsDrawer from './DirectorySettingsDrawer';
 import ShowAddedCommunities from './ShowAddedCommunities';
 import ShowAddedTags from './ShowAddedTags';
-//import { MixpanelCommunityInteractionEvent } from '../../../../../shared/analytics/types';
-//import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
@@ -58,7 +59,7 @@ const DirectoryPage = () => {
   const baseChain = defaultChainNodeId
     ? getNodeById(defaultChainNodeId, nodes)
     : undefined;
-
+  console.log('COMMUNITY.tags:: ', community?.CommunityTags);
   const { isAddedToHomeScreen } = useAppStatus();
 
   const {
@@ -73,7 +74,16 @@ const DirectoryPage = () => {
     selectedViewType,
   });
 
-  const getFilteredCommunities = React.useCallback(
+  useEffect(() => {
+    if (community?.CommunityTags && community.CommunityTags.length > 0) {
+      const communityTagNames = community.CommunityTags.map(
+        (tag) => tag.Tag?.name || '',
+      );
+      setSelectedTags(communityTagNames);
+    }
+  }, [community]);
+
+  const getFilteredCommunities = useCallback(
     (communities: any[], tags: string[], manualSelections: string[]) => {
       if (tags.length === 0 && manualSelections.length === 0) {
         return communities;
@@ -128,32 +138,25 @@ const DirectoryPage = () => {
     getFilteredCommunities,
   ]);
 
-  useEffect(() => {
-    if (filteredRelatedCommunitiesData && tableData) {
-      setFilteredCommunities(filteredRelatedCommunitiesData);
-      setFilteredTableData(tableData);
-    }
-  }, [filteredRelatedCommunitiesData, tableData]);
-
   const handleCreateCommunity = () => {
     navigate('/createCommunity', {}, null);
   };
 
-  // const { trackAnalytics } = useBrowserAnalyticsTrack({
-  //   payload: {
-  //     event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
-  //     isPWA: isAddedToHomeScreen,
-  //   },
-  // });
+  const { trackAnalytics } = useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
 
   //this function needs to be renamed when update query is done
   const useUpdateCommunitiesDirectoryMutatiion = () => {
     console.log('this will be removed');
     setIsDirectorySettingsDrawerOpen(false);
-    // trackAnalytics({
-    //   event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
-    //   isPWA: isAddedToHomeScreen,
-    // });
+    trackAnalytics({
+      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+      isPWA: isAddedToHomeScreen,
+    });
   };
 
   const isAdmin =

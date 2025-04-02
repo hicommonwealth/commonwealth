@@ -1,4 +1,5 @@
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './ShowAddedCommunities.scss';
 
@@ -14,9 +15,12 @@ const ShowAddedCommunities = ({
 
   return (
     <div className="ShowAddedCommunities">
-      {selectedCommunities.map((community) => (
-        <CWTag key={community} label={community} type="filter" />
-      ))}
+      <CWText>Added Communities</CWText>
+      <div className="added-communities-container">
+        {selectedCommunities.map((community) => (
+          <CWTag key={community} label={community} type="filter" />
+        ))}
+      </div>
     </div>
   );
 };
