@@ -25,10 +25,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
-import {
-  ActionStepProps,
-  ActionStepsProps,
-} from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { ActionStepProps } from 'views/pages/CreateCommunity/components/ActionSteps/types';
 import {
   ContestFeeType,
   ContestFormData,
@@ -36,6 +33,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 import './SignTransactionsStep.scss';
+import { getActionSteps } from './utils';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
@@ -256,47 +254,6 @@ const SignTransactionsStep = ({
     onSetLaunchContestStep('DetailsForm');
   };
 
-  const getActionSteps = (): ActionStepsProps['steps'] => {
-    const judgeTokenStep = isJudgedContest
-      ? [
-          {
-            label: 'Register and mint judge tokens',
-            state: configureNominationsData.state,
-            errorText: configureNominationsData.errorText,
-            actionButton: {
-              label:
-                configureNominationsData.state === 'completed'
-                  ? 'Signed'
-                  : 'Sign',
-              disabled:
-                configureNominationsData.state === 'loading' ||
-                configureNominationsData.state === 'completed',
-              onClick: configureNominations,
-            },
-          },
-        ]
-      : [];
-
-    return [
-      ...judgeTokenStep,
-      {
-        label: isDirectDepositSelected
-          ? 'Launch contest'
-          : 'Launch contest & re-route fees',
-        state: launchContestData.state,
-        errorText: launchContestData.errorText,
-        actionButton: {
-          label: launchContestData.state === 'completed' ? 'Signed' : 'Sign',
-          disabled:
-            launchContestData.state === 'loading' ||
-            launchContestData.state === 'completed',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: signTransaction,
-        },
-      },
-    ];
-  };
-
   const cancelDisabled = launchContestData.state === 'loading';
 
   return (
@@ -315,7 +272,16 @@ const SignTransactionsStep = ({
           complete.
         </CWText>
 
-        <ActionSteps steps={getActionSteps()} />
+        <ActionSteps
+          steps={getActionSteps({
+            isJudgedContest,
+            configureNominationsData,
+            configureNominations,
+            isDirectDepositSelected,
+            launchContestData,
+            signTransaction,
+          })}
+        />
 
         <CWDivider />
 
