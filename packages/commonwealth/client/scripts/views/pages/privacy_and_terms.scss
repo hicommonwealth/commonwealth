@@ -100,9 +100,59 @@
     gap: 16px;
     width: 100%;
     max-width: 736px;
+    padding-top: 20px;
 
     @include smallInclusive {
       width: 100%;
+    }
+
+    ol {
+      counter-reset: list-counter;
+    }
+
+    /* Parent list numbering */
+    ol > li {
+      counter-increment: list-counter;
+      list-style-type: none; /* Removes default numbering */
+    }
+
+    /* First-level numbering (1, 2, 3...) */
+    ol > li::before {
+      content: counter(list-counter) '. ';
+      font-weight: bold;
+    }
+
+    /* Second-level numbering (1.1, 1.2, 2.1...) */
+    ol ol {
+      counter-reset: sub-counter;
+    }
+
+    ol ol > li {
+      counter-increment: sub-counter;
+      padding-left: 10px;
+    }
+
+    ol ol > li::before {
+      content: counter(list-counter) '.' counter(sub-counter) '. ';
+      font-weight: normal;
+    }
+
+    /* Third-level numbering (a, b, c...) */
+    ol ol ol {
+      counter-reset: sub-sub-counter;
+      padding-left: 10px;
+    }
+
+    ol ol ol > li {
+      counter-increment: sub-sub-counter;
+    }
+
+    ol ol ol > li::before {
+      content: counter(sub-sub-counter, lower-alpha) ') ';
+      font-weight: normal;
+    }
+    li {
+      margin-bottom: 8px;
     }
   }
 }

@@ -56,6 +56,18 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
+      const community = await models.Community.findOne({
+        where: { id: thread.community_id },
+        attributes: ['spam_tier_level'],
+      });
+      mustExist('Community', community);
+
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
+
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
@@ -78,6 +90,8 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               content_url: contentUrl,
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
+              marked_as_spam_at:
+                user.tier <= community.spam_tier_level ? new Date() : null,
             },
             {
               transaction,

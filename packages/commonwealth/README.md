@@ -39,3 +39,8 @@ Use the [.env.example](../../.env.example) file to get yourself set up.
 ## Further Information
 
 For more information, see our [Knowledge Base directory](../../knowledge_base/_TOC.md).
+
+For development guidelines and best practices, see the Cursor rules in the `.cursor/rules` directory:
+- `env-variables.mdc` - Guidelines for environment variables and feature flags
+- `react_and_components_guidelines.mdc` - Guidelines for React and component development
+- `state-management.mdc` - Guidelines for state management across the application

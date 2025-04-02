@@ -9,7 +9,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
+import StickyInput from './StickyInput';
 import { StickCommentContext } from './context/StickCommentProvider';
+
+// because it is just a UI for now, this is not real flag yet
+const newStickyInput = false;
 
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
@@ -20,7 +24,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const menuVisible = useSidebarStore((state) => state.menuVisible);
 
   const handleCancel = useCallback(() => {
-    console.log('MobileStickyInput: handleCancel triggered');
     setFocused(false);
   }, []);
 
@@ -100,6 +103,10 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
         </div>
       </div>
     );
+  }
+
+  if (newStickyInput) {
+    return createPortal(<StickyInput />, parent);
   }
 
   return createPortal(

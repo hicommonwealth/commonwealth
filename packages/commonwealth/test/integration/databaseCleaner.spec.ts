@@ -105,6 +105,7 @@ describe('DatabaseCleaner Tests', async () => {
         comment_count: 0,
         search: getThreadSearchVector('Testing', ''),
         topic_id: topic!.id!,
+        is_linking_token: false,
       });
 
       const comment = await models.Comment.create({

@@ -25,6 +25,7 @@ interface UpdateCommunityProps {
   chainNodeId?: string;
   type?: ChainType;
   defaultPage?: DefaultPage;
+  spamTierLevel?: number;
 }
 
 export const buildUpdateCommunityInput = ({
@@ -48,6 +49,7 @@ export const buildUpdateCommunityInput = ({
   chainNodeId,
   type,
   defaultPage,
+  spamTierLevel,
 }: UpdateCommunityProps) => {
   return {
     jwt: userStore.getState().jwt,
@@ -88,6 +90,9 @@ export const buildUpdateCommunityInput = ({
     ...(typeof type !== 'undefined' && { type: type }),
     ...(typeof defaultPage !== 'undefined' && {
       default_page: defaultPage,
+    }),
+    ...(typeof spamTierLevel !== 'undefined' && {
+      spam_tier_level: spamTierLevel,
     }),
   };
 };

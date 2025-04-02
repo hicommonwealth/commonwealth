@@ -1,0 +1,135 @@
+---
+description: Rules for state management in Commonwealth
+globs: '**/*store.ts, **/state/**/*.ts, **/hooks/use*.ts'
+---
+
+# State Management Guidelines
+
+## Overview
+
+Commonwealth uses two primary state management solutions:
+1. **Zustand** - For UI-related state management
+2. **React Query** - For API data fetching and caching
+
+Each solution serves a different purpose and should be used according to its strengths.
+
+## Data vs UI State Separation
+
+- Use **React Query** for server state (data fetching, caching, synchronization)
+- Use **Zustand** for UI state (modals, sidebars, form inputs, UI preferences)
+
+## Zustand Guidelines
+
+### Directory Structure
+
+- State is divided between `ui` and `api` in the `state` folder
+- Zustand stores are kept in the `ui` directory
+- Create multiple small, focused stores instead of one large store
+- Each store should be in a separate directory with an `index.ts` file for exports
+
+### Store File Composition
+
+- Define an interface for the store shape
+- Create a vanilla store using `createStore`
+- Wrap with `createBoundedUseStore` for React hooks
+- Export vanilla store with named export and React-hook store as default export
+
+```typescript
+// Example store file
+interface SidebarState {
+  menuName: string;
+  menuVisible: boolean;
+  setMenu: (menu: { name: string; isVisible: boolean }) => void;
+}
+
+export const sidebarStore = createStore<SidebarState>()((set) => ({
+  menuName: '',
+  menuVisible: false,
+  setMenu: (menu) => set({ menuName: menu.name, menuVisible: menu.isVisible }),
+}));
+
+const useSidebarStore = createBoundedUseStore(sidebarStore);
+export default useSidebarStore;
+```
+
+### Middleware
+
+- Use the `devtools` middleware for debugging (Redux DevTools extension compatibility)
+- Consider using `immer` for complex state updates with nested objects
+- Use `persist` middleware when state needs to persist between page refreshes
+
+### Testing
+
+- Test stores with unit tests in the `test/unit/state` directory
+- Use the vanilla store for testing, not the React-hook store
+- Test initial state, mutations, and resulting state
+
+### Usage
+
+- In React components, use the React-hook store with destructuring:
+```typescript
+import useSidebarStore from 'state/ui/sidebar';
+const { setMenu, menuName, menuVisible } = useSidebarStore();
+```
+
+- Outside React components, use the vanilla store:
+```typescript
+import { sidebarStore } from 'state/ui/sidebar';
+const isVisible = sidebarStore.getState().menuVisible;
+sidebarStore.getState().setMenu({ name: 'exploreCommunities', isVisible: true });
+```
+
+## React Query Guidelines
+
+### Custom Hooks
+
+- Create custom hooks that encapsulate React Query functionality
+- Don't use React Query hooks directly in components
+- Name hooks descriptively based on their function (e.g., `useTopics`)
+
+```typescript
+// Example custom hook
+export const useTopics = () => {
+  const getTopicsQuery = useQuery({
+    queryKey: [ApiEndpoints.GET_TOPICS],
+    queryFn: fetchTopics
+  });
+  
+  const createTopicMutation = useMutation({
+    mutationFn: createTopic,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ApiEndpoints.GET_TOPICS] });
+    }
+  });
+  
+  return {
+    topics: getTopicsQuery.data,
+    isLoading: getTopicsQuery.isLoading,
+    createTopic: createTopicMutation.mutate
+  };
+};
+```
+
+### Query Keys
+
+- Use backend routes as the base for query keys
+- Structure keys hierarchically for related data
+- Include necessary parameters in query keys for proper caching
+
+### Naming Conventions
+
+- Queries (GET): `const getTopicQuery = useQuery()`
+- Mutations (POST, PUT, DELETE): `const createTopicMutation = useMutation()`, `const editTopicMutation = useMutation()`
+
+### Optimistic Updates
+
+- Implement optimistic updates for better user experience
+- Use custom hooks to abstract complex optimistic update logic
+- Use utility functions to modify arrays in optimistic updates
+
+### Cache Management
+
+- Start with default `staleTime` and `cacheTime` values
+- Adjust based on data requirements and performance
+- Use `invalidateQueries` to refresh data after mutations
+- Implement proper error handling and retry strategies 

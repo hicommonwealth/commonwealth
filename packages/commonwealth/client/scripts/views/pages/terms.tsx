@@ -1,159 +1,2075 @@
-import { renderMultilineText } from 'helpers';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 /* eslint-disable max-len */
 import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
 import './privacy_and_terms.scss';
 
-const TOS = `Terms of Services
-PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COW MOON WEALTH SOFTWARE INC. THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
-THE TERMS AND CONDITIONS GOVERNING THE SERVICES THAT COW MOON WEALTH SOFTWARE INC. PROVIDES TO YOU AND/OR TOKEN HOLDERS WHO USE THE PLATFORM TO VOTE, DISCUSS, OR DELEGATE THEIR VALIDATION RIGHTS TO ENTITIES ON THE COW MOON WEALTH SOFTWARE INC PLATFORM; CERTAIN REPRESENTATIONS AND WARRANTIES THAT YOU ARE BEING ASKED TO MAKE TO COW MOON WEALTH SOFTWARE INC., WHICH COW MOON WEALTH SOFTWARE INC WILL RELY UPON IN PROVIDING YOU SERVICES; CERTAIN LIMITATIONS ON AND EXCLUSIONS ON THE LIABILITIES AND OBLIGATIONS THAT COW MOON WEALTH SOFTWARE INC OWES, OR MAY OTHERWISE HAVE OWED, TO YOU UNDER APPLICABLE LAW; CERTAIN LIMITATIONS ON, AND WAIVERS OF, LEGAL RIGHTS AND REMEDIES THAT YOU HAVE OR MAY OTHERWISE HAVE HAD UNDER APPLICABLE LAW; AND A
-Terms of Services 1
-PROVISION PROVIDING FOR WAIVER OF A JURY TRIAL OR CLASS ACTION TREATMENT IN RESPECT OF, AND MANDATORY ARBITRATION OF, ANY DISPUTE ARISING OUT OF OR RELATING TO THE GOVERNANCE PLATFORM SERVICES AGREEMENT.
-BY DISCUSSING ISSUES, VOTING ON ISSUES, OR USING THE GOVERNANCE INTERFACE TO DELEGATE ANY VALIDATION RIGHTS TO COW MOON WEALTH SOFTWARE INC. (OR, IN OTHER WORDS, "BONDING" ANY TOKENS TO THE PUBLIC KEY ASSOCIATED WITH COW MOON WEALTH SOFTWARE INC. Common), YOU WILL BE CONSENTING TO BE BOUND BY, ASSENTING TO THE TERMS AND CONDITIONS OF, MAKING THE REPRESENTATIONS AND WARRANTIES SET FORTH IN, AND WILL BECOME A PARTY TO, THE GOVERNANCE PLATFORM SERVICES AGREEMENT.
-IF YOU DO NOT AGREE TO ALL OF THE TERMS AND CONDITIONS OF THE GOVERNANCE PLATFORM SERVICES AGREEMENT, OR IF ANY OF THE REPRESENTATIONS AND WARRANTIES SET FORTH IN THE GOVERNANCE PLATFORM SERVICES AGREEMENT IS INACCURATE AS APPLIED TO YOU, YOU MUST NOT USE OR ACCESS THE COMMON GOVERNANCE AND SOCIAL PLATFORM.
-Please contact us at hello@common.xyzfor any questions or issues regarding this GOVERNANCE PLATFORM SERVICES AGREEMENT.
-GOVERNANCE AND SOCIAL PLATFORM SERVICES AGREEMENT
-This Governance Platform Services Agreement (this "Agreement") is being entered into between you (the "User" or "you") and COW MOON WEALTH SOFTWARE INC Inc., a Delaware corporation ("Common"). This Agreement will, automatically and without further action of either of the parties, become effective upon you commenting or voting on posts on Common. The Common Privacy Policy is a part of this Agreement and incorporated herein by reference. Capitalized terms shall have the meanings set forth in Article I unless otherwise defined herein.
-BACKGROUND
-This "Background" section is included for convenience of reference only, as a partial summary of certain public sources of information published by third parties. Cosmos, Tezos, Polkadot, or any other third party supported network has not undertaken to and does not assume any obligation to independently investigate or verify the facts, circumstances, events, and conditions described herein or therein, or to provide updates hereto to reflect later events. The statements and information herein are not intended to be relied upon by any Person, whether as an accurate or complete statement of facts or otherwise, or to serve as representations, warranties or guarantees made by Common.
-
-NOW, THEREFORE, in consideration of the mutual agreements contained below, Common and User hereby agree as follows:
-ARTICLE I: DEFINITIONS AND RULES OF INTERPRETATION
-Section 1.1 Certain Definitions and Rules of Interpretation. The terms defined in this Section 1.1, whenever used in this Agreement shall have the meanings set forth below:
-"AAA" has the meaning assigned to such term in Section 6.2.
-"Affiliate" means, with respect to any Person, any other Person directly or indirectly controlling, controlled by, or under common control with such Person.
-"Atom" means any amount (including any fractional amount) of the digital token commonly known as "Atom" which is transacted in on the Cosmos Hub with transactions being recorded on the Cosmos Blockchain.
-
-“Common Parties” means Common and its officers, directors, employees, shareholders, creditors, lenders, lawyers, advisors, insurers, predecessors, successors, affiliates, and assigns.
-
-"Disputes" has the meaning assigned to such term in Section 6.1.
-"Governmental Authority" collectively means any nation or government, any state or other political subdivision thereof, any entity exercising legislative, judicial or administrative functions of or pertaining to government, including, without limitation, any government authority, agency, department, board, commission, instrumentality, or officers or agents of the foregoing, and any court, tribunal or arbitrator(s) of competent jurisdiction, and any self- regulatory organization including officers or agents of the same.
-"hereof," "herein," "hereunder," "hereby" and words of similar import will, unless otherwise stated, be construed to refer to this Agreement as a whole and not to any particular provision of this Agreement.
-"include(s)" and "including" shall be construed to be followed by the words "without limitation" unless the context requires otherwise.
-"Laws" means all laws, statutes, legal requirements, ordinances, rules, rulings, regulations, judgments, injunctions, orders and decrees enacted, promulgated or issued by any Governmental Authority at such time then in effect.
-"or" shall be construed to be the "inclusive or" rather than "exclusive or" (i.e., shall be read as "and/or") unless the context requires otherwise.
-"Organizational Documents" means the articles of incorporation, certificate of incorporation, charter, bylaws, articles of formation, certificate of formation, regulations, operating agreement, certificate of limited partnership, partnership agreement and all other similar documents, instruments or certificates executed, adopted or filed in connection with the creation, formation or organization of a Person, including any amendments or restatements of the same thereto.
-"Person" means an individual or real person or a legal entity, including a corporation, partnership, trust, limited liability company, association, or a government or political subdivision or an agency or instrumentality thereof.
-“Post” means to upload, publish, store, broadcast, mint or otherwise transmit information to the Service.
-
-“User Content” means all the information, images, text, illustrations, formats, logos, designs, icons, photographs, programs, music clips, video clips and written and other materials a user Posts to the Service.
-The parties hereto agree that any rule of construction to the effect that ambiguities are to be resolved against the drafting party shall not be applied in the construction or interpretation of this Agreement.
-CommonARTICLE II: ACCESS AND USE OF THE SERVICE
-Section 2.1 Description of the Service. Common offers a forum space where users can create and post written or image-based content for discussion. Features of the Services include:
-Create a Community or Group: Users can create a community of their choice. There are no requirements from the user to create these bespoke communities aside from a name, a description, a founding member, and an image to associate with their community. Within these communities, users are free to create subgroups or “groups.” A user may gate content or access to specific functions within a community or group to certain users. Common takes no direct supervisory role over what kind of groups can be created or accessed or their value within a given community. Common
-Forum: Common provides a forum wherein users can create profiles and engage each other with written text or images, and upvote that content. To engage with content users must be part of a community to be able to post within that community. A forum thread consists of an initial post, which links to the user that posted it. All ensuing comments are connected to the thread. Users can create a thread within a community by clicking “new thread.” Communities may post their own kind of threads, such as governance threads, protocol discussions, update threads, or random thread. There is no limit on the type of thread a community can create so long as that thread falls within the self-moderation rules of the community and these Terms. Users can upvote content within their community forum to make such content more easily discoverable to other users. Users can only upvote content within a community that they are a member of; however, upvoting content can and will affect how content is shown globally to users both within and outside of the originating community. Moderating a community on the Services is an unofficial voluntary position that is available to any Common user if they, or the communities they are members of, elect to do so. Moderators do not act on behalf of Common, nor are they able to act on behalf of Common or sign any third party agreements in the name of Common. Common is not responsible for moderating content within a community, so long as the groups do not violate these Terms.
-Community Stake: Stake is an NFT asset that is created by a user when they engage with a Community Stake contract launched in a community on the Service. A user generates stake by purchasing or minting the stake from a smart contract with a designated funding token chosen by the community that has enabled stake. The visual image of the stake token is chosen at the time of stake enablement. If communities wish, they can deploy a Community Stake (henceforth, “stake”) smart contract on various Ethereum Virtual Machine (EVM) networks. This contract allows users to buy (or mint) NFT tokens specific to that community on common using a predetermined cryptocurrency. These NFTs are “soulbound” to the user’s digital wallet that buys them, meaning that they cannot be transferred outside of the minting user’s wallet. Users who own stake have increased upvote power, or “vote weight”, within any community that they own stake in. If a user wishes to reduce their inventory of stake in a particular community, they must burn their stake NFTs with the originating smart contract. The cost and value of stake at acquisition and redemption are determined by a bonding curve that increases or decreases in price as more users acquire or reduce their amount of stake. By default, fees derived from Community Stake go to a fee router contract that directs the funds on behalf of the administrator’s address.
-Contests: Contests receive funds either directly from users or from fees generated by buying or selling Stake. Contests, on a user set interval, will pay out from their pool of funds some percent to the contest winners. Winners are determined by votes that are weighted by a secondary “vote weight calculation” contract that is also onchain for transparency plus trustfulness purposes. With the launch of contests, fees are directed toward the contests’ prize pools, to be distributed by the contests to contest winners. The fee manager/router contract can divert a share of the stake derived fees to any number of addresses on the blockchain the stake is deployed. Fees generated from Stake and direct deposits to the contests are used as part of a prize pool for iterative content contests within a community. The most upvoted content will receive a payout from the contest in whatever cryptocurrency the community chose to use.
-Onchain Transactions: Community Stake requires blockchain network transactions, from the administrators of the communities that found it, because they execute a transaction onchain to reserve their namespace and found their communities. Any user that acquires community stake does so by buying tokens from an onchain smart contract. When users sell the community stake, they burn the assets and redeem some value back from the smart contract. Users can buy or mint stake from a community stake contract with the smart contract’s required funding token. This token will appear in the user’s wallet whether it is a third party wallet the user signed up with. Users can redeem or burn their stake by engaging with the originating smart contract. When they redeem or burn their stake tokens, they are returned some value from the smart contract.
-Section 2.2 License to the Service. Common grants you a limited, non-exclusive, non-transferable, non-sublicensable, revocable license to access and use the Services pursuant to these Terms. This limited authorization does not grant you any licenses, implied rights, or intellectual property rights. You agree that your use of the Services is at your sole risk and that you assume all responsibility for any reliance on the Service. We reserve all rights not expressly granted to you in and to the Services and the content within. We do not guarantee the availability, accuracy, or reliability of the Service. Except and solely to the extent such a restriction is impermissible under applicable law, you may not: (i) reproduce, distribute, publicly display, publicly perform, or create derivative works of the Service; (ii) make modifications to the Service; or (iii) interfere with or circumvent any feature of the Service, including any security or access control mechanism. If you are prohibited under applicable law from using the Service, then you may not use it.
-Section 2.3 Wallet and Profile. To access most features of the Services, you will be required to verify your email address and either create or connect a digital cryptocurrency wallet (“Wallet”) to the Services to create an account. A user account may have multiple Wallet addresses associated with it. Once your account has been registered, you can add additional information to your profile. Your Wallet address, username and other information you voluntarily add to your profile may be publicly displayed on the Services when you connect your Wallet, and you consent to such public display. The profile will contain a record of all the content created by the user on the Service. For additional information about your account and profile data, please see our [insert link].
-If you do not have a Wallet, you can create one using Common by signing up with Google, Discord, Twitter, Github or an email address. Common partners with Magic, a third party non-custodial wallet infrastructure provider, to allow users to create a Common account that includes a self-custodial Wallet that can be accessed via the Services (“Magic Wallet”). By creating or using a Magic Wallet in connection with the Services, you agree that you are using the Privy Wallet under Magic’s terms and conditions available at [Magic terms of services]. Only you can sign transactions and access and control your Wallet’s contents. Common does not have custody, possession, control, or otherwise have access to your Common Wallet or any assets that may be contained therein, and does not have access to or store any passwords, recovery phrases, private keys, passkeys, or any other credentials associated with user Wallets or your use of the Services. You are solely responsible for securing your Common account and Magic Wallet authentication credentials, passkeys, and private keys. You can find more information about how Magic Wallets work at https://magic.link/
-Section 2.4 Using your Wallet. You must familiarize yourself with these Terms, and the technology and security protocols of any Wallet. We do not provide a crypto-wallet service and do not at any time have custody, possession, or control over your NFTs, crypto assets, or any other contents in your Wallet. You acknowledge and agree that we are not party to any transactions conducted while using our Services. We make no representations or warranties regarding how the Service will operate or be compatible with any specific Wallet.
-The private keys necessary to access the assets held in a Wallet are not held by Common. You are solely responsible for maintaining the security of your Wallet, including your credentials, private key, and/or seed phrase. We are in no way liable for any acts or omissions by you in connection with your Wallet or as a result of your Wallet being compromised. Hackers may seek to access your Wallet through multiple means, including, but not limited to, phishing and other fraudulent communications. Common will never provide access to offers or promotions through discord messages or links, and you should never click on any link on discord to an offer or promotion claiming to be from common even if it appears to originate from common. You are solely responsible for any losses that arise from your clicking on any links from a third party, even if such third party appears to be common, and you are solely responsible for any losses arising from the theft or unauthorized use of your wallet credentials.
-You should make contingency plans with respect to your Wallet in the event of your death or incapacity, otherwise you (and your executor, guardian, or heirs) may lose access to your Wallet, your account on the Service, and your NFTs and other purchases.
-Section 2.5 User Content. You must not Post any User Content that violates these Terms or for which you do not have all the rights necessary to grant the licenses described herein. You represent and warrant that your User Content, the source and underlying materials used in creating the User Content, and our use of such content as permitted by these Terms, will not violate any rights of or cause injury to any person or entity. Common disclaims any and all liability in connection with User Content. You are solely responsible for your User Content and the consequences of providing User Content via the Services. By providing User Content via the Service, you affirm, represent, and warrant to us that:
-You are the creator and owner of the User Content, or have the necessary licenses, rights, consents, and permissions to authorize Common and users of the Services to use and distribute your User Content in the manner contemplated by the Services and these Terms;
-Your User Content, and the Posting or other use of your User Content as contemplated by these Terms, does not and will not: (i) infringe, violate, misappropriate, or otherwise breach any third-party right, including any copyright, trademark, patent, trade secret, moral right, privacy right, right of publicity, or any other intellectual property, contract, or proprietary right; (ii) slander, defame, libel, or invade the right of privacy, publicity or other property rights of any other person; or (iii) cause Common to violate any law or regulation or require us to obtain any further licenses from or pay any royalties, fees, compensation or other amounts or provide any attribution to any third parties; and
-Your User Content is not in violation of applicable law and could not be deemed by a reasonable person to be harassing, threatening, or hateful.
-Section 2.6 Specific Rules for Images and Sound Recordings. If you Post a photograph or image to the Services that includes one or more persons, you hereby grant such persons and their administrators, guardians, heirs, and trustees, if any, an irrevocable, perpetual, royalty free, fully paid-up, worldwide license to reproduce, distribute, and publicly display that photograph for personal use and through any online platform or service, including the Service, but not to promote any third-party product, good, or service. The license contained in this Section does not permit the subject of any photo or their administrators, guardians, heirs, or trustees to sell that image or photograph, whether on a standalone basis or as embodied in any product. Notwithstanding the foregoing, this Section only applies to the extent there is not a conflicting agreement between the photographer and the subject(s) of the photo. You and the subject of any photograph or other original work of authorship you Post to the Services are free to negotiate terms and conditions to supersede the provisions of this Section.
-If you create and distribute an NFT that includes a sound recording, and the musical work embodied therein, or an audiovisual work embodying a sound recording and a musical work, then such musical works, sound recordings, and audiovisual works may be available through any platform or tools that access the applicable blockchain on which the NFT has been published.
-Section 2.7 Responsibility for Your NFTs and Tokens. You are solely responsible for the NFTs you create using Community Stake, including for clearing the rights to any third-party content included in your NFTs, including the rights of privacy and publicity, and for any third-party claims of copyright, trademark, or other intellectual property infringement or violation of any rights of privacy or publicity. You agree to indemnify, defend, and hold Common Parties harmless from and against any and all damages, liabilities, costs, and expenses (including reasonable attorneys’ fees) arising from the minting, sale, reproduction, distribution, public display, public performance, communication to the public, advertising, marketing, promoting or other use or exploitation of your NFTs and tokens.
-Section 2.8 User Content Disclaimer. We are under no obligation to edit or control User Content that you or other users Post and will not be in any way responsible or liable for User Content. Common may, however, at any time and without prior notice, screen, remove, edit, or block any User Content that in our sole judgment violates these Terms, is alleged to violate the rights of third parties, or is otherwise objectionable. You understand that, when using the Services, you will be exposed to User Content from a variety of sources and acknowledge that User Content may be inaccurate, offensive, indecent, or objectionable. You agree to waive, and do waive, any legal or equitable right or remedy you have or may have against Common with respect to User Content. If notified by a user or content owner that User Content allegedly does not conform to these Terms, we may investigate the allegation and determine in our sole discretion whether to remove the User Content, which we reserve the right to do at any time and without notice. For clarity, Common does not permit infringing activities on the Service.
-Section 2.9 Monitoring Content. Common does not control and does not have any obligation to monitor: (i) User Content; (ii) any content made available by third parties; or (iii) the use of the Services by its users. You acknowledge and agree that Common reserves the right to, and may from time to time, monitor any and all information transmitted or received through the Services for operational and other purposes. If at any time Common chooses to monitor the content, then Common still assumes no responsibility or liability for content or any loss or damage incurred as a result of the use of content. During monitoring, information may be examined, recorded, copied, and used in accordance with our Privacy Policy. Common may block, filter, mute, remove or disable access to any User Content uploaded to or transmitted through the Services without any liability to the user who Posted such User Content to the Services or to any other users of the Service.
-Section 2.10 Disputes Between Users. Common will not be a party to any disputes or dispute negotiations between users. You agree to resolve all such disputes with any other users of the Services directly and without involving Common in such dispute. Responsibility for the decisions you make regarding the Services rests solely with you. If Common is required to participate in any such dispute, then you will indemnify, defend, and hold the Common Parties harmless from and against any and all damages, liabilities, costs, and expenses (including reasonable attorneys’ fees) arising out of any such dispute.
-Section 2.11 User Suspension and Termination. Common may at any time, with or without notice, in its sole and absolute discretion, suspend or terminate providing services to User. Common may, but is under no obligation, to provide User access to its User Content stored within the Common services upon suspension or termination of such Common services, and, at its sole and absolute discretion, Common may make User Content available to such User and set a reasonable fee for the provision of such User Content. Notwithstanding the foregoing, in the event Common suspends or terminates a User for a reason other than if Common determines in its sole discretion, that the User has violated, or likely will violate, this Agreement, then Common will use commercially reasonable efforts to provide advance notice to the User of such suspension or termination.
-Section 2.12 Services Modification. Common reserves the right to modify, discontinue, improve, or change the services or terms of this Agreement at any time.
-ARTICLE III: REPRESENTATIONS AND WARRANTIES OF USER
-User hereby represents and warrants to Common, as of the date of entering into this Agreement and as of each date that User has any Validation Rights that are Delegated to Common:
-Section 3.1 Status. If User is an individual, User is at least 18 years of age or older in the jurisdiction in which User resides and is of sound mind and body has capacity to enter into this Agreement. If User is a business entity, User is duly organized, validly existing and in good standing under the laws of the jurisdiction in which it is organized, and has all requisite power and authority for a business entity of its type to carry on its business as now conducted.
-Section 3.2 Power and Authority. User has all requisite capacity, power and authority to accept the terms and conditions of this Agreement and to conduct and perform its obligations under this Agreement, and has taken, or will take, all actions necessary for the performance of User’s obligations under this Agreement. This Agreement constitutes a legal, valid and binding obligation of User enforceable against User in accordance with its terms.
-Section 3.3 No Conflict; Compliance with Law. User entering into this Agreement and User's Delegation of its Validation Rights to Common does not constitute, and would not reasonably be expected to result in (with or without notice, lapse of time, or both) a breach, default, contravention or violation of any Law applicable to User, User’s corporate governance documents (if applicable), or contract or agreement to which User is a party or by which User is bound.
-Section 3.4 Persons Subject to Sanctions. User (including if applicable its subsidiaries, respective directors, officers, employees, or to User’s knowledge its agents) is not, and is not 50% or more owned or controlled by, or acting on behalf of, any other Person (including the government of a Restricted Country, as defined below) who is, identified on any list of prohibited parties under any Law or by any Governmental Authorities, such as, for example, the lists maintained by the United Nations Security Council, the U.S. government (Including, without limitation, the U.S. Department of the Treasury’s Office of Foreign Assets Control’s Specially Designated Nationals and Blocked Persons List, Foreign Sanctions Evaders List, Sectoral Sanctions Identification List), the European Union (EU) or its member states (including the Consolidated List of Persons, Groups, and Entities Subject to EU Financial Sanctions), the UK’s Consolidated Sanctions List, and the government of User's home country. User is not, and is not owned or controlled by, organized by, established by, or acting on behalf of, any other Person who is, located, ordinarily resident, organized, established, or domiciled in Cuba, Iran, North Korea, Sudan, Syria, or the Crimea (including Sevastopol), Donetsk, and Luhansk regions of Ukraine, or any other country or jurisdiction against which the U.S. maintains economic sanctions or an arms embargo (“Restricted Countries”). User's Atoms are not derived from, and do not otherwise represent the proceeds of, any activities done in violation or contravention of any Law.
-Section 3.5 No Claim, Loan, Ownership Interest or Investment Purpose. User understands and agrees that neither User's Delegation of Validation Rights and Voting Rights to Common, nor Common's provision of Services hereunder: (a) represents or constitutes a loan or a contribution of capital to, or other investment in, Common; (b) provides User with any ownership interest, equity, security, or right to, claim, or interest in the assets, rights, properties, revenues or profits of, or voting rights whatsoever in, Common; or (c) creates or implies any fiduciary or other agency relationship between Common or any of its directors, officers, employees, agents or affiliates and User or entitles User to any fiduciary duty or similar duty on the part any of the foregoing Persons. User is not entering into this Agreement or Delegating Validation Rights or Voting Rights to Common for the purpose of making an investment with respect to Common or its securities, but solely and exclusively wishes to receive the Services from Common. User understands and agrees that Common will not accept, maintain, manage, or take custody of or interest in any Block Rewards or Transaction Fees on behalf of User, and has no responsibility or control over whether the Cosmos Hub distributes Block Rewards or Transaction Fees to User. Common's sole obligation under this Agreement is to perform the Services, upon the terms and conditions set forth in this Agreement, which may, but is not guaranteed to, result in User receiving Block Rewards and Transaction Fees directly through the operations of the Cosmos Hub.
-Section 3.6 Non-Reliance. User is knowledgeable, experienced, and sophisticated in using and evaluating the blockchain networks and tokens and similar technologies and services. User has conducted its own thorough independent investigation and analysis of each blockchain network and the other matters contemplated by this Agreement in determining to Delegate any Validation Rights or Voting Rights to Common and to enter into this Agreement, and has not relied upon any information, statement, omission, representation or warranty, express or implied, written or oral, made by or on behalf of Common in connection therewith, or by any other third-party Person.
-Section 3.7 Prohibited Conduct. User will at all times comply with all applicable Laws, regulations, rules, governmental orders, and industry standards including, without limitation, securities, derivatives, commodities, privacy and data security, intellectual property, and consumer protection laws and regulations. You may not access or use the Services for any purpose other than that for which we make the Services available. As a user of the Services, you agree not to:
-
-use the Services in a manner inconsistent with any applicable laws or regulations, including using the Services to interact with the Common protocol in a manner that is illegal or otherwise prohibited by law or regulation in any jurisdiction, or that is intended to harass, abuse, intimidate or violate the legal rights or privacy of any person;
-trick, defraud, or mislead us and other users, especially in any attempt to learn sensitive account information such as user passwords;
-harass, threaten, demean, embarrass, bully, or otherwise harm any other user of the Service;
-violate, encourage others to violate, or provide instructions on how to violate, any right of a third party, including by infringing or misappropriating any third-party intellectual property right;
-circumvent, disable, or otherwise interfere with security-related features of the Services;
-use any software or networking techniques, including use of a Virtual Private Network (VPN) to modify your internet protocol address or otherwise circumvent or attempt to circumvent this prohibition;
-make improper use of our support services or submit false reports of abuse or misconduct;
-upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or other material, including excessive use of capital letters and spamming (continuous posting of repetitive text), that interferes with any party’s uninterrupted use and enjoyment of the Services or modifies, impairs, disrupts, alters, or interferes with the use, features, functions, operation, or maintenance of the Services;
-attempt to impersonate another user or person or use the username of another user;
-interfere with, disrupt, or create an undue burden on the Services or the networks or services connected to the Services including denial of service attacks;
-sell or otherwise transfer the access granted under these Terms or any Common content or any right or ability to view, access, or use any Materials;
-attempt to bypass any measures of the Services designed to prevent or restrict access to the Services, or any portion of the Services, including by: (i) disabling or circumventing features that prevent or limit use, printing or copying of any Content; or (ii) reverse engineering or otherwise attempting to discover the source code of any portion of the Services except to the extent that the activity is expressly permitted by applicable law;
-make any unauthorized use of the Services, including collecting usernames and/or email addresses of users by electronic or other means for the purpose of sending unsolicited email, or creating user accounts by automated means or under false pretenses; or
-attempt to do or assist or permit any person to engage in any of the acts described in this Section.
-
-Section 3.8 Identity Verification. Common may require identity verification from the User in order to obtain or continue using certain Common services, to comply with legal obligations of Common or the User, or in circumstances when Common believes a user may be engaging in conduct that is not in compliance with this Agreement. You agree to fully cooperate in and comply with the identity verification processes currently in place and as may be established by Common from time to time pursuant to this Agreement or otherwise, and promptly provide all information requested by Common in connection therewith, which may include, without limitation, [personally identifiable information such as name, email, address, telephone number, date of birth, taxpayer identification or social security number, official government-issued photo identification or bank account information deemed reasonably helpful to Common to fulfill its obligations. You hereby represent that such information you provide is or will be at the time of providing it, accurate and complete.
-ARTICLE IV: INTELLECTUAL PROPERTY
-Section 4.1 Common’s Ownership. The design of Common’s services and all text, graphics, information, content, processes, and other material displayed on or contained in the services (including without limitation, the look and feel, all text, photographs, images, video and audio) are owned by Common or their respective licensors and protected by copyright, trademark, and possibly patent and other laws and may not be used except as permitted in this Agreement or with prior written permission of the owner of such material. All rights are reserved. You may not modify the information or materials displayed on, or contained in, the Common services in any way, or reproduce or publicly display, perform, or distribute or otherwise use any such information or materials for any public or commercial purpose. You may not copy, reproduce, publish, transmit, distribute, perform, display, post, modify, create derivative works from, sell, license, or otherwise exploit the Common services. Any unauthorized use of any such information or materials may violate copyright laws, trademark laws, laws of privacy and publicity, and other Laws and regulations and is prohibited. In the event of a violation of these Laws and regulations, Common reserves the right to seek all remedies available by law and in equity. For so long as you are in compliance with this Agreement, Common grants you a limited, non-exclusive, non-transferable, non-sublicensable, non-assignable, revocable license to access and use the Common services. This license is automatically revoked for your noncompliance with this Agreement, or Common’s suspension or termination of services to you.
-Section 4.2 Feedback. If you submit comments, ideas, insights, bug reports, or other feedback to Common related to its services (collectively, “Feedback”), you assign ownership in such Feedback to Common and agree that Common may use, disclose, and otherwise exploit such Feedback for any purpose at its own discretion without any additional compensation or notice to you.
-Section 4.3 Digital Millennium Copyright Act. Common will process and investigate notices of alleged copyright infringement and will take appropriate action under the Digital Millennium Copyright Act (“DMCA”). If you are an intellectual property rights holder and believe your rights have been infringed, please send your claim of copyright infringement to our designated agent by mail to [DMCA agent address], email to [DMCA agent email], or by phone to [DMCA agent phone]. You must provide the following when making your claim under the DMCA: (1) a physical or electronic signature of a person authorized to act on behalf of the copyright owner; (2) identification of the copyrighted work claimed to have been infringed; (3) identification of the material that is claimed to be infringing or to be the subject of the infringing activity, and that is to be removed or access to which is to be disabled; (4) information reasonably sufficient to permit Common to contact the copyright owner, such as an address, telephone number, and, if available, an email address; (5) a statement that you have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or law to locate the material; and (6) a statement that the information in the notification is accurate, and under penalty of perjury, that you are authorized to act on behalf of the copyright owner. Please note that Common does not determine copyright ownership or resolve infringement disputes.
-Section 4.4 User Content. Subject to Section 4.2, Common does not assert ownership in information, art, media, files, NFTs, or other content that you create, mint, post, transmit, and/or display via the Common services (“User Content”). You grant Common a worldwide, non-exclusive, sublicensable, assignable, irrevocable, royalty-free license to use, copy, modify, and display User Content for Common’s business purposes including, without limitation, to provide, support, enhance, and promote the Common services, to comply with legal obligations, and for any other purpose contemplated by Common’s Privacy Policy and this Agreement. You represent and warrant that you have all necessary rights and permissions, or are otherwise legally entitled, to generate, use, and/or disclose the User Content and to grant the foregoing license, and that the User Content and Common’s license to such User Content does not violate any laws or infringe the privacy, publicity, or intellectual property rights of any Person.
-ARTICLE V: DISCLAIMER, LIMITATIONS, AND INDEMNIFICATION
-Section 5.1 Liability Disclaimers. You agree that Common will have no responsibility or liability for the actions of other users of its services, actions of third parties (including third parties providing platforms or services integrated with or available via the Common services), authorized or unauthorized use of the services, performance of cryptographic or blockchain-based systems, or your use or reliance upon any third-party scripts, code, content, or other information. Any advice or recommendations made by Common are for your convenience only, and you agree that Common is not liable for any damages you incur from your reliance upon them. Common does not endorse, adopt, or guarantee any third-party goods, services, products, offers, or information made available via its services. You must keep confidential all User’s credentials associated with the services, and Common is not responsible for the security, transfer, or maintenance of your virtual currency assets or private keys, and you agree Common is not responsible or liable for any claimed or actual loss thereof.
-Section 5.2 Disclaimer of Warranties. The Common services are provided on an “as is” and “as available” basis. The Common services are based on novel and developing technologies that may be more likely than others to contain bugs, errors, vulnerabilities, and systematic and other risks. You hereby acknowledge and agree that you use the Common services at your own risk. Common does not represent, warrant, or guarantee that you will see any economic benefit or avoid any economic loss from your use of its services. Common does not represent or warrant that its services will be uninterrupted, secure, or error free. Common expressly disclaims, to the fullest extent allowable by law any and all, promises, representations and warranties, express or implied or statutory, including, but not limited to, the implied warranties of merchantability, fitness for a particular purpose, data accuracy, system integration, title, quiet enjoyment, and noninfringement.
-Section 5.3 No Consequential, Incidental or Punitive Damages. Notwithstanding anything to the contrary contained herein, Common shall not be liable to any Person, whether in contract, tort (including pursuant to any cause of action alleging negligence), warranty or otherwise, for special, incidental, consequential,
-indirect, punitive or exemplary damages (including but not limited to lost data, lost profits or savings, loss of business or other economic loss) arising out of or related to this Agreement, whether or not Common has been advised or knew of the possibility of such damages, and regardless of the nature or origin of the cause of action or theory asserted.
-Section 5.4 Limitation of Liability. Common's liability for damages under this Agreement shall in all cases be limited to, and under no circumstances shall exceed, the greater of (i) the portion of fees actually received by Common that demonstrably arose by virtue of the User's particular Delegation of its particular Validation Rights to Common or (ii) fifty dollars ($50) (USD).
-Section 5.5 Indemnification. To the extent permitted by Law, you agree, severally and not jointly with other Users, to indemnify, defend, and hold harmless Common and its affiliates, subsidiaries, owners, officers, directors, service providers, agents, and employees from any and all liabilities, damages, claims, losses, costs, and expenses (including reasonable attorneys’ fees and costs or other expenses reasonably incurred thereby in connection with investigating or defending any claim or proceeding from which damages may result as such expenses are incurred) arising out of related to your (i) use of the Common services, (ii) actual or alleged violation of this Agreement, (iii) User Content, or (iv) negligence or willful misconduct. You acknowledge and agree that Common may control the defense or settlement of any indemnified claims at your cost. You hereby agree to fully cooperate with Common in the defense and settlement of any indemnified claims. If Common elects to permit you to control the defense and settlement of the indemnified claims, Common may participate in the defense using counsel of its choosing and at its own cost and you may not agree to any settlement that places obligations upon Common without Common’s prior written consent.
-
-ARTICLE VI: DISPUTE RESOLUTION
-Section 6.1 Agreement to Binding, Exclusive Arbitration. Except as set forth in Section 6.5, all unresolved claims, disputes and controversies directly or indirectly arising out of or in connection with or directly or indirectly relating to this Agreement, any of the matters or transactions contemplated by this Agreement (for the avoidance of doubt, including any claim seeking to invalidate, or alleging that, all or any part of this Agreement is unenforceable, void or voidable), or your relationship with Common (such claims, disputes and controversies, collectively, "Disputes") shall be finally settled by binding arbitration, rather than in court. The arbitrator, and not any federal, state or local court, agency or other Governmental Authority, shall have exclusive authority to resolve all Disputes. The parties hereby acknowledge, represent and warrant that they understand that: (a) there is no judge or jury in arbitration, and, absent this mandatory provision, the parties would have the right to sue in court and have a jury trial concerning Disputes; (b) in some instances, the costs of arbitration could exceed the costs of litigation; (c) the right to discovery may be more limited in arbitration than in court; and (d) court review of an arbitration award is limited. The Federal Arbitration Act and federal arbitration law apply to this Agreement. Notwithstanding anything to the contrary set forth in this Section 6.1, either party may seek relief in a small claims court for Disputes within the scope of that court's jurisdiction. Prior to initiating a Dispute against Common, you agree to contact Common at [email] and provide a detailed statement of your proposed Dispute and resolution so that Common may attempt to resolve your Dispute prior to arbitration. If the parties have been unable to reach a resolution of your Dispute within sixty days after the date of Common’s receipt of your email, and you have acted in good faith to negotiate a settlement, you may submit your Dispute for arbitration in accordance with this Section 6. Any statute of limitations will be tolled during this sixty-day pre-Dispute negotiation period.
-Section 6.2 Arbitration Procedures. Either party may initiate an arbitration proceeding by delivering written notice to the other party, whereupon the parties shall reasonably cooperate to select an arbitrator mutually agreed upon by the parties, and submit the relevant Dispute to such arbitrator. In the event the parties are unable to agree on the selection of an arbitrator within 30 days from the filing of a demand for arbitration, the American Arbitration Association (“AAA”) shall appoint the arbitrator, provided such arbitrator has reasonable experience in transactions provided for in this Agreement and the Dispute. Any such arbitration shall be administered by the American Arbitration Association in accordance with the provisions of its Commercial Arbitration Rules then in effect and the supplementary procedures for consumer related disputes of the AAA, excluding any rules or procedures governing or permitting class actions. Arbitrations with an amount in controversy of less than one million dollars ($1,000,000) (USD) will be conducted before a single arbitrator without an opportunity for appeal. Arbitrations with an amount in controversy equal to or greater than one million dollars ($1,000,000) (USD) will be conducted before a panel of three arbitrators with an opportunity for appeal. There shall be limited discovery prior to the arbitration hearing as follows: (a) exchange of witness lists and copies of documentary evidence and documents relating to the issues to be arbitrated, (b) depositions of all party witnesses, and (c) such other depositions as may be allowed by the arbitrators upon a showing of good cause. The arbitrator(s) will issue a reasoned opinion accompanying their judgment. Each party will bear its own attorneys’ fees and other costs associated with the arbitration. Notwithstanding the foregoing, Common may seek its attorneys' fees, costs and necessary disbursements in addition to any other relief to which such party may be entitled if the arbitrator determines your Dispute is frivolous. The arbitrator shall be empowered to grant whatever relief would be available in a court under law or in equity. The arbitrator's award shall be written and reasoned, and binding on the parties, and may be entered into by any party as a judgment in any court of competent jurisdiction.
-
-Section 6.3 Seat of Arbitration. The seat of arbitration shall be New York County, New York. The parties may mutually choose to have the arbitration of any Dispute conducted by telephone, based on written submissions, or at a mutually agreed location other than New York County, New York. User hereby agrees to submit to the personal jurisdiction for any equitable action sought in any federal or state court in New York County, New York, including in order to compel arbitration, to stay proceedings pending arbitration, or to confirm, modify, vacate or enter judgment on the award entered by the arbitrator.
-Section 6.4 Confidentiality of Arbitration. Except to the extent necessary to enforce their respective rights under this Agreement or as otherwise required by applicable Law, the parties undertake to maintain confidentiality as to the existence, outcome, and events of the arbitration proceedings and as to all records, materials, submissions, correspondence and evidence relating to the arbitration proceedings. This provision shall survive the termination of the arbitral proceedings.
-Section 6.5 Class Action Waiver. The parties agree that any arbitration or other permitted action with respect to any Dispute shall be conducted in their individual capacities only and not as a class action or other representative action, and the parties expressly waive their right to file a class action or seek relief on a class basis. EACH PARTY AGREES THAT SUCH PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN SUCH PARTY'S INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
-If any court or arbitrator(s) makes a final, binding and non-appealable determination that the class action waiver set forth in this paragraph is void or unenforceable for any reason or that an arbitration can proceed on a class basis, then the arbitration provision set forth above shall be deemed null and void with respect to any Dispute that would thus be required to be resolved by arbitration on a class basis, and the parties shall be deemed to have not agreed to arbitrate such Dispute. In the event that, as a result of the application of the immediately preceding sentence or otherwise, any Dispute is not subject to arbitration, the parties hereby agree to submit to the personal and exclusive jurisdiction of and venue in the federal and state courts located in New York County, New York and to accept service of process by certified or registered mail with respect to such Dispute, and hereby waive any and all jurisdictional and venue defenses otherwise available with respect to such Dispute. Each party will provide necessary then current contact information to facilitate service of process.
-ARTICLE VII: MISCELLANEOUS
-Section 7.1 Governing Law. This Agreement shall be governed in all respects, including as to validity, interpretation and effect, by the internal laws of the State of New York, without giving effect to its principles or rules of conflict of laws, to the extent such principles or rules are not mandatorily applicable by statute and would permit or require the application of the laws of another jurisdiction.
-Section 7.2 Successors and Assigns. This Agreement shall inure to the benefit of the parties, and their respective permitted successors, permitted assigns, permitted transferees and permitted delegates and shall be binding upon all of the foregoing persons and any Person who may otherwise succeed to any right, obligation or liability under this Agreement by operation of law or otherwise. Nothing in this Agreement, express or implied, is intended to confer upon any party other than the parties hereto or their respective successors and permitted assignees any rights, remedies, obligations or liabilities under or by reason of this Agreement, except as expressly provided herein. User shall not share or provide a copy of, or transfer to, any Person the private key associated with any Atoms with respect to which Validation Rights are Delegated to Common without notifying such Person that such Person shall be bound by and become a party to this Agreement by virtue of making any use of such private keys while such Delegation remains in effect. Except as set forth above, no rights, obligations or liabilities of User may be assigned, transferred or delegated to any Person without the prior written consent of Common. Common may freely assign, transfer or delegate its rights, obligations and liabilities under this Agreement to the maximum extent permitted by applicable Law.
-Section 7.3 Entire Agreement. This Agreement constitutes the full and entire understanding and agreement between the parties relating to the subject matter hereof and supersedes and expressly cancels all prior or contemporaneous agreements and understandings, both written and oral, between the parties with respect to the subject matter hereof.
-Section 7.4 Severability and Survivability. If any provision of this Agreement is determined by a court of competent jurisdiction to be invalid, illegal, inoperative or unenforceable for any reason, such invalidity, illegality, inoperability or unenforceability shall not affect any other provision of this Agreement, and Common shall have the right to modify this Agreement to effect the original intent of the parties as closely as possible in an acceptable manner in order that the transactions contemplated hereby be consumed as originally contemplated to the fullest extent possible. Provisions of this Agreement which by their nature would survive termination hereof, including, without limitation, indemnification, confidentiality, limitation of liability, disclaimers of warranties, irrevocable intellectual property licenses, and dispute resolution provisions will be deemed to survive.
-Section 7.5 No Partnership and No Agency or Implied Duties. Nothing in this Agreement and no action taken by the parties pursuant to this Agreement shall constitute, or be deemed to constitute, a partnership, association, joint venture or other co-operative entity between any of the parties. Nothing in this Agreement and no action taken by the parties pursuant to this Agreement shall constitute, or be deemed to constitute or appoint, either party the agent of the other party for any purpose or to owe the other party any agency, bailment, trust or other implied duties, including any fiduciary duty. No party has, pursuant to this Agreement, any authority or power to bind or to contract in the name of the other party, except as set forth herein including Section 5.5.
-Section 7.6 Publications and Notifications. The parties shall reasonably and mutually agree to any press release or publication that jointly involves the names, brands or officers of both parties. For clarity, you may not issue any press release or publication involving the name, brand, identity, or officers, directors, or other service providers of Common without Common’s prior approval. Correspondence and notifications from Common to you, whether as a result of a dispute or otherwise intended to be official correspondence, may be sent by electronic mail (including pdf or any electronic signature complying with the U.S. federal ESIGN Act of 2000, e.g., www.docusign.com) or common forms of social media (Skype, Slack, WhatsApp) at any applicable address or username provided by you through Common's website. Any correspondence or notification from Common to you so delivered shall be deemed to have been duly and validly delivered and be valid and effective for all purposes. Correspondence and notifications to Common must be by electronic mail to [email] or by overnight courier or certified/registered mail to [address].
-Section 7.7 Force Majeure. Common shall not incur any liability or penalty for not performing any act or fulfilling any obligation hereunder by reason of any occurrence that is not within its control (including any provision of any present or future law or regulation or any act of any Governmental Authority, any act of God or war or terrorism, or the unavailability, disruption or malfunction of the Internet, the World Wide Web or any other electronic network the Cosmos Network or any aspect thereof, any event or act outside the control of Common affecting as a whole the industries in which Common operates that precludes Common from performing acts or fulfilling obligations in this Agreement, or any consensus attack, or hack, or denial-of-service or other attack, on the Cosmos Network or any aspect thereof, or on the software and infrastructure that enables Common to operate the Validating NodeInfo), it being understood that Common shall use commercially reasonable efforts, consistent with accepted practices in the industries in which Common operates, as applicable, to resume performance and comply with this Agreement as soon as reasonably practicable under the circumstances.
-Section 7.8 Taxes. User is responsible to determine any and all applicable taxes, if any, which apply to your use of the Common services and report and remit such applicable taxes to the appropriate tax authority or Governmental Authority.
-Section 7.9 Amendments. This Agreement may only be amended, modified, altered or supplemented by Common. The most current version of this Agreement will be posted on the Common website which you agree constitutes notice of an update, regardless of the provisions of Section 7.6. Such revised versions of this Agreement are effective and binding upon you immediately upon posting. User’s use of Common’s services after Common posts an updated version of this Agreement constitutes the User’s acceptance of the updated version. Common may, but is not obligated, to provide additional notice of an update in a manner of its choosing such as by posting a notice on its website for a period of time or sending an email to users, or as otherwise permitted by Section 7.6.
-Section 7.10 No Waiver. No failure on the part of any Person to exercise any power, right, privilege or remedy under this Agreement, and no delay on the part of any Person in exercising any power, right, privilege or remedy under this Agreement, shall operate as a waiver of such power, right, privilege or remedy; and no single or partial exercise of any such power, right, privilege or remedy shall preclude any other or further exercise thereof or of any other power, right, privilege or remedy. No Person shall be deemed to have waived on such party’s own behalf any claim arising out of this Agreement, or any power, right, privilege or remedy under this Agreement, unless the waiver of such claim, power, right, privilege or remedy is expressly set forth in a written instrument duly executed and delivered on behalf of such Person; and any such waiver shall not be applicable or have any effect except in the specific instance in which it is given.
-Section 7.11 No Investment Advice. The Services is not intended to provide legal, tax, investment or insurance advice. Nothing on the Services should be construed as an offer to sell, a solicitation of an offer to buy, or a recommendation for any financial instrument by us or any third party. You are solely responsible for determining whether any transaction is appropriate for you based on your personal objectives, financial circumstances, and risk tolerance. You are solely responsible for determining what, if any, taxes apply to your transactions using the Service. You should consult your legal, investment or tax professional regarding your specific situation. We do not make any representations regarding the benefits or results that you or any third party shall receive from the Services.
-Section 7.12 Valuation of Stake, or any other NFTs, and Assumption of Risk. Common does not endorse, approve of, or take any responsibility in determining any particular NFT’s value, or make any warranty about the suitability of any NFT for ownership or trading. The prices and value of any NFTs are volatile and subjective and have no guaranteed value. Common does not and cannot guarantee that any NFT purchased through the Services will retain any particular value. You acknowledge that to the extent any NFT has value, any NFT may drop in value for many reasons, and Common will have no responsibility for determining value or making up any losses in value to you. You agree to assume all risk associated with the use and value of NFTs, including the risk that an NFT may have no value in the future. You also agree not to create or use NFTs in any way that would violate applicable laws, including US securities laws.
-Section 7.13 Novel and Experimental Technology. The Service, Common, and Common Network rely on novel and experimental technology that may contain bugs, viruses, Trojan horses, or other vulnerabilities, and may be subject to hacks, phishing attempts or other malicious activity, that could result in a complete loss of the crypto assets that you use in connection with the Services, Common, or any protocol based on Common.xyz. By using Common, you acknowledge and agree to use such a novel and experimental technology at your own risk. You further acknowledge and agree that there are certain risks native to cryptographic or blockchain-based systems, which include but are not limited to, private key security, high price volatility, technological vulnerabilities, cybersecurity attacks, and other forms of malicious activity present in the crypto asset ecosystem (e.g., scams, rug pulls). Please do your own due diligence before engaging with the Service, or Common, whether directly or via any third-party products.
-Section 7.14 Modification of Terms. Common reserves the right to change or modify these Terms at any time and in our sole discretion. If we make material changes to these Terms, we will use reasonable efforts to provide notice of such changes, such as by providing notice through the Services or updating the “Last Updated” date at the beginning of these Terms. By continuing to access or use the Service, you confirm your acceptance of the revised Terms and all of the terms incorporated therein by reference effective as of the date these Terms are updated. It is your sole responsibility to review the Terms from time to time to view such changes and to ensure that you understand the terms and conditions that apply when you access or use the Service.`;
-
 const TermsPage = () => {
   const navigate = useCommonNavigate();
 
   return (
     <div className="TermsPage">
+      <CWText type="h3">Terms of Agreement</CWText>
+      <CWText>Last Updated Date: 3/8/2025</CWText>
       <div className="forum-container">
-        <CWText type="h3">Terms of Service</CWText>
-        <CWText>Posted on 7/10/2024</CWText>
-        {renderMultilineText(TOS)}
+        <p>
+          Please read this Terms of Use Agreement (the “
+          <strong>Terms of Use</strong>”) carefully. This Website and any
+          related websites or subdomains that link to these Terms of Use and are
+          operated by Cow Moon Wealth Software, Inc. (“<strong>Common</strong>”,
+          “<strong>we</strong>”, “<strong>us</strong>”, or “<strong>our</strong>
+          ”), its affiliates or agents (collectively, the “
+          <strong>Website</strong>”) and the information on the Website are
+          owned and controlled by Common. The Terms of Use governs the use of
+          the Website and applies to all users visiting the Website or using the
+          services enabled through the Website in any way, including using the
+          Software (defined below) licensed by Common to create and join
+          communities and interact with other users and using the Website and
+          the services enabled thereby (each including the Website, a “
+          <strong>Service</strong>” and, collectively, the “
+          <strong>Services</strong>”) to manage your use of the Software.
+        </p>
+        <p>
+          BY USING ANY SERVICES, CREATING AN ACCOUNT, CONNECTING A DIGITAL
+          WALLET TO THE WEBSITE, AND/OR BROWSING THE WEBSITE, YOU REPRESENT THAT
+          (1) YOU HAVE READ, UNDERSTAND, AND AGREE TO BE BOUND BY THE AGREEMENT,
+          (2) YOU ARE OF LEGAL AGE TO FORM A BINDING CONTRACT WITH COMMON, (3)
+          YOU HAVE THE AUTHORITY TO ENTER INTO THE TERMS OF USE PERSONALLY OR ON
+          BEHALF OF THE ENTITY (WHETHER OR NOT SUCH ENTITY IS REGISTERED OR
+          INCORPORATED UNDER THE LAWS OF ANY JURISDICTION) YOU HAVE NAMED AS THE
+          USER, AND TO BIND THAT ENTITY TO THE TERMS OF USE; AND (4) YOU
+          UNDERSTAND AND AGREE THAT YOU ARE SOLELY RESPONSIBLE FOR ENSURING THAT
+          YOUR USE OF THE SERVICES COMPLIES WITH THE LAWS OF YOUR JURISDICTION.
+          THE TERM “<strong>YOU</strong>” REFERS TO THE INDIVIDUAL OR ENTITY, AS
+          APPLICABLE, IDENTIFIED AS THE USER WHEN YOU REGISTERED ON THE WEBSITE.{' '}
+          <strong>
+            IF YOU DO NOT AGREE TO BE BOUND BY THE TERMS OF USE, YOU MAY NOT
+            ACCESS OR USE THIS WEBSITE OR THE SERVICES.
+          </strong>
+        </p>
+        <p>
+          <strong>
+            COMMON IS NOT AN EXCHANGE, TRUST COMPANY, LICENSED BROKER, DEALER,
+            BROKER-DEALER, INVESTMENT ADVISOR, INVESTMENT MANAGER, OR ADVISER.
+            NEITHER COMMON NOR OUR SERVICES GIVE, OFFER, OR RENDER INVESTMENT,
+            TAX, OR LEGAL ADVICE. COMMON PROVIDES SOFTWARE THAT ALLOWS YOU TO
+            MANAGE YOUR SELF-CUSTODIED SOFTWARE WALLETS AND OTHERWISE WRITE
+            TRANSACTIONS THAT MAY BE EXECUTED ON THIRD-PARTY BLOCKCHAINS AND
+            OTHER THIRD-PARTY SERVICES (DEFINED BELOW) AND RELATED
+            ADMINISTRATIVE SERVICES. BEFORE MAKING LEGAL, FINANCIAL, OR
+            INVESTMENT DECISIONS, WE RECOMMEND THAT YOU CONTACT AN INVESTMENT
+            ADVISOR, OR TAX OR LEGAL PROFESSIONAL.{' '}
+          </strong>
+        </p>
+        <p>
+          <strong>
+            YOU AGREE THAT YOU, AND NOT COMMON, ARE SOLELY RESPONSIBLE FOR
+            ENSURING THAT YOUR USE OF THE SERVICES, AND ANY ACTIONS YOU TAKE IN
+            CONNECTION WITH ANY TOKENS (INCLUDING WITHOUT LIMITATION ANY
+            MARKETING OR OTHER COMMUNICATIONS WITH RESPECT TO THE TOKENS)
+            COMPLIES WITH APPLICABLE LAW.{' '}
+          </strong>
+        </p>
+        <p>
+          The Service provides an interface that allows users of our Website (“
+          <strong>Users</strong>”) to interact with and manage Digital Wallets
+          owned and/or controlled by such Users. Each Digital Wallet is a system
+          of software-based smart contracts interoperable with software
+          installed on and operated through a user device, which such system
+          enables users to hold and transact in cryptocurrency and other digital
+          assets (“<strong>Digital Assets</strong>”) across one or more
+          third-party blockchains through a series of credible commitments. For
+          the avoidance of doubt, your Digital Wallet is not part of the Website
+          and is not a Service made available by Common under this Agreement.
+          Common has no obligation to monitor or control any use of any Digital
+          Wallet by you or any third party on or through the Website and/or any
+          use of any Digital Wallet that does not take place on or through the
+          Website. Common makes no representations or warranties about the
+          functionality of any Digital Wallet. All use of a Digital Wallet is
+          undertaken at your own risk, and Common is not and shall not be liable
+          to you or to any third party for any loss or damage arising from or
+          connected to your or any third party’s use of a Digital Wallet.
+          Notwithstanding anything to the contrary set forth herein, the terms
+          of Sections 10 through 12 of this Agreement apply, mutatis mutandis,
+          to any claims arising out of your use of or inability to use any
+          Digital Wallet.
+        </p>
+        <p>
+          <strong>
+            SECTION 16 CONTAINS PROVISIONS THAT GOVERN HOW TO RESOLVE DISPUTES
+            BETWEEN YOU AND COMMON. AMONG OTHER THINGS, SECTION 16 INCLUDES AN
+            AGREEMENT TO ARBITRATE WHICH REQUIRES, WITH LIMITED EXCEPTIONS, THAT
+            ALL DISPUTES BETWEEN YOU AND US SHALL BE RESOLVED BY BINDING AND
+            FINAL ARBITRATION. SECTION 16 ALSO CONTAINS A CLASS ACTION AND JURY
+            TRIAL WAIVER. PLEASE READ SECTION 16 CAREFULLY.
+          </strong>
+        </p>
+        <p>
+          <strong>
+            UNLESS YOU OPT OUT OF THE ARBITRATION AGREEMENT WITHIN THIRTY (30)
+            DAYS IN ACCORDANCE WITH SECTION 16: (1) YOU WILL ONLY BE PERMITTED
+            TO PURSUE DISPUTES OR CLAIMS AND SEEK RELIEF AGAINST US ON AN
+            INDIVIDUAL BASIS, NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY CLASS OR
+            REPRESENTATIVE ACTION OR PROCEEDING, AND YOU WAIVE YOUR RIGHT TO
+            PARTICIPATE IN A CLASS ACTION LAWSUIT OR CLASS-WIDE ARBITRATION; AND
+            (2) YOU ARE WAIVING YOUR RIGHT TO PURSUE DISPUTES OR CLAIMS AND SEEK
+            RELIEF IN A COURT OF LAW AND TO HAVE A JURY TRIAL.
+          </strong>
+        </p>
+        <p>
+          <strong>
+            ANY DISPUTE, CLAIM OR REQUEST FOR RELIEF RELATING IN ANY WAY TO YOUR
+            USE OF THE WEBSITE WILL BE GOVERNED AND INTERPRETED BY AND UNDER THE
+            LAWS OF NEW YORK, WITHOUT GIVING EFFECT TO ANY PRINCIPLES THAT
+            PROVIDE FOR THE APPLICATION OF THE LAW OF ANY OTHER JURISDICTION.
+            THE UNITED NATIONS CONVENTION ON CONTRACTS FOR THE INTERNATIONAL
+            SALE OF GOODS IS EXPRESSLY EXCLUDED FROM THIS AGREEMENT.{' '}
+          </strong>
+        </p>
+        <p>
+          <strong>
+            PLEASE BE AWARE THAT SECTION 4.4 (COMMON COMMUNICATIONS) OF THIS
+            AGREEMENT, BELOW, CONTAINS YOUR OPT-IN CONSENT TO RECEIVE
+            COMMUNICATIONS FROM US.
+          </strong>
+        </p>
+        <p>
+          Your use of, and participation in, certain Services may be subject to
+          additional terms (“<strong>Supplemental Terms</strong>”) and such
+          Supplemental Terms will either be listed in the Terms of Use or will
+          be presented to you for your acceptance when you sign up to use the
+          supplemental Service. If the Terms of Use are inconsistent with the
+          Supplemental Terms, the Supplemental Terms shall control with respect
+          to such Service. The Terms of Use and any applicable Supplemental
+          Terms are referred to herein as the “<strong>Agreement.</strong>”
+        </p>
+        <p>
+          PLEASE NOTE THAT THE AGREEMENT IS SUBJECT TO CHANGE BY COMMON IN ITS
+          SOLE DISCRETION AT ANY TIME. When changes are made, Common will make a
+          new copy of the Terms of Use available at the Website and any new
+          Supplemental Terms will be made available from within, or through, the
+          affected Service on the Website. We will also update the “Last
+          Updated” date at the top of the Terms of Use. If we make any material
+          changes, we may notify you by email or by notification through the
+          Services or through our social media channels. Any changes to the
+          Agreement will be effective immediately for new users of the Website
+          and/ or Services and will be effective thirty (30) days after posting
+          notice of such changes on the Website for existing Users. Common may
+          require you to provide consent to the updated Agreement in a specified
+          manner before further use of the Website, and/or the Services is
+          permitted. If you do not agree to any change(s) after receiving a
+          notice of such change(s), you shall stop using the Services.
+          Otherwise, your continued use of the Services constitutes your
+          acceptance of such change(s). PLEASE REGULARLY CHECK THE WEBSITE TO
+          VIEW THE THEN-CURRENT TERMS.
+        </p>
+        <ol>
+          <li>
+            <strong>DESCRIPTION OF THE SERVICES.</strong> The Services include
+            the Website and Services enabled thereby, as further defined and
+            described below. There are important risks and limitations
+            associated with the use of the Services as described below and
+            elsewhere in these Terms of Use. Please read them carefully.
+          </li>
+          <ol>
+            <li>
+              <strong>The Services.</strong> Common’s Services include a
+              proprietary online platform enabled through the Website, and
+              supported documentation made available therewith, that allows
+              Users to create or join online communities of Users that meet
+              certain criteria (“<strong>Communities</strong>”), create and post
+              written or image-based content for discussion, connect to and
+              transact through compatible third-party digital wallets (each, a “
+              <strong>Digital Wallet</strong>”), and acquire or dispose of
+              memecoins and other fungible Digital Assets (“
+              <strong>Tokens</strong>”). Users may be able to use the Services
+              to visualize any Tokens or other Digital Assets (collectively, “
+              <strong>User Assets</strong>”) that are associated with a Digital
+              Wallet and write transactions to be executed by such Digital
+              Wallet on third-party distributed ledgers compatible with the
+              Services (each, a “<strong>Supported Blockchain</strong>”) in
+              accordance with the technological and contractual parameters of
+              such Supported Blockchain (the applicable “
+              <strong>Blockchain Rules</strong>”). User Asset visualizations may
+              include graphs, projections, and other information about your User
+              Assets (collectively, “<strong>User Asset Information</strong>”).
+              Certain Users (each, a “<strong>Project</strong>”) can also use
+              certain Software and Services to mint and offer for sale unique
+              collections of Tokens, as set forth herein, and use Software and
+              other Services to manage such Tokens (all such Software and
+              Services collectively, the “<strong>Launchpad</strong>”).
+            </li>
+            <li>
+              <strong>Disclaimers.</strong> THE SERVICES ARE AN ADMINISTRATIVE
+              PLATFORM ONLY. THE SERVICES ARE NOT, AND COMMON DOES NOT PROVIDE,
+              LEGAL OR COMPLIANCE SERVICES. FOR THE AVOIDANCE OF DOUBT, AND
+              NOTWITHSTANDING ANYTHING ELSE SET FORTH HEREIN, YOU ARE SOLELY
+              RESPONSIBLE FOR ENSURING THAT YOUR USE OF THE LAUNCHPAD, LAUNCH
+              AND MANAGEMENT OF ANY TOKENS, OR OTHER USE OF THE SERVICES
+              COMPLIES WITH APPLICABLE LAW, AND YOU ACKNOWLEDGE AND AGREE THAT
+              COMMON SHALL HAVE NO LIABILITY TO YOU ARISING FROM OR RELATED TO
+              SAME. When you use the Launchpad to offer any Tokens, you
+              expressly release Common from any liability arising from or
+              related to such Tokens or any User activity in connection with
+              same, and you agree that you, and not Common, are solely
+              responsible for your decision to use the Launchpad, Software, and
+              any Services.
+            </li>
+            <li>
+              <strong>Common Software.</strong> Your use of any software and
+              associated documentation that is made available via the Service,
+              including without limitation the Launchpad smart contracts (“
+              <strong>Software</strong>”) is governed by the terms of the
+              license agreement that accompanies or is included with the
+              Software, or by the license agreement expressly stated on the
+              Website page(s) accompanying the Software. These license terms may
+              be posted with the Software downloads or at the Website page where
+              the Software can be accessed. Unless you agree to the terms of
+              such license agreement, you shall not use, download, or install
+              any Software that is accompanied by or includes a license
+              agreement. At no time will Common provide you with any tangible
+              copy of our Software. Common delivers access to the Software via
+              electronic transfer or download and does not use or deliver any
+              tangible media in connection with the (i) delivery, installation,
+              updating or problem resolution of any Software (including any new
+              releases); or (ii) delivery, correction or updating of
+              documentation. Unless the accompanying license agreement expressly
+              allows otherwise, any copying or redistribution of the Software is
+              prohibited, including any copying or redistribution of the
+              Software to any other server or location, or redistribution or use
+              on a service bureau basis. If there is any conflict between this
+              Agreement and the license agreement, the license agreement takes
+              precedence in relation to that Software (except as provided in the
+              following sentence). If the Software is a pre-release version,
+              then, notwithstanding anything to the contrary included within an
+              accompanying license agreement, you are not permitted to use or
+              otherwise rely on the Software for any commercial or production
+              purposes. If you and Common have not entered into a separate
+              license agreement with respect to your use of the Software or if
+              no license agreement accompanies use of the Software, use of the
+              Software will be governed by this Agreement and, subject to your
+              compliance with this Agreement, Common grants you a
+              non-assignable, non-transferable, non-sublicensable, revocable,
+              non-exclusive license to use the Software for the sole purpose of
+              enabling you to use the Service in the manner permitted by this
+              Agreement. Some Software may be offered under an OSS License
+              (defined below). There may be provisions in the OSS License that
+              expressly override this Agreement.
+            </li>
+            <li>
+              <strong>Open Source Software.</strong> You acknowledge and agree
+              that the Service may use, incorporate or link to certain software
+              made available under an “open-source” or “free” license (“
+              <strong>OSS</strong>” or “<strong>OSS License</strong>”, as
+              applicable), and that your use of the Service is subject to, and
+              you agree to comply with, any applicable OSS Licenses. Each item
+              of OSS is licensed under the terms of the end-user license that
+              accompanies such OSS. Nothing in this Agreement limits your rights
+              under, or grants you rights that supersede, the terms and
+              conditions of any applicable end user license for the OSS.
+            </li>
+            <li>
+              <strong>Communities.</strong> Communities are made available
+              through the Services, and all user (including User) activity on or
+              in connection with such Communities is subject to this Agreement
+              and any membership eligibility criteria or other supplemental
+              terms applicable to a Community (“
+              <strong>Community Guidelines</strong>”).
+            </li>
+            <ol>
+              <li>
+                <strong>Project Determines Community Guidelines.</strong> When
+                you join or otherwise participate in any Community, you
+                acknowledge and agree that the terms of this Agreement and the
+                applicable Community Guidelines apply to all such participation.
+                Notwithstanding the foregoing, you acknowledge and agree that
+                the Project that hosts the applicable Community, and not Common,
+                is responsible for the policies and operation of such Community,
+                including without limitation any membership eligibility
+                criteria, and any action or inaction taken by such Project in
+                connection with the enforcement of any Community Guidelines.
+              </li>
+              <li>
+                <strong>Moderation.</strong> Moderating a Community, whether as
+                a Project or individual User, is an unofficial, voluntary
+                position. We do not verify or validate any User’s right to
+                access or moderate any Community and we are not responsible for
+                any action taken by the moderators. If you choose to moderate a
+                Community, you agree (i) to follow the AUP and the terms of this
+                Agreement; (ii) to take appropriate action in response to
+                reports related to the Community that you moderate, including
+                without limitation escalating such reports to us; (iii) that you
+                are not, and you shall not represent that you are, authorized to
+                act on our behalf; (iv) not to enter into any agreement with any
+                third party on behalf of us; (v) that you will use any
+                non-public information to which you get access in connection
+                with moderation only for the purposes of moderation; and (vi)
+                any Community Guidelines you create for the Community that you
+                moderate will not conflict with this Agreement.
+              </li>
+            </ol>
+            <li>
+              <strong>Community Stake. “Stake</strong>” means an NFT asset that
+              is created by a Project or other User when such User engages with
+              certain Software through a Community, and may be subject to
+              Supplemental Terms as set forth on the Service. There may be Fees
+              associated with any User’s use of or interaction with any Stake or
+              the Software underlying such Stake, as further set forth on the
+              Service. Your use of or interaction with the Stake relies on
+              interactions with the applicable Supported Blockchain. For more
+              information reference our documents at{' '}
+              <a
+                href="https://docs.common.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'blue' }}
+              >
+                https://docs.common.xyz
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Contests.</strong> Projects and other Users may be able to
+              use certain Software to host, operate, and run contests for
+              members of such Users’ Communities (each, a “
+              <strong>Contest</strong>”), as further described on the Service in
+              connection with the applicable Software or Service. The User that
+              initiates a Contest is solely responsible for ensuring that their
+              Contest and all marketing and promotional materials created by
+              such User with respect thereto (the “
+              <strong>Contest Rules</strong>”) complies with all applicable
+              laws, rules, and regulations. Common does not review any Contest
+              or any Contest Rules and does not represent that the Services are
+              appropriate for all use cases or that your use of any Service in
+              connection with any Contest complies with applicable law. For more
+              information reference our documents at{' '}
+              <a
+                href="https://docs.common.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'blue' }}
+              >
+                https://docs.common.xyz
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Common Aura (Points) Program.</strong> Subject to your
+              ongoing compliance with this Agreement and any Common Aura Program
+              Terms (defined below) made available by Common from time to time,
+              Common may enable you to participate in a limited program that
+              rewards users for interacting with the Service (the “Common Aura
+              Program”) by allocating such users with Digital Assets that bear
+              no cash or monetary value and are made available by Common. These
+              Digital Assets are referred to as “Points” (known as “Aura” on the
+              platform), as further described below. Your participation in the
+              Common Aura Program constitutes your acceptance of the
+              then-current terms and conditions applicable to the Common Aura
+              Program at the time of such participation (the “Common Aura
+              Program Terms”), as may be modified or updated by Common in its
+              sole discretion. Additional terms applicable to the Common Aura
+              Program, which shall constitute part of the CommonnAura Program
+              Terms, may be set forth on the Services from time to time. For
+              more information reference our documents at
+              <a
+                href="https://docs.common.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'blue' }}
+              >
+                https://docs.common.xyz
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Transactions on Supported Blockchains.</strong> By
+              combining publicly available information with your interactions
+              with the Services, the Services can draft standard transaction
+              messages that are designed to accomplish your operational goals as
+              expressed through the interactions with the Services. You may
+              broadcast such messages to the validator network for any Supported
+              Blockchain in order to initiate a transaction of User Assets
+              through your Digital Wallet. The User must personally review and
+              authorize all transaction messages that the User wishes to
+              execute; this requires the User to sign the relevant transaction
+              message with the User’s Private Key (defined below). The
+              User-authorized message will then be broadcast to validators
+              through the Digital Wallet, and the User may pay a Gas Fee to have
+              the validators record the results of the transaction message on
+              the applicable Supported Blockchain, resulting in a transfer of
+              User Assets. Common and the Services are not agents or
+              intermediaries of the User, do not store or have access to or
+              control over any User Assets, Private Keys, passwords, Accounts or
+              other property of the User, and are not capable of performing
+              transactions or sending transaction messages on behalf of the
+              User. All transactions relating to the Tokens (“
+              <strong>Token Transactions</strong>”) are effected and recorded
+              solely through the interactions of the User with the respective
+              Projects, who are not under the control of or affiliated with
+              Common or the Services. Common does not process or transmit any
+              such Token Transactions.
+            </li>
+            <li>
+              <strong>Compatibility Risk.</strong> The Services may not be
+              compatible with all forms of cryptocurrency, blockchains, and/or
+              types of transactions, and certain of your User Assets may not be
+              compatible with the Services. Whether or not a User Asset is
+              then-currently compatible with the Services may change at any
+              time, in Common’s sole discretion, with or without notice to you.
+            </li>
+            <li>
+              <strong>Taxes</strong>. You are solely responsible (and Common has
+              no responsibility) for determining what, if any, taxes apply to
+              any transactions involving your User Assets.
+            </li>
+            <li>
+              <strong>AI Tools.</strong> Our Services leverage certain
+              third-party generative AI tools (“AI Tools”) to collect, analyze,
+              and respond to user prompts and requests in connection with the
+              matching service and to provide automated advice with respect to
+              dating and social interactions. By using any AI Tools, you hereby
+              consent and authorize Common to share any Content (defined below)
+              or other information you provide to the AI Tools with the
+              applicable Third-Party Service in order to complete your request.
+              YOU, AND NOT COMMON, SHALL BE SOLELY RESPONSIBLE FOR YOUR USE OF
+              THE AI TOOLS. YOU ACKNOWLEDGE AND AGREE THAT ANY CONDUCT YOU
+              ENGAGE IN AS A RESULT OF THE OUTPUT PROVIDED BY THE AI TOOLS IS AT
+              YOUR OWN RISK. BECAUSE AI TOOLS UTILIZE ARTIFICIAL INTELLIGENCE TO
+              COMMUNICATE WITH YOU, THE AI TOOLS MAY PROVIDE OUTPUT THAT IS
+              INACCURATE, INAPPROPRIATE, OR DOES NOT COMPLY WITH APPLICABLE LAW.
+              YOU AGREE THAT COMMON WILL NOT BE LIABLE TO YOU OR ANY THIRD PARTY
+              FOR ANY OUTPUT PROVIDED BY AI TOOLS OR YOUR OR ANY THIRD PARTY’S
+              USE OF OR RELIANCE ON SAME.
+            </li>
+            <li>
+              <strong>User Responsibility.</strong> You are solely responsible
+              for your interactions with other Users and any other parties with
+              whom you interact, including without limitation any Project;
+              provided, however, that Common reserves the right, but has no
+              obligation, to intercede in such disputes. You agree that Common
+              will not be responsible for any liability incurred as the result
+              of such interactions.
+            </li>
+          </ol>
+          <li>
+            <strong>ELIGIBILITY; USER REPRESENTATIONS AND WARRANTIES.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Registering Your Account.</strong> To access certain
+              features of the Services, you may be required to register an
+              account on the Services (“<strong>Account</strong>”).
+              Notwithstanding anything to the contrary herein, you acknowledge
+              and agree that you have no ownership or other property interest in
+              your Account, and you further acknowledge and agree that all
+              rights in and to your Account are and will forever be owned by and
+              inure to the benefit of Common. Furthermore, you are responsible
+              for all activities that occur under your Account. You shall
+              monitor your Account to restrict use by minors, and you will
+              accept full responsibility for any unauthorized use of the
+              Services by minors. You may not share your Account or password
+              with anyone, and you agree to notify Common immediately of any
+              unauthorized use of your password or any other breach of security.
+              You shall not have more than one Account at any given time. Common
+              reserves the right to remove or reclaim any usernames at any time
+              and for any reason, including but not limited to, claims by a
+              third party that a username violates the third party’s rights. You
+              agree not to create an Account or use the Services if you have
+              been previously removed by Common, or if you have been previously
+              banned from any of the Services.
+            </li>
+            <li>
+              <strong>Registration Data.</strong> When you access or use the
+              Services in any way, you agree to (a) provide true, accurate,
+              current and complete information about yourself as may be prompted
+              by the Services from time to time (the “
+              <strong>Registration Data</strong>”); and (b) maintain and
+              promptly update the Registration Data to keep it true, accurate,
+              current and complete. You acknowledge and agree that our
+              obligation to provide you with any Services is conditioned on the
+              Registration Data being accurate and complete at all times during
+              the term of this Agreement. If you provide any information that is
+              untrue, inaccurate, not current or incomplete, or Common has
+              reasonable grounds to suspect that any information you provide is
+              untrue, inaccurate, not current or incomplete, Common has the
+              right to suspend or terminate your access to the Services and
+              refuse any and all current or future use of the Services (or any
+              portion thereof). You agree not to use the Services if you have
+              been previously removed by Common, or if you have been previously
+              banned from any of the Services. Common reserves the right to
+              obtain and retain any Registration Data or other identifying
+              information as it may determine from time to time in order for you
+              to use and continue to use the Services.
+            </li>
+            <li>
+              <strong>Eligibility.</strong> You represent and warrant that:
+            </li>
+            <ol>
+              <li>
+                You are (i) at least eighteen (18) years old; (ii) of legal age
+                to form a binding contract; (iii) not a person barred from using
+                Services under the laws of the United States, your place of
+                residence or any other applicable jurisdiction; and (iv) not a
+                current resident of the United States. If you are acting on
+                behalf of a DAO or other entity, whether or not such entity is
+                formally incorporated under the laws of your jurisdiction, you
+                represent and warrant that you have all right and authority
+                necessary to act on behalf of such entity;
+              </li>
+              <li>
+                None of: (i) you; (ii) any affiliate of any entity on behalf of
+                which you are entering into this Agreement; (iii) any other
+                person having a beneficial interest in any entity on behalf of
+                which you are entering into this Agreement (or in any affiliate
+                thereof); or (iv) any person for whom you are acting as agent or
+                nominee in connection with this Agreement is: (A) a country,
+                territory, entity or individual named on an OFAC list as
+                provided at http://www.treas.gov/ofac, or any person or entity
+                prohibited under the OFAC programs, regardless of whether or not
+                they appear on the OFAC list; or (B) a senior foreign political
+                figure, or any immediate family member or close associate of a
+                senior foreign political figure. There is no legal proceeding
+                pending that relates to your activities relating to buying,
+                selling, staking, or otherwise using cryptocurrency or any other
+                Token- or Digital Asset- trading or blockchain technology
+                related activities;
+              </li>
+              <li>
+                You have not failed to comply with, and have not violated, any
+                applicable legal requirement relating to any blockchain
+                technologies or token-trading activities or any other applicable
+                laws, including, but not limited to, anti-money laundering or
+                terrorist financing laws, and no investigation or review by any
+                governmental entity is pending or, to your knowledge, has been
+                threatened against or with respect to you, nor does any
+                government order or action prohibit you or any of your
+                representatives from engaging in or continuing any conduct,
+                activity or practice relating to cryptocurrency.
+              </li>
+            </ol>
+            <li>
+              <strong>Digital Wallets.</strong> In connection with certain
+              features of the Services you may need to send cryptocurrency
+              assets to or from a Digital Wallet. If you do not have a Digital
+              Wallet, the Services may allow you to create one using Magic Labs,
+              Inc. (“<strong>Magic</strong>”). Creating a Digital Wallet through
+              Magic is subject to additional terms and conditions between you
+              and Magic. You represent that you are entitled to use such a
+              Digital Wallet. Please note that if a Digital Wallet or associated
+              service becomes unavailable then you should not attempt to use
+              such Digital Wallet in connection with the Services, and we
+              disclaim all liability in connection with the foregoing, including
+              without limitation any inability to access any User Assets you
+              have sent to such Digital Wallet. PLEASE NOTE THAT YOUR
+              RELATIONSHIP WITH MAGIC OR ANY OTHER THIRD-PARTY SERVICE PROVIDERS
+              ASSOCIATED WITH YOUR DIGITAL WALLET IS GOVERNED SOLELY BY YOUR
+              AGREEMENT(S) WITH SUCH THIRD-PARTY SERVICE PROVIDERS, AND COMMON
+              DISCLAIMS ANY LIABILITY FOR INFORMATION THAT MAY BE PROVIDED TO IT
+              OR USER ASSETS THAT MAY BE DEPLOYED TO ANY SUPPORTED BLOCKCHAIN BY
+              OR THROUGH SUCH THIRD-PARTY SERVICE PROVIDERS IN VIOLATION OF THE
+              SETTINGS THAT YOU HAVE SET IN SUCH DIGITAL WALLETS. Access to your
+              Digital Wallet may require the use of a private key or passphrase
+              (“<strong>Private Key</strong>”) and Common has no ability to
+              access your Digital Wallet without your involvement and authority.
+              Your Private Key is unique to you, and shall be maintained by you.
+              If you lose your Private Key, you may lose access to your Digital
+              Wallet and any contents thereof. Common does not have the ability
+              to recover a lost Private Key. While a Digital Wallet may be
+              interoperable with other compatible blockchain platforms, tokens,
+              or services, only User Assets supported by Common that are stored
+              in your Digital Wallet will be accessible through the Services.
+              When you use the Services in connection with any User Assets, you
+              represent and warrant that (a) you own or have the authority to
+              connect to the applicable Digital Wallet; (b) you own or have the
+              authority to deploy such User Assets; (c) all User Assets you
+              deploy, transfer, deposit, or otherwise make available in
+              connection with our Services have been earned, received, or
+              otherwise acquired by you in compliance with all applicable laws;
+              and (d) no User Assets that you deploy, transfer, deposit, or
+              otherwise make available in connection with the Services have been
+              “tumbled” or otherwise undergone any process designed to hide,
+              mask, or obscure the origin or ownership of such User Assets.
+            </li>
+            <li>
+              <strong>Access Through a Linked App.</strong> The Service may
+              allow you to link your Account with a third-party Digital Wallet
+              or valid account on a third-party platform or social network
+              (each, a “<strong>Linked Account</strong>”) by allowing Common to
+              access your Linked Account, as is permitted under the applicable
+              terms and conditions that govern your use of each Linked Account.
+              You represent that you are entitled to disclose your Linked
+              Account login information to Common and/or grant Common access to
+              your Linked Account (including, but not limited to, for use for
+              the purposes described herein) without breach by you of any of the
+              terms and conditions that govern your use of the applicable Linked
+              Account and without obligating Common to pay any fees or making
+              Common subject to any usage limitations imposed by such
+              Third-Party Service providers. By granting Common access to any
+              Linked Account, you understand that Common may access, make
+              available and store (if applicable) any information, data, text,
+              software, music, sound, photographs, graphics, video, messages,
+              tags and/or other materials (“<strong>Content</strong>”) that you
+              have provided to and stored in your Linked Account (“
+              <strong>Linked App Content</strong>”) so that it is available on
+              and through the Service via your Account. Unless otherwise
+              specified in this Agreement, all Linked App Content is considered
+              to be Your Content (defined below) for all purposes of this
+              Agreement. Depending on the Linked Accounts you choose and subject
+              to the privacy settings that you have set in such Linked Accounts,
+              personally identifiable information that you post to your Linked
+              Accounts may be available on and through your Account on the
+              Service. If a Linked Account or associated service becomes
+              unavailable, or Common’s access to such Linked Account is
+              terminated by the Third-Party Service provider, then Linked App
+              Content will no longer be available on and through the Service.
+              YOUR RELATIONSHIP WITH THE THIRD-PARTY SERVICE PROVIDERS
+              ASSOCIATED WITH YOUR THIRD-PARTY ACCOUNTS IS GOVERNED SOLELY BY
+              YOUR AGREEMENT(S) WITH SUCH THIRD-PARTY SERVICE PROVIDERS, AND
+              COMMON DISCLAIMS ANY LIABILITY FOR PERSONALLY IDENTIFIABLE
+              INFORMATION THAT MAY BE PROVIDED TO IT BY SUCH THIRD-PARTY SERVICE
+              PROVIDERS IN VIOLATION OF THE PRIVACY SETTINGS THAT YOU HAVE SET
+              IN SUCH THIRD-PARTY ACCOUNTS. Common makes no effort to review any
+              Linked App Content for any purpose, including but not limited to,
+              for accuracy, legality or noninfringement, and Common is not
+              responsible for any Linked App Content.
+            </li>
+            <li>
+              <strong>Necessary Equipment and Software.</strong> You must
+              provide all equipment and software necessary to connect to the
+              Services, including but not limited to, a mobile device that is
+              suitable to connect with and use the Services as applicable. You
+              are solely responsible for any fees, including Internet connection
+              or mobile fees, that you incur when accessing the Services.
+            </li>
+          </ol>
+          <li>
+            <strong>YOUR ASSUMPTION OF RISK.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Risk of Financial Loss.</strong> WHEN YOU USE THE
+              SERVICES, YOU UNDERSTAND AND ACKNOWLEDGE THAT COMMON IS NOT A
+              FINANCIAL OR INVESTMENT ADVISOR AND THAT THE SERVICES ENTAIL A
+              RISK OF LOSS AND MAY NOT MEET YOUR NEEDS. The Services provided by
+              Common rely on Supported Blockchains and the applicable Blockchain
+              Rules, which may not be reliable, consistent or dependent in all
+              scenarios. Common may not be able to foresee or anticipate
+              technical or other difficulties which may result in data loss or
+              other service interruptions. Common encourages you to periodically
+              confirm the valuation of your User Assets and the accuracy of any
+              User Asset Information through independent sources. Common does
+              not and cannot make any guarantee that your User Assets will not
+              lose value. The prices of cryptocurrency assets, including Tokens,
+              can be extremely volatile. Common makes no warranties as to the
+              markets in which your User Assets are staked, transferred,
+              purchased, or traded.
+            </li>
+            <li>
+              <strong>Cybersecurity Risks.</strong> You understand that like any
+              other software, the Software and the Services could be at risk of
+              third-party malware, hacks or cybersecurity breaches. You agree
+              that it is your responsibility to monitor your User Assets
+              regularly and confirm their proper use and deployment consistent
+              with your intentions.
+            </li>
+            <li>
+              <strong>Expertise and Experience.</strong> You represent and
+              warrant that you (i) have the necessary technical expertise and
+              ability to review and evaluate the security, integrity and
+              operation of your Digital Wallet and any Supported Blockchains to
+              which your User Assets may be deployed and staked in connection
+              with the Services; (ii) have the knowledge, experience,
+              understanding, professional advice and information to make your
+              own evaluation of the merits, risks and applicable compliance
+              requirements under applicable laws of any use of your Digital
+              Wallet and any Supported Blockchains to which your User Assets may
+              be deployed in connection with the Services; (iii) know,
+              understand and accept the risks associated with your Digital
+              Wallet and any Supported Blockchains to which your User Assets may
+              be deployed in connection with the Services; and (iv) accept the
+              risks associated with blockchain technology generally, and are
+              responsible for conducting your own independent analysis of the
+              risks specific to your use of the Services. You further agree that
+              Common will have no responsibility or liability for such risks.
+            </li>
+            <li>
+              <strong>General Risks of Blockchain Technology.</strong> In order
+              to be successfully completed, any transaction involving User
+              Assets initiated by or sent to your Digital Wallet must be
+              confirmed by and recorded on the applicable Supported Blockchain.
+              Common has no control over any Supported Blockchain, and therefore
+              cannot and does not ensure that any transaction details that you
+              submit or receive via our Services will be validated by or
+              confirmed on the relevant Supported Blockchain, and Common does
+              not have the ability to facilitate any cancellation or
+              modification requests. You accept and acknowledge that you take
+              full responsibility for all activities that you effect through
+              your Digital Wallet and accept all risks of loss, including loss
+              as a result of any authorized or unauthorized access to your
+              Digital Wallet, to the maximum extent permitted by law. You
+              further accept and acknowledge that:
+            </li>
+            <ol>
+              <li>
+                There are risks associated with using Digital Assets, including
+                but not limited to, the risk of hardware, software and Internet
+                connections; the risk of malicious software introduction; the
+                risk that third parties may obtain unauthorized access to
+                information stored within your Digital Wallet; the risks of
+                counterfeit assets, mislabeled assets, assets that are
+                vulnerable to metadata decay, assets on smart contracts with
+                bugs, and assets that may become untransferable; and the risk
+                that such Digital Assets may fluctuate in value. You accept and
+                acknowledge that Common will not be responsible for any
+                communication failures, disruptions, errors, distortions, delays
+                or losses you may experience when using blockchain technology,
+                however caused.
+              </li>
+              <li>
+                The regulatory regimes governing blockchain technologies,
+                cryptocurrencies, and tokens are uncertain, and new regulations
+                or policies, or new or different interpretations of existing
+                regulations, may materially adversely affect the development of
+                the Services and the value of your User Assets.
+              </li>
+              <li>
+                Common makes no guarantee as to the functionality of any
+                blockchain’s decentralized governance, which could, among other
+                things, lead to delays, conflicts of interest, or operational
+                decisions (including without limitation changes to any
+                Blockchain Rules) that are unfavorable to your User Assets. You
+                acknowledge and accept that the Blockchain Rules governing the
+                operation of a Supported Blockchain may be subject to sudden
+                changes which may materially alter such Supported Blockchain and
+                affect the value and function of any of your User Assets staked
+                on or to that Supported Blockchain.
+              </li>
+              <li>
+                Common makes no guarantee as to the security of any Supported
+                Blockchain or Digital Wallet. Common is not liable for any
+                hacks, double spending, or any other attacks on a Supported
+                Blockchain or Digital Wallet.
+              </li>
+              <li>
+                Any Supported Blockchain may slash or otherwise impose penalties
+                on certain validators (including validators to which your User
+                Assets have been deployed) in response to any activity not
+                condoned by such Supported Blockchain, whether in accordance
+                with the applicable Blockchain Rules or otherwise. You
+                acknowledge and agree that Common shall have no liability in
+                connection with any such slashing or penalties, including any
+                slashing or penalties that result in a loss or depreciation of
+                value of your User Assets.
+              </li>
+              <li>
+                The Supported Blockchains are controlled by third parties, and
+                Common is not responsible for their performance nor any risks
+                associated with the use thereof. The Services rely on, and
+                Common makes no guarantee or warranties as to the functionality
+                of or access to, any Supported Blockchain, Digital Wallet, or
+                Third-Party Service.
+              </li>
+              <li>
+                You control your Digital Wallet, and Common is not responsible
+                for its performance, nor any risks associated with the use
+                thereof.
+              </li>
+            </ol>
+          </ol>
+          <li>
+            <strong>USE OF THE SERVICES.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>License to the Services.</strong> Subject to the
+              Agreement, Common grants you a limited license to access and use
+              the Services solely as described hereunder. Unless otherwise
+              specified by Common in a separate license, your right to use any
+              and all Services is subject to this Agreement. You acknowledge and
+              agree that nothing set forth herein shall be construed as a sale
+              of any ownership interest in or to the Services or any
+              intellectual property rights associated therewith.
+            </li>
+            <li>
+              <strong>Updates.</strong> You understand that Services are
+              evolving. You acknowledge and agree that Common may update
+              Services with or without notifying you. You may need to update
+              third-party software from time to time in order to use Services.
+            </li>
+            <li>
+              <strong>Certain Restrictions.</strong> The Services are intended
+              for your internal use only. The rights granted to you in the
+              Agreement are subject to the following restrictions: (a) you shall
+              not license, sell, rent, lease, transfer, assign, reproduce,
+              distribute, host or otherwise commercially exploit the Services or
+              any portion of the Services, including the Website; (b) you shall
+              not frame or utilize framing techniques to enclose any trademark,
+              logo, or other Services (including images, text, page layout or
+              form) of Common; (c) you shall not use any metatags or other
+              “hidden text” using Common’s name or trademarks; (d) you shall not
+              modify, translate, adapt, merge, make derivative works of,
+              disassemble, decompile, reverse compile or reverse engineer any
+              part of the Services except to the extent the foregoing
+              restrictions are expressly prohibited by applicable law; (e) you
+              shall not use any manual or automated software, devices or other
+              processes (including but not limited to spiders, robots, scrapers,
+              crawlers, avatars, data mining tools or the like) to “scrape” or
+              download data from any web pages contained in the Website (except
+              that we grant the operators of public search engines revocable
+              permission to use spiders to copy materials from the Website for
+              the sole purpose of and solely to the extent necessary for
+              creating publicly available searchable indices of the materials,
+              but not caches or archives of such materials); (f) except as
+              expressly stated herein, no part of the Services may be copied,
+              reproduced, distributed, republished, downloaded, displayed,
+              posted or transmitted in any form or by any means; and (g) you
+              shall not remove or destroy any copyright notices or other
+              proprietary markings contained on or in the Services. Any future
+              release, update or other addition to the Services shall be subject
+              to the Agreement. Common, its suppliers and service providers
+              reserve all rights not granted in the Agreement. Any unauthorized
+              use of the Services may terminate the licenses granted by Common
+              pursuant to the Agreement.
+            </li>
+            <li>
+              <strong>Common Communications.</strong> By entering into this
+              Agreement or using the Services, you agree to receive
+              communications from us, including via e-mail. Communications from
+              us and our affiliated companies may include but are not limited
+              to: operational communications concerning your use of the
+              Services, updates concerning new and existing features on the
+              Services, communications concerning promotions run by us or our
+              third-party partners, and news concerning Common and industry
+              developments.
+            </li>
+            <li>
+              <strong>Third-Party Services.</strong> Certain features of the
+              Services may rely on third-party websites, services, technology,
+              or applications accessible or otherwise connected to the Services
+              but not provided by Common, including without limitation any
+              Supported Blockchain, any validator on such Supported Blockchain,
+              our third-party identity verification providers, and your Digital
+              Wallet (each, a “<strong>Third-Party Service</strong>” and,
+              collectively, “<strong>Third-Party Services</strong>”).
+              Notwithstanding anything to the contrary in these Terms of Use,
+              you acknowledge and agree that (i) Common shall not be liable for
+              any damages, liabilities, or other harms in connection with your
+              use of and/or any inability to access the Third-Party Services;
+              and (ii) Common shall be under no obligation to inquire into and
+              shall not be liable for any damages, other liabilities or harm to
+              any person or entity relating to any losses, delays, failures,
+              errors, interruptions or loss of data occurring directly or
+              indirectly by reason of Third-Party Services or any other
+              circumstances beyond Common’s control, including without
+              limitation the failure of a Supported Blockchain or other
+              Third-Party Service.
+            </li>
+            <li>
+              <strong>Responsibility for Content.</strong> You acknowledge that
+              all Content, including the Services, is the sole responsibility of
+              the party from whom such Content originated. This means that you,
+              and not Common, are entirely responsible for all Content that you
+              upload, post, e-mail, transmit or otherwise make available through
+              or in connection with any Services (“<strong>Your Content</strong>
+              ”) and that other users of the Service, and not Common, are
+              similarly responsible for all Content that they make available
+              through the Service (“<strong>User Content</strong>”). Unless
+              expressly agreed to by Common in writing elsewhere, Common has no
+              obligation to store any of Your Content. Common has no
+              responsibility or liability for the deletion or accuracy of any
+              Content, including Your Content; the failure to store, transmit,
+              or receive transmission of Content; or the security, privacy,
+              storage, or transmission of other communications originating with
+              or involving use of the Service.
+            </li>
+          </ol>
+          <li>
+            <strong>OWNERSHIP.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Services.</strong> Except with respect to Your Content,
+              you agree that as between you and Common, Common and its suppliers
+              own all rights, title and interest in the Services, including but
+              not limited to, any software, computer code, algorithms,
+              technology, themes, objects, concepts, artwork, animations,
+              sounds, methods of operation, and documentation, as well as all
+              intellectual and proprietary rights related thereto. You will not
+              remove, alter or obscure any copyright, trademark, service mark or
+              other proprietary rights notices incorporated in or accompanying
+              any Services.
+            </li>
+            <li>
+              <strong>Trademarks.</strong> Common’s stylized name and all
+              related graphics, logos, service marks and trade names used on or
+              in connection with any Services, or in connection with the
+              Services, are the trademarks of Common and may not be used without
+              permission in connection with your, or any third-party, products
+              or services. Other trademarks, service marks and trade names that
+              may appear on or in the Services are the property of their
+              respective owners.
+            </li>
+            <li>
+              <strong>Feedback.</strong> You agree that submission of any ideas,
+              suggestions, documents, and/or proposals to Common through its
+              suggestion, feedback, wiki, discord, forum, or other pages or
+              means (“<strong>Feedback</strong>”) is at your own risk and that
+              Common has no obligations (including without limitation
+              obligations of confidentiality) with respect to such Feedback. You
+              represent and warrant that you have all rights necessary to submit
+              the Feedback. You hereby grant to Common a fully paid,
+              royalty-free, perpetual, irrevocable, worldwide, non-exclusive,
+              and fully sublicensable right and license to use, reproduce,
+              perform, display, distribute, adapt, modify, re-format, create
+              derivative works of, and otherwise commercially or
+              non-commercially exploit in any manner, any and all Feedback, and
+              to sublicense the foregoing rights, in connection with the
+              operation and maintenance of Services and/or Common’s business.
+            </li>
+          </ol>
+          <li>
+            <strong>USER CONDUCT; LICENSE TO YOUR CONTENT.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>License Grant to Common.</strong> You hereby grant Common
+              a fully paid, royalty-free, worldwide, non-exclusive right
+              (including any moral rights) and license to use, sublicense,
+              distribute, reproduce, modify, adapt, and display, Your Content
+              (in whole or in part) for the purposes of (i) providing the
+              Services, including making Your Content available to other users
+              in accordance with your elections on the Services; (ii) improving
+              the Services; and (iii) and monitoring and analyzing User Content
+              usage of the Services in order to derive and share insights based
+              on User Content and usage of the Services. Without limiting the
+              foregoing, you acknowledge that Your Content may be used by
+              Common, or third-party providers of AI Tools, to train, develop,
+              enhance, evolve and improve the Service and the underlying
+              artificial intelligence models, algorithms and related technology,
+              products and services (including for labeling, classification,
+              content moderation and model training purposes). Notwithstanding
+              the foregoing, Common does not offer for sale or sell the personal
+              data of its users. For more information on how we use your
+              personal data, please visit our{' '}
+              <a
+                href={`https://${PRODUCTION_DOMAIN}/privacy`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'blue' }}
+              >
+                Privacy Policy
+              </a>{' '}
+              Except with respect to Your Content, you agree that you have no
+              right, title, or interest in or to any User Content that appears
+              on or in the Services.
+            </li>
+            <li>
+              <strong>License Grant to other Users.</strong> You also hereby
+              grant each user of the Services a non-exclusive license to access
+              Your Content through the Services, and to use, reproduce,
+              distribute, display and perform such User Content as permitted
+              through the functionality of the Services and under this
+              Agreement, including without limitation through your interactions
+              with any Community.
+            </li>
+            <li>
+              <strong>Deleting Your User Content.</strong> If the features of
+              the Services allow you to remove or delete User Content from the
+              Services, the licenses granted by you in Your Content hereunder
+              terminate within a commercially reasonable time after you remove
+              or delete such User Content from the Services. Notwithstanding the
+              foregoing, you understand and agree that Common may retain, but
+              not display, distribute, or perform, server copies of User Content
+              that have been removed or deleted; provided that in certain cases
+              the above licenses granted by you with respect to such User
+              Content will not terminate and such User Content may continue to
+              be used, displayed, distributed, and performed indefinitely.
+            </li>
+            <li>
+              <strong>Restrictions.</strong> You agree not to make available any
+              User Content or take any action using the Services that: (i) may
+              create a risk of, glorify, encourage, or threaten violence, harm,
+              physical or mental injury, emotional distress, death, disability,
+              disfigurement, self-harm, or any other loss or damage to you or
+              any other person or to any animal or to any property; (ii) may
+              discriminate against, degrade, shame, or harass, encourage,
+              glorify, or promote violence toward any person or any groups of
+              persons; (iii) contains or depicts sexual acts or sexually
+              explicit or pornographic material; (iv) seeks to harm, exploit, or
+              groom children by exposing them to inappropriate content or
+              soliciting personally identifiable details or otherwise; (v) may
+              constitute, contribute to, depict, or encourage, a crime, illegal
+              activity, or a violation or infringement of any third party’s
+              rights; (vi) solicits or seeks to obtain or discloses the personal
+              information of any other person; (vii) you do not have the right
+              to make available or to take under any law or under contractual or
+              fiduciary relationships; (viii) deceptively impersonates another
+              person or entity or contains information that is fraudulent or
+              that you know is not correct and current; (ix) violates applicable
+              law, including without limitation any securities laws or
+              regulations that may be applicable to Common, you, or any Token;
+              or (x) we deem to be otherwise unlawful, harmful, abusive,
+              racially or ethnically offensive, defamatory, infringing, invasive
+              of personal privacy or publicity rights, harassing, humiliating to
+              other people (publicly or otherwise), libelous, threatening,
+              profane, or otherwise objectionable.
+            </li>
+            <li>
+              <strong>No Obligation to Pre-Screen Content.</strong> Common may,
+              but is not obligated to pre-screen, refuse or remove any User
+              Content for any reason, including if User Content violates the
+              Agreement or is otherwise objectionable. Common has no
+              responsibility or liability for the deletion or accuracy of any
+              User Content. Certain Services may enable you to specify the level
+              at which such Services restrict access to Your Content. You are
+              solely responsible for applying the appropriate level of access to
+              Your Content. You acknowledge and agree that you have no
+              expectation of privacy concerning the transmission of Your
+              Content, including without limitation chat, text, video, or voice
+              communications.
+            </li>
+            <li>
+              <strong>Representations and Warranties.</strong> You represent and
+              warrant that you have all necessary right, title, interest,
+              authorizations, and permissions to: (i) make available all of Your
+              Content; and (ii) grant the rights, licenses, and permissions
+              granted hereunder with respect to any data, Content, information,
+              or Feedback, including Your Content.
+            </li>
+            <li>
+              <strong>Acceptable Use Policy.</strong> You agree not to: (i)
+              upload, transmit, or distribute to or through the Services any
+              computer viruses, worms, or any software intended to damage or
+              alter a computer system or data; (ii) send through the Services
+              unsolicited or unauthorized advertising, promotional materials,
+              junk mail, spam, chain letters, pyramid schemes, or any other form
+              of duplicative or unsolicited messages, whether commercial or
+              otherwise; (iii) abuse other users’ personal information that you
+              receive through the Services, such as to harvest, collect, gather
+              or assemble information or data regarding other users, including
+              e-mail addresses, without their consent; (iv) interfere with,
+              disrupt, or create an undue burden on servers or networks
+              connected to the Services, or violate the regulations, policies or
+              procedures of such networks; (v) attempt to gain unauthorized
+              access to the Services (or to other computer systems or networks
+              connected to or used together with the Services), whether through
+              password mining or any other means; (vi) interfere with any other
+              user’s use and enjoyment of the Services; (vii) request or offer
+              to perform a request that is illegal or violates any of the terms
+              set forth herein; (viii) impersonate any person or entity,
+              including any employee or representative of Common; (ix) use
+              software or automated agents or scripts to produce multiple
+              Accounts on the Services, or to generate automated searches,
+              requests, or queries to (or to strip, scrape, or mine data from)
+              the Services (provided, however, that we may conditionally grant
+              to the operators of public search engines revocable permission to
+              use spiders to copy materials from the Website for the sole
+              purpose of and solely to the extent necessary for creating
+              publicly available searchable indices of the materials, but not
+              caches or archives of such materials, subject to the parameters
+              set forth in our robots.txt file); (x) use or attempt to use a
+              Digital Wallet that is not yours without authorization; (xi)
+              create, list, transact in, or otherwise make available counterfeit
+              Digital Assets on or through the Services; (xii) attempt to
+              circumvent any content-filtering techniques we employ, or attempt
+              to access any feature or area of the Services that you are not
+              authorized to access; (xii) use the Services for any illegal or
+              unauthorized purpose, or engage in, encourage, or promote any
+              activity that violates any applicable law or this Agreement,
+              including but not limited to money laundering, terrorist financing
+              or deliberately engaging in activities designed to adversely
+              affect the performance of the Services; engage in or knowingly
+              facilitate any “front-running,” “wash trading,” “pump and dump
+              trading,” “ramping,” “cornering” or fraudulent, deceptive or
+              manipulative trading activities, including without limitation: (a)
+              trading a Digital Asset at successively lower or higher prices for
+              the purpose of creating or inducing a false, misleading or
+              artificial appearance of activity in such Digital Asset, unduly or
+              improperly influencing the market price for such Digital Asset or
+              establishing a price which does not reflect the true state of the
+              market in such Digital Asset; (b) for the purpose of creating or
+              inducing a false or misleading appearance of activity in a Digital
+              Asset or creating or inducing a false or misleading appearance
+              with respect to the market in a Digital Asset: (a) executing or
+              causing the execution of any transaction in a Digital Asset which
+              involves no material change in the beneficial ownership thereof;
+              or (b) entering any order for the purchase or sale of a Digital
+              Asset with the knowledge that an order of substantially the same
+              size, and at substantially the same price, for the sale of such
+              Digital Asset, has been or will be entered by or for the same or
+              different parties; or (c) participating in, facilitating,
+              assisting or knowingly transacting with any pool, syndicate or
+              joint account organized for the purpose of unfairly or deceptively
+              influencing the market price of a Digital Asset; (xiv) use the
+              Services to carry out any financial activities subject to
+              registration or licensing, including but not limited to using the
+              Services to transact in securities, debt financings, equity
+              financings or other similar transactions; or (xv) Use the Services
+              to participate in fundraising for a business, protocol, or
+              platform, including but not limited to creating, listing, or
+              buying assets that (i) are redeemable for financial instruments,
+              (ii) give owners rights to participate in an ICO or any securities
+              offering, or (iii) entitle owners to financial rewards, including
+              but not limited to, DeFi yield bonuses, staking bonuses, and burn
+              discounts.
+            </li>
+          </ol>
+          <li>
+            <strong>
+              Procedure for Making Claims of Copyright Infringement.
+            </strong>{' '}
+            It is Common’s policy to terminate membership privileges of any user
+            who repeatedly infringes copyright, trademark, or other intellectual
+            property rights upon prompt notification to Common by the respective
+            intellectual property owner or their legal agent. Without limiting
+            the foregoing, if you believe that your work has been copied and
+            posted on the Service in a way that constitutes intellectual
+            property rights infringement, please provide our designated
+            intellectual property agent with the following information: (i) an
+            electronic or physical signature of the person authorized to act on
+            behalf of the owner of the copyright, trademark, or other
+            intellectual property right; (ii) a description of the copyrighted
+            work, trademark, or other intellectual property right that you claim
+            has been infringed; (iii) a description of the location on the
+            Service of the material that you claim is infringing; (iv) your
+            address, telephone number, and email address; (v) a written
+            statement by you that you have a good faith belief that the disputed
+            use is not authorized by the copyright, trademark, or other
+            intellectual property right owner, its agent or the law; and (vi) a
+            statement by you, made under penalty of perjury, that the above
+            information in your notice is accurate and that you are the
+            copyright, trademark, or other intellectual property right owner or
+            authorized to act on the copyright, trademark, or other intellectual
+            property right owner’s behalf. Contact information for Common’s
+            designated agent for notice of claims of infringement is as follows:
+            DMCA@common.xyz
+          </li>
+          <li>
+            <strong>FEES.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Fees.</strong> Access to the Website and certain Services
+              is free. However, Common reserves the right to charge fees (“
+              <strong>Fees</strong>”) in connection with your use of certain
+              Services from time to time. All pricing and payment terms for such
+              Fees are as indicated on the Service, and any payment obligations
+              you incur are binding at the time of the applicable transaction.
+              In the event that Common makes available, and you elect to
+              purchase, any Services in connection with which Common charges
+              Fees, you agree that you will pay Common all such Fees at Common’s
+              then-current standard rates. You agree that all Fees are
+              non-cancellable, non-refundable, and non-recoupable.
+            </li>
+            <li>
+              <strong>Gas Fees.</strong> You are solely responsible for ensuring
+              that any payment made by you is sufficient to cover any Gas Fee
+              required to complete any transaction in connection with or effect
+              any other use of the Services. “<strong>Gas Fees</strong>” are
+              transaction fees determined by market conditions on the applicable
+              Supported Blockchain, and are not determined, set, or charged by
+              Common.
+            </li>
+            <li>
+              <strong>Taxes.</strong> You are responsible for all federal,
+              state, local, sales, use, value added, excise, or other taxes,
+              fees, or duties arising out of the Agreement or the transactions
+              contemplated by the Agreement (other than taxes based on Common’s
+              net income).
+            </li>
+            <li>
+              <strong>Promotions.</strong> Common may from time to time make
+              available certain conditional offers, airdrops, promotional
+              prices, or discounted fees (each, a “<strong>Promotion</strong>”)
+              to new or existing users of the Services. The rules governing such
+              Promotion will be made available in connection with such
+              Promotion. Common will determine your eligibility for any
+              Promotion in its sole discretion and may change the terms of or
+              terminate a Promotion at any time, with or without notice to you.
+            </li>
+            <li>
+              <strong>Currency.</strong> You may not substitute any other
+              currency, whether cryptocurrency or fiat currency, for the
+              currency in which you have contracted to pay any Fees. For
+              clarity, no fluctuation in the value of any currency, whether
+              cryptocurrency or otherwise, shall impact or excuse your
+              obligations with respect to any purchase.
+            </li>
+            <li>
+              <strong>Payment Processing Services.</strong> Common may add or
+              change any payment processing services at any time. Such services
+              may be subject to additional terms or conditions.
+            </li>
+            <li>
+              <strong>Tokens Transaction.</strong> You agree to pay all amounts
+              due in connection with any Token Transaction, including any Gas
+              Fees (“<strong>Token Fees</strong>”). Token Fees are payable to
+              the Project or other seller of the applicable Token, and not to
+              Common. Common is not a party to any Token Transaction, and you
+              agree that Common shall have no liability to any User or any third
+              party in connection with any Token Transaction, including without
+              limitation any failure of any party to initiate or complete a
+              Token Transaction.
+            </li>
+          </ol>
+          <li>
+            <strong>INDEMNIFICATION.</strong>,
+          </li>
+          <p>
+            You agree to indemnify and hold Common, its parents, subsidiaries,
+            affiliates, officers, employees, agents, partners, suppliers, and
+            licensors (each, a “<strong>Common Party</strong>” and collectively,
+            the “<strong>Common Parties</strong>”) harmless from any losses,
+            costs, liabilities and expenses (including reasonable attorneys’
+            fees) relating to or arising out of any and all of the following:
+            (a) Your Content; (b) your use of, or inability to use, any Services
+            (including any Software); (c) your violation of the Agreement,
+            including any of your representations or warranties hereunder; (d)
+            your violation of any rights of another party, including any Users;
+            (e) your failure to provide accurate or complete data in connection
+            with your use of the Services; (f) your violation of any applicable
+            laws, rules or regulations. Common reserves the right, at its own
+            cost, to assume the exclusive defense and control of any matter
+            otherwise subject to indemnification by you, in which event you will
+            fully cooperate with Common in asserting any available defenses.
+            This provision does not require you to indemnify any of the Common
+            Parties for any unconscionable commercial practice by such party or
+            for such party’s fraud, deception, false promise, misrepresentation
+            or concealment, or suppression or omission of any material fact in
+            connection with the Website or any Services provided hereunder. You
+            agree that the provisions in this section will survive any
+            termination of the Agreement and/or your access to Services.
+          </p>
+          <br></br>
+          <li>
+            <strong>RELEASE</strong>
+          </li>
+
+          <p>
+            TO THE MAXIMUM EXTENT PERMISSIBLE BY APPLICABLE LAW, YOU HEREBY
+            RELEASE THE COMMON PARTIES FROM ANY AND ALL LIABILITY, CLAIMS,
+            DEMANDS, ACTIONS, AND CAUSES OF ACTION, WHATSOEVER, ARISING OUT OF
+            OR RELATED TO ANY LOSS WHICH MAY BE SUSTAINED BY YOU WHILE USING,
+            ARISING OUT OF, OR IN CONNECTION WITH THE USE OF THE SERVICES,
+            INCLUDING ANY DIMINUTION OF VALUE TO OR LOSS OR THEFT OF ANY USER
+            ASSETS. TO THE MAXIMUM EXTENT PERMISSIBLE BY APPLICABLE LAW, THIS
+            RELEASE IS BINDING UPON YOUR RELATIVES, SPOUSE, HEIRS, NEXT OF KIN,
+            EXECUTORS, ADMINISTRATORS, BENEFICIARIES, PARTNERS, AND ANY OTHER
+            AFFILIATES OR INTERESTED PARTIES.
+          </p>
+          <p>
+            To the maximum extent permissible by applicable law, you waive and
+            relinquish any and all rights and benefits otherwise conferred by
+            any statutory or non-statutory law of any jurisdiction that would
+            purport to limit the scope of a release or waiver, including any all
+            rights and benefits which you have or may have under California
+            Civil Code Section 1542 or any similar law or code in your
+            jurisdiction, which states in substance “A GENERAL RELEASE DOES NOT
+            EXTEND TO CLAIMS THAT THE CREDITOR OR RELEASING PARTY DOES NOT KNOW
+            OR SUSPECT TO EXIST IN HIS OR HER FAVOR AT THE TIME OF EXECUTING THE
+            RELEASE AND THAT, IF KNOWN BY HIM OR HER, WOULD HAVE MATERIALLY
+            AFFECTED HIS OR HER SETTLEMENT WITH THE DEBTOR OR RELEASED PARTY.”
+            You acknowledge that the releases in these Terms of Use are intended
+            to be as broad and inclusive as permitted by law, and as a complete
+            and continuous release and waiver of liability for any and all use
+            of the Services.
+          </p>
+          <br></br>
+          <li>
+            <strong>DISCLAIMER OF WARRANTIES AND CONDITIONS.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>As Is.</strong> YOU EXPRESSLY UNDERSTAND AND AGREE THAT TO
+              THE EXTENT PERMITTED BY APPLICABLE LAW, YOUR USE OF SERVICES IS AT
+              YOUR SOLE RISK, AND SERVICES ARE PROVIDED ON AN “AS IS” AND “AS
+              AVAILABLE” BASIS, WITH ALL FAULTS. COMMON PARTIES EXPRESSLY
+              DISCLAIM ALL WARRANTIES, REPRESENTATIONS, AND CONDITIONS OF ANY
+              KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+              THE IMPLIED WARRANTIES OR CONDITIONS OF MERCHANTABILITY, FITNESS
+              FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARISING FROM USE OF
+              THE WEBSITE.{' '}
+              <strong>
+                COMMON PARTIES MAKE NO REPRESENTATION THAT THE SERVICES WILL
+                FUNCTION AS INTENDED OR BE SUITABLE FOR YOUR PURPOSES, AND YOU
+                BEAR ALL RISK ASSOCIATED WITH ANY USER ASSETS THAT YOU USE IN
+                CONNECTION THEREWITH.
+              </strong>
+            </li>
+            <ol>
+              <li>
+                COMMON PARTIES MAKE NO WARRANTY, REPRESENTATION OR CONDITION
+                THAT: (1) SERVICES WILL MEET YOUR REQUIREMENTS; (2) YOUR USE OF
+                SERVICES WILL BE UNINTERRUPTED, TIMELY, SECURE OR ERROR-FREE; OR
+                (3) THE RESULTS THAT MAY BE OBTAINED FROM USE OF SERVICES WILL
+                BE ACCURATE OR RELIABLE. COMMON MAKES NO REPRESENTATIONS OR
+                WARRANTIES WITH RESPECT TO ANY THIRD-PARTY SERVICE OR YOUR USE
+                OF THE SAME. THE COMMON PARTIES MAKE NO REPRESENTATION THAT THE
+                SERVICES WILL BE FREE OF THIRD-PARTY MALWARE, HACKS OR OTHER
+                CYBERSECURITY BREACHES.
+              </li>
+              <li>
+                ANY CONTENT DOWNLOADED FROM OR OTHERWISE ACCESSED THROUGH THE
+                SERVICES IS ACCESSED AT YOUR OWN RISK, AND YOU SHALL BE SOLELY
+                RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY, INCLUDING, BUT NOT
+                LIMITED TO, YOUR COMPUTER SYSTEM AND ANY DEVICE YOU USE TO
+                ACCESS THE SERVICES, OR ANY OTHER LOSS THAT RESULTS THEREFROM.
+              </li>
+              <li>
+                THE SERVICES MAY BE SUBJECT TO DELAYS, CANCELLATIONS AND OTHER
+                DISRUPTIONS. COMMON MAKES NO WARRANTY, REPRESENTATION OR
+                CONDITION WITH RESPECT TO THE SERVICES, INCLUDING BUT NOT
+                LIMITED TO, THE QUALITY, EFFECTIVENESS, REPUTATION AND OTHER
+                CHARACTERISTICS OF SERVICES.
+              </li>
+              <li>
+                NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED FROM
+                COMMON OR THROUGH THE SERVICES WILL CREATE ANY WARRANTY NOT
+                EXPRESSLY MADE HEREIN.
+              </li>
+            </ol>
+            <li>
+              FROM TIME TO TIME, COMMON MAY OFFER NEW “BETA” FEATURES OR TOOLS
+              WITH WHICH ITS USERS MAY EXPERIMENT. SUCH FEATURES OR TOOLS ARE
+              OFFERED SOLELY FOR EXPERIMENTAL PURPOSES AND WITHOUT ANY WARRANTY
+              OF ANY KIND, AND MAY BE MODIFIED OR DISCONTINUED AT COMMON’S SOLE
+              DISCRETION. THE PROVISIONS OF THIS SECTION APPLY WITH FULL FORCE
+              TO SUCH FEATURES OR TOOLS.
+            </li>
+            <li>
+              <strong>
+                COMMON IS NOT AN INVESTMENT OR FINANCIAL ADVISOR. NEITHER COMMON
+                NOR ITS SUPPLIERS OR LICENSORS SHALL BE RESPONSIBLE FOR
+                INVESTMENT AND OTHER FINANCIAL DECISIONS, OR DAMAGES, OR OTHER
+                LOSSES RESULTING FROM USE OF THE SERVICES OR ANY DIGITAL WALLET.
+                NEITHER COMMON NOR ITS SUPPLIERS OR LICENSORS SHALL BE
+                CONSIDERED AN “EXPERT” UNDER THE APPLICABLE SECURITIES
+                LEGISLATION IN YOUR JURISDICTION. NEITHER COMMON NOR ITS
+                SUPPLIERS OR LICENSORS WARRANT THAT THIS WEBSITE COMPLIES WITH
+                THE REQUIREMENTS OF ANY APPLICABLE REGULATORY AUTHORITY,
+                SECURITIES AND EXCHANGE COMMISSION, OR ANY SIMILAR ORGANIZATION
+                OR REGULATOR OR WITH THE SECURITIES LAWS OF ANY JURISDICTION.
+              </strong>
+            </li>
+            <li>
+              <strong>No Liability for Blockchain Losses.</strong> WE TAKE NO
+              RESPONSIBILITY FOR, AND WILL NOT BE LIABLE TO YOU FOR, ANY USE OF
+              DIGITAL ASSETS, INCLUDING BUT NOT LIMITED TO ANY LOSSES, DAMAGES
+              OR CLAIMS ARISING FROM: (I) USER ERROR SUCH AS FORGOTTEN
+              PASSWORDS, INCORRECTLY CONSTRUCTED TRANSACTIONS, OR MISTYPED
+              ADDRESSES; (II) SERVER FAILURE OR DATA LOSS; (III) CORRUPTED
+              DIGITAL WALLET FILES; (IV) UNAUTHORIZED ACCESS TO APPLICATIONS; OR
+              (V) ANY UNAUTHORIZED THIRD PARTY ACTIVITIES, INCLUDING WITHOUT
+              LIMITATION THE USE OF VIRUSES, PHISHING, BRUTEFORCING OR OTHER
+              MEANS OF ATTACK AGAINST THE SERVICES, DIGITAL ASSETS, OR DIGITAL
+              WALLETS. Common is not responsible for any losses or harms
+              sustained by you due to vulnerability or any kind of failure,
+              abnormal behavior of software (e.g., smart contract), blockchains,
+              or any other features of or inherent to Digital Assets. Common is
+              not responsible for any delay or failure to report any issues with
+              any blockchain supporting Digital Assets, including without
+              limitation forks, technical node issues, or any other issues that
+              result in losses of any sort.
+            </li>
+            <li>
+              <strong>No Liability for Conduct of Third Parties.</strong> YOU
+              ACKNOWLEDGE AND AGREE THAT COMMON PARTIES ARE NOT LIABLE, AND YOU
+              AGREE NOT TO SEEK TO HOLD COMMON PARTIES LIABLE, FOR THE CONDUCT
+              OF THIRD PARTIES, INCLUDING OTHER USERS AND OPERATORS OF EXTERNAL
+              SITES AND SUPPORTED BLOCKCHAINS, AND THAT THE RISK OF INJURY FROM
+              SUCH THIRD PARTIES RESTS ENTIRELY WITH YOU. COMMON SHALL BE UNDER
+              NO OBLIGATION TO INQUIRE INTO AND SHALL NOT BE LIABLE FOR ANY
+              DAMAGES, OTHER LIABILITIES OR HARM TO ANY PERSON OR ENTITY
+              RELATING TO ANY LOSSES, DELAYS, FAILURES, ERRORS, INTERRUPTIONS OR
+              LOSS OF DATA OCCURRING DIRECTLY OR INDIRECTLY BY REASON OF
+              CIRCUMSTANCES BEYOND COMMON CONTROL, INCLUDING WITHOUT LIMITATION
+              THROUGH THE DEPLOYMENT OF USER ASSETS TO ANY SUPPORTED BLOCKCHAIN
+              IN CONNECTION WITH THE SERVICES.
+            </li>
+            <li>
+              <strong>
+                No Liability in Connection with Open-Source Software.
+              </strong>{' '}
+              Notwithstanding anything to the contrary in these Terms of Use,
+              you acknowledge and agree that any software or services you access
+              under the terms of an OSS License is at your own risk, and Common
+              shall not be liable for any damages, other liabilities or harm to
+              any person or entity relating to any losses, delays, failures,
+              errors, interruptions or loss of data occurring directly or
+              indirectly by reason of circumstances outside beyond Common
+              control, including without limitation through your use of any
+              Content under the terms of an OSS License.
+            </li>
+            <li>
+              <strong>User Content.</strong> COMMON ASSUMES NO RESPONSIBILITY
+              FOR THE TIMELINESS, DELETION, MIS-DELIVERY OR FAILURE TO STORE ANY
+              CONTENT (INCLUDING, BUT NOT LIMITED TO, YOU USER CONTENT AND USER
+              CONTENT), USER COMMUNICATIONS OR PERSONALIZATION SETTINGS.
+            </li>
+            <li>
+              <strong>No Liability for Third-Party Materials.</strong> As a part
+              of the Services, you may have access to materials that are hosted
+              or made available by another party, including User Content. You
+              agree that it is impossible for Common to monitor such materials
+              and that you access these materials at your own risk.
+            </li>
+          </ol>
+          <li>
+            <strong>LIMITATION OF LIABILITY.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Disclaimer of Certain Damages.</strong> YOU UNDERSTAND AND
+              AGREE THAT, TO THE FULLEST EXTENT PROVIDED BY LAW, IN NO EVENT
+              SHALL COMMON PARTIES BE LIABLE FOR ANY LOSS OF PROFITS, REVENUE OR
+              DATA, INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES, OR
+              DAMAGES OR COSTS DUE TO LOSS OF PRODUCTION OR USE, BUSINESS
+              INTERRUPTION, OR PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, IN
+              EACH CASE WHETHER OR NOT COMMON HAS BEEN ADVISED OF THE
+              POSSIBILITY OF SUCH DAMAGES, ARISING OUT OF OR IN CONNECTION WITH
+              THE AGREEMENT OR USE OF SERVICES OR ANY COMMUNICATIONS,
+              INTERACTIONS OR EXCHANGES WITH OTHER USERS OF SERVICES OR THIRD
+              PARTIES THAT INTERACT WITH THE SERVICES, ON ANY THEORY OF
+              LIABILITY, INCLUDING ANY SUCH DAMAGES RESULTING FROM: (a) LOSS OR
+              DIMINISHMENT IN VALUE OF USER ASSETS, (b) THE USE OR INABILITY TO
+              USE SERVICES; (c) THE COST OF PROCUREMENT OF SUBSTITUTE GOODS OR
+              SERVICES RESULTING FROM ANY GOODS, DATA, INFORMATION OR SERVICES
+              PURCHASED OR OBTAINED; OR MESSAGES RECEIVED FOR TRANSACTIONS
+              ENTERED INTO THROUGH THE SERVICES; (d) UNAUTHORIZED ACCESS TO OR
+              ALTERATION OF YOUR TRANSMISSIONS OR DATA; (e) STATEMENTS OR
+              CONDUCT OF ANY THIRD PARTY ON OR IN CONNECTION WITH THE SERVICES,
+              INCLUDING WITHOUT LIMITATION ANY SUPPORTED BLOCKCHAIN; (f) ANY USE
+              OF ANY THIRD-PARTY SERVICE, OR (g) ANY OTHER MATTER RELATED TO
+              SERVICES, WHETHER BASED ON WARRANTY, COPYRIGHT, CONTRACT, TORT
+              (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR ANY OTHER LEGAL
+              THEORY. THE FOREGOING LIMITATION OF LIABILITY SHALL NOT APPLY TO
+              LIABILITY OF A COMMON PARTY FOR (i) DEATH OR PERSONAL INJURY
+              CAUSED BY A COMMON PARTY’S NEGLIGENCE; OR FOR (ii) ANY INJURY
+              CAUSED BY A COMMON PARTY’S FRAUD OR FRAUDULENT MISREPRESENTATION.
+            </li>
+            <li>
+              <strong>Cap on Liability.</strong> TO THE FULLEST EXTENT PROVIDED
+              BY LAW, COMMON PARTIES WILL NOT BE LIABLE TO YOU FOR MORE THAN THE
+              GREATER OF (a) $100; OR (b) THE REMEDY OR PENALTY IMPOSED BY THE
+              STATUTE UNDER WHICH SUCH CLAIM ARISES WHERE SUCH REMEDY OR PENALTY
+              CANNOT BE WAIVED OR REDUCED PURSUANT TO THIS AGREEMENT. THE
+              FOREGOING CAP ON LIABILITY SHALL NOT APPLY TO LIABILITY OF A
+              COMMON PARTY FOR (i) DEATH OR PERSONAL INJURY CAUSED BY A COMMON
+              PARTY’S NEGLIGENCE; OR FOR (ii) ANY INJURY CAUSED BY A COMMON
+              PARTY’S FRAUD OR FRAUDULENT MISREPRESENTATION.
+            </li>
+            <li>
+              <strong>User Content.</strong> COMMON ASSUMES NO RESPONSIBILITY
+              FOR THE TIMELINESS, DELETION, MIS-DELIVERY OR FAILURE TO STORE ANY
+              CONTENT (INCLUDING, BUT NOT LIMITED TO, YOUR CONTENT AND USER
+              CONTENT), USER COMMUNICATIONS OR PERSONALIZATION SETTINGS.
+            </li>
+            <li>
+              <strong>Exclusion of Damages.</strong> CERTAIN JURISDICTIONS DO
+              NOT ALLOW THE EXCLUSION OR LIMITATION OF CERTAIN DAMAGES. IF THESE
+              LAWS APPLY TO YOU, SOME OR ALL OF THE ABOVE EXCLUSIONS OR
+              LIMITATIONS MAY NOT APPLY TO YOU, AND YOU MIGHT HAVE ADDITIONAL
+              RIGHTS.
+            </li>
+            <li>
+              <strong>Basis of the Bargain.</strong> THE LIMITATIONS OF DAMAGES
+              SET FORTH ABOVE ARE FUNDAMENTAL ELEMENTS OF THE BASIS OF THE
+              BARGAIN BETWEEN COMMON AND YOU.
+            </li>
+            <li>
+              <strong>MONITORING AND ENFORCEMENT.</strong> If Common becomes
+              aware of any possible violations by you of the Agreement, Common
+              reserves the right to investigate such violations. If, as a result
+              of the investigation, Common believes that criminal activity has
+              occurred, Common reserves the right to refer the matter to, and to
+              cooperate with, any and all applicable legal authorities. Common
+              is entitled, except to the extent prohibited by applicable law, to
+              disclose any information or materials on or in the Services,
+              including any information related to your Digital Wallet and other
+              Registration Data, in Common’s possession in connection with your
+              use of Services, to (i) comply with applicable laws, legal process
+              or governmental request; (ii) enforce the Agreement, (iii) respond
+              to any claims that Your Content violates the rights of third
+              parties, (iv) respond to your requests for customer service, or
+              (v) protect the rights, property or personal safety of Common, its
+              Users or the public, and all enforcement or other government
+              officials, as Common in its sole discretion believes to be
+              necessary or appropriate.
+            </li>
+          </ol>
+          <li>
+            <strong>TERM AND TERMINATION.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Term.</strong> The Agreement commences on the date when
+              you accept the Agreement (as described in the preamble above) and
+              remain in full force and effect while you use Services, unless
+              terminated earlier in accordance with the Agreement.
+            </li>
+            <li>
+              <strong>Prior Use.</strong> Notwithstanding the foregoing, you
+              hereby acknowledge and agree that the Agreement commenced on the
+              earlier to occur of (a) the date you first used Services or (b)
+              the date you accepted the Agreement, and will remain in full force
+              and effect while you use any Services, unless earlier terminated
+              in accordance with the Agreement.
+            </li>
+            <li>
+              <strong>Termination of Services by Common.</strong> Common
+              reserves the right to terminate this Agreement and your access to
+              the Services at any time, for any or for no reason, with or
+              without notice to you.
+            </li>
+            <li>
+              <strong>Termination of Services by You.</strong> If you want to
+              terminate the Services provided by Common, you may do so by (a)
+              notifying Common at any time and (b) ceasing all further use of
+              the Services. Your notice should be sent, in writing, to Common’s
+              address set forth below.
+            </li>
+            <li>
+              <strong>Effect of Termination.</strong> Termination of any Service
+              includes removal of access to such Service and barring of further
+              use of the Service. Termination of all Services may also include
+              deletion of Your Content. Upon termination of any Service, your
+              right to use such Service will automatically terminate
+              immediately. You understand that any termination of Services may
+              involve deletion of Your Content associated therewith from our
+              live databases. Common will not have any liability whatsoever to
+              you for any suspension or termination, including for deletion of
+              Your Content. All provisions of the Agreement which by their
+              nature should survive, shall survive termination of Services,
+              including without limitation, ownership provisions, warranty
+              disclaimers, indemnification and limitation of liability.
+            </li>
+            <li>
+              <strong>No Subsequent Registration.</strong> If your ability to
+              access the Services, is discontinued by Common due to your
+              violation of any portion of the Agreement, then you agree that you
+              shall not attempt to re-register with or access the Services, and
+              you acknowledge that you will not be entitled to receive a refund
+              for any Fees related to those Services to which your access has
+              been terminated.
+            </li>
+          </ol>
+          <li>
+            <strong>INTERNATIONAL USERS.</strong> Services can be accessed from
+            countries around the world and may contain references to Services
+            and Content that are not available in your country. These references
+            do not imply that Common intends to announce such Services or
+            Content in your country. Services are controlled and offered by
+            Common from its facilities in the United States. Common makes no
+            representations that Services are appropriate or available for use
+            in other locations. Those who access or use Services from other
+            countries do so at their own volition and are responsible for
+            compliance with local law.
+          </li>
+          <li>
+            <strong>DISPUTE RESOLUTION.</strong> Please read this Section 16
+            (the “<strong>Arbitration Agreement</strong>”) carefully. It is part
+            of your contract with Common and affects your rights. It contains
+            procedures for MANDATORY BINDING ARBITRATION AND A CLASS ACTION
+            WAIVER.
+          </li>
+          <ol>
+            <li>
+              <strong>Applicability of Arbitration Agreement.</strong> Subject
+              to the terms of this Arbitration Agreement (including Section
+              16.2, which shall apply notwithstanding any laws or rules in your
+              jurisdiction that may prohibit mandatory or compelled
+              arbitration), you and Common agree that any dispute, claim,
+              disagreements arising out of or relating in any way to your access
+              to or use of the Services or the Terms of Use and prior versions
+              of the Terms of Use, including claims and disputes that arose
+              between us before the effective date of these Terms of Use (each,
+              a “<strong>Dispute</strong>”) will be resolved by binding
+              arbitration, rather than in court, except that: (1) you and Common
+              may assert claims or seek relief in small claims court if such
+              claims qualify and remain in small claims court; and (2) you or
+              Common may seek equitable relief in court for infringement or
+              other misuse of intellectual property rights (such as trademarks,
+              trade dress, domain names, trade secrets, copyrights, and
+              patents). For purposes of this Arbitration Agreement, “Dispute”
+              will also include disputes that arose or involve facts occurring
+              before the existence of this or any prior versions of the Terms of
+              Use as well as claims that may arise after the termination of
+              these Terms of Use.
+            </li>
+            <li>
+              <strong>Informal Dispute Resolution.</strong> There might be
+              instances when a Dispute arises between you and Common. If that
+              occurs, Common is committed to working with you to reach a
+              reasonable resolution. You and Common agree that good faith
+              informal efforts to resolve Disputes can result in a prompt,
+              low‐cost and mutually beneficial outcome. You and Common therefore
+              agree that before either party commences arbitration against the
+              other (or initiates an action in small claims court if a party so
+              elects), we will personally meet and confer telephonically or via
+              videoconference, in a good faith effort to resolve informally any
+              Dispute covered by this Arbitration Agreement (“
+              <strong>Informal Dispute Resolution Conference</strong>”). If you
+              are represented by counsel, your counsel may participate in the
+              conference, but you will also participate in the conference. The
+              party initiating a Dispute must give notice to the other party in
+              writing of its intent to initiate an Informal Dispute Resolution
+              Conference (“<strong>Notice</strong>”), which shall occur within
+              45 days after the other party receives such Notice, unless an
+              extension is mutually agreed upon by the parties. Notice to Common
+              that you intend to initiate an Informal Dispute Resolution
+              Conference should be sent by email to the contact information set
+              forth below. The Notice must include: (1) your name, telephone
+              number, mailing address, and e‐mail address; (2) the name,
+              telephone number, mailing address and e‐mail address of your
+              counsel, if any; and (3) a description of your Dispute. The
+              Informal Dispute Resolution Conference shall be individualized
+              such that a separate conference must be held each time either
+              party initiates a Dispute, even if the same law firm or group of
+              law firms represents multiple users in similar cases, unless all
+              parties agree; multiple individuals initiating a Dispute cannot
+              participate in the same Informal Dispute Resolution Conference
+              unless all parties agree. In the time between a party receiving
+              the Notice and the Informal Dispute Resolution Conference, nothing
+              in this Arbitration Agreement shall prohibit the parties from
+              engaging in informal communications to resolve the initiating
+              party’s Dispute. Engaging in the Informal Dispute Resolution
+              Conference is a condition precedent and requirement that must be
+              fulfilled before commencing arbitration. The statute of
+              limitations and any filing fee deadlines shall be tolled while the
+              parties engage in the Informal Dispute Resolution Conference
+              process required by this section.
+            </li>
+            <li>
+              <strong>Waiver of Jury Trial.</strong> YOU AND COMMON HEREBY WAIVE
+              ANY CONSTITUTIONAL AND STATUTORY RIGHTS TO SUE IN COURT AND HAVE A
+              TRIAL IN FRONT OF A JUDGE OR A JURY. You and Common are instead
+              electing that all Disputes shall be resolved by arbitration under
+              this Arbitration Agreement, except as specified in the subsection
+              entitled “Applicability of Arbitration Agreement” above. There is
+              no judge or jury in arbitration, and court review of an
+              arbitration award is subject to very limited review.
+            </li>
+            <li>
+              <strong>
+                Waiver of Class and Other Non-Individualized Relief.
+              </strong>{' '}
+              YOU AND COMMON AGREE THAT, EXCEPT AS SPECIFIED IN SUBSECTION 16.9,
+              EACH OF US MAY BRING CLAIMS AGAINST THE OTHER ONLY ON AN
+              INDIVIDUAL BASIS AND NOT ON A CLASS, REPRESENTATIVE, OR COLLECTIVE
+              BASIS, AND THE PARTIES HEREBY WAIVE ALL RIGHTS TO HAVE ANY DISPUTE
+              BE BROUGHT, HEARD, ADMINISTERED, RESOLVED, OR ARBITRATED ON A
+              CLASS, COLLECTIVE, REPRESENTATIVE, OR MASS ACTION BASIS. ONLY
+              INDIVIDUAL RELIEF IS AVAILABLE, AND DISPUTES OF MORE THAN ONE
+              CUSTOMER OR USER CANNOT BE ARBITRATED OR CONSOLIDATED WITH THOSE
+              OF ANY OTHER CUSTOMER OR USER. Subject to this Arbitration
+              Agreement, the arbitrator may award declaratory or injunctive
+              relief only in favor of the individual party seeking relief and
+              only to the extent necessary to provide relief warranted by the
+              party’s individual claim. Nothing in this paragraph is intended
+              to, nor shall it, affect the terms and conditions under Subsection
+              16.9. Notwithstanding anything to the contrary in this Arbitration
+              Agreement, if a court decides by means of a final decision, not
+              subject to any further appeal or recourse, that the limitations of
+              this Subsection 16.4 are invalid or unenforceable as to a
+              particular claim or request for relief (such as a request for
+              public injunctive relief), you and Common agree that that
+              particular claim or request for relief (and only that particular
+              claim or request for relief) shall be severed from the arbitration
+              and may be litigated in the courts of New York, sitting in New
+              York City. All other Disputes shall be arbitrated or litigated in
+              small claims court. This subsection does not prevent you or Common
+              from participating in a class-wide settlement of claims.
+            </li>
+            <li>
+              <strong>Rules and Forum.</strong> The Terms of Use evidence a
+              transaction involving interstate commerce; and notwithstanding any
+              other provision herein with respect to the applicable substantive
+              law, the Federal Arbitration Act, 9 U.S.C. § 1 et seq., will
+              govern the interpretation and enforcement of this Arbitration
+              Agreement and any arbitration proceedings. If the Informal Dispute
+              Resolution Conference process described above does not resolve
+              satisfactorily within sixty (60) days after receipt of your
+              Notice, you and Common agree that either party shall have the
+              right to finally resolve the Dispute through binding arbitration.
+              The arbitration will be administered by the American Arbitration
+              Association (“<strong>AAA</strong>”), in accordance with the
+              Consumer Arbitration Rules (the “<strong>AAA Rules</strong>”) then
+              in effect, except as modified by this section of this Arbitration
+              Agreement. The AAA Rules are currently available at
+              https://www.adr.org/sites/default/files/Consumer%20Rules.pdf. A
+              party who wishes to initiate arbitration must provide the other
+              party with a request for arbitration (the “
+              <strong>Request</strong>”). The Request must include: (1) the
+              name, telephone number, mailing address, e‐mail address of the
+              party seeking arbitration (if applicable) as well as the
+              applicable Digital Wallet address; (2) a statement of the legal
+              claims being asserted and the factual bases of those claims; (3) a
+              description of the remedy sought and an accurate, good‐faith
+              calculation of the amount in controversy in United States Dollars;
+              (4) a statement certifying completion of the Informal Dispute
+              Resolution Conference process as described above; and (5) evidence
+              that the requesting party has paid any necessary filing fees in
+              connection with such arbitration. If the party requesting
+              arbitration is represented by counsel, the Request shall also
+              include counsel’s name, telephone number, mailing address, and
+              email address. Such counsel must also sign the Request. By signing
+              the Request, counsel certifies to the best of counsel’s knowledge,
+              information, and belief, formed after an inquiry reasonable under
+              the circumstances, that: (1) the Request is not being presented
+              for any improper purpose, such as to harass, cause unnecessary
+              delay, or needlessly increase the cost of dispute resolution; (2)
+              the claims, defenses and other legal contentions are warranted by
+              existing law or by a nonfrivolous argument for extending,
+              modifying, or reversing existing law or for establishing new law;
+              and (3) the factual and damages contentions have evidentiary
+              support or, if specifically so identified, will likely have
+              evidentiary support after a reasonable opportunity for further
+              investigation or discovery. Unless you and Common otherwise agree,
+              or the Batch Arbitration process discussed in subsection 16.9 is
+              triggered, the arbitration will be conducted in the county where
+              you reside. Subject to the AAA Rules, the arbitrator may direct a
+              limited and reasonable exchange of information between the
+              parties, consistent with the expedited nature of the arbitration.
+              If the AAA is not available to arbitrate, the parties will select
+              an alternative arbitral forum. Your responsibility to pay any AAA
+              fees and costs will be solely as set forth in the applicable AAA
+              Rules. You and Common agree that all materials and documents
+              exchanged during the arbitration proceedings shall be kept
+              confidential and shall not be shared with anyone except the
+              parties’ attorneys, accountants, or business advisors, and then
+              subject to the condition that they agree to keep all materials and
+              documents exchanged during the arbitration proceedings
+              confidential.
+            </li>
+            <li>
+              <strong>Arbitrator.</strong> The arbitrator will be either a
+              retired judge or an attorney licensed to practice law in New York
+              and will be selected by the parties from the AAA’s roster of
+              consumer dispute arbitrators. If the parties are unable to agree
+              upon an arbitrator within thirty-five (35) days of delivery of the
+              Request, then the AAA will appoint the arbitrator in accordance
+              with the AAA Rules, provided that if the Batch Arbitration process
+              under subsection 16.9 is triggered, the AAA will appoint the
+              arbitrator for each batch.
+            </li>
+            <li>
+              <strong>Authority of Arbitrator.</strong> The arbitrator shall
+              have exclusive authority to resolve any Dispute, including,
+              without limitation, disputes arising out of or related to the
+              interpretation or application of the Arbitration Agreement,
+              including the enforceability, revocability, scope, or validity of
+              the Arbitration Agreement or any portion of the Arbitration
+              Agreement, except for the following: (1) all Disputes arising out
+              of or relating to Subsection 16.4, including any claim that all or
+              part of Subsection 16.4 is unenforceable, illegal, void or
+              voidable, or that Subsection 16.4 has been breached, shall be
+              decided by a court of competent jurisdiction and not by an
+              arbitrator; (2) except as expressly contemplated in Subsection
+              16.9, all Disputes about the payment of arbitration fees shall be
+              decided only by a court of competent jurisdiction and not by an
+              arbitrator; (3) all Disputes about whether either party has
+              satisfied any condition precedent to arbitration shall be decided
+              only by a court of competent jurisdiction and not by an
+              arbitrator; and (4) all Disputes about which version of the
+              Arbitration Agreement applies shall be decided only by a court of
+              competent jurisdiction and not by an arbitrator. The arbitration
+              proceeding will not be consolidated with any other matters or
+              joined with any other cases or parties, except as expressly
+              provided in Subsection 16.9. The arbitrator shall have the
+              authority to grant motions dispositive of all or part of any
+              Dispute. The arbitrator shall issue a written award and statement
+              of decision describing the essential findings and conclusions on
+              which the award is based, including the calculation of any damages
+              awarded. The award of the arbitrator is final and binding upon you
+              and us. Judgment on the arbitration award may be entered in any
+              court having jurisdiction.
+            </li>
+            <li>
+              <strong>Attorneys’ Fees and Costs.</strong> The parties shall bear
+              their own attorneys’ fees and costs in arbitration unless the
+              arbitrator finds that either the substance of the Dispute or the
+              relief sought in the Request was frivolous or was brought for an
+              improper purpose (as measured by the standards set forth in
+              Federal Rule of Civil Procedure 11(b)). If you or Common need to
+              invoke the authority of a court of competent jurisdiction to
+              compel arbitration, then the party that obtains an order
+              compelling arbitration in such action shall have the right to
+              collect from the other party its reasonable costs, necessary
+              disbursements, and reasonable attorneys’ fees incurred in securing
+              an order compelling arbitration. The prevailing party in any court
+              action relating to whether either party has satisfied any
+              condition precedent to arbitration, including the Informal Dispute
+              Resolution Conference process, is entitled to recover their
+              reasonable costs, necessary disbursements, and reasonable
+              attorneys’ fees and costs.
+            </li>
+            <li>
+              <strong>Batch Arbitration.</strong> To increase the efficiency of
+              administration and resolution of arbitrations, you and Common
+              agree that in the event that there are one hundred (100) or more
+              individual Requests of a substantially similar nature filed
+              against Common by or with the assistance of the same law firm,
+              group of law firms, or organizations, within a thirty (30) day
+              period (or as soon as possible thereafter), the AAA shall (1)
+              administer the arbitration demands in batches of 100 Requests per
+              batch (plus, to the extent there are less than 100 Requests left
+              over after the batching described above, a final batch consisting
+              of the remaining Requests); (2) appoint one arbitrator for each
+              batch; and (3) provide for the resolution of each batch as a
+              single consolidated arbitration with one set of filing and
+              administrative fees due per side per batch, one procedural
+              calendar, one hearing (if any) in a place to be determined by the
+              arbitrator, and one final award (“
+              <strong>Batch Arbitration</strong>”). All parties agree that
+              Requests are of a “substantially similar nature” if they arise out
+              of or relate to the same event or factual scenario and raise the
+              same or similar legal issues and seek the same or similar relief.
+              To the extent the parties disagree on the application of the Batch
+              Arbitration process, the disagreeing party shall advise the AAA,
+              and the AAA shall appoint a sole standing arbitrator to determine
+              the applicability of the Batch Arbitration process (“
+              <strong>Administrative Arbitrator</strong>”). In an effort to
+              expedite resolution of any such dispute by the Administrative
+              Arbitrator, the parties agree the Administrative Arbitrator may
+              set forth such procedures as are necessary to resolve any disputes
+              promptly. The Administrative Arbitrator’s fees shall be paid by
+              Common. You and Common agree to cooperate in good faith with the
+              AAA to implement the Batch Arbitration process including the
+              payment of single filing and administrative fees for batches of
+              Requests, as well as any steps to minimize the time and costs of
+              arbitration, which may include: (1) the appointment of a discovery
+              special master to assist the arbitrator in the resolution of
+              discovery disputes; and (2) the adoption of an expedited calendar
+              of the arbitration proceedings. This Batch Arbitration provision
+              shall in no way be interpreted as authorizing a class, collective
+              and/or mass arbitration or action of any kind, or arbitration
+              involving joint or consolidated claims under any circumstances,
+              except as expressly set forth in this provision.
+            </li>
+            <li>
+              <strong>30-Day Right to Opt Out.</strong> You have the right to
+              opt out of the provisions of this Arbitration Agreement by sending
+              written notice of your decision to opt out to the address set
+              forth below, within thirty (30) days after first becoming subject
+              to this Arbitration Agreement. Your notice must include your name
+              and address, email address, Digital Wallet address (if you have
+              one), and an unequivocal statement that you want to opt out of
+              this Arbitration Agreement. If you opt out of this Arbitration
+              Agreement, all other parts of these Terms of Use will continue to
+              apply to you. Opting out of this Arbitration Agreement has no
+              effect on any other arbitration agreements that you may currently
+              have, or may enter in the future, with us.
+            </li>
+            <li>
+              <strong>Invalidity, Expiration.</strong> Except as provided in
+              Subsection 16.4, if any part or parts of this Arbitration
+              Agreement are found under the law to be invalid or unenforceable,
+              then such specific part or parts shall be of no force and effect
+              and shall be severed and the remainder of the Arbitration
+              Agreement shall continue in full force and effect. You further
+              agree that any Dispute that you have with Common as detailed in
+              this Arbitration Agreement must be initiated via arbitration
+              within the applicable statute of limitation for that claim or
+              controversy, or it will be forever time barred. Likewise, you
+              agree that all applicable statutes of limitation will apply to
+              such arbitration in the same manner as those statutes of
+              limitation would apply in the applicable court of competent
+              jurisdiction.
+            </li>
+            <li>
+              <strong>Modification.</strong> Notwithstanding any provision in
+              these Terms of Use to the contrary, we agree that if Common makes
+              any future material change to this Arbitration Agreement, it will
+              notify you. Unless you reject the change within thirty (30) days
+              of such change become effective by writing to Common at the
+              address set forth in Section 17.10, your continued use of the
+              Services, including the acceptance of products and services
+              offered on the Services following the posting of changes to this
+              Arbitration Agreement constitutes your acceptance of any such
+              changes. Changes to this Arbitration Agreement do not provide you
+              with a new opportunity to opt out of the Arbitration Agreement if
+              you have previously agreed to a version of these Terms of Use and
+              did not validly opt out of arbitration. If you reject any change
+              or update to this Arbitration Agreement, and you were bound by an
+              existing agreement to arbitrate Disputes arising out of or
+              relating in any way to your access to or use of the Services, any
+              communications you receive, or these Terms of Use, the provisions
+              of this Arbitration Agreement as of the date you first accepted
+              the Terms of Use (or accepted any subsequent changes to these
+              Terms of Use) remain in full force and effect. Common will
+              continue to honor any valid opt outs of the Arbitration Agreement
+              that you made to a prior version of these Terms of Use.
+            </li>
+            <li>
+              <strong>Confidentiality.</strong> All aspects of the arbitration
+              proceeding, including but not limited to the award of the
+              arbitrator and compliance therewith, shall be strictly
+              confidential. The parties agree to maintain confidentiality unless
+              otherwise required by law. This paragraph shall not prevent a
+              party from submitting to a court of law any information necessary
+              to enforce this Agreement, to enforce an arbitration award, or to
+              seek injunctive or equitable relief.
+            </li>
+            <li>
+              <strong>Survival of Agreement.</strong> This Arbitration Agreement
+              will survive the termination of your relationship with Common.
+            </li>
+          </ol>
+          <li>
+            <strong>GENERAL PROVISIONS.</strong>
+          </li>
+          <ol>
+            <li>
+              <strong>Independent Contractors.</strong> The relationship of
+              Common and you under this Agreement is that of independent
+              contractors. Notwithstanding anything else set forth herein,
+              neither party will be deemed to be an employee, agent, partner or
+              legal representative of the other for any purpose and neither will
+              have any right, power or authority to create any obligation or
+              responsibility on behalf of the other. Your use of the Services
+              shall not imply, suggest, or otherwise attempt to create an
+              employment relationship between Common and you.
+            </li>
+            <li>
+              <strong>Electronic Communications.</strong> The communications
+              between you and Common may take place via electronic means,
+              whether you visit Services or send Common e-mails, or whether
+              Common posts notices on Services or communicates with you via
+              e-mail. For contractual purposes, you (a) consent to receive
+              communications from Common in an electronic form; and (b) agree
+              that all terms and conditions, agreements, notices, disclosures,
+              and other communications that Common provides to you
+              electronically satisfy any legal requirement that such
+              communications would satisfy if it were to be in writing.
+            </li>
+            <li>
+              <strong>Release.</strong> You hereby release Common Parties and
+              their successors from claims, demands, any and all losses,
+              damages, rights, and actions of any kind, including personal
+              injuries, death, and property damage, that is either directly or
+              indirectly related to or arises from your use of Services,
+              including but not limited to, any interactions with or conduct of
+              other Users or third-party websites of any kind arising in
+              connection with or as a result of the Agreement or your use of
+              Services.
+            </li>
+            <li>
+              <strong>Assignment.</strong> The Agreement, and your rights and
+              obligations hereunder, may not be assigned, subcontracted,
+              delegated or otherwise transferred by you without Common’s prior
+              written consent, and any attempted assignment, subcontract,
+              delegation, or transfer in violation of the foregoing will be null
+              and void.
+            </li>
+            <li>
+              <strong>Force Majeure.</strong> Common shall not be liable for any
+              delay or failure to perform resulting from causes outside its
+              reasonable control, including, but not limited to, acts of God,
+              war, terrorism, riots, embargos, acts of civil or military
+              authorities, fire, floods, accidents, strikes or shortages of
+              transportation facilities, fuel, energy, labor or materials.
+            </li>
+            <li>
+              <strong>Questions, Complaints, Claims.</strong> If you have any
+              questions, complaints or claims with respect to Services, please
+              contact us at: hello@common.xyz. We will do our best to address
+              your concerns. If you feel that your concerns have been addressed
+              incompletely, we invite you to let us know for further
+              investigation.
+            </li>
+            <li>
+              <strong>Exclusive Venue.</strong> To the extent the parties are
+              permitted under this Agreement to initiate litigation in a court,
+              both you and Common agree that all claims and disputes arising out
+              of or relating to the Agreement will be litigated exclusively in
+              the courts of courts of New York City.
+            </li>
+            <li>
+              <strong>Governing Law.</strong> THE TERMS AND ANY ACTION RELATED
+              THERETO WILL BE GOVERNED AND INTERPRETED BY AND UNDER THE LAWS OF
+              NEW YORK, WITHOUT GIVING EFFECT TO ANY PRINCIPLES THAT PROVIDE FOR
+              THE APPLICATION OF THE LAW OF ANOTHER JURISDICTION. THE UNITED
+              NATIONS CONVENTION ON CONTRACTS FOR THE INTERNATIONAL SALE OF
+              GOODS DOES NOT APPLY TO THE AGREEMENT.
+            </li>
+            <li>
+              <strong>Choice of Language.</strong> It is the express wish of the
+              parties that the Agreement and all related documents have been
+              drawn up in English.
+            </li>
+            <li>
+              <strong>Notice.</strong> Where Common requires that you provide an
+              e-mail address, you are responsible for providing Common with your
+              most current e-mail address. In the event that the last e-mail
+              address you provided to Common is not valid, or for any reason is
+              not capable of delivering to you any notices required/ permitted
+              by the Agreement, Common’s dispatch of the e-mail containing such
+              notice will nonetheless constitute effective notice. You may give
+              notice to Common at the following address:{' '}
+              <strong>447 Broadway, 2nd FL #163, New York, NY, 10013.</strong>{' '}
+              Such notice shall be deemed given when received by Common by
+              letter delivered by nationally recognized overnight delivery
+              service or first class postage prepaid mail at the above address.
+            </li>
+            <li>
+              <strong>Notice.</strong> Where Common requires that you provide an
+              e-mail address, you are responsible for providing Common with your
+              most current e-mail address. In the event that the last e-mail
+              address you provided to Common is not valid, or for any reason is
+              not capable of delivering to you any notices required/ permitted
+              by the Agreement, Common’s dispatch of the e-mail containing such
+              notice will nonetheless constitute effective notice. You may give
+              notice to Common at the following address:{' '}
+              <strong>447 Broadway, 2nd FL #163, New York, NY, 10013.</strong>{' '}
+              Such notice shall be deemed given when received by Common by
+              letter delivered by nationally recognized overnight delivery
+              service or first class postage prepaid mail at the above address.
+            </li>
+            <li>
+              <strong>Waiver.</strong> Any waiver or failure to enforce any
+              provision of the Agreement on one occasion will not be deemed a
+              waiver of any other provision or of such provision on any other
+              occasion.
+            </li>
+            <li>
+              <strong>Severability.</strong> If any portion of this Agreement is
+              held invalid or unenforceable, that portion shall be construed in
+              a manner to reflect, as nearly as possible, the original intention
+              of the parties, and the remaining portions shall remain in full
+              force and effect.
+            </li>
+            <li>
+              <strong>Export Control.</strong> You may not use, export, import,
+              or transfer Services except as authorized by the laws of the
+              jurisdiction in which you obtained Services, and any other
+              applicable laws.
+            </li>
+            <li>
+              <strong>Entire Agreement.</strong> The Agreement is the final,
+              complete and exclusive agreement of the parties with respect to
+              the subject matter hereof and supersedes and merges all prior
+              discussions between the parties with respect to such subject
+              matter.
+            </li>
+          </ol>
+        </ol>
+
         <CWText
           onClick={() => {
-            window.open(
-              'https://drive.google.com/file/d/1Sd9dnyOKONc8880QwDiVSB3mrq1Pzb86/view?usp=sharing',
-              '_blank',
-            );
+            navigate('/privacy');
           }}
           className="link"
         >
-          See Full Policy
+          Privacy Policy
         </CWText>
         <CWText
           onClick={() => {
-            navigate('/tos-1-26-2023');
+            navigate('/tos-7-10-24');
           }}
           className="link"
         >
-          Previous Privacy Policy
+          Previous Terms of Service
         </CWText>
       </div>
     </div>

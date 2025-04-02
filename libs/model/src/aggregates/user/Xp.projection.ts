@@ -489,6 +489,9 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'WalletLinked',
           payload.new_user ? -1 : undefined, // first user linking is system quest
         );
+        // TODO: use action meta attributes to determine denomination and conversion to XP,
+        // at the moment we assume ETH (wei) denomination
+        const threshold = Number(payload.balance);
         await recordXpsForQuest(
           payload.user_id,
           payload.created_at,
@@ -496,7 +499,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           undefined,
           {
             wallet: payload.wallet_id,
-            threshold: payload.balance,
+            threshold,
           },
         );
       },

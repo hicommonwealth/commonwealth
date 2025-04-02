@@ -39,6 +39,8 @@ export const ActivityThread = z.object({
   marked_as_spam_at: z.string().nullish(),
   read_only: z.boolean(),
   has_poll: z.boolean().nullish(),
+  is_linking_token: z.boolean().optional(),
+  launchpad_token_address: z.string().nullish(),
   discord_meta: DiscordMetaSchema.nullish(),
   topic: z.object({
     id: z.number(),

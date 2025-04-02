@@ -430,7 +430,7 @@ export const events = {
     new_user: z.boolean(),
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
-    balance: z.number(),
+    balance: z.string(),
     created_at: z.coerce.date(),
   }),
 
