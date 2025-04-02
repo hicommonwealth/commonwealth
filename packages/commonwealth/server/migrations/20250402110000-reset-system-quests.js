@@ -18,7 +18,7 @@ module.exports = {
 
         -- reset awards, cap, and end system quest -1
         UPDATE "Quests" 
-        SET "xp_awarded" = (SELECT SUM(xp_points + creator_xp_points)
+        SET "xp_awarded" = (SELECT SUM(xp_points + COALESCE(creator_xp_points, 0))
           FROM "XpLogs" WHERE "action_meta_id" IN (-1, -2, -3)),
         "end_date" = now(),
         "max_xp_to_end" = 2000000
