@@ -47,7 +47,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         });
         if (!userAddress?.User) {
           log.warn(
-            `User address not found for trader address ${payload.trader_address}`,
+            `User not found for trader address ${payload.trader_address}`,
           );
           return;
         }
