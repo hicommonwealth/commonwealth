@@ -46,6 +46,7 @@ import {
   generateThreadTitlePrompt,
 } from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
+import Turnstile, { useTurnstile } from 'react-turnstile';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -222,6 +223,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         : undefined,
   });
 
+  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
+  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
+
+  const turnstile = useTurnstile();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
   const buttonDisabled =
     !user.activeAccount ||
     !userSelectedAddress ||
@@ -231,7 +238,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
     isDisabled ||
-    isGenerating;
+    isGenerating ||
+    (isTurnstileEnabled && !turnstileToken);
 
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
@@ -240,6 +248,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
+      return;
+    }
+
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the Turnstile verification');
       return;
     }
 
@@ -297,6 +310,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           bech32_prefix: community?.bech32_prefix || '',
           eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
         }),
+        turnstileToken,
       });
 
       const thread = await createThread(input);
@@ -315,7 +329,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       if (err instanceof SessionKeyError) {
         console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
-        return;
+
+        // Reset turnstile if there's an error
+        turnstile.reset();
+        setTurnstileToken(null);
       }
 
       if (err?.message?.includes('limit')) {
@@ -323,11 +340,17 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         notifyError(
           'Limit of submitted threads in selected contest has been exceeded.',
         );
-        return;
+        // Reset turnstile if there's an error
+        turnstile.reset();
+        setTurnstileToken(null);
       }
 
       console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
+
+      // Reset turnstile if there's an error
+      turnstile.reset();
+      setTurnstileToken(null);
     } finally {
       setIsSaving(false);
       if (!isInsideCommunity) {
@@ -357,6 +380,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     checkForSessionKeyRevalidationErrors,
     user,
     aiInteractionsToggleEnabled,
+    isTurnstileEnabled,
+    turnstileToken,
+    turnstile,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -633,6 +659,30 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
+
+              {isTurnstileEnabled && (
+                <div className="turnstile-container">
+                  <Turnstile
+                    sitekey={turnstileSiteKey || ''}
+                    onVerify={(token) => {
+                      console.log('Turnstile verified', token);
+                      setTurnstileToken(token);
+                    }}
+                    onExpire={() => {
+                      console.log('Turnstile expired');
+                      setTurnstileToken(null);
+                      turnstile.reset();
+                    }}
+                    onError={() => {
+                      console.log('Turnstile error');
+                      setTurnstileToken(null);
+                      notifyError(
+                        'Turnstile verification failed. Please try again.',
+                      );
+                    }}
+                  />
+                </div>
+              )}
 
               <div className="buttons-row">
                 <CWButton
