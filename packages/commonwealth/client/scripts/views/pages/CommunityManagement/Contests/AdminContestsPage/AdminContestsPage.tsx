@@ -217,7 +217,7 @@ const AdminContestsPage = () => {
                     ? `You need a namespace for your community to run Common contests. Set one up first.`
                     : !hasAtLeastOneWeightedVotingTopic
                       ? `You have a namespace, but no topics with weighted voting. You can still run a 
-                      judged contest, but weighted voting topics are necessary for weighted contests.`
+                      judged contest, but weighted topics are necessary for weighted voting contests.`
                       : `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
                 }
                 button={{

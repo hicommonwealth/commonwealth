@@ -41,7 +41,7 @@ export const ContractMethods = {
   GET_SELL_PRICE: 'getSellPrice',
   GET_CONTEST_BALANCE: 'getContestBalance',
   GET_FEE_MANAGER_BALANCE: 'getFeeManagerBalance',
-};
+  };
 
 // keys that are not (yet) associated with API routes
 export const QueryKeys = {

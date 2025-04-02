@@ -1,3 +1,4 @@
+import useConfigureNominationsMutation from './configureNominations';
 import useCreateContestMutation from './createContest';
 import useDeleteContestMutation from './deleteContest';
 import useDeployRecurringContestOnchainMutation from './deployRecurringContestOnchain';
@@ -9,6 +10,7 @@ import useGetContestsQuery from './getContests';
 import useFetchFarcasterCastsQuery from './getFarcasterCasts';
 
 export {
+  useConfigureNominationsMutation,
   useCreateContestMutation,
   useDeleteContestMutation,
   useDeployRecurringContestOnchainMutation,

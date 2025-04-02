@@ -43,7 +43,6 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     contestAddress,
   });
 
-  // Determine if it's a judged contest based on topic data
   const isJudgedContest =
     judgeContestEnabled &&
     contestFormData?.contestTopic &&
