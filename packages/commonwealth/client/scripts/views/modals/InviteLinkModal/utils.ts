@@ -1,13 +1,11 @@
 const inviteCommunityMessage = 'Join my Community on Common using my link!';
 const inviteCommonMessage = 'Join me on Common using my link!';
 
-export const generatePermalink = (
+export const generateTextAndLink = (
   isInsideCommunity: boolean,
   inviteLink: string,
 ) => {
-  const message = isInsideCommunity
-    ? inviteCommunityMessage
-    : inviteCommonMessage;
+  const text = isInsideCommunity ? inviteCommunityMessage : inviteCommonMessage;
 
-  return `${message} \n${inviteLink}`;
+  return { text, link: inviteLink };
 };

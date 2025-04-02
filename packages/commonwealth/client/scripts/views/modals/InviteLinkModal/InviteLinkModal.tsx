@@ -6,7 +6,7 @@ import app from 'state';
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import ShareSection from 'views/components/ShareSection';
-import { generatePermalink } from 'views/modals/InviteLinkModal/utils';
+import { generateTextAndLink } from 'views/modals/InviteLinkModal/utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -46,7 +46,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
     communityId ? `/${communityId}/discussions` : '/dashboard'
   }?refcode=${refCode}`;
 
-  const permalink = generatePermalink(!!communityId, inviteLink);
+  const textAndLink = generateTextAndLink(!!communityId, inviteLink);
 
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
@@ -91,7 +91,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
               iconRight={<CWIcon iconName="copy" />}
             />
 
-            <ShareSection url={permalink} />
+            <ShareSection url={textAndLink.link} text={textAndLink.text} />
           </>
         </div>
       </CWModalBody>
