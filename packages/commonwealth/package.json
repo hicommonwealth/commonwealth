@@ -9,7 +9,8 @@
   },
   "type": "module",
   "scripts": {
-    "async-delete-spam": "tsx scripts/async-delete-spam-threads.ts",
+    "async-delete-spam-comments": "tsx scripts/async-delete-spam-comments.ts",
+    "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",

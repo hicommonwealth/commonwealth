@@ -25,7 +25,7 @@ async function asyncDeleteThreads() {
   let deletedCount;
   const { communityId, deleteAfter, deleteFromTopicId } = parsedArgs;
   const whereClausesAND: string[] = [];
-  const vietnameseClause = `(t.title ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]' 
+  const foreignLanguageClause = `(t.title ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]' 
         OR t.body ~ '[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẸỆỈỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỳỵỷỹÝ]')`;
 
   const replacements = { communityId };
@@ -45,10 +45,10 @@ async function asyncDeleteThreads() {
       FROM "Threads" t
                JOIN "Topics" topic ON topic.community_id = t.community_id
       WHERE (t.community_id = :communityId AND ${whereClausesAND.join(' AND ')})
-          OR (t.community_id = :communityId AND ${vietnameseClause})
+          OR (t.community_id = :communityId AND ${foreignLanguageClause})
           LIMIT 10;
   `;
-  console.log('running command', threadSelectCommand);
+  console.log('running thread deletion command', threadSelectCommand);
 
   do {
     const deletedThreadIds = await models.sequelize.transaction(
