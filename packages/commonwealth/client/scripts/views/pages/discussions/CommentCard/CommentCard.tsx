@@ -462,6 +462,7 @@ export const CommentCard = ({
                 <ShareButton
                   url={shareURL}
                   title={undefined}
+                  text="See my comment and join me on Common"
                   shareType="comment"
                   buttonLabel="Share"
                 />

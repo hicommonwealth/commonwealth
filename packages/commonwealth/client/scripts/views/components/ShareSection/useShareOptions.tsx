@@ -55,12 +55,12 @@ export function useShareOptions(
    * text and is not strictly JUST a url. In these situations, if the user
    * has specified the text to send, we include that too.
    */
-  function computeCombinedURLPayload() {
+  const computeCombinedURLPayload = useCallback(() => {
     if (text) {
       return `${url}\n\n${text}`;
     }
     return url;
-  }
+  }, [text, url]);
 
   return useMemo(
     () =>
@@ -116,6 +116,6 @@ export function useShareOptions(
           },
         },
       ].filter(filterPredicate),
-    [filterPredicate, handleCopy, text, title, url],
+    [computeCombinedURLPayload, filterPredicate, handleCopy, text, title, url],
   );
 }

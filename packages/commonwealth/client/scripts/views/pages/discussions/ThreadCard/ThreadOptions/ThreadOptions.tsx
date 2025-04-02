@@ -157,7 +157,7 @@ export const ThreadOptions = ({
             <ShareButton
               url={shareEndpoint}
               title={thread.title}
-              text={thread.body}
+              text="See my thread and join me on Common"
               shareType="thread"
               buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
             />
