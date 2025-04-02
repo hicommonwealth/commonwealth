@@ -18,6 +18,11 @@ export const distributeSkale = async (
       // eslint-disable-next-line max-len
       `${BASE_API_PATH}/user.distributeSkale?batch=1`,
       payload,
+      {
+        headers: {
+          address: walletAccount,
+        },
+      },
     );
     if (response.status !== 200) {
       throw new Error(
