@@ -50,6 +50,18 @@ export function useShareOptions(
     doAsync().catch(console.error);
   }, [referralsEnabled, url, user.activeAccount]);
 
+  /**
+   * Some providers, like Telegram and Twitter, support the url param being
+   * text and is not strictly JUST a url. In these situations, if the user
+   * has specified the text to send, we include that too.
+   */
+  function computeCombinedURLPayload() {
+    if (text) {
+      return `${url}\n\n${text}`;
+    }
+    return url;
+  }
+
   return useMemo(
     () =>
       [
@@ -59,20 +71,26 @@ export function useShareOptions(
           onClick: () => window.open(url),
         },
         {
+          // url+text in URL param: yes
           name: 'Telegram',
           icon: telegramImg,
-          onClick: () =>
-            window.open(
-              `https://t.me/share/url?url=${encodeURIComponent(url)}`,
-            ),
+          onClick: () => {
+            const data = text + '\n\n' + url;
+
+            return window.open(
+              `https://t.me/share/url?url=${encodeURIComponent(computeCombinedURLPayload())}`,
+            );
+          },
         },
         {
+          // url+text in URL param: yes
           name: 'X (Twitter)',
           icon: twitterImg,
-          onClick: () =>
-            window.open(
-              `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`,
-            ),
+          onClick: () => {
+            return window.open(
+              `https://twitter.com/intent/tweet?url=${encodeURIComponent(computeCombinedURLPayload())}`,
+            );
+          },
         },
         {
           name: 'Warpcast',
