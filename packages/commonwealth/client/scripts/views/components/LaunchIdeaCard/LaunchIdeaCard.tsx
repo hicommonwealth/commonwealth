@@ -1,5 +1,5 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import React, { useState } from 'react';
+import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
@@ -10,14 +10,17 @@ type LaunchIdeaCardProps = {
   onTokenLaunchClick?: () => void;
   onRandomizeClick?: (ideaPrompt?: string) => void;
   maxPromptLength?: number;
+  ideaPrompt: string;
+  onIdeaPromptChange: (newPrompt: string) => void;
 };
 
 const LaunchIdeaCard = ({
   onTokenLaunchClick,
   onRandomizeClick,
   maxPromptLength = 80,
+  ideaPrompt,
+  onIdeaPromptChange,
 }: LaunchIdeaCardProps) => {
-  const [ideaPrompt, setIdeaPrompt] = useState<string>();
   const maxCharLimitReached = maxPromptLength === (ideaPrompt || '').length;
 
   return (
@@ -27,8 +30,9 @@ const LaunchIdeaCard = ({
         <CWTextInput
           placeholder="Type your idea or select randomize to launch a token...."
           fullWidth
+          value={ideaPrompt}
           onInput={(e) =>
-            !maxCharLimitReached && setIdeaPrompt(e.target.value.trim())
+            !maxCharLimitReached && onIdeaPromptChange(e.target.value)
           }
           customError={
             maxCharLimitReached

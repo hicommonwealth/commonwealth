@@ -4,6 +4,7 @@ import {
   type CosmosContractSource,
   type CosmosSource,
   type NativeSource,
+  type SolanaSource,
 } from '@hicommonwealth/shared';
 import type { GroupAttributes } from '../models/group';
 import type {
@@ -153,8 +154,9 @@ export function makeGetBalancesOptions(
             }
             break;
           }
+          case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL: {
-            const castedSource = requirement.data.source as ContractSource;
+            const castedSource = requirement.data.source as SolanaSource;
             const existingOptions = allOptions.find((opt) => {
               const castedOpt = opt as GetSPLBalancesOptions;
               return (
@@ -164,9 +166,9 @@ export function makeGetBalancesOptions(
             });
             if (!existingOptions) {
               allOptions.push({
-                balanceSourceType:
-                  castedSource.source_type as BalanceSourceType.SPL,
+                balanceSourceType: castedSource.source_type,
                 mintAddress: castedSource.contract_address,
+                solanaNetwork: castedSource.solana_network,
                 addresses,
               });
             }

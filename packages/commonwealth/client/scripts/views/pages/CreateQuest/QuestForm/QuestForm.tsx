@@ -140,16 +140,16 @@ const QuestForm = (props: QuestFormProps) => {
 
           <div className="xp-configuration-section">
             <CWText type="b1" fontWeight="semiBold">
-              XP Configuration
+              Aura Configuration
             </CWText>
 
             <CWTextInput
-              label="XP limit"
-              placeholder="XP limit"
+              label="Aura limit"
+              placeholder="Aura limit"
               fullWidth
               name="max_xp_to_end"
               hookToForm
-              instructionalMessage="Maximum XP that will be awarded for this quest before marking it as complete"
+              instructionalMessage="Maximum Aura that will be awarded for this quest before marking it as complete"
             />
           </div>
 

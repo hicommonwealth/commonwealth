@@ -34,7 +34,7 @@ const XPProgressIndicator = ({
         >
           {mode === XPProgressIndicatorMode.Compact ? (
             <CWText type="b2" fontWeight="semiBold">
-              XP
+              Aura
             </CWText>
           ) : (
             <WeeklyProgressGoal
