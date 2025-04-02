@@ -357,6 +357,7 @@ export const customIconLookup = {
   apple: CustomIcons.CWApple,
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatText),
+  privy: CustomIcons.CWPrivy,
 };
 
 export type IconName = keyof typeof iconLookup;

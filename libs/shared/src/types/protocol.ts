@@ -69,6 +69,7 @@ export type AbiType = Record<string, unknown>[];
 
 export enum WalletId {
   Magic = 'magic',
+  Privy = 'privy',
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
@@ -99,6 +100,8 @@ export enum WalletSsoSource {
   Email = 'email',
   Farcaster = 'farcaster',
   SMS = 'SMS',
+
+  // TODO: remove
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
