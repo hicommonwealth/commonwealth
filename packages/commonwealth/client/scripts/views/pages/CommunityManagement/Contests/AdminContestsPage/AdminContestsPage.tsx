@@ -213,14 +213,20 @@ const AdminContestsPage = () => {
                 img={commonUrl}
                 title="Launch on Common"
                 subtitle={
-                  hasAtLeastOneWeightedVotingTopic
-                    ? `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
-                    : `For weighted contests, you need at least one topic with weighted voting enabled. 
-You can still proceed to set up your contest.`
+                  !community?.namespace
+                    ? `You need a namespace for your community to run Common contests. Set one up first.`
+                    : !hasAtLeastOneWeightedVotingTopic
+                      ? `You have a namespace, but no topics with weighted voting. You can still run a 
+                      judged contest, but weighted voting topics are necessary for weighted contests.`
+                      : `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
                 }
                 button={{
-                  label: 'Launch Common contest',
-                  handler: goToLaunchCommonContest,
+                  label: community?.namespace
+                    ? 'Launch Common contest'
+                    : 'Create a namespace',
+                  handler: community?.namespace
+                    ? goToLaunchCommonContest
+                    : () => setContestView(ContestView.NamespaceEnablemenement),
                 }}
               />
             ) : (

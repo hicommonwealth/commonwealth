@@ -23,7 +23,7 @@ interface ManageContestProps {
 
 const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
-    useState<LaunchContestStep>('DetailsForm');
+    useState<LaunchContestStep>('ContestLive');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
 
   const [searchParams] = useSearchParams();
