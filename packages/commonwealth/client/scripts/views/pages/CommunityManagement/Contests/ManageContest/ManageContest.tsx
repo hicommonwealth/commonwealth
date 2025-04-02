@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -23,8 +24,9 @@ interface ManageContestProps {
 
 const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
-    useState<LaunchContestStep>('ContestLive');
+    useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
+  const judgeContestEnabled = useFlag('judgeContest');
 
   const [searchParams] = useSearchParams();
   const contestType = searchParams.get('type');
@@ -40,6 +42,12 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   } = useManageContestForm({
     contestAddress,
   });
+
+  // Determine if it's a judged contest based on topic data
+  const isJudgedContest =
+    judgeContestEnabled &&
+    contestFormData?.contestTopic &&
+    !contestFormData?.contestTopic.weightedVoting;
 
   const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
   const { data: tokenMetadata } = useTokenMetadataQuery({
@@ -93,6 +101,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
             isFarcasterContest={isFarcasterContest}
+            isJudgedContest={isJudgedContest}
             fundingTokenTicker={fundingTokenTicker}
             fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />

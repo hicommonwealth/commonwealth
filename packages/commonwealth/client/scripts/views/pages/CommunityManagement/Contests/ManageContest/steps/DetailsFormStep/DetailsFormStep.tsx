@@ -71,7 +71,9 @@ const DetailsFormStep = ({
   const isJudgedContest = (selectedTopic?: {
     weightedVoting?: TopicWeightedVoting | null;
   }) => {
-    return !selectedTopic?.weightedVoting && judgeContestEnabled;
+    return (
+      judgeContestEnabled && selectedTopic && !selectedTopic?.weightedVoting
+    );
   };
 
   const [payoutStructure, setPayoutStructure] = useState<
