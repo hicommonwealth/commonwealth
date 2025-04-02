@@ -11,6 +11,7 @@ const MIN_TRADE_AMOUNT = 10 ** 6;
 const log = logger(import.meta);
 
 const inputs = {
+  NamespaceDeployed: events.NamespaceDeployed,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
@@ -20,6 +21,48 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
+      NamespaceDeployed: async ({ payload }) => {
+        const { nameSpaceAddress, _namespaceDeployer } = payload.parsedArgs;
+
+        const community = await models.Community.findOne({
+          where: { namespace_address: nameSpaceAddress },
+        });
+        if (!community) {
+          log.warn(
+            `Community not found for namespace address ${nameSpaceAddress}`,
+          );
+          return;
+        }
+
+        const namespaceCreatorAddress = await models.Address.findOne({
+          where: { address: _namespaceDeployer },
+          include: [
+            {
+              model: models.User,
+              required: true,
+            },
+          ],
+        });
+        if (!namespaceCreatorAddress?.User) {
+          log.warn(
+            `Namespace creator user not found for address ${_namespaceDeployer}`,
+          );
+          return;
+        }
+        if (namespaceCreatorAddress.User.tier >= 4) return;
+
+        await models.User.update(
+          { tier: 4 },
+          {
+            where: {
+              id: namespaceCreatorAddress.User.id,
+              tier: {
+                [Op.lt]: 4,
+              },
+            },
+          },
+        );
+      },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
 
@@ -78,6 +121,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
                 tier: {
                   [Op.lt]: 4,
                 },
+                a,
               },
             },
           );
