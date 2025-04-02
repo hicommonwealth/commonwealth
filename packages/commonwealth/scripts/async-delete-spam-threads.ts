@@ -60,6 +60,7 @@ async function asyncDeleteThreads() {
 
         if (threads.length === 0) {
           console.log('No more threads found, returning');
+          return;
         }
 
         const threadIds = threads.map((t) => t.id);

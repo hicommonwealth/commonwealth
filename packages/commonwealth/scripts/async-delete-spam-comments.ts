@@ -43,6 +43,7 @@ async function asyncDeleteComments() {
 
         if (comments.length === 0) {
           console.log('No more comments found, returning');
+          return;
         }
 
         const commentIds = comments.map((t) => t.id);
