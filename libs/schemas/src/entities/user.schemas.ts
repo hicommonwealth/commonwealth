@@ -63,6 +63,7 @@ export const User = z.object({
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
+  privy_id: z.string().max(255).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),

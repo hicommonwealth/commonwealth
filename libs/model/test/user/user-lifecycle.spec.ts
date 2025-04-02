@@ -4,7 +4,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletId } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -329,7 +329,7 @@ describe('User lifecycle', () => {
         xp_awarded: 0,
         max_xp_to_end: 100,
         start_date: new Date(),
-        end_date: new Date(),
+        end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
         quest_type: 'common',
       });
 
@@ -874,7 +874,13 @@ describe('User lifecycle', () => {
       });
 
       // signin nonmember
-      const result = await signIn(signer, community_id, member.user.id);
+      const result = await signIn(
+        signer,
+        community_id,
+        member.user.id,
+        undefined,
+        WalletId.Coinbase,
+      );
 
       vi.clearAllMocks();
 
@@ -889,7 +895,9 @@ describe('User lifecycle', () => {
         where: { id: result!.user_id! },
       });
 
-      expect(after!.xp_points).toBe(before!.xp_points! + 13);
+      // 10 from system quest wallet linking
+      // 13 from wallet linking with balance
+      expect(after!.xp_points).toBe(before!.xp_points! + 10 + 13);
     });
   });
 });
