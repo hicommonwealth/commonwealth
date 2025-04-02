@@ -42,7 +42,7 @@ async function asyncDeleteComments() {
         );
 
         if (comments.length === 0) {
-          console.log('No more threads found, returning');
+          console.log('No more comments found, returning');
         }
 
         const commentIds = comments.map((t) => t.id);
