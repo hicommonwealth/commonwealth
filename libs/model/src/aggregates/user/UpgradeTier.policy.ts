@@ -1,5 +1,8 @@
 import { logger, Policy } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
+import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
+import { getChainNodeUrl } from 'model/src/utils/utils';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../../database';
 
@@ -9,6 +12,8 @@ const log = logger(import.meta);
 
 const inputs = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  ContestContentAdded: events.ContestContentAdded,
+  ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
 export function UpgradeTierPolicy(): Policy<typeof inputs> {
@@ -34,7 +39,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         }
 
         // check tier of token creator user
-        const userAddress = await models.Address.findOne({
+        const tokenCreatorAddress = await models.Address.findOne({
           where: {
             address: token.creator_address!,
           },
@@ -45,15 +50,15 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
             },
           ],
         });
-        if (!userAddress?.User) {
+        if (!tokenCreatorAddress?.User) {
           log.warn(
-            `User not found for trader address ${payload.trader_address}`,
+            `Token creator user not found for address ${token.creator_address!}`,
           );
           return;
         }
-        if (userAddress.User.tier >= 4) return;
+        if (tokenCreatorAddress.User.tier >= 4) return;
 
-        // if token has been traded above min amount, upgrade tier
+        // if token has been traded above min amount, upgrade token creator to tier 4
         const [totalTraded] = await models.sequelize.query<{
           sum: number;
         }>(
@@ -67,10 +72,109 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         if (totalTraded.sum > MIN_TRADE_AMOUNT) {
           await models.User.update(
             { tier: 4 },
-            { where: { id: userAddress.User.id } },
+            {
+              where: {
+                id: tokenCreatorAddress.User.id,
+                tier: {
+                  [Op.lt]: 4,
+                },
+              },
+            },
           );
         }
+      },
+      ContestContentAdded: async ({ payload }) => {
+        await onContestActivity(payload);
+      },
+      ContestContentUpvoted: async ({ payload }) => {
+        await onContestActivity(payload);
       },
     },
   };
 }
+
+type ContestActivityPayload = {
+  contest_address: string;
+  contest_id?: number;
+};
+
+const onContestActivity = async ({
+  contest_address,
+  contest_id,
+}: ContestActivityPayload) => {
+  const contestManager = await findActiveContestManager(contest_address, {
+    include: [
+      {
+        model: models.Community,
+        required: true,
+        include: [
+          {
+            model: models.ChainNode,
+            required: true,
+          },
+        ],
+      },
+    ],
+  });
+  if (!contestManager) {
+    log.warn(
+      `Contest manager not found for contest address ${contest_address}`,
+    );
+    return;
+  }
+
+  const rpc = getChainNodeUrl({
+    url: contestManager!.Community!.ChainNode!.url,
+    private_url: contestManager!.Community!.ChainNode!.private_url,
+  });
+
+  const chain: commonProtocol.EvmProtocolChain = {
+    eth_chain_id: contestManager.Community!.ChainNode!.eth_chain_id!,
+    rpc,
+  };
+
+  const { contestBalance } = await commonProtocol.getContestScore(
+    chain,
+    contest_address,
+    contestManager.prize_percentage!,
+    contestManager.payout_structure,
+    contest_id,
+  );
+
+  if (!contestBalance) {
+    return;
+  }
+
+  // contest has been funded, upgrade contest creator to tier 4
+
+  const contestCreatorAddress = await models.Address.findOne({
+    where: {
+      address: contestManager.creator_address!,
+    },
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
+  });
+  if (!contestCreatorAddress?.User) {
+    log.warn(
+      `Contest creator user not found for address ${contestManager.creator_address!}`,
+    );
+    return;
+  }
+  if (contestCreatorAddress.User.tier >= 4) return;
+
+  await models.User.update(
+    { tier: 4 },
+    {
+      where: {
+        id: contestCreatorAddress.User.id,
+        tier: {
+          [Op.lt]: 4,
+        },
+      },
+    },
+  );
+};
