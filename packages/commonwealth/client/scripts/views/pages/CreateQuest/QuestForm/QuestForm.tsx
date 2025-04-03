@@ -46,7 +46,8 @@ const QuestForm = (props: QuestFormProps) => {
     formMethodsRef,
   } = useQuestForm(props);
 
-  const popoverProps = usePopover();
+  const popoverPropsQuestActions = usePopover();
+  const popoverPropsQuestTypes = usePopover();
   const isUpdateMode = mode === 'update';
 
   return (
@@ -116,7 +117,40 @@ const QuestForm = (props: QuestFormProps) => {
                   isUpdateMode && 'update-mode',
                 )}
               >
-                <CWText type="caption">Quest Type</CWText>
+                <CWText type="b1" fontWeight="semiBold">
+                  Quest Type&nbsp;
+                  <CWPopover
+                    body={
+                      <div>
+                        <CWText type="b1" fontWeight="semiBold">
+                          Common Quests:
+                        </CWText>
+                        <br />
+                        <CWText type="b2">
+                          Common Quests are for events that happen on Common
+                          such as Threads, Comments, and Common Protocol events
+                          like Namespace Creation and more
+                        </CWText>
+                        <br />
+
+                        <CWText type="b1" fontWeight="semiBold">
+                          Channel Quests:
+                        </CWText>
+                        <br />
+                        <CWText type="b2">
+                          Channel Quests are external integrations such as to
+                          Twitter and Chain Events.
+                        </CWText>
+                      </div>
+                    }
+                    {...popoverPropsQuestTypes}
+                  />
+                  <CWIconButton
+                    iconName="question"
+                    onMouseEnter={popoverPropsQuestTypes.handleInteraction}
+                    onMouseLeave={popoverPropsQuestTypes.handleInteraction}
+                  />
+                </CWText>
                 <CWRadioButton
                   className="radio-btn mt-8"
                   value={QuestTypes.Common}
@@ -222,12 +256,12 @@ const QuestForm = (props: QuestFormProps) => {
                       </CWText>
                     </div>
                   }
-                  {...popoverProps}
+                  {...popoverPropsQuestActions}
                 />
                 <CWIconButton
                   iconName="question"
-                  onMouseEnter={popoverProps.handleInteraction}
-                  onMouseLeave={popoverProps.handleInteraction}
+                  onMouseEnter={popoverPropsQuestActions.handleInteraction}
+                  onMouseLeave={popoverPropsQuestActions.handleInteraction}
                 />
               </CWText>
               <CWText type="b2">
