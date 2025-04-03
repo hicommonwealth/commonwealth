@@ -113,7 +113,7 @@ const PersonalInformationStep = ({
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
     // Auto-select the generated username
-    setIsUserNameChangeDisabled(true);
+    setIsUserNameChangeDisabled(false);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
