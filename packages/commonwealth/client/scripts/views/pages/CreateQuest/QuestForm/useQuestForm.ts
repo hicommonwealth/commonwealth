@@ -126,7 +126,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
         questActions: questActionSubForms.map(({ values }) => ({
           creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
-          event_name: values.action as any,
+          event_name: values.action as QuestAction,
           quest_id: Math.random(),
           reward_amount: parseInt(`${values.rewardAmount || 0}`),
           participation_times_per_period: parseInt(
