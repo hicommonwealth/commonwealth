@@ -12,7 +12,6 @@ type ShareModalProps = {
   open: boolean;
   title?: string;
   text?: string;
-  dialogTitle: string;
   shareType: 'thread' | 'comment';
   headerLabel: string;
   BodyContent: () => ReactNode;
