@@ -3,6 +3,7 @@ import React from 'react';
 
 export const actionCopies = {
   title: {
+    ['SignUpFlowCompleted']: 'Sign in to Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
@@ -14,6 +15,7 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
   },
   pre_reqs: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -26,6 +28,7 @@ export const actionCopies = {
       `Requires Twitter/X linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
   },
   explainer: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -55,6 +58,7 @@ export const actionCopies = {
     ),
   },
   shares: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: 'referrer',
     ['CommunityJoined']: 'referrer',
     ['ThreadCreated']: '',

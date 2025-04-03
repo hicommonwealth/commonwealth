@@ -59,7 +59,7 @@ export function CreateBotNamespace(): Command<
           .toLowerCase(),
         name,
         tier: 0,
-        spam_tier_level: 1,
+        spam_tier_level: -1,
         default_symbol: symbol,
         icon_url,
         description,

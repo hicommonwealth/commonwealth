@@ -1142,3 +1142,7 @@ export const CWPara = ({
     </svg>
   );
 };
+
+export const CWPrivy = () => {
+  return <svg></svg>;
+};
