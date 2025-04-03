@@ -180,7 +180,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                 contract_name: ChildContractNames.Namespace,
                 parent_contract_address:
                   cp.factoryContracts[ethChainId].factory,
-                created_at_block: block_number,
+                created_at_block: Number(block_number),
               },
               { transaction },
             );

@@ -24,7 +24,9 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
     inputs,
     body: {
       NamespaceTransferSingle: async ({ payload }) => {
-        const { from: namespaceAddress, to: userAddress } = payload.parsedArgs;
+        const { from, to: userAddress } = payload.parsedArgs;
+        const { address: namespaceAddress } = payload.rawLog;
+        if (from !== namespaceAddress) return;
 
         const community = await models.Community.findOne({
           where: { namespace_address: namespaceAddress },

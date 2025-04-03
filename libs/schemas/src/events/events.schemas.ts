@@ -384,7 +384,6 @@ export const events = {
       signature: EVM_BYTES,
       namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
-      block_number: z.number().int().positive(),
     }),
   }),
 
@@ -433,7 +432,6 @@ export const events = {
       _signature: EVM_BYTES,
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
-      block_number: z.number().int().positive(),
     }),
   }),
 
