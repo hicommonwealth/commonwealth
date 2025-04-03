@@ -8,6 +8,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import TrustLevelRole from 'views/components/TrustLevelRole';
+
 import './XPTable.scss';
 
 const columns: CWTableColumnInfo[] = [
@@ -41,6 +43,7 @@ type RankProfile = {
     id: number;
     name: string;
     avatar_url: string;
+    tier: number;
   };
   xp: number;
   rank: number;
@@ -102,7 +105,13 @@ const XPTable = () => {
                       size={24}
                       address={rank.user_profile.id}
                     />
-                    <p>{rank.user_profile.name}</p>
+                    <p>
+                      {rank.user_profile.name}
+                      <TrustLevelRole
+                        type="user"
+                        level={rank.user_profile.tier}
+                      />
+                    </p>
                   </Link>
                 </div>
               ),
