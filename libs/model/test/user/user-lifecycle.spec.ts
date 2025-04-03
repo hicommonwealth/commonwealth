@@ -514,7 +514,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      expect(xps1!.length).to.equal(8);
+      expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
         expect(xp.quest_id).to.be.a('number');
         expect(xp.quest_action_meta_id).to.be.a('number');
