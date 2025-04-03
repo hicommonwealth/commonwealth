@@ -9,6 +9,7 @@ import Collaboration from './collaboration';
 import Comment from './comment';
 import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
+import CommunityDirectoryTags from './communit_directory_tags';
 import Community from './community';
 import CommunityAlert from './community_alerts';
 import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
@@ -65,6 +66,7 @@ export const Factories = {
   CommunityGoalReached,
   CommunityStake,
   CommunityTags,
+  CommunityDirectoryTags,
   Contest,
   ContestAction,
   ContestManager,

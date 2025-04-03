@@ -4,7 +4,11 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useGetCommunitySelectedTagsAndCommunities,
+  useUpdateCommunityDirectoryTags,
+} from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
@@ -59,7 +63,7 @@ const DirectoryPage = () => {
   const baseChain = defaultChainNodeId
     ? getNodeById(defaultChainNodeId, nodes)
     : undefined;
-  console.log('COMMUNITY.tags:: ', community?.CommunityTags);
+
   const { isAddedToHomeScreen } = useAppStatus();
 
   const {
@@ -74,67 +78,97 @@ const DirectoryPage = () => {
     selectedViewType,
   });
 
-  useEffect(() => {
-    if (community?.CommunityTags && community.CommunityTags.length > 0) {
-      const communityTagNames = community.CommunityTags.map(
-        (tag) => tag.Tag?.name || '',
-      );
-      setSelectedTags(communityTagNames);
-    }
-  }, [community]);
+  const {
+    data: communityTagsAndCommunities,
+    isLoading: isLoadingTagsAndCommunities,
+  } = useGetCommunitySelectedTagsAndCommunities({
+    community_id: communityId,
+    enabled: !!communityId,
+  });
+  console.log('communityTagsAndCommunities', communityTagsAndCommunities);
+  const { mutateAsync: updateCommunityDirectoryTags } =
+    useUpdateCommunityDirectoryTags();
+  console.log('communityTagsAndCommunities:: ', communityTagsAndCommunities);
 
   const getFilteredCommunities = useCallback(
     (communities: any[], tags: string[], manualSelections: string[]) => {
-      if (tags.length === 0 && manualSelections.length === 0) {
-        return communities;
+      if (
+        !communities ||
+        (tags.length === 0 && manualSelections.length === 0)
+      ) {
+        return communities || [];
       }
-
-      const manuallySelectedCommunities =
-        manualSelections.length > 0
-          ? communities.filter((manualSelectedCommunity) =>
-              manualSelections.includes(manualSelectedCommunity.name),
-            )
-          : [];
-
-      const communitiesFromTags =
-        tags.length > 0
-          ? communities.filter((tagSelectedCommunity) =>
-              tagSelectedCommunity.tag_ids?.some((tagId) =>
-                tags.includes(tagId),
-              ),
-            )
-          : [];
-
-      return [...manuallySelectedCommunities, ...communitiesFromTags].filter(
-        (item, index, self) =>
-          index === self.findIndex((c) => c.id === item.id),
-      );
+      if (manualSelections.length > 0) {
+        return communities.filter((comm) => manualSelections.includes(comm.id));
+      }
+      if (tags.length > 0) {
+        return communities.filter((comm) =>
+          tags.some((tag) => comm.tag_names?.includes(tag)),
+        );
+      }
+      return communities;
     },
     [],
   );
 
   useEffect(() => {
-    if (filteredRelatedCommunitiesData && tableData) {
-      const newFilteredCommunities = getFilteredCommunities(
+    if (!communityTagsAndCommunities?.[0]) return;
+
+    const initialTags = communityTagsAndCommunities[0].tag_names || [];
+    const initialCommunities =
+      communityTagsAndCommunities[0].selected_community_ids || [];
+
+    // Set initial selected tags and communities
+    setSelectedTags(initialTags);
+    setSelectedCommunities(initialCommunities);
+
+    // If we have related communities data, apply initial filtering
+    if (filteredRelatedCommunitiesData) {
+      const initialFilteredCommunities = getFilteredCommunities(
         filteredRelatedCommunitiesData,
-        selectedTags,
-        selectedCommunities,
+        initialTags,
+        initialCommunities,
       );
 
-      setFilteredCommunities(newFilteredCommunities);
+      setFilteredCommunities(initialFilteredCommunities);
 
-      const newTableData = tableData.filter((row) =>
-        newFilteredCommunities.some(
-          (filteredItem) => filteredItem.id === row.id,
-        ),
-      );
-      setFilteredTableData(newTableData);
+      // Update table data based on filtered communities
+      if (tableData) {
+        const newTableData = tableData.filter((row) =>
+          initialFilteredCommunities.some(
+            (filteredItem) => filteredItem.id === row.id,
+          ),
+        );
+        setFilteredTableData(newTableData);
+      }
     }
   }, [
+    communityTagsAndCommunities,
     filteredRelatedCommunitiesData,
     tableData,
+    getFilteredCommunities,
+  ]);
+
+  useEffect(() => {
+    if (!filteredRelatedCommunitiesData || !tableData) return;
+
+    const newFilteredCommunities = getFilteredCommunities(
+      filteredRelatedCommunitiesData,
+      selectedTags,
+      selectedCommunities,
+    );
+
+    setFilteredCommunities(newFilteredCommunities);
+
+    const newTableData = tableData.filter((row) =>
+      newFilteredCommunities.some((filteredItem) => filteredItem.id === row.id),
+    );
+    setFilteredTableData(newTableData);
+  }, [
     selectedTags,
     selectedCommunities,
+    filteredRelatedCommunitiesData,
+    tableData,
     getFilteredCommunities,
   ]);
 
@@ -149,14 +183,22 @@ const DirectoryPage = () => {
     },
   });
 
-  //this function needs to be renamed when update query is done
-  const useUpdateCommunitiesDirectoryMutatiion = () => {
-    console.log('this will be removed');
-    setIsDirectorySettingsDrawerOpen(false);
-    trackAnalytics({
-      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
-      isPWA: isAddedToHomeScreen,
-    });
+  const handleSaveChanges = async () => {
+    try {
+      await updateCommunityDirectoryTags({
+        community_id: communityId,
+        tag_names: selectedTags,
+        selected_community_ids: selectedCommunities,
+      });
+      setIsDirectorySettingsDrawerOpen(false);
+      trackAnalytics({
+        event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+        isPWA: isAddedToHomeScreen,
+      });
+    } catch (error) {
+      //change this to a toast?
+      console.error('Failed to update Directory page:', error);
+    }
   };
 
   const isAdmin =
@@ -280,7 +322,7 @@ const DirectoryPage = () => {
           setSelectedTags={setSelectedTags}
           selectedCommunities={selectedCommunities}
           setSelectedCommunities={setSelectedCommunities}
-          handleSaveChanges={useUpdateCommunitiesDirectoryMutatiion}
+          handleSaveChanges={handleSaveChanges}
         />
       </div>
     </CWPageLayout>

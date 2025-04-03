@@ -248,3 +248,34 @@ export const GetPinnedTokens = {
   }),
   output: PinnedTokenWithPrices.array(),
 };
+
+export const GetCommunitySelectedTagsAndCommunities = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z
+    .object({
+      id: z.string(),
+      icon_url: z.string().optional(),
+      community: z.string(),
+      description: z.string().optional(),
+      lifetime_thread_count: PG_INT,
+      profile_count: PG_INT,
+      namespace: z.string().optional(),
+      chain_node_id: PG_INT.optional(),
+      tag_names: z.array(z.string()).optional(),
+      selected_community_ids: z.array(z.string()).optional(),
+    })
+    .array(),
+};
+
+export const UpdateCommunityDirectoryTags = {
+  input: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+};

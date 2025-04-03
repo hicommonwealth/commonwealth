@@ -544,4 +544,11 @@ export const events = {
       .array(),
     created_at: z.coerce.date(),
   }),
+
+  CommunityDirectoryTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
+    created_at: z.coerce.date(),
+  }),
 } as const;
