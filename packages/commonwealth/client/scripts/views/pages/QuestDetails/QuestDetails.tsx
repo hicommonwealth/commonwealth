@@ -109,7 +109,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  const { pendingWeeklyQuests } = useXPProgress();
+  const { pendingWeeklyQuests } = useXPProgress({ includeSystemQuests: true }); // show system quests in quest details
 
   const popoverProps = usePopover();
 
@@ -147,6 +147,13 @@ const QuestDetails = ({ id }: { id: number }) => {
     actionContentId?: string,
   ) => {
     switch (actionName) {
+      case 'SignUpFlowCompleted': {
+        setAuthModalConfig({
+          type: AuthModalType.CreateAccount,
+          options: ['wallets', 'sso'],
+        });
+        break;
+      }
       case 'WalletLinked': {
         setAuthModalConfig({
           type: AuthModalType.SignIn,
