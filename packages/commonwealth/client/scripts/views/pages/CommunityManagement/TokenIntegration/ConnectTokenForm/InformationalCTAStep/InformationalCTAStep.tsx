@@ -24,6 +24,7 @@ const InformationalCTAStep = ({
       <CWText type="b1" fontWeight="semiBold" className="cta-link-container">
         Not sure?&nbsp;
         <a
+          // eslint-disable-next-line max-len
           href="https://docs.common.xyz/commonwealth/community-overview/capabilities/webhooks/connecting-an-existing-token-to-your-community"
           target="_blank"
           rel="noopener noreferrer"
