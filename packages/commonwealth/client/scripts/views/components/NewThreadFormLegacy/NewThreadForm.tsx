@@ -373,9 +373,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const showBanner =
     selectedCommunityId && !userSelectedAddress && isBannerVisible;
 
-  const contestThreadBannerVisible =
-    isContestAvailable && hasTopicOngoingContest;
-
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
