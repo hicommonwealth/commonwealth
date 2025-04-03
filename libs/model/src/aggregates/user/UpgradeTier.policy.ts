@@ -1,17 +1,19 @@
 import { logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { getChainNodeUrl } from 'model/src/utils/utils';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../../database';
+import { tokenBalanceCache } from '../../services';
 
 const MIN_TRADE_AMOUNT = 10 ** 6;
 
 const log = logger(import.meta);
 
 const inputs = {
-  NamespaceDeployed: events.NamespaceDeployed,
+  TransferSingle: events.TransferSingle,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
@@ -21,21 +23,21 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
-      NamespaceDeployed: async ({ payload }) => {
-        const { nameSpaceAddress, _namespaceDeployer } = payload.parsedArgs;
+      TransferSingle: async ({ payload }) => {
+        const { from: namespaceAddress, to: judge } = payload.parsedArgs;
 
         const community = await models.Community.findOne({
-          where: { namespace_address: nameSpaceAddress },
+          where: { namespace_address: namespaceAddress },
         });
         if (!community) {
           log.warn(
-            `Community not found for namespace address ${nameSpaceAddress}`,
+            `Community not found for namespace address ${namespaceAddress}`,
           );
           return;
         }
 
-        const namespaceCreatorAddress = await models.Address.findOne({
-          where: { address: _namespaceDeployer },
+        const nominatedAddress = await models.Address.findOne({
+          where: { address: judge },
           include: [
             {
               model: models.User,
@@ -43,19 +45,30 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
             },
           ],
         });
-        if (!namespaceCreatorAddress?.User) {
-          log.warn(
-            `Namespace creator user not found for address ${_namespaceDeployer}`,
-          );
+        if (!nominatedAddress?.User) {
+          log.warn(`Judge user not found for address ${judge}`);
           return;
         }
-        if (namespaceCreatorAddress.User.tier >= 4) return;
+        if (nominatedAddress.User.tier >= 4) return;
+
+        // if judge has sufficient balance of community nomination token, upgrade to tier 4
+        const balances = await tokenBalanceCache.getBalances({
+          addresses: [nominatedAddress.address],
+          balanceSourceType: BalanceSourceType.ERC1155,
+          sourceOptions: {
+            evmChainId: community.ChainNode!.eth_chain_id!,
+            contractAddress: community.namespace_address!,
+            tokenId: 3,
+          },
+        });
+        const balance = parseInt(balances[nominatedAddress.address] ?? '0');
+        if (balance < 5) return;
 
         await models.User.update(
           { tier: 4 },
           {
             where: {
-              id: namespaceCreatorAddress.User.id,
+              id: nominatedAddress.User.id,
               tier: {
                 [Op.lt]: 4,
               },

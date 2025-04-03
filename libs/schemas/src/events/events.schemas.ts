@@ -387,6 +387,16 @@ export const events = {
     }),
   }),
 
+  TransferSingle: ChainEventBase.extend({
+    parsedArgs: z.object({
+      operator: EVM_ADDRESS_STRICT,
+      from: EVM_ADDRESS_STRICT,
+      to: EVM_ADDRESS_STRICT,
+      id: z.coerce.bigint(),
+      value: z.coerce.bigint(),
+    }),
+  }).describe('When a token is transferred'),
+
   LaunchpadTokenCreated: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
