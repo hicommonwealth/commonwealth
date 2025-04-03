@@ -14,12 +14,10 @@ import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
 // FIXME: remove these... they aren't what we need.
-type URLFactory = (communityId: string | undefined) => string;
-
 type TextFactory = (communityId: string | undefined) => string;
 
 export type ShareSectionProps = {
-  url: string | URLFactory;
+  url: string;
   title?: string;
   text?: string | TextFactory;
   /**
@@ -57,7 +55,7 @@ export const ShareSection = (props: ShareSectionProps) => {
   const [refCode, setRefCode] = useState(refAddress);
 
   // eslint-disable-next-line react/destructuring-assignment
-  const url = computeURLWithReferral(props.url, communityId, refCode);
+  const url = computeURLWithReferral(props.url, refCode);
   const text =
     // eslint-disable-next-line react/destructuring-assignment
     typeof props.text === 'function' ? props.text(undefined) : props.text;
@@ -122,20 +120,7 @@ export const ShareSection = (props: ShareSectionProps) => {
   );
 };
 
-function computeURLWithReferral(
-  urlFactory: string | URLFactory,
-  communityId: string | undefined,
-  refcode: string | undefined,
-) {
-  function computeURL() {
-    if (typeof urlFactory === 'string') {
-      return urlFactory;
-    }
-    return urlFactory(communityId);
-  }
-
-  const url = computeURL();
-
+function computeURLWithReferral(url: string, refcode: string | undefined) {
   if (!refcode) {
     return url;
   }
