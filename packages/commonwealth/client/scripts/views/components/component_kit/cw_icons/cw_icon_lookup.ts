@@ -323,8 +323,7 @@ export const iconLookup = {
   xTwitter: withPhosphorIcon(XLogo),
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
-  starFour: withPhosphorIcon(StarFour),
-  // Chain icons moved to customIconLookup only
+  starFour: withPhosphorIcon(StarFour)
 };
 
 export const customIconLookup = {
