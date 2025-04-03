@@ -5,13 +5,20 @@ import './ShowAddedCommunities.scss';
 
 interface ShowAddedCommunitiesProps {
   selectedCommunities: string[];
-  onRemoveCommunity: (community: string) => void;
 }
 
 const ShowAddedCommunities = ({
   selectedCommunities,
 }: ShowAddedCommunitiesProps) => {
-  if (!selectedCommunities?.length) return null;
+  console.log(
+    'ShowAddedCommunities - selectedCommunities:',
+    selectedCommunities,
+  );
+
+  if (!selectedCommunities?.length) {
+    console.log('ShowAddedCommunities - No communities to display');
+    return null;
+  }
 
   return (
     <div className="ShowAddedCommunities">

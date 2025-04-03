@@ -50,6 +50,8 @@ const DirectoryPage = () => {
   const { data: nodes } = useFetchNodesQuery();
 
   const communityId = app.activeChainId() || '';
+  console.log('Current communityId:', communityId);
+
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
       id: communityId,
@@ -81,44 +83,95 @@ const DirectoryPage = () => {
   const {
     data: communityTagsAndCommunities,
     isLoading: isLoadingTagsAndCommunities,
+    error: tagsAndCommunitiesError,
   } = useGetCommunitySelectedTagsAndCommunities({
     community_id: communityId,
     enabled: !!communityId,
   });
-  console.log('communityTagsAndCommunities', communityTagsAndCommunities);
+
+  console.log('Current communityId:', communityId);
+  console.log('communityTagsAndCommunities::', communityTagsAndCommunities);
+  console.log('isLoadingTagsAndCommunities:', isLoadingTagsAndCommunities);
+  console.log('tagsAndCommunitiesError:', tagsAndCommunitiesError);
+
   const { mutateAsync: updateCommunityDirectoryTags } =
     useUpdateCommunityDirectoryTags();
-  console.log('communityTagsAndCommunities:: ', communityTagsAndCommunities);
 
   const getFilteredCommunities = useCallback(
     (communities: any[], tags: string[], manualSelections: string[]) => {
-      if (
-        !communities ||
-        (tags.length === 0 && manualSelections.length === 0)
-      ) {
-        return communities || [];
+      console.log('Filtering communities with tags:', tags);
+      console.log(
+        'Filtering communities with manual selections:',
+        manualSelections,
+      );
+
+      if (!communities) {
+        return [];
       }
-      if (manualSelections.length > 0) {
-        return communities.filter((comm) => manualSelections.includes(comm.id));
+
+      // If no filters are applied, return all communities
+      if (tags.length === 0 && manualSelections.length === 0) {
+        return communities;
       }
-      if (tags.length > 0) {
-        return communities.filter((comm) =>
-          tags.some((tag) => comm.tag_names?.includes(tag)),
-        );
-      }
-      return communities;
+
+      // Filter communities that match either tags OR manual selections
+      return communities.filter((comm) => {
+        // Check if community matches any of the selected tags
+        const matchesTags =
+          tags.length > 0 && tags.some((tag) => comm.tag_names?.includes(tag));
+
+        // Check if community is in the manual selections
+        const matchesManualSelection =
+          manualSelections.length > 0 && manualSelections.includes(comm.id);
+
+        // Include community if it matches either criteria
+        return matchesTags || matchesManualSelection;
+      });
     },
     [],
   );
 
   useEffect(() => {
-    if (!communityTagsAndCommunities?.[0]) return;
+    // Early return if data is not available or loading
+    if (isLoadingTagsAndCommunities) {
+      console.log('Still loading tags and communities...');
+      return;
+    }
 
-    const initialTags = communityTagsAndCommunities[0].tag_names || [];
-    const initialCommunities =
-      communityTagsAndCommunities[0].selected_community_ids || [];
+    if (tagsAndCommunitiesError) {
+      console.error(
+        'Error loading tags and communities:',
+        tagsAndCommunitiesError,
+      );
+      return;
+    }
 
-    // Set initial selected tags and communities
+    // Initialize with empty arrays if no data
+    const communityData = communityTagsAndCommunities?.[0] || {
+      tag_names: [],
+      selected_community_ids: [],
+    };
+
+    // Ensure we have arrays, defaulting to empty if null/undefined
+    const initialTags = Array.isArray(communityData.tag_names)
+      ? communityData.tag_names
+      : [];
+    const initialCommunities = Array.isArray(
+      communityData.selected_community_ids,
+    )
+      ? communityData.selected_community_ids
+      : [];
+
+    console.log('Setting tags and communities:', {
+      tags: initialTags,
+      communities: initialCommunities,
+      rawData: communityData,
+      hasData: {
+        hasTags: initialTags.length > 0,
+        hasCommunities: initialCommunities.length > 0,
+      },
+    });
+
     setSelectedTags(initialTags);
     setSelectedCommunities(initialCommunities);
 
@@ -132,7 +185,6 @@ const DirectoryPage = () => {
 
       setFilteredCommunities(initialFilteredCommunities);
 
-      // Update table data based on filtered communities
       if (tableData) {
         const newTableData = tableData.filter((row) =>
           initialFilteredCommunities.some(
@@ -144,6 +196,8 @@ const DirectoryPage = () => {
     }
   }, [
     communityTagsAndCommunities,
+    isLoadingTagsAndCommunities,
+    tagsAndCommunitiesError,
     filteredRelatedCommunitiesData,
     tableData,
     getFilteredCommunities,
@@ -152,12 +206,19 @@ const DirectoryPage = () => {
   useEffect(() => {
     if (!filteredRelatedCommunitiesData || !tableData) return;
 
+    console.log('Updating filtered communities with tags:', selectedTags);
+    console.log(
+      'Updating filtered communities with communities:',
+      selectedCommunities,
+    );
+
     const newFilteredCommunities = getFilteredCommunities(
       filteredRelatedCommunitiesData,
       selectedTags,
       selectedCommunities,
     );
 
+    console.log('Updated filtered communities:', newFilteredCommunities);
     setFilteredCommunities(newFilteredCommunities);
 
     const newTableData = tableData.filter((row) =>
@@ -185,18 +246,27 @@ const DirectoryPage = () => {
 
   const handleSaveChanges = async () => {
     try {
+      // Ensure we're sending arrays, defaulting to empty if undefined
+      const validTags = selectedTags || [];
+      const validCommunities = selectedCommunities || [];
+
+      console.log('Saving changes with:', {
+        tags: validTags,
+        communities: validCommunities,
+      });
+
       await updateCommunityDirectoryTags({
         community_id: communityId,
-        tag_names: selectedTags,
-        selected_community_ids: selectedCommunities,
+        tag_names: validTags,
+        selected_community_ids: validCommunities,
       });
+
       setIsDirectorySettingsDrawerOpen(false);
       trackAnalytics({
         event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
         isPWA: isAddedToHomeScreen,
       });
     } catch (error) {
-      //change this to a toast?
       console.error('Failed to update Directory page:', error);
     }
   };
@@ -221,6 +291,10 @@ const DirectoryPage = () => {
     return (
       <ErrorPage message="Directory Page is not enabled for this community." />
     );
+  }
+
+  if (isLoadingTagsAndCommunities) {
+    return <CWCircleMultiplySpinner />;
   }
 
   return (
@@ -287,20 +361,8 @@ const DirectoryPage = () => {
             </div>
           </div>
           <div>
-            <ShowAddedTags
-              selectedTags={selectedTags}
-              onRemoveTag={(tag) =>
-                setSelectedTags(selectedTags.filter((t) => t !== tag))
-              }
-            />
-            <ShowAddedCommunities
-              selectedCommunities={selectedCommunities}
-              onRemoveCommunity={(manualCommunity) =>
-                setSelectedCommunities(
-                  selectedCommunities.filter((c) => c !== manualCommunity),
-                )
-              }
-            />
+            <ShowAddedTags selectedTags={selectedTags} />
+            <ShowAddedCommunities selectedCommunities={selectedCommunities} />
           </div>
         </div>
 

@@ -11,13 +11,26 @@ export function GetCommunitySelectedTagsAndCommunities(): Query<
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const result = await models.sequelize.query(
+      type QueryResult = {
+        id: string;
+        community: string;
+        lifetime_thread_count: number;
+        profile_count: number;
+        icon_url?: string;
+        description?: string;
+        namespace?: string;
+        chain_node_id?: number;
+        tag_names?: string[];
+        selected_community_ids?: string[];
+      };
+
+      const result = await models.sequelize.query<QueryResult>(
         `
         WITH community_tags AS (
           SELECT 
             d.community_id,
-            array_agg(DISTINCT t.name) as tag_names,
-            array_agg(DISTINCT d.selected_community_id) as selected_community_ids
+            array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tag_names,
+            array_agg(DISTINCT d.selected_community_id) FILTER (WHERE d.selected_community_id IS NOT NULL) as selected_community_ids
           FROM "CommunityDirectoryTags" d
           LEFT JOIN "Tags" t ON d.tag_id = t.id
           WHERE d.community_id = :community_id
@@ -45,18 +58,11 @@ export function GetCommunitySelectedTagsAndCommunities(): Query<
         },
       );
 
-      return result as {
-        id: string;
-        community: string;
-        lifetime_thread_count: number;
-        profile_count: number;
-        icon_url?: string;
-        description?: string;
-        namespace?: string;
-        chain_node_id?: number;
-        tag_names?: string[];
-        selected_community_ids?: string[];
-      }[];
+      return result.map((item: QueryResult) => ({
+        ...item,
+        tag_names: item.tag_names || [],
+        selected_community_ids: item.selected_community_ids || [],
+      }));
     },
   };
 }

@@ -5,11 +5,15 @@ import './ShowAddedTags.scss';
 
 interface ShowAddedTagsProps {
   selectedTags: string[];
-  onRemoveTag: (tag: string) => void;
 }
 
 const ShowAddedTags = ({ selectedTags }: ShowAddedTagsProps) => {
-  if (!selectedTags?.length) return null;
+  console.log('ShowAddedTags - selectedTags:', selectedTags);
+
+  if (!selectedTags?.length) {
+    console.log('ShowAddedTags - No tags to display');
+    return null;
+  }
 
   return (
     <div className="ShowAddedTags">
