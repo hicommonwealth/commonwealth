@@ -6,7 +6,7 @@ import {
   questSubFormValidationSchemaWithCreatorPoints,
   questSubFormValidationSchemaWithCreatorPointsWithContentLink,
 } from './QuestActionSubForm/validation';
-import { questFormValidationSchema } from './validation';
+import { buildDynamicQuestFormValidationSchema } from './validation';
 
 export type QuestActionSubFormValues = z.infer<
   typeof questSubFormValidationSchema
@@ -30,7 +30,9 @@ export type QuestFormProps =
   | {
       mode: 'update';
       questId: number;
-      initialValues: z.infer<typeof questFormValidationSchema> & {
+      initialValues: z.infer<
+        ReturnType<typeof buildDynamicQuestFormValidationSchema>
+      > & {
         participation_period?: QuestParticipationPeriod;
         participation_times_per_period?: number;
       } & {
