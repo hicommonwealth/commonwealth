@@ -2,6 +2,7 @@ import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
+  doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionAllowTwitterTweetURL,
@@ -47,6 +48,7 @@ const useQuestActionMultiFormsState = ({
           refs: {
             runParticipationLimitValidator: () => {},
           },
+          // todo: 11391 fix this
           id: index + (questActionSubForms.length + 1),
         })),
       ]);
@@ -144,10 +146,12 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionAllowTopicId(chosenAction);
       const allowsTwitterTweetUrl =
         allowsContentId && doesActionAllowTwitterTweetURL(chosenAction);
+      const isActionRepeatable = doesActionAllowRepetition(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
         with_optional_comment_id:
           allowsContentId && doesActionAllowCommentId(chosenAction),
@@ -179,6 +183,12 @@ const useQuestActionMultiFormsState = ({
       if (updateBody.action === 'TweetEngagement') {
         updatedSubForms[index].values.contentIdScope =
           QuestActionContentIdScope.TwitterTweet;
+      }
+
+      // set fixed action repitition per certain actions
+      if (!isActionRepeatable) {
+        updatedSubForms[index].values.participationLimit =
+          QuestParticipationLimit.OncePerQuest;
       }
 
       // set/reset default values/config if action allows content link

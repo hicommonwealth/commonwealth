@@ -17,6 +17,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
@@ -260,6 +261,11 @@ const QuestActionSubForm = ({
     });
   }, [participationPeriod, defaultValues?.participationPeriod, onChange]);
 
+  const doesPreventRepetition =
+    typeof config?.is_action_repeatable !== 'undefined'
+      ? !config?.is_action_repeatable
+      : false;
+
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
       {isRemoveable && (
@@ -274,23 +280,28 @@ const QuestActionSubForm = ({
         <CWText type="caption" fontWeight="semiBold">
           Action Schedule
         </CWText>
-        <CWRepetitionCycleRadioButton
-          customError={repetitionCycleRadio.error}
-          {...repetitionCycleRadio.props}
-          className="radio-btn mt-8"
-          value={QuestParticipationLimit.OncePerPeriod}
-          groupName={`participationLimit-${defaultValues?.action}`}
-          {...(defaultValues?.participationLimit ===
-            QuestParticipationLimit.OncePerPeriod && {
-            checked: true,
-          })}
-          onChange={(e) =>
-            e.target.checked &&
-            onChange?.({
-              participationLimit: QuestParticipationLimit.OncePerPeriod,
-            })
-          }
-        />
+        {withTooltip(
+          <CWRepetitionCycleRadioButton
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
+            className="radio-btn mt-8"
+            value={QuestParticipationLimit.OncePerPeriod}
+            groupName={`participationLimit-${defaultValues?.action}`}
+            {...(defaultValues?.participationLimit ===
+              QuestParticipationLimit.OncePerPeriod && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                participationLimit: QuestParticipationLimit.OncePerPeriod,
+              })
+            }
+            disabled={doesPreventRepetition}
+          />,
+          `Selected action does not allow repetition`,
+          doesPreventRepetition,
+        )}
         <CWRadioButton
           className="radio-btn"
           value={QuestParticipationLimit.OncePerQuest}

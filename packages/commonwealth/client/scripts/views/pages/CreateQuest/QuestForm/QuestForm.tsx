@@ -169,7 +169,6 @@ const QuestForm = (props: QuestFormProps) => {
                   groupName="quest_type"
                   disabled={isUpdateMode}
                 />
-                {/* TODO: add explainer copy - diff b/w channel and common quest */}
               </div>,
               'Change not allowed during update',
               isUpdateMode,
@@ -224,7 +223,8 @@ const QuestForm = (props: QuestFormProps) => {
               fullWidth
               name="max_xp_to_end"
               hookToForm
-              instructionalMessage="Maximum Aura that will be awarded for this quest before marking it as complete"
+              // eslint-disable-next-line max-len
+              instructionalMessage={`Maximum Aura that will be awarded for this quest before marking it as complete. ${watch('quest_type') === QuestTypes.Channel ? `This doesn't apply to 'Tweet Engagement' actions.` : ''}`}
             />
           </div>
 

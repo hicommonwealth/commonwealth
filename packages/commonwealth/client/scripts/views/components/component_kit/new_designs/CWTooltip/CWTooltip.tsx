@@ -56,7 +56,11 @@ export const withTooltip = (
       placement="bottom"
       content={content}
       renderTrigger={(handleInteraction) => (
-        <span onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+        <span
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+          className="w-fit"
+        >
           {children}
         </span>
       )}

@@ -5,6 +5,7 @@ import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
+  doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionAllowTwitterTweetURL,
@@ -80,6 +81,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 config: {
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
+                  is_action_repeatable: doesActionAllowRepetition(chosenAction),
                   with_optional_topic_id:
                     allowsContentId && doesActionAllowTopicId(chosenAction),
                   with_optional_thread_id:

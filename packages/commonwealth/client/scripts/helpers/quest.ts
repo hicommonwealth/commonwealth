@@ -57,6 +57,10 @@ export const doesActionAllowTwitterTweetURL = (action: QuestActionType) => {
   return action === 'TweetEngagement';
 };
 
+export const doesActionAllowRepetition = (action: QuestActionType) => {
+  return action !== 'TweetEngagement';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,
