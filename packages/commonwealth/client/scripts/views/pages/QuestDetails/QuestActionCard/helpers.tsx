@@ -35,13 +35,23 @@ export const actionCopies = {
     ['WalletLinked']: () => '',
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
-      <>
+      <div>
         XP rewarded to participants after any of these tweet metrics are met.
         <br />
         {likes > 0 ? `${pluralize(likes, 'Like')}, ` : ''}
         {retweets > 0 ? `${pluralize(retweets, 'Retweet')}, ` : ''}
         {replies > 0 ? `${pluralize(replies, 'Replies')}` : ''}.
-      </>
+        <br />
+        <ul>
+          <li>
+            ● This action is not bound by the max Aura limit for this quest.
+          </li>
+          <li>
+            ● Aura is awarded to the first engagements of the tweet regardless
+            of when the quest starts.
+          </li>
+        </ul>
+      </div>
     ),
   },
   shares: {
