@@ -24,7 +24,7 @@ const InformationalCTAStep = ({
       <CWText type="b1" fontWeight="semiBold" className="cta-link-container">
         Not sure?&nbsp;
         <a
-          href="#" // TODO: https://github.com/hicommonwealth/commonwealth/issues/10234
+          href="https://docs.common.xyz/commonwealth/community-overview/capabilities/webhooks/connecting-an-existing-token-to-your-community"
           target="_blank"
           rel="noopener noreferrer"
         >
