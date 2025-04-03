@@ -17,6 +17,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
+import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
@@ -50,6 +51,7 @@ import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/Com
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
+import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../component_kit/new_designs/cw_toggle';
@@ -75,6 +77,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const location = useLocation();
 
   const user = useUserStore();
+  const { data: userProfile } = useFetchProfileByIdQuery({
+    userId: user.id,
+    apiCallEnabled: !!user.id,
+  });
 
   const {
     aiInteractionsToggleEnabled,
@@ -633,6 +639,17 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
+
+              {community &&
+                userProfile &&
+                community.spam_tier_level >= 0 &&
+                userProfile.tier <= community.spam_tier_level && (
+                  <CWBanner
+                    type="warning"
+                    body="Your post will be marked as spam due to the Community's Trust Settings. You can increase your trust level by verifying an SSO or adding a wallet with Balance."
+                    className="spam-trust-banner"
+                  />
+                )}
 
               <div className="buttons-row">
                 <CWButton
