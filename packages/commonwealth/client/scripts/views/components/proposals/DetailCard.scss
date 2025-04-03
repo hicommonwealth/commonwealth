@@ -15,9 +15,9 @@
   .detail-card-header {
     display: flex;
     height: 40px;
-    border: 2px solid #eeedef;
+    border: 2px solid $neutral-75;
     width: 100%;
-    background: #f7f6f7;
+    background: $neutral-50;
     border-radius: 5px 5px 0px 0px;
     justify-content: space-between;
     align-items: center;
@@ -29,7 +29,7 @@
     padding: 16px;
     gap: 8px;
     border-radius: 0px 0px 5px 5px;
-    border: 2px solid #e6e5e7;
+    border: 2px solid $neutral-150;
     flex-direction: column;
     .label {
       font-size: 14px;
@@ -45,13 +45,13 @@
       line-height: 20px;
       font-size: 12px;
       line-height: 16px;
-      color: #352e38;
+      color: $neutral-850;
       font-family: 'NeueHaasUnica';
       height: 24px;
       border-radius: 4px;
       padding: 4px 8px 4px 8px;
-      background-color: #fff9e5;
-      color: #806000;
+      background-color: $yellow-50;
+      color: $yellow-700;
       width: fit-content;
     }
     .detail {
@@ -59,7 +59,7 @@
       line-height: 20px;
       font-size: 14px;
       line-height: 20px;
-      color: #352e38;
+      color: $neutral-850;
       font-family: 'NeueHaasUnica';
     }
     .address {

@@ -72,6 +72,7 @@ import {
   Notepad,
   PaperPlaneTilt,
   PencilSimple,
+  Play,
   Plus,
   PlusCircle,
   PushPin,
@@ -322,7 +323,7 @@ export const iconLookup = {
   xTwitter: withPhosphorIcon(XLogo),
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
-  vector: Icons.CWVector,
+  play: withPhosphorIcon(Play),
 };
 
 export const customIconLookup = {

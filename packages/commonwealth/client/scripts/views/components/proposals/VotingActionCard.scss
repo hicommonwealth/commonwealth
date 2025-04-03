@@ -1,6 +1,6 @@
 @import '../../../styles/shared.scss';
 .VotingActionCard {
-  background: #f7f7f7;
+  background: $neutral-50;
   gap: 16px;
   border-radius: 6px;
   padding: 16px;
@@ -16,10 +16,10 @@
     border: none;
   }
   .poll-box {
-    border: 1px solid #e0dfe1 !important;
+    border: 1px solid $neutral-200 !important;
     padding: 16px;
     gap: 10px;
-    background: #f7f7f7 !important;
+    background: $neutral-50 !important;
     display: flex;
     flex-direction: column;
   }

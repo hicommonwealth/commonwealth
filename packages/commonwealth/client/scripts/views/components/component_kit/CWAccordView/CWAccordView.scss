@@ -1,33 +1,23 @@
 @import '../../../../styles/shared.scss';
-.accord-container {
+.AccordView {
   width: 100%;
   border: 2px solid $neutral-200;
   border-radius: 6px;
-}
+  .accord-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.2s ease;
+  }
 
-.accord-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  cursor: pointer;
-  border-bottom: 1px solid transparent;
-  transition: background-color 0.2s ease;
-}
-
-.accord-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333333;
-}
-
-.accord-arrow {
-  font-size: 12px;
-  color: #666666;
-  transition: transform 0.3s ease;
-
-  &.expanded {
-    transform: rotate(180deg);
+  .accord-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: $neutral-800;
+    font-family: 'NeueHaasUnica';
   }
 }
 

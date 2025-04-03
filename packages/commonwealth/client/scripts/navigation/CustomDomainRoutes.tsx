@@ -115,6 +115,10 @@ const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
 
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
+);
+
 const CustomDomainRoutes = () => {
   return [
     <Route
@@ -289,6 +293,13 @@ const CustomDomainRoutes = () => {
       key="/new/proposal"
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/:scope/proposal-details/:identifier"
+      path="/:scope/proposal-details/:identifier"
+      element={withLayout(newProposalViewPage, {
         scoped: true,
       })}
     />,

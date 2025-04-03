@@ -1,4 +1,3 @@
-import { Coin } from 'adapters/currency';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -15,7 +14,6 @@ import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 import './voting_actions.scss';
 
-import BN from 'bn.js';
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
@@ -25,11 +23,11 @@ import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
-import { VoteOption } from './VotingResultView';
 
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
+import { getVoteOptions } from './utils';
 import VotingActionCard from './VotingActionCard';
 
 type VotingActionsProps = {
@@ -282,45 +280,8 @@ export const VotingActions = ({
     if ((proposal as CosmosProposal).data?.state?.tally) {
       const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
         .state.tally;
-      const formatCurrency = (n: BN) => {
-        const decimals = new BN(10).pow(
-          new BN(
-            getChainDecimals(app.chain.id || '', app.chain.meta.base) || 6,
-          ),
-        );
-        const denom = app.chain.meta?.default_symbol;
-        const coin = new Coin(denom, n, false, decimals);
-        return coin.format();
-      };
 
-      const getPct = (n: BN, voteTotal: BN) => {
-        if (voteTotal.isZero()) return '0';
-        return (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
-      };
-      const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
-      const voteResult: VoteOption[] = [
-        {
-          label: 'Yes',
-          percentage: getPct(yes, voteTotal),
-          results: formatCurrency(yes),
-        },
-        {
-          label: 'No',
-          percentage: getPct(no, voteTotal),
-          results: formatCurrency(no),
-        },
-        {
-          label: 'Abstain',
-          percentage: getPct(abstain, voteTotal),
-          results: formatCurrency(abstain),
-        },
-        {
-          label: 'No with Veto',
-          percentage: getPct(noWithVeto, voteTotal),
-          results: formatCurrency(noWithVeto),
-        },
-      ];
-
+      const voteResult = getVoteOptions(yes, no, abstain, noWithVeto);
       if (!(proposal instanceof CosmosProposalV1AtomOne)) {
         const voteOptions = [
           { label: 'Yes', value: 'yes', voteCount: 0 },

@@ -7,54 +7,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../component_kit/cw_text';
 import './TimeLineCard.scss';
-
-const formatDate = (isoString: string | undefined) => {
-  if (!isoString) return 'N/A';
-  return new Date(isoString).toLocaleDateString();
-};
-
-const getTimelineEvents = (proposalData) => {
-  let submitTime, votingStartTime, votingEndTime;
-
-  if (
-    proposalData?.submitTime &&
-    proposalData?.votingStartTime &&
-    proposalData?.votingEndTime
-  ) {
-    submitTime = proposalData.submitTime;
-    votingStartTime = proposalData.votingStartTime;
-    votingEndTime = proposalData.votingEndTime;
-  } else if (proposalData?.id && proposalData?.body) {
-    submitTime = proposalData?.start
-      ? new Date(proposalData.start * 1000).toISOString()
-      : undefined;
-    votingStartTime = submitTime;
-    votingEndTime = proposalData?.end
-      ? new Date(proposalData.end * 1000).toISOString()
-      : undefined;
-  }
-
-  return [
-    {
-      date: formatDate(submitTime),
-      title: 'Proposal Published',
-      type: 'past',
-      iconName: 'plusCirclePhosphor',
-    },
-    {
-      date: formatDate(votingStartTime),
-      title: 'Voting Begins',
-      type: 'active',
-      iconName: 'vector',
-    },
-    {
-      date: formatDate(votingEndTime),
-      title: 'Voting Ends',
-      type: 'coming',
-      iconName: 'infoEmpty',
-    },
-  ];
-};
+import { getTimelineEvents } from './utils';
 
 const TimeLineCard = ({
   proposalData,
@@ -88,13 +41,13 @@ const TimeLineCard = ({
                 <div
                   className={clsx('timeline-dot', {
                     last_item: index === timelineEvents.length - 1,
+                    active: event.type === 'active',
                   })}
                 >
                   <CWIcon
                     className={event.type}
                     iconName={event.iconName as IconName}
                     iconSize="large"
-                    fill="red"
                   />
                 </div>
                 <div className="right-container">

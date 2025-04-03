@@ -10,6 +10,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './DetailCard.scss';
+
 type DetailCardProps = {
   status: string;
   scope?: string;
@@ -18,6 +19,7 @@ type DetailCardProps = {
   id?: string;
   Threads: { id: number; title: string }[];
 };
+
 const DetailCard = ({
   status,
   scope = '',

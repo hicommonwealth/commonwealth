@@ -17,9 +17,9 @@
   .timeline-header {
     display: flex;
     height: 40px;
-    border: 2px solid #eeedef;
+    border: 2px solid $neutral-75;
     width: 100%;
-    background: #f7f6f7;
+    background: $neutral-50;
     border-radius: 5px 5px 0px 0px;
     justify-content: space-between;
     align-items: center;
@@ -31,7 +31,7 @@
     padding: 16px 16px 0px 16px;
     gap: 8px;
     border-radius: 0px 0px 5px 5px;
-    border: 2px solid #e6e5e7;
+    border: 2px solid $neutral-150;
     flex-direction: column;
     ul.rb {
       padding: 8px 0px 0px 0px;
@@ -65,13 +65,21 @@
             left: -13px;
           }
 
+          &.active {
+            height: 28px;
+            width: 28px;
+            border-radius: 14px;
+            background-color: $primary-500;
+          }
+
           svg {
-            border: 2px solid rgba($white, 1);
-            border-radius: 500%;
-            background: none; // Default background (can be adjusted if icon has its own color)
+            background: none;
             transition: all 500ms ease-in-out;
             &.active {
-              color: $primary-500;
+              color: $white;
+              background-color: $primary-500;
+              height: 16px;
+              width: 16px;
             }
             &.coming {
               color: $neutral-600;

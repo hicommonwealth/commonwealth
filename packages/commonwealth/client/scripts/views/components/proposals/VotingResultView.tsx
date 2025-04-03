@@ -3,6 +3,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './VotingResultView.scss';
+import { formatVoteCount, getCombinedBarColor } from './utils';
 
 export interface VoteOption {
   label: string;
@@ -27,22 +28,6 @@ const VotingResultView: React.FC<GovernanceVoteProps> = ({
     0,
   );
 
-  const getCombinedBarColor = (label: string, index: number) => {
-    const negativeLabels = ['No', 'No with Veto'];
-
-    if (index === 0) return '#78A824';
-    if (negativeLabels.includes(label)) return '#D63200';
-    return '#666666';
-  };
-  function formatVoteCount(number) {
-    if (number >= 1_000_000) {
-      return (number / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
-    } else if (number >= 1_000) {
-      return (number / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
-    } else {
-      return number.toString();
-    }
-  }
   return (
     <>
       {!showCombineBarOnly ? (

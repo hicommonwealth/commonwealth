@@ -19,7 +19,7 @@ const CWAccordView = ({
 
   return (
     <>
-      <div className="accord-container">
+      <div className="AccordView">
         <div className="accord-header" onClick={toggleAccord}>
           <div className="accord-title">{title}</div>
           <CWIcon
