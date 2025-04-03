@@ -108,7 +108,7 @@ export const QuestActionMeta = z
     updated_at: z.coerce.date().optional(),
 
     // associations
-    QuestTweet: QuestTweet.optional(),
+    QuestTweet: QuestTweet.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
