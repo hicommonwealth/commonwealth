@@ -59,7 +59,6 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
@@ -625,7 +624,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {!!contestThreadBannerVisible && <ContestThreadBanner />}
+              {/* {!!contestThreadBannerVisible && <ContestThreadBanner />} */}
 
               <MessageRow
                 hasFeedback={!!walletBalanceError}
