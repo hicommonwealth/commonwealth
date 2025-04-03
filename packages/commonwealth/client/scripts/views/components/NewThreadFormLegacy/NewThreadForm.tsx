@@ -47,6 +47,7 @@ import {
 } from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import Turnstile, { useTurnstile } from 'react-turnstile';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -76,6 +77,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const location = useLocation();
 
   const user = useUserStore();
+  const { isDarkMode } = useDarkMode();
 
   const {
     aiInteractionsToggleEnabled,
@@ -680,6 +682,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                         'Turnstile verification failed. Please try again.',
                       );
                     }}
+                    appearance="interaction-only"
+                    // TODO: isDarkMode is true even when page is light
+                    // theme={isDarkMode ? 'dark' : 'light'}
+                    theme="light"
+                    fixedSize={false}
+                    size="normal"
                   />
                 </div>
               )}

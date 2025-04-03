@@ -7,9 +7,11 @@ import Account from 'models/Account';
 import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
+import Turnstile, { useTurnstile } from 'react-turnstile';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { CWText } from '../../component_kit/cw_text';
@@ -68,12 +70,19 @@ const CommentEditor = ({
     aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
   } = useLocalAISettingsStore();
+  const user = useUserStore();
+  const { isDarkMode } = useDarkMode();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const { generateCompletion } = useAiCompletion();
+
+  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY;
+  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
+  const turnstile = useTurnstile();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleCommentWithAI = () => {
     setIsSubmitDisabled(true);
@@ -115,6 +124,10 @@ const CommentEditor = ({
         bubbles: true,
       }) as unknown as React.MouseEvent,
     );
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
 
     // Handle the rest of the submission process asynchronously
     try {
@@ -123,6 +136,10 @@ const CommentEditor = ({
         commentId = await handleSubmitComment();
       } catch (error) {
         console.error('Failed to submit comment:', error);
+        if (isTurnstileEnabled) {
+          turnstile.reset();
+          setTurnstileToken(null);
+        }
         return;
       }
 
@@ -174,6 +191,10 @@ const CommentEditor = ({
       }, 0);
     } catch (error) {
       console.error('Error during submission:', error);
+      if (isTurnstileEnabled) {
+        turnstile.reset();
+        setTurnstileToken(null);
+      }
     }
   };
 
@@ -221,6 +242,33 @@ const CommentEditor = ({
         shouldFocus={shouldFocus}
         onKeyDown={handleKeyDown}
       />
+
+      {isTurnstileEnabled && (
+        <div className="turnstile-container">
+          <Turnstile
+            sitekey={turnstileSiteKey || ''}
+            onVerify={(token) => {
+              console.log('Turnstile verified', token);
+              setTurnstileToken(token);
+            }}
+            onExpire={() => {
+              console.log('Turnstile expired');
+              setTurnstileToken(null);
+              turnstile.reset();
+            }}
+            onError={() => {
+              console.log('Turnstile error');
+              setTurnstileToken(null);
+              notifyError('Verification failed. Please try again.');
+            }}
+            appearance="interaction-only"
+            theme="light"
+            fixedSize={false}
+            size="normal"
+          />
+        </div>
+      )}
+
       <div className="form-bottom">
         <div className="form-buttons">
           <CWButton
@@ -259,7 +307,11 @@ const CommentEditor = ({
           <CWButton
             containerClassName="post-button"
             buttonWidth="narrow"
-            disabled={disabled || isSubmitDisabled}
+            disabled={
+              disabled ||
+              isSubmitDisabled ||
+              (isTurnstileEnabled && !turnstileToken)
+            }
             onClick={() => void handleEnhancedSubmit()}
             label="Post"
           />
