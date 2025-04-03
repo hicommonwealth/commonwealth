@@ -11,6 +11,7 @@ import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
 import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { CustomIconName } from '../../component_kit/cw_icons/cw_icon_lookup';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
@@ -47,7 +48,7 @@ const AddressItem = (props: AddressItemProps) => {
   });
 
   // Add function to determine icon based on wallet and community base
-  const getChainIcon = () => {
+  const getChainIcon = (): CustomIconName => {
     // First check wallet type
     if (
       walletId &&

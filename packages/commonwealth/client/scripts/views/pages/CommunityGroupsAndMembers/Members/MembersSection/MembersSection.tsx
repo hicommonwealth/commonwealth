@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CustomIconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -107,7 +108,7 @@ const MembersSection = ({
   const filteredMember = removeDuplicateAddresses(filteredMembers);
 
   // Add function to determine icon based on community base and wallet type
-  const getChainIcon = (address: AddressInfo) => {
+  const getChainIcon = (address: AddressInfo): CustomIconName => {
     // First check wallet type if available
     if (address.wallet_id) {
       if (
@@ -130,16 +131,16 @@ const MembersSection = ({
         case ChainBase.CosmosSDK:
           return 'cosmos';
         case ChainBase.NEAR:
-          return 'near';
+          return 'nearIcon';
         case ChainBase.Substrate:
           return 'polkadot';
         case ChainBase.Ethereum:
         default:
-          return 'ethereum';
+          return 'eth';
       }
     }
 
-    return 'ethereum'; // default fallback
+    return 'eth'; // default fallback
   };
 
   return (
@@ -207,9 +208,11 @@ const MembersSection = ({
                   return (
                     <div key={index} className="address-item">
                       <CWTag
-                        label={formatAddressShort(address.address)}
                         type="address"
+                        label={formatAddressShort(address.address)}
                         iconName={getChainIcon(address)}
+                        useCustomIcon={true}
+                        classNames="address-tag"
                       />
                     </div>
                   );

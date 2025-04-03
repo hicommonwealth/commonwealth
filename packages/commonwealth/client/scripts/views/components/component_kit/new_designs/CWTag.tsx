@@ -2,8 +2,9 @@ import { X } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import React from 'react';
 import { CWCommunityAvatar } from '../cw_community_avatar';
+import { CWCustomIcon } from '../cw_icons/cw_custom_icon';
 import { CWIcon } from '../cw_icons/cw_icon';
-import type { IconName } from '../cw_icons/cw_icon_lookup';
+import type { CustomIconName, IconName } from '../cw_icons/cw_icon_lookup';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
@@ -33,7 +34,7 @@ export type TagType =
   | 'pill';
 
 export type TagProps = {
-  iconName?: IconName;
+  iconName?: IconName | CustomIconName;
   label: string;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -46,6 +47,7 @@ export type TagProps = {
   };
   onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
+  useCustomIcon?: boolean;
 };
 
 export const CWTag = ({
@@ -59,6 +61,7 @@ export const CWTag = ({
   community,
   onMouseEnter,
   onMouseLeave,
+  useCustomIcon = false,
 }: TagProps) => {
   const displayLabel = () => {
     if (!trimAt) {
@@ -92,8 +95,19 @@ export const CWTag = ({
         />
       )}
       {type === 'contest' && <CWIcon iconName="trophy" iconSize="small" />}
-      {!!iconName && (
-        <CWIcon iconName={iconName} iconSize="small" className={iconName} />
+      {!!iconName && !useCustomIcon && (
+        <CWIcon
+          iconName={iconName as IconName}
+          iconSize="small"
+          className={iconName as string}
+        />
+      )}
+      {!!iconName && useCustomIcon && (
+        <CWCustomIcon
+          iconName={iconName as CustomIconName}
+          iconSize="small"
+          className="chain-icon"
+        />
       )}
       <CWText type="caption" fontWeight="medium" noWrap>
         {displayLabel()}
