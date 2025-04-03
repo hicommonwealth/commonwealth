@@ -21,6 +21,7 @@ import './QuestActionCard.scss';
 
 const actionCopies = {
   title: {
+    ['SignUpFlowCompleted']: 'Sign in to Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
