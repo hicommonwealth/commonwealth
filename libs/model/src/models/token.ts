@@ -36,6 +36,7 @@ export default (
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      creator_address: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
 

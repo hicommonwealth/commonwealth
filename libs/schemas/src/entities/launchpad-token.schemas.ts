@@ -33,6 +33,10 @@ export const LaunchpadToken = z.object({
     .string()
     .nullish()
     .describe('description of the token (platform only)'),
+  creator_address: z
+    .string()
+    .nullish()
+    .describe('Address of the user who created the token'),
 
   created_at: z.coerce.date().optional().describe('Date the token was created'),
   updated_at: z.coerce

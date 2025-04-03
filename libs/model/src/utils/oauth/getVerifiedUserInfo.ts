@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { MagicUserMetadata } from '@magic-sdk/admin';
+import type { User as PrivyUser } from '@privy-io/server-auth';
 import fetch from 'node-fetch';
 import { VerifiedUserInfo } from './types';
 
@@ -65,63 +66,78 @@ async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
 
 // Assume email returned by magic is unverified
 // Apple doesn't have an endpoint from which we can fetch user info to check email
-function getAppleUser(magicData: MagicUserMetadata): VerifiedUserInfo {
-  if (!magicData.email) {
-    throw new Error('No email found in magic metadata');
+function getAppleUser(
+  magicData?: MagicUserMetadata,
+  privyUser?: PrivyUser,
+): VerifiedUserInfo {
+  const email = magicData?.email || privyUser?.apple?.email;
+  if (!email) {
+    throw new Error('Email address associated with Apple account not found');
   }
-
   return {
     provider: WalletSsoSource.Apple,
-    email: magicData.email,
-    emailVerified: false,
+    email,
+    emailVerified: true,
   };
 }
 
-function getSmsUser(magicData: MagicUserMetadata): VerifiedUserInfo {
-  if (!magicData.phoneNumber) {
+function getSmsUser(
+  magicData?: MagicUserMetadata,
+  privyUser?: PrivyUser,
+): VerifiedUserInfo {
+  const phoneNumber = magicData?.phoneNumber || privyUser?.phone?.number;
+  if (!phoneNumber) {
     throw new Error('No phone number found in magic metadata');
   }
   return {
     provider: WalletSsoSource.SMS,
-    phoneNumber: magicData.phoneNumber,
+    phoneNumber,
   };
 }
 
-function getFarcasterUser(): VerifiedUserInfo {
+function getFarcasterUser(privyUser?: PrivyUser): VerifiedUserInfo {
   return {
     provider: WalletSsoSource.Farcaster,
+    username: privyUser?.farcaster?.fid
+      ? String(privyUser?.farcaster?.fid)
+      : undefined,
   };
 }
 
-function getEmailUser(magicData: MagicUserMetadata): VerifiedUserInfo {
-  if (!magicData.email) {
-    throw new Error('No email found in magic metadata');
+function getEmailUser(
+  magicData?: MagicUserMetadata,
+  privyUser?: PrivyUser,
+): VerifiedUserInfo {
+  const email = magicData?.email || privyUser?.email?.address;
+  if (!email) {
+    throw new Error('Email address not found');
   }
-
   return {
     provider: WalletSsoSource.Email,
-    email: magicData.email,
+    email,
     emailVerified: true,
   };
 }
 
 export async function getVerifiedUserInfo({
   magicMetadata,
+  privyUser,
   token,
   walletSsoSource,
 }: {
-  magicMetadata: MagicUserMetadata;
+  magicMetadata?: MagicUserMetadata;
+  privyUser?: PrivyUser;
   // magicMetadata.oauthProvider is not set for email and some others
   walletSsoSource: WalletSsoSource;
   token?: string;
 }): Promise<VerifiedUserInfo> {
   const provider: WalletSsoSource =
-    (magicMetadata.oauthProvider?.toLowerCase() as WalletSsoSource) ||
+    (magicMetadata?.oauthProvider?.toLowerCase() as WalletSsoSource) ||
     walletSsoSource;
 
   if (
-    magicMetadata.oauthProvider &&
-    magicMetadata.oauthProvider?.toLowerCase() !== walletSsoSource
+    magicMetadata?.oauthProvider &&
+    magicMetadata?.oauthProvider?.toLowerCase() !== walletSsoSource
   ) {
     throw new Error('Invalid oauth provider');
   }
@@ -139,16 +155,14 @@ export async function getVerifiedUserInfo({
     case WalletSsoSource.Google:
       return getGoogleUser(token!);
     case WalletSsoSource.Apple:
-      return Promise.resolve(getAppleUser(magicMetadata));
+      return Promise.resolve(getAppleUser(magicMetadata, privyUser));
     case WalletSsoSource.SMS:
-      return Promise.resolve(getSmsUser(magicMetadata));
+      return Promise.resolve(getSmsUser(magicMetadata, privyUser));
     case WalletSsoSource.Farcaster:
-      return Promise.resolve(getFarcasterUser());
+      return Promise.resolve(getFarcasterUser(privyUser));
     case WalletSsoSource.Email:
-      return Promise.resolve(getEmailUser(magicMetadata));
+      return Promise.resolve(getEmailUser(magicMetadata, privyUser));
     default:
-      throw new Error(
-        `Unsupported SSO provider: ${magicMetadata.oauthProvider}`,
-      );
+      throw new Error(`Unsupported SSO provider: ${provider}`);
   }
 }

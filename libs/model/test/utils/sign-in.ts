@@ -26,6 +26,7 @@ export async function signIn(
   community_id: string,
   user_id = -1,
   referrer_address?: string,
+  wallet_id?: WalletId,
 ) {
   const { payload } = await evmSigner.newSession(CANVAS_TOPIC);
   const address = evmSigner.getAddressFromDid(payload.did);
@@ -42,7 +43,7 @@ export async function signIn(
       address,
       community_id,
       referrer_address,
-      wallet_id: WalletId.Metamask,
+      wallet_id: wallet_id || WalletId.Metamask,
       session: serializeCanvas(payload),
     },
   });

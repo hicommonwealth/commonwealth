@@ -13,7 +13,6 @@ class CommunityStakes extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
-  chainId?: string;
 
   constructor(
     contractAddress: string,
@@ -23,7 +22,7 @@ class CommunityStakes extends ContractBase {
   ) {
     super(contractAddress, CommunityStakeAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
-    this.chainId = chainId;
+    this.chainId = chainId || '1';
   }
 
   async initialize(withWallet: boolean = false): Promise<void> {

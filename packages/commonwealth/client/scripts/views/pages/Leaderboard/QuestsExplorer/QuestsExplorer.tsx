@@ -20,7 +20,6 @@ const QuestsExplorer = () => {
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
-    // dont show system quests in quest lists for communities
     include_system_quests: true,
     enabled: xpEnabled,
   });

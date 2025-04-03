@@ -8,7 +8,11 @@ import './XPProgressIndicator.scss';
 
 const WEEKLY_XP_GOAL = 100; // Hardcoded in client per product spec.
 
-const useXPProgress = () => {
+type UseXPProgress = {
+  includeSystemQuests?: boolean;
+};
+
+const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
 
@@ -26,7 +30,7 @@ const useXPProgress = () => {
       limit: 40,
       end_after: moment().startOf('week').toDate(),
       start_before: moment().endOf('week').toDate(),
-      include_system_quests: false, // dont show system quests in xp progression bar
+      include_system_quests: includeSystemQuests,
       enabled: user.isLoggedIn && xpEnabled,
     });
 

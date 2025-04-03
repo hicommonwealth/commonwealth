@@ -69,6 +69,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         },
         include,
         order: [['created_at', 'DESC']],
+        limit: 1000, // TODO: paginate this query, system quests are too big
       });
 
       const finalXps = xps
