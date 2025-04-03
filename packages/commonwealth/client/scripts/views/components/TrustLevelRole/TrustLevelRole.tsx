@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { getCommunityTrustLevel, getUserTrustLevel } from 'utils/trustLevel';
 
 import './TrustLevelRole.scss';
@@ -10,6 +11,10 @@ interface TrustLevelRoleProps {
 }
 
 const TrustLevelRole = ({ type, level }: TrustLevelRoleProps) => {
+  const isTrustLevelEnabled = useFlag('trustLevel');
+
+  if (!isTrustLevelEnabled) return null;
+
   const { icon } =
     type === 'community'
       ? getCommunityTrustLevel(level)
