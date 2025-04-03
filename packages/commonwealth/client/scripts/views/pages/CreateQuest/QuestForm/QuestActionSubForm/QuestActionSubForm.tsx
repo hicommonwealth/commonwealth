@@ -301,6 +301,7 @@ const QuestActionSubForm = ({
           />,
           `Selected action does not allow repetition`,
           doesPreventRepetition,
+          'w-fit',
         )}
         <CWRadioButton
           className="radio-btn"

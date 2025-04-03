@@ -1,4 +1,4 @@
-import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
+import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
@@ -31,9 +31,25 @@ import { QuestFormProps } from './types';
 import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
-const MAX_ACTIONS_LIMIT = Object.values(QuestEvents).length; // = 8 max actions
 
 const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
+  const questActions = {
+    common: [
+      'CommunityCreated',
+      'CommunityJoined',
+      'ThreadCreated',
+      'ThreadUpvoted',
+      'CommentCreated',
+      'CommentUpvoted',
+      'WalletLinked',
+      'SSOLinked',
+    ] as QuestAction[],
+    channel: ['TweetEngagement'] as QuestAction[],
+  };
+  const [availableQuestActions, setAvailableQuestActions] = useState<
+    QuestAction[]
+  >([...questActions.common]);
+
   const {
     addSubForm,
     questActionSubForms,
@@ -44,7 +60,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     validateSubForms,
   } = useQuestActionMultiFormsState({
     minSubForms: MIN_ACTIONS_LIMIT,
-    maxSubForms: MAX_ACTIONS_LIMIT,
+    maxSubForms: availableQuestActions.length,
   });
 
   useRunOnceOnCondition({
@@ -384,23 +400,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     }
   };
 
-  const questActions = {
-    common: [
-      'CommunityCreated',
-      'CommunityJoined',
-      'ThreadCreated',
-      'ThreadUpvoted',
-      'CommentCreated',
-      'CommentUpvoted',
-      'WalletLinked',
-      'SSOLinked',
-    ] as QuestAction[],
-    channel: ['TweetEngagement'] as QuestAction[],
-  };
-  const [availableQuestActions, setAvailableQuestActions] = useState<
-    QuestAction[]
-  >([...questActions.common]);
-
   // recalculate `availableQuestActions` when quest type changes
   formMethodsRef?.current?.watch((values) => {
     const newActions = [...questActions[values.quest_type]];
@@ -416,7 +415,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   return {
     // subform specific fields
     MIN_ACTIONS_LIMIT,
-    MAX_ACTIONS_LIMIT,
+    MAX_ACTIONS_LIMIT: availableQuestActions.length,
     addSubForm,
     questActionSubForms,
     removeSubFormByIndex,

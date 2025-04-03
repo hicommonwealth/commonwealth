@@ -47,7 +47,8 @@ export const CWTooltip: FC<TooltipProps> = ({
 export const withTooltip = (
   children: ReactNode,
   content: string,
-  shouldDisplay,
+  shouldDisplay: boolean,
+  containerClassName?: string,
 ) => {
   if (!shouldDisplay) return children;
 
@@ -59,7 +60,7 @@ export const withTooltip = (
         <span
           onMouseEnter={handleInteraction}
           onMouseLeave={handleInteraction}
-          className="w-fit"
+          className={containerClassName}
         >
           {children}
         </span>
