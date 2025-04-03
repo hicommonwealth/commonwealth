@@ -8,7 +8,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
   return {
     ...schemas.GetXps,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const {
         user_id,
