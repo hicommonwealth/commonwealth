@@ -12,9 +12,9 @@ type ShareModalProps = {
   open: boolean;
   title?: string;
   text?: string;
-  shareType: 'thread' | 'comment';
   headerLabel: string;
   BodyContent: () => ReactNode;
+  onCommunityChange?: (communityId: string | undefined) => void;
 };
 
 export const ShareModal = (props: ShareModalProps) => {

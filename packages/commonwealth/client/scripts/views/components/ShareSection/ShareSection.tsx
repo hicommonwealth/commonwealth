@@ -1,7 +1,7 @@
 import { formatAddressShort } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import { uniqBy } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
@@ -13,6 +13,7 @@ import { ShareOptionButton } from 'views/components/ShareSection/ShareOptionButt
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
+// FIXME: remove these... they aren't what we need.
 type URLFactory = (communityId: string | undefined) => string;
 
 type TextFactory = (communityId: string | undefined) => string;
@@ -21,6 +22,12 @@ export type ShareSectionProps = {
   url: string | URLFactory;
   title?: string;
   text?: string | TextFactory;
+  /**
+   * Called when the community ID is changed. you MUST memoize this callback!
+   *
+   * IF you don't you'll be called in an infinite loop.
+   */
+  onCommunityChange?: (communityId: string | undefined) => void;
 };
 
 /**
@@ -29,7 +36,7 @@ export type ShareSectionProps = {
  * Title and text are only supported on certain providers.
  */
 export const ShareSection = (props: ShareSectionProps) => {
-  const { title } = props;
+  const { title, onCommunityChange } = props;
 
   const referralsEnabled = useFlag('referrals');
 
@@ -63,6 +70,10 @@ export const ShareSection = (props: ShareSectionProps) => {
 
   const block0 = shareOptions.slice(0, 5);
   const block1 = shareOptions.slice(5, 9);
+
+  useEffect(() => {
+    onCommunityChange?.(communityId);
+  }, [communityId, onCommunityChange]);
 
   return (
     <>
