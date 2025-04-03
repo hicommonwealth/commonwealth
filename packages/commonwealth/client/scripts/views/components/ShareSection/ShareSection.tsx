@@ -13,13 +13,10 @@ import { ShareOptionButton } from 'views/components/ShareSection/ShareOptionButt
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
-// FIXME: remove these... they aren't what we need.
-type TextFactory = (communityId: string | undefined) => string;
-
 export type ShareSectionProps = {
   url: string;
   title?: string;
-  text?: string | TextFactory;
+  text?: string;
   /**
    * Called when the community ID is changed. you MUST memoize this callback!
    *
@@ -34,7 +31,7 @@ export type ShareSectionProps = {
  * Title and text are only supported on certain providers.
  */
 export const ShareSection = (props: ShareSectionProps) => {
-  const { title, onCommunityChange } = props;
+  const { title, onCommunityChange, text } = props;
 
   const referralsEnabled = useFlag('referrals');
 
@@ -56,9 +53,6 @@ export const ShareSection = (props: ShareSectionProps) => {
 
   // eslint-disable-next-line react/destructuring-assignment
   const url = computeURLWithReferral(props.url, refCode);
-  const text =
-    // eslint-disable-next-line react/destructuring-assignment
-    typeof props.text === 'function' ? props.text(undefined) : props.text;
 
   const shareOptions = useShareOptions(url, title, text);
 
