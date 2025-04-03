@@ -10,7 +10,7 @@ import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWCustomIcon } from './component_kit/cw_icons/cw_custom_icon';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWIdentificationTag } from './component_kit/new_designs/CWIdentificationTag';
 import { CWModal } from './component_kit/new_designs/CWModal';
@@ -66,7 +66,7 @@ const Address = ({ addressInfo }: AddressProps) => {
     }
 
     // If no specific wallet match, check community base
-    if (fetchedCommunity?.base) {
+    if (community && community.id && fetchedCommunity?.base) {
       switch (fetchedCommunity.base) {
         case ChainBase.Solana:
           return 'solana';
@@ -78,17 +78,17 @@ const Address = ({ addressInfo }: AddressProps) => {
           return 'polkadot';
         case ChainBase.Ethereum:
         default:
-          return 'ethereum';
+          return 'eth';
       }
     }
 
-    return 'ethereum'; // default fallback
+    return 'eth'; // default fallback
   };
 
   return (
     <div className="AddressContainer">
       <div className="address">
-        <CWIcon iconName={getChainIcon()} iconSize="small" />
+        <CWCustomIcon iconName={getChainIcon()} iconSize="small" />
         <CWIdentificationTag
           iconLeft={walletId}
           address={`\u2022 ${formatAddressShort(address)}`}
