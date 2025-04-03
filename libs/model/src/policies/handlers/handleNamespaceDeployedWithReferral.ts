@@ -11,6 +11,7 @@ export const handleNamespaceDeployedWithReferral: EventHandler<
     referrer: referrer_address,
     namespaceDeployer: referee_address,
     nameSpaceAddress: namespace_address,
+    block_number,
   } = payload.parsedArgs;
 
   await command(LinkNamespace(), {
@@ -28,6 +29,7 @@ export const handleNamespaceDeployedWithReferral: EventHandler<
             transaction_hash: payload.rawLog.transactionHash,
           }
         : undefined,
+      block_number: Number(block_number),
     },
   });
 };

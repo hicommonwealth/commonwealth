@@ -13,7 +13,7 @@ const MIN_TRADE_AMOUNT = 10 ** 6;
 const log = logger(import.meta);
 
 const inputs = {
-  TransferSingle: events.TransferSingle,
+  NamespaceTransferSingle: events.NamespaceTransferSingle,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
@@ -23,8 +23,8 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
-      TransferSingle: async ({ payload }) => {
-        const { from: namespaceAddress, to: judge } = payload.parsedArgs;
+      NamespaceTransferSingle: async ({ payload }) => {
+        const { from: namespaceAddress, to: userAddress } = payload.parsedArgs;
 
         const community = await models.Community.findOne({
           where: { namespace_address: namespaceAddress },
@@ -37,7 +37,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         }
 
         const nominatedAddress = await models.Address.findOne({
-          where: { address: judge },
+          where: { address: userAddress },
           include: [
             {
               model: models.User,
@@ -46,7 +46,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           ],
         });
         if (!nominatedAddress?.User) {
-          log.warn(`Judge user not found for address ${judge}`);
+          log.warn(`User not found for address ${userAddress}`);
           return;
         }
         if (nominatedAddress.User.tier >= 4) return;

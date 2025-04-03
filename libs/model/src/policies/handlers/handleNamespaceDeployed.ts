@@ -7,7 +7,8 @@ export const handleNamespaceDeployed: EventHandler<
   'NamespaceDeployed',
   ZodUndefined
 > = async ({ payload }) => {
-  const { nameSpaceAddress, _namespaceDeployer } = payload.parsedArgs;
+  const { nameSpaceAddress, _namespaceDeployer, block_number } =
+    payload.parsedArgs;
 
   await command(LinkNamespace(), {
     actor: systemActor({}),
@@ -15,6 +16,7 @@ export const handleNamespaceDeployed: EventHandler<
       namespace_address: nameSpaceAddress,
       deployer_address: _namespaceDeployer,
       log_removed: payload.rawLog.removed,
+      block_number,
     },
   });
 };

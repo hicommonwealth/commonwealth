@@ -291,6 +291,76 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   };
 };
 
+const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    // ERC1155 ABI for TransferSingle event
+    abi: [
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: 'address',
+            name: 'operator',
+            type: 'address',
+          },
+          {
+            indexed: true,
+            internalType: 'address',
+            name: 'from',
+            type: 'address',
+          },
+          {
+            indexed: true,
+            internalType: 'address',
+            name: 'to',
+            type: 'address',
+          },
+          {
+            indexed: false,
+            internalType: 'uint256',
+            name: 'id',
+            type: 'uint256',
+          },
+          {
+            indexed: false,
+            internalType: 'uint256',
+            name: 'value',
+            type: 'uint256',
+          },
+        ],
+        name: 'TransferSingle',
+        type: 'event',
+      },
+    ],
+    eventName: 'TransferSingle',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  const args = decoded.args as Record<string, unknown>;
+  const operatorAddress = args.operator as string;
+  const fromAddress = args.from as string;
+  const toAddress = args.to as string;
+
+  return {
+    event_name: 'NamespaceTransferSingle',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        operator: operatorAddress as `0x${string}`,
+        from: fromAddress as `0x${string}`,
+        to: toAddress as `0x${string}`,
+        id: BigInt((args.id as string) || '0'),
+        value: BigInt((args.value as string) || '0'),
+        block_number: Number(event.block.number),
+      },
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -307,6 +377,9 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.Referrals.FeeDistributed]: referralFeeDistributed,
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
+
+  // Namespace
+  [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
 
   // Contests
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:

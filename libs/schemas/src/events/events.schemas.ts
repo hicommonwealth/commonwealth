@@ -384,10 +384,11 @@ export const events = {
       signature: EVM_BYTES,
       namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
+      block_number: z.number().int().positive(),
     }),
   }),
 
-  TransferSingle: ChainEventBase.extend({
+  NamespaceTransferSingle: ChainEventBase.extend({
     parsedArgs: z.object({
       operator: EVM_ADDRESS_STRICT,
       from: EVM_ADDRESS_STRICT,
@@ -395,7 +396,7 @@ export const events = {
       id: z.coerce.bigint(),
       value: z.coerce.bigint(),
     }),
-  }).describe('When a token is transferred'),
+  }).describe('When a namespace token is transferred'),
 
   LaunchpadTokenCreated: z.object({
     block_timestamp: z.coerce.bigint(),
@@ -432,6 +433,7 @@ export const events = {
       _signature: EVM_BYTES,
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
+      block_number: z.number().int().positive(),
     }),
   }),
 

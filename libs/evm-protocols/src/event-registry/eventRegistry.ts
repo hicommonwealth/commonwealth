@@ -47,6 +47,7 @@ type ContractAddresses = {
 export enum ChildContractNames {
   SingleContest = 'SingleContest',
   RecurringContest = 'RecurringContest',
+  Namespace = 'Namespace',
 }
 
 export type ContractSource = {
@@ -92,6 +93,10 @@ const namespaceFactorySource = {
         EvmEventSignatures.Contests.SingleContestStarted,
         EvmEventSignatures.Contests.SingleContestVoterVoted,
       ],
+    },
+    [ChildContractNames.Namespace]: {
+      abi: [], // We'll use the ERC1155 event signature directly
+      eventSignatures: [EvmEventSignatures.Namespace.TransferSingle],
     },
   },
 } satisfies ContractSource;

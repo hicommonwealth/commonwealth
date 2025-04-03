@@ -21,7 +21,8 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
       });
       mustExist('Group', group);
 
-      if (group.is_system_managed && !actor.user.isAdmin)
+      // no one can delete system-managed groups
+      if (group.is_system_managed)
         throw new InvalidInput(DeleteGroupErrors.SystemManaged);
 
       await models.sequelize.transaction(async (transaction) => {
