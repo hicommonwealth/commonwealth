@@ -9,6 +9,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
@@ -34,7 +35,7 @@ const App = () => {
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <>
+                  <DefaultPrivyProvider>
                     <ForceMobileAuth>
                       <OnBoardingWrapperForMobile>
                         <ReactNativeBridgeUser />
@@ -43,7 +44,7 @@ const App = () => {
                         <RouterProvider router={router()} />
                       </OnBoardingWrapperForMobile>
                     </ForceMobileAuth>
-                  </>
+                  </DefaultPrivyProvider>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && <ReactQueryDevtools />}
