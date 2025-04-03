@@ -1,13 +1,26 @@
-import React from 'react';
+import { formatAddressShort } from 'helpers';
+import { useFlag } from 'hooks/useFlag';
+import { uniqBy } from 'lodash';
+import React, { useState } from 'react';
+import app from 'state';
+import useUserStore from 'state/ui/user';
+import { saveToClipboard } from 'utils/clipboard';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { ShareOptionButton } from 'views/components/ShareSection/ShareOptionButton';
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
 
+type URLFactory = (communityId: string | undefined) => string;
+
+type TextFactory = (communityId: string | undefined) => string;
+
 export type ShareSectionProps = {
-  url: string;
+  url: string | URLFactory;
   title?: string;
-  text?: string;
+  text?: string | TextFactory;
 };
 
 /**
@@ -16,29 +29,107 @@ export type ShareSectionProps = {
  * Title and text are only supported on certain providers.
  */
 export const ShareSection = (props: ShareSectionProps) => {
-  const { url, title, text } = props;
+  const { title } = props;
+
+  const referralsEnabled = useFlag('referrals');
+
+  const user = useUserStore();
+  const hasJoinedCommunity = !!user.activeAccount;
+  const communityId = hasJoinedCommunity ? app.activeChainId() : '';
+
+  const availableAddresses = uniqBy(user.addresses, 'address');
+
+  const addressOptions = availableAddresses.map((addressInfo) => ({
+    value: addressInfo.address,
+    label: formatAddressShort(addressInfo.address, 6),
+  }));
+  const refAddress = communityId
+    ? user.activeAccount?.address
+    : addressOptions?.[0]?.value;
+
+  const [refCode, setRefCode] = useState(refAddress);
+
+  // eslint-disable-next-line react/destructuring-assignment
+  const url = computeURLWithReferral(props.url, communityId, refCode);
+  const text =
+    // eslint-disable-next-line react/destructuring-assignment
+    typeof props.text === 'function' ? props.text(undefined) : props.text;
 
   const shareOptions = useShareOptions(url, title, text);
+
+  const handleCopy = () => {
+    saveToClipboard(url, true).catch(console.error);
+  };
 
   const block0 = shareOptions.slice(0, 5);
   const block1 = shareOptions.slice(5, 9);
 
   return (
-    <div className="ShareSection">
-      <CWText fontWeight="bold">Share to</CWText>
-      <div className="share-options">
-        {block0.map((option, idx) => (
-          <ShareOptionButton key={idx} {...option} />
-        ))}
+    <>
+      {referralsEnabled && (
+        <>
+          <CWSelectList
+            label="Select Address"
+            placeholder="Select a wallet"
+            isClearable={false}
+            isSearchable={false}
+            value={addressOptions.find((option) => option.value === refCode)}
+            defaultValue={addressOptions[0]}
+            options={addressOptions}
+            onChange={(option) => setRefCode(option?.value)}
+          />
+
+          <CWTextInput
+            inputClassName="invite-link-input"
+            fullWidth
+            type="text"
+            value={url}
+            readOnly
+            onClick={handleCopy}
+            iconRight={<CWIcon iconName="copy" />}
+          />
+        </>
+      )}
+
+      <div className="ShareSection">
+        <CWText fontWeight="bold">Share to</CWText>
+        <div className="share-options">
+          {block0.map((option, idx) => (
+            <ShareOptionButton key={idx} {...option} />
+          ))}
+        </div>
+        <div className="share-options">
+          {block1.map((option, idx) => (
+            <ShareOptionButton key={idx} {...option} />
+          ))}
+          <div className="share-option" />
+          <div className="share-option" />
+          <div className="share-option" />
+        </div>
       </div>
-      <div className="share-options">
-        {block1.map((option, idx) => (
-          <ShareOptionButton key={idx} {...option} />
-        ))}
-        <div className="share-option" />
-        <div className="share-option" />
-        <div className="share-option" />
-      </div>
-    </div>
+    </>
   );
 };
+
+function computeURLWithReferral(
+  urlFactory: string | URLFactory,
+  communityId: string | undefined,
+  refcode: string | undefined,
+) {
+  function computeURL() {
+    if (typeof urlFactory === 'string') {
+      return urlFactory;
+    }
+    return urlFactory(communityId);
+  }
+
+  const url = computeURL();
+
+  if (!refcode) {
+    return url;
+  }
+
+  const u = new URL(url);
+  u.searchParams.set('refcode', refcode);
+  return u.toString();
+}
