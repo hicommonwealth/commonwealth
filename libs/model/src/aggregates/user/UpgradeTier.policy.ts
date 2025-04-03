@@ -51,7 +51,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         }
         if (nominatedAddress.User.tier >= 4) return;
 
-        // if judge has sufficient balance of community nomination token, upgrade to tier 4
+        // if user has sufficient balance of community nomination token, upgrade to tier 4
         const balances = await tokenBalanceCache.getBalances({
           addresses: [nominatedAddress.address],
           balanceSourceType: BalanceSourceType.ERC1155,
