@@ -1,4 +1,4 @@
-import { Role } from '@hicommonwealth/shared';
+import { ChainBase, Role, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
@@ -43,6 +43,7 @@ export type AddressInfo = {
   stake_balance: number;
   role: string;
   referred_by: string | null;
+  wallet_id?: WalletId;
 };
 
 type MembersSectionProps = {
@@ -104,6 +105,42 @@ const MembersSection = ({
     }));
   };
   const filteredMember = removeDuplicateAddresses(filteredMembers);
+
+  // Add function to determine icon based on community base and wallet type
+  const getChainIcon = (address: AddressInfo) => {
+    // First check wallet type if available
+    if (address.wallet_id) {
+      if (
+        [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
+          address.wallet_id,
+        )
+      ) {
+        return 'solana';
+      }
+      if (address.wallet_id === WalletId.Keplr) {
+        return 'cosmos';
+      }
+    }
+
+    // If no specific wallet match, check community base
+    if (community?.base) {
+      switch (community.base) {
+        case ChainBase.Solana:
+          return 'solana';
+        case ChainBase.CosmosSDK:
+          return 'cosmos';
+        case ChainBase.NEAR:
+          return 'near';
+        case ChainBase.Substrate:
+          return 'polkadot';
+        case ChainBase.Ethereum:
+        default:
+          return 'ethereum';
+      }
+    }
+
+    return 'ethereum'; // default fallback
+  };
 
   return (
     <div className="MembersSection">
@@ -172,7 +209,7 @@ const MembersSection = ({
                       <CWTag
                         label={formatAddressShort(address.address)}
                         type="address"
-                        iconName="ethereum"
+                        iconName={getChainIcon(address)}
                       />
                     </div>
                   );

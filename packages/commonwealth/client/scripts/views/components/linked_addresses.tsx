@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -40,12 +41,54 @@ type LinkedAddressesProps = {
 };
 
 const Address = ({ addressInfo }: AddressProps) => {
-  const { address, walletId } = addressInfo;
+  const { address, walletId, community } = addressInfo;
+
+  // Get community data to determine chain base
+  const { data: fetchedCommunity } = useGetCommunityByIdQuery({
+    id: community?.id,
+    enabled: !!community?.id,
+  });
+
+  // Function to determine the correct chain icon
+  const getChainIcon = () => {
+    // First check wallet type
+    if (walletId) {
+      if (
+        [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
+          walletId,
+        )
+      ) {
+        return 'solana';
+      }
+      if (walletId === WalletId.Keplr) {
+        return 'cosmos';
+      }
+    }
+
+    // If no specific wallet match, check community base
+    if (fetchedCommunity?.base) {
+      switch (fetchedCommunity.base) {
+        case ChainBase.Solana:
+          return 'solana';
+        case ChainBase.CosmosSDK:
+          return 'cosmos';
+        case ChainBase.NEAR:
+          return 'near';
+        case ChainBase.Substrate:
+          return 'polkadot';
+        case ChainBase.Ethereum:
+        default:
+          return 'ethereum';
+      }
+    }
+
+    return 'ethereum'; // default fallback
+  };
 
   return (
     <div className="AddressContainer">
       <div className="address">
-        <CWIcon iconName="ethereum" iconSize="small" />
+        <CWIcon iconName={getChainIcon()} iconSize="small" />
         <CWIdentificationTag
           iconLeft={walletId}
           address={`\u2022 ${formatAddressShort(address)}`}

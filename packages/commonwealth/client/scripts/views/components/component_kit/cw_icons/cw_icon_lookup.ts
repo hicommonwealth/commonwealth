@@ -324,6 +324,7 @@ export const iconLookup = {
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
   starFour: withPhosphorIcon(StarFour),
+  solana: CustomIcons.CWSolana,
 };
 
 export const customIconLookup = {
@@ -358,6 +359,7 @@ export const customIconLookup = {
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatText),
   privy: CustomIcons.CWPrivy,
+  solana: CustomIcons.CWSolana,
 };
 
 export type IconName = keyof typeof iconLookup;
