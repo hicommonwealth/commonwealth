@@ -32,6 +32,7 @@ export const ShareSection = (props: ShareSectionProps) => {
   const { title } = props;
 
   const referralsEnabled = useFlag('referrals');
+
   const user = useUserStore();
   const hasJoinedCommunity = !!user.activeAccount;
   const communityId = hasJoinedCommunity ? app.activeChainId() : '';
