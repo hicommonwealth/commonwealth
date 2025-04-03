@@ -11,7 +11,7 @@ type ShareButtonProps = {
 };
 
 export const ShareButton = (props: ShareButtonProps) => {
-  const { buttonLabel, title, shareType } = props;
+  const { buttonLabel, shareType } = props;
 
   const [dialogActive, setDialogActive] = useState(false);
 
