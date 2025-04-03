@@ -22,6 +22,7 @@ import {
   buildURLFromContentId,
   inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
+import { QuestTypes } from '../CreateQuest/QuestForm/types';
 import './UpdateQuest.scss';
 
 const UpdateQuest = ({ id }: { id: number }) => {
@@ -109,6 +110,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
               name: quest.name,
               start_date: quest.start_date,
               max_xp_to_end: `${quest.max_xp_to_end}`,
+              quest_type: quest.quest_type as QuestTypes,
               ...(quest.community_id &&
                 community && {
                   community: {

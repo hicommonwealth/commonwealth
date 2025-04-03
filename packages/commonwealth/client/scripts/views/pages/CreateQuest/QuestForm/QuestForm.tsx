@@ -1,4 +1,5 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import clsx from 'clsx';
 import { capitalize } from 'lodash';
 import React from 'react';
 import CWCommunityInput from 'views/components/CWCommunityInput';
@@ -18,9 +19,10 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import './QuestForm.scss';
-import { QuestFormProps } from './types';
+import { QuestFormProps, QuestTypes } from './types';
 import useQuestForm from './useQuestForm';
 import { questFormValidationSchema } from './validation';
 
@@ -40,10 +42,12 @@ const QuestForm = (props: QuestFormProps) => {
     minStartDate,
     idealStartDate,
     minEndDate,
+    availableQuestActions,
     formMethodsRef,
   } = useQuestForm(props);
 
   const popoverProps = usePopover();
+  const isUpdateMode = mode === 'update';
 
   return (
     <CWForm
@@ -61,11 +65,13 @@ const QuestForm = (props: QuestFormProps) => {
               end_date: initialValues.end_date,
               community: initialValues.community,
               max_xp_to_end: initialValues.max_xp_to_end,
+              quest_type: initialValues.quest_type,
             },
           }
         : {
             initialValues: {
               participation_limit: QuestParticipationLimit.OncePerQuest,
+              quest_type: QuestTypes.Common,
             },
           })}
       className="QuestForm"
@@ -102,6 +108,39 @@ const QuestForm = (props: QuestFormProps) => {
               imageBehavior={ImageBehavior.Fill}
               withAIImageGeneration
             />
+
+            {withTooltip(
+              <div
+                className={clsx(
+                  'quest-type-selector',
+                  isUpdateMode && 'update-mode',
+                )}
+              >
+                <CWText type="caption">Quest Type</CWText>
+                <CWRadioButton
+                  className="radio-btn mt-8"
+                  value={QuestTypes.Common}
+                  label="Common Quest"
+                  name="quest_type"
+                  hookToForm
+                  groupName="quest_type"
+                  disabled={isUpdateMode}
+                />
+                <CWRadioButton
+                  className="radio-btn"
+                  value={QuestTypes.Channel}
+                  label="Channel Quest"
+                  name="quest_type"
+                  hookToForm
+                  groupName="quest_type"
+                  disabled={isUpdateMode}
+                />
+                {/* TODO: add explainer copy - diff b/w channel and common quest */}
+              </div>,
+              'Change not allowed during update',
+              isUpdateMode,
+            )}
+
             <CWCommunityInput
               key={`${watch('community')}`}
               name="community"
@@ -207,6 +246,7 @@ const QuestForm = (props: QuestFormProps) => {
                 }
                 isRemoveable={questActionSubForms.length !== MIN_ACTIONS_LIMIT}
                 onRemove={() => removeSubFormByIndex(index)}
+                availableActions={availableQuestActions}
                 hiddenActions={
                   questActionSubForms
                     .filter((form) => !!form.values.action)

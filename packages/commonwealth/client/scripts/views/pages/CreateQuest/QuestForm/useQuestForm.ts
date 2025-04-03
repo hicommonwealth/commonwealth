@@ -11,6 +11,7 @@ import {
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import { isEqual } from 'lodash';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useRef, useState } from 'react';
@@ -37,6 +38,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     questActionSubForms,
     removeSubFormByIndex,
     updateSubFormByIndex,
+    setQuestActionSubFormsInitialState,
     setQuestActionSubForms,
     validateSubForms,
   } = useQuestActionMultiFormsState({
@@ -202,7 +204,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       ...(values?.community && {
         community_id: values.community.value,
       }),
-      quest_type: 'channel', // TODO: 11391 make this configurable via UI
+      quest_type: values.quest_type,
     });
 
     if (quest && quest.id) {
@@ -380,6 +382,35 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     }
   };
 
+  const questActions = {
+    common: [
+      'CommunityCreated',
+      'CommunityJoined',
+      'ThreadCreated',
+      'ThreadUpvoted',
+      'CommentCreated',
+      'CommentUpvoted',
+      'WalletLinked',
+      'SSOLinked',
+    ] as QuestAction[],
+    channel: ['TweetEngagement'] as QuestAction[],
+  };
+  const [availableQuestActions, setAvailableQuestActions] = useState<
+    QuestAction[]
+  >([...questActions.common]);
+
+  // recalculate `availableQuestActions` when quest type changes
+  formMethodsRef?.current?.watch((values) => {
+    const newActions = [...questActions[values.quest_type]];
+
+    // if quest type changes, reset all quest actions
+    if (!isEqual(availableQuestActions, newActions)) {
+      setQuestActionSubFormsInitialState();
+    }
+
+    setAvailableQuestActions(newActions);
+  });
+
   return {
     // subform specific fields
     MIN_ACTIONS_LIMIT,
@@ -397,6 +428,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     idealStartDate,
     minEndDate,
     formMethodsRef,
+    availableQuestActions,
   };
 };
 

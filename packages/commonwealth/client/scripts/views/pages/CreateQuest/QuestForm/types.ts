@@ -3,6 +3,11 @@ import { z } from 'zod';
 import { QuestActionSubFormFields } from './QuestActionSubForm';
 import { questFormValidationSchema } from './validation';
 
+export enum QuestTypes {
+  Channel = 'channel',
+  Common = 'common',
+}
+
 export type QuestFormProps =
   | {
       mode: 'create';

@@ -4,6 +4,7 @@ import {
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
+import { QuestTypes } from './types';
 
 // update in future if required
 export const MAX_XP_TO_END_UPPER_LIMIT = 10_000_000;
@@ -37,6 +38,7 @@ export const questFormValidationSchema = z
         ),
       },
     ),
+    quest_type: z.enum([QuestTypes.Channel, QuestTypes.Common]),
     community: z
       .object(
         {

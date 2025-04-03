@@ -65,6 +65,7 @@ export type QuestActionSubFormProps = {
   config?: QuestActionSubFormConfig;
   isRemoveable?: boolean;
   onRemove?: () => void;
+  availableActions: QuestAction[];
   hiddenActions?: QuestAction[];
   internalRefs?: QuestActionSubFormInternalRefs;
 };

@@ -36,22 +36,26 @@ const useQuestActionMultiFormsState = ({
     (subForm) => Object.keys(subForm.errors || {}).length > 0,
   );
 
+  const setQuestActionSubFormsInitialState = () => {
+    if (minSubForms) {
+      setQuestActionSubForms([
+        ...Array.from({ length: minSubForms }, (_, index) => ({
+          values: {
+            participationLimit: QuestParticipationLimit.OncePerQuest,
+            contentIdScope: QuestActionContentIdScope.Topic,
+          },
+          refs: {
+            runParticipationLimitValidator: () => {},
+          },
+          id: index + (questActionSubForms.length + 1),
+        })),
+      ]);
+    }
+  };
+
   useRunOnceOnCondition({
     callback: () => {
-      if (minSubForms) {
-        setQuestActionSubForms(
-          Array.from({ length: minSubForms }, (_, index) => ({
-            values: {
-              participationLimit: QuestParticipationLimit.OncePerQuest,
-              contentIdScope: QuestActionContentIdScope.Topic,
-            },
-            refs: {
-              runParticipationLimitValidator: () => {},
-            },
-            id: index + 1,
-          })),
-        );
-      }
+      setQuestActionSubFormsInitialState();
     },
     shouldRun: true,
   });
@@ -223,6 +227,7 @@ const useQuestActionMultiFormsState = ({
     addSubForm,
     removeSubFormByIndex,
     updateSubFormByIndex,
+    setQuestActionSubFormsInitialState,
     setQuestActionSubForms,
     validateSubFormByIndex,
     validateSubForms,

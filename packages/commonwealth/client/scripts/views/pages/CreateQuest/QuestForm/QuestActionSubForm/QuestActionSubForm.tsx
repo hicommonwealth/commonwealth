@@ -40,20 +40,11 @@ const QuestActionSubForm = ({
   defaultValues,
   config,
   onChange,
+  availableActions,
   hiddenActions,
   internalRefs,
 }: QuestActionSubFormProps) => {
-  const actionOptions = [
-    'CommunityCreated',
-    'CommunityJoined',
-    'ThreadCreated',
-    'ThreadUpvoted',
-    'CommentCreated',
-    'CommentUpvoted',
-    'WalletLinked',
-    'SSOLinked',
-    'TweetEngagement',
-  ]
+  const actionOptions = availableActions
     .map((event) => ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
