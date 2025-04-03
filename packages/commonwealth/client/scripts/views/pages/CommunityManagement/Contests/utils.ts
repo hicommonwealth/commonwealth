@@ -33,9 +33,11 @@ export const copyFarcasterContestFrameUrl = async (contestAddress: string) => {
   }
 };
 
-export const isJudgedContest = (contestTopic?: {
-  weightedVoting?: TopicWeightedVoting | null;
-}): boolean => {
+export const isJudgedContest = (
+  contestTopic?: {
+    weightedVoting?: TopicWeightedVoting | null;
+  } | null,
+): boolean => {
   const judgeContestEnabled = client.getBooleanValue('judgeContest', false);
   return (
     !!judgeContestEnabled && !!contestTopic && !contestTopic.weightedVoting

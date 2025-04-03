@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -27,7 +26,6 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
-  const judgeContestEnabled = useFlag('judgeContest');
 
   const [searchParams] = useSearchParams();
   const contestType = searchParams.get('type');
