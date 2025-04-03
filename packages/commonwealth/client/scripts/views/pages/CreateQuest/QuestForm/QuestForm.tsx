@@ -119,6 +119,7 @@ const QuestForm = (props: QuestFormProps) => {
               Quest timeline
             </CWText>
             <CWDateTimeInput
+              autoComplete="off"
               label="Start Date"
               hookToForm
               name="start_date"
@@ -127,6 +128,7 @@ const QuestForm = (props: QuestFormProps) => {
               showTimeInput
             />
             <CWDateTimeInput
+              autoComplete="off"
               label="End Date"
               hookToForm
               name="end_date"
