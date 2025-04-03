@@ -324,7 +324,6 @@ export const iconLookup = {
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
   starFour: withPhosphorIcon(StarFour),
-  // Chain icons moved to customIconLookup only
 };
 
 export const customIconLookup = {
