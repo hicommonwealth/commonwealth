@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
+import Turnstile from 'react-turnstile';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWImageInput,
@@ -43,6 +44,12 @@ const CommunityInformationForm = ({
   initialValues,
   isCreatingCommunity,
   submitBtnLabel,
+  isTurnstileEnabled,
+  turnstileSiteKey,
+  onTurnstileVerify,
+  onTurnstileError,
+  onTurnstileExpire,
+  turnstileToken,
 }: CommunityInformationFormProps) => {
   const [communityName, setCommunityName] = useState(
     initialValues?.communityName || '',
@@ -137,6 +144,12 @@ const CommunityInformationForm = ({
 
     await onSubmit({ ...values, communityId }).catch(console.error);
   };
+
+  // Check if the submit button should be disabled
+  const isSubmitDisabled =
+    isCreatingCommunity ||
+    isProcessingProfileImage ||
+    (isTurnstileEnabled && !turnstileToken);
 
   return (
     <CWForm
@@ -265,6 +278,22 @@ const CommunityInformationForm = ({
         <></>
       )}
 
+      {/* Add Turnstile verification */}
+      {isTurnstileEnabled && (
+        <div className="turnstile-container">
+          <Turnstile
+            sitekey={turnstileSiteKey || ''}
+            onVerify={onTurnstileVerify}
+            onExpire={onTurnstileExpire}
+            onError={onTurnstileError}
+            appearance="interaction-only"
+            theme="light"
+            fixedSize={false}
+            size="normal"
+          />
+        </div>
+      )}
+
       {/* Action buttons */}
       <section className="action-buttons">
         <CWButton
@@ -278,7 +307,7 @@ const CommunityInformationForm = ({
           type="submit"
           buttonWidth="wide"
           label={submitBtnLabel}
-          disabled={isCreatingCommunity || isProcessingProfileImage}
+          disabled={isSubmitDisabled}
         />
       </section>
     </CWForm>

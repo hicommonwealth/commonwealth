@@ -1,7 +1,7 @@
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -12,6 +12,8 @@ import useCreateCommunityMutation, {
 } from 'state/api/communities/createCommunity';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 // eslint-disable-next-line max-len
+import { useTurnstile } from 'react-turnstile';
+import useUserStore from 'state/ui/user';
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
 import FeatureHint from 'views/components/FeatureHint';
@@ -34,6 +36,13 @@ const CommunityInformationStep = ({
   handleSelectedChainId,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
+  const user = useUserStore();
+
+  // Add Turnstile state
+  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
+  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
+  const turnstile = useTurnstile();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -53,6 +62,11 @@ const CommunityInformationStep = ({
       (chain) => String(chain.value) === values?.chain?.value,
     );
 
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
+
     try {
       const input = buildCreateCommunityInput({
         id: values.communityId,
@@ -62,11 +76,17 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
+        turnstileToken: turnstileToken || undefined,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
     } catch (err) {
       notifyError(err.message);
+      // Reset turnstile if there's an error
+      if (isTurnstileEnabled) {
+        turnstile.reset();
+        setTurnstileToken(null);
+      }
     }
   };
 
@@ -124,6 +144,23 @@ const CommunityInformationStep = ({
         withSocialLinks={false} // TODO: Set this when design figures out how we will integrate the social links
         isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Launch Community"
+        isTurnstileEnabled={isTurnstileEnabled}
+        turnstileSiteKey={turnstileSiteKey}
+        turnstileToken={turnstileToken}
+        onTurnstileVerify={(token) => {
+          console.log('Turnstile verified', token);
+          setTurnstileToken(token);
+        }}
+        onTurnstileExpire={() => {
+          console.log('Turnstile expired');
+          setTurnstileToken(null);
+          turnstile.reset();
+        }}
+        onTurnstileError={() => {
+          console.log('Turnstile error');
+          setTurnstileToken(null);
+          notifyError('Verification failed. Please try again.');
+        }}
       />
     </div>
   );

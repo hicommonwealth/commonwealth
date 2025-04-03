@@ -9,9 +9,13 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { tiered } from '../../middleware';
-import { authVerified } from '../../middleware/auth';
-import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
+import {
+  authVerified,
+  mustBeSuperAdmin,
+  mustExist,
+  tiered,
+  turnstile,
+} from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 
@@ -47,7 +51,11 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [authVerified(), tiered({ creates: true })],
+    auth: [
+      authVerified(),
+      tiered({ creates: true }),
+      turnstile({ widgetName: 'create-community' }),
+    ],
     body: async ({ actor, payload }) => {
       const {
         id,

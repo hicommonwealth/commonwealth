@@ -29,4 +29,11 @@ export type CommunityInformationFormProps = {
   isCreatingCommunity: boolean;
   initialValues?: CommunityInformationFormSubmitValues;
   submitBtnLabel: string;
+  // Turnstile props
+  isTurnstileEnabled?: boolean;
+  turnstileSiteKey?: string;
+  onTurnstileVerify?: (token: string) => void;
+  onTurnstileError?: () => void;
+  onTurnstileExpire?: () => void;
+  turnstileToken?: string | null;
 };
