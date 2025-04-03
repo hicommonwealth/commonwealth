@@ -142,6 +142,8 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
+  const isSystemQuest = quest.id < 0;
+
   const handleActionStart = (
     actionName: QuestAction,
     actionContentId?: string,
@@ -457,11 +459,20 @@ const QuestDetails = ({ id }: { id: number }) => {
                       id: log.action_meta_id,
                       createdAt: new Date(log.event_created_at),
                     }))}
-                  canStartAction={isStarted && !isEnded}
-                  {...((!isStarted || isEnded) && {
-                    actionStartBlockedReason: !isStarted
-                      ? 'Only available when quest starts'
-                      : 'Unavailable, quest has ended',
+                  canStartAction={
+                    isSystemQuest
+                      ? !user.isLoggedIn && isStarted && !isEnded
+                      : isStarted && !isEnded
+                  }
+                  {...(((isSystemQuest && user.isLoggedIn) ||
+                    !isStarted ||
+                    isEnded) && {
+                    actionStartBlockedReason:
+                      isSystemQuest && user.isLoggedIn
+                        ? `Only available for new users`
+                        : !isStarted
+                          ? 'Only available when quest starts'
+                          : 'Unavailable, quest has ended',
                   })}
                 />
               ))}
