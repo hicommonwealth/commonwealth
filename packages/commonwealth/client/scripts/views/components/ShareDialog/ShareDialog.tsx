@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
-import { ShareModal } from 'views/components/ShareDialog/ShareModal';
+import { ShareModal } from 'views/components/ShareModal/ShareModal';
 
 type ShareDialogProps = {
   onClose: () => void;

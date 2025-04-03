@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ShareModal } from 'views/components/ShareDialog/ShareModal';
+import { ShareModal } from 'views/components/ShareModal/ShareModal';
 import './InviteLinkModal.scss';
 import { generateTextAndLink } from './utils';
 

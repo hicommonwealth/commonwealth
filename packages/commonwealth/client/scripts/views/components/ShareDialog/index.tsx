@@ -1,3 +1,1 @@
-import { ShareDialog } from './ShareDialog';
-
-export default ShareDialog;
+export { ShareDialog } from './ShareDialog';
