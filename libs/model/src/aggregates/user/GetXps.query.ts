@@ -45,7 +45,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
               attributes: ['id', 'name'],
               where: {
                 ...(community_id && { community_id }),
-                ...(quest_id ? { id: quest_id } : { id: { [Op.gt]: 0 } }),
+                ...(quest_id && { id: quest_id }),
               },
             },
           ],
