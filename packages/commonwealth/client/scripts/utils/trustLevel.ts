@@ -3,7 +3,7 @@ import { COMMUNITY_TIER, USER_TIER } from '@hicommonwealth/schemas';
 interface TrustLevel {
   level: number;
   icon: string;
-  type: string;
+  name: string;
   description: string;
 }
 
@@ -14,37 +14,37 @@ const USER_TRUST_LEVELS: Record<number, UserTrustLevel> = {
   0: {
     level: 0,
     icon: '👤',
-    type: 'Unverified',
+    name: 'Unverified',
     description: 'Basic account without verification.',
   },
   1: {
     level: 1,
     icon: '👶',
-    type: 'Social Verified',
+    name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
   },
   2: {
     level: 2,
     icon: '⌛',
-    type: 'Namespace Verified',
+    name: 'Namespace Verified',
     description: 'Verified ownership of namespace or domain',
   },
   3: {
     level: 3,
     icon: '🌐',
-    type: 'Manual Verification',
+    name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
   },
   4: {
     level: 4,
     icon: '🔗',
-    type: 'Premium Verification',
+    name: 'Premium Verification',
     description: 'Highest level of trust with additional benefits.',
   },
   5: {
     level: 5,
     icon: '⭐',
-    type: 'Premium Verification',
+    name: 'Premium Verification',
     description: 'Highest level of trust with additional benefits.',
   },
 };
@@ -53,31 +53,31 @@ const COMMUNITY_TRUST_LEVELS: Record<number, CommunityTrustLevel> = {
   0: {
     level: 0,
     icon: '👤',
-    type: 'Unverified',
+    name: 'Unverified',
     description: 'Basic community without verification.',
   },
   1: {
     level: 1,
     icon: '🌐',
-    type: 'Social Verified',
+    name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
   },
   2: {
     level: 2,
     icon: '🔗',
-    type: 'Community Verified',
+    name: 'Community Verified',
     description: 'Ownership of verified community or domain',
   },
   3: {
     level: 3,
     icon: '✅',
-    type: 'Manual Verification',
+    name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
   },
   4: {
     level: 4,
     icon: '⭐',
-    type: 'Premium Verification',
+    name: 'Premium Verification',
     description: 'Highest level of trust with additional benefits.',
   },
 };
