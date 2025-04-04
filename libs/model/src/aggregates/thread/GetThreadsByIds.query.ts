@@ -1,5 +1,4 @@
 import { InvalidInput, Query } from '@hicommonwealth/core';
-import { ThreadInstance } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -27,109 +26,103 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
         throw new InvalidInput('Invalid thread_ids format');
       }
 
-      let threads: ThreadInstance[];
-      await models.sequelize.transaction(async (transaction) => {
-        threads = await models.Thread.findAll({
-          where: {
-            ...(community_id && { community_id }),
-            id: { [Op.in]: parsedThreadIds },
-          },
+      const threads = await models.Thread.findAll({
+        where: {
+          ...(community_id && { community_id }),
+          id: { [Op.in]: parsedThreadIds },
+        },
 
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-              include: [
-                {
-                  model: models.User,
-                  as: 'User',
-                  required: true,
-                  attributes: ['id', 'profile', 'tier'],
-                },
-              ],
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-              include: [
-                {
-                  model: models.User,
-                  as: 'User',
-                  required: true,
-                  attributes: ['id', 'profile', 'tier'],
-                },
-              ],
-            },
-            {
-              model: models.Topic,
-              as: 'topic',
-              required: true,
-            },
-            {
-              model: models.Reaction,
-              as: 'reactions',
-              include: [
-                {
-                  model: models.Address,
-                  as: 'Address',
-                  required: true,
-                  include: [
-                    {
-                      model: models.User,
-                      as: 'User',
-                      required: true,
-                      attributes: ['id', 'profile', 'tier'],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              model: models.ContestAction,
-              where: {
-                action: 'upvoted',
+        include: [
+          {
+            model: models.Address,
+            as: 'Address',
+            include: [
+              {
+                model: models.User,
+                as: 'User',
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
               },
-              required: false,
-              attributes: ['content_id', 'thread_id'],
-              include: [
-                {
-                  model: models.Contest,
-                  on: {
-                    contest_id: sequelize.where(
-                      sequelize.col('"ContestActions".contest_id'),
-                      '=',
-                      sequelize.col('"ContestActions->Contest".contest_id'),
-                    ),
-                    contest_address: sequelize.where(
-                      sequelize.col('"ContestActions".contest_address'),
-                      '=',
-                      sequelize.col(
-                        '"ContestActions->Contest".contest_address',
-                      ),
-                    ),
+            ],
+          },
+          {
+            model: models.Address,
+            as: 'collaborators',
+            include: [
+              {
+                model: models.User,
+                as: 'User',
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          {
+            model: models.Topic,
+            as: 'topic',
+            required: true,
+          },
+          {
+            model: models.Reaction,
+            as: 'reactions',
+            include: [
+              {
+                model: models.Address,
+                as: 'Address',
+                required: true,
+                include: [
+                  {
+                    model: models.User,
+                    as: 'User',
+                    required: true,
+                    attributes: ['id', 'profile', 'tier'],
                   },
-                  attributes: [
-                    'contest_id',
-                    'contest_address',
-                    'score',
-                    'start_time',
-                    'end_time',
-                  ],
-                  include: [
-                    {
-                      model: models.ContestManager,
-                      attributes: ['name', 'cancelled', 'interval'],
-                    },
-                  ],
+                ],
+              },
+            ],
+          },
+          {
+            model: models.ContestAction,
+            where: {
+              action: 'upvoted',
+            },
+            required: false,
+            attributes: ['content_id', 'thread_id'],
+            include: [
+              {
+                model: models.Contest,
+                on: {
+                  contest_id: sequelize.where(
+                    sequelize.col('"ContestActions".contest_id'),
+                    '=',
+                    sequelize.col('"ContestActions->Contest".contest_id'),
+                  ),
+                  contest_address: sequelize.where(
+                    sequelize.col('"ContestActions".contest_address'),
+                    '=',
+                    sequelize.col('"ContestActions->Contest".contest_address'),
+                  ),
                 },
-              ],
-            },
-            {
-              model: models.ThreadVersionHistory,
-            },
-          ],
-          transaction,
-        });
+                attributes: [
+                  'contest_id',
+                  'contest_address',
+                  'score',
+                  'start_time',
+                  'end_time',
+                ],
+                include: [
+                  {
+                    model: models.ContestManager,
+                    attributes: ['name', 'cancelled', 'interval'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: models.ThreadVersionHistory,
+          },
+        ],
       });
 
       return threads!.map(

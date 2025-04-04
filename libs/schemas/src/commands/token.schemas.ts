@@ -47,5 +47,6 @@ export const GetTokenizedThreadsAllowed = {
   }),
   output: z.object({
     tokenized_threads_enabled: z.boolean(),
+    thread_purchase_token: z.string().nullish(),
   }),
 };

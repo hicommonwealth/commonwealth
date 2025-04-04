@@ -83,6 +83,7 @@ import {
   SignOut,
   Sparkle,
   SquaresFour,
+  StarFour,
   Table,
   TextB,
   TextHOne,
@@ -324,6 +325,7 @@ export const iconLookup = {
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
   play: withPhosphorIcon(Play),
+  starFour: withPhosphorIcon(StarFour),
 };
 
 export const customIconLookup = {
@@ -357,6 +359,7 @@ export const customIconLookup = {
   apple: CustomIcons.CWApple,
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatText),
+  privy: CustomIcons.CWPrivy,
 };
 
 export type IconName = keyof typeof iconLookup;

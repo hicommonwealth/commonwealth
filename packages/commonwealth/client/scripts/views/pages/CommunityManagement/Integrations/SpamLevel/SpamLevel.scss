@@ -1,0 +1,48 @@
+@import '../../../../../styles/shared';
+
+.SpamLevel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+
+    .h4 {
+      color: $neutral-900 !important;
+    }
+  }
+
+  .b1 {
+    color: $neutral-500 !important;
+    padding-bottom: 12px;
+  }
+
+  .action-btn {
+    margin: 0 !important;
+    margin-top: 12px !important;
+
+    &:focus-within {
+      border-width: 1px !important;
+      padding: 0px !important;
+    }
+  }
+}
+
+.docs-link {
+  margin-top: 4px;
+
+  a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

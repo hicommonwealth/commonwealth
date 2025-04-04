@@ -6,10 +6,9 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
-import { Op, Transaction, WhereOptions } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
-import { QuestInstance } from '../../models/quest';
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -29,24 +28,18 @@ async function getUserByAddress(address: string) {
 
 /*
  * Finds all active quest action metas for a given event
- * - Global quests are not filtered by community
- * - Local quests are filtered by community
  */
 async function getQuestActionMetas(
   event_payload: { community_id?: string; created_at?: Date },
   event_name: keyof typeof schemas.QuestEvents,
-  quest_id?: number, // to get system quest action metas
 ) {
-  const where: WhereOptions<QuestInstance> = quest_id
-    ? { id: quest_id }
-    : {
-        community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
-        start_date: { [Op.lte]: event_payload.created_at },
-        end_date: { [Op.gte]: event_payload.created_at },
-      };
   // make sure quest was active when event was created
   const metas = await models.Quest.findAll({
-    where,
+    where: {
+      community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
+      start_date: { [Op.lte]: event_payload.created_at },
+      end_date: { [Op.gte]: event_payload.created_at },
+    },
     include: [
       {
         required: true,
@@ -114,9 +107,12 @@ async function recordXpsForQuest(
     topic_id?: number;
     thread_id?: number;
     comment_id?: number;
+    group_id?: number;
+    wallet?: string;
     sso?: string;
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
     goal_id?: number; // community goals
+    threshold?: number; // rewards when threshold over configured meta value
   },
 ) {
   const shared_with_address =
@@ -136,8 +132,11 @@ async function recordXpsForQuest(
           (scoped === 'topic' && +id !== scope?.topic_id) ||
           (scoped === 'thread' && +id !== scope?.thread_id) ||
           (scoped === 'comment' && +id !== scope?.comment_id) ||
+          (scoped === 'group' && +id !== scope?.group_id) ||
+          (scoped === 'wallet' && id !== scope?.wallet) ||
           (scoped === 'sso' && id !== scope?.sso) ||
-          (scoped === 'goal' && +id !== scope?.goal_id)
+          (scoped === 'goal' && +id !== scope?.goal_id) ||
+          (scoped === 'threshold' && +id > (scope?.threshold || 0))
         )
           continue;
       }
@@ -228,7 +227,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const action_metas = await getQuestActionMetas(
           payload,
           'SignUpFlowCompleted',
-          -1,
         );
         await recordXpsForQuest(
           payload.user_id,
@@ -478,23 +476,23 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
       },
       WalletLinked: async ({ payload }) => {
-        const action_metas = await getQuestActionMetas(
-          payload,
-          'WalletLinked',
-          payload.new_user ? -1 : undefined, // first user linking is system quest
-        );
+        const action_metas = await getQuestActionMetas(payload, 'WalletLinked');
+        // TODO: use action meta attributes to determine denomination and conversion to XP,
+        // at the moment we assume ETH (wei) denomination
+        const threshold = Number(payload.balance);
         await recordXpsForQuest(
           payload.user_id,
           payload.created_at,
           action_metas,
+          undefined,
+          {
+            wallet: payload.wallet_id,
+            threshold,
+          },
         );
       },
       SSOLinked: async ({ payload }) => {
-        const action_metas = await getQuestActionMetas(
-          payload,
-          'SSOLinked',
-          payload.new_user ? -1 : undefined, // first user linking is system quest
-        );
+        const action_metas = await getQuestActionMetas(payload, 'SSOLinked');
         await recordXpsForQuest(
           payload.user_id,
           payload.created_at,
@@ -549,8 +547,6 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const action_metas = await getQuestActionMetas(
           payload,
           'TwitterCommonMentioned',
-          // TODO: create system quest?
-          undefined,
         );
         await recordXpsForQuest(
           address.user_id!,
@@ -593,6 +589,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
         if (!action_meta) return;
         await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
+      },
+      MembershipsRefreshed: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'MembershipsRefreshed',
+        );
+        await Promise.all(
+          payload.membership
+            .filter((m) => !m.rejected)
+            .map(async ({ user_id, group_id }) => {
+              await recordXpsForQuest(
+                user_id,
+                payload.created_at,
+                action_metas,
+                undefined,
+                { group_id },
+              );
+            }),
+        );
       },
     },
   };

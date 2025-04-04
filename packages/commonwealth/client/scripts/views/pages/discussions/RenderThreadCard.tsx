@@ -4,7 +4,7 @@ import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
-import { Memberships } from 'client/scripts/state/api/groups/refreshMembership';
+import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
 import useUserStore from 'client/scripts/state/ui/user';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';

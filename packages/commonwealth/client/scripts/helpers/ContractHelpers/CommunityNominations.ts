@@ -1,10 +1,11 @@
-import { communityNominationsAbi } from '@hicommonwealth/evm-protocols';
+import { CommunityNominationsAbi } from '@commonxyz/common-protocol-abis';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
 
 class communityNominations extends ContractBase {
   constructor(contractAddress: string, rpc: string) {
-    super(contractAddress, communityNominationsAbi, rpc);
+    super(contractAddress, CommunityNominationsAbi, rpc);
   }
 
   async initialize(
@@ -16,7 +17,8 @@ class communityNominations extends ContractBase {
 
   async nominateJudge(
     namespace: string,
-    judge: string,
+    judges: string[],
+    judgeId: number,
     walletAddress: string,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
@@ -26,8 +28,12 @@ class communityNominations extends ContractBase {
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
-        .nominateJudge(namespace, judge, 100)
+        .nominateJudges(namespace, judges, judgeId)
         .send({
+          value: this.web3.utils.toWei(
+            commonProtocol.NOMINATION_FEE * judges.length,
+            'ether',
+          ),
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),

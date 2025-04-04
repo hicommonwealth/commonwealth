@@ -62,6 +62,7 @@ SELECT
       'read_only', T.read_only,
       'has_poll', T.has_poll,
       'discord_meta', T.discord_meta,
+      'is_linking_token', T.is_linking_token,
       'topic', jsonb_build_object(
         'id', T.topic_id,
         'name', Tp.name,
