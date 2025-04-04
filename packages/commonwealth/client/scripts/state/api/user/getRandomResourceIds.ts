@@ -9,20 +9,12 @@ type UseGetRandomResourceIdsProps = z.infer<
 };
 
 const useGetRandomResourceIds = ({
-  cursor,
-  limit,
   exclude_joined_communities,
-  order_by,
-  order_direction,
   enabled = true,
 }: UseGetRandomResourceIdsProps) => {
   return trpc.user.getRandomResourceIds.useQuery(
     {
-      cursor,
-      limit,
       exclude_joined_communities,
-      order_by,
-      order_direction,
     },
     {
       enabled,

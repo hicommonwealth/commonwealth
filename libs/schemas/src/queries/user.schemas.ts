@@ -183,10 +183,10 @@ export const RandomResourceIdsView = z.object({
 });
 
 export const GetRandomResourceIds = {
-  input: PaginationParamsSchema.extend({
+  input: z.object({
     exclude_joined_communities: z.boolean().optional(),
   }),
-  output: PaginatedResultSchema.extend({
+  output: z.object({
     results: z.array(RandomResourceIdsView),
   }),
 };
