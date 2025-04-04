@@ -1,7 +1,7 @@
 import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { QuestActionSubFormFields } from './QuestActionSubForm';
-import { questFormValidationSchema } from './validation';
+import { buildDynamicQuestFormValidationSchema } from './validation';
 
 export enum QuestTypes {
   Channel = 'channel',
@@ -17,7 +17,9 @@ export type QuestFormProps =
   | {
       mode: 'update';
       questId: number;
-      initialValues: z.infer<typeof questFormValidationSchema> & {
+      initialValues: z.infer<
+        ReturnType<typeof buildDynamicQuestFormValidationSchema>
+      > & {
         participation_period?: QuestParticipationPeriod;
         participation_times_per_period?: number;
       } & {

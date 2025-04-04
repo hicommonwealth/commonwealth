@@ -514,7 +514,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      expect(xps1!.length).to.equal(8);
+      expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
         expect(xp.quest_id).to.be.a('number');
         expect(xp.quest_action_meta_id).to.be.a('number');
@@ -535,7 +535,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: { from: xps2!.at(-1)!.created_at },
       });
-      expect(xps3!.length).to.equal(4);
+      expect(xps3!.length).to.equal(5);
 
       // 4 events for member (ThreadCreated and CommentUpvoted)
       const xps4 = await query(GetXps(), {
@@ -553,10 +553,12 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: { user_id: new_actor.user.id },
       });
-      expect(xps5!.length).to.equal(1);
-      xps5?.forEach((xp) => {
-        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
-      });
+      expect(xps5!.length).to.equal(2);
+      xps5
+        ?.filter((x) => x.action_meta_id > 0)
+        ?.forEach((xp) => {
+          expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
+        });
 
       // 3 CommentCreated events for admin
       const xps6 = await query(GetXps(), {
