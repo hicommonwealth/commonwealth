@@ -35,7 +35,6 @@ import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import useCreateThreadMutation from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer';
@@ -270,10 +269,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     createDeltaFromText(''),
   );
 
-  const { mutateAsync: createThread } = useCreateThreadMutation({
-    communityId: communityId,
-  });
-
   const handleCancel = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -440,6 +435,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               canComment={true}
               handleSubmitComment={() => {
                 // This isn't used for creating threads
+                console.error('Not implemented');
                 return Promise.resolve(-1);
               }}
               errorMsg=""

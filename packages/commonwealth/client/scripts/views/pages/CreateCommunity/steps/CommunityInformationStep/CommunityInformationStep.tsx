@@ -2,6 +2,7 @@ import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import React, { useState } from 'react';
+import { useTurnstile } from 'react-turnstile';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -10,10 +11,9 @@ import {
 import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
+import useUserStore from 'state/ui/user';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
 // eslint-disable-next-line max-len
-import { useTurnstile } from 'react-turnstile';
-import useUserStore from 'state/ui/user';
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
 import FeatureHint from 'views/components/FeatureHint';

@@ -13,7 +13,13 @@ import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import Turnstile, { useTurnstile } from 'react-turnstile';
 import app from 'state';
+import { useAiCompletion } from 'state/api/ai';
+import {
+  generateThreadPrompt,
+  generateThreadTitlePrompt,
+} from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -21,6 +27,7 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -40,14 +47,6 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateThreadPrompt,
-  generateThreadTitlePrompt,
-} from 'state/api/ai/prompts';
-// eslint-disable-next-line max-len
-import Turnstile, { useTurnstile } from 'react-turnstile';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
