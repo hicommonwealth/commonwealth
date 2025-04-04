@@ -248,6 +248,7 @@ export const CommentCard = ({
         const prompt = generateCommentPrompt(contextText);
 
         await generateCompletion(prompt, {
+          model: 'gpt-4o-mini',
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
