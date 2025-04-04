@@ -2,12 +2,14 @@ import { notifyError } from 'controllers/app/notifications';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import Turnstile, { useTurnstile } from 'react-turnstile';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -42,6 +44,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
+  const { isDarkMode } = useDarkMode();
   const { generateCompletion } = useAiCompletion();
   const stickyCommentReset = useActiveStickCommentReset();
 
@@ -63,6 +66,12 @@ export const MobileInput = (props: MobileInputProps) => {
   // Define default constants (must match NewThreadForm and ViewThreadPage)
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
+
+  // Add turnstile related code
+  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
+  const isTurnstileEnabled = !!turnstileSiteKey && (user.tier || 0) < 3;
+  const turnstile = useTurnstile();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -100,6 +109,12 @@ export const MobileInput = (props: MobileInputProps) => {
 
     if (mode === 'thread') {
       try {
+        // Check for turnstile verification if enabled
+        if (isTurnstileEnabled && !turnstileToken) {
+          notifyError('Please complete the Turnstile verification');
+          return;
+        }
+
         // Find a default topic (prefer "General" if it exists)
         const defaultTopic =
           sortedTopics.find(
@@ -134,12 +149,17 @@ export const MobileInput = (props: MobileInputProps) => {
           title: effectiveTitle,
           topic: defaultTopic,
           body: effectiveBody,
+          turnstileToken,
         });
 
         const thread = await createThreadMutation(threadInput);
 
-        // Clear the input
+        // Clear the input and reset turnstile
         setValue('');
+        if (turnstile) {
+          turnstile.reset();
+          setTurnstileToken(null);
+        }
 
         // Construct the correct navigation path with proper URL encoding
         const encodedTitle = encodeURIComponent(
@@ -153,6 +173,12 @@ export const MobileInput = (props: MobileInputProps) => {
       } catch (error) {
         console.error('Error creating thread:', error);
         notifyError('Failed to create thread');
+
+        // Reset turnstile on error
+        if (turnstile) {
+          turnstile.reset();
+          setTurnstileToken(null);
+        }
       }
     } else {
       // --- Traditional Comment Submission Logic ---
@@ -239,6 +265,32 @@ export const MobileInput = (props: MobileInputProps) => {
           </div>
         </div>
       </div>
+
+      {mode === 'thread' && isTurnstileEnabled && (
+        <div className="mobile-turnstile-container">
+          <Turnstile
+            sitekey={turnstileSiteKey || ''}
+            onVerify={(token) => {
+              console.log('Mobile Turnstile verified', token);
+              setTurnstileToken(token);
+            }}
+            onExpire={() => {
+              console.log('Mobile Turnstile expired');
+              setTurnstileToken(null);
+              turnstile.reset();
+            }}
+            onError={() => {
+              console.log('Mobile Turnstile error');
+              setTurnstileToken(null);
+              notifyError('Turnstile verification failed. Please try again.');
+            }}
+            appearance="interaction-only"
+            theme={isDarkMode ? 'dark' : 'light'}
+            fixedSize={false}
+            size="compact"
+          />
+        </div>
+      )}
     </div>
   );
 };

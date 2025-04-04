@@ -13,7 +13,13 @@ import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import Turnstile, { useTurnstile } from 'react-turnstile';
 import app from 'state';
+import { useAiCompletion } from 'state/api/ai';
+import {
+  generateThreadPrompt,
+  generateThreadTitlePrompt,
+} from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -22,6 +28,7 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -40,12 +47,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-// eslint-disable-next-line max-len
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateThreadPrompt,
-  generateThreadTitlePrompt,
-} from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -80,6 +81,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     userId: user.id,
     apiCallEnabled: !!user.id,
   });
+  const { isDarkMode } = useDarkMode();
 
   const {
     aiInteractionsToggleEnabled,
@@ -227,6 +229,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         : undefined,
   });
 
+  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
+  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
+
+  const turnstile = useTurnstile();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
   const buttonDisabled =
     !user.activeAccount ||
     !userSelectedAddress ||
@@ -236,7 +244,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
     isDisabled ||
-    isGenerating;
+    isGenerating ||
+    (isTurnstileEnabled && !turnstileToken);
 
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
@@ -245,6 +254,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
+      return;
+    }
+
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the Turnstile verification');
       return;
     }
 
@@ -302,6 +316,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           bech32_prefix: community?.bech32_prefix || '',
           eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
         }),
+        turnstileToken,
       });
 
       const thread = await createThread(input);
@@ -320,7 +335,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       if (err instanceof SessionKeyError) {
         console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
-        return;
+
+        // Reset turnstile if there's an error
+        turnstile.reset();
+        setTurnstileToken(null);
       }
 
       if (err?.message?.includes('Exceeded content creation limit')) {
@@ -336,11 +354,17 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         notifyError(
           'Limit of submitted threads in selected contest has been exceeded.',
         );
-        return;
+        // Reset turnstile if there's an error
+        turnstile.reset();
+        setTurnstileToken(null);
       }
 
       console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
+
+      // Reset turnstile if there's an error
+      turnstile.reset();
+      setTurnstileToken(null);
     } finally {
       setIsSaving(false);
       if (!isInsideCommunity) {
@@ -370,6 +394,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     checkForSessionKeyRevalidationErrors,
     user,
     aiInteractionsToggleEnabled,
+    isTurnstileEnabled,
+    turnstileToken,
+    turnstile,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -655,6 +682,34 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     className="spam-trust-banner"
                   />
                 )}
+
+              {isTurnstileEnabled && (
+                <div className="turnstile-container">
+                  <Turnstile
+                    sitekey={turnstileSiteKey || ''}
+                    onVerify={(token) => {
+                      console.log('Turnstile verified', token);
+                      setTurnstileToken(token);
+                    }}
+                    onExpire={() => {
+                      console.log('Turnstile expired');
+                      setTurnstileToken(null);
+                      turnstile.reset();
+                    }}
+                    onError={() => {
+                      console.log('Turnstile error');
+                      setTurnstileToken(null);
+                      notifyError(
+                        'Turnstile verification failed. Please try again.',
+                      );
+                    }}
+                    appearance="interaction-only"
+                    theme={isDarkMode ? 'dark' : 'light'}
+                    fixedSize={false}
+                    size="normal"
+                  />
+                </div>
+              )}
 
               <div className="buttons-row">
                 <CWButton

@@ -12,6 +12,7 @@ interface CreateCommunityProps {
   iconUrl: string;
   socialLinks: string[];
   tokenName?: string;
+  turnstileToken?: string;
 }
 
 export const buildCreateCommunityInput = ({
@@ -23,6 +24,7 @@ export const buildCreateCommunityInput = ({
   socialLinks,
   tokenName,
   chainNodeId,
+  turnstileToken,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
   return {
@@ -36,6 +38,7 @@ export const buildCreateCommunityInput = ({
     default_symbol: nameToSymbol,
     token_name: tokenName,
     chain_node_id: chainNodeId,
+    turnstile_token: turnstileToken,
   };
 };
 

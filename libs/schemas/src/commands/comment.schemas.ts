@@ -16,6 +16,7 @@ export const CanvasComment = z.object({
 export const CreateComment = {
   input: CanvasComment.extend({
     discord_meta: DiscordMetaSchema.optional(),
+    turnstile_token: z.string().nullish(),
   }),
   output: Comment.extend({ community_id: z.string() }),
   context: ThreadContext,

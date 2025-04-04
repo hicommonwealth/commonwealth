@@ -197,4 +197,9 @@
     align-items: center;
     gap: 4px;
   }
+
+  .turnstile-container {
+    display: flex;
+    justify-content: right;
+  }
 }

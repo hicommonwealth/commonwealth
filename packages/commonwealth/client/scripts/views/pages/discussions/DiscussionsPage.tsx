@@ -29,16 +29,12 @@ import {
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
-import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import useCreateThreadMutation, {
-  buildCreateThreadInput,
-} from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer';
@@ -273,59 +269,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     createDeltaFromText(''),
   );
 
-  const { mutateAsync: createThread } = useCreateThreadMutation({
-    communityId: communityId,
-  });
-
-  const handleCreateThread = async (): Promise<number> => {
-    if (!user.activeAccount) {
-      notifyError('You must be logged in to create a thread');
-      throw new Error('Not logged in');
-    }
-
-    if (!topicObj) {
-      notifyError('You must select a topic to create a thread');
-      throw new Error('No topic selected');
-    }
-
-    if (!user.activeAccount.community?.base) {
-      notifyError('Invalid community configuration');
-      throw new Error('Invalid community configuration');
-    }
-
-    try {
-      const input = await buildCreateThreadInput({
-        address: user.activeAccount.address,
-        kind: 'discussion',
-        stage: 'Discussion',
-        communityId: communityId,
-        communityBase: user.activeAccount.community.base,
-        title: 'New Thread',
-        topic: topicObj,
-        body: getTextFromDelta(threadContentDelta),
-      });
-
-      const thread = await createThread(input);
-
-      if (!thread?.id) {
-        throw new Error('Failed to create thread - no ID returned');
-      }
-
-      setThreadContentDelta(createDeltaFromText(''));
-
-      // Construct the correct navigation path
-      const communityPrefix = communityId ? `/${communityId}` : '';
-      const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
-
-      navigate(threadUrl);
-
-      return thread.id;
-    } catch (error) {
-      notifyError('Failed to create thread');
-      throw error;
-    }
-  };
-
   const handleCancel = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -490,7 +433,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <StickyEditorContainer
               parentType={ContentType.Thread}
               canComment={true}
-              handleSubmitComment={handleCreateThread}
+              handleSubmitComment={() => {
+                // This isn't used for creating threads
+                console.error('Not implemented');
+                return Promise.resolve(-1);
+              }}
               errorMsg=""
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}

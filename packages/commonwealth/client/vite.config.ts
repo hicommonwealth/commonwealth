@@ -92,6 +92,15 @@ export default defineConfig(({ mode }) => {
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
     'process.env.PRIVY_APP_ID': JSON.stringify(env.PRIVY_APP_ID),
+    'process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+    ),
   };
 
   return {
