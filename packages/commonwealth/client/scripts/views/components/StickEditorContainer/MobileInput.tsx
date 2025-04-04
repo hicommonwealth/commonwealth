@@ -236,6 +236,7 @@ export const MobileInput = (props: MobileInputProps) => {
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
+              <CWIconButton iconName="paperPlaneTilt" onClick={handleSubmit} />
             </div>
           </div>
         </div>
