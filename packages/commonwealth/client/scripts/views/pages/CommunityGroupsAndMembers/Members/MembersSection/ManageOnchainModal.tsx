@@ -1,10 +1,13 @@
-import { Role } from '@hicommonwealth/shared';
+import { ChainBase, Role, WalletId } from '@hicommonwealth/shared';
 import {
   notifyError,
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
-import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateRoleMutation,
+} from 'client/scripts/state/api/communities';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
@@ -48,6 +51,48 @@ export const ManageOnchainModal = ({
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
+
+  // Get community data to determine chain base
+  const { data: community } = useGetCommunityByIdQuery({
+    id: chainId,
+    enabled: !!chainId,
+  });
+
+  // Function to determine the correct chain icon based on wallet type and community base
+  const getChainIcon = (address: AddressInfo) => {
+    // First check wallet type if available
+    if (address.wallet_id) {
+      if (
+        [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
+          address.wallet_id,
+        )
+      ) {
+        return 'solana';
+      }
+      if (address.wallet_id === WalletId.Keplr) {
+        return 'cosmos';
+      }
+    }
+
+    // If no specific wallet match, check community base
+    if (community?.base) {
+      switch (community.base) {
+        case ChainBase.Solana:
+          return 'solana';
+        case ChainBase.CosmosSDK:
+          return 'cosmos';
+        case ChainBase.NEAR:
+          return 'near';
+        case ChainBase.Substrate:
+          return 'polkadot';
+        case ChainBase.Ethereum:
+        default:
+          return 'ethereum';
+      }
+    }
+
+    return 'ethereum'; // default fallback
+  };
 
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
@@ -153,7 +198,7 @@ export const ManageOnchainModal = ({
                 <CWTag
                   label={formatAddressShort(address.address)}
                   type="address"
-                  iconName="ethereum"
+                  iconName={getChainIcon(address)}
                 />
               </div>
               <div className="role-selection">

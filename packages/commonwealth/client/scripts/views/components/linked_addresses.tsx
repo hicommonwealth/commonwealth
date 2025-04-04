@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
@@ -9,7 +10,7 @@ import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWCustomIcon } from './component_kit/cw_icons/cw_custom_icon';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWIdentificationTag } from './component_kit/new_designs/CWIdentificationTag';
 import { CWModal } from './component_kit/new_designs/CWModal';
@@ -40,12 +41,54 @@ type LinkedAddressesProps = {
 };
 
 const Address = ({ addressInfo }: AddressProps) => {
-  const { address, walletId } = addressInfo;
+  const { address, walletId, community } = addressInfo;
+
+  // Get community data to determine chain base
+  const { data: fetchedCommunity } = useGetCommunityByIdQuery({
+    id: community?.id,
+    enabled: !!community?.id,
+  });
+
+  // Function to determine the correct chain icon
+  const getChainIcon = () => {
+    // First check wallet type
+    if (walletId) {
+      if (
+        [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
+          walletId,
+        )
+      ) {
+        return 'solana';
+      }
+      if (walletId === WalletId.Keplr) {
+        return 'cosmos';
+      }
+    }
+
+    // If no specific wallet match, check community base
+    if (community && community.id && fetchedCommunity?.base) {
+      switch (fetchedCommunity.base) {
+        case ChainBase.Solana:
+          return 'solana';
+        case ChainBase.CosmosSDK:
+          return 'cosmos';
+        case ChainBase.NEAR:
+          return 'near';
+        case ChainBase.Substrate:
+          return 'polkadot';
+        case ChainBase.Ethereum:
+        default:
+          return 'eth';
+      }
+    }
+
+    return 'eth'; // default fallback
+  };
 
   return (
     <div className="AddressContainer">
       <div className="address">
-        <CWIcon iconName="ethereum" iconSize="small" />
+        <CWCustomIcon iconName={getChainIcon()} iconSize="small" />
         <CWIdentificationTag
           iconLeft={walletId}
           address={`\u2022 ${formatAddressShort(address)}`}
