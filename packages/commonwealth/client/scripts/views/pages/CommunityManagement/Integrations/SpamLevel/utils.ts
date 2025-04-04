@@ -6,13 +6,18 @@ export enum SpamLevels {
 }
 
 export const SpamLevelOptions = [
-  { label: 'Unverified users', value: SpamLevels.Unverified },
   {
-    label: 'One week-old users with incomplete profiles',
+    label: '🚫: Users with unverified wallet will be flagged: ',
+    value: SpamLevels.Unverified,
+  },
+  {
+    label:
+      '🐣: Users with no balance or social account (and below) will be flagged',
     value: SpamLevels.OneWeekOld,
   },
   {
-    label: 'Users with incomplete profiles',
+    label:
+      '⏳: Users with 1 week old account, no balance, or social account (and below) will be flagged',
     value: SpamLevels.UsersWithIncompleteProfiles,
   },
 ];
