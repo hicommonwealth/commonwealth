@@ -12,6 +12,7 @@ import {
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
+import erc1155Abi from 'evm-protocols/src/abis/erc1155Abi';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -295,46 +296,7 @@ const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
   event: EvmEvent,
 ) => {
   const decoded = decodeLog({
-    // ERC1155 ABI for TransferSingle event
-    abi: [
-      {
-        anonymous: false,
-        inputs: [
-          {
-            indexed: true,
-            internalType: 'address',
-            name: 'operator',
-            type: 'address',
-          },
-          {
-            indexed: true,
-            internalType: 'address',
-            name: 'from',
-            type: 'address',
-          },
-          {
-            indexed: true,
-            internalType: 'address',
-            name: 'to',
-            type: 'address',
-          },
-          {
-            indexed: false,
-            internalType: 'uint256',
-            name: 'id',
-            type: 'uint256',
-          },
-          {
-            indexed: false,
-            internalType: 'uint256',
-            name: 'value',
-            type: 'uint256',
-          },
-        ],
-        name: 'TransferSingle',
-        type: 'event',
-      },
-    ],
+    abi: erc1155Abi,
     eventName: 'TransferSingle',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
@@ -378,12 +340,14 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
 
+  // Namespace Factory
+  [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
+    contestManagerDeployedMapper,
+
   // Namespace
   [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
 
   // Contests
-  [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
-    contestManagerDeployedMapper,
   [EvmEventSignatures.Contests.RecurringContestStarted]:
     recurringContestStartedMapper,
   [EvmEventSignatures.Contests.SingleContestStarted]:

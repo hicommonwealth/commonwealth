@@ -8,6 +8,7 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
+import erc1155Abi from '../abis/erc1155Abi';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
@@ -95,7 +96,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.Namespace]: {
-      abi: [], // We'll use the ERC1155 event signature directly
+      abi: erc1155Abi,
       eventSignatures: [EvmEventSignatures.Namespace.TransferSingle],
     },
   },

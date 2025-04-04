@@ -1,7 +1,10 @@
 import { logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+} from '@hicommonwealth/shared';
 import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { getChainNodeUrl } from 'model/src/utils/utils';
 import { Op, QueryTypes } from 'sequelize';
@@ -60,7 +63,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           sourceOptions: {
             evmChainId: community.ChainNode!.eth_chain_id!,
             contractAddress: community.namespace_address!,
-            tokenId: 3,
+            tokenId: NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
           },
         });
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
