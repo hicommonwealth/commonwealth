@@ -14,11 +14,7 @@ import {
 } from './voting_result_components';
 
 type VotingResultsProps = { proposal: AnyProposal };
-interface VoteOption {
-  label: string;
-  percentage: string;
-  results: string;
-}
+
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const [, setLoading] = useState(
