@@ -42,7 +42,7 @@ export const USER_TIERS = {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
   },
-};
+} as const satisfies Record<number, Tier>;
 
 export const COMMUNITY_TIERS = {
   0: {
