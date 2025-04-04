@@ -262,7 +262,7 @@ const CommentEditor = ({
               notifyError('Verification failed. Please try again.');
             }}
             appearance="interaction-only"
-            theme="light"
+            theme={isDarkMode ? 'dark' : 'light'}
             fixedSize={false}
             size="normal"
           />

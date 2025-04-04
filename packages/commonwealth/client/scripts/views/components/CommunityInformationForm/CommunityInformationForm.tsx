@@ -3,6 +3,7 @@ import { slugifyPreserveDashes } from 'utils';
 
 import Turnstile from 'react-turnstile';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import {
   CWImageInput,
   ImageBehavior,
@@ -56,6 +57,7 @@ const CommunityInformationForm = ({
   );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const { isDarkMode } = useDarkMode();
 
   const {
     socialLinks,
@@ -287,7 +289,7 @@ const CommunityInformationForm = ({
             onExpire={onTurnstileExpire}
             onError={onTurnstileError}
             appearance="interaction-only"
-            theme="light"
+            theme={isDarkMode ? 'dark' : 'light'}
             fixedSize={false}
             size="normal"
           />

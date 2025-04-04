@@ -9,6 +9,7 @@ import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -43,6 +44,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
+  const { isDarkMode } = useDarkMode();
   const { generateCompletion } = useAiCompletion();
   const stickyCommentReset = useActiveStickCommentReset();
 
@@ -283,7 +285,7 @@ export const MobileInput = (props: MobileInputProps) => {
               notifyError('Turnstile verification failed. Please try again.');
             }}
             appearance="interaction-only"
-            theme="light"
+            theme={isDarkMode ? 'dark' : 'light'}
             fixedSize={false}
             size="compact"
           />

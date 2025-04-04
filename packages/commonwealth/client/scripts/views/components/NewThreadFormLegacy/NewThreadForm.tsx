@@ -683,9 +683,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       );
                     }}
                     appearance="interaction-only"
-                    // TODO: isDarkMode is true even when page is light
-                    // theme={isDarkMode ? 'dark' : 'light'}
-                    theme="light"
+                    theme={isDarkMode ? 'dark' : 'light'}
                     fixedSize={false}
                     size="normal"
                   />
