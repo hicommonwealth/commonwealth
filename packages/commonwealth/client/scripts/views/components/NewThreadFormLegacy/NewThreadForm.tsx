@@ -646,7 +646,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 userProfile.tier <= community.spam_tier_level && (
                   <CWBanner
                     type="warning"
-                    body="Your post will be marked as spam due to the Community's Trust Settings. You can increase your trust level by verifying an SSO or adding a wallet with Balance."
+                    body={
+                      "Your post will be marked as spam due to the Community's Trust Settings. " +
+                      'You can increase your trust level by verifying an SSO or adding a wallet with Balance.'
+                    }
                     className="spam-trust-banner"
                   />
                 )}
