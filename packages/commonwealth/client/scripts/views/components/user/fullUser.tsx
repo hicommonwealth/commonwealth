@@ -225,7 +225,8 @@ export const FullUser = ({
               className="user-address"
               to={`/profile/id/${profile?.userId}`}
             >
-              {profile?.name} {/* // add here */}
+              {profile?.name}{' '}
+              <TrustLevelRole type="user" level={profile?.tier || 0} />
             </Link>
           )}
           {profile?.address && (
@@ -300,6 +301,7 @@ export const FullUser = ({
           content={userPopover}
           {...popoverProps}
           placement={popoverPlacement}
+          open={true}
         />
       )}
     </div>
