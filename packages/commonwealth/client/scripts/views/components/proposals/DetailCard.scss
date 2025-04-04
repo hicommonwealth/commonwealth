@@ -1,0 +1,64 @@
+@import '../../../styles/shared.scss';
+.DetailCard {
+  display: flex;
+  width: 248px;
+  overflow: hidden;
+  flex-direction: column;
+  @include smallInclusive {
+    width: 100%;
+  }
+  .rb-container {
+    display: flex;
+    width: 100%;
+    padding: 16px;
+    gap: 8px;
+    flex-direction: column;
+    .label {
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-400;
+      font-weight: 400;
+      line-height: 20px;
+      font-family: 'NeueHaasUnica';
+    }
+
+    .status {
+      font-weight: 400;
+      line-height: 20px;
+      font-size: 12px;
+      line-height: 16px;
+      color: $neutral-850;
+      font-family: 'NeueHaasUnica';
+      height: 24px;
+      border-radius: 4px;
+      padding: 4px 8px 4px 8px;
+      background-color: $yellow-50;
+      color: $yellow-700;
+      width: fit-content;
+    }
+    .detail {
+      font-weight: 400;
+      line-height: 20px;
+      font-size: 14px;
+      line-height: 20px;
+      color: $neutral-850;
+      font-family: 'NeueHaasUnica';
+    }
+    .address {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      .detail {
+        @extend .detail;
+      }
+    }
+    .link {
+      cursor: pointer;
+      flex-wrap: wrap;
+      .detail {
+        @extend .detail;
+        color: $primary-500;
+      }
+    }
+  }
+}

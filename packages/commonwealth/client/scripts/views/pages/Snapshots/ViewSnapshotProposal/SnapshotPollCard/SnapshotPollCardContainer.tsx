@@ -9,6 +9,7 @@ import moment from 'moment';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 
+import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
 import { SnapshotPollCard } from './SnapshotPollCard';
 import { calculateTimeRemaining } from './utils';
 
@@ -26,6 +27,8 @@ type SnapshotProposalCardsProps = {
   fetchedPower: boolean;
   totalScore: number;
   loadVotes: () => Promise<void>;
+  snapShotVotingResult: VoteOption[];
+  toggleShowVotesDrawer: (newState: boolean) => void;
 };
 
 const enum VotingError {
@@ -48,8 +51,9 @@ export const SnapshotPollCardContainer = (
     fetchedPower,
     totalScore,
     loadVotes,
+    snapShotVotingResult,
+    toggleShowVotesDrawer,
   } = props;
-
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [choice, setChoice] = React.useState<string>();
 
@@ -58,15 +62,25 @@ export const SnapshotPollCardContainer = (
     moment(+proposal.start * 1000) <= moment() &&
     moment(+proposal.end * 1000) > moment();
 
-  const [userVote, setUserVote] = useState(
-    proposal.choices[
-      // @ts-expect-error <StrictNullChecks/>
-      votes.find((vote) => {
-        return vote.voter === activeUserAddress;
-      })?.choice - 1
-    ],
+  const [userVote, setUserVote] = useState<string | undefined>(() =>
+    votes?.find((vote) => vote.voter === activeUserAddress)
+      ? proposal.choices[
+          votes.find((vote) => vote.voter === activeUserAddress)!.choice - 1
+        ]
+      : undefined,
   );
-  const [hasVoted, setHasVoted] = useState(userVote !== undefined);
+  const [hasVoted, setHasVoted] = useState<boolean>(!!userVote);
+
+  const { memoUserVote, memoHasVoted } = useMemo(() => {
+    const userVoteObj = votes?.find((vote) => vote.voter === activeUserAddress);
+    const userVoteChoice = userVoteObj
+      ? proposal.choices[userVoteObj.choice - 1]
+      : undefined;
+    return {
+      memoUserVote: userVoteChoice,
+      memoHasVoted: !!userVoteChoice,
+    };
+  }, [votes, activeUserAddress, proposal.choices]);
 
   const voteErrorText = !validatedAgainstStrategies
     ? VotingError.NOT_VALIDATED
@@ -75,7 +89,9 @@ export const SnapshotPollCardContainer = (
       : null;
 
   const timeRemaining = useMemo(() => {
-    return calculateTimeRemaining(proposal);
+    // @ts-expect-error <StrictNullChecks/>
+    const end = new Date(moment(proposal.end * 1000));
+    return calculateTimeRemaining(end);
   }, [proposal]);
 
   const voteInformation = useMemo(() => {
@@ -103,13 +119,14 @@ export const SnapshotPollCardContainer = (
       setIsModalOpen(true);
     }
   }, [choice]);
-
+  const finalUserVote = userVote !== undefined ? userVote : memoUserVote;
+  const finalHasVoted = hasVoted || memoHasVoted;
   return (
     <>
       <SnapshotPollCard
         pollEnded={!isActive}
-        hasVoted={hasVoted}
-        votedFor={hasVoted ? userVote : ''}
+        hasVoted={finalHasVoted}
+        votedFor={finalUserVote}
         disableVoteButton={!fetchedPower || voteErrorText !== null}
         proposalTitle={proposal.title}
         timeRemaining={timeRemaining}
@@ -126,6 +143,8 @@ export const SnapshotPollCardContainer = (
         // @ts-expect-error <StrictNullChecks/>
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
+        snapShotVotingResult={snapShotVotingResult}
+        toggleShowVotesDrawer={toggleShowVotesDrawer}
       />
       <CWModal
         size="small"
@@ -142,7 +161,6 @@ export const SnapshotPollCardContainer = (
             successCallback={async () => {
               await loadVotes();
               setHasVoted(true);
-              // @ts-expect-error <StrictNullChecks/>
               setUserVote(choice);
             }}
             onModalClose={() => setIsModalOpen(false)}

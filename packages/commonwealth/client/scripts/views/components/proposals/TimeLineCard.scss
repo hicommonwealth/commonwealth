@@ -1,0 +1,119 @@
+@import '../../../styles/shared.scss';
+.TimeLineCard {
+  display: flex;
+  width: 248px;
+  min-height: 16.5625rem;
+  overflow: hidden;
+  flex-direction: column;
+  &.isCollapsed {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  @include smallInclusive {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .timeline-header {
+    display: flex;
+    height: 40px;
+    border: 2px solid $neutral-75;
+    width: 100%;
+    background: $neutral-50;
+    border-radius: 5px 5px 0px 0px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 10px;
+  }
+  .rb-container {
+    display: flex;
+    width: 100%;
+    padding: 16px 16px 0px 16px;
+    gap: 8px;
+    flex-direction: column;
+    ul.rb {
+      padding: 8px 0px 0px 0px;
+      display: inline-block;
+      li {
+        list-style: none;
+        margin: auto;
+        margin-left: 0.4rem;
+        min-height: 50px;
+        padding: 2px 0px 38px 24px;
+        position: relative;
+        border-style: solid;
+        border-width: 0px 0px 0px 2px;
+        border-color: $neutral-500;
+
+        &:last-child {
+          border-left: 0;
+        }
+
+        .timeline-dot {
+          position: absolute;
+          left: -16px;
+          top: -5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: white;
+
+          &.last_item {
+            left: -13px;
+          }
+
+          &.active {
+            height: 28px;
+            width: 28px;
+            border-radius: 14px;
+            background-color: $primary-500;
+          }
+
+          svg {
+            background: none;
+            transition: all 500ms ease-in-out;
+            &.active {
+              color: $white;
+              background-color: $primary-500;
+              height: 16px;
+              width: 16px;
+            }
+            &.coming {
+              color: $neutral-600;
+            }
+            &.past {
+              color: $neutral-600;
+            }
+          }
+        }
+        .right-container {
+          position: relative;
+          top: -10px;
+          .timestamp {
+            .Text {
+              color: $neutral-500;
+              font-size: 14px;
+              line-height: 20px;
+            }
+          }
+          .item-title {
+            .Text {
+              font-size: 14px;
+              line-height: 20px;
+              font-weight: 500 !important;
+              &.active {
+                color: $primary-500;
+              }
+              &.coming {
+                color: $neutral-600;
+              }
+              &.past {
+                color: $neutral-600;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -7,25 +7,29 @@ import {
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
+import app from 'state';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 import './voting_actions.scss';
 
-import app from 'state';
-
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
 import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
+import moment from 'moment';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { CWText } from '../component_kit/cw_text';
+import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
+
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
+import { getVoteOptions } from './utils';
+import VotingActionCard from './VotingActionCard';
 
 type VotingActionsProps = {
   onModalClose: () => void;
@@ -34,6 +38,7 @@ type VotingActionsProps = {
   votingModalOpen: boolean;
   redrawProposals: React.Dispatch<React.SetStateAction<boolean>>;
   proposalRedrawState: boolean;
+  toggleShowVotesDrawer: (newModalState: boolean) => void;
 };
 
 export const VotingActions = ({
@@ -42,11 +47,35 @@ export const VotingActions = ({
   votingModalOpen,
   redrawProposals,
   proposalRedrawState,
+  toggleShowVotesDrawer,
 }: VotingActionsProps) => {
   const [amount, setAmount] = useState<number>();
-
   const { isAddedToHomeScreen } = useAppStatus();
   const userData = useUserStore();
+
+  const timeRemaining = useMemo(() => {
+    // @ts-expect-error <StrictNullChecks/>
+    const end = new Date(moment(proposal?.data?.votingEndTime));
+    return calculateTimeRemaining(end);
+  }, [proposal]);
+  let user;
+  const isPastDate = moment(proposal?.data?.votingEndTime).isBefore(moment());
+
+  const {
+    hasVotedYes,
+    hasVotedNo,
+    hasVotedAbstain,
+    hasVotedVeto,
+    hasVotedForAnyChoice,
+  } = getVotingResults(proposal, user);
+
+  const defaultVotingOption = useMemo(() => {
+    if (hasVotedYes) return 'yes';
+    if (hasVotedNo) return 'no';
+    if (hasVotedAbstain) return 'abstain';
+    if (hasVotedVeto) return 'NoWithVeto';
+    return undefined; // No default if user hasn't voted
+  }, [hasVotedYes, hasVotedNo, hasVotedAbstain, hasVotedVeto]);
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({ onAction: true });
 
@@ -57,8 +86,6 @@ export const VotingActions = ({
   } else if (!proposal.canVoteFrom(userData.activeAccount)) {
     return <CannotVote label="Cannot vote from this address" />;
   }
-
-  let user;
 
   if (
     proposal instanceof CosmosProposal ||
@@ -75,8 +102,7 @@ export const VotingActions = ({
     redrawProposals(!proposalRedrawState);
   };
 
-  const voteYes = async (e) => {
-    e.preventDefault();
+  const voteYes = async () => {
     toggleVotingModal(true);
 
     if (
@@ -117,8 +143,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteNo = async (e) => {
-    e.preventDefault();
+  const voteNo = async () => {
     toggleVotingModal(true);
 
     if (
@@ -143,8 +168,7 @@ export const VotingActions = ({
     }
   };
 
-  const voteAbstain = (e) => {
-    e.preventDefault();
+  const voteAbstain = async () => {
     toggleVotingModal(true);
 
     if (
@@ -153,18 +177,23 @@ export const VotingActions = ({
       proposal instanceof CosmosProposalGovgen ||
       proposal instanceof CosmosProposalV1AtomOne
     ) {
-      proposal
-        .voteTx(new CosmosVote(user, 'Abstain'))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.voteTx(new CosmosVote(user, 'Abstain'));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
     }
   };
 
-  const voteVeto = (e) => {
-    e.preventDefault();
+  const voteVeto = async () => {
     toggleVotingModal(true);
 
     if (
@@ -172,28 +201,24 @@ export const VotingActions = ({
       proposal instanceof CosmosProposalV1 ||
       proposal instanceof CosmosProposalGovgen
     ) {
-      proposal
-        .voteTx(new CosmosVote(user, 'NoWithVeto'))
-        .then(emitRedraw)
-        .catch((err) => notifyError(err.toString()));
+      try {
+        await proposal.voteTx(new CosmosVote(user, 'NoWithVeto'));
+        emitRedraw();
+        trackAnalytics({
+          event: MixpanelGovernanceEvents.COSMOS_VOTE_OCCURRED,
+          isPWA: isAddedToHomeScreen,
+        });
+      } catch (err) {
+        notifyError(err.toString());
+      }
     } else {
       toggleVotingModal(false);
       return notifyError('Invalid proposal type');
     }
   };
 
-  const {
-    hasVotedYes,
-    hasVotedNo,
-    hasVotedAbstain,
-    hasVotedVeto,
-    hasVotedForAnyChoice,
-    // @ts-expect-error <StrictNullChecks/>
-  } = getVotingResults(proposal, user);
-
   // @ts-expect-error <StrictNullChecks/>
   const canVote = getCanVote(proposal, hasVotedForAnyChoice);
-
   const yesButton = (
     <CWButton
       disabled={!canVote || hasVotedYes || votingModalOpen}
@@ -229,15 +254,17 @@ export const VotingActions = ({
     />
   );
 
-  // cosmos: veto
-  const noWithVetoButton = (
-    <CWButton
-      buttonType="destructive"
-      disabled={!canVote || hasVotedVeto || votingModalOpen}
-      onClick={voteVeto}
-      label={hasVotedVeto ? 'Vetoed' : 'Veto'}
-    />
-  );
+  const handleVote = (e: string) => {
+    if (e === 'yes') {
+      voteYes().catch((err) => notifyError(err.toString()));
+    } else if (e === 'no') {
+      voteNo().catch((err) => notifyError(err.toString()));
+    } else if (e === 'abstain') {
+      voteAbstain().catch((err) => notifyError(err.toString()));
+    } else if (e === 'veto') {
+      voteVeto().catch((err) => notifyError(err.toString()));
+    }
+  };
 
   let votingActionObj;
   if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
@@ -252,19 +279,54 @@ export const VotingActions = ({
       </>
     );
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-    if (!(proposal instanceof CosmosProposalV1AtomOne)) {
-      votingActionObj = (
-        <>
-          <div className="button-row">
-            {yesButton}
-            {noButton}
-            {abstainButton}
-            {noWithVetoButton}
-          </div>
-          {/* @ts-expect-error StrictNullChecks*/}
-          <ProposalExtensions proposal={proposal} />
-        </>
-      );
+    if ((proposal as CosmosProposal).data?.state?.tally) {
+      const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
+        .state.tally;
+
+      const voteResult = getVoteOptions(yes, no, abstain, noWithVeto);
+      if (!(proposal instanceof CosmosProposalV1AtomOne)) {
+        const voteOptions = [
+          { label: 'Yes', value: 'yes', voteCount: 0 },
+          { label: 'No', value: 'no', voteCount: 0 },
+          { label: 'Abstain', value: 'abstain', voteCount: 0 },
+          { label: 'Veto', value: 'veto', voteCount: 0 },
+        ];
+
+        votingActionObj = (
+          <>
+            <CWTooltip
+              content={
+                isPastDate
+                  ? 'The poll has ended.'
+                  : hasVotedForAnyChoice
+                    ? 'You have already voted.'
+                    : ''
+              }
+              placement="top"
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  <VotingActionCard
+                    options={voteOptions}
+                    canVote={canVote && !votingModalOpen}
+                    onVote={handleVote}
+                    type="cosmos"
+                    timeRemaining={timeRemaining}
+                    votingOption={voteResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                    defaultVotingOption={defaultVotingOption}
+                  />
+                </div>
+              )}
+            />
+
+            {/* @ts-expect-error StrictNullChecks*/}
+            <ProposalExtensions proposal={proposal} />
+          </>
+        );
+      }
     } else {
       votingActionObj = (
         <>
@@ -282,12 +344,5 @@ export const VotingActions = ({
     votingActionObj = <CannotVote label="Unsupported proposal type" />;
   }
 
-  return (
-    <div className="VotingActions">
-      <CWText type="h4" className="voting-actions-header">
-        Cast Your Vote
-      </CWText>
-      {votingActionObj}
-    </div>
-  );
+  return <div className="VotingActions">{votingActionObj}</div>;
 };

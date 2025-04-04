@@ -111,9 +111,7 @@ const SnapshotProposalPage = lazy(
 const ViewMultipleSnapshotsPage = lazy(
   () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
-const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
-);
+
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
@@ -134,6 +132,10 @@ const CommunityHomePage = lazy(
 const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
+
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
+);
 
 const CommonDomainRoutes = () => [
   <Route
@@ -354,12 +356,18 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
+
   <Route
     key="/:scope/proposal/:identifier"
     path="/:scope/proposal/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      // redirect to proposal detail page
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/proposal/:type"
@@ -381,6 +389,13 @@ const CommonDomainRoutes = () => [
     element={
       <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
     }
+  />,
+  <Route
+    key="/:scope/proposal-details/:identifier"
+    path="/:scope/proposal-details/:identifier"
+    element={withLayout(newProposalViewPage, {
+      scoped: true,
+    })}
   />,
   <Route
     key="/:scope/governance"
@@ -601,9 +616,15 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/snapshot/:snapshotId/:identifier"
     path="/:scope/snapshot/:snapshotId/:identifier"
-    element={withLayout(ViewSnapshotsProposalPage, {
-      scoped: true,
-    })}
+    // redirect to proposal detail page
+    element={
+      <Navigate
+        to={(parameters) =>
+          // eslint-disable-next-line max-len
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?snapshotId=${parameters.snapshotId}&type=snapshot`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/snapshot/:snapshotId"
