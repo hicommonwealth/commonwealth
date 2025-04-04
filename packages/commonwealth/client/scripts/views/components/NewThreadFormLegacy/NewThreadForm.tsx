@@ -324,6 +324,14 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         return;
       }
 
+      if (err?.message?.includes('Exceeded content creation limit')) {
+        console.log('NewThreadForm: Content creation limit exceeded');
+        notifyError(
+          'Exceeded content creation limit. Please try again later based on your trust level.',
+        );
+        return;
+      }
+
       if (err?.message?.includes('limit')) {
         console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
