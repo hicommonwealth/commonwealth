@@ -29,6 +29,7 @@ import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWText } from '../../component_kit/cw_text';
 import XPProgressIndicator from '../XPProgressIndicator';
 
+import DownloadMobileApp from 'views/components/DownloadMobileApp';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -101,7 +102,10 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       </div>
       <div className="searchbar">
         <CWSearchBar />
+        <DownloadMobileApp />
       </div>
+
+      <div></div>
       <div className="header-right">
         <div
           className={clsx('DesktopMenuContainerParent', {

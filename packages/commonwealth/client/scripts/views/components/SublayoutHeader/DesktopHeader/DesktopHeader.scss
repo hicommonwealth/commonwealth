@@ -28,7 +28,8 @@
 
   .searchbar {
     width: 608px;
-
+    display: flex;
+    gap: 4px;
     .SearchBar {
       @include extraSmall {
         display: none;
