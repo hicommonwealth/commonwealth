@@ -65,21 +65,12 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
             contractAddress: community.namespace_address!,
             tokenId: NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
           },
+          cacheRefresh: true,
         });
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
         if (balance < 5) return;
 
-        await models.User.update(
-          { tier: 4 },
-          {
-            where: {
-              id: nominatedAddress.User.id,
-              tier: {
-                [Op.lt]: 4,
-              },
-            },
-          },
-        );
+        await upgradeUserTier(nominatedAddress.User.id!, 4);
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
@@ -131,18 +122,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         );
 
         if (totalTraded.sum > MIN_TRADE_AMOUNT) {
-          await models.User.update(
-            { tier: 4 },
-            {
-              where: {
-                id: tokenCreatorAddress.User.id,
-                tier: {
-                  [Op.lt]: 4,
-                },
-                a,
-              },
-            },
-          );
+          await upgradeUserTier(tokenCreatorAddress.User.id!, 4);
         }
       },
       ContestContentAdded: async ({ payload }) => {
@@ -154,6 +134,20 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
     },
   };
 }
+
+const upgradeUserTier = async (userId: number, toTier: number) => {
+  await models.User.update(
+    { tier: toTier },
+    {
+      where: {
+        id: userId,
+        tier: {
+          [Op.lt]: toTier,
+        },
+      },
+    },
+  );
+};
 
 type ContestActivityPayload = {
   contest_address: string;
@@ -228,15 +222,5 @@ const onContestActivity = async ({
   }
   if (contestCreatorAddress.User.tier >= 4) return;
 
-  await models.User.update(
-    { tier: 4 },
-    {
-      where: {
-        id: contestCreatorAddress.User.id,
-        tier: {
-          [Op.lt]: 4,
-        },
-      },
-    },
-  );
+  await upgradeUserTier(contestCreatorAddress.User.id!, 4);
 };
