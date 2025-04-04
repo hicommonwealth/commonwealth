@@ -123,12 +123,21 @@ export const USER_TIERS = {
   },
 } as const satisfies Record<UserTierMap, UserTier>;
 
+export enum CommunityTierMap {
+  SpamCommunity = 0,
+  Unverified = 1,
+  SocialVerified = 2,
+  CommunityVerified = 3,
+  ManualVerification = 4,
+  PremiumVerification = 5,
+}
+
 export const COMMUNITY_TIERS = {
-  0: {
+  [CommunityTierMap.SpamCommunity]: {
     name: 'Spam Community',
     description: 'Community struck by the Spam Hammer.',
   },
-  1: {
+  [CommunityTierMap.Unverified]: {
     name: 'Unverified',
     description: 'Basic community without verification.',
     clientInfo: {
@@ -136,7 +145,7 @@ export const COMMUNITY_TIERS = {
       icon: '🚫',
     },
   },
-  2: {
+  [CommunityTierMap.SocialVerified]: {
     name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
     clientInfo: {
@@ -144,7 +153,7 @@ export const COMMUNITY_TIERS = {
       icon: '🌐',
     },
   },
-  3: {
+  [CommunityTierMap.CommunityVerified]: {
     name: 'Community Verified',
     description: 'Ownership of verified community or domain',
     clientInfo: {
@@ -152,7 +161,7 @@ export const COMMUNITY_TIERS = {
       icon: '🔗',
     },
   },
-  4: {
+  [CommunityTierMap.ManualVerification]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
@@ -160,7 +169,7 @@ export const COMMUNITY_TIERS = {
       icon: '✅',
     },
   },
-  5: {
+  [CommunityTierMap.PremiumVerification]: {
     name: 'Premium Verification',
     description: 'Highest level of trust with additional benefits.',
     clientInfo: {
@@ -168,7 +177,7 @@ export const COMMUNITY_TIERS = {
       icon: '⭐',
     },
   },
-} as const satisfies Record<number, Tier>;
+} as const satisfies Record<CommunityTierMap, Tier>;
 
 export type UserTierLevels = keyof typeof USER_TIERS;
 export type CommunityTierLevels = keyof typeof COMMUNITY_TIERS;

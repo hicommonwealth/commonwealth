@@ -42,12 +42,12 @@ export function tiered({
   creates = false,
   upvotes = false,
   ai = { images: false, text: false },
-  minTier = 0,
+  minTier = UserTierMap.IncompleteUser,
 }: {
   creates?: boolean;
   upvotes?: boolean;
   ai?: { images?: boolean; text?: boolean };
-  minTier?: number;
+  minTier?: UserTierMap;
 }) {
   return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
