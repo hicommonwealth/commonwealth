@@ -30,7 +30,6 @@ export default (
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        references: { model: 'QuestionActionMetas', key: 'id' },
       },
       active: { type: Sequelize.BOOLEAN, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },

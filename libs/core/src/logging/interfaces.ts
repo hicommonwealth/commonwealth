@@ -1,3 +1,5 @@
+import { LogLevel } from '../ports/enums';
+
 export type LogContext = {
   // fingerprint is a Rollbar concept that helps Rollbar group error occurrences together
   fingerprint?: string;
@@ -19,4 +21,4 @@ export interface ILogger {
 
 export type LoggerIds = [string, ...string[]];
 
-export type GetLogger = (ids: LoggerIds) => ILogger;
+export type GetLogger = (ids: LoggerIds, logLevel?: LogLevel) => ILogger;

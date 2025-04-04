@@ -554,9 +554,11 @@ describe('User lifecycle', () => {
         payload: { user_id: new_actor.user.id },
       });
       expect(xps5!.length).to.equal(2);
-      xps5?.filter(x => x.action_meta_id > 0)?.forEach((xp) => {
-        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
-      });
+      xps5
+        ?.filter((x) => x.action_meta_id > 0)
+        ?.forEach((xp) => {
+          expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
+        });
 
       // 3 CommentCreated events for admin
       const xps6 = await query(GetXps(), {

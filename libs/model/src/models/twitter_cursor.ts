@@ -20,6 +20,12 @@ export default (
       last_polled_timestamp: {
         type: Sequelize.BIGINT,
         allowNull: false,
+        get() {
+          const timestamp = this.getDataValue(
+            'last_polled_timestamp',
+          ) as unknown as string;
+          return BigInt(timestamp);
+        },
       },
     },
     {

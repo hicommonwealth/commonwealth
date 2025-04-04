@@ -5,6 +5,14 @@
     z-index: 0 !important;
   }
 
+  &.disabled {
+    cursor: not-allowed !important;
+
+    input {
+      cursor: not-allowed !important;
+    }
+  }
+
   .repetition-cycle-label {
     display: flex;
     align-items: center;

@@ -59,7 +59,23 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    &.cols-3 {
+      @include mediumSmallInclusive {
+        grid-template-columns: 1fr;
+      }
+
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
     gap: 24px;
     align-items: flex-start;
+  }
+
+  .MessageRow {
+    gap: 4px;
+
+    .feedback-message-text.Text {
+      text-align: left !important;
+    }
   }
 }

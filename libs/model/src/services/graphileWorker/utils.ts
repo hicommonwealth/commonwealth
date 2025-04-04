@@ -112,6 +112,7 @@ export async function scheduleTask<Name extends GraphileTaskNames>(
       },
       type: QueryTypes.SELECT,
       transaction: options?.transaction,
+      logging: console.log,
     },
   );
   const job = jobs[0];

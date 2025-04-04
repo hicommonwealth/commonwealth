@@ -104,18 +104,11 @@ export const QuestActionMeta = z
         /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
       )
       .nullish(),
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().positive().max(100),
-        retweets: z.number().positive().max(100),
-        replies: z.number().positive().max(100),
-      })
-      .optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
     // associations
-    QuestTweet: QuestTweet.optional(),
+    QuestTweet: QuestTweet.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

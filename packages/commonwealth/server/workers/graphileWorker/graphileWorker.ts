@@ -24,8 +24,13 @@ blobStorage({
 stats({
   adapter: HotShotsStats(),
 });
+
+if (!config.CACHE.REDIS_URL) {
+  throw new Error('REDIS_URL is not set');
+}
+
 cache({
-  adapter: new RedisCache(config.CACHE.REDIS_URL as string),
+  adapter: new RedisCache(config.CACHE.REDIS_URL),
 });
 
 async function startGraphileWorker() {
