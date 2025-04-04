@@ -13,13 +13,13 @@ export interface CommunityTrustLevel extends TrustLevel {}
 const USER_TRUST_LEVELS: Record<number, UserTrustLevel> = {
   0: {
     level: 0,
-    icon: '👤',
+    icon: '🚫',
     name: 'Unverified',
     description: 'Basic account without verification.',
   },
   1: {
     level: 1,
-    icon: '👶',
+    icon: '🐣',
     name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
   },
@@ -52,7 +52,7 @@ const USER_TRUST_LEVELS: Record<number, UserTrustLevel> = {
 const COMMUNITY_TRUST_LEVELS: Record<number, CommunityTrustLevel> = {
   0: {
     level: 0,
-    icon: '👤',
+    icon: '🚫',
     name: 'Unverified',
     description: 'Basic community without verification.',
   },
