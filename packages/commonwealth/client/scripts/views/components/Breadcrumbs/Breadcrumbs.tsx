@@ -31,16 +31,13 @@ export const Breadcrumbs = () => {
     : null;
 
   const { proposal: snapshotProposal } = useSnapshotProposal({
-    // @ts-expect-error <StrictNullChecks/>
-    identifier: proposalId,
-    // @ts-expect-error <StrictNullChecks/>
-    snapshotId: querySnapshotId,
+    identifier: proposalId || '',
+    snapshotId: querySnapshotId || '',
     enabled: !!(queryType === 'snapshot' && querySnapshotId),
   });
 
   const { title: proposalTitle } = useCosmosProposal({
-    // @ts-expect-error <StrictNullChecks/>
-    proposalId,
+    proposalId: proposalId || '',
     enabled: !!(proposalId && queryType === 'cosmos'),
   });
 

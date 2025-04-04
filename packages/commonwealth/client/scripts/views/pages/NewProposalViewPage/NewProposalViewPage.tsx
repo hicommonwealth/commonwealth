@@ -29,7 +29,7 @@ import { JSONDisplay } from '../view_proposal/JSONDisplay';
 import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
 import { useSnapshotProposal } from './useSnapshotProposal';
-type ViewProposalPageAttrs = {
+type ViewProposalPageProps = {
   id: string;
   scope: string;
   identifier: string;
@@ -39,7 +39,7 @@ export enum CodeEditorType {
   Code,
   Preview,
 }
-const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageAttrs) => {
+const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');

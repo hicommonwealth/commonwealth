@@ -112,7 +112,7 @@ const useGetSnapshotProposalsQuery = ({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
     queryFn: () => getProposals({ space }),
     staleTime: PROPOSALS_STALE_TIME,
-    enabled: enabled,
+    enabled,
   });
 };
 

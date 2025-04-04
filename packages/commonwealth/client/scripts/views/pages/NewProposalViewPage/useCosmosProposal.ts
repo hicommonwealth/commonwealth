@@ -15,7 +15,7 @@ import type { AnyProposal } from '../../../models/types';
 
 interface UseCosmosProposalProps {
   proposalId: string;
-  enabledApi?: boolean;
+  enabled?: boolean;
 }
 
 interface ProposalMetadata {
@@ -26,7 +26,7 @@ interface ProposalMetadata {
 
 export const useCosmosProposal = ({
   proposalId,
-  enabledApi = true,
+  enabled = true,
 }: UseCosmosProposalProps) => {
   const [proposal, setProposal] = useState<AnyProposal | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
@@ -38,7 +38,7 @@ export const useCosmosProposal = ({
     error: cosmosError,
     isFetching: isFetchingCosmos,
   } = useCosmosProposalQuery({
-    isApiReady: !!(app.chain?.apiInitialized && enabledApi),
+    isApiReady: !!(app.chain?.apiInitialized && enabled),
     proposalId,
   });
 
