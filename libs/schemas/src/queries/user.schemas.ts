@@ -179,7 +179,6 @@ export const GetXps = {
 export const XpRankedUser = z.object({
   user_id: PG_INT,
   xp_points: z.number(),
-  xp_referrer_points: z.number(),
   tier: z.number(),
   user_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
