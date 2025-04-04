@@ -7,20 +7,12 @@ import {
 import {
   hasTierRateLimits,
   USER_TIERS,
-  UserTier,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { models } from '../database';
-
-const tierLimitsPerHour = Object.values(USER_TIERS).reduce(
-  (acc, tier) => {
-    if ('hourlyRateLimits' in tier) return [...acc, tier.hourlyRateLimits];
-    return acc;
-  },
-  [] as UserTier['hourlyRateLimits'][],
-);
 
 function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
   return `${user_id}-${counter}-${new Date().toISOString().substring(0, 13)}`;
@@ -73,9 +65,15 @@ export function tiered({
 
     // upgrade tier after a week
     let tier = user.tier;
-    if (tier < 2 && moment().diff(moment(user.created_at), 'weeks') >= 1)
-      tier = 2;
-    if (tier < 1) tier = 1;
+    if (
+      tier === UserTierMap.NewVerifiedWallet &&
+      moment().diff(moment(user.created_at), 'weeks') >= 1
+    )
+      tier = UserTierMap.VerifiedWallet;
+
+    // WARNING: If router is not authenticated before this middleware this will incorrectly bump user tier
+    if (tier === UserTierMap.IncompleteUser)
+      tier = UserTierMap.NewVerifiedWallet;
     if (tier > user.tier)
       await models.User.update({ tier }, { where: { id: user.id } });
 

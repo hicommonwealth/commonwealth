@@ -1,25 +1,51 @@
-export interface Tier {
-  level: number;
+type TierClientInfo = {
+  trustLevel: 1 | 2 | 3 | 4 | 5;
   icon: string;
+};
+
+type TierRateLimits = {
+  create: number;
+  upvote: number;
+  ai: {
+    images: number;
+    text: number;
+  };
+};
+
+export interface Tier {
   name: string;
   description: string;
+  clientInfo?: TierClientInfo;
 }
 
 export interface UserTier extends Tier {
-  hourlyRateLimits?: {
-    create: number;
-    upvote: number;
-    ai: {
-      images: number;
-      text: number;
-    };
-  };
+  hourlyRateLimits?: TierRateLimits;
+}
+
+export enum UserTierMap {
+  IncompleteUser = 0,
+  BannedUser = 1,
+  NewVerifiedWallet = 2,
+  VerifiedWallet = 3,
+  SocialVerified = 4,
+  ChainVerified = 5,
+  ManualVerification = 6,
 }
 
 export const USER_TIERS = {
-  0: {
-    level: 0,
-    icon: '🚫',
+  [UserTierMap.IncompleteUser]: {
+    name: 'Incomplete User',
+    description: 'User has not completed the sign-up process.',
+    hourlyRateLimits: {
+      create: 0,
+      upvote: 0,
+      ai: {
+        images: 0,
+        text: 0,
+      },
+    },
+  },
+  [UserTierMap.BannedUser]: {
     name: 'Banned User',
     description: 'User was banned.',
     hourlyRateLimits: {
@@ -31,11 +57,13 @@ export const USER_TIERS = {
       },
     },
   },
-  1: {
-    level: 1,
-    icon: '🐣',
+  [UserTierMap.NewVerifiedWallet]: {
     name: 'New Verified Wallet',
     description: 'Verified wallet younger than 1 week',
+    clientInfo: {
+      trustLevel: 1,
+      icon: '🐣',
+    },
     hourlyRateLimits: {
       create: 1,
       upvote: 5,
@@ -45,11 +73,13 @@ export const USER_TIERS = {
       },
     },
   },
-  2: {
-    level: 2,
-    icon: '⌛',
+  [UserTierMap.VerifiedWallet]: {
     name: 'Verified Wallet',
     description: 'Verified wallet older than 1 week',
+    clientInfo: {
+      trustLevel: 2,
+      icon: '⌛',
+    },
     hourlyRateLimits: {
       create: 2,
       upvote: 10,
@@ -59,11 +89,13 @@ export const USER_TIERS = {
       },
     },
   },
-  3: {
-    level: 3,
-    icon: '🐣',
+  [UserTierMap.SocialVerified]: {
     name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
+    clientInfo: {
+      trustLevel: 3,
+      icon: '🌐',
+    },
     hourlyRateLimits: {
       create: 5,
       upvote: 25,
@@ -73,56 +105,68 @@ export const USER_TIERS = {
       },
     },
   },
-  4: {
-    level: 4,
-    icon: '🔗',
+  [UserTierMap.ChainVerified]: {
     name: 'Chain Verified',
     description: 'Creator of a namespace, contest, or launchpad token.',
+    clientInfo: {
+      trustLevel: 4,
+      icon: '🔗',
+    },
   },
-  5: {
-    level: 5,
-    icon: '⭐',
+  [UserTierMap.ManualVerification]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
+    clientInfo: {
+      trustLevel: 5,
+      icon: '⭐',
+    },
   },
-} as const satisfies Record<number, UserTier>;
+} as const satisfies Record<UserTierMap, UserTier>;
 
 export const COMMUNITY_TIERS = {
   0: {
-    level: 0,
-    icon: '❌',
     name: 'Spam Community',
     description: 'Community struck by the Spam Hammer.',
   },
   1: {
-    level: 0,
-    icon: '🚫',
     name: 'Unverified',
     description: 'Basic community without verification.',
+    clientInfo: {
+      trustLevel: 1,
+      icon: '🚫',
+    },
   },
   2: {
-    level: 1,
-    icon: '🌐',
     name: 'Social Verified',
     description: 'Basic verification through social media accounts.',
+    clientInfo: {
+      trustLevel: 2,
+      icon: '🌐',
+    },
   },
   3: {
-    level: 2,
-    icon: '🔗',
     name: 'Community Verified',
     description: 'Ownership of verified community or domain',
+    clientInfo: {
+      trustLevel: 3,
+      icon: '🔗',
+    },
   },
   4: {
-    level: 3,
-    icon: '✅',
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
+    clientInfo: {
+      trustLevel: 4,
+      icon: '✅',
+    },
   },
   5: {
-    level: 4,
-    icon: '⭐',
     name: 'Premium Verification',
     description: 'Highest level of trust with additional benefits.',
+    clientInfo: {
+      trustLevel: 5,
+      icon: '⭐',
+    },
   },
 } as const satisfies Record<number, Tier>;
 
@@ -132,7 +176,7 @@ export type CommunityTierLevels = keyof typeof COMMUNITY_TIERS;
 export type TierWithRateLimits = UserTierLevels &
   {
     [K in UserTierLevels]: (typeof USER_TIERS)[K] extends {
-      hourlyRateLimits: any;
+      hourlyRateLimits: TierRateLimits;
     }
       ? K
       : never;
@@ -142,4 +186,19 @@ export function hasTierRateLimits(
   tier: UserTierLevels,
 ): tier is TierWithRateLimits {
   return 'hourlyRateLimits' in USER_TIERS[tier];
+}
+
+export type TierWithClientInfo = UserTierLevels &
+  {
+    [K in UserTierLevels]: (typeof USER_TIERS)[K] extends {
+      clientInfo: TierClientInfo;
+    }
+      ? K
+      : never;
+  }[UserTierLevels];
+
+export function hasTierClientInfo(
+  tier: UserTierLevels,
+): tier is TierWithClientInfo {
+  return 'clientInfo' in USER_TIERS[tier];
 }
