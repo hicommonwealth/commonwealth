@@ -654,20 +654,22 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   />
                 )}
 
-                <div className="ai-toggle-wrapper">
-                  <CWToggle
-                    className="ai-toggle"
-                    icon="sparkle"
-                    iconColor="#757575"
-                    checked={aiCommentsToggleEnabled}
-                    onChange={() => {
-                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                    }}
-                  />
-                  <CWText type="caption" className="toggle-label">
-                    AI initial comment
-                  </CWText>
-                </div>
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <div className="ai-toggle-wrapper">
+                    <CWToggle
+                      className="ai-toggle"
+                      icon="sparkle"
+                      iconColor="#757575"
+                      checked={aiCommentsToggleEnabled}
+                      onChange={() => {
+                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                      }}
+                    />
+                    <CWText type="caption" className="toggle-label">
+                      AI initial comment
+                    </CWText>
+                  </div>
+                )}
 
                 <CWButton
                   label="Create"
