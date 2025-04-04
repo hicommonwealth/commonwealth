@@ -176,11 +176,12 @@ const QuestForm = (props: QuestFormProps) => {
                       <br />
 
                       <CWText type="b2">
-                        &#9679; Join &apos;Common&apos; Community to earn 70 XP
+                        &#9679; Join &apos;Common&apos; Community to earn 70
+                        Aura
                       </CWText>
 
                       <CWText type="b2">
-                        &#9679; Participate in any contest to earn 90 XP
+                        &#9679; Participate in any contest to earn 90 Aura
                       </CWText>
                     </div>
                   }

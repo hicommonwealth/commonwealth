@@ -22,8 +22,8 @@ const CreateQuest = () => {
           <CWText type="h2">Create a Quest</CWText>
           <CWText type="b1">
             Create community-focused tasks to increase engagement! Note: All
-            requirements must be fulfilled for users to earn XP, so we encourage
-            relevant quest items to be grouped into multiple quests.
+            requirements must be fulfilled for users to earn Aura, so we
+            encourage relevant quest items to be grouped into multiple quests.
           </CWText>
         </div>
         <QuestForm mode="create" />

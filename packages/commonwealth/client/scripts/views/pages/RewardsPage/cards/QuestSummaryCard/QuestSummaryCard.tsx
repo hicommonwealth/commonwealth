@@ -78,7 +78,7 @@ const QuestSummaryCard = () => {
       <div className="QuestSummaryCard">
         <div className="xp-body">
           <CWText fontWeight="bold" type="h4">
-            {user.xpPoints} XP&nbsp;
+            {user.xpPoints} Aura&nbsp;
             <CWText type="caption">earned from quests</CWText>
           </CWText>
         </div>
