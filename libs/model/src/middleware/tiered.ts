@@ -20,7 +20,7 @@ function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
 
 async function getUserCount(user_id: number, counter: 'creates' | 'upvotes') {
   const cacheKey = builtKey(user_id, counter);
-  const count = await cache().getKey(CacheNamespaces.TieredCounter, cacheKey);
+  const count = await cache().getKey(CacheNamespaces.Tiered_Counter, cacheKey);
   return +(count ?? '0');
 }
 
@@ -30,7 +30,7 @@ export async function incrementUserCount(
 ) {
   const cacheKey = builtKey(user_id, counter);
   const value = await cache().incrementKey(
-    CacheNamespaces.TieredCounter,
+    CacheNamespaces.Tiered_Counter,
     cacheKey,
     1,
     60,
@@ -42,10 +42,12 @@ export function tiered({
   creates = false,
   upvotes = false,
   ai = { images: false, text: false },
+  minTier = 0,
 }: {
   creates?: boolean;
   upvotes?: boolean;
   ai?: { images?: boolean; text?: boolean };
+  minTier?: number;
 }) {
   return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
@@ -76,6 +78,12 @@ export function tiered({
       tier = UserTierMap.NewVerifiedWallet;
     if (tier > user.tier)
       await models.User.update({ tier }, { where: { id: user.id } });
+
+    if (tier < minTier)
+      throw new InvalidActor(
+        actor,
+        `Must be a user with tier above ${minTier}`,
+      );
 
     // allow users with tiers above limits
     if (!hasTierRateLimits(tier)) return;
