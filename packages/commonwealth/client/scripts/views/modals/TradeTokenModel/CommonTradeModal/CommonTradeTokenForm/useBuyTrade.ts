@@ -71,7 +71,7 @@ const useBuyTrade = ({
     isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
-    ethChainId: chainNode.ethChainId || 0,
+    ethChainId,
     mode: 'buy',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,

@@ -11,7 +11,7 @@ import { UseCommonTradeTokenFormProps } from './types';
 import useBuyTrade from './useBuyTrade';
 import useSellTrade from './useSellTrade';
 
-const COMMON_PLATFORM_FEE_PERCENTAGE = 5; // make configurable when needed
+const COMMON_PLATFORM_FEE_PERCENTAGE = 1; // make configurable when needed
 
 const useCommonTradeTokenForm = ({
   tradeConfig,
