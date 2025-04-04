@@ -24,7 +24,7 @@ const columns: CWTableColumnInfo[] = [
     key: 'xp',
     header: () => (
       <CWText className="table-header">
-        <CWIcon iconName="help" iconSize="regular" /> XP
+        <CWIcon iconName="help" iconSize="regular" /> Aura
       </CWText>
     ),
     numeric: true,
