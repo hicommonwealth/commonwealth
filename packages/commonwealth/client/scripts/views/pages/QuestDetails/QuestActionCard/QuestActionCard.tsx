@@ -101,9 +101,11 @@ const QuestActionCard = ({
                   {actionCopies.pre_reqs[questAction.event_name]()}
                 </CWText>
                 <CWText type="caption">
-                  {/* TODO: 11391 platform - use likes etc counts from platform when getQuest/getQuests apis
-                  get updated to return them */}
-                  {actionCopies.explainer[questAction.event_name](8, 2, 3)}
+                  {actionCopies.explainer[questAction.event_name](
+                    questAction?.QuestTweet?.like_cap || 0,
+                    questAction?.QuestTweet?.retweet_cap || 0,
+                    questAction?.QuestTweet?.replies_cap || 0,
+                  )}
                 </CWText>
               </>
             )}
