@@ -106,7 +106,10 @@ export const FullUser = ({
       ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
-        profile?.name
+        <>
+          {profile?.name} &nbsp;
+          <TrustLevelRole type="user" level={profile?.tier || 0} />
+        </>
       ) : (
         <>
           <div className="profile-name">
@@ -301,7 +304,6 @@ export const FullUser = ({
           content={userPopover}
           {...popoverProps}
           placement={popoverPlacement}
-          open={true}
         />
       )}
     </div>

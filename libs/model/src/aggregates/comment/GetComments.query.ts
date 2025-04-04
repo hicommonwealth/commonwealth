@@ -49,6 +49,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CA.last_active,
             CA.community_id,
             CU.id AS "user_id",
+            CU.tier AS "user_tier",
             COALESCE(CU.profile->>'name', '${DEFAULT_NAME}') AS "profile_name",
             COALESCE(CU.profile->>'avatar_url', '${getRandomAvatar()}') AS "avatar_url",
             CASE WHEN max(CVH.id) IS NOT NULL THEN
@@ -144,6 +145,11 @@ export function GetComments(): Query<typeof schemas.GetComments> {
           ),
         } as unknown as z.infer<typeof CommentsView>;
       });
+
+      console.log(
+        'sanitizedComments',
+        JSON.stringify(sanitizedComments, null, 2),
+      );
 
       return schemas.buildPaginatedResponse(
         sanitizedComments,
