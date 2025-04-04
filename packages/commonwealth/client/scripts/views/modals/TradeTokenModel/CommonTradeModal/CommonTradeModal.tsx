@@ -39,7 +39,7 @@ const CommonTradeModal = ({
   return (
     <CWModal
       open={isOpen}
-      onClose={() => !isActionPending && onModalClose?.()}
+      onClose={() => onModalClose?.()}
       size="medium"
       className="CommonTradeModal"
       content={
@@ -53,7 +53,7 @@ const CommonTradeModal = ({
                 )}
               </CWText>
             }
-            onModalClose={() => !isActionPending && onModalClose?.()}
+            onModalClose={() => onModalClose?.()}
           />
           <CWModalBody>
             <TradeTokenForm
