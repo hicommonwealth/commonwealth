@@ -3,12 +3,12 @@ import { getSaltedApiKeyHash } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { randomBytes } from 'crypto';
 import { models } from '../../database';
-import { authVerified } from '../../middleware/auth';
+import { authVerified, tiered } from '../../middleware';
 
 export function CreateApiKey(): Command<typeof schemas.CreateApiKey> {
   return {
     ...schemas.CreateApiKey,
-    auth: [authVerified()],
+    auth: [authVerified(), tiered({ minTier: 3 })],
     secure: true,
     body: async ({ actor }) => {
       const apiKey = randomBytes(32).toString('base64url');
