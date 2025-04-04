@@ -10,11 +10,14 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import {
+  useConfigureNominationsMutation,
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
+  useDeploySingleJudgedContestOnchainMutation,
 } from 'state/api/contests';
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
+import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -22,10 +25,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
-import {
-  ActionStepProps,
-  ActionStepsProps,
-} from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { ActionStepProps } from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { isJudgedContest } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -33,6 +34,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 import './SignTransactionsStep.scss';
+import { getActionSteps } from './utils';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
@@ -61,12 +63,21 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const [configureNominationsData, setConfigureNominationsData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
   const { stakeData } = useCommunityStake();
 
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: deploySingleERC20ContestOnchainMutation } =
     useDeploySingleERC20ContestOnchainMutation();
+  const { mutateAsync: deploySingleJudgedContestOnchainMutation } =
+    useDeploySingleJudgedContestOnchainMutation();
+  const { mutateAsync: configureNominationsMutation } =
+    useConfigureNominationsMutation();
 
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
@@ -81,16 +92,16 @@ const SignTransactionsStep = ({
     contestFormData.contestRecurring === ContestRecurringType.Yes;
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
-
   const devContest = useFlag('contestDev');
+  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
 
   const signTransaction = async () => {
     const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
     const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
-    const namespaceName = app?.chain?.meta?.namespace;
+    const namespaceName = app?.chain?.meta?.namespace || '';
     const contestLength = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
-      : contestFormData?.contestDuration;
+      : contestFormData?.contestDuration || 0;
 
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
@@ -121,18 +132,29 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
+    const singleJudged = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestInterval: contestLength,
+      winnerShares,
+      voterShare,
+      walletAddress,
+      exchangeToken,
+    } as DeploySingleJudgedContestOnchainProps;
+
     const recurring = {
       ethChainId,
       chainRpc,
       namespaceName,
-      contestInterval,
-      winnerShares,
+      contestInterval: contestInterval || 0,
+      winnerShares: winnerShares || [],
       stakeId,
       prizeShare,
       voterShare,
       feeShare,
       weight,
-      walletAddress,
+      walletAddress: walletAddress || '',
     };
 
     let contestAddress: string;
@@ -143,13 +165,15 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
-      isContestRecurring
-        ? (contestAddress = await deployRecurringContestOnchainMutation(
-            // @ts-expect-error <StrictNullChecks/>
-            recurring,
-          ))
-        : (contestAddress =
-            await deploySingleERC20ContestOnchainMutation(singleERC20));
+      if (isContestRecurring) {
+        contestAddress = await deployRecurringContestOnchainMutation(recurring);
+      } else if (judgedContest) {
+        contestAddress =
+          await deploySingleJudgedContestOnchainMutation(singleJudged);
+      } else {
+        contestAddress =
+          await deploySingleERC20ContestOnchainMutation(singleERC20);
+      }
 
       await createContestMutation({
         contest_address: contestAddress,
@@ -187,28 +211,43 @@ const SignTransactionsStep = ({
     }
   };
 
-  const handleBack = () => {
-    onSetLaunchContestStep('DetailsForm');
+  const configureNominations = async () => {
+    const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+    const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+    const namespaceName = app?.chain?.meta?.namespace || '';
+    const walletAddress = user.activeAccount?.address || '';
+
+    try {
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      await configureNominationsMutation({
+        namespaceName,
+        creatorOnly: true,
+        walletAddress,
+        maxNominations: 5,
+        ethChainId,
+        chainRpc,
+      });
+
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error configuring nominations', error);
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to configure nominations. Please try again.',
+      }));
+    }
   };
 
-  const getActionSteps = (): ActionStepsProps['steps'] => {
-    return [
-      {
-        label: isDirectDepositSelected
-          ? 'Launch contest'
-          : 'Launch contest & re-route fees',
-        state: launchContestData.state,
-        errorText: launchContestData.errorText,
-        actionButton: {
-          label: launchContestData.state === 'completed' ? 'Signed' : 'Sign',
-          disabled:
-            launchContestData.state === 'loading' ||
-            launchContestData.state === 'completed',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: signTransaction,
-        },
-      },
-    ];
+  const handleBack = () => {
+    onSetLaunchContestStep('DetailsForm');
   };
 
   const cancelDisabled = launchContestData.state === 'loading';
@@ -229,7 +268,16 @@ const SignTransactionsStep = ({
           complete.
         </CWText>
 
-        <ActionSteps steps={getActionSteps()} />
+        <ActionSteps
+          steps={getActionSteps({
+            isJudgedContest: judgedContest,
+            configureNominationsData,
+            configureNominations,
+            isDirectDepositSelected,
+            launchContestData,
+            signTransaction,
+          })}
+        />
 
         <CWDivider />
 
