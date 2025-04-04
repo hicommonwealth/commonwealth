@@ -102,6 +102,7 @@ export const GetUserAddresses = {
       address: z.string(),
       lastActive: z.date().or(z.string()),
       avatarUrl: z.string().nullish(),
+      tier: z.number().nullish(),
     }),
   ),
 };

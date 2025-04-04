@@ -16,6 +16,7 @@ import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithF
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../../models/NewProfile';
 import { SharePopover } from '../../SharePopover';
+import TrustLevelRole from '../../TrustLevelRole';
 import { CWText } from '../../component_kit/cw_text';
 import { SocialAccounts } from '../../social_accounts';
 
@@ -70,6 +71,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
       <div className="profile-name-and-bio">
         <CWText type="h3" className="name">
           {name || DEFAULT_NAME}
+          <TrustLevelRole type="user" level={profile.tier} />
         </CWText>
 
         {referralsEnabled && isCurrentUser && (

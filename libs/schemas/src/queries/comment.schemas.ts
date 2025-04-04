@@ -20,6 +20,7 @@ export const SearchComments = {
 
 export const CommentsView = CommentView.extend({
   reactions: z.array(ReactionView).nullish(),
+  user_tier: z.number().nullish(),
 });
 
 export const GetCommentsOrderBy = z.enum(['newest', 'oldest', 'mostLikes']);

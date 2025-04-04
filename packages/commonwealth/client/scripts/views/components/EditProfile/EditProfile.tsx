@@ -106,6 +106,7 @@ const EditProfile = () => {
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       // @ts-expect-error <StrictNullChecks/>

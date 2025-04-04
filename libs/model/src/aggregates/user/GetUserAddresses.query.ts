@@ -37,6 +37,7 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
         address: address.address,
         lastActive: address.last_active ?? address.User!.created_at!,
         avatarUrl: address.User?.profile.avatar_url,
+        tier: address.User?.tier,
       }));
     },
   };

@@ -114,6 +114,7 @@ export const CommunitySection = ({
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       return;

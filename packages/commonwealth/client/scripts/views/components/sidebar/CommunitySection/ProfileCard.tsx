@@ -5,7 +5,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
+import TrustLevelRole from '../../TrustLevelRole';
+
 import './ProfileCard.scss';
+
 enum ImageBehavior {
   Cover = 'cover',
   Fill = 'fill',
@@ -66,7 +69,10 @@ const ProfileCard = () => {
               to={`/profile/id/${userData.id}`}
               className="user-info"
             >
-              <h3 className="profile-name">{data?.profile.name}</h3>
+              <h3 className="profile-name">
+                {data?.profile.name}
+                <TrustLevelRole type="user" level={data?.tier} />
+              </h3>
             </Link>
           )}
         />

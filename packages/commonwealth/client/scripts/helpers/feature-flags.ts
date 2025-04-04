@@ -36,6 +36,7 @@ const featureFlags = {
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
   privy: buildFlag(process.env.FLAG_PRIVY),
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
+  trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

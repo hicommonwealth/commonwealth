@@ -53,6 +53,7 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.FLAG_PRIVY': JSON.stringify(env.FLAG_PRIVY),
     'process.env.FLAG_JUDGE_CONTEST': JSON.stringify(env.FLAG_JUDGE_CONTEST),
+    'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
   };
 
   const config = {

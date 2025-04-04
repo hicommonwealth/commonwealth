@@ -362,6 +362,7 @@ export const CommentCard = ({
                 name: comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
+                tier: comment.user_tier || 0,
               }}
               versionHistory={(comment.CommentVersionHistories || []).map(
                 (cvh) => ({

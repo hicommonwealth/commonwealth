@@ -13,6 +13,7 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import TrustLevelRole from '../TrustLevelRole';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -110,10 +111,16 @@ export const User = ({
       ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
-        profile?.name
+        <>
+          {profile?.name} &nbsp;
+          <TrustLevelRole type="user" level={profile?.tier} />
+        </>
       ) : (
         <>
-          <div>{profile?.name}</div>
+          <div>
+            {profile?.name} &nbsp;
+            <TrustLevelRole type="user" level={profile?.tier} />
+          </div>
           <div className="id-short">{fullAddress}</div>
         </>
       )}
@@ -208,10 +215,14 @@ export const User = ({
                     redactedAddress
                   )
                 ) : !shouldShowAddressWithDisplayName ? (
-                  profile?.name
+                  <>
+                    {profile?.name} &nbsp;
+                    <TrustLevelRole type="user" level={profile?.tier} />
+                  </>
                 ) : (
                   <>
-                    {profile?.name}
+                    {profile?.name} &nbsp;
+                    <TrustLevelRole type="user" level={profile?.tier} />
                     <div className="id-short">{redactedAddress}</div>
                   </>
                 )}

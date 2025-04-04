@@ -46,7 +46,12 @@ const Profile = ({ userId }: ProfileProps) => {
     }
     if (data) {
       setProfile(
-        new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
+        new NewProfile({
+          ...data.profile,
+          userId,
+          isOwner: isOwner ?? false,
+          tier: data.tier,
+        }),
       );
       setThreads(
         data.threads.map((t) => {

@@ -74,9 +74,14 @@
       justify-content: center;
       word-break: break-word;
       text-align: center;
+      display: inline-block;
 
       &.hasMargin {
         margin-bottom: 24px;
+      }
+
+      .TrustLevelRole {
+        margin-left: 8px;
       }
     }
 

@@ -41,6 +41,7 @@ const useFetchProfilesByAddressesQuery = ({
             t.avatarUrl ?? '',
             currentChainId,
             new Date(t.lastActive),
+            t.tier ?? 0,
           );
           return profile;
         }),
@@ -116,6 +117,7 @@ export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = async (
       t.avatarUrl,
       communities[0],
       t.lastActive,
+      t.tier ?? 0,
     );
     return profile;
   });

@@ -22,6 +22,7 @@ export const ActivityThread = z.object({
   community_icon: z.string().nullish(),
   id: z.number(),
   user_id: z.number(),
+  user_tier: z.number(),
   user_address: z.string(),
   profile_name: z.string().nullish(),
   profile_avatar: z.string().nullish(),
