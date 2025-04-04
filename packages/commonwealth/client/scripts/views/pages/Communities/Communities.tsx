@@ -1,5 +1,9 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import {
+  ChainNetwork,
+  CommunityType,
+  ContentType,
+} from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -11,6 +15,9 @@ import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer/StickyEditorContainer';
 import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
@@ -38,10 +45,10 @@ import {
   communitySortOptionsLabelToKeysMap,
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
+import { getCommunityCountsString } from './helpers';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
 import TokensList from './TokensList';
-import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
@@ -251,197 +258,205 @@ const CommunitiesPage = () => {
   };
 
   return (
-    // @ts-expect-error <StrictNullChecks/>
-    <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
-      <div className="CommunitiesPage">
-        <div className="header-section">
-          <div className="description">
-            <CWText
-              type="h1"
-              {...(launchpadEnabled && { fontWeight: 'semiBold' })}
-            >
-              Explore {launchpadEnabled ? '' : 'Communities'}
-            </CWText>
-
-            {isWindowSmallInclusive ? communitiesCount : <></>}
-            <div className="actions">
-              {!isWindowSmallInclusive ? communitiesCount : <></>}
-              {!launchpadEnabled && (
-                <CreateCommunityButton buttonHeight="med" withIcon />
-              )}
-            </div>
-          </div>
-
-          <IdeaLaunchpad />
-
-          {/* Tab Navigation */}
-          <CWTabsRow className="explore-tabs-row">
-            {TAB_VIEWS.map((tab) => (
-              <CWTab
-                key={tab.value}
-                label={tab.label}
-                isSelected={activeTab === tab.value}
-                onClick={() => handleTabClick(tab.value)}
-              />
-            ))}
-          </CWTabsRow>
-        </div>
-
-        {/* Conditionally render content based on active tab */}
-        {launchpadEnabled
-          ? activeTab === 'tokens' && (
-              <TokensList filters={filters} hideHeader />
-            )
-          : null}
-        {questsEnabled
-          ? activeTab === 'quests' && <QuestList hideHeader />
-          : null}
-        {activeTab === 'contests' && <ExploreContestList hideHeader />}
-        {activeTab === 'threads' && (
-          <div className="threads-tab">
-            <Feed
-              query={useFetchGlobalActivityQuery}
-              customScrollParent={containerRef.current}
-            />
-          </div>
-        )}
-        {activeTab === 'users' && (
-          <div className="users-tab">
-            <div className="users-xp-table">
-              <XPTable />
-            </div>
-          </div>
-        )}
-
-        {/* All tab - show all content types */}
-        {activeTab === 'all' && (
-          <>
-            {/* Communities section */}
-            <div className="section-container">
-              <AllTabContent containerRef={containerRef} filters={filters} />
-            </div>
-          </>
-        )}
-
-        {/* Communities Tab Content */}
-        {activeTab === 'communities' && (
-          <>
-            <div
-              className={clsx('filters', {
-                hasAppliedFilter:
-                  Object.values(filters).filter(Boolean).length === 1
-                    ? !filters.withCommunitySortOrder
-                    : Object.values(filters).filter(Boolean).length > 0,
-              })}
-            >
-              <CWButton
-                label="Filters"
-                iconRight="funnelSimple"
-                buttonType="secondary"
-                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-              />
-              {filters.withCommunitySortBy && (
-                <CWTag
-                  label={`${filters.withCommunitySortBy}${
-                    filters.withCommunitySortOrder &&
-                    filters.withCommunitySortBy !==
-                      CommunitySortOptions.MostRecent
-                      ? ` : ${filters.withCommunitySortOrder}`
-                      : ''
-                  }
-                  `}
-                  type="filter"
-                  onCloseClick={removeCommunitySortByFilter}
-                />
-              )}
-              {filters.withCommunityType && (
-                <CWTag
-                  label={filters.withCommunityType}
-                  type="filter"
-                  onCloseClick={removeCommunityTypeFilter}
-                />
-              )}
-              {filters.withNetwork && (
-                <CWTag
-                  label={filters.withNetwork}
-                  type="filter"
-                  onCloseClick={removeChainNetworkFilter}
-                />
-              )}
-              {filters.withCommunityEcosystem && (
-                <CWTag
-                  label={filters.withCommunityEcosystem}
-                  type="filter"
-                  onCloseClick={removeCommunityEcosystemFilter}
-                />
-              )}
-              {filters.withEcosystemChainId && (
-                <CWTag
-                  label={
-                    Object.entries(communityChains).find(
-                      ([_, v]) => filters.withEcosystemChainId === v,
-                    )?.[0] as string
-                  }
-                  type="filter"
-                  onCloseClick={removeEcosystemChainIdFilter}
-                />
-              )}
-              {filters.withStakeEnabled && (
-                <CWTag
-                  label="Stake"
-                  type="filter"
-                  onCloseClick={removeStakeFilter}
-                />
-              )}
-              {filters.withTagsIds &&
-                filters.withTagsIds.map((id) => (
-                  <CWTag
-                    key={id}
-                    type="filter"
-                    label={(tags || []).find((t) => t.id === id)?.name || ''}
-                    onCloseClick={() => removeTagFilter(id)}
-                  />
-                ))}
-              <FiltersDrawer
-                isOpen={isFilterDrawerOpen}
-                onClose={() => setIsFilterDrawerOpen(false)}
-                filters={filters}
-                onFiltersChange={(newFilters) => setFilters(newFilters)}
-              />
-            </div>
-            <CommunitiesTabContent
-              isLoading={isLoading}
-              isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-              communitiesList={communitiesList}
-              containerRef={containerRef}
-              filters={filters}
-              historicalPrices={historicalPrices}
-              ethUsdRate={Number(ethUsdRate)}
-              setSelectedCommunityId={setSelectedCommunityId}
-              hasNextPage={hasNextPage}
-              fetchMoreCommunities={fetchMoreCommunities}
-            />
-          </>
-        )}
-
-        <CWModal
-          size="small"
-          content={
-            <ManageCommunityStakeModal
-              mode={modeOfManageCommunityStakeModal}
-              // @ts-expect-error <StrictNullChecks/>
-              onModalClose={() => setModeOfManageCommunityStakeModal(null)}
-              denomination={
-                findDenominationString(selectedCommunityId || '') || 'ETH'
-              }
-            />
-          }
-          // @ts-expect-error <StrictNullChecks/>
-          onClose={() => setModeOfManageCommunityStakeModal(null)}
-          open={!!modeOfManageCommunityStakeModal}
+    <StickCommentProvider mode="community">
+      <WithDefaultStickyComment>
+        <StickyEditorContainer
+          parentType={ContentType.Thread}
+          handleSubmitComment={async () => 0}
         />
-      </div>
-    </CWPageLayout>
+      </WithDefaultStickyComment>
+      {/* @ts-expect-error <StrictNullChecks/> */}
+      <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
+        <div className="CommunitiesPage">
+          <div className="header-section">
+            <div className="description">
+              <CWText
+                type="h1"
+                {...(launchpadEnabled && { fontWeight: 'semiBold' })}
+              >
+                Explore {launchpadEnabled ? '' : 'Communities'}
+              </CWText>
+
+              {isWindowSmallInclusive ? communitiesCount : <></>}
+              <div className="actions">
+                {!isWindowSmallInclusive ? communitiesCount : <></>}
+                {!launchpadEnabled && (
+                  <CreateCommunityButton buttonHeight="med" withIcon />
+                )}
+              </div>
+            </div>
+
+            <IdeaLaunchpad />
+
+            {/* Tab Navigation */}
+            <CWTabsRow className="explore-tabs-row">
+              {TAB_VIEWS.map((tab) => (
+                <CWTab
+                  key={tab.value}
+                  label={tab.label}
+                  isSelected={activeTab === tab.value}
+                  onClick={() => handleTabClick(tab.value)}
+                />
+              ))}
+            </CWTabsRow>
+          </div>
+
+          {/* Conditionally render content based on active tab */}
+          {launchpadEnabled
+            ? activeTab === 'tokens' && (
+                <TokensList filters={filters} hideHeader />
+              )
+            : null}
+          {questsEnabled
+            ? activeTab === 'quests' && <QuestList hideHeader />
+            : null}
+          {activeTab === 'contests' && <ExploreContestList hideHeader />}
+          {activeTab === 'threads' && (
+            <div className="threads-tab">
+              <Feed
+                query={useFetchGlobalActivityQuery}
+                customScrollParent={containerRef.current}
+              />
+            </div>
+          )}
+          {activeTab === 'users' && (
+            <div className="users-tab">
+              <div className="users-xp-table">
+                <XPTable />
+              </div>
+            </div>
+          )}
+
+          {/* All tab - show all content types */}
+          {activeTab === 'all' && (
+            <>
+              {/* Communities section */}
+              <div className="section-container">
+                <AllTabContent containerRef={containerRef} filters={filters} />
+              </div>
+            </>
+          )}
+
+          {/* Communities Tab Content */}
+          {activeTab === 'communities' && (
+            <>
+              <div
+                className={clsx('filters', {
+                  hasAppliedFilter:
+                    Object.values(filters).filter(Boolean).length === 1
+                      ? !filters.withCommunitySortOrder
+                      : Object.values(filters).filter(Boolean).length > 0,
+                })}
+              >
+                <CWButton
+                  label="Filters"
+                  iconRight="funnelSimple"
+                  buttonType="secondary"
+                  onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+                />
+                {filters.withCommunitySortBy && (
+                  <CWTag
+                    label={`${filters.withCommunitySortBy}${
+                      filters.withCommunitySortOrder &&
+                      filters.withCommunitySortBy !==
+                        CommunitySortOptions.MostRecent
+                        ? ` : ${filters.withCommunitySortOrder}`
+                        : ''
+                    }
+                    `}
+                    type="filter"
+                    onCloseClick={removeCommunitySortByFilter}
+                  />
+                )}
+                {filters.withCommunityType && (
+                  <CWTag
+                    label={filters.withCommunityType}
+                    type="filter"
+                    onCloseClick={removeCommunityTypeFilter}
+                  />
+                )}
+                {filters.withNetwork && (
+                  <CWTag
+                    label={filters.withNetwork}
+                    type="filter"
+                    onCloseClick={removeChainNetworkFilter}
+                  />
+                )}
+                {filters.withCommunityEcosystem && (
+                  <CWTag
+                    label={filters.withCommunityEcosystem}
+                    type="filter"
+                    onCloseClick={removeCommunityEcosystemFilter}
+                  />
+                )}
+                {filters.withEcosystemChainId && (
+                  <CWTag
+                    label={
+                      Object.entries(communityChains).find(
+                        ([_, v]) => filters.withEcosystemChainId === v,
+                      )?.[0] as string
+                    }
+                    type="filter"
+                    onCloseClick={removeEcosystemChainIdFilter}
+                  />
+                )}
+                {filters.withStakeEnabled && (
+                  <CWTag
+                    label="Stake"
+                    type="filter"
+                    onCloseClick={removeStakeFilter}
+                  />
+                )}
+                {filters.withTagsIds &&
+                  filters.withTagsIds.map((id) => (
+                    <CWTag
+                      key={id}
+                      type="filter"
+                      label={(tags || []).find((t) => t.id === id)?.name || ''}
+                      onCloseClick={() => removeTagFilter(id)}
+                    />
+                  ))}
+                <FiltersDrawer
+                  isOpen={isFilterDrawerOpen}
+                  onClose={() => setIsFilterDrawerOpen(false)}
+                  filters={filters}
+                  onFiltersChange={(newFilters) => setFilters(newFilters)}
+                />
+              </div>
+              <CommunitiesTabContent
+                isLoading={isLoading}
+                isInitialCommunitiesLoading={isInitialCommunitiesLoading}
+                communitiesList={communitiesList}
+                containerRef={containerRef}
+                filters={filters}
+                historicalPrices={historicalPrices}
+                ethUsdRate={Number(ethUsdRate)}
+                setSelectedCommunityId={setSelectedCommunityId}
+                hasNextPage={hasNextPage}
+                fetchMoreCommunities={fetchMoreCommunities}
+              />
+            </>
+          )}
+
+          <CWModal
+            size="small"
+            content={
+              <ManageCommunityStakeModal
+                mode={modeOfManageCommunityStakeModal}
+                // @ts-expect-error <StrictNullChecks/>
+                onModalClose={() => setModeOfManageCommunityStakeModal(null)}
+                denomination={
+                  findDenominationString(selectedCommunityId || '') || 'ETH'
+                }
+              />
+            }
+            // @ts-expect-error <StrictNullChecks/>
+            onClose={() => setModeOfManageCommunityStakeModal(null)}
+            open={!!modeOfManageCommunityStakeModal}
+          />
+        </div>
+      </CWPageLayout>
+    </StickCommentProvider>
   );
 };
 

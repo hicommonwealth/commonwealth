@@ -41,6 +41,23 @@ export type CommentEditorProps = {
   streamingReplyIds?: number[];
   thread?: Thread;
   parentCommentText?: string;
+  initialPrompt?: string;
+  comment?: Comment;
+  parentComment?: Comment | null;
+  proposal?: IChainProposal;
+  canReply?: boolean;
+  isProposalVoteComment?: boolean;
+  isEditing?: boolean;
+  replyToCommunity?: string;
+  replyingToAddress?: Address;
+  nodeUrl?: string;
+  onCancelReplyToSelection?: (e?: React.MouseEvent) => void;
+  onResetThread?: (shouldResetEditor?: boolean) => void;
+  onSave?: (comment: Comment) => void;
+  onReactionsUpdate?: (response: boolean) => void;
+  fromSticky?: boolean;
+  parentBackgroundColor?: string;
+  setAICommentsToggleEnabled?: (value: boolean) => void;
 };
 
 const CommentEditor = ({
@@ -61,15 +78,34 @@ const CommentEditor = ({
   onCommentCreated,
   thread,
   parentCommentText,
+  initialPrompt,
+  comment,
+  parentComment,
+  proposal,
+  canReply,
+  isProposalVoteComment,
+  isEditing,
+  replyToCommunity,
+  replyingToAddress,
+  replyingToAuthor,
+  nodeUrl,
+  onCancelReplyToSelection,
+  onResetThread,
+  onSave,
+  onReactionsUpdate,
+  fromSticky,
+  parentBackgroundColor,
+  setAICommentsToggleEnabled: propSetAICommentsToggleEnabled,
 }: CommentEditorProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const {
     aiCommentsToggleEnabled,
     aiInteractionsToggleEnabled,
-    setAICommentsToggleEnabled,
+    setAICommentsToggleEnabled: hookSetAICommentsToggleEnabled,
   } = useLocalAISettingsStore();
 
-  const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
+  const effectiveSetAICommentsToggleEnabled =
+    propSetAICommentsToggleEnabled || hookSetAICommentsToggleEnabled;
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
@@ -133,13 +169,13 @@ const CommentEditor = ({
       }
 
       if (onCommentCreated) {
-        onCommentCreated(commentId, !!effectiveAiStreaming);
+        onCommentCreated(commentId, !!initialAiStreaming);
       }
 
       // Handle AI streaming and comment jumping asynchronously
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
-        if (effectiveAiStreaming === true && onAiReply) {
+        if (initialAiStreaming === true && onAiReply) {
           Promise.resolve(onAiReply(commentId)).catch((error) => {
             console.error('Failed to trigger AI reply:', error);
             notifyError('Failed to generate AI reply');
@@ -152,7 +188,7 @@ const CommentEditor = ({
             `.comment-${commentId}`,
           );
           if (commentElement) {
-            jumpHighlightComment(commentId, effectiveAiStreaming === true);
+            jumpHighlightComment(commentId, initialAiStreaming === true);
             return true;
           }
           return false;
@@ -249,7 +285,7 @@ const CommentEditor = ({
               iconColor="#757575"
               checked={aiCommentsToggleEnabled}
               onChange={() => {
-                setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                effectiveSetAICommentsToggleEnabled(!aiCommentsToggleEnabled);
               }}
             />
             <CWText type="caption" className="toggle-label">

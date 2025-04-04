@@ -7,6 +7,7 @@ import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor
 import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { CommunityCreationForm } from './CommunityCreationForm/CommunityCreationForm';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
 import StickyInput from './StickyInput';
@@ -16,7 +17,7 @@ import { StickCommentContext } from './context/StickCommentProvider';
 const newStickyInput = false;
 
 export const MobileStickyInput = (props: CommentEditorProps) => {
-  const { handleSubmitComment } = props;
+  const { handleSubmitComment, initialPrompt } = props;
   const [focused, setFocused] = useState(false);
   const { mode } = useContext(StickCommentContext);
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
@@ -75,20 +76,31 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     return null;
   }
 
+  // Get title based on mode
+  const getEditorTitle = () => {
+    if (mode === 'thread') return 'Create Thread';
+    if (mode === 'community') return 'Create Community';
+    return 'Write Comment';
+  };
+
   if (focused) {
     return (
       <div className="MobileStickyInputFocused">
         <div className="mobile-editor-container">
           <div className="header-row">
             <div className="left-section">
-              <CWText type="h4">
-                {mode === 'thread' ? 'Create Thread' : 'Write Comment'}
-              </CWText>
+              <CWText type="h4">{getEditorTitle()}</CWText>
             </div>
           </div>
 
           {mode === 'thread' ? (
             <NewThreadForm onCancel={handleCancel} />
+          ) : mode === 'community' ? (
+            <CommunityCreationForm
+              onCancel={handleCancel}
+              initialPrompt={initialPrompt}
+              generateOnMount={!!initialPrompt}
+            />
           ) : (
             <CommentEditor
               {...props}

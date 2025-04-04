@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { ActivatorContext } from './ActivatorContext';
 
-export type EditorMode = 'thread' | 'comment';
+export type EditorMode = 'thread' | 'comment' | 'community';
 
 interface StickCommentContextType {
   mode: EditorMode;
