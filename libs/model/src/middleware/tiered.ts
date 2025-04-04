@@ -1,24 +1,26 @@
 import {
+  cache,
   CacheNamespaces,
   Context,
   InvalidActor,
-  cache,
 } from '@hicommonwealth/core';
+import {
+  hasTierRateLimits,
+  USER_TIERS,
+  UserTier,
+} from '@hicommonwealth/shared';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { models } from '../database';
 
-const tierLimitsPerHour = [
-  // tier 0 (new unverified addresses with no sso, balance, etc - bad aura)
-  { create: 0, upvote: 0, ai: { images: 0, text: 0 } },
-  // tier 1 (new verified address)
-  { create: 1, upvote: 5, ai: { images: 2, text: 5 } },
-  // tier 2 (1 week old and verified)
-  { create: 2, upvote: 10, ai: { images: 4, text: 10 } },
-  // tier 3 (email verified/sso, or wallet with balance (TODO: cache balances))
-  { create: 5, upvote: 25, ai: { images: 10, text: 50 } },
-];
+const tierLimitsPerHour = Object.values(USER_TIERS).reduce(
+  (acc, tier) => {
+    if ('hourlyRateLimits' in tier) return [...acc, tier.hourlyRateLimits];
+    return acc;
+  },
+  [] as UserTier['hourlyRateLimits'][],
+);
 
 function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
   return `${user_id}-${counter}-${new Date().toISOString().substring(0, 13)}`;
@@ -78,16 +80,17 @@ export function tiered({
       await models.User.update({ tier }, { where: { id: user.id } });
 
     // allow users with tiers above limits
-    if (tier >= tierLimitsPerHour.length) return;
+    if (!hasTierRateLimits(tier)) return;
+    const tierLimitsPerHour = USER_TIERS[tier].hourlyRateLimits;
 
     if (creates) {
       const last_creates = await getUserCount(user.id, 'creates');
-      if (last_creates >= tierLimitsPerHour[tier].create)
+      if (last_creates >= tierLimitsPerHour.create)
         throw new InvalidActor(actor, 'Exceeded content creation limit');
     }
     if (upvotes) {
       const last_upvotes = await getUserCount(user.id, 'upvotes');
-      if (last_upvotes >= tierLimitsPerHour[tier].upvote)
+      if (last_upvotes >= tierLimitsPerHour.upvote)
         throw new InvalidActor(actor, 'Exceeded upvote limit');
     }
     if (ai.images) {

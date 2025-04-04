@@ -38,7 +38,14 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
-export const USER_TIER = z.number().int().min(0).max(5);
+export const USER_TIER = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+]);
 export const User = z.object({
   id: PG_INT.optional(),
   tier: USER_TIER,
