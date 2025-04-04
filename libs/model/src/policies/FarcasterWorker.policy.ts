@@ -1,4 +1,4 @@
-import { command, Policy } from '@hicommonwealth/core';
+import { command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '..';
@@ -11,6 +11,12 @@ import {
   createOnchainContestContent,
   createOnchainContestVote,
 } from './utils/contest-utils';
+
+const log = logger(import.meta);
+
+const Errors = {
+  ContestEnded: 'Contest has ended',
+};
 
 const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
@@ -69,8 +75,18 @@ export function FarcasterWorker(): Policy<typeof inputs> {
               [Op.contains]: [payload.parent_hash!],
             },
           },
+          include: [
+            {
+              model: models.Contest,
+              required: true,
+            },
+          ],
         });
         mustExist('Contest Manager', contestManager);
+        if (new Date() > contestManager.contests![0]!.end_time) {
+          log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
+          return;
+        }
 
         const community = await models.Community.findByPk(
           contestManager.community_id,
@@ -121,8 +137,18 @@ export function FarcasterWorker(): Policy<typeof inputs> {
               [Op.contains]: [payload.parent_hash!],
             },
           },
+          include: [
+            {
+              model: models.Contest,
+              required: true,
+            },
+          ],
         });
         mustExist('Contest Manager', contestManager);
+        if (new Date() > contestManager.contests![0]!.end_time) {
+          log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
+          return;
+        }
 
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
@@ -162,8 +188,18 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             },
             contest_address: payload.contest_address,
           },
+          include: [
+            {
+              model: models.Contest,
+              required: true,
+            },
+          ],
         });
         mustExist('Contest Manager', contestManager);
+        if (new Date() > contestManager.contests![0]!.end_time) {
+          log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
+          return;
+        }
 
         // find content by url
         const contestActions = await models.ContestAction.findAll({
