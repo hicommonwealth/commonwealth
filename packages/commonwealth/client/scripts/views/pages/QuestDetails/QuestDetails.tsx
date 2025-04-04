@@ -67,8 +67,6 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
     useGetRandomResourceIds({
-      limit: 1,
-      cursor: 1,
       enabled: true,
     });
   const randomResourceId = randomResourceIds?.results?.[0];
