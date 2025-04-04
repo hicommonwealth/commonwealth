@@ -273,6 +273,7 @@ export const LinkNamespace = {
     deployer_address: z.string(),
     log_removed: z.boolean(),
     referral: NamespaceReferral.optional(),
+    block_number: z.coerce.bigint(),
   }),
   output: z.boolean(),
 };

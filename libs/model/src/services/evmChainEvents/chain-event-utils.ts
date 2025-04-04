@@ -12,6 +12,7 @@ import {
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
+import erc1155Abi from 'evm-protocols/src/abis/erc1155Abi';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -291,6 +292,37 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   };
 };
 
+const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: erc1155Abi,
+    eventName: 'TransferSingle',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  const args = decoded.args as Record<string, unknown>;
+  const operatorAddress = args.operator as string;
+  const fromAddress = args.from as string;
+  const toAddress = args.to as string;
+
+  return {
+    event_name: 'NamespaceTransferSingle',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        operator: operatorAddress as `0x${string}`,
+        from: fromAddress as `0x${string}`,
+        to: toAddress as `0x${string}`,
+        id: BigInt((args.id as string) || '0'),
+        value: BigInt((args.value as string) || '0'),
+        block_number: Number(event.block.number),
+      },
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -308,9 +340,14 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
 
-  // Contests
+  // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
+
+  // Namespace
+  [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
+
+  // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
     recurringContestStartedMapper,
   [EvmEventSignatures.Contests.SingleContestStarted]:
