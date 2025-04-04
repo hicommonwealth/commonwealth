@@ -76,6 +76,7 @@ export const UserView = z.object({
   updated_at: z.date().or(z.string()).nullish(),
   ProfileTags: z.array(ProfileTagsView).optional(),
   unsubscribe_uuid: z.string().uuid().nullish().optional(),
+  tier: z.number().nullish().optional(),
 });
 type UserView = z.infer<typeof UserView>;
 

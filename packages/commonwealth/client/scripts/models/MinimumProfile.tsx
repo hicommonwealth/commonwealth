@@ -20,6 +20,7 @@ export function addressToUserProfile(
     avatarUrl: address.User?.profile.avatar_url ?? '',
     name: address.User?.profile.name ?? DEFAULT_NAME,
     address: address?.address,
+    tier: address.User?.tier ?? 0,
     lastActive: (
       address?.last_active ??
       address.User?.created_at ??
