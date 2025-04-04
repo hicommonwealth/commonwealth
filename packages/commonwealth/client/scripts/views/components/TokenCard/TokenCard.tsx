@@ -18,6 +18,7 @@ export interface TokenCardProps {
   marketCap: { current: number; goal: number; isCapped: boolean };
   price: number;
   pricePercentage24HourChange: number;
+  isPinnedToken: boolean;
   mode: TradingMode.Buy | TradingMode.Swap;
   className?: string;
   onCTAClick?: (mode: TradingMode) => void;
@@ -34,6 +35,7 @@ const TokenCard = ({
   marketCap,
   price,
   pricePercentage24HourChange,
+  isPinnedToken,
   mode,
   className,
   onCardBodyClick,
@@ -95,11 +97,13 @@ const TokenCard = ({
         </div>
       </div>
       {/* market cap row */}
-      <MarketCapProgress
-        marketCap={marketCap}
-        currency={currency}
-        onBodyClick={handleBodyClick}
-      />
+      {!isPinnedToken && (
+        <MarketCapProgress
+          marketCap={marketCap}
+          currency={currency}
+          onBodyClick={handleBodyClick}
+        />
+      )}
       {/* action cta */}
       <CWButton
         label={mode}

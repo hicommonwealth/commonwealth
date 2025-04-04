@@ -12,6 +12,7 @@ import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
 import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
+import CommunityIndexer from './community_indexer';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -65,6 +66,7 @@ export const Factories = {
   CommunityGoalReached,
   CommunityStake,
   CommunityTags,
+  CommunityIndexer,
   Contest,
   ContestAction,
   ContestManager,
