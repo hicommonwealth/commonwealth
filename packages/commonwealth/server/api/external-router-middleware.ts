@@ -128,8 +128,7 @@ export function addRateLimiterMiddleware() {
   const baseLimiterOptions = {
     standardHeaders: true,
     legacyHeaders: false,
-    // eslint-disable-next-line @typescript-eslint/require-await
-    keyGenerator: async (req: Request) => {
+    keyGenerator: (req: Request) => {
       return `${req.path}_${req.headers['x-api-key']}`;
     },
   };
@@ -178,5 +177,18 @@ export function addRateLimiterMiddleware() {
     } else {
       return tierOneRateLimiter(req, res, next);
     }
+  });
+
+  // count all authenticated, non-rate-limited requests for analytics
+  router.use(async (req: Request, _, next: NextFunction) => {
+    // This theoretically will never happen since the key is validated during auth
+    if (!req.user || !req.user.id) throw new AppError('Unauthorized', 401);
+
+    await redis.incrementKey(
+      CacheNamespaces.External_Api_Usage_Counter,
+      String(req.user.id),
+      1,
+    );
+    next();
   });
 }
