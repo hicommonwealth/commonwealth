@@ -1,4 +1,4 @@
-import { blobStorage, logger } from '@hicommonwealth/core';
+import { blobStorage, dispose, logger } from '@hicommonwealth/core';
 import { TaskPayloads, config } from '@hicommonwealth/model';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
@@ -178,3 +178,15 @@ export const archiveOutboxTask = {
   input: TaskPayloads.ArchiveOutbox,
   fn: archiveOutbox,
 };
+
+if (import.meta.url.endsWith(process.argv[1])) {
+  archiveOutbox()
+    .then(() => {
+      log.info('Success');
+      dispose()('EXIT', true);
+    })
+    .catch((err) => {
+      log.info('Failed', err);
+      dispose()('ERROR', true);
+    });
+}
