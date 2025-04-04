@@ -131,7 +131,8 @@ const CommunityInformationStep = ({
       <FeatureHint
         title="Chain selection cannot be changed"
         hint={`
-              Choose the chain that your Ethereum project is built on. Chain selection 
+              Choose the chain your project is built on. You can choose between Solana, Ethereum,
+               or Cosmos based chains. Chain selection 
               determines availability of features such as Contests, Stakes, and Weighted Voting.
             `}
       />

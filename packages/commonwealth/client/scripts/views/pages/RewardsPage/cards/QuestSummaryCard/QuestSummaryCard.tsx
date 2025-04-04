@@ -35,7 +35,7 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_after: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
@@ -47,7 +47,7 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
