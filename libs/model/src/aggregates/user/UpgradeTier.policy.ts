@@ -4,6 +4,7 @@ import { events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { getChainNodeUrl } from 'model/src/utils/utils';
@@ -27,12 +28,22 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
     inputs,
     body: {
       NamespaceTransferSingle: async ({ payload }) => {
-        const { from, to: userAddress } = payload.parsedArgs;
-        const { address: namespaceAddress } = payload.rawLog;
-        if (from !== namespaceAddress) return;
+        const {
+          parsedArgs: { from, to: userAddress, id: tokenId },
+          rawLog: { address: namespaceAddress },
+        } = payload;
+        if (tokenId !== 3n) return; // must be community nomination token
+
+        if (from !== ZERO_ADDRESS) return; // must be minted
 
         const community = await models.Community.findOne({
           where: { namespace_address: namespaceAddress },
+          include: [
+            {
+              model: models.ChainNode,
+              required: true,
+            },
+          ],
         });
         if (!community) {
           log.warn(
