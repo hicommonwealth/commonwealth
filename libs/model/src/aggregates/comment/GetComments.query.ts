@@ -146,11 +146,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         } as unknown as z.infer<typeof CommentsView>;
       });
 
-      console.log(
-        'sanitizedComments',
-        JSON.stringify(sanitizedComments, null, 2),
-      );
-
       return schemas.buildPaginatedResponse(
         sanitizedComments,
         comments?.length ? parseInt(`${comments!.at(0)!.total_count}`) : 0,

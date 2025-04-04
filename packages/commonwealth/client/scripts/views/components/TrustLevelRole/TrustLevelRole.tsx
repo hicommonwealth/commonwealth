@@ -3,8 +3,6 @@ import React from 'react';
 import { useFlag } from 'hooks/useFlag';
 import { getCommunityTrustLevel, getUserTrustLevel } from 'utils/trustLevel';
 
-import './TrustLevelRole.scss';
-
 interface TrustLevelRoleProps {
   type: 'community' | 'user';
   level: number;
