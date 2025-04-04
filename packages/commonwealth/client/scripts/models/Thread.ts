@@ -237,6 +237,7 @@ export class Thread implements IUniqueId {
       reactionWeights?: number[];
       userId?: number;
       user_id?: number;
+      user_tier?: number;
       avatar_url?: string | null;
       address_last_active?: string;
       associatedReactions?: ReactionView[];
@@ -374,6 +375,7 @@ export class Thread implements IUniqueId {
         address: t.Address?.address ?? '',
         lastActive: t.address_last_active ?? '',
         avatarUrl: t.avatar_url ?? '',
+        tier: t.user_tier ?? 0,
       };
     }
   }
