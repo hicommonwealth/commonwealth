@@ -168,6 +168,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
           aiPromise = generateCompletion(prompt, {
             stream: false,
+            model: 'gpt-4o-mini',
           });
         }
         // Call the actual comment submission logic passed in as a prop.

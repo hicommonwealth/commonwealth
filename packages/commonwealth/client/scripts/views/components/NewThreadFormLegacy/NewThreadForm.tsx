@@ -399,6 +399,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const prompt = generateThreadPrompt(context);
 
       const threadContent = await generateCompletion(prompt, {
+        model: 'gpt-4o-mini',
         stream: true,
         onError: (error) => {
           console.error('Error generating AI thread:', error);

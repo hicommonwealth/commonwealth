@@ -88,6 +88,7 @@ const CommentEditor = ({
     const prompt = generateCommentPrompt(context);
 
     generateCompletion(prompt, {
+      model: 'gpt-4o-mini',
       stream: true,
       onError: (error) => {
         console.error('Error generating AI comment:', error);
