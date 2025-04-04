@@ -141,7 +141,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     setMinQuestLevelXP(
       calculateTotalXPForQuestActions({
         isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
-        questActions: questActionSubForms.map(({ values }) => ({
+        questActions: [...questActionSubForms].map(({ values }) => ({
           creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
           event_name: values.action as QuestAction,
           quest_id: Math.random(),
@@ -234,7 +234,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           subForm.values.noOfRetweets ||
           subForm.values.noOfReplies) && {
           tweet_engagement_caps: {
-            // TODO: 11391 platform - update platform to allow any 1 of these values
             likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
             retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
