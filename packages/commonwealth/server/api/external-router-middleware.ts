@@ -180,6 +180,7 @@ export function addRateLimiterMiddleware() {
   });
 
   // count all authenticated, non-rate-limited requests for analytics
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   router.use(async (req: Request, _, next: NextFunction) => {
     // This theoretically will never happen since the key is validated during auth
     if (!req.user || !req.user.id) throw new AppError('Unauthorized', 401);
