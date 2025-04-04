@@ -24,7 +24,7 @@ interface VotingActionCardProps {
   defaultVotingOption?: string | undefined;
 }
 
-const VotingActionCard: React.FC<VotingActionCardProps> = ({
+const VotingActionCard = ({
   options,
   timeRemaining,
   canVote,
@@ -34,7 +34,7 @@ const VotingActionCard: React.FC<VotingActionCardProps> = ({
   votingOption,
   toggleShowVotesDrawer,
   defaultVotingOption,
-}) => {
+}: VotingActionCardProps) => {
   const [selectedOption, setSelectedOption] = useState(defaultVotingOption);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const handleVoteClick = () => {

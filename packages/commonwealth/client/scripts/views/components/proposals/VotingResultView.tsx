@@ -17,11 +17,11 @@ interface GovernanceVoteProps {
   governanceUrl?: string;
 }
 
-const VotingResultView: React.FC<GovernanceVoteProps> = ({
+const VotingResultView = ({
   voteOptions,
   showCombineBarOnly,
   governanceUrl,
-}) => {
+}: GovernanceVoteProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const totalVotes = voteOptions?.reduce(
     (sum, option) => sum + parseFloat(option.results || '0'),

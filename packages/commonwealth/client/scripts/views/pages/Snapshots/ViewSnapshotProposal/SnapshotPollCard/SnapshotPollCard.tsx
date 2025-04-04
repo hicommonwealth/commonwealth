@@ -5,6 +5,7 @@ import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
 
+import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import VotingActionCard from 'client/scripts/views/components/proposals/VotingActionCard';
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
 import '../../../../components/Polls/PollCard/PollCard.scss';
@@ -58,19 +59,34 @@ export const SnapshotPollCard = ({
     setInternalVoteInformation(voteInformation);
   }, [voteInformation]);
 
+  const tooltipMessage = internalHasVoted
+    ? 'You have already voted.'
+    : pollEnded
+      ? 'The poll has ended.'
+      : '';
   return (
-    <div className="poll-voting-section">
-      <VotingActionCard
-        options={internalVoteInformation}
-        timeRemaining={timeRemaining}
-        canVote={!internalHasVoted && !pollEnded}
-        hasVoted={hasVoted}
-        onVote={castVote}
-        type="snapshot"
-        votingOption={snapShotVotingResult}
-        toggleShowVotesDrawer={toggleShowVotesDrawer}
-        defaultVotingOption={votedFor}
-      />
-    </div>
+    <CWTooltip
+      placement="top"
+      content={tooltipMessage}
+      renderTrigger={(handleInteraction) => (
+        <div
+          className="poll-voting-section"
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        >
+          <VotingActionCard
+            options={internalVoteInformation}
+            timeRemaining={timeRemaining}
+            canVote={!internalHasVoted && !pollEnded}
+            hasVoted={hasVoted}
+            onVote={castVote}
+            type="snapshot"
+            votingOption={snapShotVotingResult}
+            toggleShowVotesDrawer={toggleShowVotesDrawer}
+            defaultVotingOption={votedFor}
+          />
+        </div>
+      )}
+    />
   );
 };

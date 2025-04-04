@@ -5,6 +5,9 @@
   overflow: hidden;
   padding: 0;
   width: 248px;
+  @include smallInclusive {
+    width: 100%;
+  }
   &.isCollapsed {
     min-height: 40px;
     height: 40px;

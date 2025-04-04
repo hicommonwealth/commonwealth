@@ -348,13 +348,11 @@ export const CWContentPage = ({
               )}
               {!isCollapsed &&
                 sidebarComponents?.map((c) => (
-                  // @ts-expect-error <StrictNullChecks/>
-                  <React.Fragment key={c.label}>{c.item}</React.Fragment>
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
                 ))}
               {proposalDetailSidebar &&
                 proposalDetailSidebar.map((c) => (
-                  // @ts-expect-error <StrictNullChecks/>
-                  <React.Fragment key={c.label}>{c.item}</React.Fragment>
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
                 ))}
             </div>
           )}

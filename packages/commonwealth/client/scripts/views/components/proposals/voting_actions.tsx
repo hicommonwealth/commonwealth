@@ -24,6 +24,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
@@ -58,6 +59,7 @@ export const VotingActions = ({
     return calculateTimeRemaining(end);
   }, [proposal]);
   let user;
+  const isPastDate = moment(proposal?.data?.votingEndTime).isBefore(moment());
 
   const {
     hasVotedYes,
@@ -292,16 +294,34 @@ export const VotingActions = ({
 
         votingActionObj = (
           <>
-            <VotingActionCard
-              options={voteOptions}
-              canVote={canVote && !votingModalOpen}
-              onVote={handleVote}
-              type="cosmos"
-              timeRemaining={timeRemaining}
-              votingOption={voteResult}
-              toggleShowVotesDrawer={toggleShowVotesDrawer}
-              defaultVotingOption={defaultVotingOption}
+            <CWTooltip
+              content={
+                isPastDate
+                  ? 'The poll has ended.'
+                  : hasVotedForAnyChoice
+                    ? 'You have already voted.'
+                    : ''
+              }
+              placement="top"
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  <VotingActionCard
+                    options={voteOptions}
+                    canVote={canVote && !votingModalOpen}
+                    onVote={handleVote}
+                    type="cosmos"
+                    timeRemaining={timeRemaining}
+                    votingOption={voteResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                    defaultVotingOption={defaultVotingOption}
+                  />
+                </div>
+              )}
             />
+
             {/* @ts-expect-error StrictNullChecks*/}
             <ProposalExtensions proposal={proposal} />
           </>

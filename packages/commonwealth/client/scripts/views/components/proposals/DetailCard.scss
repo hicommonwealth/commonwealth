@@ -2,34 +2,16 @@
 .DetailCard {
   display: flex;
   width: 248px;
-  min-height: 344px;
   overflow: hidden;
   flex-direction: column;
   @include smallInclusive {
     width: 100%;
-  }
-  &.isCollapsed {
-    min-height: 40px;
-    height: 40px;
-  }
-  .detail-card-header {
-    display: flex;
-    height: 40px;
-    border: 2px solid $neutral-75;
-    width: 100%;
-    background: $neutral-50;
-    border-radius: 5px 5px 0px 0px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2px 10px;
   }
   .rb-container {
     display: flex;
     width: 100%;
     padding: 16px;
     gap: 8px;
-    border-radius: 0px 0px 5px 5px;
-    border: 2px solid $neutral-150;
     flex-direction: column;
     .label {
       font-size: 14px;

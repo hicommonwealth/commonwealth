@@ -358,12 +358,18 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
+
   <Route
     key="/:scope/proposal/:identifier"
     path="/:scope/proposal/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      // redirect to proposal detail page
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/proposal/:type"
@@ -612,9 +618,15 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/snapshot/:snapshotId/:identifier"
     path="/:scope/snapshot/:snapshotId/:identifier"
-    element={withLayout(ViewSnapshotsProposalPage, {
-      scoped: true,
-    })}
+    // redirect to proposal detail page
+    element={
+      <Navigate
+        to={(parameters) =>
+          // eslint-disable-next-line max-len
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?snapshotId=${parameters.snapshotId}&type=snapshot`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/snapshot/:snapshotId"
