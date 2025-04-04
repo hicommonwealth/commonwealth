@@ -4,9 +4,7 @@ import telegramImg from 'assets/img/share/telegram.png';
 import warpcastImg from 'assets/img/share/warpcast.png';
 import twitterImg from 'assets/img/share/x.png';
 import useAppStatus from 'hooks/useAppStatus';
-import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useMemo } from 'react';
-import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { ShareOption } from './ShareOption';
@@ -17,8 +15,6 @@ export function useShareOptions(
   text?: string,
 ): ShareOption[] {
   const { isIOS, isAndroid } = useAppStatus();
-  const referralsEnabled = useFlag('referrals');
-  const user = useUserStore();
 
   const mobile = isIOS || isAndroid;
 
@@ -36,19 +32,11 @@ export function useShareOptions(
 
   const handleCopy = useCallback(() => {
     async function doAsync() {
-      if (referralsEnabled && url.startsWith('https://common.xyz/')) {
-        const refLink =
-          // TODO: @Marcin to check address access (referral link creation) + related changes in this file
-          url +
-          (user.activeAccount ? `?refcode=${user.activeAccount.address}` : '');
-        await saveToClipboard(refLink, true);
-      } else {
-        await saveToClipboard(url, true);
-      }
+      await saveToClipboard(url, true);
     }
 
     doAsync().catch(console.error);
-  }, [referralsEnabled, url, user.activeAccount]);
+  }, [url]);
 
   /**
    * Some providers, like Telegram and Twitter, support the url param being

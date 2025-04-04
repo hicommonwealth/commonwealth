@@ -9,6 +9,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { computeURLWithReferral } from 'views/components/ShareSection/computeURLWithReferral';
 import { ShareOptionButton } from 'views/components/ShareSection/ShareOptionButton';
 import { useShareOptions } from 'views/components/ShareSection/useShareOptions';
 import './ShareSection.scss';
@@ -113,13 +114,3 @@ export const ShareSection = (props: ShareSectionProps) => {
     </>
   );
 };
-
-function computeURLWithReferral(url: string, refcode: string | undefined) {
-  if (!refcode) {
-    return url;
-  }
-
-  const u = new URL(url);
-  u.searchParams.set('refcode', refcode);
-  return u.toString();
-}
