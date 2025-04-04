@@ -621,8 +621,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {/* {!!contestThreadBannerVisible && <ContestThreadBanner />} */}
-
               <MessageRow
                 hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
