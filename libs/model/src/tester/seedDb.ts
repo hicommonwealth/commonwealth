@@ -3,8 +3,10 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   CosmosGovernanceVersion,
   Role,
+  UserTierMap,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -31,7 +33,7 @@ export const seedDb = async () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           emailNotificationInterval: 'never' as any,
           profile: {},
-          tier: 1,
+          tier: UserTierMap.NewlyVerifiedWallet,
         }),
       ),
     );
@@ -131,7 +133,7 @@ export const seedDb = async () => {
       [
         {
           id: 'alex',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'ALEX',
@@ -144,7 +146,7 @@ export const seedDb = async () => {
         },
         {
           id: 'yearn',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'YFI',
@@ -157,7 +159,7 @@ export const seedDb = async () => {
         },
         {
           id: 'sushi',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'SUSHI',
@@ -171,7 +173,7 @@ export const seedDb = async () => {
         },
         {
           id: 'edgeware',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Edgeware,
           default_symbol: 'EDG',
@@ -185,7 +187,7 @@ export const seedDb = async () => {
         },
         {
           id: 'ethereum',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           profile_count: 2,
           network: ChainNetwork.Ethereum,
@@ -199,7 +201,7 @@ export const seedDb = async () => {
         },
         {
           id: 'osmosis',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'OSMO',
@@ -213,7 +215,7 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-beta',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
@@ -227,7 +229,7 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
@@ -241,7 +243,7 @@ export const seedDb = async () => {
         },
         {
           id: 'common-protocol',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.ERC20,
           default_symbol: 'cmn',
@@ -257,7 +259,7 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-beta-local',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
@@ -271,7 +273,7 @@ export const seedDb = async () => {
         },
         {
           id: 'csdk-v1-local',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
@@ -285,7 +287,7 @@ export const seedDb = async () => {
         },
         {
           id: 'evmos-dev-local',
-          tier: 0,
+          tier: CommunityTierMap.Unverified,
           spam_tier_level: 0,
           network: ChainNetwork.Evmos,
           default_symbol: 'STAKE',

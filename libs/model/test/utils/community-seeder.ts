@@ -1,6 +1,6 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { ChainBase, UserTierMap, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -59,7 +59,7 @@ export async function seedCommunity({
     referral_count: 0,
     referral_eth_earnings: 0,
     xp_points: 0,
-    tier: 4,
+    tier: UserTierMap.ManuallyVerified,
     emailVerified: false,
   }));
 

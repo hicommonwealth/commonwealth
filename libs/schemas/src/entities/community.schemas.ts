@@ -4,6 +4,7 @@ import {
   ChainNetwork,
   ChainType,
   CommunityGoalTypes,
+  CommunityTierMap,
   DefaultPage,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
-export const COMMUNITY_TIER = z.number().int().min(0).max(3);
+export const COMMUNITY_TIER = z.nativeEnum(CommunityTierMap);
 
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional

@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -167,7 +168,9 @@ export async function findOrCreateUser({
       profile: {},
       referred_by_address: referrer_address ?? null,
       privy_id: privyUserId ?? null,
-      tier: 1,
+      tier: privyUserId
+        ? UserTierMap.SocialVerified
+        : UserTierMap.NewlyVerifiedWallet,
     },
     { transaction },
   );
