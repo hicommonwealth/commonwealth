@@ -1,3 +1,4 @@
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 export const TriggerNotificationsWorkflow = {
@@ -17,9 +18,10 @@ export const TriggerNotificationsWorkflow = {
   }),
 };
 
-export const MarkCommunityAsSpam = {
+export const SetCommunityTier = {
   input: z.object({
     community_id: z.string(),
+    tier: z.nativeEnum(CommunityTierMap),
   }),
   output: z.object({
     success: z.boolean(),
