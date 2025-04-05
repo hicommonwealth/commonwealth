@@ -17,6 +17,15 @@ export const TriggerNotificationsWorkflow = {
   }),
 };
 
+export const MarkCommunityAsSpam = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
 export const EnableDigestEmail = {
   input: z.object({
     communityId: z.string(),
