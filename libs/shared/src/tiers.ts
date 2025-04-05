@@ -25,11 +25,11 @@ export interface UserTier extends Tier {
 export enum UserTierMap {
   IncompleteUser = 0,
   BannedUser = 1,
-  NewVerifiedWallet = 2,
+  NewlyVerifiedWallet = 2,
   VerifiedWallet = 3,
   SocialVerified = 4,
   ChainVerified = 5,
-  ManualVerification = 6,
+  ManuallyVerified = 6,
 }
 
 export const USER_TIERS = {
@@ -57,7 +57,7 @@ export const USER_TIERS = {
       },
     },
   },
-  [UserTierMap.NewVerifiedWallet]: {
+  [UserTierMap.NewlyVerifiedWallet]: {
     name: 'New Verified Wallet',
     description: 'Verified wallet younger than 1 week',
     clientInfo: {
@@ -113,7 +113,7 @@ export const USER_TIERS = {
       icon: '🔗',
     },
   },
-  [UserTierMap.ManualVerification]: {
+  [UserTierMap.ManuallyVerified]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
@@ -128,7 +128,7 @@ export enum CommunityTierMap {
   Unverified = 1,
   SocialVerified = 2,
   CommunityVerified = 3,
-  ManualVerification = 4,
+  ManuallyVerified = 4,
   PremiumVerification = 5,
 }
 
@@ -161,7 +161,7 @@ export const COMMUNITY_TIERS = {
       icon: '🔗',
     },
   },
-  [CommunityTierMap.ManualVerification]: {
+  [CommunityTierMap.ManuallyVerified]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
