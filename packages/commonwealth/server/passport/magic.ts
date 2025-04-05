@@ -17,6 +17,7 @@ import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
+  UserTierMap,
   WalletId,
   WalletSsoSource,
   deserializeCanvas,
@@ -285,7 +286,7 @@ async function createNewMagicUser({
           // name: oauth_username, ?
         },
         referred_by_address: referrer_address,
-        tier: 3, // verified SSO
+        tier: UserTierMap.SocialVerified, // verified SSO
       },
       { transaction },
     );

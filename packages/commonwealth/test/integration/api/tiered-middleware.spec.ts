@@ -1,6 +1,6 @@
 import { Actor, dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, UserTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
@@ -93,16 +93,16 @@ describe('Tiered middleware', () => {
     server = await testServer();
 
     const [member1_user] = await tester.seed('User', {
-      tier: 0,
+      tier: UserTierMap.IncompleteUser,
       created_at: new Date(),
     });
     const [member2_user] = await tester.seed('User', {
-      tier: 0,
+      tier: UserTierMap.IncompleteUser,
       created_at: moment().subtract(2, 'weeks'),
     });
     const [member3_user] = await tester.seed('User', {
       created_at: new Date(),
-      tier: 3,
+      tier: UserTierMap.SocialVerified,
     });
     const [community] = await tester.seed('Community', {
       chain_node_id: server.e2eTestEntities.testChainNodes[0].id,
