@@ -17,6 +17,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
+import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
@@ -50,6 +51,7 @@ import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/Com
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
+import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../component_kit/new_designs/cw_toggle';
@@ -59,7 +61,6 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
@@ -75,6 +76,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const location = useLocation();
 
   const user = useUserStore();
+  const { data: userProfile } = useFetchProfileByIdQuery({
+    userId: user.id,
+    apiCallEnabled: !!user.id,
+  });
 
   const {
     aiInteractionsToggleEnabled,
@@ -318,6 +323,14 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         return;
       }
 
+      if (err?.message?.includes('Exceeded content creation limit')) {
+        console.log('NewThreadForm: Content creation limit exceeded');
+        notifyError(
+          'Exceeded content creation limit. Please try again later based on your trust level.',
+        );
+        return;
+      }
+
       if (err?.message?.includes('limit')) {
         console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
@@ -374,9 +387,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const showBanner =
     selectedCommunityId && !userSelectedAddress && isBannerVisible;
 
-  const contestThreadBannerVisible =
-    isContestAvailable && hasTopicOngoingContest;
-
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
@@ -399,6 +409,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const prompt = generateThreadPrompt(context);
 
       const threadContent = await generateCompletion(prompt, {
+        model: 'gpt-4o-mini',
         stream: true,
         onError: (error) => {
           console.error('Error generating AI thread:', error);
@@ -625,14 +636,26 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {!!contestThreadBannerVisible && <ContestThreadBanner />}
-
               <MessageRow
                 hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"
               />
+
+              {community &&
+                userProfile &&
+                community.spam_tier_level >= 0 &&
+                userProfile.tier <= community.spam_tier_level && (
+                  <CWBanner
+                    type="warning"
+                    body={
+                      "Your post will be marked as spam due to the Community's Trust Settings. " +
+                      'You can increase your trust level by verifying an SSO or adding a wallet with Balance.'
+                    }
+                    className="spam-trust-banner"
+                  />
+                )}
 
               <div className="buttons-row">
                 <CWButton
@@ -654,20 +677,22 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   />
                 )}
 
-                <div className="ai-toggle-wrapper">
-                  <CWToggle
-                    className="ai-toggle"
-                    icon="sparkle"
-                    iconColor="#757575"
-                    checked={aiCommentsToggleEnabled}
-                    onChange={() => {
-                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                    }}
-                  />
-                  <CWText type="caption" className="toggle-label">
-                    AI initial comment
-                  </CWText>
-                </div>
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <div className="ai-toggle-wrapper">
+                    <CWToggle
+                      className="ai-toggle"
+                      icon="sparkle"
+                      iconColor="#757575"
+                      checked={aiCommentsToggleEnabled}
+                      onChange={() => {
+                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                      }}
+                    />
+                    <CWText type="caption" className="toggle-label">
+                      AI initial comment
+                    </CWText>
+                  </div>
+                )}
 
                 <CWButton
                   label="Create"

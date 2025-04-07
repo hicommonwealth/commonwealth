@@ -194,6 +194,7 @@ class Contest extends ContractBase {
     voterShare: number,
     walletAddress: string,
     exchangeToken: string,
+    judgeId: number,
   ): Promise<string> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
@@ -207,6 +208,7 @@ class Contest extends ContractBase {
         voterShare,
         walletAddress,
         exchangeToken,
+        judgeId,
       );
       // @ts-expect-error StrictNullChecks
       const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);

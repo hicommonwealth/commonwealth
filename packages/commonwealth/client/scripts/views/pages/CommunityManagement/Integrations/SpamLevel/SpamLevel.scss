@@ -32,3 +32,17 @@
     }
   }
 }
+
+.docs-link {
+  margin-top: 4px;
+
+  a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

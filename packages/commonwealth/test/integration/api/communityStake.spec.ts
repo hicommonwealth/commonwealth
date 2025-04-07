@@ -1,5 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
 import { commonProtocol, type UserInstance } from '@hicommonwealth/model';
+import { UserTierMap } from '@hicommonwealth/shared';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -45,7 +46,13 @@ describe('POST communityStakes Tests', () => {
     const controller = new ServerCommunitiesController(server.models, null);
     const user: UserInstance = buildUser({
       models: server.models,
-      userAttributes: { email: '', id: 1, isAdmin: true, profile: {}, tier: 4 },
+      userAttributes: {
+        email: '',
+        id: 1,
+        isAdmin: true,
+        profile: {},
+        tier: UserTierMap.ManuallyVerified,
+      },
     }) as UserInstance;
 
     const createResponse = await controller.createCommunityStake({
