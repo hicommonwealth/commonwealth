@@ -7,7 +7,6 @@ import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import { Avatar } from 'views/components/Avatar';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
@@ -86,8 +85,6 @@ const XPTable = () => {
     xp: rank.xp_points,
   }));
 
-  const hasMorePages = rankings.length === currentPage * USERS_PER_PAGE;
-
   return (
     <section className="XPTable">
       <div className="filters">
@@ -139,14 +136,6 @@ const XPTable = () => {
               },
             }))}
           />
-          {hasMorePages && (
-            <div className="pagination">
-              <CWButton
-                label="Load More"
-                onClick={() => setCurrentPage(currentPage + 1)}
-              />
-            </div>
-          )}
         </>
       )}
     </section>
