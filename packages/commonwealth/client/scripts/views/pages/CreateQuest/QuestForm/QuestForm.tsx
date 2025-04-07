@@ -22,7 +22,7 @@ import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import './QuestForm.scss';
 import { QuestFormProps } from './types';
 import useQuestForm from './useQuestForm';
-import { questFormValidationSchema } from './validation';
+import { buildDynamicQuestFormValidationSchema } from './validation';
 
 const QuestForm = (props: QuestFormProps) => {
   const { mode, initialValues } = props;
@@ -41,6 +41,7 @@ const QuestForm = (props: QuestFormProps) => {
     idealStartDate,
     minEndDate,
     formMethodsRef,
+    minQuestLevelXP,
   } = useQuestForm(props);
 
   const popoverProps = usePopover();
@@ -48,7 +49,9 @@ const QuestForm = (props: QuestFormProps) => {
   return (
     <CWForm
       ref={formMethodsRef}
-      validationSchema={questFormValidationSchema}
+      validationSchema={buildDynamicQuestFormValidationSchema({
+        max_xp_to_end_lower_limit: minQuestLevelXP || 0,
+      })}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       {...(initialValues
@@ -173,11 +176,12 @@ const QuestForm = (props: QuestFormProps) => {
                       <br />
 
                       <CWText type="b2">
-                        &#9679; Join &apos;Common&apos; Community to earn 70 XP
+                        &#9679; Join &apos;Common&apos; Community to earn 70
+                        Aura
                       </CWText>
 
                       <CWText type="b2">
-                        &#9679; Participate in any contest to earn 90 XP
+                        &#9679; Participate in any contest to earn 90 Aura
                       </CWText>
                     </div>
                   }

@@ -11,6 +11,7 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
+import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
@@ -35,6 +36,15 @@ const CommunityInformationStep = ({
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: 'create-community',
+  });
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
   >({
@@ -53,6 +63,11 @@ const CommunityInformationStep = ({
       (chain) => String(chain.value) === values?.chain?.value,
     );
 
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
+
     try {
       const input = buildCreateCommunityInput({
         id: values.communityId,
@@ -62,11 +77,16 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
+        turnstileToken: turnstileToken || undefined,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
     } catch (err) {
       notifyError(err.message);
+      // Reset turnstile if there's an error
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
     }
   };
 
@@ -125,6 +145,9 @@ const CommunityInformationStep = ({
         withSocialLinks={false} // TODO: Set this when design figures out how we will integrate the social links
         isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Launch Community"
+        isTurnstileEnabled={isTurnstileEnabled}
+        turnstileToken={turnstileToken}
+        TurnstileWidget={isTurnstileEnabled ? TurnstileWidget : undefined}
       />
     </div>
   );

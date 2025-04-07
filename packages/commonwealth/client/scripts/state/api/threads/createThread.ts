@@ -22,6 +22,7 @@ interface CreateThreadProps {
   body?: string;
   url?: string;
   ethChainIdOrBech32Prefix?: string | number;
+  turnstileToken?: string | null;
 }
 
 export const buildCreateThreadInput = async ({
@@ -35,6 +36,7 @@ export const buildCreateThreadInput = async ({
   body,
   url,
   ethChainIdOrBech32Prefix,
+  turnstileToken,
 }: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
@@ -55,6 +57,7 @@ export const buildCreateThreadInput = async ({
     url,
     read_only: false,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
+    turnstile_token: turnstileToken,
   };
 };
 

@@ -148,7 +148,7 @@ const QuestCard = ({
         </div>
         <CWDivider />
         <div className="xp-row">
-          <CWTag type="proposal" label={`${xpPoints} XP`} />
+          <CWTag type="proposal" label={`${xpPoints} Aura`} />
           <CWButton
             iconLeft="upvote"
             label="Leaderboard"
