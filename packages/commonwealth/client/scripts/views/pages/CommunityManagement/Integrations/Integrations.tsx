@@ -10,6 +10,7 @@ import './Integrations.scss';
 import Snapshots from './Snapshots';
 import Stake from './Stake';
 import Token from './Token';
+import Tokenization from './Tokenization';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
@@ -32,6 +33,7 @@ const Integrations = () => {
         <Token />
         <Stake />
         {showSnapshotIntegration && <Snapshots />}
+        <Tokenization />
         <Discord />
         <Webhooks />
         <CustomTOS />
