@@ -14,6 +14,7 @@ import type { CommentEditorProps } from 'views/components/Comments/CommentEditor
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
@@ -23,22 +24,15 @@ export type MobileInputProps = CommentEditorProps & {
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
   parentCommentText?: string;
+  initialPrompt?: string;
 };
 
-export const MobileInput = (props: MobileInputProps) => {
-  const {
-    onFocus,
-    setContentDelta,
-    handleSubmitComment,
-    isReplying,
-    replyingToAuthor,
-    onCancel,
-    onAiReply,
-    aiCommentsToggleEnabled,
-    parentCommentText,
-    thread: originalThread,
-  } = props;
-
+export const MobileInput = ({
+  onFocus,
+  replyingToAuthor,
+  aiCommentsToggleEnabled,
+  initialPrompt,
+}: MobileInputProps) => {
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
@@ -67,9 +61,9 @@ export const MobileInput = (props: MobileInputProps) => {
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
       stickyCommentReset();
-      onCancel(e);
+      onFocus && onFocus();
     },
-    [stickyCommentReset, onCancel],
+    [stickyCommentReset, onFocus],
   );
 
   const handleChange = useCallback(
@@ -158,10 +152,9 @@ export const MobileInput = (props: MobileInputProps) => {
       // --- Traditional Comment Submission Logic ---
       try {
         let aiPromise;
-        if (aiCommentsToggleEnabled && onAiReply) {
+        if (aiCommentsToggleEnabled && onFocus) {
           const context = `
-          Thread: ${originalThread?.title || ''}
-          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+          Thread: ${initialPrompt || ''}
           `;
 
           const prompt = generateCommentPrompt(context);
@@ -175,11 +168,11 @@ export const MobileInput = (props: MobileInputProps) => {
         setValue('');
         stickyCommentReset();
 
-        if (aiPromise && onAiReply) {
+        if (aiPromise && onFocus) {
           try {
             const aiReply = await aiPromise;
             if (aiReply) {
-              onAiReply(aiReply);
+              onFocus();
             }
           } catch (error) {
             console.error('AI generation failed:', error);
@@ -205,15 +198,16 @@ export const MobileInput = (props: MobileInputProps) => {
     return filtered.length > 0 ? filtered[0].profile?.avatarUrl : undefined;
   }, [user]);
 
-  const placeholder =
-    mode === 'thread'
-      ? 'Create a thread...'
-      : isReplying
-        ? `Replying to ${replyingToAuthor} ...`
-        : 'Comment on thread...';
+  const getPlaceholderText = () => {
+    if (mode === 'thread') return 'Create a thread...';
+    if (mode === 'community') return 'Create a community...';
+    return replyingToAuthor
+      ? `Reply to ${replyingToAuthor}...`
+      : 'Write a comment...';
+  };
 
   return (
-    <div className="MobileInput">
+    <div className="MobileInput" onClick={handleClose}>
       <div className="container">
         {avatarURL && (
           <div className="AvatarBox">
@@ -223,7 +217,7 @@ export const MobileInput = (props: MobileInputProps) => {
         <div className="input-container">
           <input
             type="text"
-            placeholder={placeholder}
+            placeholder={getPlaceholderText()}
             onKeyDown={handleKeyDown}
             onChange={handleChange}
             value={value}
@@ -231,7 +225,7 @@ export const MobileInput = (props: MobileInputProps) => {
           />
           <div className="ai-toggle-row">
             <div className="RightButton">
-              {isReplying && (
+              {replyingToAuthor && (
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
@@ -239,6 +233,11 @@ export const MobileInput = (props: MobileInputProps) => {
           </div>
         </div>
       </div>
+      {aiCommentsToggleEnabled && (
+        <div className="ai-icon">
+          <CWIcon iconName="sparkle" />
+        </div>
+      )}
     </div>
   );
 };
