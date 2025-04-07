@@ -141,6 +141,7 @@ const SignTransactionsStep = ({
       voterShare,
       walletAddress,
       exchangeToken,
+      judgeId: 1,
     } as DeploySingleJudgedContestOnchainProps;
 
     const recurring = {
