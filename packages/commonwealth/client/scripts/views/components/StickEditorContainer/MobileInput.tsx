@@ -236,7 +236,14 @@ export const MobileInput = (props: MobileInputProps) => {
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
-              <CWIconButton iconName="paperPlaneTilt" onClick={handleSubmit} />
+              <CWIconButton
+                iconName="paperPlaneTilt"
+                onClick={() => {
+                  handleSubmit().catch((error) => {
+                    console.error('Error submitting comment:', error);
+                  });
+                }}
+              />
             </div>
           </div>
         </div>
