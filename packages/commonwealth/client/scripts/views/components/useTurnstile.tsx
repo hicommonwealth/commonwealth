@@ -32,17 +32,6 @@ interface UseTurnstileResult {
 export const useTurnstile = (
   options: UseTurnstileOptions,
 ): UseTurnstileResult => {
-  if (!options.siteKey) {
-    console.warn('Turnstile site key not provided');
-    return {
-      turnstileToken: null,
-      setTurnstileToken: () => {},
-      resetTurnstile: () => {},
-      isTurnstileEnabled: false,
-      TurnstileWidget: () => <></>,
-    };
-  }
-
   const {
     siteKey,
     action,
@@ -127,13 +116,24 @@ export const useTurnstile = (
     action,
   ]);
 
-  return {
-    turnstileToken,
-    setTurnstileToken,
-    resetTurnstile,
-    isTurnstileEnabled,
-    TurnstileWidget,
-  };
+  if (!options.siteKey) {
+    console.warn('Turnstile site key not provided');
+    return {
+      turnstileToken: null,
+      setTurnstileToken: () => {},
+      resetTurnstile: () => {},
+      isTurnstileEnabled: false,
+      TurnstileWidget: () => <></>,
+    };
+  } else {
+    return {
+      turnstileToken,
+      setTurnstileToken,
+      resetTurnstile,
+      isTurnstileEnabled,
+      TurnstileWidget,
+    };
+  }
 };
 
 export default useTurnstile;
