@@ -7,7 +7,9 @@ import {
   CWModalHeader,
 } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
-import React from 'react';
+import React, { useState } from 'react';
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './TokenizationModal.scss';
@@ -25,6 +27,34 @@ const TokenizationModal = ({
   onCancel,
   onSaveChanges,
 }: TokenizationModalProps) => {
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [tokenizeAllTopics, setTokenizeAllTopics] = useState(false);
+
+  const communityId = app.activeChainId() || '';
+  const { data: topics = [] } = useFetchTopicsQuery({
+    communityId,
+    includeArchivedTopics: false,
+    apiEnabled: !!communityId,
+  });
+
+  const topicOptions = topics.map((topic) => ({
+    label: topic.name,
+    value: topic.id?.toString() || '',
+  }));
+
+  const handleTopicSelection = (selectedOptions: any) => {
+    setSelectedTopics(selectedOptions.map((option: any) => option.value));
+  };
+
+  const handleTokenizeAllTopicsChange = (checked: boolean) => {
+    setTokenizeAllTopics(checked);
+    if (checked) {
+      setSelectedTopics(topicOptions.map((option) => option.value));
+    } else {
+      setSelectedTopics([]);
+    }
+  };
+
   return (
     <div className="TokenizationModal">
       <CWModalHeader label="Tokenization Settings" onModalClose={onCancel} />
@@ -63,14 +93,27 @@ const TokenizationModal = ({
             <CWText type="b2" fontWeight="semiBold">
               Tokenized Topics
             </CWText>
-            <CWCheckbox label="Tokenize all topics" name="tokenizeAllTopics" />
+            <CWCheckbox
+              label="Tokenize all topics"
+              name="tokenizeAllTopics"
+              checked={tokenizeAllTopics}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleTokenizeAllTopicsChange(e.target.checked)
+              }
+            />
           </div>
 
           <CWSelectList
             name="searchTopics"
             placeholder="Search Topics"
             isSearchable={true}
-            options={[]}
+            options={topicOptions}
+            isMulti={true}
+            value={topicOptions.filter((option) =>
+              selectedTopics.includes(option.value),
+            )}
+            onChange={handleTopicSelection}
+            isDisabled={tokenizeAllTopics}
           />
         </div>
 
