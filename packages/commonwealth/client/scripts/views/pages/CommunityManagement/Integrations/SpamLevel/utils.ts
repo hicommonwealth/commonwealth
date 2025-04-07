@@ -1,7 +1,5 @@
 import { USER_TIERS, UserTierMap } from '@hicommonwealth/shared';
 
-export const DisableSpamLevel = -1 as const;
-
 export const SpamLevelOptions = [
   {
     label: `${

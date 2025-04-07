@@ -6,6 +6,7 @@ import {
   CommunityGoalTypes,
   CommunityTierMap,
   DefaultPage,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
@@ -24,7 +25,11 @@ export const Community = z.object({
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
-  spam_tier_level: z.union([z.literal(-1), z.literal(2), z.literal(3)]),
+  spam_tier_level: z.union([
+    z.literal(DisabledCommunitySpamTier),
+    z.literal(2),
+    z.literal(3),
+  ]),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),

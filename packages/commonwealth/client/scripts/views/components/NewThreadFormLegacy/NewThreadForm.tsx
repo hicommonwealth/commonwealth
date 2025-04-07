@@ -1,4 +1,5 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { DisabledCommunitySpamTier } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import {
   SessionKeyError,
@@ -644,7 +645,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
               {community &&
                 userProfile &&
-                community.spam_tier_level >= 0 &&
+                community.spam_tier_level !== DisabledCommunitySpamTier &&
                 userProfile.tier <= community.spam_tier_level && (
                   <CWBanner
                     type="warning"

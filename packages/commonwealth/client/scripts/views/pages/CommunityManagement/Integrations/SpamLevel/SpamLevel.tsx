@@ -1,4 +1,4 @@
-import { UserTierMap } from '@hicommonwealth/shared';
+import { DisabledCommunitySpamTier, UserTierMap } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
@@ -12,7 +12,7 @@ import {
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './SpamLevel.scss';
-import { DisableSpamLevel, SpamLevelOptions } from './utils';
+import { SpamLevelOptions } from './utils';
 
 const SpamLevel = () => {
   const communityId = app.activeChainId() || '';
@@ -30,25 +30,25 @@ const SpamLevel = () => {
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [spamTierLevel, setSpamTierLevel] = useState<
-    | typeof DisableSpamLevel
+    | typeof DisabledCommunitySpamTier
     | UserTierMap.VerifiedWallet
     | UserTierMap.NewlyVerifiedWallet
-  >(DisableSpamLevel);
+  >(DisabledCommunitySpamTier);
 
   useEffect(() => {
     if (!isLoadingCommunity && community) {
       const tier =
         typeof community.spam_tier_level === 'number'
           ? community.spam_tier_level
-          : DisableSpamLevel;
+          : DisabledCommunitySpamTier;
 
-      const isSpamEnabled = tier !== DisableSpamLevel;
+      const isSpamEnabled = tier !== DisabledCommunitySpamTier;
       setIsEnabled(isSpamEnabled);
 
       setSpamTierLevel(
-        tier >= DisableSpamLevel && tier <= UserTierMap.VerifiedWallet
+        tier >= DisabledCommunitySpamTier && tier <= UserTierMap.VerifiedWallet
           ? tier
-          : DisableSpamLevel,
+          : DisabledCommunitySpamTier,
       );
     }
   }, [isLoadingCommunity, community]);
@@ -85,8 +85,8 @@ const SpamLevel = () => {
     setIsEnabled(newIsEnabled);
 
     if (!newIsEnabled) {
-      setSpamTierLevel(DisableSpamLevel);
-    } else if (spamTierLevel === DisableSpamLevel) {
+      setSpamTierLevel(DisabledCommunitySpamTier);
+    } else if (spamTierLevel === DisabledCommunitySpamTier) {
       setSpamTierLevel(UserTierMap.NewlyVerifiedWallet);
     }
   };

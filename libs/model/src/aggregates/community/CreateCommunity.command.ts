@@ -7,6 +7,7 @@ import {
   ChainType,
   CommunityTierMap,
   DefaultPage,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
@@ -124,7 +125,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             id,
             name,
             tier: CommunityTierMap.Unverified,
-            spam_tier_level: -1,
+            spam_tier_level: DisabledCommunitySpamTier,
             default_symbol,
             icon_url,
             description,
