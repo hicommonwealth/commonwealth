@@ -7,9 +7,10 @@ import {
   CWModalHeader,
 } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import app from 'state';
-import { useFetchTopicsQuery } from 'state/api/topics';
+import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './TokenizationModal.scss';
@@ -34,6 +35,7 @@ const TokenizationModal = ({
 }: TokenizationModalProps) => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [tokenizeAllTopics, setTokenizeAllTopics] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const communityId = app.activeChainId() || '';
   const { data: topics = [] } = useFetchTopicsQuery({
@@ -41,6 +43,8 @@ const TokenizationModal = ({
     includeArchivedTopics: false,
     apiEnabled: !!communityId,
   });
+
+  const { mutateAsync: editTopic } = useEditTopicMutation();
 
   const topicOptions = topics.map((topic) => ({
     label: topic.name,
@@ -57,6 +61,28 @@ const TokenizationModal = ({
       setSelectedTopics(topicOptions.map((option) => option.value));
     } else {
       setSelectedTopics([]);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    try {
+      const updatePromises = selectedTopics.map((topicId) =>
+        editTopic({
+          topic_id: parseInt(topicId, 10),
+          community_id: communityId,
+          allow_tokenized_threads: true,
+        }),
+      );
+
+      await Promise.all(updatePromises);
+      notifySuccess('Topics updated successfully');
+      onSaveChanges();
+    } catch (error) {
+      console.error('Error updating topics:', error);
+      notifyError('Failed to update topics');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -139,7 +165,8 @@ const TokenizationModal = ({
         <CWButton
           buttonType="primary"
           label="Save Changes"
-          onClick={onSaveChanges}
+          onClick={handleSaveChanges}
+          disabled={isSaving}
         />
       </CWModalFooter>
     </div>
