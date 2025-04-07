@@ -168,6 +168,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
           aiPromise = generateCompletion(prompt, {
             stream: false,
+            model: 'gpt-4o-mini',
           });
         }
         // Call the actual comment submission logic passed in as a prop.
@@ -235,6 +236,14 @@ export const MobileInput = (props: MobileInputProps) => {
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
+              <CWIconButton
+                iconName="paperPlaneTilt"
+                onClick={() => {
+                  handleSubmit().catch((error) => {
+                    console.error('Error submitting comment:', error);
+                  });
+                }}
+              />
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ export interface DeploySingleJudgedContestOnchainProps {
   voterShare: number;
   walletAddress: string;
   exchangeToken: string;
+  judgeId: number;
 }
 
 const deploySingleJudgedContestOnchain = async ({
@@ -23,6 +24,7 @@ const deploySingleJudgedContestOnchain = async ({
   voterShare,
   walletAddress,
   exchangeToken,
+  judgeId,
 }: DeploySingleJudgedContestOnchainProps) => {
   const contest = new Contest(
     '',
@@ -38,6 +40,7 @@ const deploySingleJudgedContestOnchain = async ({
     voterShare,
     walletAddress,
     exchangeToken,
+    judgeId,
   );
 };
 
