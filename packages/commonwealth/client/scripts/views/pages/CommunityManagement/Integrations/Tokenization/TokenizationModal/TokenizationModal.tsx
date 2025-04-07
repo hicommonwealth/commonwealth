@@ -8,7 +8,7 @@ import {
 } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -36,6 +36,7 @@ const TokenizationModal = ({
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [tokenizeAllTopics, setTokenizeAllTopics] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [deselectedTopics, setDeselectedTopics] = useState<string[]>([]);
 
   const communityId = app.activeChainId() || '';
   const { data: topics = [] } = useFetchTopicsQuery({
@@ -46,21 +47,44 @@ const TokenizationModal = ({
 
   const { mutateAsync: editTopic } = useEditTopicMutation();
 
+  useEffect(() => {
+    const tokenizedTopicIds = topics
+      .filter((topic) => topic.allow_tokenized_threads)
+      .map((topic) => topic.id?.toString() || '')
+      .filter(Boolean);
+    setSelectedTopics(tokenizedTopicIds);
+  }, [topics]);
+
   const topicOptions = topics.map((topic) => ({
     label: topic.name,
     value: topic.id?.toString() || '',
   }));
 
   const handleTopicSelection = (selectedOptions: TopicOption[]) => {
-    setSelectedTopics(selectedOptions.map((option) => option.value));
+    const selectedIds = selectedOptions.map((option) => option.value);
+
+    const newlyDeselectedTopics = selectedTopics.filter(
+      (id) => !selectedIds.includes(id),
+    );
+
+    setDeselectedTopics([...deselectedTopics, ...newlyDeselectedTopics]);
+
+    setSelectedTopics(selectedIds);
+    setTokenizeAllTopics(selectedIds.length === topicOptions.length);
   };
 
   const handleTokenizeAllTopicsChange = (checked: boolean) => {
     setTokenizeAllTopics(checked);
     if (checked) {
       setSelectedTopics(topicOptions.map((option) => option.value));
+      setDeselectedTopics([]);
     } else {
       setSelectedTopics([]);
+      const previouslyTokenizedTopics = topics
+        .filter((topic) => topic.allow_tokenized_threads)
+        .map((topic) => topic.id?.toString() || '')
+        .filter(Boolean);
+      setDeselectedTopics(previouslyTokenizedTopics);
     }
   };
 
@@ -75,7 +99,15 @@ const TokenizationModal = ({
         }),
       );
 
-      await Promise.all(updatePromises);
+      const deselectPromises = deselectedTopics.map((topicId) =>
+        editTopic({
+          topic_id: parseInt(topicId, 10),
+          community_id: communityId,
+          allow_tokenized_threads: false,
+        }),
+      );
+
+      await Promise.all([...updatePromises, ...deselectPromises]);
       notifySuccess('Topics updated successfully');
       onSaveChanges();
     } catch (error) {
@@ -144,7 +176,6 @@ const TokenizationModal = ({
               selectedTopics.includes(option.value),
             )}
             onChange={handleTopicSelection}
-            isDisabled={tokenizeAllTopics}
           />
         </div>
 

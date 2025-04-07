@@ -37,5 +37,17 @@
       align-items: center;
       justify-content: space-between;
     }
+
+    .CWSelectList {
+      width: 100%;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+
+    .SelectList {
+      width: 100%;
+    }
   }
 }
