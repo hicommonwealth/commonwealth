@@ -48,6 +48,7 @@ class AddressInfo extends Account {
           '', // user avatar url - not needed for auth user
           community.id,
           foundAddress?.lastActive?.toDate?.() || null,
+          0,
         );
         return profile;
       })(),

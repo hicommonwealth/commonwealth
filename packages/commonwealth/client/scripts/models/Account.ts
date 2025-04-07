@@ -100,6 +100,7 @@ class Account {
         signedInProfile.avatarUrl ?? '',
         updatedProfile.chain,
         signedInProfile.lastActive ?? null,
+        0,
       );
       // manually trigger an update signal when data is fetched
       NewProfilesController.Instance.isFetched.emit('redraw');
