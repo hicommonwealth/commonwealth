@@ -53,6 +53,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const [availableQuestActions, setAvailableQuestActions] = useState<
     QuestAction[]
   >([...questActions.common]);
+  const availableQuestActionsRef = useRef([...availableQuestActions]);
+  availableQuestActionsRef.current = availableQuestActions;
 
   const {
     addSubForm,
@@ -449,9 +451,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   // recalculate `availableQuestActions` when quest type changes
   formMethodsRef?.current?.watch((values) => {
     const newActions = [...questActions[values.quest_type]];
+    const oldActions = [...(availableQuestActionsRef.current || [])];
 
     // if quest type changes, reset all quest actions
-    if (!isEqual(availableQuestActions, newActions)) {
+    if (!isEqual([...oldActions], newActions)) {
       setQuestActionSubFormsInitialState();
     }
 
