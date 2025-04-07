@@ -87,7 +87,7 @@ export const useTurnstile = (
       notifyError(error || 'Verification failed. Please try again.');
       externalOnError?.(error);
     },
-    [externalOnError, action],
+    [externalOnError],
   );
 
   // Turnstile component that can be rendered where needed
