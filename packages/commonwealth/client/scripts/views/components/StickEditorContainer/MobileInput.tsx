@@ -2,14 +2,12 @@ import { notifyError } from 'controllers/app/notifications';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import Turnstile, { useTurnstile } from 'react-turnstile';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -17,6 +15,7 @@ import { StickCommentContext } from 'views/components/StickEditorContainer/conte
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
@@ -44,7 +43,6 @@ export const MobileInput = (props: MobileInputProps) => {
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
-  const { isDarkMode } = useDarkMode();
   const { generateCompletion } = useAiCompletion();
   const stickyCommentReset = useActiveStickCommentReset();
 
@@ -69,9 +67,15 @@ export const MobileInput = (props: MobileInputProps) => {
 
   // Add turnstile related code
   const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
-  const isTurnstileEnabled = !!turnstileSiteKey && (user.tier || 0) < 3;
-  const turnstile = useTurnstile();
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    siteKey: turnstileSiteKey,
+    action: 'mobile_create_thread',
+  });
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -156,10 +160,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
         // Clear the input and reset turnstile
         setValue('');
-        if (turnstile) {
-          turnstile.reset();
-          setTurnstileToken(null);
-        }
+        resetTurnstile();
 
         // Construct the correct navigation path with proper URL encoding
         const encodedTitle = encodeURIComponent(
@@ -175,10 +176,7 @@ export const MobileInput = (props: MobileInputProps) => {
         notifyError('Failed to create thread');
 
         // Reset turnstile on error
-        if (turnstile) {
-          turnstile.reset();
-          setTurnstileToken(null);
-        }
+        resetTurnstile();
       }
     } else {
       // --- Traditional Comment Submission Logic ---
@@ -268,27 +266,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
       {mode === 'thread' && isTurnstileEnabled && (
         <div className="mobile-turnstile-container">
-          <Turnstile
-            sitekey={turnstileSiteKey || ''}
-            onVerify={(token) => {
-              console.log('Mobile Turnstile verified', token);
-              setTurnstileToken(token);
-            }}
-            onExpire={() => {
-              console.log('Mobile Turnstile expired');
-              setTurnstileToken(null);
-              turnstile.reset();
-            }}
-            onError={() => {
-              console.log('Mobile Turnstile error');
-              setTurnstileToken(null);
-              notifyError('Turnstile verification failed. Please try again.');
-            }}
-            appearance="interaction-only"
-            theme={isDarkMode ? 'dark' : 'light'}
-            fixedSize={false}
-            size="compact"
-          />
+          <TurnstileWidget />
         </div>
       )}
     </div>

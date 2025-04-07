@@ -31,9 +31,6 @@ export type CommunityInformationFormProps = {
   submitBtnLabel: string;
   // Turnstile props
   isTurnstileEnabled?: boolean;
-  turnstileSiteKey?: string;
-  onTurnstileVerify?: (token: string) => void;
-  onTurnstileError?: () => void;
-  onTurnstileExpire?: () => void;
   turnstileToken?: string | null;
+  TurnstileWidget?: React.FC;
 };

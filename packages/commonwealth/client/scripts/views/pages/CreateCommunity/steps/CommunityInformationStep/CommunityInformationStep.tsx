@@ -1,8 +1,7 @@
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useState } from 'react';
-import { useTurnstile } from 'react-turnstile';
+import React from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
@@ -11,8 +10,8 @@ import {
 import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
-import useUserStore from 'state/ui/user';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
+import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
@@ -36,13 +35,17 @@ const CommunityInformationStep = ({
   handleSelectedChainId,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
-  const user = useUserStore();
 
-  // Add Turnstile state
   const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
-  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
-  const turnstile = useTurnstile();
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    siteKey: turnstileSiteKey,
+    action: 'create_community',
+  });
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -84,8 +87,7 @@ const CommunityInformationStep = ({
       notifyError(err.message);
       // Reset turnstile if there's an error
       if (isTurnstileEnabled) {
-        turnstile.reset();
-        setTurnstileToken(null);
+        resetTurnstile();
       }
     }
   };
@@ -146,22 +148,8 @@ const CommunityInformationStep = ({
         isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Launch Community"
         isTurnstileEnabled={isTurnstileEnabled}
-        turnstileSiteKey={turnstileSiteKey}
         turnstileToken={turnstileToken}
-        onTurnstileVerify={(token) => {
-          console.log('Turnstile verified', token);
-          setTurnstileToken(token);
-        }}
-        onTurnstileExpire={() => {
-          console.log('Turnstile expired');
-          setTurnstileToken(null);
-          turnstile.reset();
-        }}
-        onTurnstileError={() => {
-          console.log('Turnstile error');
-          setTurnstileToken(null);
-          notifyError('Verification failed. Please try again.');
-        }}
+        TurnstileWidget={isTurnstileEnabled ? TurnstileWidget : undefined}
       />
     </div>
   );

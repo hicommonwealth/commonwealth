@@ -13,7 +13,6 @@ import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Turnstile, { useTurnstile } from 'react-turnstile';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import {
@@ -28,7 +27,6 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -40,6 +38,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
@@ -81,7 +80,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     userId: user.id,
     apiCallEnabled: !!user.id,
   });
-  const { isDarkMode } = useDarkMode();
 
   const {
     aiInteractionsToggleEnabled,
@@ -230,10 +228,15 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   });
 
   const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
-  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
-
-  const turnstile = useTurnstile();
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    siteKey: turnstileSiteKey,
+    action: 'create_thread',
+  });
 
   const buttonDisabled =
     !user.activeAccount ||
@@ -258,7 +261,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     }
 
     if (isTurnstileEnabled && !turnstileToken) {
-      notifyError('Please complete the Turnstile verification');
+      notifyError('Please complete the verification');
       return;
     }
 
@@ -337,8 +340,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         checkForSessionKeyRevalidationErrors(err);
 
         // Reset turnstile if there's an error
-        turnstile.reset();
-        setTurnstileToken(null);
+        resetTurnstile();
       }
 
       if (err?.message?.includes('Exceeded content creation limit')) {
@@ -355,16 +357,14 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           'Limit of submitted threads in selected contest has been exceeded.',
         );
         // Reset turnstile if there's an error
-        turnstile.reset();
-        setTurnstileToken(null);
+        resetTurnstile();
       }
 
       console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
 
       // Reset turnstile if there's an error
-      turnstile.reset();
-      setTurnstileToken(null);
+      resetTurnstile();
     } finally {
       setIsSaving(false);
       if (!isInsideCommunity) {
@@ -396,7 +396,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     aiInteractionsToggleEnabled,
     isTurnstileEnabled,
     turnstileToken,
-    turnstile,
+    resetTurnstile,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -683,33 +683,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   />
                 )}
 
-              {isTurnstileEnabled && (
-                <div className="turnstile-container">
-                  <Turnstile
-                    sitekey={turnstileSiteKey || ''}
-                    onVerify={(token) => {
-                      console.log('Turnstile verified', token);
-                      setTurnstileToken(token);
-                    }}
-                    onExpire={() => {
-                      console.log('Turnstile expired');
-                      setTurnstileToken(null);
-                      turnstile.reset();
-                    }}
-                    onError={() => {
-                      console.log('Turnstile error');
-                      setTurnstileToken(null);
-                      notifyError(
-                        'Turnstile verification failed. Please try again.',
-                      );
-                    }}
-                    appearance="interaction-only"
-                    theme={isDarkMode ? 'dark' : 'light'}
-                    fixedSize={false}
-                    size="normal"
-                  />
-                </div>
-              )}
+              {isTurnstileEnabled && <TurnstileWidget />}
 
               <div className="buttons-row">
                 <CWButton

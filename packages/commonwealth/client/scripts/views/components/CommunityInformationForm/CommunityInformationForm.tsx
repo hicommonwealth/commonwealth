@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
-import Turnstile from 'react-turnstile';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import {
   CWImageInput,
   ImageBehavior,
@@ -46,18 +44,14 @@ const CommunityInformationForm = ({
   isCreatingCommunity,
   submitBtnLabel,
   isTurnstileEnabled,
-  turnstileSiteKey,
-  onTurnstileVerify,
-  onTurnstileError,
-  onTurnstileExpire,
   turnstileToken,
+  TurnstileWidget,
 }: CommunityInformationFormProps) => {
   const [communityName, setCommunityName] = useState(
     initialValues?.communityName || '',
   );
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
-  const { isDarkMode } = useDarkMode();
 
   const {
     socialLinks,
@@ -281,20 +275,7 @@ const CommunityInformationForm = ({
       )}
 
       {/* Add Turnstile verification */}
-      {isTurnstileEnabled && (
-        <div className="turnstile-container">
-          <Turnstile
-            sitekey={turnstileSiteKey || ''}
-            onVerify={onTurnstileVerify}
-            onExpire={onTurnstileExpire}
-            onError={onTurnstileError}
-            appearance="interaction-only"
-            theme={isDarkMode ? 'dark' : 'light'}
-            fixedSize={false}
-            size="normal"
-          />
-        </div>
-      )}
+      {isTurnstileEnabled && TurnstileWidget && <TurnstileWidget />}
 
       {/* Action buttons */}
       <section className="action-buttons">

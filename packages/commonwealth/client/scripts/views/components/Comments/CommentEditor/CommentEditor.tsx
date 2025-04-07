@@ -7,11 +7,10 @@ import Account from 'models/Account';
 import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
-import Turnstile, { useTurnstile } from 'react-turnstile';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { CWText } from '../../component_kit/cw_text';
@@ -70,8 +69,6 @@ const CommentEditor = ({
     aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
   } = useLocalAISettingsStore();
-  const user = useUserStore();
-  const { isDarkMode } = useDarkMode();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
@@ -80,9 +77,15 @@ const CommentEditor = ({
   const { generateCompletion } = useAiCompletion();
 
   const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY;
-  const isTurnstileEnabled = !!turnstileSiteKey && user.tier < 3;
-  const turnstile = useTurnstile();
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const {
+    resetTurnstile,
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+  } = useTurnstile({
+    siteKey: turnstileSiteKey,
+    action: 'create_comment',
+  });
 
   const handleCommentWithAI = () => {
     setIsSubmitDisabled(true);
@@ -137,8 +140,7 @@ const CommentEditor = ({
       } catch (error) {
         console.error('Failed to submit comment:', error);
         if (isTurnstileEnabled) {
-          turnstile.reset();
-          setTurnstileToken(null);
+          resetTurnstile();
         }
         return;
       }
@@ -192,8 +194,7 @@ const CommentEditor = ({
     } catch (error) {
       console.error('Error during submission:', error);
       if (isTurnstileEnabled) {
-        turnstile.reset();
-        setTurnstileToken(null);
+        resetTurnstile();
       }
     }
   };
@@ -243,31 +244,7 @@ const CommentEditor = ({
         onKeyDown={handleKeyDown}
       />
 
-      {isTurnstileEnabled && (
-        <div className="turnstile-container">
-          <Turnstile
-            sitekey={turnstileSiteKey || ''}
-            onVerify={(token) => {
-              console.log('Turnstile verified', token);
-              setTurnstileToken(token);
-            }}
-            onExpire={() => {
-              console.log('Turnstile expired');
-              setTurnstileToken(null);
-              turnstile.reset();
-            }}
-            onError={() => {
-              console.log('Turnstile error');
-              setTurnstileToken(null);
-              notifyError('Verification failed. Please try again.');
-            }}
-            appearance="interaction-only"
-            theme={isDarkMode ? 'dark' : 'light'}
-            fixedSize={false}
-            size="normal"
-          />
-        </div>
-      )}
+      {isTurnstileEnabled && <TurnstileWidget />}
 
       <div className="form-bottom">
         <div className="form-buttons">
