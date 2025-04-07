@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useFlag } from 'hooks/useFlag';
-import { getCommunityTrustLevel, getUserTrustLevel } from 'utils/trustLevel';
+import { getCommunityTrustLevel, getUserTrustLevel } from './utils';
 
 interface TrustLevelRoleProps {
   type: 'community' | 'user';
