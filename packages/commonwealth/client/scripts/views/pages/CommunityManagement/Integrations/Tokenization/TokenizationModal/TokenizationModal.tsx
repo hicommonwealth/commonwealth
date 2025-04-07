@@ -21,6 +21,11 @@ interface TokenizationModalProps {
   onSaveChanges: () => void;
 }
 
+type TopicOption = {
+  label: string;
+  value: string;
+};
+
 const TokenizationModal = ({
   onUnderstand,
   onDismiss,
@@ -42,8 +47,8 @@ const TokenizationModal = ({
     value: topic.id?.toString() || '',
   }));
 
-  const handleTopicSelection = (selectedOptions: any) => {
-    setSelectedTopics(selectedOptions.map((option: any) => option.value));
+  const handleTopicSelection = (selectedOptions: TopicOption[]) => {
+    setSelectedTopics(selectedOptions.map((option) => option.value));
   };
 
   const handleTokenizeAllTopicsChange = (checked: boolean) => {
