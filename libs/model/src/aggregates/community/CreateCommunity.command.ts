@@ -1,11 +1,12 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
+  bech32ToHex,
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   DefaultPage,
-  bech32ToHex,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
@@ -130,7 +131,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             id,
             name,
-            tier: 0,
+            tier: CommunityTierMap.Unverified,
             spam_tier_level: -1,
             default_symbol,
             icon_url,
