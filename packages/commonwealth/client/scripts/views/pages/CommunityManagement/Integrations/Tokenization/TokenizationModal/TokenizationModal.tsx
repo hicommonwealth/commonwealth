@@ -165,7 +165,9 @@ const TokenizationModal = ({
         <CWButton
           buttonType="primary"
           label="Save Changes"
-          onClick={handleSaveChanges}
+          onClick={() => {
+            void handleSaveChanges();
+          }}
           disabled={isSaving}
         />
       </CWModalFooter>
