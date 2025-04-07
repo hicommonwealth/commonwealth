@@ -94,6 +94,15 @@ const SpamLevel = () => {
         tier level. This is useful for communities that are not yet ready to be
         moderated.
       </CWText>
+      <CWText type="b1" className="docs-link">
+        <a
+          href="https://docs.common.xyz/commonwealth/account-overview/user-trust-levels"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn more about how trust levels work
+        </a>
+      </CWText>
 
       {isEnabled && (
         <div>

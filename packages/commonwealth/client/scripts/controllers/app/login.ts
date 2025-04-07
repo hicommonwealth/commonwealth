@@ -249,6 +249,7 @@ export function updateActiveUser(data) {
       referredByAddress: data?.referred_by_address,
       xpPoints: data?.xp_points,
       xpReferrerPoints: data?.xp_referrer_points,
+      tier: data?.tier,
     });
   }
 }

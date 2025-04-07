@@ -23,6 +23,7 @@ import {
   CanvasSignedData,
   SubstrateSignerCW,
   TEST_BLOCK_INFO_STRING,
+  UserTierMap,
   serializeCanvas,
   toCanvasSignedDataApiArgs,
   type Link,
@@ -290,7 +291,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       });
 
     // update tier for testing
-    await models.User.update({ tier: 4 }, { where: { id: res.body.user_id } });
+    await models.User.update(
+      { tier: UserTierMap.ManuallyVerified },
+      { where: { id: res.body.user_id } },
+    );
 
     const address_id = res.body.id;
     const user_id = res.body.user_id;
