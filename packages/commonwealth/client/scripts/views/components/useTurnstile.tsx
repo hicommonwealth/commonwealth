@@ -1,4 +1,4 @@
-import { UserTierMap } from '@hicommonwealth/shared';
+import { TurnstileWidgetNames, UserTierMap } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import React, { useCallback, useState } from 'react';
 import Turnstile, { useTurnstile as useReactTurnstile } from 'react-turnstile';
@@ -6,8 +6,7 @@ import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import useUserStore from 'state/ui/user';
 
 interface UseTurnstileOptions {
-  siteKey: string | undefined;
-  action: string;
+  action: TurnstileWidgetNames;
   onVerify?: (token: string) => void;
   onExpire?: () => void;
   onError?: (error?: string) => void;
@@ -33,7 +32,6 @@ export const useTurnstile = (
   options: UseTurnstileOptions,
 ): UseTurnstileResult => {
   const {
-    siteKey,
     action,
     onVerify: externalOnVerify,
     onExpire: externalOnExpire,
@@ -46,6 +44,13 @@ export const useTurnstile = (
   const turnstile = useReactTurnstile();
   const { isDarkMode } = useDarkMode();
   const user = useUserStore();
+
+  const siteKey =
+    action === 'create-thread'
+      ? process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY
+      : action === 'create-comment'
+        ? process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY
+        : process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
 
   // Determine if Turnstile should be enabled based on site key and user tier
   const isTurnstileEnabled =
@@ -90,10 +95,15 @@ export const useTurnstile = (
   const TurnstileWidget: React.FC = useCallback(() => {
     if (!isTurnstileEnabled) return null;
 
+    if (!siteKey) {
+      console.warn('Turnstile site key disabled');
+      return null;
+    }
+
     return (
       <div className="turnstile-container">
         <Turnstile
-          sitekey={siteKey || ''}
+          sitekey={siteKey}
           onVerify={handleVerify}
           onExpire={handleExpire}
           onError={handleError}
@@ -115,7 +125,7 @@ export const useTurnstile = (
     size,
   ]);
 
-  if (!options.siteKey) {
+  if (!siteKey) {
     console.warn('Turnstile site key not provided');
     return {
       turnstileToken: null,

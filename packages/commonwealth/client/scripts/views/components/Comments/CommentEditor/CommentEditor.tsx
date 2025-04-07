@@ -76,15 +76,13 @@ const CommentEditor = ({
 
   const { generateCompletion } = useAiCompletion();
 
-  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY;
   const {
     resetTurnstile,
     turnstileToken,
     isTurnstileEnabled,
     TurnstileWidget,
   } = useTurnstile({
-    siteKey: turnstileSiteKey,
-    action: 'create_comment',
+    action: 'create-comment',
   });
 
   const handleCommentWithAI = () => {

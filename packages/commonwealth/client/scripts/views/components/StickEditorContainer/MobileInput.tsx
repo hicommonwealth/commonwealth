@@ -65,16 +65,13 @@ export const MobileInput = (props: MobileInputProps) => {
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
-  // Add turnstile related code
-  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
   const {
     turnstileToken,
     isTurnstileEnabled,
     TurnstileWidget,
     resetTurnstile,
   } = useTurnstile({
-    siteKey: turnstileSiteKey,
-    action: 'mobile_create_thread',
+    action: mode === 'thread' ? 'create_thread' : 'create-comment',
   });
 
   const handleClose = useCallback(

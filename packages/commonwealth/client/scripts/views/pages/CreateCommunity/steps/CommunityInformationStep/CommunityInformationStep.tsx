@@ -36,15 +36,13 @@ const CommunityInformationStep = ({
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
   const {
     turnstileToken,
     isTurnstileEnabled,
     TurnstileWidget,
     resetTurnstile,
   } = useTurnstile({
-    siteKey: turnstileSiteKey,
-    action: 'create_community',
+    action: 'create-community',
   });
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<

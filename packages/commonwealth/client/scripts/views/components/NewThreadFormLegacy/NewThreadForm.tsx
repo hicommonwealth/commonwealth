@@ -227,15 +227,13 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         : undefined,
   });
 
-  const turnstileSiteKey = process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY;
   const {
     turnstileToken,
     isTurnstileEnabled,
     TurnstileWidget,
     resetTurnstile,
   } = useTurnstile({
-    siteKey: turnstileSiteKey,
-    action: 'create_thread',
+    action: 'create-thread',
   });
 
   const buttonDisabled =

@@ -4,10 +4,11 @@ import {
   InvalidInput,
   logger,
 } from '@hicommonwealth/core';
-import { UserTierMap } from '@hicommonwealth/shared';
+import { TurnstileWidgetNames, UserTierMap } from '@hicommonwealth/shared';
 import { ZodSchema } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
+
 const log = logger(import.meta);
 
 async function verifyTurnstile(token: string, secret: string) {
@@ -37,11 +38,6 @@ async function verifyTurnstile(token: string, secret: string) {
     return false;
   }
 }
-
-type TurnstileWidgetNames =
-  | 'create-community'
-  | 'create-thread'
-  | 'create-comment';
 
 const TurnstileSecretMap: Record<TurnstileWidgetNames, string | undefined> = {
   'create-community': config.CLOUDFLARE.TURNSTILE.CREATE_COMMUNITY?.SECRET_KEY,
