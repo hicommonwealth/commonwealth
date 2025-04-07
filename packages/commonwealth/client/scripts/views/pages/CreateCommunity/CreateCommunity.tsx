@@ -4,7 +4,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import CommunityStakeStep from './steps/CommunityStakeStep';
+import CommunityTransactions from './steps/CommunityTransactions/CommunityTransactions';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
@@ -70,7 +70,7 @@ const CreateCommunity = () => {
 
       case CreateCommunityStep.CommunityStake:
         return (
-          <CommunityStakeStep
+          <CommunityTransactions
             createdCommunityName={createdCommunityName}
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
