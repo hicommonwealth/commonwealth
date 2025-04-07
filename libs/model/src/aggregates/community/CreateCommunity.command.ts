@@ -1,17 +1,22 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
+  bech32ToHex,
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   DefaultPage,
-  bech32ToHex,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { tiered } from '../../middleware';
-import { authVerified } from '../../middleware/auth';
-import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
+import {
+  authVerified,
+  mustBeSuperAdmin,
+  mustExist,
+  tiered,
+  turnstile,
+} from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 
@@ -47,7 +52,11 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [authVerified(), tiered({ creates: true })],
+    auth: [
+      authVerified(),
+      tiered({ creates: true }),
+      turnstile({ widgetName: 'create-community' }),
+    ],
     body: async ({ actor, payload }) => {
       const {
         id,
@@ -122,7 +131,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             id,
             name,
-            tier: 0,
+            tier: CommunityTierMap.Unverified,
             spam_tier_level: -1,
             default_symbol,
             icon_url,

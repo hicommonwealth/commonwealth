@@ -4,7 +4,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { BalanceSourceType, WalletId } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  UserTierMap,
+  WalletId,
+} from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -389,7 +393,7 @@ describe('User lifecycle', () => {
 
       // upgrade tier for testing
       await models.User.update(
-        { tier: 4 },
+        { tier: UserTierMap.ManuallyVerified },
         { where: { id: new_address!.user_id! } },
       );
 
