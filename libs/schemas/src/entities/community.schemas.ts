@@ -24,7 +24,7 @@ export const Community = z.object({
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
-  spam_tier_level: z.number().int().min(-1).max(2),
+  spam_tier_level: z.union([z.literal(-1), z.literal(2), z.literal(3)]),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),

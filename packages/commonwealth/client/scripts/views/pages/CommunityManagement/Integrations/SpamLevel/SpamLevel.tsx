@@ -1,9 +1,9 @@
-import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -12,7 +12,7 @@ import {
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './SpamLevel.scss';
-import { SpamLevelOptions, SpamLevels } from './utils';
+import { DisableSpamLevel, SpamLevelOptions } from './utils';
 
 const SpamLevel = () => {
   const communityId = app.activeChainId() || '';
@@ -29,26 +29,29 @@ const SpamLevel = () => {
     });
 
   const [isEnabled, setIsEnabled] = useState(false);
-  const [spamTierLevel, setSpamTierLevel] = useState<SpamLevels>(
-    SpamLevels.Disabled,
-  );
+  const [spamTierLevel, setSpamTierLevel] = useState<
+    | typeof DisableSpamLevel
+    | UserTierMap.VerifiedWallet
+    | UserTierMap.NewlyVerifiedWallet
+  >(DisableSpamLevel);
 
-  useRunOnceOnCondition({
-    callback: () => {
+  useEffect(() => {
+    if (!isLoadingCommunity && community) {
       const tier =
-        typeof community?.spam_tier_level === 'number'
-          ? community?.spam_tier_level
-          : SpamLevels.Disabled;
-      setIsEnabled(tier > SpamLevels.Disabled);
+        typeof community.spam_tier_level === 'number'
+          ? community.spam_tier_level
+          : DisableSpamLevel;
+
+      const isSpamEnabled = tier !== DisableSpamLevel;
+      setIsEnabled(isSpamEnabled);
+
       setSpamTierLevel(
-        tier >= SpamLevels.Disabled &&
-          tier <= SpamLevels.UsersWithIncompleteProfiles
+        tier >= DisableSpamLevel && tier <= UserTierMap.VerifiedWallet
           ? tier
-          : SpamLevels.Disabled,
+          : DisableSpamLevel,
       );
-    },
-    shouldRun: !isLoadingCommunity && !!community,
-  });
+    }
+  }, [isLoadingCommunity, community]);
 
   const onSaveChanges = useCallback(async () => {
     if (
@@ -77,17 +80,22 @@ const SpamLevel = () => {
     updateCommunity,
   ]);
 
+  const handleToggleChange = () => {
+    const newIsEnabled = !isEnabled;
+    setIsEnabled(newIsEnabled);
+
+    if (!newIsEnabled) {
+      setSpamTierLevel(DisableSpamLevel);
+    } else if (spamTierLevel === DisableSpamLevel) {
+      setSpamTierLevel(UserTierMap.NewlyVerifiedWallet);
+    }
+  };
+
   return (
     <section className="SpamLevel">
       <div className="header">
         <CWText type="h4">Auto Flag Spam</CWText>
-        <CWToggle
-          checked={isEnabled}
-          onChange={() => {
-            setIsEnabled(!isEnabled);
-            setSpamTierLevel(isEnabled ? spamTierLevel : SpamLevels.Disabled);
-          }}
-        />
+        <CWToggle checked={isEnabled} onChange={handleToggleChange} />
       </div>
       <CWText type="b1">
         Automatically flag posts as spam when poster does not meet the specified
@@ -107,7 +115,9 @@ const SpamLevel = () => {
       {isEnabled && (
         <div>
           <CWSelectList
-            defaultValue={SpamLevelOptions[spamTierLevel]}
+            defaultValue={SpamLevelOptions.find(
+              (option) => option.value === spamTierLevel,
+            )}
             options={SpamLevelOptions}
             onChange={(item) => {
               item && setSpamTierLevel(+item.value);

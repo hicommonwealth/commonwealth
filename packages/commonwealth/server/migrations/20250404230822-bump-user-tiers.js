@@ -19,6 +19,18 @@ module.exports = {
       `,
         { transaction },
       );
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "Communities"
+        SET spam_tier_level = CASE
+          WHEN spam_tier_level = 0 THEN -1
+          WHEN spam_tier_level = 1 THEN 2
+          WHEN spam_tier_level = 2 THEN 3
+        ELSE 1 END
+        WHERE spam_tier_level != -1;
+      `,
+        { transaction },
+      );
     });
   },
 
