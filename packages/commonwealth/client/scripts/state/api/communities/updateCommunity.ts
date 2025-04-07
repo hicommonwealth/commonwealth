@@ -1,7 +1,11 @@
-import { ChainType, DefaultPage, UserTierMap } from '@hicommonwealth/shared';
+import {
+  ChainType,
+  DefaultPage,
+  DisabledCommunitySpamTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { initAppState } from 'state';
 import { trpc } from 'utils/trpcClient';
-import { DisableSpamLevel } from 'views/pages/CommunityManagement/Integrations/SpamLevel/utils';
 import useUserStore, { userStore } from '../../ui/user';
 import { invalidateAllQueriesForCommunity } from './getCommuityById';
 
@@ -27,7 +31,7 @@ interface UpdateCommunityProps {
   type?: ChainType;
   defaultPage?: DefaultPage;
   spamTierLevel?:
-    | typeof DisableSpamLevel
+    | typeof DisabledCommunitySpamTier
     | UserTierMap.NewlyVerifiedWallet
     | UserTierMap.VerifiedWallet;
 }
