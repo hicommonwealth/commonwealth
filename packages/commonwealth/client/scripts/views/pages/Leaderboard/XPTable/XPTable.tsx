@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import { Avatar } from 'views/components/Avatar';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -31,11 +30,7 @@ const columns: CWTableColumnInfo[] = [
   },
   {
     key: 'xp',
-    header: () => (
-      <CWText className="table-header">
-        <CWIcon iconName="help" iconSize="regular" /> Aura
-      </CWText>
-    ),
+    header: `Aura`,
     numeric: true,
     sortable: true,
   },
