@@ -1,0 +1,41 @@
+@import '../../../styles/shared.scss';
+
+.ShareSection {
+  .Text.bold {
+    margin-block: 16px;
+  }
+
+  .share-options {
+    display: flex;
+    justify-content: space-between;
+    overflow-y: auto;
+    padding: 4px;
+
+    .share-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 12px;
+      transition: background-color 0.2s;
+      width: 52px;
+
+      .icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .Text.caption {
+        color: $neutral-400;
+        white-space: nowrap;
+        justify-content: center;
+      }
+
+      &:hover {
+        background-color: $neutral-50;
+        transition: background-color 0.2s;
+      }
+    }
+  }
+}
