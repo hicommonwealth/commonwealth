@@ -26,7 +26,7 @@ module.exports = {
           WHEN spam_tier_level = 0 THEN -1
           WHEN spam_tier_level = 1 THEN 2
           WHEN spam_tier_level = 2 THEN 3
-        ELSE 1 END
+        ELSE -1 END
         WHERE spam_tier_level != -1;
       `,
         { transaction },
