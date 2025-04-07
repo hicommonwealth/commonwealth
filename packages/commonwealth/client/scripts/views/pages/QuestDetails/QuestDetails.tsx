@@ -19,7 +19,7 @@ import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
-import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
+import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -65,12 +65,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     enabled: user.isLoggedIn && xpEnabled,
   });
 
-  const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
-    useGetRandomResourceIds({
-      enabled: true,
-    });
-  const randomResourceId = randomResourceIds?.results?.[0];
-
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
@@ -115,7 +109,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (isLoading) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -218,9 +212,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionContentId.split(':')[1],
                   actionContentId.split(':')[0] as ContentIdType,
                 ).split(window.location.origin)[1]
-              : `/discussion/${
-                  randomResourceId?.thread_id
-                }?comment=${randomResourceId?.comment_id}`,
+              : `/explore?tab=threads`,
             {},
             null,
           );
