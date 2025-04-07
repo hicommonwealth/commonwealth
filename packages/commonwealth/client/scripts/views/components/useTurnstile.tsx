@@ -113,7 +113,6 @@ export const useTurnstile = (
     appearance,
     isDarkMode,
     size,
-    action,
   ]);
 
   if (!options.siteKey) {
