@@ -71,7 +71,7 @@ export const MobileInput = (props: MobileInputProps) => {
     TurnstileWidget,
     resetTurnstile,
   } = useTurnstile({
-    action: mode === 'thread' ? 'create_thread' : 'create-comment',
+    action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
   const handleClose = useCallback(
