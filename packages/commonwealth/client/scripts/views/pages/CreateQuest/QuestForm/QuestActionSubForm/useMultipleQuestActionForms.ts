@@ -48,7 +48,6 @@ const useQuestActionMultiFormsState = ({
           refs: {
             runParticipationLimitValidator: () => {},
           },
-          // todo: 11391 fix this
           id: index + (questActionSubForms.length + 1),
         })),
       ]);
