@@ -39,6 +39,8 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
             attributes: ['id', 'base', 'ss58_prefix'],
           },
         ],
+        limit: 300,
+        order: [['created_at', 'DESC']],
       });
 
       const addressIds = [...new Set(addresses.map((a) => a.id!))];

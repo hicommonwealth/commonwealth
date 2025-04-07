@@ -9,6 +9,7 @@ export const BASE_API_PATH = '/api/internal/trpc';
 
 export const trpcClient = trpc.createClient({
   links: [
+    // TODO: use env to switch between single and batch
     httpBatchLink({
       url: BASE_API_PATH,
 
