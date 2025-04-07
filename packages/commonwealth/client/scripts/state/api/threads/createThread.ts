@@ -1,5 +1,6 @@
 import { ChainBase, toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
+import { resetXPCacheForUser } from 'helpers/quest';
 import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -74,9 +75,7 @@ const useCreateThreadMutation = ({
 
   return trpc.thread.createThread.useMutation({
     onSuccess: async (newThread) => {
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);

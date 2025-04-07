@@ -110,6 +110,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       indexes: [
         { fields: ['email'], unique: true },
         { fields: ['privy_id'], unique: true },
+        { fields: ['xp_points'], unique: false },
       ],
       defaultScope: {
         attributes: {

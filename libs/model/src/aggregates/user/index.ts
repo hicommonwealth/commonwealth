@@ -9,6 +9,7 @@ export * from './GetUserProfile.query';
 export * from './GetUserReferralFees.query';
 export * from './GetUserReferrals.query';
 export * from './GetXps.query';
+export * from './GetXpsRanked.query';
 export * from './SearchUserProfiles.query';
 export * from './signIn/SignIn.command';
 export * from './UpdateUser.command';
