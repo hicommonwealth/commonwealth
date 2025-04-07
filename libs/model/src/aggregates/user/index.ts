@@ -3,7 +3,6 @@ export * from './DeleteApiKey.command';
 export * from './DistributeSkale.command';
 export * from './GetApiKey.query';
 export * from './GetNewContent.query';
-export * from './GetRandomResourceIds.query';
 export * from './GetUser.query';
 export * from './GetUserAddresses.query';
 export * from './GetUserProfile.query';
