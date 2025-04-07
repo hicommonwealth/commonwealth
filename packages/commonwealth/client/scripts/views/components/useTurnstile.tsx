@@ -83,7 +83,6 @@ export const useTurnstile = (
   // Handle verification errors
   const handleError = useCallback(
     (error?: string) => {
-      console.log(`Turnstile error${action ? ` for ${action}` : ''}`);
       setTurnstileToken(null);
       notifyError(error || 'Verification failed. Please try again.');
       externalOnError?.(error);
