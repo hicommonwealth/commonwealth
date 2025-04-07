@@ -195,7 +195,7 @@ export const MobileInput = (props: MobileInputProps) => {
           });
         }
         // Call the actual comment submission logic passed in as a prop.
-        const commentId = await handleSubmitComment();
+        const commentId = await handleSubmitComment(turnstileToken);
         setValue('');
         stickyCommentReset();
 

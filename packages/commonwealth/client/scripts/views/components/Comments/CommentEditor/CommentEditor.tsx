@@ -24,7 +24,7 @@ import './CommentEditor.scss';
 export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
-  handleSubmitComment: () => Promise<number>;
+  handleSubmitComment: (turnstileToken?: string | null) => Promise<number>;
   errorMsg: string;
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
@@ -136,7 +136,7 @@ const CommentEditor = ({
     try {
       let commentId: number;
       try {
-        commentId = await handleSubmitComment();
+        commentId = await handleSubmitComment(turnstileToken);
       } catch (error) {
         console.error('Failed to submit comment:', error);
         if (isTurnstileEnabled) {

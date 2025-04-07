@@ -4,6 +4,7 @@ import {
   InvalidInput,
   logger,
 } from '@hicommonwealth/core';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { ZodSchema } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
@@ -50,10 +51,10 @@ const TurnstileSecretMap: Record<TurnstileWidgetNames, string | undefined> = {
 
 export function turnstile({
   widgetName,
-  byassMinTier = 3,
+  bypassMinTier = UserTierMap.SocialVerified,
 }: {
   widgetName: TurnstileWidgetNames;
-  byassMinTier?: number;
+  bypassMinTier?: number;
 }) {
   return async function ({ actor, payload }: Context<ZodSchema, ZodSchema>) {
     const turnstileSiteKey = TurnstileSecretMap[widgetName];
@@ -72,10 +73,10 @@ export function turnstile({
       },
     });
     if (!user) throw new InvalidActor(actor, 'User not found');
-    if (user.tier >= byassMinTier) {
+    if (user.tier >= bypassMinTier) {
       log.trace('Turnstile bypassed', {
         userTier: user.tier,
-        minTier: byassMinTier,
+        minTier: bypassMinTier,
       });
       return;
     }
