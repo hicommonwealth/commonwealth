@@ -5,6 +5,7 @@ import {
   XpLogView,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
@@ -186,4 +187,12 @@ export const isQuestActionComplete = (
     ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
     : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
         questAction.participation_times_per_period;
+};
+
+export const resetXPCacheForUser = (
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
+) => {
+  // reset xp cache
+  trpcUtils.quest.getQuests.invalidate().catch(console.error);
+  trpcUtils.user.getXps.invalidate().catch(console.error);
 };

@@ -1,6 +1,7 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { resetXPCacheForUser } from 'helpers/quest';
 import { initAppState } from 'state';
+import { trpc } from 'utils/trpcClient';
 import useUserStore from '../../ui/user';
 
 interface CreateCommunityProps {
@@ -46,9 +47,7 @@ const useCreateCommunityMutation = () => {
     onSuccess: async () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
 
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       await initAppState(false);
     },
