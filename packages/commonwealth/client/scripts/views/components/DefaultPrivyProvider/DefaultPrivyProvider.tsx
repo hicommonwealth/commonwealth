@@ -1,34 +1,19 @@
-import { PrivyProvider } from '@privy-io/react-auth';
-import React from 'react';
-import { useDarkMode } from 'state/ui/darkMode/darkMode';
+import React, { memo } from 'react';
+import { LoadPrivy } from './LoadPrivy';
+import { WaitForPrivy } from './WaitForPrivy';
 
-const PRIVY_APP_ID = process.env.PRIVY_APP_ID;
-
-type DefaultPrivyProvider = {
+type DefaultPrivyProviderProps = {
   children: React.ReactNode;
 };
 
-export const DefaultPrivyProvider = (props: DefaultPrivyProvider) => {
+export const DefaultPrivyProvider = memo(function DefaultPrivyProvider(
+  props: DefaultPrivyProviderProps,
+) {
   const { children } = props;
-  const darkMode = useDarkMode();
-
-  if (!PRIVY_APP_ID) return <div>Privy not configured in .env</div>;
 
   return (
-    <PrivyProvider
-      appId={PRIVY_APP_ID}
-      config={{
-        loginMethods: ['email', 'wallet', 'sms'],
-        appearance: {
-          theme: darkMode ? 'dark' : 'light',
-          logo: 'https://common.xyz/brand_assets/common.png',
-        },
-        embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
-        },
-      }}
-    >
-      {children}
-    </PrivyProvider>
+    <LoadPrivy>
+      <WaitForPrivy>{children}</WaitForPrivy>
+    </LoadPrivy>
   );
-};
+});
