@@ -5,6 +5,7 @@ import {
   ChainType,
   CommunityTierMap,
   CosmosGovernanceVersion,
+  DisabledCommunitySpamTier,
   Role,
   UserTierMap,
   ZERO_ADDRESS,
@@ -134,7 +135,7 @@ export const seedDb = async () => {
         {
           id: 'alex',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.ERC20,
           default_symbol: 'ALEX',
           name: 'Alex',
@@ -147,7 +148,7 @@ export const seedDb = async () => {
         {
           id: 'yearn',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.ERC20,
           default_symbol: 'YFI',
           name: 'yearn.finance',
@@ -160,7 +161,7 @@ export const seedDb = async () => {
         {
           id: 'sushi',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.ERC20,
           default_symbol: 'SUSHI',
           name: 'Sushi',
@@ -174,7 +175,7 @@ export const seedDb = async () => {
         {
           id: 'edgeware',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Edgeware,
           default_symbol: 'EDG',
           name: 'Edgeware',
@@ -188,7 +189,7 @@ export const seedDb = async () => {
         {
           id: 'ethereum',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           profile_count: 2,
           network: ChainNetwork.Ethereum,
           default_symbol: 'ETH',
@@ -202,7 +203,7 @@ export const seedDb = async () => {
         {
           id: 'osmosis',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Osmosis,
           default_symbol: 'OSMO',
           name: 'Osmosis',
@@ -216,7 +217,7 @@ export const seedDb = async () => {
         {
           id: 'csdk-beta',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'Cosmos SDK v0.45.0 devnet',
@@ -230,7 +231,7 @@ export const seedDb = async () => {
         {
           id: 'csdk',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'Cosmos SDK v0.46.11 devnet',
@@ -244,7 +245,7 @@ export const seedDb = async () => {
         {
           id: 'common-protocol',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.ERC20,
           default_symbol: 'cmn',
           name: 'Common Protocol',
@@ -260,7 +261,7 @@ export const seedDb = async () => {
         {
           id: 'csdk-beta-local',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'CI: Cosmos SDK v0.45 devnet',
@@ -274,7 +275,7 @@ export const seedDb = async () => {
         {
           id: 'csdk-v1-local',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Osmosis,
           default_symbol: 'STAKE',
           name: 'CI: Cosmos SDK v0.46.11 devnet',
@@ -288,7 +289,7 @@ export const seedDb = async () => {
         {
           id: 'evmos-dev-local',
           tier: CommunityTierMap.Unverified,
-          spam_tier_level: 0,
+          spam_tier_level: DisabledCommunitySpamTier,
           network: ChainNetwork.Evmos,
           default_symbol: 'STAKE',
           name: 'CI: Ethermint devnet',
