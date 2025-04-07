@@ -192,7 +192,8 @@ export const isQuestActionComplete = (
 export const resetXPCacheForUser = (
   trpcUtils: ReturnType<typeof trpc.useUtils>,
 ) => {
-  // reset xp cache
+  // reset xp cache after gaining xp
   trpcUtils.quest.getQuests.invalidate().catch(console.error);
   trpcUtils.user.getXps.invalidate().catch(console.error);
+  trpcUtils.user.getXpsRanked.invalidate().catch(console.error);
 };
