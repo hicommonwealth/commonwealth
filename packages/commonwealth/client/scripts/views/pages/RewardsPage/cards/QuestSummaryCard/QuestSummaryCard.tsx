@@ -35,7 +35,7 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_after: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
@@ -47,12 +47,12 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
   const handleSeeAllClick = () => {
-    navigate('/explore');
+    navigate('/explore?tab=quests');
   };
 
   const handleCTAClick = (questId: number, communityId?: string) => {
@@ -71,14 +71,14 @@ const QuestSummaryCard = () => {
   return (
     <RewardsCard
       title="Quests"
-      description="XP and tokens earned from your contests, bounties, and posted threads."
+      description="Aura and tokens earned from your contests, bounties, and posted threads."
       icon="trophy"
       onSeeAllClick={handleSeeAllClick}
     >
       <div className="QuestSummaryCard">
         <div className="xp-body">
           <CWText fontWeight="bold" type="h4">
-            {user.xpPoints} XP&nbsp;
+            {user.xpPoints} Aura&nbsp;
             <CWText type="caption">earned from quests</CWText>
           </CWText>
         </div>

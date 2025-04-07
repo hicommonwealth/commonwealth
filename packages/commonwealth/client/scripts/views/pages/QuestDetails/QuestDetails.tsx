@@ -19,7 +19,7 @@ import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
-import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
+import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -65,14 +65,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     enabled: user.isLoggedIn && xpEnabled,
   });
 
-  const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
-    useGetRandomResourceIds({
-      limit: 1,
-      cursor: 1,
-      enabled: true,
-    });
-  const randomResourceId = randomResourceIds?.results?.[0];
-
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
@@ -109,7 +101,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  const { pendingWeeklyQuests } = useXPProgress();
+  const { pendingWeeklyQuests } = useXPProgress({ includeSystemQuests: true }); // show system quests in quest details
 
   const popoverProps = usePopover();
 
@@ -117,7 +109,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (isLoading) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -142,11 +134,20 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
+  const isSystemQuest = quest.id < 0;
+
   const handleActionStart = (
     actionName: QuestAction,
     actionContentId?: string,
   ) => {
     switch (actionName) {
+      case 'SignUpFlowCompleted': {
+        setAuthModalConfig({
+          type: AuthModalType.CreateAccount,
+          options: ['wallets', 'sso'],
+        });
+        break;
+      }
       case 'WalletLinked': {
         setAuthModalConfig({
           type: AuthModalType.SignIn,
@@ -211,9 +212,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionContentId.split(':')[1],
                   actionContentId.split(':')[0] as ContentIdType,
                 ).split(window.location.origin)[1]
-              : `/discussion/${
-                  randomResourceId?.thread_id
-                }?comment=${randomResourceId?.comment_id}`,
+              : `/explore?tab=threads`,
             {},
             null,
           );
@@ -265,7 +264,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           {isDeletionAllowed
             ? 'Deletion would remove this quest and its sub-tasks entirely for every user.'
             : // eslint-disable-next-line max-len
-              `With cancelation, users who earned XP for this quest will retain that XP. However new submissions to this quest won't be allowed and won't reward any XP to users.`}
+              `With cancellation, users who earned any aura for this quest will retain that aura. However new submissions to this quest won't be allowed and won't reward any aura to users.`}
         </>
       ),
       buttons: [
@@ -292,7 +291,7 @@ const QuestDetails = ({ id }: { id: number }) => {
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
@@ -356,14 +355,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     body={
                       <div>
                         <CWText type="b2">
-                          Indicates the maximum xp allocation before this quest
-                          is considered complete.
+                          Indicates the maximum Aura allocation before this
+                          quest is considered complete.
                         </CWText>
                         <br />
 
                         <CWText type="b2">
                           The quest automatically transitions to completed
-                          status, if max XP is alloted before quest end date.
+                          status, if max Aura is alloted before quest end date.
                         </CWText>
                       </div>
                     }
@@ -425,10 +424,10 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Complete tasks to earn XP
+                Create action to earn aura
               </CWText>
               <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} XP`}
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
                 type="proposal"
               />
             </div>
@@ -450,11 +449,20 @@ const QuestDetails = ({ id }: { id: number }) => {
                       id: log.action_meta_id,
                       createdAt: new Date(log.event_created_at),
                     }))}
-                  canStartAction={isStarted && !isEnded}
-                  {...((!isStarted || isEnded) && {
-                    actionStartBlockedReason: !isStarted
-                      ? 'Only available when quest starts'
-                      : 'Unavailable, quest has ended',
+                  canStartAction={
+                    isSystemQuest
+                      ? !user.isLoggedIn && isStarted && !isEnded
+                      : isStarted && !isEnded
+                  }
+                  {...(((isSystemQuest && user.isLoggedIn) ||
+                    !isStarted ||
+                    isEnded) && {
+                    actionStartBlockedReason:
+                      isSystemQuest && user.isLoggedIn
+                        ? `Only available for new users`
+                        : !isStarted
+                          ? 'Only available when quest starts'
+                          : 'Unavailable, quest has ended',
                   })}
                 />
               ))}

@@ -8,6 +8,7 @@ import Directory from './Directory';
 import Discord from './Discord';
 import './Integrations.scss';
 import Snapshots from './Snapshots';
+import SpamLevel from './SpamLevel';
 import Stake from './Stake';
 import Token from './Token';
 import Tokenization from './Tokenization';
@@ -30,6 +31,7 @@ const Integrations = () => {
     >
       <section className="Integrations">
         <Directory />
+        <SpamLevel />
         <Token />
         <Stake />
         {showSnapshotIntegration && <Snapshots />}

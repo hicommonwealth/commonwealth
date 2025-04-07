@@ -66,7 +66,7 @@ export const trpcRouter = trpc.router({
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,
     trpc.Tag.Thread,
-    undefined,
+    { ttlSecs: 10 },
     [
       trpc.fireAndForget(async (input) => {
         log.trace('incrementing thread view count', { ids: input.thread_ids });

@@ -1,4 +1,4 @@
-import { Roles, WalletId } from '@hicommonwealth/shared';
+import { Roles, UserTierMap, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Tags } from './tag.schemas';
@@ -38,9 +38,11 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
+export const USER_TIER = z.nativeEnum(UserTierMap);
+
 export const User = z.object({
   id: PG_INT.optional(),
-  tier: z.number().int().min(0).max(5),
+  tier: USER_TIER,
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
@@ -62,6 +64,7 @@ export const User = z.object({
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
+  privy_id: z.string().max(255).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -112,6 +115,7 @@ export const SsoToken = z.object({
 
 export const CommunityMember = z.object({
   user_id: PG_INT,
+  tier: USER_TIER,
   profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   addresses: z.array(
@@ -132,6 +136,8 @@ export const CommunityMember = z.object({
       avatar_url: z.string().nullish(),
     })
     .nullish(),
-  referral_count: PG_INT.default(0).nullish(),
-  referral_eth_earnings: z.number().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number(),
+  xp_points: PG_INT.default(0),
+  xp_referrer_points: PG_INT.default(0),
 });

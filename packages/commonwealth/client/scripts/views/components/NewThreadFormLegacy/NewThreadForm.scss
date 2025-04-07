@@ -183,7 +183,8 @@
     }
   }
 
-  .JoinCommunityBanner {
+  .JoinCommunityBanner,
+  .spam-trust-banner {
     margin-top: 8px;
   }
 
@@ -195,5 +196,10 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+
+  .turnstile-container {
+    display: flex;
+    justify-content: right;
   }
 }

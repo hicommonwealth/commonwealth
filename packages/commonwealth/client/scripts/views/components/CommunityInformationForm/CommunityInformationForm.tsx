@@ -45,6 +45,9 @@ const CommunityInformationForm = ({
   initialValues,
   isCreatingCommunity,
   submitBtnLabel,
+  isTurnstileEnabled,
+  turnstileToken,
+  TurnstileWidget,
 }: CommunityInformationFormProps) => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
@@ -144,6 +147,12 @@ const CommunityInformationForm = ({
 
     await onSubmit({ ...values, communityId }).catch(console.error);
   };
+
+  // Check if the submit button should be disabled
+  const isSubmitDisabled =
+    isCreatingCommunity ||
+    isProcessingProfileImage ||
+    (isTurnstileEnabled && !turnstileToken);
 
   return (
     <CWForm
@@ -294,6 +303,9 @@ const CommunityInformationForm = ({
         <></>
       )}
 
+      {/* Add Turnstile verification */}
+      {isTurnstileEnabled && TurnstileWidget && <TurnstileWidget />}
+
       {/* Action buttons */}
       <section className="action-buttons">
         <CWButton
@@ -307,7 +319,7 @@ const CommunityInformationForm = ({
           type="submit"
           buttonWidth="wide"
           label={submitBtnLabel}
-          disabled={isCreatingCommunity || isProcessingProfileImage}
+          disabled={isSubmitDisabled}
         />
       </section>
     </CWForm>

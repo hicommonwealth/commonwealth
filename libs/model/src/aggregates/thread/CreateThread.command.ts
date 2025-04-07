@@ -10,9 +10,14 @@ import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
-import { authTopic, tiered } from '../../middleware';
-import { verifyThreadSignature } from '../../middleware/canvas';
-import { mustBeAuthorized } from '../../middleware/guards';
+import {
+  authTopic,
+  mustBeAuthorized,
+  mustExist,
+  tiered,
+  turnstile,
+  verifyThreadSignature,
+} from '../../middleware';
 import { getThreadSearchVector } from '../../models/thread';
 import { tokenBalanceCache } from '../../services';
 import {
@@ -87,14 +92,28 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
       tiered({ creates: true }),
+      turnstile({ widgetName: 'create-thread' }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address } = mustBeAuthorized(actor, context);
 
-      const { community_id, topic_id, kind, url, ...rest } = payload;
+      const { community_id, topic_id, kind, url, is_linking_token, ...rest } =
+        payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
+
+      const community = await models.Community.findOne({
+        where: { id: community_id },
+        attributes: ['spam_tier_level'],
+      });
+      mustExist('Community', community);
+
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
 
       const topic = await models.Topic.findOne({ where: { id: topic_id } });
       if (topic?.archived_at)
@@ -135,6 +154,9 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               reaction_weights_sum: '0',
               search: getThreadSearchVector(rest.title, body),
               content_url: contentUrl,
+              is_linking_token,
+              marked_as_spam_at:
+                user.tier <= community.spam_tier_level ? new Date() : null,
             },
             {
               transaction,

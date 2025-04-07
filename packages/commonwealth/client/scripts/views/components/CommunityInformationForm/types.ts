@@ -30,4 +30,8 @@ export type CommunityInformationFormProps = {
   isCreatingCommunity: boolean;
   initialValues?: CommunityInformationFormSubmitValues;
   submitBtnLabel: string;
+  // Turnstile props
+  isTurnstileEnabled?: boolean;
+  turnstileToken?: string | null;
+  TurnstileWidget?: React.FC;
 };

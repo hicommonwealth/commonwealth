@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useUpdateContestMutation from 'state/api/contests/updateContest';
@@ -25,7 +26,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
 import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
-import { CONTEST_FAQ_URL } from '../../../utils';
+import { CONTEST_FAQ_URL, isJudgedContest } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -65,6 +66,7 @@ const DetailsFormStep = ({
   isFarcasterContest,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
+  const judgeContestEnabled = useFlag('judgeContest');
 
   const [payoutStructure, setPayoutStructure] = useState<
     ContestFormData['payoutStructure']
@@ -108,33 +110,50 @@ const DetailsFormStep = ({
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
-  const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting)
-    .map((t) => ({
-      value: t.id,
-      label: t.name,
-      weightedVoting: t.weighted_voting,
-      helpText: weightedVotingValueToLabel(t.weighted_voting!),
-      tokenAddress: t.token_address,
-    }));
+  const filteredTopics = (topicsData || []).filter(
+    (t) => t.name.toLowerCase() !== 'general',
+  );
+
+  const availableTopics = judgeContestEnabled
+    ? filteredTopics.map((t) => ({
+        value: t.id,
+        label: t.name,
+        weightedVoting: t.weighted_voting,
+        helpText: t.weighted_voting
+          ? weightedVotingValueToLabel(t.weighted_voting)
+          : 'Judged',
+        tokenAddress: t.token_address,
+      }))
+    : filteredTopics
+        .filter((t) => t.weighted_voting)
+        .map((t) => ({
+          value: t.id,
+          label: t.name,
+          weightedVoting: t.weighted_voting,
+          helpText: weightedVotingValueToLabel(t.weighted_voting!),
+          tokenAddress: t.token_address,
+        }));
 
   const getInitialValues = () => {
+    const selectedTopic = availableTopics.find(
+      (t) => t.value === contestFormData?.contestTopic?.value,
+    );
+    const judgedContestSelected = isJudgedContest(selectedTopic);
+
     return {
       contestName: contestFormData?.contestName,
-      contestTopic: weightedTopics.find(
-        (t) => t.value === contestFormData?.contestTopic?.value,
-      ),
+      contestTopic: selectedTopic,
       contestDescription: contestFormData?.contestDescription,
       contestImage: contestFormData?.contestImage,
       feeType:
         contestFormData?.feeType ||
-        (isFarcasterContest
+        (isFarcasterContest || judgedContestSelected
           ? ContestFeeType.DirectDeposit
           : ContestFeeType.CommunityStake),
       fundingTokenAddress: contestFormData?.fundingTokenAddress,
       contestRecurring:
         contestFormData?.contestRecurring ||
-        (isFarcasterContest
+        (isFarcasterContest || judgedContestSelected
           ? ContestRecurringType.No
           : ContestRecurringType.Yes),
     };
@@ -180,20 +199,23 @@ const DetailsFormStep = ({
       return;
     }
 
-    const selectedTopic = (weightedTopics || []).find(
+    const selectedTopic = (availableTopics || []).find(
       (t) => t.value === values?.contestTopic?.value,
     );
-    const feeType = isFarcasterContest
-      ? ContestFeeType.DirectDeposit
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const judgedContestSelected = isJudgedContest(selectedTopic);
+    const feeType =
+      isFarcasterContest || judgedContestSelected
         ? ContestFeeType.DirectDeposit
-        : ContestFeeType.CommunityStake;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestFeeType.DirectDeposit
+          : ContestFeeType.CommunityStake;
 
-    const contestRecurring = isFarcasterContest
-      ? ContestRecurringType.No
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const contestRecurring =
+      isFarcasterContest || judgedContestSelected
         ? ContestRecurringType.No
-        : ContestRecurringType.Yes;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestRecurringType.No
+          : ContestRecurringType.Yes;
 
     const formData: ContestFormData = {
       contestName: values.contestName,
@@ -290,7 +312,7 @@ const DetailsFormStep = ({
                     placeholder="Select topic"
                     isClearable={false}
                     isSearchable={false}
-                    options={[...weightedTopics, createNewTopicOption]}
+                    options={[...availableTopics, createNewTopicOption]}
                     isDisabled={editMode}
                     components={{
                       Option: (originalProps) =>
@@ -303,14 +325,20 @@ const DetailsFormStep = ({
                         return navigate('/manage/topics');
                       }
 
-                      if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
+                      if (
+                        t?.weightedVoting === TopicWeightedVoting.ERC20 ||
+                        // Non-weighted topic for judge nominated contests
+                        isJudgedContest(t)
+                      ) {
                         const token = topicsData?.find(
-                          (topic) => topic.id === t.value,
+                          (topic) => topic.id === t?.value,
                         )?.token_address;
                         setTokenValue(token || '');
                         setValue('feeType', ContestFeeType.DirectDeposit);
                         setValue('contestRecurring', ContestRecurringType.No);
-                      } else {
+                      } else if (
+                        t?.weightedVoting === TopicWeightedVoting.Stake
+                      ) {
                         setValue('feeType', ContestFeeType.CommunityStake);
                         setValue('contestRecurring', ContestRecurringType.Yes);
                       }
@@ -378,9 +406,10 @@ const DetailsFormStep = ({
 
               <CWDivider />
 
-              {weightedTopics.find(
-                (t) => t.value === watch('contestTopic')?.value,
-              )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
+              {watch('contestTopic')?.weightedVoting ===
+                TopicWeightedVoting.ERC20 ||
+              // Non-weighted topic for judge nominated contests
+              isJudgedContest(watch('contestTopic')) ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>
@@ -413,9 +442,8 @@ const DetailsFormStep = ({
                     disabled={editMode}
                   />
                 </>
-              ) : weightedTopics.find(
-                  (t) => t.value === watch('contestTopic')?.value,
-                )?.weightedVoting === TopicWeightedVoting.Stake ? (
+              ) : watch('contestTopic')?.weightedVoting ===
+                TopicWeightedVoting.Stake ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>

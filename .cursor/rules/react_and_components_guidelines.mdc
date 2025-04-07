@@ -1,0 +1,187 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# React & Component Development Guidelines
+
+## Key Principles
+
+-   **Design System:** Figma is the single source of truth for UI design. Engineering implements components according to these specs.
+-   **Functional Components:** Use functional components exclusively; avoid class components.
+-   **TypeScript:** Apply TypeScript throughout the codebase for type safety.
+-   **Reusability:** Build reusable UI components, primarily within the `component_kit` or `components` directories.
+-   **Composition:** Favor composition over inheritance for component relationships.
+-   **Single Responsibility:** Keep components focused on a single responsibility.
+-   **StrictMode:** Enable React StrictMode (`<React.StrictMode>`) for development checks, identifying potential issues like unsafe lifecycles, legacy refs, and side effects.
+
+## Directory Structure
+
+### General Structure
+
+-   **`/components`:** Houses reusable UI components shared across the application.
+-   **`/component_kit`:** A specific subdirectory within `/components` for core design system components. Use `/component_kit/new_designs` for components based on new, unreleased designs.
+-   **`/pages`:** Contains only components serving as entry points for routes. Each folder represents a route, named in `PascalCase` or `kebab-case`. The main component for a route should be in its own file (e.g., `RouteName.tsx`).
+
+### Component Folder Structure
+
+-   Each component resides in its own folder named in `PascalCase` (e.g., `Button`, `CWButton`).
+-   Include an `index.ts` file in each component folder to export the component(s) (e.g., `export * from './Button';`).
+-   Place component-specific SCSS files next to their corresponding TSX file with matching names (e.g., `Button.tsx`, `Button.scss`).
+
+Example (`component_kit`):
+```
+└── components
+    └── component_kit
+        ├── CWButton
+        │   ├── index.ts
+        │   ├── CWButton.tsx
+        │   └── CWButton.scss
+        └── CWTag
+            ├── index.ts
+            ├── CWTag.tsx
+            └── CWTag.scss
+```
+Example (general component):
+```
+└── components
+    └── UserProfile
+        ├── index.ts
+        ├── UserProfile.tsx
+        └── UserProfile.scss
+```
+
+## Naming Conventions
+
+-   **Components:** Use `PascalCase`. Prefix `component_kit` components with `CW` (e.g., `CWButton`, `UserProfile`).
+-   **Files:** Match the component name (e.g., `CWButton.tsx`, `UserProfile.tsx`). Use `PascalCase` or `kebab-case` for page folders.
+-   **SCSS Files:** Match the component name (e.g., `CWButton.scss`, `UserProfile.scss`).
+-   **Props Interface:** Use `ComponentNameProps` (e.g., `CWButtonProps`, `UserProfileProps`).
+-   **Root Element Class:** The most parent element's CSS class should match the component name in PascalCase (e.g., `CWButton` for `CWButton`, `UsesrProfile` for `UserProfile`).
+
+## Component Implementation
+
+### File Structure
+
+-   Keep only one React component per `.tsx` file.
+-   Define the component props interface (e.g., `UserProfileProps`) immediately above the component definition.
+-   Use named exports for `component_kit` components (`export const CWButton = ...`) and default exports for other components (`export default UserProfile`).
+
+### Component Definition
+
+-   Use functional components with destructured props.
+-   Define component-specific types (like enums or complex types) at the top of the file or in a separate `types.ts`.
+-   Implement component logic (state, effects, calculations) *before* the `return` statement.
+-   Define event handlers (like `handleClick`) within the component body, not inline in JSX.
+-   Minimize logic directly within the JSX returned. Use helper functions or variables defined above the `return` for complex rendering logic.
+
+```typescript
+// Example (Component Kit Component)
+import { getClasses, ComponentType } from './utils'; // Assuming utils exist
+import classNames from 'classnames'; // If using classnames library
+
+type TagType = 'passed' | 'failed' | 'active'; // Keep specific types close
+
+export type CWTagProps = {
+  label: string;
+  type: TagType;
+  iconName?: string;
+  className?: string;
+  onClick?: () => void;
+};
+
+export const CWTag = ({
+  label,
+  type,
+  iconName,
+  className,
+  onClick,
+}: CWTagProps) => {
+  // Hooks and logic go here
+  const displayLabel = ()= > { /* ... */ };
+
+  return (
+    <div
+      className={clsx("CWTag")}
+      onClick={onClick}
+    >
+      {iconName && <Icon name={iconName} />}
+      <span>{displayLabel()}</span>
+    </div>
+  );
+};
+
+// Example (General Component)
+import { useState, useEffect } from 'react';
+import { useUserData } from '../hooks/useUserData'; // Custom hook example
+
+interface UserProfileProps {
+  userId: number;
+}
+
+const UserProfile = ({ userId }: UserProfileProps) => {
+  const { user, loading, error } = useUserData(userId);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
+
+  if (loading) return <UserProfileSkeleton />; // Use Skeleton component
+  if (error) return <div>Error loading user data.</div>;
+  if (!user) return null;
+
+  return (
+    <div className="UserProfile">
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+      <button onClick={handleEditToggle}>
+        {isEditing ? 'Cancel' : 'Edit'}
+      </button>
+      {/* More JSX */}
+    </div>
+  );
+};
+
+export default UserProfile;
+```
+
+### Styling
+
+-   Place styles in a matching `.scss` file next to the component.
+-   For `component_kit` components, use the `getClasses` utility helper and `ComponentType` enum to apply consistent base class names and variant classes.
+-   Keep styles scoped to the component to prevent global leakage. Use CSS Modules or ensure specific selectors if not using `getClasses`.
+
+### Component Variants
+
+-   Implement variants using props (e.g., `<CWButton variant="primary">`) rather than creating separate components where possible.
+-   Use TypeScript union types to define allowed variant values (e.g., `type ButtonVariant = 'primary' | 'secondary' | 'danger';`).
+-   Ensure variants map clearly to Figma designs.
+
+### Skeleton Components
+
+-   Create skeleton loading states for components that fetch data.
+-   Place skeleton components in separate files named after the component they represent (e.g., `UserProfileSkeleton.tsx`).
+-   Export skeleton components from the component's `index.ts`.
+-   Conditionally render the skeleton component during loading states: `if (loading) return <ComponentSkeleton />;`
+
+## React Hooks
+
+-   **Placement:** Call hooks only at the top level of functional components, never inside loops, conditions, or nested functions.
+-   **Imports:** Use destructured imports: `import { useState, useEffect } from 'react';`
+-   **Dependencies:** Always provide accurate dependency arrays for hooks like `useEffect`, `useCallback`, and `useMemo`. Do *not* disable the `exhaustive-deps` lint rule. If dependencies cause infinite loops, refactor the logic or memoize the dependencies themselves using `useMemo` or `useCallback`.
+-   **Custom Hooks:** Extract reusable stateful logic and side effects into custom hooks (e.g., `useUserData`, `useFormValidation`) placed in a relevant `hooks` directory.
+
+## State Management
+
+-   Use standard React hooks (`useState`, `useReducer`) for local component state.
+-   For global application state, follow the established state management library conventions (refer to `state-management.mdc` if applicable).
+
+## Component Documentation & Showcase
+
+-   **Props:** Document component props using TSDoc comments, explaining their purpose and usage.
+-   **Showcase:** Add significant components (especially `component_kit`) to the Components Showcase page for visibility and testing (`pnpm add-component-showcase`).
+    -   Categorize as "Foundations" or "Components".
+    -   Use `<React.Fragment>` as the top-level wrapper in showcase files.
+    -   Minimize custom styling, preferring utility classes and standard layouts (`flex-column`, `flex-row`).
+-   **Updates:** Keep documentation and showcases up-to-date when component APIs change.

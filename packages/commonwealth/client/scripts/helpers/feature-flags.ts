@@ -26,6 +26,7 @@ const featureFlags = {
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
   newContestPage: buildFlag(process.env.FLAG_NEW_CONTEST_PAGE),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
+  mobileDownload: buildFlag(process.env.FLAG_MOBILE_DOWNLOAD),
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
@@ -34,6 +35,8 @@ const featureFlags = {
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
+  privy: buildFlag(process.env.FLAG_PRIVY),
+  judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
 };
 
