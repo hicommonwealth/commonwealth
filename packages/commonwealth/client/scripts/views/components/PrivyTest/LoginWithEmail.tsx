@@ -1,10 +1,11 @@
-import { useLoginWithEmail } from '@privy-io/react-auth';
+import { useLoginWithEmail, usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
 
 export const LoginWithEmail = () => {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const { sendCode, loginWithCode } = useLoginWithEmail();
+  const { authenticated, user, login, logout } = usePrivy();
 
   const handleSendCode = useCallback(() => {
     // FIXME: ... I get Captcha failed - but no captcha is shown.
@@ -25,6 +26,17 @@ export const LoginWithEmail = () => {
 
     doAsync().catch(console.error);
   }, [code, loginWithCode]);
+
+  if (authenticated) {
+    return (
+      <div>
+        Welcome, {user?.email?.address}
+        <div>
+          <button onClick={logout}>Logout</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
