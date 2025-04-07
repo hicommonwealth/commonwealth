@@ -4,7 +4,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { BalanceSourceType, WalletId } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  UserTierMap,
+  WalletId,
+} from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -389,7 +393,7 @@ describe('User lifecycle', () => {
 
       // upgrade tier for testing
       await models.User.update(
-        { tier: 4 },
+        { tier: UserTierMap.ManuallyVerified },
         { where: { id: new_address!.user_id! } },
       );
 
@@ -554,9 +558,11 @@ describe('User lifecycle', () => {
         payload: { user_id: new_actor.user.id },
       });
       expect(xps5!.length).to.equal(2);
-      xps5?.filter(x => x.action_meta_id > 0)?.forEach((xp) => {
-        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
-      });
+      xps5
+        ?.filter((x) => x.action_meta_id > 0)
+        ?.forEach((xp) => {
+          expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
+        });
 
       // 3 CommentCreated events for admin
       const xps6 = await query(GetXps(), {

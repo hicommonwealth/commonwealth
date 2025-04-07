@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/core';
 import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import { ChainBase, ChainType, UserTierMap } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
@@ -103,11 +103,26 @@ describe('Community lifecycle', () => {
     cosmosNode = _cosmosNode!;
     substrateNode = _substrateNode!;
 
-    const [superadmin] = await seed('User', { isAdmin: true, tier: 4 });
-    const [admin] = await seed('User', { isAdmin: false, tier: 4 });
-    const [member] = await seed('User', { isAdmin: false, tier: 4 });
-    const [cosmosMember] = await seed('User', { isAdmin: false, tier: 4 });
-    const [substrateMember] = await seed('User', { isAdmin: false, tier: 4 });
+    const [superadmin] = await seed('User', {
+      isAdmin: true,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [admin] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [member] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [cosmosMember] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [substrateMember] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
 
     const [ethBase] = await seed('Community', {
       chain_node_id: _ethNode!.id!,
