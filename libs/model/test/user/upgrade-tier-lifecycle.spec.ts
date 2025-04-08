@@ -1,14 +1,7 @@
 import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
-import {
-  ChainNode,
-  Community,
-  ContestManager,
-  EventPair,
-  Topic,
-  User,
-} from '@hicommonwealth/schemas';
+import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
@@ -66,14 +59,10 @@ const buildNamespaceTransferSingleEvent = (
 describe('Upgrade Tiers lifecycle', () => {
   const userAddress: string = '0x8888888888888888888888888888888888888888';
   const contestAddress: string = '0x1234567890123456789012345678901234567890';
-  const contestFundingTokenAddress: string = '0x1337';
   const contestId: number = 1;
 
-  let node: z.infer<typeof ChainNode>;
   let community: z.infer<typeof Community>;
   let user: z.infer<typeof User>;
-  let topic: z.infer<typeof Topic>;
-  let contestManager: z.infer<typeof ContestManager>;
 
   beforeAll(async () => {
     const [node1] = await seed('ChainNode', {
@@ -103,7 +92,7 @@ describe('Upgrade Tiers lifecycle', () => {
       community_id: community1!.id,
     });
 
-    contestManager = await models.ContestManager.create({
+    await models.ContestManager.create({
       name: 'hello',
       community_id: community1!.id,
       payout_structure: [],
@@ -130,9 +119,7 @@ describe('Upgrade Tiers lifecycle', () => {
       created_at: new Date(),
     });
 
-    node = node1!;
     user = user1!;
-    topic = topic1!;
     community = community1!;
 
     vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({

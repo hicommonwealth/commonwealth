@@ -13,7 +13,7 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
   return {
     ...schemas.DeleteGroup,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload }) => {
+    body: async ({ payload }) => {
       const { community_id, group_id } = payload;
 
       const group = await models.Group.findOne({
