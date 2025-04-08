@@ -263,7 +263,6 @@ export const GetThreads = {
   output: z.object({
     page: z.number(),
     limit: z.number(),
-    numVotingThreads: z.number(),
     threads: z.array(ThreadView),
     threadCount: z.number().optional(),
   }),
