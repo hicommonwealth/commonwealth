@@ -6,13 +6,19 @@ import {
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+import {
+  USDC_BASE_MAINNET_ADDRESS,
+  USDC_BASE_SEPOLIA_ADDRESS,
+} from 'model/src/services/openai/parseBotCommand';
 import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
 import { getChainNodeUrl } from 'model/src/utils/utils';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { tokenBalanceCache } from '../../services';
 
-const MIN_TRADE_AMOUNT = 10 ** 6;
+export const UPGRADE_MIN_TRADE_AMOUNT = 250_000_000_000_000_000n; // 2.5 * 10^17
+export const UPGRADE_MIN_USDC_BALANCE = 50_000_000_000_000_000_000n; // 50 * 10^18
+export const UPGRADE_MIN_LAUNCHPAD_BALANCE = 1_000_000_000_000_000_000n; // 1 * 10^18
 
 const log = logger(import.meta);
 
@@ -132,7 +138,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           },
         );
 
-        if (totalTraded.sum > MIN_TRADE_AMOUNT) {
+        if (totalTraded.sum > UPGRADE_MIN_TRADE_AMOUNT) {
           await upgradeUserTier(tokenCreatorAddress.User.id!, 4);
         }
       },
@@ -183,12 +189,32 @@ const onContestActivity = async ({
       },
     ],
   });
-  if (!contestManager) {
+  if (!contestManager?.Community?.ChainNode) {
     log.warn(
-      `Contest manager not found for contest address ${contest_address}`,
+      `Active contest manager with chain node not found for contest address ${contest_address}`,
     );
     return;
   }
+
+  const contestCreatorAddress = await models.Address.findOne({
+    where: {
+      address: contestManager.creator_address!,
+    },
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
+  });
+  if (!contestCreatorAddress?.User) {
+    log.warn(
+      `Contest creator user not found for address ${contestManager.creator_address!}`,
+    );
+    return;
+  }
+
+  if (contestCreatorAddress.User.tier >= 4) return;
 
   const rpc = getChainNodeUrl({
     url: contestManager!.Community!.ChainNode!.url,
@@ -208,30 +234,36 @@ const onContestActivity = async ({
     contest_id,
   );
 
-  if (!contestBalance) {
+  const contestBalanceInt = BigInt(contestBalance ?? '0');
+
+  if (!contestBalanceInt) {
     return;
   }
 
-  // contest has been funded, upgrade contest creator to tier 4
+  // must be USDC or launchpad token
 
-  const contestCreatorAddress = await models.Address.findOne({
+  const isUSDC = [
+    USDC_BASE_MAINNET_ADDRESS,
+    USDC_BASE_SEPOLIA_ADDRESS,
+  ].includes(contestManager.funding_token_address!);
+
+  const isLaunchpadToken = !!(await models.LaunchpadToken.findOne({
     where: {
-      address: contestManager.creator_address!,
+      // launchpad token addresses are all lowercase
+      token_address: contestManager.funding_token_address!.toLowerCase(),
     },
-    include: [
-      {
-        model: models.User,
-        required: true,
-      },
-    ],
-  });
-  if (!contestCreatorAddress?.User) {
+  }));
+
+  if (
+    (isUSDC && contestBalanceInt >= UPGRADE_MIN_USDC_BALANCE) ||
+    (isLaunchpadToken && contestBalanceInt >= UPGRADE_MIN_LAUNCHPAD_BALANCE)
+  ) {
+    // contest has been funded, upgrade contest creator to tier 4
+    await upgradeUserTier(contestCreatorAddress.User.id!, 4);
+  } else {
     log.warn(
-      `Contest creator user not found for address ${contestManager.creator_address!}`,
+      `Contest funding token not approved for contest ${contest_address}`,
     );
     return;
   }
-  if (contestCreatorAddress.User.tier >= 4) return;
-
-  await upgradeUserTier(contestCreatorAddress.User.id!, 4);
 };

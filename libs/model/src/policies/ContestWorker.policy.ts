@@ -118,6 +118,11 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
         }
 
+        console.log(
+          'activeContestManagersWithoutVote',
+          activeContestManagersWithoutVote,
+        );
+
         const chainNodeUrl = getChainNodeUrl(
           activeContestManagersWithoutVote[0]!,
         );
