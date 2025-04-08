@@ -2,6 +2,7 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { AxiosError } from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
+import { resetXPCacheForUser } from 'helpers/quest';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
@@ -55,9 +56,7 @@ const useCreateCommentReactionMutation = () => {
       // reset comments cache state
       utils.comment.getComments.invalidate().catch(console.error);
 
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

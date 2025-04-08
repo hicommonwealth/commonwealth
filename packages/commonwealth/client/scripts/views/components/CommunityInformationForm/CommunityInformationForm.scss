@@ -14,6 +14,16 @@
     margin-top: auto;
   }
 
+  .tokenize-toggle {
+    display: flex;
+    flex-direction: column;
+
+    .token-toggle-header {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
   .social-links {
     display: flex;
     flex-direction: column;
@@ -54,5 +64,10 @@
     @include smallInclusive {
       justify-content: flex-end;
     }
+  }
+
+  .turnstile-container {
+    display: flex;
+    justify-content: right;
   }
 }

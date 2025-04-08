@@ -15,6 +15,7 @@ import { StickCommentContext } from 'views/components/StickEditorContainer/conte
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
@@ -64,6 +65,15 @@ export const MobileInput = (props: MobileInputProps) => {
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: mode === 'thread' ? 'create-thread' : 'create-comment',
+  });
+
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
       stickyCommentReset();
@@ -100,6 +110,12 @@ export const MobileInput = (props: MobileInputProps) => {
 
     if (mode === 'thread') {
       try {
+        // Check for turnstile verification if enabled
+        if (isTurnstileEnabled && !turnstileToken) {
+          notifyError('Please complete the Turnstile verification');
+          return;
+        }
+
         // Find a default topic (prefer "General" if it exists)
         const defaultTopic =
           sortedTopics.find(
@@ -134,12 +150,14 @@ export const MobileInput = (props: MobileInputProps) => {
           title: effectiveTitle,
           topic: defaultTopic,
           body: effectiveBody,
+          turnstileToken,
         });
 
         const thread = await createThreadMutation(threadInput);
 
-        // Clear the input
+        // Clear the input and reset turnstile
         setValue('');
+        resetTurnstile();
 
         // Construct the correct navigation path with proper URL encoding
         const encodedTitle = encodeURIComponent(
@@ -153,6 +171,9 @@ export const MobileInput = (props: MobileInputProps) => {
       } catch (error) {
         console.error('Error creating thread:', error);
         notifyError('Failed to create thread');
+
+        // Reset turnstile on error
+        resetTurnstile();
       }
     } else {
       // --- Traditional Comment Submission Logic ---
@@ -172,7 +193,7 @@ export const MobileInput = (props: MobileInputProps) => {
           });
         }
         // Call the actual comment submission logic passed in as a prop.
-        const commentId = await handleSubmitComment();
+        const commentId = await handleSubmitComment(turnstileToken);
         setValue('');
         stickyCommentReset();
 
@@ -248,6 +269,12 @@ export const MobileInput = (props: MobileInputProps) => {
           </div>
         </div>
       </div>
+
+      {mode === 'thread' && isTurnstileEnabled && (
+        <div className="mobile-turnstile-container">
+          <TurnstileWidget />
+        </div>
+      )}
     </div>
   );
 };

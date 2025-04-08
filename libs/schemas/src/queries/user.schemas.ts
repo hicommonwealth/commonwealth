@@ -177,17 +177,27 @@ export const GetXps = {
   output: z.array(XpLogView),
 };
 
+export const XpRankedUser = z.object({
+  user_id: PG_INT,
+  xp_points: z.number(),
+  tier: z.number(),
+  user_name: z.string().nullish(),
+  avatar_url: z.string().nullish(),
+});
+
+export const GetXpsRanked = {
+  input: z.object({
+    top: z.number(),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
+  }),
+  output: z.array(XpRankedUser),
+};
+
 export const RandomResourceIdsView = z.object({
   community_id: z.string(),
   thread_id: z.number(),
   comment_id: z.number(),
 });
-
-export const GetRandomResourceIds = {
-  input: z.object({
-    exclude_joined_communities: z.boolean().optional(),
-  }),
-  output: z.object({
-    results: z.array(RandomResourceIdsView),
-  }),
-};

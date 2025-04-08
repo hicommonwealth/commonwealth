@@ -105,7 +105,7 @@ describe('Thread lifecycle', () => {
           : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
-      spam_tier_level: 1,
+      spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
       active: true,
