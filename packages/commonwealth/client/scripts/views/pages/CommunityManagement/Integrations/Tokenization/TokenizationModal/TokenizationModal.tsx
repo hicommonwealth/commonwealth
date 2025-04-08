@@ -40,6 +40,7 @@ const TokenizationModal = ({
   const [isSaving, setIsSaving] = useState(false);
   const [deselectedTopics, setDeselectedTopics] = useState<string[]>([]);
   const [threadPurchaseToken, setThreadPurchaseToken] = useState('');
+  const [showInfoBox, setShowInfoBox] = useState(true);
 
   const communityId = app.activeChainId() || '';
   const { data: topics = [] } = useFetchTopicsQuery({
@@ -141,38 +142,49 @@ const TokenizationModal = ({
     }
   };
 
+  const handleUnderstand = () => {
+    setShowInfoBox(false);
+    onUnderstand();
+  };
+
+  const handleDismiss = () => {
+    setShowInfoBox(false);
+    onDismiss();
+  };
+
   return (
     <div className="TokenizationModal">
       <CWModalHeader label="Tokenization Settings" onModalClose={onCancel} />
 
       <CWModalBody>
-        <div className="info-box">
-          <div className="header">
-            <CWIcon iconName="infoEmpty" className="blue-icon" />
-            <CWText type="b2" fontWeight="semiBold" className="blue">
-              How it works
+        {showInfoBox && (
+          <div className="info-box">
+            <div className="header">
+              <CWIcon iconName="infoEmpty" className="blue-icon" />
+              <CWText type="b2" fontWeight="semiBold" className="blue">
+                How it works
+              </CWText>
+            </div>
+            <CWText className="blue">
+              By default, all topics created in this community allow tokenized
+              threads. Threads created in these topics will count as entries
+              during community-wide contests. Read more about tokenized threads
+              here.
             </CWText>
+            <div className="info-actions">
+              <CWButton
+                buttonType="secondary"
+                label="I understand"
+                onClick={handleUnderstand}
+              />
+              <CWButton
+                buttonType="tertiary"
+                label="Dismiss"
+                onClick={handleDismiss}
+              />
+            </div>
           </div>
-
-          <CWText className="blue">
-            By default, all topics created in this community allow tokenized
-            threads. Threads created in these topics will count as entries
-            during community-wide contests. Read more about tokenized threads
-            here.
-          </CWText>
-          <div className="info-actions">
-            <CWButton
-              buttonType="secondary"
-              label="I understand"
-              onClick={onUnderstand}
-            />
-            <CWButton
-              buttonType="tertiary"
-              label="Dismiss"
-              onClick={onDismiss}
-            />
-          </div>
-        </div>
+        )}
 
         <div className="topics-row">
           <div className="header">
