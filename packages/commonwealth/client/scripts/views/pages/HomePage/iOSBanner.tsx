@@ -1,6 +1,6 @@
+import iosBannerImage from 'assets/img/iosbanner.svg';
 import React, { useState } from 'react';
 import './iOSBanner.scss';
-import iosBannerImage from 'assets/img/iosbanner.svg';
 
 interface IOSBannerProps {
   onDismiss?: () => void;
