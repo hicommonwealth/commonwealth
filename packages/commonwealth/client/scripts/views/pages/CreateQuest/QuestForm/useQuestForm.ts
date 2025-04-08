@@ -218,7 +218,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               (subForm.config?.with_optional_comment_id ||
                 subForm.config?.with_optional_thread_id ||
                 subForm.config?.with_optional_topic_id) && {
-                content_id: await buildContentIdFromURL(
+                content_id: buildContentIdFromURL(
                   subForm.values.contentLink,
                   subForm.values?.contentIdScope ===
                     QuestActionContentIdScope.Thread
@@ -278,7 +278,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             (subForm.config?.with_optional_comment_id ||
               subForm.config?.with_optional_thread_id ||
               subForm.config?.with_optional_topic_id) && {
-              content_id: await buildContentIdFromURL(
+              content_id: buildContentIdFromURL(
                 subForm.values.contentLink,
                 subForm.values?.contentIdScope ===
                   QuestActionContentIdScope.Thread
@@ -303,7 +303,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const subFormErrors = validateSubForms();
@@ -407,7 +407,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             (form) =>
               form.config?.with_optional_topic_id &&
               form.values.contentIdScope === QuestActionContentIdScope.Topic &&
-              error.includes(form.values?.contentLink?.trim()),
+              error.includes(form.values?.contentLink?.trim()?.toLowerCase()),
           );
           if (foundSubForm) {
             foundSubForm.errors = {
