@@ -10,14 +10,14 @@ import {
   User,
 } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import { z } from 'zod';
 import {
   UPGRADE_MIN_USDC_BALANCE,
   UpgradeTierPolicy,
-} from 'model/src/aggregates/user/UpgradeTier.policy';
-import { models } from 'model/src/database';
-import { USDC_BASE_MAINNET_ADDRESS } from 'model/src/services/openai/parseBotCommand';
-import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { z } from 'zod';
+} from '../../src/aggregates/user/UpgradeTier.policy';
+import { models } from '../../src/database';
+import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCommand';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 

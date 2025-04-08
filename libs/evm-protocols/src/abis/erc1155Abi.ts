@@ -1,4 +1,4 @@
-const erc1155Abi = [
+export const erc1155Abi = [
   {
     anonymous: false,
     inputs: [
@@ -312,4 +312,3 @@ const erc1155Abi = [
     type: 'function',
   },
 ] as const;
-export default erc1155Abi;

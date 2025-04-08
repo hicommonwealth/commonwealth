@@ -9,10 +9,10 @@ import {
 import {
   EvmEventSignatures,
   decodeLog,
+  erc1155Abi,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
-import erc1155Abi from 'evm-protocols/src/abis/erc1155Abi';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (

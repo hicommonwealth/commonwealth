@@ -8,7 +8,7 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
-import erc1155Abi from '../abis/erc1155Abi';
+import { erc1155Abi } from '../abis/erc1155Abi';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';

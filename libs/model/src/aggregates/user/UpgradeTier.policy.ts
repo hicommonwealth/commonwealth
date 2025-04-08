@@ -6,15 +6,15 @@ import {
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import {
-  USDC_BASE_MAINNET_ADDRESS,
-  USDC_BASE_SEPOLIA_ADDRESS,
-} from 'model/src/services/openai/parseBotCommand';
-import { findActiveContestManager } from 'model/src/utils/findActiveContestManager';
-import { getChainNodeUrl } from 'model/src/utils/utils';
 import { Op, QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { tokenBalanceCache } from '../../services';
+import {
+  USDC_BASE_MAINNET_ADDRESS,
+  USDC_BASE_SEPOLIA_ADDRESS,
+} from '../../services/openai/parseBotCommand';
+import { findActiveContestManager } from '../../utils/findActiveContestManager';
+import { getChainNodeUrl } from '../../utils/utils';
 
 export const UPGRADE_MIN_TRADE_AMOUNT = 250_000_000_000_000_000n; // 2.5 * 10^17
 export const UPGRADE_MIN_USDC_BALANCE = 50_000_000_000_000_000_000n; // 50 * 10^18
