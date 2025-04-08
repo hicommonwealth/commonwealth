@@ -10,6 +10,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import TrustLevelRole from 'views/components/TrustLevelRole';
 
 import './XPTable.scss';
 
@@ -28,12 +29,6 @@ const columns: CWTableColumnInfo[] = [
     numeric: false,
     sortable: true,
   },
-  // {
-  //   key: 'xp',
-  //   header: `Aura`,
-  //   numeric: true,
-  //   sortable: true,
-  // },
 ];
 
 const XPTable = () => {
@@ -76,6 +71,7 @@ const XPTable = () => {
       id: rank.user_id,
       name: rank.user_name || '',
       avatar_url: rank.avatar_url || '',
+      tier: rank.tier,
     },
     xp: rank.xp_points,
   }));
@@ -124,7 +120,13 @@ const XPTable = () => {
                         size={24}
                         address={rank.user_profile.id}
                       />
-                      <p>{rank.user_profile.name}</p>
+                      <p>
+                        {rank.user_profile.name}
+                        <TrustLevelRole
+                          type="user"
+                          level={rank.user_profile.tier}
+                        />
+                      </p>
                     </Link>
                   </div>
                 ),

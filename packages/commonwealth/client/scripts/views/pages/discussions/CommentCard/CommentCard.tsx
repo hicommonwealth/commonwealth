@@ -6,6 +6,7 @@ import {
   CanvasSignedData,
   DEFAULT_NAME,
   deserializeCanvas,
+  UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
@@ -363,6 +364,7 @@ export const CommentCard = ({
                 name: comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
+                tier: comment.user_tier || UserTierMap.IncompleteUser,
               }}
               versionHistory={(comment.CommentVersionHistories || []).map(
                 (cvh) => ({

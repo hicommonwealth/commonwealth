@@ -120,6 +120,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                     'community_id', A.community_id
                 ) as "Address",
                 U.id as user_id,
+                U.tier as user_tier,
                 A.last_active as address_last_active,
                 U.profile->>'avatar_url' as avatar_url,
                 U.profile->>'name' as profile_name
@@ -218,6 +219,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'profile_name', U.profile->>'name',
                   'profile_avatar', U.profile->>'avatar_url',
                   'user_id', U.id,
+                  'user_tier', U.tier,
                   'content_url', COM.content_url
               ))) as "recentComments"
               FROM (
