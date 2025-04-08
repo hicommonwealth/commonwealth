@@ -1,4 +1,4 @@
-import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
+import { ChainBase, DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
@@ -108,13 +108,19 @@ export const FullUser = ({
       ) : !shouldShowAddressWithDisplayName ? (
         <>
           {profile?.name} &nbsp;
-          <TrustLevelRole type="user" level={profile?.tier || 0} />
+          <TrustLevelRole
+            type="user"
+            level={profile?.tier || UserTierMap.IncompleteUser}
+          />
         </>
       ) : (
         <>
           <div className="profile-name">
             {profile?.name}{' '}
-            <TrustLevelRole type="user" level={profile?.tier || 0} />
+            <TrustLevelRole
+              type="user"
+              level={profile?.tier || UserTierMap.IncompleteUser}
+            />
           </div>
           <div className="id-short">{fullAddress}</div>
         </>
@@ -209,13 +215,19 @@ export const FullUser = ({
                 ) : !shouldShowAddressWithDisplayName ? (
                   <>
                     {profile?.name}{' '}
-                    <TrustLevelRole type="user" level={profile?.tier || 0} />
+                    <TrustLevelRole
+                      type="user"
+                      level={profile?.tier || UserTierMap.IncompleteUser}
+                    />
                   </>
                 ) : (
                   <>
                     <>
                       {profile?.name}{' '}
-                      <TrustLevelRole type="user" level={profile?.tier || 0} />
+                      <TrustLevelRole
+                        type="user"
+                        level={profile?.tier || UserTierMap.IncompleteUser}
+                      />
                     </>
                     <div className="id-short">{redactedAddress}</div>
                   </>
@@ -229,7 +241,10 @@ export const FullUser = ({
               to={`/profile/id/${profile?.userId}`}
             >
               {profile?.name}{' '}
-              <TrustLevelRole type="user" level={profile?.tier || 0} />
+              <TrustLevelRole
+                type="user"
+                level={profile?.tier || UserTierMap.IncompleteUser}
+              />
             </Link>
           )}
           {profile?.address && (

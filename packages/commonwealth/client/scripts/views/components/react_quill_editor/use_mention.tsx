@@ -5,6 +5,7 @@ import { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
+import { UserTierMap } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import app from 'state';
 import { useSearchProfilesQuery } from 'state/api/profiles';
@@ -126,7 +127,7 @@ export const useMention = ({
                 avatarUrl,
                 profileCommunity,
                 null,
-                0,
+                UserTierMap.IncompleteUser,
               );
               const node = document.createElement('div');
 

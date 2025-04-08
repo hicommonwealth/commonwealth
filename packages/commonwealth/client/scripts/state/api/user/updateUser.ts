@@ -1,4 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { trpc } from '../../../utils/trpcClient';
 import useUserStore from '../../ui/user';
@@ -47,7 +47,7 @@ const useUpdateUserMutation = ({
             updated.profile.avatar_url!,
             chain,
             null,
-            0,
+            UserTierMap.IncompleteUser,
           );
           utils.user.getUserAddresses.setData(
             {

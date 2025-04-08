@@ -1,5 +1,6 @@
 import {
   DEFAULT_NAME,
+  UserTierMap,
   type ChainBase,
   type WalletId,
 } from '@hicommonwealth/shared';
@@ -100,7 +101,7 @@ class Account {
         signedInProfile.avatarUrl ?? '',
         updatedProfile.chain,
         signedInProfile.lastActive ?? null,
-        0,
+        UserTierMap.IncompleteUser,
       );
       // manually trigger an update signal when data is fetched
       NewProfilesController.Instance.isFetched.emit('redraw');

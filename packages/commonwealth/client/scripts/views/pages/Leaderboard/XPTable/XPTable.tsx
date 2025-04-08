@@ -29,25 +29,7 @@ const columns: CWTableColumnInfo[] = [
     numeric: false,
     sortable: true,
   },
-  // {
-  //   key: 'xp',
-  //   header: `Aura`,
-  //   numeric: true,
-  //   sortable: true,
-  // },
 ];
-
-type RankProfile = {
-  user_id: number;
-  user_profile: {
-    id: number;
-    name: string;
-    avatar_url: string;
-    tier: number;
-  };
-  xp: number;
-  rank: number;
-};
 
 const XPTable = () => {
   const [currentPage, setCurrentPage] = useState(1);

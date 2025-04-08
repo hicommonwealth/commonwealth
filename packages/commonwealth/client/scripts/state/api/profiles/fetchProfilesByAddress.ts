@@ -1,4 +1,5 @@
 import * as schemas from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { getQueryKey } from '@trpc/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
@@ -6,7 +7,6 @@ import { queryClient } from 'state/api/config';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { userStore } from '../../ui/user';
-
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
 
 interface FetchProfilesByAddressProps {
@@ -41,7 +41,7 @@ const useFetchProfilesByAddressesQuery = ({
             t.avatarUrl ?? '',
             currentChainId,
             new Date(t.lastActive),
-            t.tier ?? 0,
+            t.tier ?? UserTierMap.IncompleteUser,
           );
           return profile;
         }),
@@ -117,7 +117,7 @@ export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = async (
       t.avatarUrl,
       communities[0],
       t.lastActive,
-      t.tier ?? 0,
+      t.tier ?? UserTierMap.IncompleteUser,
     );
     return profile;
   });
