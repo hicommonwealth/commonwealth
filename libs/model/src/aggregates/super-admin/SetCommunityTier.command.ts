@@ -1,8 +1,8 @@
 import { Command, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import { models } from 'model/src/database';
-import { isSuperAdmin } from 'model/src/middleware';
+import { models } from '../../database';
+import { isSuperAdmin } from '../../middleware';
 
 export function SetCommunityTier(): Command<typeof schemas.SetCommunityTier> {
   return {
