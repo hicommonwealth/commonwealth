@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './iOSBanner.scss';
-import iOSBannerImage from './iosbanner.svg';
+import iosBannerImage from 'assets/iosbanner.svg';
 
 interface IOSBannerProps {
   onDismiss?: () => void;
 }
 
-export const IOSBanner: React.FC<IOSBannerProps> = ({ onDismiss }) => {
+const IOSBanner: React.FC<IOSBannerProps> = ({ onDismiss }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   const handleDismiss = () => {
@@ -17,36 +17,43 @@ export const IOSBanner: React.FC<IOSBannerProps> = ({ onDismiss }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="bannerContainer">
+    <div className="bannerContainer" data-testid="ios-banner">
+      <img
+        src={iosBannerImage}
+        alt="iOS App Banner Illustration"
+        className="bannerImage"
+        aria-hidden="true"
+      />
       <div className="contentWrapper">
         <div className="textContent">
-          <h1 className="title">Download Common from the App Store</h1>
-          <p className="subtitle">
-            Engage, earn, and participate all on mobile.
+          <h2 className="title" id="ios-banner-title">
+            Get the Commonwealth iOS App
+          </h2>
+          <p className="subtitle" id="ios-banner-description">
+            Stay connected to your communities with our mobile app
           </p>
         </div>
         <div className="buttonGroup">
           <a
-            href="https://apps.apple.com/us/app/common-protocol/id1577646789"
+            href="https://apps.apple.com/us/app/commonwealth-app/id1657298714"
             target="_blank"
             rel="noopener noreferrer"
             className="downloadButton"
+            aria-labelledby="ios-banner-title ios-banner-description"
+            data-testid="ios-banner-download"
           >
-            Download on iOS
+            Download on the App Store
           </a>
           <button
             onClick={handleDismiss}
             className="dismissButton"
+            aria-label="Dismiss iOS app banner"
+            data-testid="ios-banner-dismiss"
           >
             Dismiss
           </button>
         </div>
       </div>
-      <img
-        src={iOSBannerImage}
-        alt="Download Common App"
-        className="bannerImage"
-      />
     </div>
   );
 };

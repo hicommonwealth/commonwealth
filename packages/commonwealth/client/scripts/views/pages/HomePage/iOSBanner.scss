@@ -1,57 +1,47 @@
 @import '../../../styles/shared.scss';
 
 .bannerContainer {
-  background: linear-gradient(90deg, rgba(255, 240, 240, 0.4) 0%, rgba(240, 240, 255, 0.4) 100%);
-  border-radius: 6px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
+  background: linear-gradient(90deg, #F8F8FF 0%, #E8E8FF 100%);
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
-  margin: 16px 0;
-  border: 1px solid $neutral-100;
+  padding: 32px;
+  margin: 24px 0;
 
   @media (max-width: 768px) {
-    padding: 24px 20px;
-    text-align: center;
+    padding: 24px 16px;
+    margin: 16px 0;
   }
 }
 
 .contentWrapper {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  flex: 1;
-  max-width: 50%;
+  gap: 24px;
+  max-width: 60%;
   z-index: 1;
-  margin-right: 40%;
+  position: relative;
 
   @media (max-width: 768px) {
     max-width: 100%;
-    margin-right: 0;
     gap: 16px;
-    align-items: center;
   }
 }
 
 .bannerImage {
   position: absolute;
-  right: -120px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 150%;
-  width: 70%;
+  height: 100%;
+  width: auto;
   object-fit: contain;
 
   @media (max-width: 768px) {
-    right: 0;
-    top: auto;
-    bottom: -20%;
-    transform: none;
-    width: 100%;
-    height: 80%;
     opacity: 0.15;
+    width: 100%;
+    height: auto;
+    right: -20%;
   }
 }
 
@@ -59,95 +49,76 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  @media (max-width: 768px) {
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-  }
 }
 
 .title {
   font-size: 24px;
-  margin: 0;
-  color: $neutral-900;
   font-weight: 600;
-  line-height: 1.2;
+  color: #1A1A1A;
+  margin: 0;
 
   @media (max-width: 768px) {
     font-size: 20px;
-    text-align: center;
-    max-width: 100%;
   }
 }
 
 .subtitle {
-  font-size: 15px;
+  font-size: 16px;
+  color: #4D4D4D;
   margin: 0;
-  color: $neutral-600;
-  line-height: 1.4;
+  line-height: 1.5;
 
   @media (max-width: 768px) {
     font-size: 14px;
-    text-align: center;
-    max-width: 100%;
   }
 }
 
 .buttonGroup {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 12px;
-    width: 100%;
   }
 }
 
 .downloadButton {
-  background: #2B2B2B;
+  background: #4B37CF;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 500;
-  transition: background-color 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background: #404040;
+    background: #3928A9;
   }
 
   @media (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
-    padding: 12px 20px;
+    text-align: center;
+    padding: 10px 20px;
   }
 }
 
 .dismissButton {
-  background: none;
-  border: none;
-  color: $primary-500;
+  background: transparent;
+  border: 1px solid #4B37CF;
+  color: #4B37CF;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 10px;
-  font-size: 14px;
   font-weight: 500;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.8;
+    background: rgba(75, 55, 207, 0.1);
   }
 
   @media (max-width: 768px) {
-    padding: 8px 0;
-    width: 100%;
-    text-align: center;
+    padding: 10px 20px;
   }
 } 
