@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import {
@@ -11,10 +11,10 @@ import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
 import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CustomIconName } from '../../component_kit/cw_icons/cw_icon_lookup';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
 import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
@@ -47,48 +47,16 @@ const AddressItem = (props: AddressItemProps) => {
     enabled: !!community.id,
   });
 
-  // Add function to determine icon based on wallet and community base
-  const getChainIcon = (): CustomIconName => {
-    // First check wallet type
-    if (
-      walletId &&
-      [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
-        walletId,
-      )
-    ) {
-      return 'solana';
-    }
-    if (walletId === WalletId.Keplr) {
-      return 'cosmos';
-    }
-
-    // If no specific wallet match, check community base
-    if (fetchedCommunity?.base) {
-      switch (fetchedCommunity.base) {
-        case ChainBase.Solana:
-          return 'solana';
-        case ChainBase.CosmosSDK:
-          return 'cosmos';
-        case ChainBase.NEAR:
-          return 'nearIcon';
-        case ChainBase.Substrate:
-          return 'polkadot';
-        case ChainBase.Ethereum:
-        default:
-          return 'eth';
-      }
-    }
-
-    return 'eth'; // default fallback
-  };
-
   if (!fetchedCommunity) return null;
 
   return (
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWCustomIcon iconName={getChainIcon()} iconSize="small" />
+          <CWCustomIcon
+            iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
+            iconSize="small"
+          />
           <CWIdentificationTag
             iconLeft={walletId}
             address={`\u2022 ${formatAddressShort(address)}`}

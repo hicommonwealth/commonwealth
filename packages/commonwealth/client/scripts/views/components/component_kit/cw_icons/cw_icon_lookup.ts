@@ -324,17 +324,23 @@ export const iconLookup = {
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
   starFour: withPhosphorIcon(StarFour),
+  // Chain icons with distinct names
+  solanaChain: CustomIcons.CWSolana,
+  nearChain: CustomIcons.CWNearIcon,
+  ethChain: CustomIcons.CWEth,
+  cosmosChain: CustomIcons.CWCosmos,
+  polkadotChain: CustomIcons.CWPolkadot,
 };
 
 export const customIconLookup = {
   base: CustomIcons.CWBase,
   blast: CustomIcons.CWBlast,
   email: CustomIcons.CWEmail,
-  eth: CustomIcons.CWEth,
+  solana: CustomIcons.CWSolana,
   nearIcon: CustomIcons.CWNearIcon,
+  eth: CustomIcons.CWEth,
   cosmos: CustomIcons.CWCosmos,
   polkadot: CustomIcons.CWPolkadot,
-  solana: CustomIcons.CWSolana,
   discordIcon: CustomIcons.CWDiscord,
   githubIcon: CustomIcons.CWGithub,
   twitterIcon: CustomIcons.CWTwitter,

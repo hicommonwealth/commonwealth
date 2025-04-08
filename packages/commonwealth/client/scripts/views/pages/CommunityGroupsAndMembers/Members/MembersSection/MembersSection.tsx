@@ -1,14 +1,14 @@
-import { ChainBase, Role, WalletId } from '@hicommonwealth/shared';
+import { Role, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CustomIconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -107,42 +107,6 @@ const MembersSection = ({
   };
   const filteredMember = removeDuplicateAddresses(filteredMembers);
 
-  // Add function to determine icon based on community base and wallet type
-  const getChainIcon = (address: AddressInfo): CustomIconName => {
-    // First check wallet type if available
-    if (address.wallet_id) {
-      if (
-        [WalletId.Phantom, WalletId.Solflare, WalletId.Backpack].includes(
-          address.wallet_id,
-        )
-      ) {
-        return 'solana';
-      }
-      if (address.wallet_id === WalletId.Keplr) {
-        return 'cosmos';
-      }
-    }
-
-    // If no specific wallet match, check community base
-    if (community?.base) {
-      switch (community.base) {
-        case ChainBase.Solana:
-          return 'solana';
-        case ChainBase.CosmosSDK:
-          return 'cosmos';
-        case ChainBase.NEAR:
-          return 'nearIcon';
-        case ChainBase.Substrate:
-          return 'polkadot';
-        case ChainBase.Ethereum:
-        default:
-          return 'eth';
-      }
-    }
-
-    return 'eth'; // default fallback
-  };
-
   return (
     <div className="MembersSection">
       <CWTable
@@ -210,7 +174,7 @@ const MembersSection = ({
                       <CWTag
                         type="address"
                         label={formatAddressShort(address.address)}
-                        iconName={getChainIcon(address)}
+                        iconName={getChainIcon(address, community?.base)}
                         useCustomIcon={true}
                         classNames="address-tag"
                       />
