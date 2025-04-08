@@ -18,8 +18,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './TokenizationModal.scss';
 
 interface TokenizationModalProps {
-  onUnderstand: () => void;
-  onDismiss: () => void;
   onCancel: () => void;
   onSaveChanges: () => void;
 }
@@ -30,8 +28,6 @@ type TopicOption = {
 };
 
 const TokenizationModal = ({
-  onUnderstand,
-  onDismiss,
   onCancel,
   onSaveChanges,
 }: TokenizationModalProps) => {
@@ -144,12 +140,10 @@ const TokenizationModal = ({
 
   const handleUnderstand = () => {
     setShowInfoBox(false);
-    onUnderstand();
   };
 
   const handleDismiss = () => {
     setShowInfoBox(false);
-    onDismiss();
   };
 
   return (

@@ -22,18 +22,6 @@ const Tokenization = () => {
     (topic) => topic.allow_tokenized_threads,
   ).length;
 
-  const handleUnderstand = () => {};
-
-  const handleDismiss = () => {};
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSaveChanges = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <section className="Tokenization">
       <div className="header">
@@ -59,10 +47,8 @@ const Tokenization = () => {
         size="small"
         content={
           <TokenizationModal
-            onUnderstand={handleUnderstand}
-            onDismiss={handleDismiss}
-            onCancel={handleCancel}
-            onSaveChanges={handleSaveChanges}
+            onCancel={() => setIsModalOpen(false)}
+            onSaveChanges={() => setIsModalOpen(false)}
           />
         }
         open={isModalOpen}
