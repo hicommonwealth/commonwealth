@@ -11,6 +11,7 @@ import {
 import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useNominationsTransaction from './helpers/useNominationsTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
+import useVerificationTokenTransaction from './helpers/useVerificationTokenTransaction';
 import { StakeData, TransactionConfig } from './types';
 
 interface CommunityOnchainTransactionsProps {
@@ -45,7 +46,7 @@ const CommunityOnchainTransactions = ({
   onSignTransactionDeployNamespace,
   onSignTransactionConfigureStake,
   onSignTransactionConfigureNominations,
-  // onSignTransactionMintVerificationToken,
+  onSignTransactionMintVerificationToken,
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
@@ -86,6 +87,13 @@ const CommunityOnchainTransactions = ({
     onSuccess: onSignTransactionConfigureNominations,
   });
 
+  const verificationTokenTransaction = useVerificationTokenTransaction({
+    namespace: communityStakeData.namespace,
+    userAddress: selectedAddress?.address,
+    chainId,
+    onSuccess: onSignTransactionMintVerificationToken,
+  });
+
   const handleEnableStakeStepSuccess = (data: StakeData) => {
     setCommunityStakeData(data);
     setEnableStakePage(false);
@@ -123,6 +131,7 @@ const CommunityOnchainTransactions = ({
       [TransactionType.DeployNamespace]: namespaceTransaction,
       [TransactionType.ConfigureStakes]: stakeTransaction,
       [TransactionType.ConfigureNominations]: nominationsTransaction,
+      [TransactionType.MintVerificationToken]: verificationTokenTransaction,
     };
 
     let previousTransactionCompleted = true;
