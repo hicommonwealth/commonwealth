@@ -61,8 +61,10 @@ const SignCommunityTransactions = ({
                     label:
                       transaction.state === 'completed' ? 'Signed' : 'Sign',
                     disabled:
-                      transaction.state === 'loading' ||
-                      transaction.state === 'completed',
+                      transaction.isActionButtonDisabled !== undefined
+                        ? transaction.isActionButtonDisabled
+                        : transaction.state === 'loading' ||
+                          transaction.state === 'completed',
                     onClick: transaction.action,
                   },
                 }

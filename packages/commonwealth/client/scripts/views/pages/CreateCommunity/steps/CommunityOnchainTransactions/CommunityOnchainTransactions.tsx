@@ -9,6 +9,7 @@ import {
   getTransactionText,
 } from './helpers/transactionUtils';
 import useNamespaceTransaction from './helpers/useNamespaceTransaction';
+import useNominationsTransaction from './helpers/useNominationsTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
 import { StakeData, TransactionConfig } from './types';
 
@@ -25,6 +26,7 @@ interface CommunityOnchainTransactionsProps {
   onEnableStakeStepCancel?: () => void;
   onSignTransactionsStepReserveNamespaceSuccess?: () => void;
   onSignTransactionsStepLaunchStakeSuccess?: () => void;
+  onSignTransactionsStepConfigureNominationsSuccess?: () => void;
   onSignTransactionsStepCancel?: () => void;
 }
 
@@ -41,6 +43,7 @@ const CommunityOnchainTransactions = ({
   onEnableStakeStepCancel,
   onSignTransactionsStepReserveNamespaceSuccess,
   onSignTransactionsStepLaunchStakeSuccess,
+  onSignTransactionsStepConfigureNominationsSuccess,
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
@@ -60,7 +63,7 @@ const CommunityOnchainTransactions = ({
     communityId: createdCommunityId,
     namespace: communityStakeData.namespace,
     symbol: communityStakeData.symbol,
-    userAddress: selectedAddress.address,
+    userAddress: selectedAddress?.address,
     chainId,
     onSuccess: onSignTransactionsStepReserveNamespaceSuccess,
     hasNamespaceReserved,
@@ -69,9 +72,16 @@ const CommunityOnchainTransactions = ({
   const stakeTransaction = useStakeTransaction({
     namespace: communityStakeData.namespace,
     communityId: createdCommunityId,
-    userAddress: selectedAddress.address,
+    userAddress: selectedAddress?.address,
     chainId,
     onSuccess: onSignTransactionsStepLaunchStakeSuccess,
+  });
+
+  const nominationsTransaction = useNominationsTransaction({
+    namespace: communityStakeData.namespace,
+    userAddress: selectedAddress?.address,
+    chainId,
+    onSuccess: onSignTransactionsStepConfigureNominationsSuccess,
   });
 
   const handleEnableStakeStepSuccess = (data: StakeData) => {
@@ -110,18 +120,21 @@ const CommunityOnchainTransactions = ({
     const transactionHooks = {
       [TransactionType.DeployNamespace]: namespaceTransaction,
       [TransactionType.ConfigureStakes]: stakeTransaction,
+      [TransactionType.ConfigureNominations]: nominationsTransaction,
     };
 
-    return transactionTypes.map((type) => {
+    let previousTransactionCompleted = true;
+
+    return transactionTypes.map((type, index) => {
       const transaction = transactionHooks[type];
 
-      const showActionButton =
-        type === TransactionType.ConfigureStakes
-          ? transactionHooks[TransactionType.DeployNamespace].state ===
-            'completed'
-          : true;
+      const canBeEnabled = index === 0 ? true : previousTransactionCompleted;
 
-      return createTransaction(type, transaction, showActionButton);
+      if (index < transactionTypes.length - 1) {
+        previousTransactionCompleted = transaction.state === 'completed';
+      }
+
+      return createTransaction(type, transaction, true, canBeEnabled);
     });
   };
 

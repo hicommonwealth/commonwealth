@@ -22,6 +22,7 @@ export interface TransactionConfig {
   errorText: TransactionData['errorText'];
   action: () => void;
   shouldShowActionButton: boolean;
+  isActionButtonDisabled?: boolean;
 }
 
 export interface TransactionHookResult {

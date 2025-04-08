@@ -76,7 +76,11 @@ const CreateCommunity = () => {
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
             chainId={selectedChainId || ''}
-            transactionTypes={[TransactionType.DeployNamespace]}
+            transactionTypes={[
+              TransactionType.DeployNamespace,
+              TransactionType.ConfigureNominations,
+              TransactionType.MintVerificationToken,
+            ]}
             onEnableStakeStepCancel={goToSuccessStep}
             onSignTransactionsStepReserveNamespaceSuccess={goToSuccessStep}
             onSignTransactionsStepCancel={goToSuccessStep}
