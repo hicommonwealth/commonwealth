@@ -1,3 +1,4 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
@@ -9,6 +10,8 @@ import './Tokenization.scss';
 import TokenizationModal from './TokenizationModal';
 
 const Tokenization = () => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const communityId = app.activeChainId() || '';
 
@@ -21,6 +24,8 @@ const Tokenization = () => {
   const tokenizedTopicsCount = topics.filter(
     (topic) => topic.allow_tokenized_threads,
   ).length;
+
+  if (!tokenizedThreadsEnabled) return <></>;
 
   return (
     <section className="Tokenization">
