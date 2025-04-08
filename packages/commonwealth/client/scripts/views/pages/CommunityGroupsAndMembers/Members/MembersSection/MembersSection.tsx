@@ -175,7 +175,6 @@ const MembersSection = ({
                         type="address"
                         label={formatAddressShort(address.address)}
                         iconName={getChainIcon(address, community?.base)}
-                        useCustomIcon={true}
                         classNames="address-tag"
                       />
                     </div>
