@@ -3,7 +3,7 @@
 .SignCommunityTransactions {
   display: flex;
 
-  .Hint {
+  .FeatureHint {
     &.mobile {
       display: none;
 
@@ -67,8 +67,8 @@
     margin-top: 32px;
   }
 
-  @media (max-width: 991px) {
-    .Hint {
+  @include smallInclusive {
+    .FeatureHint {
       &.desktop {
         display: none;
       }

@@ -30,9 +30,6 @@ interface UseNamespaceTransactionProps {
   referrerAddress?: string | null;
 }
 
-/**
- * Hook for handling namespace reservation transaction
- */
 const useNamespaceTransaction = ({
   communityId,
   namespace,
@@ -50,6 +47,7 @@ const useNamespaceTransaction = ({
   );
 
   const onchainReferralsEnabled = useFlag('onchainReferrals');
+
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId,
@@ -64,7 +62,6 @@ const useNamespaceTransaction = ({
   });
 
   const action = async () => {
-    // Skip if already completed or in progress
     if (
       transactionData.state === 'loading' ||
       transactionData.state === 'completed'
@@ -78,7 +75,6 @@ const useNamespaceTransaction = ({
         errorText: '',
       });
 
-      // Set active account for community update
       await setActiveAccount(
         new Account({
           community: {
@@ -89,7 +85,6 @@ const useNamespaceTransaction = ({
         }),
       );
 
-      // Deploy namespace with or without referrer
       const txReceipt =
         referrerAddress && onchainReferralsEnabled
           ? await namespaceFactory.deployNamespaceWithReferrer(
@@ -106,7 +101,6 @@ const useNamespaceTransaction = ({
               chainId,
             );
 
-      // Update community with namespace info
       await updateCommunity(
         buildUpdateCommunityInput({
           communityId,
@@ -116,16 +110,13 @@ const useNamespaceTransaction = ({
         }),
       );
 
-      // Mark transaction as completed
       setTransactionData({
         state: 'completed',
         errorText: '',
       });
 
-      // Trigger success callback
       onSuccess?.();
 
-      // Track analytics
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,
         community: chainId,
@@ -136,12 +127,10 @@ const useNamespaceTransaction = ({
     } catch (err) {
       console.log(err);
 
-      // Handle specific error case
       const error = err?.message?.includes('Namespace already reserved')
         ? 'Namespace already reserved'
         : 'There was an issue creating the namespace. Please try again.';
 
-      // Reset to not-started with error
       setTransactionData({
         state: 'not-started',
         errorText: error,

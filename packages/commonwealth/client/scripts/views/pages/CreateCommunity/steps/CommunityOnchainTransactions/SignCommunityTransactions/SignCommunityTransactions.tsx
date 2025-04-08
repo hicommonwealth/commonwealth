@@ -29,10 +29,8 @@ const SignCommunityTransactions = ({
   isPreventLeaveEnabled = true,
   backButton,
 }: SignCommunityTransactionsProps) => {
-  // Prevent page leave when transactions are in progress
   useBeforeUnload(isPreventLeaveEnabled);
 
-  // Check if any transaction is in loading state to disable cancel button
   const cancelDisabled = transactions.some(
     (transaction) => transaction.state === 'loading',
   );

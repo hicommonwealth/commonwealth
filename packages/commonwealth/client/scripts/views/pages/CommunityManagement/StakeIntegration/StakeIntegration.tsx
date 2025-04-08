@@ -18,7 +18,7 @@ import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import useGetCommunityByIdQuery from '../../../../state/api/communities/getCommuityById';
 import { PageNotFound } from '../../404';
 import CommunityOnchainTransactions from '../../CreateCommunity/steps/CommunityOnchainTransactions';
-import { TransactionType } from '../../CreateCommunity/steps/CommunityOnchainTransactions/helpers/transactionUtils';
+import { TransactionType } from '../../CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 import CanBeDisabled from './CanBeDisabled';
 import ContractInfo from './ContractInfo';
 import './StakeIntegration.scss';

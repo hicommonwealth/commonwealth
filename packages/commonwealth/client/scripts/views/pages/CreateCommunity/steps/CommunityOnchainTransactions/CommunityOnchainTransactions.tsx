@@ -12,20 +12,13 @@ import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
 import { StakeData, TransactionConfig } from './types';
 
-import './CommunityOnchainTransactions.scss';
-
 interface CommunityOnchainTransactionsProps {
   createdCommunityName?: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
   chainId: string;
   isTopicFlow?: boolean;
-
-  // New property - array of transaction types to include
-  transactionTypes?: TransactionType[];
-
-  // Legacy properties for backward compatibility
-  onlyNamespace?: boolean;
+  transactionTypes: TransactionType[];
   namespace?: string | null;
   symbol?: string;
   onEnableStakeStepSucess?: (data: StakeData) => void;
@@ -41,8 +34,7 @@ const CommunityOnchainTransactions = ({
   selectedAddress,
   chainId,
   isTopicFlow,
-  transactionTypes, // New property
-  onlyNamespace,
+  transactionTypes,
   namespace,
   symbol,
   onEnableStakeStepSucess,
@@ -52,6 +44,10 @@ const CommunityOnchainTransactions = ({
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
+  const onlyNamespace =
+    transactionTypes.length === 1 &&
+    transactionTypes[0] === TransactionType.DeployNamespace;
+
   const [enableStakePage, setEnableStakePage] = useState(
     hasNamespaceReserved ? false : true,
   );
@@ -59,14 +55,6 @@ const CommunityOnchainTransactions = ({
     namespace: namespace || createdCommunityName || '',
     symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
-
-  // Determine which transaction types to use
-  // If transactionTypes is provided, use it; otherwise, use the legacy onlyNamespace flag
-  const transactionsToInclude =
-    transactionTypes ||
-    (onlyNamespace
-      ? [TransactionType.DeployNamespace]
-      : [TransactionType.DeployNamespace, TransactionType.ConfigureStakes]);
 
   const namespaceTransaction = useNamespaceTransaction({
     communityId: createdCommunityId,
@@ -86,8 +74,6 @@ const CommunityOnchainTransactions = ({
     onSuccess: onSignTransactionsStepLaunchStakeSuccess,
   });
 
-  // Create a hooks map for easy access by transaction type
-
   const handleEnableStakeStepSuccess = (data: StakeData) => {
     setCommunityStakeData(data);
     setEnableStakePage(false);
@@ -101,11 +87,9 @@ const CommunityOnchainTransactions = ({
   const handleSignTransactionsStepCancel = () => {
     openConfirmation({
       title: 'Are you sure you want to cancel?',
-      description:
-        transactionsToInclude.length === 1 &&
-        transactionsToInclude[0] === TransactionType.DeployNamespace
-          ? 'Namespace has not been enabled for your community yet'
-          : 'Community Stake has not been enabled for your community yet',
+      description: onlyNamespace
+        ? 'Namespace has not been enabled for your community yet'
+        : 'Community Stake has not been enabled for your community yet',
       buttons: [
         {
           label: 'Cancel',
@@ -126,10 +110,9 @@ const CommunityOnchainTransactions = ({
     const transactionHooks = {
       [TransactionType.DeployNamespace]: namespaceTransaction,
       [TransactionType.ConfigureStakes]: stakeTransaction,
-      // Add more hooks here as needed
     };
 
-    return transactionsToInclude.map((type) => {
+    return transactionTypes.map((type) => {
       const transaction = transactionHooks[type];
 
       const showActionButton =
@@ -142,7 +125,7 @@ const CommunityOnchainTransactions = ({
     });
   };
 
-  const { title, description } = getTransactionText(transactionsToInclude);
+  const { title, description } = getTransactionText(transactionTypes);
 
   return (
     <div className="CommunityOnchainTransactions">
@@ -150,10 +133,7 @@ const CommunityOnchainTransactions = ({
         <EnableStake
           communityStakeData={communityStakeData}
           chainId={chainId}
-          onlyNamespace={
-            transactionsToInclude.length === 1 &&
-            transactionsToInclude[0] === TransactionType.DeployNamespace
-          }
+          onlyNamespace={onlyNamespace}
           confirmButton={{
             label: 'Yes',
             action: handleEnableStakeStepSuccess,

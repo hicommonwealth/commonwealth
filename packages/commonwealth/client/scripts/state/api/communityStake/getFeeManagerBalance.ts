@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNamespaceFactory } from 'client/scripts/views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
-
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import { ContractMethods } from 'state/api/config';
+import { useNamespaceFactory } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
 
 const GET_FEE_MANAGER_BALANCE_STALE_TIME = 60 * 1_000; // 60 sec
 

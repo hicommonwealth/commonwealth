@@ -23,9 +23,6 @@ interface UseStakeTransactionProps {
   onSuccess?: () => void;
 }
 
-/**
- * Hook for handling community stake launch transaction
- */
 const useStakeTransaction = ({
   namespace,
   communityId,
@@ -48,7 +45,6 @@ const useStakeTransaction = ({
   });
 
   const action = async () => {
-    // Skip if already completed or in progress
     if (
       transactionData.state === 'loading' ||
       transactionData.state === 'completed'
@@ -62,7 +58,6 @@ const useStakeTransaction = ({
         errorText: '',
       });
 
-      // Configure community stakes through the namespace factory
       await namespaceFactory.configureCommunityStakes(
         namespace,
         commonProtocol.STAKE_ID,
@@ -70,19 +65,16 @@ const useStakeTransaction = ({
         chainId,
       );
 
-      // Update community stake in the backend
       await updateCommunityStake({
         communityId,
         stakeId: commonProtocol.STAKE_ID,
       });
 
-      // Mark transaction as completed
       setTransactionData({
         state: 'completed',
         errorText: '',
       });
 
-      // Track analytics
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.LAUNCHED_COMMUNITY_STAKE,
         community: chainId,
@@ -91,16 +83,13 @@ const useStakeTransaction = ({
         isPWA: isAddedToHomeScreen,
       });
 
-      // Trigger success callback
       onSuccess?.();
     } catch (err) {
       console.log(err);
 
-      // Set error message
       const error =
         'There was an issue launching community stakes. Please try again.';
 
-      // Reset to not-started with error
       setTransactionData({
         state: 'not-started',
         errorText: error,

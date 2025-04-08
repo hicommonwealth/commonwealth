@@ -6,7 +6,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
 import CommunityOnchainTransactions from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
-import { TransactionType } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions/helpers/transactionUtils';
+import { TransactionType } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 
 import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
