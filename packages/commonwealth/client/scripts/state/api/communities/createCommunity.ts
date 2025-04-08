@@ -14,6 +14,7 @@ interface CreateCommunityProps {
   socialLinks: string[];
   tokenName?: string;
   turnstileToken?: string;
+  tokenizeCommunity: boolean;
 }
 
 export const buildCreateCommunityInput = ({
@@ -23,6 +24,7 @@ export const buildCreateCommunityInput = ({
   description,
   iconUrl,
   socialLinks,
+  tokenizeCommunity,
   tokenName,
   chainNodeId,
   turnstileToken,
@@ -40,6 +42,7 @@ export const buildCreateCommunityInput = ({
     token_name: tokenName,
     chain_node_id: chainNodeId,
     turnstile_token: turnstileToken,
+    allow_tokenized_threads: tokenizeCommunity,
   };
 };
 

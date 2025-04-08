@@ -78,6 +78,7 @@ const CommunityInformationStep = ({
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
         turnstileToken: turnstileToken || undefined,
+        tokenizeCommunity: values.tokenizeCommunity,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
