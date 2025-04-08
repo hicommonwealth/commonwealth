@@ -7,8 +7,8 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 
 import Hint from '../../../components/Hint';
+import { useNamespaceFactory } from '../../CommunityTransactions';
 import { EnableStakeProps, StakeData } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
 import { validationSchema } from './validations';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';

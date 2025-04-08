@@ -8,8 +8,8 @@ import {
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
+import { useNamespaceFactory } from '../../CommunityTransactions ';
 import { ActionState, defaultActionState } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
 
 interface UseLaunchCommunityStakeProps {
   namespace: string;

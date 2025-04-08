@@ -12,12 +12,12 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import useNamespaceFactory from '../CommunityStakeStep/useNamespaceFactory';
 import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
 } from './types';
+import useNamespaceFactory from './useNamespaceFactory';
 
 interface UseNamespaceTransactionProps {
   communityId: string;

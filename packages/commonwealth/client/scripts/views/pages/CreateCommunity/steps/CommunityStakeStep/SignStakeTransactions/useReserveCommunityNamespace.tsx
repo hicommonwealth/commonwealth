@@ -12,8 +12,8 @@ import {
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
+import { useNamespaceFactory } from '../../CommunityTransactions';
 import { ActionState, defaultActionState } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
 interface UseReserveCommunityNamespaceProps {
   communityId: string;
   namespace: string;

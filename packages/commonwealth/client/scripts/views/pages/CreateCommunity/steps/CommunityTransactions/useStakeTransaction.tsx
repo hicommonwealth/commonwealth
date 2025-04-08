@@ -8,12 +8,12 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import useNamespaceFactory from '../CommunityStakeStep/useNamespaceFactory';
 import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
 } from './types';
+import useNamespaceFactory from './useNamespaceFactory';
 
 interface UseStakeTransactionProps {
   namespace: string;
