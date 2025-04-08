@@ -10,6 +10,7 @@ export enum TransactionType {
 export interface TransactionDefinition {
   id: string;
   label: string;
+  description?: string;
 }
 
 export const TRANSACTION_DEFINITIONS: Record<
@@ -19,18 +20,22 @@ export const TRANSACTION_DEFINITIONS: Record<
   [TransactionType.DeployNamespace]: {
     id: 'namespace',
     label: 'Reserve community namespace',
+    description: 'Reserve your unique community identifier on the blockchain.',
   },
   [TransactionType.ConfigureStakes]: {
     id: 'stake',
     label: 'Launch community stake',
+    description: 'This transaction launches a community stake.',
   },
   [TransactionType.ConfigureNominations]: {
     id: 'nominations',
     label: 'Configure nominations',
+    description: 'This transaction configures nominations for your community.',
   },
   [TransactionType.MintVerificationToken]: {
     id: 'verificationToken',
     label: 'Mint verification token',
+    description: 'Create verification credentials for your community.',
   },
 };
 
@@ -45,6 +50,7 @@ export const createTransaction = (
   return {
     id: definition.id,
     label: definition.label,
+    description: definition.description,
     state: transaction?.state,
     errorText: transaction?.errorText,
     action: transaction?.action,

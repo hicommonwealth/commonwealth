@@ -53,6 +53,7 @@ const SignCommunityTransactions = ({
         <ActionSteps
           steps={transactions.map((transaction) => ({
             label: transaction.label,
+            description: transaction.description,
             state: transaction.state,
             errorText: transaction.errorText,
             ...(transaction.shouldShowActionButton

@@ -18,6 +18,7 @@ export const defaultTransactionState: TransactionData = {
 export interface TransactionConfig {
   id: string;
   label: string;
+  description?: string;
   state: TransactionData['state'];
   errorText: TransactionData['errorText'];
   action: () => void;
