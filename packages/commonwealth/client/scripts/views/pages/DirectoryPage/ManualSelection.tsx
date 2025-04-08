@@ -39,7 +39,6 @@ const ManualSelection = ({
 
   const handleCommunityClick = useCallback(
     (community: any) => {
-      console.log('Selected community data:', community);
       const newCommunities = localSelectedCommunities.includes(community.id)
         ? localSelectedCommunities.filter((c) => c !== community.id)
         : [...localSelectedCommunities, community.id];
@@ -48,14 +47,6 @@ const ManualSelection = ({
     },
     [localSelectedCommunities, setSelectedCommunities],
   );
-
-  const handleCommunityRemove = (communityName: string) => {
-    const newCommunities = localSelectedCommunities.filter(
-      (c) => c !== communityName,
-    );
-    setLocalSelectedCommunities(newCommunities);
-    setSelectedCommunities(newCommunities);
-  };
 
   const renderItem = useCallback(
     (i: number, community: any) => {
