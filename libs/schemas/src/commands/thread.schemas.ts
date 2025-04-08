@@ -49,7 +49,7 @@ export const UpdateThread = {
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
     is_linking_token: z.boolean().optional(),
-    launchpad_token_address: z.string().optional(),
+    launchpad_token_address: z.string().nullish(),
   }),
   output: Thread,
   context: ThreadContext,

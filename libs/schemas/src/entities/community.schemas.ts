@@ -23,6 +23,7 @@ export const Community = z.object({
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
+  spam_tier_level: z.number().int().min(-1).max(2),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
@@ -54,6 +55,7 @@ export const Community = z.object({
   directory_page_chain_node_id: PG_INT.nullish(),
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
+  namespace_creator_address: z.string().nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -61,6 +63,7 @@ export const Community = z.object({
   lifetime_thread_count: PG_INT.optional(),
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
+  thread_purchase_token: z.string().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
