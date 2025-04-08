@@ -15,6 +15,7 @@ import './HomePage.scss';
 import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
 import XpQuestList from './XpQuestList/XpQuestList';
+import { IOSBanner } from './iOSBanner';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,6 +45,7 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
+          <IOSBanner />
         </div>
         <TrendingTokensList />
         <TrendingCommunitiesPreview />

@@ -116,7 +116,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
           })}
         >
           <CWText type="h2">
-            No tokens found
+            No tokens foudddnd
             <br />
             Launch a new token <Link to="/createTokenCommunity">here</Link>.
           </CWText>
