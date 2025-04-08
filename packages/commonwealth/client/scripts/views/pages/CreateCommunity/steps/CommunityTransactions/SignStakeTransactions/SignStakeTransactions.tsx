@@ -7,14 +7,30 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
 import useUserStore from 'state/ui/user';
+import { AddressInfo } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/MembersSection';
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
 import Hint from '../../../components/Hint';
-import { SignStakeTransactionsProps } from '../types';
+import { StakeData } from '../types';
 import useLaunchCommunityStake from './useLaunchCommunityStake';
 import useReserveCommunityNamespace from './useReserveCommunityNamespace';
 
 import './SignStakeTransactions.scss';
+
+interface SignStakeTransactionsProps {
+  communityStakeData: StakeData;
+  selectedAddress: AddressInfo;
+  createdCommunityId: string;
+  chainId: string;
+  onlyNamespace?: boolean;
+  hasNamespaceReserved?: boolean;
+  onReserveNamespaceSuccess: () => void;
+  onLaunchStakeSuccess: () => void;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
+}
 
 const SignStakeTransactions = ({
   communityStakeData,

@@ -1,7 +1,6 @@
 export { default } from './CommunityTransactions';
-export { default as SignCommunityTransactions } from './SignCommunityTransactions';
-export * from './transactionUtils';
+export * from './helpers/transactionUtils';
+export { default as useNamespaceFactory } from './helpers/useNamespaceFactory';
+export { default as useNamespaceTransaction } from './helpers/useNamespaceTransaction';
+export { default as useStakeTransaction } from './helpers/useStakeTransaction';
 export * from './types';
-export { default as useNamespaceFactory } from './useNamespaceFactory';
-export { default as useNamespaceTransaction } from './useNamespaceTransaction';
-export { default as useStakeTransaction } from './useStakeTransaction';

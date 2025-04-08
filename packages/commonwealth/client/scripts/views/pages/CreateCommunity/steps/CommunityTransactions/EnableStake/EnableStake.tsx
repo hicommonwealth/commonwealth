@@ -5,14 +5,28 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { useNamespaceFactory } from 'views/pages/CreateCommunity/steps/CommunityTransactions';
 
-import { useNamespaceFactory } from '..';
 import Hint from '../../../components/Hint';
-import { EnableStakeProps, StakeData } from '../types';
+import { StakeData } from '../types';
 import { validationSchema } from './validations';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import './EnableStake.scss';
+
+interface EnableStakeProps {
+  communityStakeData: StakeData;
+  chainId: string;
+  onlyNamespace?: boolean;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
+  confirmButton?: {
+    label: string;
+    action: (data: StakeData) => void;
+  };
+}
 
 const EnableStake = ({
   communityStakeData,

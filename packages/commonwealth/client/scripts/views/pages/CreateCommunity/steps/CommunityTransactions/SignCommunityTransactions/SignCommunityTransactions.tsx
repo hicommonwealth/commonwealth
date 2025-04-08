@@ -6,14 +6,22 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
 import Hint from 'views/pages/CreateCommunity/components/Hint';
-import { SignCommunityTransactionsProps } from './types';
+
+import { TransactionConfig } from '../types';
 
 import './SignCommunityTransactions.scss';
 
-/**
- * Generic component for signing community transactions
- * Can handle multiple transaction types and dynamic configuration
- */
+export interface SignCommunityTransactionsProps {
+  title: string;
+  description: string;
+  transactions: TransactionConfig[];
+  isPreventLeaveEnabled?: boolean;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
+}
+
 const SignCommunityTransactions = ({
   title,
   description,

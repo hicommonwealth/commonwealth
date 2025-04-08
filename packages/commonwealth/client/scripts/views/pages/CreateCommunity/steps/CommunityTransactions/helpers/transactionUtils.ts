@@ -1,4 +1,4 @@
-import { TransactionConfig, TransactionHookResult } from './types';
+import { TransactionConfig, TransactionHookResult } from '../types';
 
 /**
  * Creates a namespace transaction configuration

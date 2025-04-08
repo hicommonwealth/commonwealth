@@ -11,13 +11,12 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import { useNamespaceFactory } from '..';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
+import { useNamespaceFactory } from '../../CommunityTransactions';
 import {
   ActionState,
   defaultActionState,
 } from '../../CommunityTransactions/types';
-
 interface UseReserveCommunityNamespaceProps {
   communityId: string;
   namespace: string;

@@ -16,7 +16,7 @@ import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
-} from './types';
+} from '../types';
 import useNamespaceFactory from './useNamespaceFactory';
 
 interface UseNamespaceTransactionProps {

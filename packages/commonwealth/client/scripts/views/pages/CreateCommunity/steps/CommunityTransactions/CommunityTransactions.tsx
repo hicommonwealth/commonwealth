@@ -2,22 +2,18 @@ import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import EnableStake from './EnableStake';
-import { SignCommunityTransactions } from './index';
+import SignCommunityTransactions from './SignCommunityTransactions';
 import {
   createNamespaceTransaction,
   createStakeTransaction,
   getNamespaceTransactionText,
-} from './transactionUtils';
+} from './helpers/transactionUtils';
+import useNamespaceTransaction from './helpers/useNamespaceTransaction';
+import useStakeTransaction from './helpers/useStakeTransaction';
 import { StakeData } from './types';
-import useNamespaceTransaction from './useNamespaceTransaction';
-import useStakeTransaction from './useStakeTransaction';
 
 import './CommunityTransactions.scss';
 
-/**
- * Props for the CommunityTransactions component
- * Maintains the same interface as CommunityStakeStep for backward compatibility
- */
 interface CommunityTransactionsProps {
   createdCommunityName?: string;
   createdCommunityId: string;
@@ -35,10 +31,6 @@ interface CommunityTransactionsProps {
   onSignTransactionsStepCancel?: () => void;
 }
 
-/**
- * Modern replacement for CommunityStakeStep that uses the new transaction architecture
- * Maintains the same interface for backward compatibility
- */
 const CommunityTransactions = ({
   createdCommunityName,
   createdCommunityId,
