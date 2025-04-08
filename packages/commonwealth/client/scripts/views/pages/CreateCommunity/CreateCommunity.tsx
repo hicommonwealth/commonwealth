@@ -11,6 +11,7 @@ import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
@@ -32,6 +33,8 @@ const CreateCommunity = () => {
     selectedChainId,
   } = useCreateCommunity();
 
+  const judgeContestEnabled = useFlag('judgeContest');
+
   const { isAddedToHomeScreen } = useAppStatus();
 
   useBrowserAnalyticsTrack({
@@ -46,6 +49,20 @@ const CreateCommunity = () => {
   const goToSuccessStep = () => {
     onChangeStep(true);
   };
+
+  const communityOnchainTransactionsConfig = judgeContestEnabled
+    ? {
+        transactionTypes: [
+          TransactionType.DeployNamespace,
+          TransactionType.ConfigureNominations,
+          TransactionType.MintVerificationToken,
+        ],
+        onSignTransactionMintVerificationToken: goToSuccessStep,
+      }
+    : {
+        transactionTypes: [TransactionType.DeployNamespace],
+        onSignTransactionDeployNamespace: goToSuccessStep,
+      };
 
   const getCurrentStep = () => {
     switch (createCommunityStep) {
@@ -76,14 +93,9 @@ const CreateCommunity = () => {
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
             chainId={selectedChainId || ''}
-            transactionTypes={[
-              TransactionType.DeployNamespace,
-              TransactionType.ConfigureNominations,
-              TransactionType.MintVerificationToken,
-            ]}
             onEnableStakeStepCancel={goToSuccessStep}
-            onSignTransactionDeployNamespace={goToSuccessStep}
             onSignTransactionsStepCancel={goToSuccessStep}
+            {...communityOnchainTransactionsConfig}
           />
         );
 
