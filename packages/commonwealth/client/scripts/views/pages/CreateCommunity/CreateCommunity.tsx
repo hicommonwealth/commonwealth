@@ -28,7 +28,7 @@ const CreateCommunity = () => {
     createdCommunityName,
     handleCompleteCommunityInformationStep,
     onChangeStep,
-    showCommunityStakeStep,
+    showOnchainTransactionsStep,
     selectedChainId,
   } = useCreateCommunity();
 
@@ -69,7 +69,7 @@ const CreateCommunity = () => {
           />
         );
 
-      case CreateCommunityStep.CommunityStake:
+      case CreateCommunityStep.OnchainTransactions:
         return (
           <CommunityOnchainTransactions
             createdCommunityName={createdCommunityName}
@@ -93,7 +93,10 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
+            steps={getFormSteps(
+              createCommunityStep,
+              showOnchainTransactionsStep,
+            )}
           />
         )}
 
