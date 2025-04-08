@@ -47,6 +47,7 @@ const useUpdateUserMutation = ({
             updated.profile.avatar_url!,
             chain,
             null,
+            0,
           );
           utils.user.getUserAddresses.setData(
             {

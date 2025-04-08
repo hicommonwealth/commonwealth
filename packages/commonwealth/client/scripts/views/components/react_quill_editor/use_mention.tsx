@@ -126,6 +126,7 @@ export const useMention = ({
                 avatarUrl,
                 profileCommunity,
                 null,
+                0,
               );
               const node = document.createElement('div');
 
