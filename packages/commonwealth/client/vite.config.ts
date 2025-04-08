@@ -164,6 +164,7 @@ export default defineConfig(({ mode }) => {
         'numeral',
         'firebase/app',
         'firebase/messaging',
+        'eventsource-client',
       ],
     },
     build: {
