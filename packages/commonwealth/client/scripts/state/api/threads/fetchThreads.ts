@@ -132,7 +132,6 @@ const fetchBulkThreads = (props) => {
     pageParam = 1,
   }): Promise<{
     data: {
-      numVotingThreads: number;
       limit: number;
       page: number;
       threads: Thread[];

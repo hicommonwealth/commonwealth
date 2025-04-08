@@ -1,4 +1,4 @@
-import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
+import { ChainBase, DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
@@ -15,6 +15,7 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import TrustLevelRole from '../TrustLevelRole';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
@@ -105,10 +106,22 @@ export const FullUser = ({
       ) : !profile?.userId ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
-        profile?.name
+        <>
+          {profile?.name} &nbsp;
+          <TrustLevelRole
+            type="user"
+            level={profile?.tier || UserTierMap.IncompleteUser}
+          />
+        </>
       ) : (
         <>
-          <div className="profile-name">{profile?.name}</div>
+          <div className="profile-name">
+            {profile?.name}{' '}
+            <TrustLevelRole
+              type="user"
+              level={profile?.tier || UserTierMap.IncompleteUser}
+            />
+          </div>
           <div className="id-short">{fullAddress}</div>
         </>
       )}
@@ -200,10 +213,22 @@ export const FullUser = ({
                     redactedAddress
                   )
                 ) : !shouldShowAddressWithDisplayName ? (
-                  profile?.name
+                  <>
+                    {profile?.name}{' '}
+                    <TrustLevelRole
+                      type="user"
+                      level={profile?.tier || UserTierMap.IncompleteUser}
+                    />
+                  </>
                 ) : (
                   <>
-                    {profile?.name}
+                    <>
+                      {profile?.name}{' '}
+                      <TrustLevelRole
+                        type="user"
+                        level={profile?.tier || UserTierMap.IncompleteUser}
+                      />
+                    </>
                     <div className="id-short">{redactedAddress}</div>
                   </>
                 )}
@@ -215,7 +240,11 @@ export const FullUser = ({
               className="user-address"
               to={`/profile/id/${profile?.userId}`}
             >
-              {profile?.name}
+              {profile?.name}{' '}
+              <TrustLevelRole
+                type="user"
+                level={profile?.tier || UserTierMap.IncompleteUser}
+              />
             </Link>
           )}
           {profile?.address && (
@@ -246,7 +275,6 @@ export const FullUser = ({
               </div>
             </div>
           )}
-
           {friendlyCommunityName && (
             <div className="user-chain">{friendlyCommunityName}</div>
           )}

@@ -6,6 +6,7 @@ import {
   CanvasSignedData,
   DEFAULT_NAME,
   deserializeCanvas,
+  UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
@@ -22,7 +23,7 @@ import useUserStore from 'state/ui/user';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
-import { SharePopover } from 'views/components/SharePopover';
+import ShareButton from 'views/components/ShareButton';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
@@ -248,6 +249,7 @@ export const CommentCard = ({
         const prompt = generateCommentPrompt(contextText);
 
         await generateCompletion(prompt, {
+          model: 'gpt-4o-mini',
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
@@ -362,6 +364,7 @@ export const CommentCard = ({
                 name: comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
+                tier: comment.user_tier || UserTierMap.IncompleteUser,
               }}
               versionHistory={(comment.CommentVersionHistories || []).map(
                 (cvh) => ({
@@ -459,7 +462,13 @@ export const CommentCard = ({
                   </>
                 )}
 
-                <SharePopover linkToShare={shareURL} buttonLabel="Share" />
+                <ShareButton
+                  url={shareURL}
+                  title={undefined}
+                  text="See my comment and join me on Common"
+                  shareType="comment"
+                  buttonLabel="Share"
+                />
 
                 {!isThreadArchived && replyBtnVisible && (
                   <>

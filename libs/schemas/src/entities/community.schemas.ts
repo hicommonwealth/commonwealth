@@ -4,7 +4,9 @@ import {
   ChainNetwork,
   ChainType,
   CommunityGoalTypes,
+  CommunityTierMap,
   DefaultPage,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
@@ -16,13 +18,18 @@ import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
-export const COMMUNITY_TIER = z.number().int().min(0).max(3);
+export const COMMUNITY_TIER = z.nativeEnum(CommunityTierMap);
 
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
+  spam_tier_level: z.union([
+    z.literal(DisabledCommunitySpamTier),
+    z.literal(2),
+    z.literal(3),
+  ]),
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
@@ -54,6 +61,7 @@ export const Community = z.object({
   directory_page_chain_node_id: PG_INT.nullish(),
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
+  namespace_creator_address: z.string().nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -61,6 +69,7 @@ export const Community = z.object({
   lifetime_thread_count: PG_INT.optional(),
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
+  thread_purchase_token: z.string().nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -81,7 +90,6 @@ export const Community = z.object({
 });
 
 export const ExtendedCommunity = Community.extend({
-  numVotingThreads: PG_INT,
   adminsAndMods: z.array(
     z.object({
       address: z.string(),

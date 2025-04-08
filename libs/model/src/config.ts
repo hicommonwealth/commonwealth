@@ -52,8 +52,17 @@ const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
+  PRIVY_FLAG,
+  PRIVY_APP_ID,
+  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
+  CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+  CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY,
+  CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+  CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
+  CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+  CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -182,9 +191,39 @@ export const config = configure(
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
+    PRIVY: {
+      FLAG_ENABLED: PRIVY_FLAG === 'true',
+      APP_ID: PRIVY_APP_ID,
+      APP_SECRET: PRIVY_APP_SECRET,
+    },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
+    },
+    CLOUDFLARE: {
+      TURNSTILE: {
+        ...(CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY &&
+          CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY && {
+            CREATE_COMMUNITY: {
+              SITE_KEY: CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY,
+            },
+          }),
+        ...(CF_TURNSTILE_CREATE_THREAD_SITE_KEY &&
+          CF_TURNSTILE_CREATE_THREAD_SECRET_KEY && {
+            CREATE_THREAD: {
+              SITE_KEY: CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
+            },
+          }),
+        ...(CF_TURNSTILE_CREATE_COMMENT_SITE_KEY &&
+          CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY && {
+            CREATE_COMMENT: {
+              SITE_KEY: CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
+            },
+          }),
+      },
     },
   },
   z.object({
@@ -406,11 +445,54 @@ export const config = configure(
           'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
+    PRIVY: z
+      .object({
+        FLAG_ENABLED: z.boolean(),
+        APP_ID: z.string().optional(),
+        APP_SECRET: z.string().optional(),
+      })
+      .refine(
+        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
+      ),
     IMAGE_GENERATION: z
       .object({
         FLAG_USE_RUNWARE: z.boolean().optional(),
         RUNWARE_API_KEY: z.string().optional(),
       })
       .refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
+    CLOUDFLARE: z.object({
+      TURNSTILE: z.object({
+        CREATE_COMMUNITY: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create community widget keys are required in production',
+          ),
+        CREATE_THREAD: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create thread widget keys are required in production',
+          ),
+        CREATE_COMMENT: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create comment widget keys are required in production',
+          ),
+      }),
+    }),
   }),
 );

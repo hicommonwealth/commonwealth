@@ -19,7 +19,7 @@ import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
-import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
+import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -65,14 +65,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     enabled: user.isLoggedIn && xpEnabled,
   });
 
-  const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
-    useGetRandomResourceIds({
-      limit: 1,
-      cursor: 1,
-      enabled: true,
-    });
-  const randomResourceId = randomResourceIds?.results?.[0];
-
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
@@ -109,7 +101,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  const { pendingWeeklyQuests } = useXPProgress();
+  const { pendingWeeklyQuests } = useXPProgress({ includeSystemQuests: true }); // show system quests in quest details
 
   const popoverProps = usePopover();
 
@@ -117,7 +109,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (isLoading) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -142,11 +134,20 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
+  const isSystemQuest = quest.id < 0;
+
   const handleActionStart = (
     actionName: QuestAction,
     actionContentId?: string,
   ) => {
     switch (actionName) {
+      case 'SignUpFlowCompleted': {
+        setAuthModalConfig({
+          type: AuthModalType.CreateAccount,
+          options: ['wallets', 'sso'],
+        });
+        break;
+      }
       case 'WalletLinked': {
         setAuthModalConfig({
           type: AuthModalType.SignIn,
@@ -211,9 +212,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionContentId.split(':')[1],
                   actionContentId.split(':')[0] as ContentIdType,
                 ).split(window.location.origin)[1]
-              : `/discussion/${
-                  randomResourceId?.thread_id
-                }?comment=${randomResourceId?.comment_id}`,
+              : `/explore?tab=threads`,
             {},
             null,
           );
@@ -450,11 +449,20 @@ const QuestDetails = ({ id }: { id: number }) => {
                       id: log.action_meta_id,
                       createdAt: new Date(log.event_created_at),
                     }))}
-                  canStartAction={isStarted && !isEnded}
-                  {...((!isStarted || isEnded) && {
-                    actionStartBlockedReason: !isStarted
-                      ? 'Only available when quest starts'
-                      : 'Unavailable, quest has ended',
+                  canStartAction={
+                    isSystemQuest
+                      ? !user.isLoggedIn && isStarted && !isEnded
+                      : isStarted && !isEnded
+                  }
+                  {...(((isSystemQuest && user.isLoggedIn) ||
+                    !isStarted ||
+                    isEnded) && {
+                    actionStartBlockedReason:
+                      isSystemQuest && user.isLoggedIn
+                        ? `Only available for new users`
+                        : !isStarted
+                          ? 'Only available when quest starts'
+                          : 'Unavailable, quest has ended',
                   })}
                 />
               ))}
