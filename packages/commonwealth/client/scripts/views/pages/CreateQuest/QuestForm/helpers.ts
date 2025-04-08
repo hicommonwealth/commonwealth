@@ -19,8 +19,15 @@ export const buildContentIdFromURL = (url: string, idType: ContentIdType) => {
     )}`;
   }
   if (idType === 'topic') {
-    const topicIdentifier = generateTopicIdentifiersFromUrl(url);
+    // check if url is in a redirect format
+    const urlObj = new URL(url);
+    if (url.includes(`${urlObj.origin}/discussion/topic/`)) {
+      const topicId = parseInt(url.split('/').at(-1) || '');
+      if (topicId) return `${idType}:${topicId}`;
+    }
 
+    // check if url is in a resolved format
+    const topicIdentifier = generateTopicIdentifiersFromUrl(url);
     if (topicIdentifier?.topicId) return `${idType}:${topicIdentifier.topicId}`;
 
     throw new Error(`invalid topic url ${url}`);
