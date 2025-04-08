@@ -12,6 +12,7 @@ import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_walle
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
+import OKXWebWalletController from './webWallets/okx_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import SolflareWebWalletController from './webWallets/solflare_web_wallet';
@@ -115,6 +116,7 @@ export default class WebWalletController {
 
   constructor() {
     this._wallets = [
+      new OKXWebWalletController(),
       new PolkadotWebWalletController(),
       new MetamaskWebWalletController(),
       new WalletConnectWebWalletController(),

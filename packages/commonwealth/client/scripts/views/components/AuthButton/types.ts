@@ -19,8 +19,8 @@ export type AuthSSOs =
   | 'website';
 export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
-export type SolanaWallets = 'phantom' | 'backpack' | 'solflare';
-export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase';
+export type SolanaWallets = 'okx' | 'phantom' | 'backpack' | 'solflare';
+export type EVMWallets = 'walletconnect' | 'okx' | 'metamask' | 'coinbase';
 export type CommunitySpecificWallets =
   | 'terrastation'
   | 'terra-walletconnect'

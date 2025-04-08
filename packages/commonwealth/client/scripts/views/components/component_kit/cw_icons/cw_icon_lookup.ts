@@ -353,6 +353,7 @@ export const customIconLookup = {
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
   coinbase: CustomIcons.CWCoinbase,
+  okx: CustomIcons.CWOKX,
   x: CustomIcons.CWX, // twitter
   apple: CustomIcons.CWApple,
   farcaster: CustomIcons.CWFarcaster,
