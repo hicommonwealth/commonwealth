@@ -5,6 +5,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import CommunityOnchainTransactions from './steps/CommunityOnchainTransactions';
+import { TransactionType } from './steps/CommunityOnchainTransactions/helpers/transactionUtils';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
@@ -75,7 +76,7 @@ const CreateCommunity = () => {
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
             chainId={selectedChainId || ''}
-            onlyNamespace
+            transactionTypes={[TransactionType.DeployNamespace]}
             onEnableStakeStepCancel={goToSuccessStep}
             onSignTransactionsStepReserveNamespaceSuccess={goToSuccessStep}
             onSignTransactionsStepCancel={goToSuccessStep}

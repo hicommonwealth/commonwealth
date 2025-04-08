@@ -22,9 +22,10 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
+import CommunityOnchainTransactions from '../../../CreateCommunity/steps/CommunityOnchainTransactions';
+import { TransactionType } from '../../../CreateCommunity/steps/CommunityOnchainTransactions/helpers/transactionUtils';
 
 import { CWDivider } from '../../../../components/component_kit/cw_divider';
-import CommunityOnchainTransactions from '../../../CreateCommunity/steps/CommunityOnchainTransactions';
 import ContestsList from '../ContestsList';
 import EmptyContestsList from '../EmptyContestsList';
 import { ContestType, ContestView } from '../types';
@@ -267,7 +268,7 @@ Set one up first.`
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
             chainId={String(ethChainId)}
-            onlyNamespace
+            transactionTypes={[TransactionType.DeployNamespace]}
             onEnableStakeStepCancel={gotToContestTypeSelection}
             onSignTransactionsStepReserveNamespaceSuccess={
               goToLaunchFarcasterContest

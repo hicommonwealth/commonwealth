@@ -1,5 +1,4 @@
-import useNamespaceTransaction from './useNamespaceTransaction';
-import useStakeTransaction from './useStakeTransaction';
 export * from './transactionUtils';
-
-export { useNamespaceTransaction, useStakeTransaction };
+export * from './useNamespaceFactory';
+export { default as useNamespaceTransaction } from './useNamespaceTransaction';
+export { default as useStakeTransaction } from './useStakeTransaction';

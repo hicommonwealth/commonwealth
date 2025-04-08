@@ -23,7 +23,6 @@ export interface TransactionConfig {
   errorText?: string;
   action: () => void;
   shouldShowActionButton: boolean;
-  dependsOn?: string[]; // IDs of transactions this one depends on
 }
 
 // Standard transaction hook result

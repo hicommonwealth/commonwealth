@@ -4,13 +4,13 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import EnableStake from './EnableStake';
 import SignCommunityTransactions from './SignCommunityTransactions';
 import {
-  createNamespaceTransaction,
-  createStakeTransaction,
-  getNamespaceTransactionText,
+  TransactionType,
+  createTransaction,
+  getTransactionText,
 } from './helpers/transactionUtils';
 import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
-import { StakeData } from './types';
+import { StakeData, TransactionConfig } from './types';
 
 import './CommunityOnchainTransactions.scss';
 
@@ -21,6 +21,10 @@ interface CommunityOnchainTransactionsProps {
   chainId: string;
   isTopicFlow?: boolean;
 
+  // New property - array of transaction types to include
+  transactionTypes?: TransactionType[];
+
+  // Legacy properties for backward compatibility
   onlyNamespace?: boolean;
   namespace?: string | null;
   symbol?: string;
@@ -37,6 +41,7 @@ const CommunityOnchainTransactions = ({
   selectedAddress,
   chainId,
   isTopicFlow,
+  transactionTypes, // New property
   onlyNamespace,
   namespace,
   symbol,
@@ -55,7 +60,14 @@ const CommunityOnchainTransactions = ({
     symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
-  // Hook for namespace transaction
+  // Determine which transaction types to use
+  // If transactionTypes is provided, use it; otherwise, use the legacy onlyNamespace flag
+  const transactionsToInclude =
+    transactionTypes ||
+    (onlyNamespace
+      ? [TransactionType.DeployNamespace]
+      : [TransactionType.DeployNamespace, TransactionType.ConfigureStakes]);
+
   const namespaceTransaction = useNamespaceTransaction({
     communityId: createdCommunityId,
     namespace: communityStakeData.namespace,
@@ -74,6 +86,8 @@ const CommunityOnchainTransactions = ({
     onSuccess: onSignTransactionsStepLaunchStakeSuccess,
   });
 
+  // Create a hooks map for easy access by transaction type
+
   const handleEnableStakeStepSuccess = (data: StakeData) => {
     setCommunityStakeData(data);
     setEnableStakePage(false);
@@ -87,9 +101,11 @@ const CommunityOnchainTransactions = ({
   const handleSignTransactionsStepCancel = () => {
     openConfirmation({
       title: 'Are you sure you want to cancel?',
-      description: onlyNamespace
-        ? 'Namespace has not been enabled for your community yet'
-        : 'Community Stake has not been enabled for your community yet',
+      description:
+        transactionsToInclude.length === 1 &&
+        transactionsToInclude[0] === TransactionType.DeployNamespace
+          ? 'Namespace has not been enabled for your community yet'
+          : 'Community Stake has not been enabled for your community yet',
       buttons: [
         {
           label: 'Cancel',
@@ -106,23 +122,27 @@ const CommunityOnchainTransactions = ({
     });
   };
 
-  // Configure transactions array based on needs
-  const getTransactions = () => {
-    const transactions = [createNamespaceTransaction(namespaceTransaction)];
+  const getTransactions = (): TransactionConfig[] => {
+    const transactionHooks = {
+      [TransactionType.DeployNamespace]: namespaceTransaction,
+      [TransactionType.ConfigureStakes]: stakeTransaction,
+      // Add more hooks here as needed
+    };
 
-    if (!onlyNamespace) {
-      transactions.push(
-        createStakeTransaction(
-          stakeTransaction,
-          namespaceTransaction.state === 'completed',
-        ),
-      );
-    }
+    return transactionsToInclude.map((type) => {
+      const transaction = transactionHooks[type];
 
-    return transactions;
+      const showActionButton =
+        type === TransactionType.ConfigureStakes
+          ? transactionHooks[TransactionType.DeployNamespace].state ===
+            'completed'
+          : true;
+
+      return createTransaction(type, transaction, showActionButton);
+    });
   };
 
-  const { title, description } = getNamespaceTransactionText(!!onlyNamespace);
+  const { title, description } = getTransactionText(transactionsToInclude);
 
   return (
     <div className="CommunityOnchainTransactions">
@@ -130,7 +150,10 @@ const CommunityOnchainTransactions = ({
         <EnableStake
           communityStakeData={communityStakeData}
           chainId={chainId}
-          onlyNamespace={onlyNamespace}
+          onlyNamespace={
+            transactionsToInclude.length === 1 &&
+            transactionsToInclude[0] === TransactionType.DeployNamespace
+          }
           confirmButton={{
             label: 'Yes',
             action: handleEnableStakeStepSuccess,
