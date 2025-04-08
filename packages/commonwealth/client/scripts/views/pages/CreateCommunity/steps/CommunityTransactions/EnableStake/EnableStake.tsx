@@ -6,8 +6,8 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 
+import { useNamespaceFactory } from '..';
 import Hint from '../../../components/Hint';
-import { useNamespaceFactory } from '../../CommunityTransactions';
 import { EnableStakeProps, StakeData } from '../types';
 import { validationSchema } from './validations';
 

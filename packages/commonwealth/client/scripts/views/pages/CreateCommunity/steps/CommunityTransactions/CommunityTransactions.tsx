@@ -1,14 +1,14 @@
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import EnableStake from '../CommunityStakeStep/EnableStake';
-import { StakeData } from '../CommunityStakeStep/types';
+import EnableStake from './EnableStake';
 import { SignCommunityTransactions } from './index';
 import {
   createNamespaceTransaction,
   createStakeTransaction,
   getNamespaceTransactionText,
 } from './transactionUtils';
+import { StakeData } from './types';
 import useNamespaceTransaction from './useNamespaceTransaction';
 import useStakeTransaction from './useStakeTransaction';
 
