@@ -90,7 +90,6 @@ export const Community = z.object({
 });
 
 export const ExtendedCommunity = Community.extend({
-  numVotingThreads: PG_INT,
   adminsAndMods: z.array(
     z.object({
       address: z.string(),
