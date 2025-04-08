@@ -1,4 +1,4 @@
-import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useUnSubscribeEmailMutation } from 'state/api/trpc/subscription/useUnSubscribeEmailMutation';
@@ -15,12 +15,13 @@ const UnSubscribePage = () => {
     setModalOpen(false);
     navigate('/dashboard');
   };
-  const id = splitAndDecodeURL(window.location.pathname);
+  // TODO 11546: verify if correct
+  const identifier = generateTopicIdentifiersFromUrl(window.location.pathname);
 
   const handleUnsubscribe = async () => {
-    if (id) {
+    if (identifier?.topicName) {
       await unSubscribeEmail({
-        user_uuid: id,
+        user_uuid: identifier?.topicName,
         email_notifications_enabled: false,
       }).catch(console.error);
       navigate('/dashboard');
@@ -34,10 +35,10 @@ const UnSubscribePage = () => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (identifier?.topicName) {
       setModalOpen(true);
     }
-  }, [id]);
+  }, [identifier?.topicName]);
 
   return (
     <CWPageLayout>

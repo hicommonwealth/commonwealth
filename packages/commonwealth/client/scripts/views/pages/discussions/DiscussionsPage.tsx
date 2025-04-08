@@ -25,7 +25,8 @@ import {
   ContentType,
   ZERO_ADDRESS,
   formatDecimalToWei,
-  splitAndDecodeURL,
+  generateTopicIdentifiersFromUrl,
+  generateUrlPartForTopicIdentifiers,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -61,7 +62,7 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-type DiscussionsPageProps = {
+export type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
   selectedView?: string;
   topicName?: string;
@@ -77,7 +78,8 @@ const VIEWS = [
   { value: 'overview', label: 'Overview' },
   { value: 'cardview', label: 'Cardview' },
 ];
-const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+
+const DiscussionsPage = () => {
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -87,8 +89,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
-  // @ts-expect-error <StrictNullChecks/>
-  const stageName: string = searchParams.get('stage');
+  const stageName: string = searchParams.get('stage') || '';
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -116,7 +117,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   }, [tabStatus]);
 
-  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicIdentifiersFromURL = generateTopicIdentifiersFromUrl(
+    location.pathname,
+  );
+  const topicObj = topics?.find(
+    ({ name }) => name === topicIdentifiersFromURL?.topicName,
+  );
   const topicId = topicObj?.id;
 
   const user = useUserStore();
@@ -200,16 +206,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
-  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
-  const topicNameFromURL = splitAndDecodeURL(location.pathname);
-
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
     if (
       !isLoadingTopics &&
-      topicNameFromURL &&
-      topicNameFromURL !== 'archived' &&
-      topicNameFromURL !== 'overview' &&
+      topicIdentifiersFromURL &&
+      topicIdentifiersFromURL.topicName !== 'archived' &&
+      topicIdentifiersFromURL.topicName !== 'overview' &&
       tabStatus !== 'overview'
     ) {
       // Don't redirect if we're on a discussion page
@@ -217,19 +220,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         return;
       }
 
-      const validTopics = topics?.some(
-        (topic) => topic?.name === topicNameFromURL,
+      const validTopic = topics?.find(
+        (topic) => topic?.name === topicIdentifiersFromURL.topicName,
       );
-      if (!validTopics) {
+      if (!validTopic) {
         navigate('/discussions');
       }
+      if (
+        validTopic &&
+        (!topicIdentifiersFromURL.topicId ||
+          topicIdentifiersFromURL.topicId !== validTopic.id)
+      ) {
+        const identifier = generateUrlPartForTopicIdentifiers(
+          validTopic?.id,
+          validTopic.name,
+        );
+        navigate(`/discussions/${encodeURI(identifier)}`, { replace: true });
+      }
     }
-    if (topicNameFromURL === 'overview') {
+    if (topicIdentifiersFromURL?.topicName === 'overview') {
       setSelectedView(VIEWS[1].value);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, topicNameFromURL, isLoadingTopics]);
+  }, [topics, topicIdentifiersFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
@@ -317,8 +331,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         )}
 
         <HeaderWithFilters
-          // @ts-expect-error <StrictNullChecks/>
-          topic={topicName}
+          topic={topicIdentifiersFromURL?.topicName || ''}
           stage={stageName}
           featuredFilter={featuredFilter}
           dateRange={dateRange}
