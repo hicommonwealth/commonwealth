@@ -49,6 +49,11 @@
     }
   }
 
+  .turnstile-container {
+    display: flex;
+    justify-content: right;
+  }
+
   .form-bottom {
     display: flex;
     flex-direction: column;

@@ -32,6 +32,8 @@ export enum UserTierMap {
   ManuallyVerified = 6,
 }
 
+export const DisabledCommunitySpamTier = -1 as const;
+
 export const USER_TIERS = {
   [UserTierMap.IncompleteUser]: {
     name: 'Incomplete User',

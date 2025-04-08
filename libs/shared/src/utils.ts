@@ -521,3 +521,8 @@ export function serializeBigIntObj(
 
   return traverse(obj) as Record<string | number | symbol, unknown>;
 }
+
+export type TurnstileWidgetNames =
+  | 'create-community'
+  | 'create-thread'
+  | 'create-comment';

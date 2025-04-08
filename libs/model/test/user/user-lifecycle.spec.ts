@@ -25,6 +25,7 @@ import { CreateThread } from '../../src/aggregates/thread';
 import {
   GetUserProfile,
   GetXps,
+  GetXpsRanked,
   UpdateUser,
   Xp,
 } from '../../src/aggregates/user';
@@ -904,6 +905,22 @@ describe('User lifecycle', () => {
       // 10 from system quest wallet linking
       // 13 from wallet linking with balance
       expect(after!.xp_points).toBe(before!.xp_points! + 10 + 13);
+    });
+
+    it('should query ranked by xp points', async () => {
+      const xps1 = await query(GetXpsRanked(), {
+        actor: admin,
+        payload: { top: 10 },
+      });
+      expect(xps1!.length).to.equal(4);
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([147, 50, 37, 11]);
+
+      const xps2 = await query(GetXpsRanked(), {
+        actor: admin,
+        payload: { top: 10, quest_id: -1 },
+      });
+      expect(xps2!.length).to.equal(2);
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 10]);
     });
   });
 });

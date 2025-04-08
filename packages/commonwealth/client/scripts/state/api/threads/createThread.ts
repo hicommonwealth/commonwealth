@@ -1,5 +1,6 @@
 import { ChainBase, toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
+import { resetXPCacheForUser } from 'helpers/quest';
 import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -21,6 +22,7 @@ interface CreateThreadProps {
   body?: string;
   url?: string;
   ethChainIdOrBech32Prefix?: string | number;
+  turnstileToken?: string | null;
 }
 
 export const buildCreateThreadInput = async ({
@@ -34,6 +36,7 @@ export const buildCreateThreadInput = async ({
   body,
   url,
   ethChainIdOrBech32Prefix,
+  turnstileToken,
 }: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
@@ -54,6 +57,7 @@ export const buildCreateThreadInput = async ({
     url,
     read_only: false,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
+    turnstile_token: turnstileToken,
   };
 };
 
@@ -71,9 +75,7 @@ const useCreateThreadMutation = ({
 
   return trpc.thread.createThread.useMutation({
     onSuccess: async (newThread) => {
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);

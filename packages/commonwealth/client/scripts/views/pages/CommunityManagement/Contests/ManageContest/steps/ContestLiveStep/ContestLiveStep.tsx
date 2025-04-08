@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { useAnimation } from 'hooks/useAnimation';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -16,6 +17,7 @@ import './ContestLiveStep.scss';
 interface ContestLiveStepProps {
   createdContestAddress: string;
   isFarcasterContest: boolean;
+  isJudgedContest?: boolean;
   fundingTokenTicker: string;
   fundingTokenAddress: string;
 }
@@ -23,6 +25,7 @@ interface ContestLiveStepProps {
 const ContestLiveStep = ({
   createdContestAddress,
   isFarcasterContest,
+  isJudgedContest,
   fundingTokenTicker,
   fundingTokenAddress,
 }: ContestLiveStepProps) => {
@@ -30,6 +33,7 @@ const ContestLiveStep = ({
 
   const navigate = useCommonNavigate();
   const { animationStyles } = useAnimation();
+  const judgeContestEnabled = useFlag('judgeContest');
 
   return (
     <>
@@ -61,6 +65,14 @@ const ContestLiveStep = ({
                       console.log,
                     );
                   }}
+                />
+              )}
+              {judgeContestEnabled && isJudgedContest && (
+                <CWButton
+                  containerClassName="cta-btn"
+                  label="Nominate judges"
+                  buttonType="secondary"
+                  onClick={() => navigate('/members?tab=groups')}
                 />
               )}
               <CWButton
