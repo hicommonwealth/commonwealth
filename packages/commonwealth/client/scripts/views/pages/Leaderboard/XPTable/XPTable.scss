@@ -8,11 +8,38 @@
     overflow: scroll;
   }
 
+  .filters {
+    margin-bottom: 16px;
+
+    .quest-filter {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      .CWSelectList {
+        width: 100%;
+      }
+    }
+  }
+
   .table-header {
     display: flex;
-    gap: 4px;
-    justify-content: center;
     align-items: center;
+    gap: 4px;
+  }
+
+  .table-cell {
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+
+      p {
+        margin: 0;
+      }
+    }
   }
 
   tr {
@@ -24,10 +51,21 @@
     }
   }
 
+  .user-info {
+    .TrustLevelRole {
+      margin-left: 4px;
+    }
+  }
+
   .empty-rankings {
-    margin: 24px auto;
+    text-align: center;
+    margin-top: 32px;
+    padding-bottom: 240px;
+  }
+
+  .pagination {
     display: flex;
     justify-content: center;
-    text-align: center;
+    margin-top: 16px;
   }
 }

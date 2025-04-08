@@ -34,6 +34,7 @@ export function mustBeProtocolChainId(
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
+export const NOMINATION_FEE = 0.00005;
 
 type factoryContractsType = {
   [key in ValidChains]: {
@@ -44,6 +45,7 @@ type factoryContractsType = {
     tokenCommunityManager?: string;
     referralFeeManager?: string;
     veBridge?: string;
+    communityNomination?: string;
     chainId: number;
   };
 };
@@ -64,6 +66,7 @@ export const factoryContracts = {
     tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
     chainId: 84532,
   },
   [ValidChains.Blast]: {

@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useLocalAISettingsStore } from 'state/ui/user';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { CWText } from '../../component_kit/cw_text';
@@ -23,7 +24,7 @@ import './CommentEditor.scss';
 export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
-  handleSubmitComment: () => Promise<number>;
+  handleSubmitComment: (turnstileToken?: string | null) => Promise<number>;
   errorMsg: string;
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
@@ -75,6 +76,15 @@ const CommentEditor = ({
 
   const { generateCompletion } = useAiCompletion();
 
+  const {
+    resetTurnstile,
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+  } = useTurnstile({
+    action: 'create-comment',
+  });
+
   const handleCommentWithAI = () => {
     setIsSubmitDisabled(true);
     let text = '';
@@ -88,6 +98,7 @@ const CommentEditor = ({
     const prompt = generateCommentPrompt(context);
 
     generateCompletion(prompt, {
+      model: 'gpt-4o-mini',
       stream: true,
       onError: (error) => {
         console.error('Error generating AI comment:', error);
@@ -115,14 +126,21 @@ const CommentEditor = ({
         bubbles: true,
       }) as unknown as React.MouseEvent,
     );
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
 
     // Handle the rest of the submission process asynchronously
     try {
       let commentId: number;
       try {
-        commentId = await handleSubmitComment();
+        commentId = await handleSubmitComment(turnstileToken);
       } catch (error) {
         console.error('Failed to submit comment:', error);
+        if (isTurnstileEnabled) {
+          resetTurnstile();
+        }
         return;
       }
 
@@ -174,6 +192,9 @@ const CommentEditor = ({
       }, 0);
     } catch (error) {
       console.error('Error during submission:', error);
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
     }
   };
 
@@ -221,6 +242,9 @@ const CommentEditor = ({
         shouldFocus={shouldFocus}
         onKeyDown={handleKeyDown}
       />
+
+      {isTurnstileEnabled && <TurnstileWidget />}
+
       <div className="form-bottom">
         <div className="form-buttons">
           <CWButton
@@ -259,7 +283,11 @@ const CommentEditor = ({
           <CWButton
             containerClassName="post-button"
             buttonWidth="narrow"
-            disabled={disabled || isSubmitDisabled}
+            disabled={
+              disabled ||
+              isSubmitDisabled ||
+              (isTurnstileEnabled && !turnstileToken)
+            }
             onClick={() => void handleEnhancedSubmit()}
             label="Post"
           />
