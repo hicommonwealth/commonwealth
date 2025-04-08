@@ -303,7 +303,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = async (
+  const handleSubmit = (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const subFormErrors = validateSubForms();
