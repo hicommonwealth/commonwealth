@@ -69,6 +69,11 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       });
       mustExist('User', user);
 
+      const marked_as_spam_at =
+        address.role === 'member' && user.tier <= community.spam_tier_level
+          ? new Date()
+          : null;
+
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
@@ -91,8 +96,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               content_url: contentUrl,
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
-              marked_as_spam_at:
-                user.tier <= community.spam_tier_level ? new Date() : null,
+              marked_as_spam_at,
             },
             {
               transaction,
