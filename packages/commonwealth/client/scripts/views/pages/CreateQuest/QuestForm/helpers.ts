@@ -19,9 +19,7 @@ export const buildContentIdFromURL = (url: string, idType: ContentIdType) => {
     )}`;
   }
   if (idType === 'topic') {
-    const topicIdentifier = generateTopicIdentifiersFromUrl(
-      new URL(url).pathname,
-    );
+    const topicIdentifier = generateTopicIdentifiersFromUrl(url);
 
     if (topicIdentifier?.topicId) return `${idType}:${topicIdentifier.topicId}`;
 

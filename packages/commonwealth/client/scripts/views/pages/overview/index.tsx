@@ -33,7 +33,7 @@ const OverviewPage = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const topicIndentifiersFromURL = generateTopicIdentifiersFromUrl(
-    location.pathname,
+    window.location.href,
   );
 
   useRunOnceOnCondition({

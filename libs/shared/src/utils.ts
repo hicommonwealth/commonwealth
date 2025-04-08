@@ -40,10 +40,11 @@ export const slugify = (str: string): string => {
 };
 /* eslint-disable */
 
-export const generateTopicIdentifiersFromUrl = (locationPathname: string) => {
+export const generateTopicIdentifiersFromUrl = (url: string) => {
   //checks if a url is custom or not and decodes the url after splitting it
   //this is to check for malformed urls on a topics page in /discussions
-  const splitURLPath = locationPathname.split('/');
+  const urlObj = new URL(url);
+  const splitURLPath = urlObj.pathname.split('/');
 
   const generateTopicIdentifiersFromUrlPart = (urlPart: string) => {
     const topicIdentifier = decodeURIComponent(urlPart);

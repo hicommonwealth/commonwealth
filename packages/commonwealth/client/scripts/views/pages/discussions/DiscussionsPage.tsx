@@ -118,7 +118,7 @@ const DiscussionsPage = () => {
   }, [tabStatus]);
 
   const topicIdentifiersFromURL = generateTopicIdentifiersFromUrl(
-    location.pathname,
+    window.location.href,
   );
   const topicObj = topics?.find(
     ({ name }) => name === topicIdentifiersFromURL?.topicName,
