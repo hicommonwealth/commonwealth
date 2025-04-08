@@ -117,10 +117,8 @@ interface UseEditThreadMutationProps {
 const useEditThreadMutation = ({
   communityId,
   threadId,
-  currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
-  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.updateThread.useMutation({
