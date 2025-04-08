@@ -147,7 +147,7 @@ const StakeIntegration = ({
             ]}
             isTopicFlow={isTopicFlow}
             onEnableStakeStepCancel={goBack}
-            onSignTransactionsStepLaunchStakeSuccess={
+            onSignTransactionConfigureStake={
               handleSignTransactionsStepLaunchStakeSuccess
             }
             onSignTransactionsStepCancel={goBack}

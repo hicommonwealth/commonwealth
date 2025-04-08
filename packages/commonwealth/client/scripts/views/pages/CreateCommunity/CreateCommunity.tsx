@@ -82,7 +82,7 @@ const CreateCommunity = () => {
               TransactionType.MintVerificationToken,
             ]}
             onEnableStakeStepCancel={goToSuccessStep}
-            onSignTransactionsStepReserveNamespaceSuccess={goToSuccessStep}
+            onSignTransactionDeployNamespace={goToSuccessStep}
             onSignTransactionsStepCancel={goToSuccessStep}
           />
         );

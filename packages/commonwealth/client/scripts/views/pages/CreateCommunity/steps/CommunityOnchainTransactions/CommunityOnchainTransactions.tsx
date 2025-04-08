@@ -24,9 +24,10 @@ interface CommunityOnchainTransactionsProps {
   symbol?: string;
   onEnableStakeStepSucess?: (data: StakeData) => void;
   onEnableStakeStepCancel?: () => void;
-  onSignTransactionsStepReserveNamespaceSuccess?: () => void;
-  onSignTransactionsStepLaunchStakeSuccess?: () => void;
-  onSignTransactionsStepConfigureNominationsSuccess?: () => void;
+  onSignTransactionDeployNamespace?: () => void;
+  onSignTransactionConfigureStake?: () => void;
+  onSignTransactionConfigureNominations?: () => void;
+  onSignTransactionMintVerificationToken?: () => void;
   onSignTransactionsStepCancel?: () => void;
 }
 
@@ -41,9 +42,10 @@ const CommunityOnchainTransactions = ({
   symbol,
   onEnableStakeStepSucess,
   onEnableStakeStepCancel,
-  onSignTransactionsStepReserveNamespaceSuccess,
-  onSignTransactionsStepLaunchStakeSuccess,
-  onSignTransactionsStepConfigureNominationsSuccess,
+  onSignTransactionDeployNamespace,
+  onSignTransactionConfigureStake,
+  onSignTransactionConfigureNominations,
+  // onSignTransactionMintVerificationToken,
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
@@ -65,7 +67,7 @@ const CommunityOnchainTransactions = ({
     symbol: communityStakeData.symbol,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionsStepReserveNamespaceSuccess,
+    onSuccess: onSignTransactionDeployNamespace,
     hasNamespaceReserved,
   });
 
@@ -74,14 +76,14 @@ const CommunityOnchainTransactions = ({
     communityId: createdCommunityId,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionsStepLaunchStakeSuccess,
+    onSuccess: onSignTransactionConfigureStake,
   });
 
   const nominationsTransaction = useNominationsTransaction({
     namespace: communityStakeData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionsStepConfigureNominationsSuccess,
+    onSuccess: onSignTransactionConfigureNominations,
   });
 
   const handleEnableStakeStepSuccess = (data: StakeData) => {

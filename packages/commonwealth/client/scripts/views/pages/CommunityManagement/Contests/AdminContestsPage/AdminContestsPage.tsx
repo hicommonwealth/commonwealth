@@ -269,9 +269,7 @@ Set one up first.`
             chainId={String(ethChainId)}
             transactionTypes={[TransactionType.DeployNamespace]}
             onEnableStakeStepCancel={gotToContestTypeSelection}
-            onSignTransactionsStepReserveNamespaceSuccess={
-              goToLaunchFarcasterContest
-            }
+            onSignTransactionDeployNamespace={goToLaunchFarcasterContest}
             onSignTransactionsStepCancel={gotToContestTypeSelection}
           />
         ) : null}
