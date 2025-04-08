@@ -22,7 +22,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
-import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStakeStep';
+import CommunityTransactions from 'views/pages/CreateCommunity/steps/CommunityTransactions';
 
 import { CWDivider } from '../../../../components/component_kit/cw_divider';
 import ContestsList from '../ContestsList';
@@ -262,7 +262,7 @@ Set one up first.`
             />
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
-          <CommunityStakeStep
+          <CommunityTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
