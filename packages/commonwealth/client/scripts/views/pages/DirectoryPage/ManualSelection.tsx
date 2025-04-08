@@ -38,10 +38,11 @@ const ManualSelection = ({
   };
 
   const handleCommunityClick = useCallback(
-    (communityName: string) => {
-      const newCommunities = localSelectedCommunities.includes(communityName)
-        ? localSelectedCommunities.filter((c) => c !== communityName)
-        : [...localSelectedCommunities, communityName];
+    (community: any) => {
+      console.log('Selected community data:', community);
+      const newCommunities = localSelectedCommunities.includes(community.id)
+        ? localSelectedCommunities.filter((c) => c !== community.id)
+        : [...localSelectedCommunities, community.id];
       setLocalSelectedCommunities(newCommunities);
       setSelectedCommunities(newCommunities);
     },
@@ -58,7 +59,7 @@ const ManualSelection = ({
 
   const renderItem = useCallback(
     (i: number, community: any) => {
-      const isSelected = localSelectedCommunities.includes(community.name);
+      const isSelected = localSelectedCommunities.includes(community.id);
 
       return (
         <div>
@@ -66,7 +67,7 @@ const ManualSelection = ({
             tagOrCommunityName={community.name}
             communityIcon={community.iconUrl}
             isSelected={isSelected}
-            onChange={() => handleCommunityClick(community.name)}
+            onChange={() => handleCommunityClick(community)}
           />
         </div>
       );

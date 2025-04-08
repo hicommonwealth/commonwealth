@@ -33,32 +33,42 @@ export const updateCommunityDirectoryTags = async (
     transaction,
   });
 
-  // Insert new entries
-  if (tag_names.length > 0) {
-    const validEntries = [];
+  const entries = [];
 
-    for (const tag_name of tag_names) {
-      const tag_id = tagNameToId.get(tag_name);
-      if (tag_id !== undefined) {
-        validEntries.push({
-          community_id,
-          tag_id,
-          selected_community_id: selected_community_ids[0],
-          created_at: new Date(),
-          updated_at: new Date(),
-        });
-      }
+  // Create entries for tags (with null selected_community_id)
+  for (const tag_name of tag_names) {
+    const tag_id = tagNameToId.get(tag_name);
+    if (tag_id !== undefined) {
+      entries.push({
+        community_id,
+        tag_id,
+        selected_community_id: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
     }
+  }
 
-    if (validEntries.length > 0) {
-      const [status, newRows] = await models.CommunityDirectoryTags.bulkCreate(
-        validEntries,
-        { transaction },
-      );
+  // Create entries for selected communities (with null tag_id)
+  for (const selected_community_id of selected_community_ids) {
+    entries.push({
+      community_id,
+      tag_id: null,
+      selected_community_id,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+  }
 
-      if (!(status || newRows)) {
-        throw new AppError('Failed to create community directory tags');
-      }
+  // Insert all entries if we have any
+  if (entries.length > 0) {
+    const [status, newRows] = await models.CommunityDirectoryTags.bulkCreate(
+      entries,
+      { transaction },
+    );
+
+    if (!(status || newRows)) {
+      throw new AppError('Failed to create community directory tags');
     }
   }
 };

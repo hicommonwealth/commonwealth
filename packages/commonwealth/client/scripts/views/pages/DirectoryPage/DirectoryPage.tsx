@@ -1,5 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -50,7 +51,6 @@ const DirectoryPage = () => {
   const { data: nodes } = useFetchNodesQuery();
 
   const communityId = app.activeChainId() || '';
-  console.log('Current communityId:', communityId);
 
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
@@ -89,42 +89,26 @@ const DirectoryPage = () => {
     enabled: !!communityId,
   });
 
-  console.log('Current communityId:', communityId);
-  console.log('communityTagsAndCommunities::', communityTagsAndCommunities);
-  console.log('isLoadingTagsAndCommunities:', isLoadingTagsAndCommunities);
-  console.log('tagsAndCommunitiesError:', tagsAndCommunitiesError);
-
   const { mutateAsync: updateCommunityDirectoryTags } =
     useUpdateCommunityDirectoryTags();
 
   const getFilteredCommunities = useCallback(
     (communities: any[], tags: string[], manualSelections: string[]) => {
-      console.log('Filtering communities with tags:', tags);
-      console.log(
-        'Filtering communities with manual selections:',
-        manualSelections,
-      );
-
       if (!communities) {
         return [];
       }
 
-      // If no filters are applied, return all communities
       if (tags.length === 0 && manualSelections.length === 0) {
         return communities;
       }
 
-      // Filter communities that match either tags OR manual selections
       return communities.filter((comm) => {
-        // Check if community matches any of the selected tags
         const matchesTags =
-          tags.length > 0 && tags.some((tag) => comm.tag_names?.includes(tag));
+          tags.length > 0 && tags.some((tag) => comm.tag_ids?.includes(tag));
 
-        // Check if community is in the manual selections
         const matchesManualSelection =
           manualSelections.length > 0 && manualSelections.includes(comm.id);
 
-        // Include community if it matches either criteria
         return matchesTags || matchesManualSelection;
       });
     },
@@ -132,9 +116,7 @@ const DirectoryPage = () => {
   );
 
   useEffect(() => {
-    // Early return if data is not available or loading
     if (isLoadingTagsAndCommunities) {
-      console.log('Still loading tags and communities...');
       return;
     }
 
@@ -146,13 +128,11 @@ const DirectoryPage = () => {
       return;
     }
 
-    // Initialize with empty arrays if no data
     const communityData = communityTagsAndCommunities?.[0] || {
       tag_names: [],
       selected_community_ids: [],
     };
 
-    // Ensure we have arrays, defaulting to empty if null/undefined
     const initialTags = Array.isArray(communityData.tag_names)
       ? communityData.tag_names
       : [];
@@ -162,20 +142,9 @@ const DirectoryPage = () => {
       ? communityData.selected_community_ids
       : [];
 
-    console.log('Setting tags and communities:', {
-      tags: initialTags,
-      communities: initialCommunities,
-      rawData: communityData,
-      hasData: {
-        hasTags: initialTags.length > 0,
-        hasCommunities: initialCommunities.length > 0,
-      },
-    });
-
     setSelectedTags(initialTags);
     setSelectedCommunities(initialCommunities);
 
-    // If we have related communities data, apply initial filtering
     if (filteredRelatedCommunitiesData) {
       const initialFilteredCommunities = getFilteredCommunities(
         filteredRelatedCommunitiesData,
@@ -206,19 +175,12 @@ const DirectoryPage = () => {
   useEffect(() => {
     if (!filteredRelatedCommunitiesData || !tableData) return;
 
-    console.log('Updating filtered communities with tags:', selectedTags);
-    console.log(
-      'Updating filtered communities with communities:',
-      selectedCommunities,
-    );
-
     const newFilteredCommunities = getFilteredCommunities(
       filteredRelatedCommunitiesData,
       selectedTags,
       selectedCommunities,
     );
 
-    console.log('Updated filtered communities:', newFilteredCommunities);
     setFilteredCommunities(newFilteredCommunities);
 
     const newTableData = tableData.filter((row) =>
@@ -246,14 +208,8 @@ const DirectoryPage = () => {
 
   const handleSaveChanges = async () => {
     try {
-      // Ensure we're sending arrays, defaulting to empty if undefined
       const validTags = selectedTags || [];
       const validCommunities = selectedCommunities || [];
-
-      console.log('Saving changes with:', {
-        tags: validTags,
-        communities: validCommunities,
-      });
 
       await updateCommunityDirectoryTags({
         community_id: communityId,
@@ -267,7 +223,8 @@ const DirectoryPage = () => {
         isPWA: isAddedToHomeScreen,
       });
     } catch (error) {
-      console.error('Failed to update Directory page:', error);
+      console.log(error);
+      notifyError('Failed to update Directory Settings');
     }
   };
 
@@ -361,8 +318,14 @@ const DirectoryPage = () => {
             </div>
           </div>
           <div>
-            <ShowAddedTags selectedTags={selectedTags} />
-            <ShowAddedCommunities selectedCommunities={selectedCommunities} />
+            <ShowAddedTags
+              selectedTags={selectedTags}
+              isLoading={isLoadingTagsAndCommunities}
+            />
+            <ShowAddedCommunities
+              selectedCommunities={selectedCommunities}
+              isLoading={isLoadingTagsAndCommunities}
+            />
           </div>
         </div>
 

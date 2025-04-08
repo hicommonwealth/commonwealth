@@ -1,17 +1,20 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './ShowAddedTags.scss';
 
 interface ShowAddedTagsProps {
   selectedTags: string[];
+  isLoading: boolean;
 }
 
-const ShowAddedTags = ({ selectedTags }: ShowAddedTagsProps) => {
-  console.log('ShowAddedTags - selectedTags:', selectedTags);
+const ShowAddedTags = ({ selectedTags, isLoading }: ShowAddedTagsProps) => {
+  if (isLoading) {
+    return <CWCircleMultiplySpinner />;
+  }
 
   if (!selectedTags?.length) {
-    console.log('ShowAddedTags - No tags to display');
     return null;
   }
 

@@ -1,22 +1,23 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './ShowAddedCommunities.scss';
 
 interface ShowAddedCommunitiesProps {
   selectedCommunities: string[];
+  isLoading: boolean;
 }
 
 const ShowAddedCommunities = ({
   selectedCommunities,
+  isLoading,
 }: ShowAddedCommunitiesProps) => {
-  console.log(
-    'ShowAddedCommunities - selectedCommunities:',
-    selectedCommunities,
-  );
+  if (isLoading) {
+    return <CWCircleMultiplySpinner />;
+  }
 
   if (!selectedCommunities?.length) {
-    console.log('ShowAddedCommunities - No communities to display');
     return null;
   }
 
