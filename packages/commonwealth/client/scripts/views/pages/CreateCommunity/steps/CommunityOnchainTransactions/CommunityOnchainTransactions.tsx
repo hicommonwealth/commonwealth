@@ -12,9 +12,9 @@ import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
 import { StakeData } from './types';
 
-import './CommunityTransactions.scss';
+import './CommunityOnchainTransactions.scss';
 
-interface CommunityTransactionsProps {
+interface CommunityOnchainTransactionsProps {
   createdCommunityName?: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
@@ -31,7 +31,7 @@ interface CommunityTransactionsProps {
   onSignTransactionsStepCancel?: () => void;
 }
 
-const CommunityTransactions = ({
+const CommunityOnchainTransactions = ({
   createdCommunityName,
   createdCommunityId,
   selectedAddress,
@@ -45,7 +45,7 @@ const CommunityTransactions = ({
   onSignTransactionsStepReserveNamespaceSuccess,
   onSignTransactionsStepLaunchStakeSuccess,
   onSignTransactionsStepCancel,
-}: CommunityTransactionsProps) => {
+}: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
   const [enableStakePage, setEnableStakePage] = useState(
     hasNamespaceReserved ? false : true,
@@ -66,7 +66,6 @@ const CommunityTransactions = ({
     hasNamespaceReserved,
   });
 
-  // Hook for stake transaction
   const stakeTransaction = useStakeTransaction({
     namespace: communityStakeData.namespace,
     communityId: createdCommunityId,
@@ -75,7 +74,6 @@ const CommunityTransactions = ({
     onSuccess: onSignTransactionsStepLaunchStakeSuccess,
   });
 
-  // Enable Stake step handlers
   const handleEnableStakeStepSuccess = (data: StakeData) => {
     setCommunityStakeData(data);
     setEnableStakePage(false);
@@ -86,7 +84,6 @@ const CommunityTransactions = ({
     onEnableStakeStepCancel?.();
   };
 
-  // Sign Transactions step handlers
   const handleSignTransactionsStepCancel = () => {
     openConfirmation({
       title: 'Are you sure you want to cancel?',
@@ -125,11 +122,10 @@ const CommunityTransactions = ({
     return transactions;
   };
 
-  // Get text for transactions component
   const { title, description } = getNamespaceTransactionText(!!onlyNamespace);
 
   return (
-    <div className="CommunityTransactions">
+    <div className="CommunityOnchainTransactions">
       {enableStakePage ? (
         <EnableStake
           communityStakeData={communityStakeData}
@@ -159,4 +155,4 @@ const CommunityTransactions = ({
   );
 };
 
-export default CommunityTransactions;
+export default CommunityOnchainTransactions;

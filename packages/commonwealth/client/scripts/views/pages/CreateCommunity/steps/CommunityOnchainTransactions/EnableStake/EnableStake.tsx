@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
+import { useNamespaceFactory } from 'client/scripts/views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { useNamespaceFactory } from 'views/pages/CreateCommunity/steps/CommunityTransactions';
 
 import Hint from '../../../components/Hint';
 import { StakeData } from '../types';

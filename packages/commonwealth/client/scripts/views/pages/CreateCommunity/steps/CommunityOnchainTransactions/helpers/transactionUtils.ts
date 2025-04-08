@@ -35,27 +35,6 @@ export const createStakeTransaction = (
 };
 
 /**
- * Creates a custom transaction configuration
- */
-export const createCustomTransaction = (
-  id: string,
-  label: string,
-  transaction: TransactionHookResult,
-  shouldShowActionButton: boolean,
-  dependsOn?: string[],
-): TransactionConfig => {
-  return {
-    id,
-    label,
-    state: transaction.state,
-    errorText: transaction.errorText,
-    action: transaction.action,
-    shouldShowActionButton,
-    dependsOn,
-  };
-};
-
-/**
  * Returns namespace transaction title and description
  */
 export const getNamespaceTransactionText = (onlyNamespace: boolean) => {

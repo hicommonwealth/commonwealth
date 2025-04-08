@@ -7,12 +7,9 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
+import { useNamespaceFactory } from '..';
 import useAppStatus from '../../../../../../hooks/useAppStatus';
-import { useNamespaceFactory } from '../../CommunityTransactions';
-import {
-  ActionState,
-  defaultActionState,
-} from '../../CommunityTransactions/types';
+import { ActionState, defaultActionState } from '../types';
 
 interface UseLaunchCommunityStakeProps {
   namespace: string;

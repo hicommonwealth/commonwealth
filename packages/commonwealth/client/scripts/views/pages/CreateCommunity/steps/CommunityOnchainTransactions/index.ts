@@ -1,4 +1,4 @@
-export { default } from './CommunityTransactions';
+export { default } from './CommunityOnchainTransactions';
 export * from './helpers/transactionUtils';
 export { default as useNamespaceFactory } from './helpers/useNamespaceFactory';
 export { default as useNamespaceTransaction } from './helpers/useNamespaceTransaction';

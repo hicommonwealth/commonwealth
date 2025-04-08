@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNamespaceFactory } from 'views/pages/CreateCommunity/steps/CommunityTransactions';
+import { useNamespaceFactory } from 'client/scripts/views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
 
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import { ContractMethods } from 'state/api/config';

@@ -17,7 +17,7 @@ import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/T
 import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import useGetCommunityByIdQuery from '../../../../state/api/communities/getCommuityById';
 import { PageNotFound } from '../../404';
-import CommunityTransactions from '../../CreateCommunity/steps/CommunityTransactions';
+import CommunityOnchainTransactions from '../../CreateCommunity/steps/CommunityOnchainTransactions';
 import CanBeDisabled from './CanBeDisabled';
 import ContractInfo from './ContractInfo';
 import './StakeIntegration.scss';
@@ -133,7 +133,7 @@ const StakeIntegration = ({
             )}
           </>
         ) : (
-          <CommunityTransactions
+          <CommunityOnchainTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             namespace={community?.namespace}
