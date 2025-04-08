@@ -4,9 +4,13 @@ import {
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
-import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useUpdateRoleMutation,
+} from 'client/scripts/state/api/communities';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
+import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -48,6 +52,12 @@ export const ManageOnchainModal = ({
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
+
+  // Get community data to determine chain base
+  const { data: community } = useGetCommunityByIdQuery({
+    id: chainId,
+    enabled: !!chainId,
+  });
 
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
@@ -153,7 +163,7 @@ export const ManageOnchainModal = ({
                 <CWTag
                   label={formatAddressShort(address.address)}
                   type="address"
-                  iconName="ethereum"
+                  iconName={getChainIcon(address, community?.base)}
                 />
               </div>
               <div className="role-selection">

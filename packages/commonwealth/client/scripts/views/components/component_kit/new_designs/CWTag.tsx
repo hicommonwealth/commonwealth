@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWIcon } from '../cw_icons/cw_icon';
-import type { IconName } from '../cw_icons/cw_icon_lookup';
+import type { CustomIconName, IconName } from '../cw_icons/cw_icon_lookup';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
@@ -33,7 +33,7 @@ export type TagType =
   | 'pill';
 
 export type TagProps = {
-  iconName?: IconName;
+  iconName?: IconName | CustomIconName;
   label: string;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
