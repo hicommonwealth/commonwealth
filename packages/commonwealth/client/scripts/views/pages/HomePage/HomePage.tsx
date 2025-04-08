@@ -20,6 +20,7 @@ import { IOSBanner } from './iOSBanner';
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const homePageEnabled = useFlag('homePage');
+  const mobileDownloadEnabled = useFlag('mobileDownload');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -45,7 +46,7 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
-          <IOSBanner />
+          {mobileDownloadEnabled && <IOSBanner />}
         </div>
         <TrendingTokensList />
         <TrendingCommunitiesPreview />
