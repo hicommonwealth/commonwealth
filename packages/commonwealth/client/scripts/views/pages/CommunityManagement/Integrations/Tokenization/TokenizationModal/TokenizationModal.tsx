@@ -15,6 +15,7 @@ import useEditCommunityTokenMutation from 'state/api/communities/editCommunityTo
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import useTokenFinder from 'views/components/TokenFinder/useTokenFinder';
 import './TokenizationModal.scss';
 
 interface TokenizationModalProps {
@@ -35,10 +36,12 @@ const TokenizationModal = ({
   const [tokenizeAllTopics, setTokenizeAllTopics] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deselectedTopics, setDeselectedTopics] = useState<string[]>([]);
-  const [threadPurchaseToken, setThreadPurchaseToken] = useState('');
   const [showInfoBox, setShowInfoBox] = useState(true);
+  const [localTokenValue, setLocalTokenValue] = useState('');
 
   const communityId = app.activeChainId() || '';
+  const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
+
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
     includeArchivedTopics: false,
@@ -50,6 +53,18 @@ const TokenizationModal = ({
     enabled: !!communityId,
   });
 
+  useEffect(() => {
+    if (community?.thread_purchase_token) {
+      setLocalTokenValue(community.thread_purchase_token);
+    }
+  }, [community]);
+
+  const { tokenMetadata, tokenMetadataLoading, getTokenError, setTokenValue } =
+    useTokenFinder({
+      nodeEthChainId,
+      initialTokenValue: localTokenValue || undefined,
+    });
+
   const { mutateAsync: editTopic } = useEditTopicMutation();
   const { mutateAsync: editCommunityToken } = useEditCommunityTokenMutation();
 
@@ -60,12 +75,6 @@ const TokenizationModal = ({
       .filter(Boolean);
     setSelectedTopics(tokenizedTopicIds);
   }, [topics]);
-
-  useEffect(() => {
-    if (community?.thread_purchase_token) {
-      setThreadPurchaseToken(community.thread_purchase_token);
-    }
-  }, [community]);
 
   const topicOptions = topics.map((topic) => ({
     label: topic.name,
@@ -100,7 +109,23 @@ const TokenizationModal = ({
     }
   };
 
+  const handleTokenInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    setLocalTokenValue(value);
+    setTokenValue(value);
+  };
+
   const handleSaveChanges = async () => {
+    if (localTokenValue.trim()) {
+      console.log('Validating token:', localTokenValue);
+      const tokenError = getTokenError(true);
+      console.log('Token error:', tokenError);
+      if (tokenError) {
+        notifyError(tokenError);
+        return;
+      }
+    }
+
     setIsSaving(true);
     try {
       const updatePromises = selectedTopics.map((topicId) =>
@@ -121,10 +146,10 @@ const TokenizationModal = ({
 
       await Promise.all([...updatePromises, ...deselectPromises]);
 
-      if (threadPurchaseToken.trim()) {
+      if (localTokenValue.trim()) {
         await editCommunityToken({
           community_id: communityId,
-          thread_purchase_token: threadPurchaseToken.trim(),
+          thread_purchase_token: localTokenValue.trim(),
         });
       }
 
@@ -217,12 +242,25 @@ const TokenizationModal = ({
           </CWText>
 
           <CWTextInput
-            value={threadPurchaseToken}
-            onInput={(e: React.FormEvent<HTMLInputElement>) =>
-              setThreadPurchaseToken(e.currentTarget.value)
-            }
+            value={localTokenValue}
+            onInput={handleTokenInput}
             placeholder="Enter token address"
           />
+          {localTokenValue.trim() && tokenMetadataLoading && (
+            <CWText type="caption" className="mt-2">
+              Loading token metadata...
+            </CWText>
+          )}
+          {localTokenValue.trim() && tokenMetadata?.name && (
+            <CWText type="caption" className="mt-2">
+              Token: {tokenMetadata.name} ({tokenMetadata.symbol})
+            </CWText>
+          )}
+          {localTokenValue.trim() && getTokenError() && (
+            <CWText type="caption" className="mt-2 error">
+              {getTokenError()}
+            </CWText>
+          )}
         </div>
       </CWModalBody>
 
