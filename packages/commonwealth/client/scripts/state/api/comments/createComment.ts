@@ -17,6 +17,7 @@ interface CreateCommentProps {
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
   existingNumberOfComments: number;
+  turnstileToken?: string | null;
 }
 
 export const buildCreateCommentInput = async ({
@@ -26,6 +27,7 @@ export const buildCreateCommentInput = async ({
   unescapedText,
   parentCommentId = null,
   parentCommentMsgId = null,
+  turnstileToken,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(address, {
     thread_id: threadMsgId ?? null,
@@ -39,6 +41,7 @@ export const buildCreateCommentInput = async ({
     parent_id: parentCommentId ?? undefined,
     body: unescapedText,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
+    turnstile_token: turnstileToken,
   };
 };
 

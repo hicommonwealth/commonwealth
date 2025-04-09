@@ -33,6 +33,9 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
+    'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
+      env.FLAG_MOBILE_DOWNLOAD,
+    ),
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
@@ -92,6 +95,15 @@ export default defineConfig(({ mode }) => {
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
     'process.env.PRIVY_APP_ID': JSON.stringify(env.PRIVY_APP_ID),
+    'process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+    ),
   };
 
   return {

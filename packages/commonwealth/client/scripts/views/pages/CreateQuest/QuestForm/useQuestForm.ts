@@ -1,8 +1,12 @@
-import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
+import {
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
 import { getDefaultContestImage } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
+  calculateTotalXPForQuestActions,
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
@@ -15,7 +19,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
@@ -28,7 +32,7 @@ import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQ
 import './QuestForm.scss';
 import { buildContentIdFromURL } from './helpers';
 import { QuestFormProps } from './types';
-import { questFormValidationSchema } from './validation';
+import { buildDynamicQuestFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
 
@@ -49,6 +53,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const [availableQuestActions, setAvailableQuestActions] = useState<
     QuestAction[]
   >([...questActions.common]);
+  const availableQuestActionsRef = useRef([...availableQuestActions]);
+  availableQuestActionsRef.current = availableQuestActions;
 
   const {
     addSubForm,
@@ -124,6 +130,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const minEndDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000); // now + 1 day in future
 
   const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
+  const [minQuestLevelXP, setMinQuestLevelXP] = useState(0);
 
   const { mutateAsync: createQuest } = useCreateQuestMutation();
   const { mutateAsync: updateQuest } = useUpdateQuestMutation();
@@ -131,6 +138,46 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const navigate = useCommonNavigate();
 
   const formMethodsRef = useRef<CWFormRef>(null);
+
+  const triggerCalculateTotalXPForQuestActions = useCallback(() => {
+    setMinQuestLevelXP(
+      calculateTotalXPForQuestActions({
+        isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
+        questActions: [...questActionSubForms].map(({ values }) => ({
+          creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
+          event_name: values.action as QuestAction,
+          quest_id: Math.random(),
+          reward_amount: parseInt(`${values.rewardAmount || 0}`),
+          participation_times_per_period: parseInt(
+            `${values.participationTimesPerPeriod || 0}`,
+          ),
+          participation_limit:
+            values.participationLimit || QuestParticipationLimit.OncePerQuest,
+          participation_period:
+            values.participationPeriod || QuestParticipationPeriod.Daily,
+        })),
+        questEndDate:
+          formMethodsRef?.current?.getValues('end_date') || new Date(),
+        questStartDate:
+          formMethodsRef?.current?.getValues('start_date') || new Date(),
+      }),
+    );
+  }, [questActionSubForms]);
+
+  // recalculate `minQuestLevelXP` when parent form changes
+  formMethodsRef?.current?.watch(() =>
+    triggerCalculateTotalXPForQuestActions(),
+  );
+
+  // recalculate `minQuestLevelXP` when any subform changes
+  useEffect(() => {
+    triggerCalculateTotalXPForQuestActions();
+  }, [questActionSubForms, triggerCalculateTotalXPForQuestActions]);
+
+  // recalculate `max_xp_to_end` field error state when `minQuestLevelXP` changes
+  useEffect(() => {
+    formMethodsRef?.current?.trigger('max_xp_to_end').catch(console.error);
+  }, [minQuestLevelXP]);
 
   const handleQuestMutateConfirmation = async (hours: number) => {
     return new Promise((resolve, reject) => {
@@ -189,7 +236,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           subForm.values.noOfRetweets ||
           subForm.values.noOfReplies) && {
           tweet_engagement_caps: {
-            // TODO: 11391 platform - update platform to allow any 1 of these values
             likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
             retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
@@ -210,7 +256,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   };
 
   const handleCreateQuest = async (
-    values: z.infer<typeof questFormValidationSchema>,
+    values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const quest = await createQuest({
       name: values.name.trim(),
@@ -234,7 +280,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   };
 
   const handleUpdateQuest = async (
-    values: z.infer<typeof questFormValidationSchema>,
+    values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     if (!questId) return;
 
@@ -257,7 +303,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
+  const handleSubmit = (
+    values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
+  ) => {
     const subFormErrors = validateSubForms();
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
@@ -403,9 +451,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   // recalculate `availableQuestActions` when quest type changes
   formMethodsRef?.current?.watch((values) => {
     const newActions = [...questActions[values.quest_type]];
+    const oldActions = [...(availableQuestActionsRef.current || [])];
 
     // if quest type changes, reset all quest actions
-    if (!isEqual(availableQuestActions, newActions)) {
+    if (!isEqual([...oldActions], newActions)) {
       setQuestActionSubFormsInitialState();
     }
 
@@ -422,6 +471,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     updateSubFormByIndex,
     validateSubForms,
     // main form specific fields
+    minQuestLevelXP,
     handleSubmit,
     isProcessingQuestImage,
     setIsProcessingQuestImage,

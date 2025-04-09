@@ -48,7 +48,6 @@ const useQuestActionMultiFormsState = ({
           refs: {
             runParticipationLimitValidator: () => {},
           },
-          // todo: 11391 fix this
           id: index + (questActionSubForms.length + 1),
         })),
       ]);
@@ -161,6 +160,12 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowTwitterTweetURL(chosenAction),
       };
 
+      // set fixed action repitition per certain actions
+      if (!isActionRepeatable) {
+        updatedSubForms[index].values.participationLimit =
+          QuestParticipationLimit.OncePerQuest;
+      }
+
       // reset errors/values if action doesn't require creator points
       if (!requiresCreatorPoints) {
         updatedSubForms[index].values.creatorRewardAmount = undefined;
@@ -183,12 +188,6 @@ const useQuestActionMultiFormsState = ({
       if (updateBody.action === 'TweetEngagement') {
         updatedSubForms[index].values.contentIdScope =
           QuestActionContentIdScope.TwitterTweet;
-      }
-
-      // set fixed action repitition per certain actions
-      if (!isActionRepeatable) {
-        updatedSubForms[index].values.participationLimit =
-          QuestParticipationLimit.OncePerQuest;
       }
 
       // set/reset default values/config if action allows content link

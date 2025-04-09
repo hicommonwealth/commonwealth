@@ -74,9 +74,10 @@ export const numberValidationSchema = {
     ),
   optional: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .optional()
     .refine(
       (value) => {
-        if (value.toString().trim() === '') return true;
+        if (!value || value.toString().trim() === '') return true;
         const intVal = parseInt(value, 10);
         return !isNaN(intVal) && intVal.toString() === value.trim();
       },

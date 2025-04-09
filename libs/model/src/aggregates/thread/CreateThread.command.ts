@@ -10,9 +10,14 @@ import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
-import { authTopic, tiered } from '../../middleware';
-import { verifyThreadSignature } from '../../middleware/canvas';
-import { mustBeAuthorized, mustExist } from '../../middleware/guards';
+import {
+  authTopic,
+  mustBeAuthorized,
+  mustExist,
+  tiered,
+  turnstile,
+  verifyThreadSignature,
+} from '../../middleware';
 import { getThreadSearchVector } from '../../models/thread';
 import { tokenBalanceCache } from '../../services';
 import {
@@ -87,6 +92,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
       tiered({ creates: true }),
+      turnstile({ widgetName: 'create-thread' }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address } = mustBeAuthorized(actor, context);
