@@ -48,6 +48,7 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -92,6 +93,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   useAppStatus();
 
   const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
+
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [selectedCommunityId, setSelectedCommunityId] = useState(
     app.activeChainId() || '',
@@ -479,293 +483,336 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     [handleNewThreadCreation],
   );
 
+  const sidebarComponent = [
+    {
+      label: 'Links',
+      item: (
+        <div className="cards-colum">
+          <>Custom Components</>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
       <CWPageLayout>
         <div className="NewThreadForm" onKeyDown={handleKeyDown}>
-          <div className="new-thread-body">
-            <div className="new-thread-form-inputs">
-              {!isInsideCommunity && (
-                <>
-                  <CWSelectList
-                    className="community-select"
-                    options={user?.communities?.map((c) => ({
-                      label: c.name,
-                      value: c.id,
-                    }))}
-                    placeholder="Select community"
-                    {...(selectedCommunityId && {
-                      value: {
-                        label:
-                          user.communities.find(
-                            (c) => c.id === selectedCommunityId,
-                          )?.name || '',
-                        value: selectedCommunityId,
-                      },
-                    })}
-                    onChange={(option) => {
-                      option?.value && setSelectedCommunityId(option.value);
-                      setUserSelectedAddress('');
-                    }}
-                  />
-                  <CWSelectList
-                    components={{
-                      Option: (originalProps) =>
-                        CustomAddressOption({
-                          originalProps,
-                          selectedAddressValue: userSelectedAddress || '',
-                        }),
-                    }}
-                    noOptionsMessage={() => 'No available Metamask address'}
-                    {...(userSelectedAddress && {
-                      value: convertAddressToDropdownOption(
-                        userSelectedAddress || '',
-                      ),
-                    })}
-                    formatOptionLabel={(option) => (
-                      <CustomAddressOptionElement
-                        value={option.value}
-                        label={option.label}
-                        selectedAddressValue={userSelectedAddress || ''}
-                      />
-                    )}
-                    placeholder="Select address"
-                    isClearable={false}
-                    isSearchable={false}
-                    options={(
-                      user.addresses
-                        .filter((a) => a.community.id === selectedCommunityId)
-                        .map((a) => a.address) || []
-                    )?.map(convertAddressToDropdownOption)}
-                    onChange={(option) =>
-                      option?.value && setUserSelectedAddress(option.value)
-                    }
-                  />
-                </>
-              )}
-
-              <div className="thread-title-row">
-                <div className="thread-title-row-left">
-                  <CWTextInput
-                    fullWidth
-                    autoFocus
-                    placeholder="Title"
-                    value={threadTitle}
-                    tabIndex={1}
-                    onInput={(e) => setThreadTitle(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {!!hasTopics && !!threadTopic && (
-                <CWSelectList
-                  className="topic-select"
-                  components={{
-                    Option: (originalProps) =>
-                      CustomTopicOption({
-                        originalProps,
-                        topic: topicsForSelector.find(
-                          (t) => String(t.id) === originalProps.data.value,
-                        ),
-                        helpText: weightedVotingValueToLabel(
-                          topicsForSelector.find(
-                            (t) => String(t.id) === originalProps.data.value,
-                          )?.weighted_voting as TopicWeightedVoting,
-                        ),
-                      }),
-                  }}
-                  formatOptionLabel={(option) => (
-                    <>
-                      {!!contestTopicAffordanceVisible && (
-                        <CWIcon
-                          className="trophy-icon"
-                          iconName="trophy"
-                          iconSize="small"
-                        />
-                      )}
-                      {option.label}
-                    </>
-                  )}
-                  options={sortedTopics.map((topic) => ({
-                    label: topic?.name,
-                    value: `${topic?.id}`,
-                  }))}
-                  defaultValue={{
-                    label: threadTopic?.name,
-                    value: `${threadTopic?.id}`,
-                  }}
-                  {...(!!location.search &&
-                    threadTopic?.name &&
-                    threadTopic?.id && {
-                      value: {
-                        label: threadTopic?.name,
-                        value: `${threadTopic?.id}`,
-                      },
-                    })}
-                  placeholder="Select topic"
-                  customError={
-                    contestTopicError
-                      ? 'Can no longer post in this topic while contest is active.'
-                      : ''
-                  }
-                  onChange={(topic) => {
-                    if (!topic) return;
-                    setCanShowGatingBanner(true);
-                    setCanShowTopicPermissionBanner(true);
-                    const foundTopic = topicsForSelector.find(
-                      (t) => `${t.id}` === topic.value,
-                    );
-                    if (foundTopic) {
-                      setThreadTopic(foundTopic);
-                    }
-                  }}
-                />
-              )}
-
-              {!!contestTopicAffordanceVisible && (
-                <ContestTopicBanner
-                  contests={threadTopic?.active_contest_managers?.map((acm) => {
-                    return {
-                      name: acm?.name,
-                      address: acm?.contest_address,
-                      submittedEntries:
-                        acm?.content?.filter(
-                          (c) => c.actor_address === userSelectedAddress,
-                        ).length || 0,
-                    };
-                  })}
-                />
-              )}
-
-              {!isDiscussion && (
-                <CWTextInput
-                  placeholder="https://"
-                  value={threadUrl}
-                  tabIndex={2}
-                  onInput={(e) => setThreadUrl(e.target.value)}
-                />
-              )}
-
-              <ReactQuillEditor
-                contentDelta={threadContentDelta}
-                setContentDelta={setThreadContentDelta}
-                {...(selectedCommunityId && {
-                  isDisabled:
-                    isRestrictedMembership ||
-                    !!disabledActionsTooltipText ||
-                    !userSelectedAddress,
-                  tooltipLabel:
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText,
-                })}
-                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-              />
-
-              <MessageRow
-                hasFeedback={!!walletBalanceError}
-                statusMessage={`Ensure that your connected wallet has at least
-                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
-                validationStatus="failure"
-              />
-
-              {community &&
-                userProfile &&
-                community.spam_tier_level !== DisabledCommunitySpamTier &&
-                userProfile.tier <= community.spam_tier_level && (
-                  <CWBanner
-                    type="warning"
-                    body={
-                      "Your post will be marked as spam due to the Community's Trust Settings. " +
-                      'You can increase your trust level by verifying an SSO or adding a wallet with Balance.'
-                    }
-                    className="spam-trust-banner"
-                  />
-                )}
-
-              {isTurnstileEnabled && <TurnstileWidget />}
-
-              <div className="buttons-row">
-                <CWButton
-                  buttonType="tertiary"
-                  onClick={handleCancel}
-                  tabIndex={3}
-                  label="Cancel"
-                  containerClassName="no-pad cancel-button"
-                />
-
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWThreadAction
-                    action="ai-reply"
-                    label="Draft thread with AI"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleGenerateAIThread().catch(console.error);
-                    }}
-                  />
-                )}
-
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <div className="ai-toggle-wrapper">
-                    <CWToggle
-                      className="ai-toggle"
-                      icon="sparkle"
-                      iconColor="#757575"
-                      checked={aiCommentsToggleEnabled}
-                      onChange={() => {
-                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+          <div className="form-view">
+            <div className="new-thread-body">
+              <div className="new-thread-form-inputs">
+                {!isInsideCommunity && (
+                  <>
+                    <CWSelectList
+                      className="community-select"
+                      options={user?.communities?.map((c) => ({
+                        label: c.name,
+                        value: c.id,
+                      }))}
+                      placeholder="Select community"
+                      {...(selectedCommunityId && {
+                        value: {
+                          label:
+                            user.communities.find(
+                              (c) => c.id === selectedCommunityId,
+                            )?.name || '',
+                          value: selectedCommunityId,
+                        },
+                      })}
+                      onChange={(option) => {
+                        option?.value && setSelectedCommunityId(option.value);
+                        setUserSelectedAddress('');
                       }}
                     />
-                    <CWText type="caption" className="toggle-label">
-                      AI initial comment
-                    </CWText>
+                    <CWSelectList
+                      components={{
+                        Option: (originalProps) =>
+                          CustomAddressOption({
+                            originalProps,
+                            selectedAddressValue: userSelectedAddress || '',
+                          }),
+                      }}
+                      noOptionsMessage={() => 'No available Metamask address'}
+                      {...(userSelectedAddress && {
+                        value: convertAddressToDropdownOption(
+                          userSelectedAddress || '',
+                        ),
+                      })}
+                      formatOptionLabel={(option) => (
+                        <CustomAddressOptionElement
+                          value={option.value}
+                          label={option.label}
+                          selectedAddressValue={userSelectedAddress || ''}
+                        />
+                      )}
+                      placeholder="Select address"
+                      isClearable={false}
+                      isSearchable={false}
+                      options={(
+                        user.addresses
+                          .filter((a) => a.community.id === selectedCommunityId)
+                          .map((a) => a.address) || []
+                      )?.map(convertAddressToDropdownOption)}
+                      onChange={(option) =>
+                        option?.value && setUserSelectedAddress(option.value)
+                      }
+                    />
+                  </>
+                )}
+
+                <div className="thread-title-row">
+                  <div className="thread-title-row-left">
+                    <CWTextInput
+                      fullWidth
+                      autoFocus
+                      placeholder="Title"
+                      value={threadTitle}
+                      tabIndex={1}
+                      onInput={(e) => setThreadTitle(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {!!hasTopics && !!threadTopic && (
+                  <CWSelectList
+                    className="topic-select"
+                    components={{
+                      Option: (originalProps) =>
+                        CustomTopicOption({
+                          originalProps,
+                          topic: topicsForSelector.find(
+                            (t) => String(t.id) === originalProps.data.value,
+                          ),
+                          helpText: weightedVotingValueToLabel(
+                            topicsForSelector.find(
+                              (t) => String(t.id) === originalProps.data.value,
+                            )?.weighted_voting as TopicWeightedVoting,
+                          ),
+                        }),
+                    }}
+                    formatOptionLabel={(option) => (
+                      <>
+                        {!!contestTopicAffordanceVisible && (
+                          <CWIcon
+                            className="trophy-icon"
+                            iconName="trophy"
+                            iconSize="small"
+                          />
+                        )}
+                        {option.label}
+                      </>
+                    )}
+                    options={sortedTopics.map((topic) => ({
+                      label: topic?.name,
+                      value: `${topic?.id}`,
+                    }))}
+                    defaultValue={{
+                      label: threadTopic?.name,
+                      value: `${threadTopic?.id}`,
+                    }}
+                    {...(!!location.search &&
+                      threadTopic?.name &&
+                      threadTopic?.id && {
+                        value: {
+                          label: threadTopic?.name,
+                          value: `${threadTopic?.id}`,
+                        },
+                      })}
+                    placeholder="Select topic"
+                    customError={
+                      contestTopicError
+                        ? 'Can no longer post in this topic while contest is active.'
+                        : ''
+                    }
+                    onChange={(topic) => {
+                      if (!topic) return;
+                      setCanShowGatingBanner(true);
+                      setCanShowTopicPermissionBanner(true);
+                      const foundTopic = topicsForSelector.find(
+                        (t) => `${t.id}` === topic.value,
+                      );
+                      if (foundTopic) {
+                        setThreadTopic(foundTopic);
+                      }
+                    }}
+                  />
+                )}
+
+                {!!contestTopicAffordanceVisible && (
+                  <ContestTopicBanner
+                    contests={threadTopic?.active_contest_managers?.map(
+                      (acm) => {
+                        return {
+                          name: acm?.name,
+                          address: acm?.contest_address,
+                          submittedEntries:
+                            acm?.content?.filter(
+                              (c) => c.actor_address === userSelectedAddress,
+                            ).length || 0,
+                        };
+                      },
+                    )}
+                  />
+                )}
+
+                {!isDiscussion && (
+                  <CWTextInput
+                    placeholder="https://"
+                    value={threadUrl}
+                    tabIndex={2}
+                    onInput={(e) => setThreadUrl(e.target.value)}
+                  />
+                )}
+
+                <ReactQuillEditor
+                  contentDelta={threadContentDelta}
+                  setContentDelta={setThreadContentDelta}
+                  {...(selectedCommunityId && {
+                    isDisabled:
+                      isRestrictedMembership ||
+                      !!disabledActionsTooltipText ||
+                      !userSelectedAddress,
+                    tooltipLabel:
+                      typeof disabledActionsTooltipText === 'function'
+                        ? disabledActionsTooltipText?.('submit')
+                        : disabledActionsTooltipText,
+                  })}
+                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                />
+
+                <MessageRow
+                  hasFeedback={!!walletBalanceError}
+                  statusMessage={`Ensure that your connected wallet has at least
+                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
+                  validationStatus="failure"
+                />
+
+                {community &&
+                  userProfile &&
+                  community.spam_tier_level !== DisabledCommunitySpamTier &&
+                  userProfile.tier <= community.spam_tier_level && (
+                    <CWBanner
+                      type="warning"
+                      body={
+                        "Your post will be marked as spam due to the Community's Trust Settings. " +
+                        'You can increase your trust level by verifying an SSO or adding a wallet with Balance.'
+                      }
+                      className="spam-trust-banner"
+                    />
+                  )}
+
+                {isTurnstileEnabled && <TurnstileWidget />}
+
+                <div className="buttons-row">
+                  <CWButton
+                    buttonType="tertiary"
+                    onClick={handleCancel}
+                    tabIndex={3}
+                    label="Cancel"
+                    containerClassName="no-pad cancel-button"
+                  />
+
+                  {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                    <CWThreadAction
+                      action="ai-reply"
+                      label="Draft thread with AI"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleGenerateAIThread().catch(console.error);
+                      }}
+                    />
+                  )}
+
+                  {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                    <div className="ai-toggle-wrapper">
+                      <CWToggle
+                        className="ai-toggle"
+                        icon="sparkle"
+                        iconColor="#757575"
+                        checked={aiCommentsToggleEnabled}
+                        onChange={() => {
+                          setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                        }}
+                      />
+                      <CWText type="caption" className="toggle-label">
+                        AI initial comment
+                      </CWText>
+                    </div>
+                  )}
+
+                  <CWButton
+                    label="Create"
+                    disabled={buttonDisabled}
+                    onClick={() => {
+                      handleNewThreadCreation().catch(console.error);
+                    }}
+                    tabIndex={4}
+                    containerClassName="no-pad create-button"
+                  />
+                </div>
+
+                {showBanner && (
+                  <JoinCommunityBanner
+                    onClose={handleCloseBanner}
+                    onJoin={() => {
+                      handleJoinCommunity().catch(console.error);
+                    }}
+                  />
+                )}
+
+                {isRestrictedMembership && canShowGatingBanner && (
+                  <div>
+                    <CWGatedTopicBanner
+                      groupNames={gatedGroupNames}
+                      onClose={() => setCanShowGatingBanner(false)}
+                    />
                   </div>
                 )}
 
-                <CWButton
-                  label="Create"
-                  disabled={buttonDisabled}
-                  onClick={() => {
-                    handleNewThreadCreation().catch(console.error);
-                  }}
-                  tabIndex={4}
-                  containerClassName="no-pad create-button"
+                {canShowTopicPermissionBanner &&
+                  foundTopicPermissions &&
+                  !isAdmin &&
+                  !foundTopicPermissions?.permissions?.includes(
+                    PermissionEnum.CREATE_THREAD,
+                  ) && (
+                    <CWGatedTopicPermissionLevelBanner
+                      topicPermissions={
+                        foundTopicPermissions?.permissions as PermissionEnum[]
+                      }
+                      onClose={() => setCanShowTopicPermissionBanner(false)}
+                    />
+                  )}
+              </div>
+            </div>
+          </div>
+          {!isWindowSmallInclusive && (
+            <div className="sidebar">
+              <div className="actions">
+                <div className="left-container">
+                  <CWIcon
+                    iconName="squaresFour"
+                    iconSize="medium"
+                    weight="bold"
+                  />
+                  <CWText type="h5" fontWeight="semiBold">
+                    Actions
+                  </CWText>
+                </div>
+                <CWIcon
+                  iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                  iconSize="small"
+                  className="caret-icon"
+                  weight="bold"
+                  onClick={() => setIsCollapsed(!isCollapsed)}
                 />
               </div>
 
-              {showBanner && (
-                <JoinCommunityBanner
-                  onClose={handleCloseBanner}
-                  onJoin={() => {
-                    handleJoinCommunity().catch(console.error);
-                  }}
-                />
-              )}
-
-              {isRestrictedMembership && canShowGatingBanner && (
-                <div>
-                  <CWGatedTopicBanner
-                    groupNames={gatedGroupNames}
-                    onClose={() => setCanShowGatingBanner(false)}
-                  />
-                </div>
-              )}
-
-              {canShowTopicPermissionBanner &&
-                foundTopicPermissions &&
-                !isAdmin &&
-                !foundTopicPermissions?.permissions?.includes(
-                  PermissionEnum.CREATE_THREAD,
-                ) && (
-                  <CWGatedTopicPermissionLevelBanner
-                    topicPermissions={
-                      foundTopicPermissions?.permissions as PermissionEnum[]
-                    }
-                    onClose={() => setCanShowTopicPermissionBanner(false)}
-                  />
-                )}
+              {!isCollapsed &&
+                sidebarComponent?.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
             </div>
-          </div>
+          )}
         </div>
       </CWPageLayout>
       {JoinCommunityModals}
