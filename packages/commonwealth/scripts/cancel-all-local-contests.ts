@@ -4,34 +4,32 @@
 
 */
 
-import { config, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { logger } from '@hicommonwealth/core';
 import { exit } from 'process';
-import { Op } from 'sequelize';
 
 const log = logger(import.meta);
 
 async function cancelAllLocalContests() {
-  const { host } = models.sequelize.config;
-  if (config.APP_ENV !== 'local' || host !== 'localhost') {
-    throw new Error('script can only be run on localhost DB');
-  }
-  const activeContests = await models.ContestManager.update(
-    {
-      cancelled: true,
-    },
-    {
-      where: {
-        cancelled: {
-          [Op.not]: true,
-        },
-        ended: {
-          [Op.not]: true,
-        },
-      },
-    },
-  );
-  log.debug(`cancelled ${activeContests.length} active contests`);
+  // const { host } = models.sequelize.config;
+  // if (config.APP_ENV !== 'local' || host !== 'localhost') {
+  //   throw new Error('script can only be run on localhost DB');
+  // }
+  // const activeContests = await models.ContestManager.update(
+  //   {
+  //     cancelled: true,
+  //   },
+  //   {
+  //     where: {
+  //       cancelled: {
+  //         [Op.not]: true,
+  //       },
+  //       ended: {
+  //         [Op.not]: true,
+  //       },
+  //     },
+  //   },
+  // );
+  // log.debug(`cancelled ${activeContests.length} active contests`);
   exit(0);
 }
 

@@ -25,7 +25,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
       const {
         block_timestamp,
         transaction_hash,
-        token_address,
+        token_address: token_address_unformatted,
         trader_address,
         is_buy,
         eth_chain_id,
@@ -33,6 +33,8 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         community_token_amount,
         floating_supply,
       } = payload;
+
+      const token_address = token_address_unformatted.toLowerCase();
 
       const token = await models.LaunchpadToken.findOne({
         where: { token_address },
@@ -68,10 +70,9 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         return;
       }
 
-      if (
-        !token.liquidity_transferred &&
-        floating_supply === BigInt(token.launchpad_liquidity)
-      ) {
+      const remainingLiquidity =
+        BigInt(token.launchpad_liquidity) - floating_supply;
+      if (!token.liquidity_transferred && remainingLiquidity < BigInt(1000)) {
         const onChainTokenData = await getLaunchpadToken({
           rpc: chainNode.private_url!,
           tokenAddress: token_address,

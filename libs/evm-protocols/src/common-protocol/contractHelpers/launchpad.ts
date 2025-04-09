@@ -2,11 +2,9 @@ import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
   createPrivateEvmClient,
-  decodeParameters,
   EvmEventSignatures,
-  getBlock,
-  getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
+import { createPublicClient, http, parseEventLogs } from 'viem';
 import { Web3 } from 'web3';
 
 export const launchToken = async (
@@ -35,7 +33,7 @@ export const launchToken = async (
       tokenCommunityManager,
       connectorWeight,
     )
-    .send({ from: walletAddress, value: value - 0.000444e18 });
+    .send({ from: walletAddress, value: 4.4400042e14 - 0.000444e18 });
   return txReceipt;
 };
 
@@ -115,12 +113,14 @@ export const transferLiquidity = async (
   tokenAddress: string,
   walletAddress: string,
 ) => {
-  const remainingTokens = await contract.methods._poolLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods
+    ._poolLiquidity(tokenAddress)
+    .call();
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,
-    remainingTokens,
-    500000,
+    Number(remainingTokens),
+    830000,
   );
 
   const txReceipt = await contract.methods
@@ -152,48 +152,25 @@ export async function getLaunchpadTradeTransaction({
   rpc: string;
   transactionHash: string;
 }) {
-  const { evmClient, txReceipt } = await getTransactionReceipt({
-    rpc,
-    txHash: transactionHash,
+  const client = createPublicClient({
+    transport: http(rpc),
   });
-  if (!txReceipt) {
+
+  const receipt = await client.getTransactionReceipt({
+    hash: transactionHash as `0x${string}`,
+  });
+
+  if (!receipt) {
     return;
   }
 
-  const { block } = await getBlock({
-    evmClient: evmClient,
-    rpc,
-    blockHash: txReceipt.blockHash.toString(),
+  const parsedLogs = parseEventLogs({
+    abi: LPBondingCurveAbi,
+    eventName: 'Trade',
+    logs: receipt.logs,
   });
 
-  const tradeLog = txReceipt.logs.find((l) => {
-    if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
-    }
-    return false;
-  });
-  if (!tradeLog) return;
-
-  const {
-    0: traderAddress,
-    1: tokenAddress,
-    2: isBuy,
-    3: communityTokenAmount,
-    4: ethAmount,
-    5: protocolEthAmount,
-    6: floatingSupply,
-  } = decodeParameters({
-    abiInput: [
-      'address',
-      'address',
-      'bool',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-    ],
-    data: txReceipt.logs[1].data!.toString(),
-  });
+  if (parsedLogs.length === 0) return;
 
   return {
     txReceipt,

@@ -61,6 +61,7 @@ const UniswapTradeModal = ({
         (args[0].includes('fadeAnimation') ||
           (typeof args[0] === 'string' && args[0].includes('hideOverflow')))
       ) {
+        console.log('here');
         return;
       }
       originalConsoleError(...args);
@@ -81,6 +82,7 @@ const UniswapTradeModal = ({
       !uniswapWidget.provider
     ) {
       uniswapWidget.connectWallet().catch(() => {
+        console.log('here');
         notifyError(
           'There was an error connecting your wallet. Please try again.',
         );
