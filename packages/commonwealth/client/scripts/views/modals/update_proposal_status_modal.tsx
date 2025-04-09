@@ -59,7 +59,7 @@ type UpdateProposalStatusModalProps = {
   snapshotProposalConnected?: boolean;
   initialSnapshotLinks?: Link[];
   setLinkedProposals?: React.Dispatch<React.SetStateAction<ProposalState>>; // State setter for proposals
-  linkedProposals?: ProposalState;
+  linkedProposals?: ProposalState | null;
 };
 
 export const UpdateProposalStatusModal = ({
