@@ -580,7 +580,6 @@ export const NewThreadForm = () => {
                   )}
               </div>
             </div>
-
             <>
               {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
@@ -655,8 +654,8 @@ export const NewThreadForm = () => {
               )}
               {isWindowSmallInclusive && (
                 <div className="action-cards">
-                  {sidebarComponent.map((view) => (
-                    <div key={view.label}>{view.item}</div>
+                  {sidebarComponent?.map((view) => (
+                    <div key={view?.label}>{view?.item}</div>
                   ))}
                 </div>
               )}

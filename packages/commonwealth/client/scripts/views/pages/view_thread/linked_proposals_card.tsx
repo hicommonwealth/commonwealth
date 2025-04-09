@@ -123,7 +123,7 @@ export const LinkedProposalsCard = ({
     (initialSnapshotLinks.length > 0 && snapshotProposalsLoaded) ||
     linkedProposals?.source === 'snapshot';
 
-  console.log({ linkedProposals });
+  console.log('xxxxxx', { linkedProposals, initialProposalLinks });
   return (
     <>
       <CWContentPageCard
@@ -136,14 +136,23 @@ export const LinkedProposalsCard = ({
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {initialProposalLinks.length > 0 ||
-              showSnapshot ||
-              linkedProposals ? (
+              {linkedProposals ||
+              initialProposalLinks.length > 0 ||
+              showSnapshot ? (
                 <div className="links-container">
-                  {initialProposalLinks.length > 0 && (
+                  {/* Linked Proposals: Render from `linkedProposals` if available, otherwise fallback to map */}
+                  {(linkedProposals?.source === 'proposal' ||
+                    initialProposalLinks.length > 0) && (
                     <div className="linked-proposals">
-                      {initialProposalLinks.map((l) => {
-                        return (
+                      {linkedProposals?.source === 'proposal' ? (
+                        <ReactRouterLink
+                          key={linkedProposals.identifier}
+                          to={'#'}
+                        >
+                          {`${linkedProposals?.title ?? 'Proposal'} #${linkedProposals?.identifier}`}
+                        </ReactRouterLink>
+                      ) : (
+                        initialProposalLinks.map((l) => (
                           <ReactRouterLink
                             key={l.identifier}
                             to={getThreadLink({
@@ -152,20 +161,25 @@ export const LinkedProposalsCard = ({
                               isCustomDomain: domain?.isCustomDomain,
                             })}
                           >
-                            {`${l?.title ?? 'Proposal'} #${l?.identifier}`}
+                            {`${l.title ?? 'Proposal'} #${l.identifier}`}
                           </ReactRouterLink>
-                        );
-                      })}
+                        ))
+                      )}
                     </div>
                   )}
 
-                  {/* fsadhjk */}
-                  {(showSnapshot || linkedProposals) &&
-                    (snapshotUrl || linkedProposals ? (
+                  {/* Snapshot: Render from `linkedProposals` if it's a snapshot, otherwise fallback */}
+                  {(linkedProposals?.source === 'snapshot' || showSnapshot) &&
+                    (linkedProposals?.source === 'snapshot' ? (
+                      <ReactRouterLink
+                        to={`https://snapshot.org/#/${linkedProposals.snapshotIdentifier}/proposal/${linkedProposals.proposalId}`}
+                      >
+                        Snapshot: {linkedProposals.title ?? snapshotTitle}
+                      </ReactRouterLink>
+                    ) : snapshotUrl ? (
                       <ReactRouterLink to={snapshotUrl}>
                         Snapshot:{' '}
-                        {initialSnapshotLinks[0]?.title ??
-                          (snapshotTitle || linkedProposals?.title)}
+                        {initialSnapshotLinks[0].title ?? snapshotTitle}
                       </ReactRouterLink>
                     ) : (
                       <div className="snapshot-spinner-container">
@@ -178,6 +192,7 @@ export const LinkedProposalsCard = ({
                   There are currently no linked proposals.
                 </CWText>
               )}
+
               {showAddProposalButton && (
                 <CWButton
                   buttonHeight="sm"
@@ -197,7 +212,7 @@ export const LinkedProposalsCard = ({
         size="medium"
         content={
           <UpdateProposalStatusModal
-            thread={thread}
+            thread={thread ? thread : null}
             onModalClose={() => setIsModalOpen(false)}
             snapshotProposalConnected={showSnapshot}
             initialSnapshotLinks={initialSnapshotLinks}
