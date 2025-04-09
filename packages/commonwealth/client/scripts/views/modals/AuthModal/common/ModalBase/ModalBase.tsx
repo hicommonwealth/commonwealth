@@ -188,7 +188,7 @@ const ModalBase = ({
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
-        case ChainBase.Ethereum:
+        case ChainBase.Ethereum: {
           const configEvmWallets: string[] = [];
           if (isOkxWalletAvailable && partnershipWalletEnabled) {
             configEvmWallets.push('okx');
@@ -197,6 +197,7 @@ const ModalBase = ({
             configEvmWallets.push('walletconnect');
           }
           return configEvmWallets;
+        }
         case ChainBase.CosmosSDK:
           return cosmosWallets;
         case ChainBase.Solana:
