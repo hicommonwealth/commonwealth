@@ -36,6 +36,7 @@ export function UpdateContestManagerFrameHashes(): Command<
           include: [
             {
               model: models.Contest,
+              as: 'contests',
               required: true,
             },
           ],

@@ -45,6 +45,7 @@ export function FarcasterUpvoteAction(): Command<
             include: [
               {
                 model: models.Contest,
+                as: 'contests',
                 required: true,
               },
               {

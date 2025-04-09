@@ -78,6 +78,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           include: [
             {
               model: models.Contest,
+              as: 'contests',
               required: true,
             },
           ],
@@ -140,6 +141,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           include: [
             {
               model: models.Contest,
+              as: 'contests',
               required: true,
             },
           ],
@@ -191,6 +193,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           include: [
             {
               model: models.Contest,
+              as: 'contests',
               required: true,
             },
           ],
