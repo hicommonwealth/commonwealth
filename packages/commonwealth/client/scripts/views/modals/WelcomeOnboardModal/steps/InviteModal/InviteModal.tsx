@@ -75,7 +75,11 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
 
   return (
     <section className="InviteModal">
-      <img src={referralImage} className="referral_logo" style={{ width: '200px', height: 'auto' }} />
+      <img
+        src={referralImage}
+        className="referral_logo"
+        style={{ width: '200px', height: 'auto' }}
+      />
 
       <CWText type="h3" className="title" isCentered>
         Get a referral bonus for inviting friends to common!{' '}
