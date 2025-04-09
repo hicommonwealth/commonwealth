@@ -1,1 +1,0 @@
-SELECT * FROM "Threads" WHERE URL IS NOT NULL;
