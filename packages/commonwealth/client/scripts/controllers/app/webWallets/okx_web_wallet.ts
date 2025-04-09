@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 
 import type Web3 from 'web3';
@@ -22,6 +22,7 @@ class OkxWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: Web3BaseProvider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _web3: Web3 | any;
 
   public readonly name = WalletId.OKX;
@@ -103,7 +104,7 @@ class OkxWebWalletController implements IWebWallet<string> {
       let ethereum = window.okxwallet;
 
       if (window.okxwallet.providers?.length) {
-        window.okxwallet.providers.forEach(async (p) => {
+        window.okxwallet.providers.forEach((p) => {
           if (p.isOkxWallet) ethereum = p;
         });
       }
