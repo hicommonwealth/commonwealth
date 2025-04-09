@@ -9,6 +9,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import type Thread from '../../../models/Thread';
+import { ProposalState } from '../../components/NewThreadFormModern/NewThreadForm';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -39,12 +40,20 @@ const getThreadLink = ({
 
 type LinkedProposalsCardProps = {
   showAddProposalButton: boolean;
-  thread: Thread;
+  thread: Thread | null;
+  setLinkedProposals?: React.Dispatch<
+    React.SetStateAction<ProposalState | null>
+  >; // State setter for proposals
+  linkedProposals?: ProposalState | null;
+  communityId?: string;
 };
 
 export const LinkedProposalsCard = ({
   thread,
   showAddProposalButton,
+  setLinkedProposals,
+  linkedProposals,
+  communityId,
 }: LinkedProposalsCardProps) => {
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
@@ -53,21 +62,21 @@ export const LinkedProposalsCard = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const initialSnapshotLinks = useMemo(
-    () => filterLinks(thread.links, LinkSource.Snapshot),
-    [thread.links],
+    () => filterLinks(thread?.links, LinkSource.Snapshot),
+    [thread?.links],
   );
 
   const initialProposalLinks = useMemo(
-    () => filterLinks(thread.links, LinkSource.Proposal),
-    [thread.links],
+    () => filterLinks(thread?.links, LinkSource.Proposal),
+    [thread?.links],
   );
 
   useEffect(() => {
-    if (initialSnapshotLinks.length > 0) {
+    if (initialSnapshotLinks.length > 0 && thread) {
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${domain?.isCustomDomain ? '' : `/${thread.communityId}`}/snapshot/${
+          `${domain?.isCustomDomain ? '' : `/${thread?.communityId}`}/snapshot/${
             proposal.identifier
           }`,
         );
@@ -93,11 +102,28 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [domain?.isCustomDomain, initialSnapshotLinks, thread.communityId]);
+  }, [
+    domain?.isCustomDomain,
+    initialSnapshotLinks,
+    thread?.communityId,
+    thread,
+  ]);
+
+  useEffect(() => {
+    if (linkedProposals?.source === 'snapshot') {
+      setSnapshotUrl(
+        `${domain?.isCustomDomain ? '' : `/${communityId}`}/proposal-details/${
+          linkedProposals.proposalId
+        }?snapshotId=${linkedProposals.snapshotIdentifier}&type=snapshot`,
+      );
+    }
+  }, [linkedProposals, domain?.isCustomDomain, communityId]);
 
   const showSnapshot =
-    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
+    (initialSnapshotLinks.length > 0 && snapshotProposalsLoaded) ||
+    linkedProposals?.source === 'snapshot';
 
+  console.log({ linkedProposals });
   return (
     <>
       <CWContentPageCard
@@ -110,7 +136,9 @@ export const LinkedProposalsCard = ({
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {initialProposalLinks.length > 0 || showSnapshot ? (
+              {initialProposalLinks.length > 0 ||
+              showSnapshot ||
+              linkedProposals ? (
                 <div className="links-container">
                   {initialProposalLinks.length > 0 && (
                     <div className="linked-proposals">
@@ -119,22 +147,25 @@ export const LinkedProposalsCard = ({
                           <ReactRouterLink
                             key={l.identifier}
                             to={getThreadLink({
-                              threadChain: thread.communityId,
+                              threadChain: thread?.communityId || '',
                               identifier: l.identifier,
                               isCustomDomain: domain?.isCustomDomain,
                             })}
                           >
-                            {`${l.title ?? 'Proposal'} #${l.identifier}`}
+                            {`${l?.title ?? 'Proposal'} #${l?.identifier}`}
                           </ReactRouterLink>
                         );
                       })}
                     </div>
                   )}
-                  {showSnapshot &&
-                    (snapshotUrl ? (
+
+                  {/* fsadhjk */}
+                  {(showSnapshot || linkedProposals) &&
+                    (snapshotUrl || linkedProposals ? (
                       <ReactRouterLink to={snapshotUrl}>
                         Snapshot:{' '}
-                        {initialSnapshotLinks[0].title ?? snapshotTitle}
+                        {initialSnapshotLinks[0]?.title ??
+                          (snapshotTitle || linkedProposals?.title)}
                       </ReactRouterLink>
                     ) : (
                       <div className="snapshot-spinner-container">
@@ -170,6 +201,8 @@ export const LinkedProposalsCard = ({
             onModalClose={() => setIsModalOpen(false)}
             snapshotProposalConnected={showSnapshot}
             initialSnapshotLinks={initialSnapshotLinks}
+            setLinkedProposals={setLinkedProposals}
+            linkedProposals={linkedProposals}
           />
         }
         onClose={() => setIsModalOpen(false)}

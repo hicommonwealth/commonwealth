@@ -4,7 +4,7 @@ import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -25,20 +25,49 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { ThreadKind } from '../../../models/types';
+import { AnyProposal, ThreadKind } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
+import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
+import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
+import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import ContestThreadBanner from './ContestThreadBanner';
+
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
+import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
+import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import DetailCard from '../proposals/DetailCard';
+import TimeLineCard from '../proposals/TimeLineCard';
+import VotingResultView from '../proposals/VotingResultView';
+import { VotingActions } from '../proposals/voting_actions';
+import { VotingResults } from '../proposals/voting_results';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
+export type ProposalState = {
+  identifier: string;
+  source: string;
+  title: string;
+  proposalId: string;
+  snapshotIdentifier?: string;
+};
+
 export const NewThreadForm = () => {
   const location = useLocation();
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [showVotesDrawer, setShowVotesDrawer] = useState(false);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
@@ -52,6 +81,7 @@ export const NewThreadForm = () => {
   });
 
   const { isContestAvailable } = useCommunityContests();
+  const forceRerender = useForceRerender();
 
   const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
   const hasTopics = sortedTopics?.length;
@@ -224,181 +254,446 @@ export const NewThreadForm = () => {
     refreshTopics().catch(console.error);
   }, [refreshTopics]);
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [linkedProposals, setLinkedProposals] =
+    useState<ProposalState | null>();
+
+  const snapshotLink = linkedProposals?.source === 'snapshot';
+  const cosmosLink = linkedProposals?.source === 'proposal';
+  const {
+    proposal: snapshotProposal,
+    symbol,
+    votes,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    activeUserAddress,
+    loadVotes,
+    power,
+    threads,
+  } = useSnapshotProposal({
+    identifier: linkedProposals?.proposalId || '',
+    snapshotId: linkedProposals?.snapshotIdentifier || '',
+    enabled: !!snapshotLink,
+  });
+
+  const { proposal, threads: cosmosThreads } = useCosmosProposal({
+    // @ts-expect-error <StrictNullChecks/>
+    proposalId: linkedProposals?.identifier,
+    enabledApi: !!cosmosLink,
+  });
+
+  useEffect(() => {
+    proposal?.isFetched?.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched?.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
+  const snapShotVotingResult = React.useMemo(() => {
+    if (!snapshotProposal || !votes) return [];
+    const { choices } = snapshotProposal;
+    const totalVoteCount = totals.sumOfResultsBalance || 0;
+
+    return choices.map((label: string, index: number) => {
+      const voteCount = votes
+        .filter((vote) => vote.choice === index + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      const percentage =
+        totalVoteCount > 0
+          ? ((voteCount / totalVoteCount) * 100).toFixed(2)
+          : '0';
+      const results = voteCount.toFixed(4); // Adjust precision as needed
+
+      return {
+        label,
+        percentage,
+        results,
+      };
+    });
+  }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
+
+  // eslint-disable-next-line max-len
+  const governanceUrl = `https://snapshot.box/#/s:${linkedProposals?.snapshotIdentifier}/proposal/${linkedProposals?.proposalId}`;
+
+  const governanceType = proposal
+    ? 'cosmos'
+    : snapshotProposal
+      ? 'snapshot'
+      : '';
+  const status =
+    // @ts-expect-error <StrictNullChecks/>
+    snapshotProposal?.state || proposal?.status ? proposal?.status : '';
+
+  const toggleShowVotesDrawer = (newModalState: boolean) => {
+    setShowVotesDrawer(newModalState);
+  };
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+
+  const sidebarComponent = [
+    {
+      label: 'Links',
+      item: (
+        <div className="cards-column">
+          <LinkedProposalsCard
+            thread={null}
+            showAddProposalButton={true}
+            setLinkedProposals={setLinkedProposals}
+            linkedProposals={linkedProposals}
+            communityId={communityId}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  const proposalDetailSidebar = [
+    ...(!isWindowSmallInclusive && (snapshotProposal || proposal)
+      ? [
+          {
+            label: 'Detail',
+            item: (
+              <DetailCard
+                status={status}
+                governanceType={governanceType}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={snapshotProposal?.created || proposal.createdAt}
+                id={linkedProposals?.proposalId}
+                Threads={threads || cosmosThreads}
+                scope={communityId}
+              />
+            ),
+          },
+
+          {
+            label: 'Timeline',
+            item: (
+              <TimeLineCard proposalData={snapshotProposal || proposal?.data} />
+            ),
+          },
+
+          {
+            label: 'Results',
+            item: (
+              <>
+                {!snapshotLink ? (
+                  <VotingResults proposal={proposal as AnyProposal} />
+                ) : (
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
+                    governanceUrl={governanceUrl}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]
+      : []),
+  ];
+
   return (
     <>
       <CWPageLayout>
         <div className="NewThreadForm">
-          <CWText type="h2" fontWeight="medium" className="header">
-            Create thread
-          </CWText>
-          <div className="new-thread-body">
-            <div className="new-thread-form-inputs">
-              <CWTextInput
-                fullWidth
-                autoFocus
-                placeholder="Title"
-                value={threadTitle}
-                tabIndex={1}
-                onInput={(e) => setThreadTitle(e.target.value)}
-              />
+          <div className="form-view">
+            <CWText type="h2" fontWeight="medium" className="header">
+              Create thread
+            </CWText>
+            <div className="new-thread-body">
+              <div className="new-thread-form-inputs">
+                <CWTextInput
+                  fullWidth
+                  autoFocus
+                  placeholder="Title"
+                  value={threadTitle}
+                  tabIndex={1}
+                  onInput={(e) => setThreadTitle(e.target.value)}
+                />
 
-              {!!hasTopics && (
-                <CWSelectList
-                  className="topic-select"
-                  components={{
-                    // eslint-disable-next-line react/no-multi-comp
-                    Option: (originalProps) =>
-                      CustomTopicOption({
-                        originalProps,
-                        topic: topicsForSelector.find(
-                          (t) => String(t.id) === originalProps.data.value,
-                        ),
-                        helpText: weightedVotingValueToLabel(
-                          topicsForSelector.find(
+                {!!hasTopics && (
+                  <CWSelectList
+                    className="topic-select"
+                    components={{
+                      // eslint-disable-next-line react/no-multi-comp
+                      Option: (originalProps) =>
+                        CustomTopicOption({
+                          originalProps,
+                          topic: topicsForSelector.find(
                             (t) => String(t.id) === originalProps.data.value,
-                          )?.weighted_voting as TopicWeightedVoting,
+                          ),
+                          helpText: weightedVotingValueToLabel(
+                            topicsForSelector.find(
+                              (t) => String(t.id) === originalProps.data.value,
+                            )?.weighted_voting as TopicWeightedVoting,
+                          ),
+                        }),
+                    }}
+                    formatOptionLabel={(option) => (
+                      <>
+                        {contestTopicAffordanceVisible && (
+                          <CWIcon
+                            className="trophy-icon"
+                            iconName="trophy"
+                            iconSize="small"
+                          />
+                        )}
+                        {option.label}
+                      </>
+                    )}
+                    options={sortedTopics.map((topic) => ({
+                      label: topic?.name,
+                      value: `${topic?.id}`,
+                    }))}
+                    {...(!!location.search &&
+                      threadTopic?.name &&
+                      threadTopic?.id && {
+                        value: {
+                          label: threadTopic?.name,
+                          value: `${threadTopic?.id}`,
+                        },
+                      })}
+                    placeholder="Select topic"
+                    customError={
+                      contestTopicError
+                        ? 'Can no longer post in this topic while contest is active.'
+                        : ''
+                    }
+                    onChange={(topic) => {
+                      setCanShowGatingBanner(true);
+                      setThreadTopic(
+                        // @ts-expect-error <StrictNullChecks/>
+                        topicsForSelector.find(
+                          (t) => `${t.id}` === topic?.value,
                         ),
-                      }),
-                  }}
-                  formatOptionLabel={(option) => (
+                      );
+                    }}
+                  />
+                )}
+
+                {contestTopicAffordanceVisible && (
+                  <ContestTopicBanner
+                    contests={threadTopic?.active_contest_managers?.map(
+                      (acm) => {
+                        return {
+                          name: acm?.name,
+                          address: acm?.contest_address,
+                          submittedEntries:
+                            acm?.content?.filter(
+                              (c) =>
+                                c.actor_address === user.activeAccount?.address,
+                            ).length || 0,
+                        };
+                      },
+                    )}
+                  />
+                )}
+
+                {!isDiscussion && (
+                  <CWTextInput
+                    placeholder="https://"
+                    value={threadUrl}
+                    tabIndex={2}
+                    onInput={(e) => setThreadUrl(e.target.value)}
+                  />
+                )}
+
+                <MarkdownEditor
+                  onMarkdownEditorMethods={(methods) =>
+                    (markdownEditorMethodsRef.current = methods)
+                  }
+                  onChange={(markdown) => setEditorText(markdown)}
+                  disabled={
+                    isRestrictedMembership ||
+                    !!disabledActionsTooltipText ||
+                    !user.activeAccount
+                  }
+                  tooltip={
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('submit')
+                      : disabledActionsTooltipText
+                  }
+                  placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                  SubmitButton={() => (
+                    <MarkdownSubmitButton
+                      label="Create Thread"
+                      disabled={
+                        isDisabled ||
+                        !user.activeAccount ||
+                        !!disabledActionsTooltipText ||
+                        walletBalanceError ||
+                        contestTopicError
+                      }
+                      tabIndex={4}
+                      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                      onClick={handleNewThreadCreation}
+                    />
+                  )}
+                />
+
+                {contestThreadBannerVisible && <ContestThreadBanner />}
+
+                <MessageRow
+                  hasFeedback={!!walletBalanceError}
+                  statusMessage={`Ensure that your connected wallet has at least
+                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
+                  validationStatus="failure"
+                />
+
+                {showBanner && (
+                  <JoinCommunityBanner
+                    onClose={handleCloseBanner}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onJoin={handleJoinCommunity}
+                  />
+                )}
+
+                {isRestrictedMembership && canShowGatingBanner && (
+                  <div>
+                    <CWGatedTopicBanner
+                      groupNames={gatedGroupNames}
+                      onClose={() => setCanShowGatingBanner(false)}
+                    />
+                  </div>
+                )}
+
+                {canShowTopicPermissionBanner &&
+                  foundTopicPermissions &&
+                  !isAdmin &&
+                  !foundTopicPermissions?.permissions?.includes(
+                    PermissionEnum.CREATE_THREAD,
+                  ) && (
+                    <CWGatedTopicPermissionLevelBanner
+                      topicPermissions={
+                        foundTopicPermissions?.permissions as PermissionEnum[]
+                      }
+                      onClose={() => setCanShowTopicPermissionBanner(false)}
+                    />
+                  )}
+              </div>
+            </div>
+
+            <>
+              {isWindowSmallInclusive && (snapshotProposal || proposal) && (
+                <>
+                  <DetailCard
+                    status={status}
+                    governanceType={governanceType}
+                    publishDate={
+                      // @ts-expect-error <StrictNullChecks/>
+                      snapshotProposal?.created || proposal.createdAt
+                    }
+                    id={linkedProposals?.proposalId}
+                    Threads={threads || cosmosThreads}
+                    scope={communityId}
+                  />
+                  <TimeLineCard
+                    proposalData={snapshotProposal || proposal?.data}
+                  />
+                </>
+              )}
+              {snapshotProposal ? (
+                <>
+                  <SnapshotPollCardContainer
+                    activeUserAddress={activeUserAddress}
+                    fetchedPower={!!power}
+                    identifier={linkedProposals?.proposalId || ''}
+                    proposal={snapshotProposal as SnapshotProposal}
+                    scores={[]}
+                    space={space as SnapshotSpace}
+                    symbol={symbol}
+                    totals={totals}
+                    totalScore={totalScore}
+                    validatedAgainstStrategies={validatedAgainstStrategies}
+                    votes={votes}
+                    loadVotes={async () => loadVotes()}
+                    snapShotVotingResult={snapShotVotingResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                  />
+                  {isWindowSmallInclusive && (
+                    <VotingResultView
+                      voteOptions={snapShotVotingResult}
+                      showCombineBarOnly={false}
+                      governanceUrl={governanceUrl}
+                    />
+                  )}
+                  <ProposalVotesDrawer
+                    header="Votes"
+                    votes={votes}
+                    choices={snapshotProposal?.choices}
+                    isOpen={showVotesDrawer}
+                    setIsOpen={setShowVotesDrawer}
+                  />
+                </>
+              ) : (
+                <>
+                  {proposal && (
                     <>
-                      {contestTopicAffordanceVisible && (
-                        <CWIcon
-                          className="trophy-icon"
-                          iconName="trophy"
-                          iconSize="small"
-                        />
+                      <VotingActions
+                        onModalClose={onModalClose}
+                        proposal={proposal}
+                        toggleVotingModal={toggleVotingModal}
+                        votingModalOpen={votingModalOpen}
+                        redrawProposals={redrawProposals}
+                        proposalRedrawState={proposalRedrawState}
+                        toggleShowVotesDrawer={toggleShowVotesDrawer}
+                      />
+                      {isWindowSmallInclusive && (
+                        <VotingResults proposal={proposal} />
                       )}
-                      {option.label}
                     </>
                   )}
-                  options={sortedTopics.map((topic) => ({
-                    label: topic?.name,
-                    value: `${topic?.id}`,
-                  }))}
-                  {...(!!location.search &&
-                    threadTopic?.name &&
-                    threadTopic?.id && {
-                      value: {
-                        label: threadTopic?.name,
-                        value: `${threadTopic?.id}`,
-                      },
-                    })}
-                  placeholder="Select topic"
-                  customError={
-                    contestTopicError
-                      ? 'Can no longer post in this topic while contest is active.'
-                      : ''
-                  }
-                  onChange={(topic) => {
-                    setCanShowGatingBanner(true);
-                    setThreadTopic(
-                      // @ts-expect-error <StrictNullChecks/>
-                      topicsForSelector.find((t) => `${t.id}` === topic.value),
-                    );
-                  }}
-                />
+                </>
               )}
-
-              {contestTopicAffordanceVisible && (
-                <ContestTopicBanner
-                  contests={threadTopic?.active_contest_managers?.map((acm) => {
-                    return {
-                      name: acm?.name,
-                      address: acm?.contest_address,
-                      submittedEntries:
-                        acm?.content?.filter(
-                          (c) =>
-                            c.actor_address === user.activeAccount?.address,
-                        ).length || 0,
-                    };
-                  })}
-                />
-              )}
-
-              {!isDiscussion && (
-                <CWTextInput
-                  placeholder="https://"
-                  value={threadUrl}
-                  tabIndex={2}
-                  onInput={(e) => setThreadUrl(e.target.value)}
-                />
-              )}
-
-              <MarkdownEditor
-                onMarkdownEditorMethods={(methods) =>
-                  (markdownEditorMethodsRef.current = methods)
-                }
-                onChange={(markdown) => setEditorText(markdown)}
-                disabled={
-                  isRestrictedMembership ||
-                  !!disabledActionsTooltipText ||
-                  !user.activeAccount
-                }
-                tooltip={
-                  typeof disabledActionsTooltipText === 'function'
-                    ? disabledActionsTooltipText?.('submit')
-                    : disabledActionsTooltipText
-                }
-                placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
-                SubmitButton={() => (
-                  <MarkdownSubmitButton
-                    label="Create Thread"
-                    disabled={
-                      isDisabled ||
-                      !user.activeAccount ||
-                      !!disabledActionsTooltipText ||
-                      walletBalanceError ||
-                      contestTopicError
-                    }
-                    tabIndex={4}
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onClick={handleNewThreadCreation}
-                  />
-                )}
-              />
-
-              {contestThreadBannerVisible && <ContestThreadBanner />}
-
-              <MessageRow
-                hasFeedback={!!walletBalanceError}
-                statusMessage={`Ensure that your connected wallet has at least
-                ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
-                validationStatus="failure"
-              />
-
-              {showBanner && (
-                <JoinCommunityBanner
-                  onClose={handleCloseBanner}
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onJoin={handleJoinCommunity}
-                />
-              )}
-
-              {isRestrictedMembership && canShowGatingBanner && (
-                <div>
-                  <CWGatedTopicBanner
-                    groupNames={gatedGroupNames}
-                    onClose={() => setCanShowGatingBanner(false)}
-                  />
+              {isWindowSmallInclusive && (
+                <div className="action-cards">
+                  {sidebarComponent.map((view) => (
+                    <div key={view.label}>{view.item}</div>
+                  ))}
                 </div>
               )}
-
-              {canShowTopicPermissionBanner &&
-                foundTopicPermissions &&
-                !isAdmin &&
-                !foundTopicPermissions?.permissions?.includes(
-                  PermissionEnum.CREATE_THREAD,
-                ) && (
-                  <CWGatedTopicPermissionLevelBanner
-                    topicPermissions={
-                      foundTopicPermissions?.permissions as PermissionEnum[]
-                    }
-                    onClose={() => setCanShowTopicPermissionBanner(false)}
-                  />
-                )}
-            </div>
+            </>
           </div>
+          {!isWindowSmallInclusive && (
+            <div className="sidebar">
+              <div className="actions">
+                <div className="left-container">
+                  <CWIcon
+                    iconName="squaresFour"
+                    iconSize="medium"
+                    weight="bold"
+                  />
+                  <CWText type="h5" fontWeight="semiBold">
+                    Actions
+                  </CWText>
+                </div>
+                <CWIcon
+                  iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                  iconSize="small"
+                  className="caret-icon"
+                  weight="bold"
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                />
+              </div>
+
+              {!isCollapsed &&
+                sidebarComponent?.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
+              {proposalDetailSidebar &&
+                proposalDetailSidebar.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
+            </div>
+          )}
         </div>
       </CWPageLayout>
       {JoinCommunityModals}

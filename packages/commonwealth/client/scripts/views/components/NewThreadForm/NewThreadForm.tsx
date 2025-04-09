@@ -8,6 +8,7 @@ export const NewThreadForm = () => {
   const newEditor = useFlag('newEditor');
   const user = useUserStore();
 
+  console.log({ newEditor });
   if (newEditor) {
     return <NewThreadFormModern key={user.addresses.length} />;
   }
