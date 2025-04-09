@@ -46,7 +46,7 @@ const CommunityDirectoryCard = ({
   };
 
   // allow user to buy stake if they have a connected address that matches active community base chain
-  // Use ChainNode from communityData to determine base
+
   const canBuyStake = !!user.addresses.find?.((address) => {
     const communityBase = communityData.ChainNode?.cosmosChainId
       ? 'cosmos'
@@ -59,8 +59,6 @@ const CommunityDirectoryCard = ({
   return (
     <CWRelatedCommunityCard
       key={communityData.id}
-      // Cast is potentially unsafe, ensure CWRelatedCommunityCard handles potentially missing fields gracefully
-      // or adjust the mapping above to provide all required fields.
       community={
         communityForCard as unknown as z.infer<typeof ExtendedCommunity>
       }
