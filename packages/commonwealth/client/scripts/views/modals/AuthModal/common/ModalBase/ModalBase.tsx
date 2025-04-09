@@ -1,6 +1,7 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
@@ -107,7 +108,7 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
-
+  const partnershipWalletEnabled = useFlag('partnershipWallet');
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
@@ -167,11 +168,12 @@ const ModalBase = ({
     wallets.find((wallet) => wallet.name === walletId);
 
   const hasWalletConnect = findWalletById(WalletId.WalletConnect);
+  const isOkxWalletAvailable = findWalletById(WalletId.OKX);
   const evmWallets = filterWalletNames(ChainBase.Ethereum) as EVMWallets[];
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-
+  console.log('isOkxWalletAvailable', isOkxWalletAvailable);
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -187,7 +189,14 @@ const ModalBase = ({
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum:
-          return hasWalletConnect ? ['walletconnect'] : [];
+          const configEvmWallets: string[] = [];
+          if (isOkxWalletAvailable && partnershipWalletEnabled) {
+            configEvmWallets.push('okx');
+          }
+          if (hasWalletConnect) {
+            configEvmWallets.push('walletconnect');
+          }
+          return configEvmWallets;
         case ChainBase.CosmosSDK:
           return cosmosWallets;
         case ChainBase.Solana:
@@ -200,8 +209,15 @@ const ModalBase = ({
     }
 
     if (!app?.chain?.base) {
+      const configEvmWallets: string[] = [];
+      if (isOkxWalletAvailable && partnershipWalletEnabled) {
+        configEvmWallets.push('okx');
+      }
+      if (hasWalletConnect) {
+        configEvmWallets.push('walletconnect');
+      }
       return [
-        ...(hasWalletConnect ? ['walletconnect'] : []),
+        ...configEvmWallets,
         ...cosmosWallets,
         ...solanaWallets,
         ...substrateWallets,
