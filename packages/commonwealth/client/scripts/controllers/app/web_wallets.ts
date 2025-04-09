@@ -20,6 +20,9 @@ import TerraStationWebWalletController from './webWallets/terra_station_web_wall
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 
+// IMPORTANT: Uncomment this for debugging
+// import OKXDebugWebWalletController from './webWallets/okx_web_wallet';
+
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
   private static _instance: WebWalletController;
@@ -34,6 +37,10 @@ export default class WebWalletController {
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     // handle case like injective, where we require a specific wallet
+    console.log(
+      '[WebWalletController] Available wallets:',
+      this._wallets.map((w) => w.name).join(', '),
+    );
     const specificChain = app.chain?.meta?.id || '';
     if (specificChain) {
       const specificWallets = this._wallets.filter(
@@ -88,6 +95,10 @@ export default class WebWalletController {
       return this.getByName(account.walletId);
     }
     const availableWallets = this.availableWallets(chain);
+    console.log(
+      '[WebWalletController] Available wallets:',
+      availableWallets.map((w) => w.name).join(', '),
+    );
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');
     }
@@ -115,21 +126,52 @@ export default class WebWalletController {
   }
 
   constructor() {
-    this._wallets = [
-      new OKXWebWalletController(),
-      new PolkadotWebWalletController(),
-      new MetamaskWebWalletController(),
-      new WalletConnectWebWalletController(),
-      new KeplrWebWalletController(),
-      new LeapWebWalletController(),
-      new TerraStationWebWalletController(),
-      new CosmosEvmMetamaskWalletController(),
-      new KeplrEthereumWalletController(),
-      new PhantomWebWalletController(),
-      new TerraWalletConnectWebWalletController(),
-      new CoinbaseWebWalletController(),
-      new BackpackWebWalletController(),
-      new SolflareWebWalletController(),
-    ];
+    console.log('[WebWalletController] Initializing wallet controllers');
+    try {
+      // Initialize OKX wallet with error handling
+      const okxWallet = new OKXWebWalletController();
+      console.log('[WebWalletController] OKX wallet initialized successfully');
+
+      this._wallets = [
+        okxWallet, // First in the list for priority
+        new PolkadotWebWalletController(),
+        new MetamaskWebWalletController(),
+        new WalletConnectWebWalletController(),
+        new KeplrWebWalletController(),
+        new LeapWebWalletController(),
+        new TerraStationWebWalletController(),
+        new CosmosEvmMetamaskWalletController(),
+        new KeplrEthereumWalletController(),
+        new PhantomWebWalletController(),
+        new TerraWalletConnectWebWalletController(),
+        new CoinbaseWebWalletController(),
+        new BackpackWebWalletController(),
+        new SolflareWebWalletController(),
+      ];
+
+      // Log the registered wallets
+      console.log(
+        '[WebWalletController] Wallets registered:',
+        this._wallets.map((w) => `${w.name} (${w.chain})`).join(', '),
+      );
+    } catch (error) {
+      console.error('[WebWalletController] Error initializing wallets:', error);
+      // Initialize without the problematic wallet
+      this._wallets = [
+        new PolkadotWebWalletController(),
+        new MetamaskWebWalletController(),
+        new WalletConnectWebWalletController(),
+        new KeplrWebWalletController(),
+        new LeapWebWalletController(),
+        new TerraStationWebWalletController(),
+        new CosmosEvmMetamaskWalletController(),
+        new KeplrEthereumWalletController(),
+        new PhantomWebWalletController(),
+        new TerraWalletConnectWebWalletController(),
+        new CoinbaseWebWalletController(),
+        new BackpackWebWalletController(),
+        new SolflareWebWalletController(),
+      ];
+    }
   }
 }

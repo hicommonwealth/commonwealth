@@ -473,7 +473,18 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onWalletSelect = async (wallet: Wallet) => {
+    console.log(`[onWalletSelect] wallet: ${wallet}`);
+
+    if (!wallet) {
+      console.error('[onWalletSelect] Wallet object is undefined!');
+      notifyError(
+        'Failed to find the selected wallet. Please try again or choose a different wallet.',
+      );
+      return;
+    }
+
     try {
+      console.log(`[onWalletSelect] wallet name: ${wallet.name}`);
       await wallet.enable();
     } catch (error) {
       notifyError(error?.message || error);

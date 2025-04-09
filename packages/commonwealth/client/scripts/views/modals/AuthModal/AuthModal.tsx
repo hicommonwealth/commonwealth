@@ -24,16 +24,28 @@ const AuthModal = ({
   showAuthOptionTypesFor,
   isUserFromWebView,
 }: AuthModalProps) => {
+  console.log(
+    '[AuthModal] Initializing with type:',
+    type,
+    'showWalletsFor:',
+    showWalletsFor,
+  );
+
   const [modalType, setModalType] = useState(type);
   const { sessionKeyValidationError } = useAuthModalStore();
   const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+
   useEffect(() => {
     // reset `modalType` state whenever modal is opened
-    isOpen && setModalType(type);
+    if (isOpen) {
+      console.log('[AuthModal] Modal opened with type:', type);
+      setModalType(type);
+    }
   }, [isOpen, type]);
 
   const handleOnSignInClick = () => {
+    console.log('[AuthModal] Sign in button clicked');
     // switch to sign-in modal if user click on `Sign in`.
     if (modalType === AuthModalType.CreateAccount) {
       setModalType(AuthModalType.SignIn);
@@ -41,7 +53,12 @@ const AuthModal = ({
   };
 
   const handleSuccess = (isNewlyCreated) => {
+    console.log(
+      '[AuthModal] Authentication successful, isNewlyCreated:',
+      isNewlyCreated,
+    );
     const userUniqueAddresses = getUniqueUserAddresses({});
+    console.log('[AuthModal] User unique addresses:', userUniqueAddresses);
 
     // open welcome modal only if there is a single connected address
     if (isNewlyCreated && userUniqueAddresses.length === 1) {
@@ -54,6 +71,13 @@ const AuthModal = ({
   };
 
   const getActiveModalComponent = () => {
+    console.log(
+      '[AuthModal] Getting active modal component for type:',
+      modalType,
+    );
+    console.log('[AuthModal] showAuthOptionTypesFor:', showAuthOptionTypesFor);
+    console.log('[AuthModal] showWalletsFor:', showWalletsFor);
+
     const commonVariantProps = {
       onClose,
       onSuccess: handleSuccess,

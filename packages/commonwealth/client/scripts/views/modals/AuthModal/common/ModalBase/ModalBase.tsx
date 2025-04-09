@@ -3,6 +3,7 @@ import commonLogo from 'assets/img/branding/common-logo.svg';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -105,6 +106,7 @@ const ModalBase = ({
   isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
+  const partnershipWalletEnabled = useFlag('partnershipWallet');
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
 
@@ -183,32 +185,70 @@ const ModalBase = ({
     //    b. On `evmos` and `injective` communities, only show `cosm-metamask` (metamask for cosmos communities) and
     //       `keplr-ethereum` (keplr for ethereum communities) wallets
 
+    const okxWalletName = WalletId.OKX;
+    console.log(
+      `[ModalBase] Getting wallet names, partnership flag: ${partnershipWalletEnabled}, showWalletsFor: ${showWalletsFor}, chain base: ${app?.chain?.base}`,
+    );
+
+    // First, determine which wallets to show
+    let walletsToShow: string[] = [];
+
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
+      console.log(
+        `[ModalBase] Showing wallets for specific chain: ${showWalletsForSpecificChains}`,
+      );
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum:
-          return hasWalletConnect ? ['walletconnect'] : [];
+          // Include OKX for Ethereum if available
+          walletsToShow = hasWalletConnect ? ['walletconnect'] : [];
+          // Add OKX as an option for Ethereum
+          walletsToShow.push(okxWalletName);
+          break;
         case ChainBase.CosmosSDK:
-          return cosmosWallets;
+          walletsToShow = cosmosWallets as string[];
+          break;
         case ChainBase.Solana:
-          return solanaWallets;
+          // For Solana, include all Solana wallets including OKX
+          walletsToShow = solanaWallets as string[];
+          break;
         case ChainBase.Substrate:
-          return substrateWallets;
+          walletsToShow = substrateWallets as string[];
+          break;
         default:
-          return [];
+          walletsToShow = [];
+          break;
       }
-    }
-
-    if (!app?.chain?.base) {
-      return [
+    } else if (!app?.chain?.base) {
+      // On non-community pages, include all compatible wallets
+      walletsToShow = [
         ...(hasWalletConnect ? ['walletconnect'] : []),
-        ...cosmosWallets,
-        ...solanaWallets,
-        ...substrateWallets,
+        ...(cosmosWallets as string[]),
+        ...(solanaWallets as string[]),
+        ...(substrateWallets as string[]),
       ];
     }
 
-    return [];
+    // If the partnership flag is enabled, move OKX to the beginning of the list
+    // for compatible chains (Ethereum and Solana)
+    if (partnershipWalletEnabled && walletsToShow.includes(okxWalletName)) {
+      console.log(
+        `[ModalBase] Partnership wallet enabled, prioritizing ${okxWalletName}`,
+      );
+
+      // Remove OKX from its current position
+      walletsToShow = walletsToShow.filter(
+        (wallet) => wallet !== okxWalletName,
+      );
+
+      // Add it to the beginning of the list
+      walletsToShow = [okxWalletName, ...walletsToShow];
+    }
+
+    console.log(
+      `[ModalBase] Final wallet list: ${JSON.stringify(walletsToShow)}`,
+    );
+    return walletsToShow as AuthWallets[];
   };
 
   const shouldShowSSOOptions = (() => {
@@ -244,13 +284,31 @@ const ModalBase = ({
   ];
 
   useEffect(() => {
-    setActiveTabIndex((prevActiveTab) => {
-      if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
+    console.log(
+      `[ModalBase] useEffect triggered - showAuthOptionFor: ${showAuthOptionFor}, showAuthOptionTypesFor: ${JSON.stringify(showAuthOptionTypesFor)}, shouldShowSSOOptions: ${shouldShowSSOOptions}`,
+    );
 
-      if (isMobileApp()) return 1;
+    setActiveTabIndex((prevActiveTab) => {
+      console.log(`[ModalBase] Setting active tab, previous: ${prevActiveTab}`);
+
+      if (!shouldShowSSOOptions && prevActiveTab === 1) {
+        console.log('[ModalBase] No SSO options to show, setting tab to 0');
+        return 0;
+      }
+
+      if (isMobileApp()) {
+        console.log('[ModalBase] Mobile app detected, setting tab to 1 (SSO)');
+        return 1;
+      }
 
       if (showAuthOptionFor) {
-        return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
+        const newTab = SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs)
+          ? 1
+          : 0;
+        console.log(
+          `[ModalBase] showAuthOptionFor set to ${showAuthOptionFor}, setting tab to ${newTab}`,
+        );
+        return newTab;
       }
 
       if (
@@ -258,14 +316,22 @@ const ModalBase = ({
           showAuthOptionTypesFor.length === 1) ||
         prevActiveTab === 1
       ) {
+        console.log(
+          '[ModalBase] SSO options only or previously on SSO tab, setting tab to 1',
+        );
         return 1;
       }
 
+      console.log('[ModalBase] Default case, setting tab to 0 (Wallets)');
       return 0;
     });
   }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
+    console.log(
+      `[ModalBase] Auth method selected: ${option}, activeTabIndex: ${activeTabIndex}`,
+    );
+
     if (option === 'email') {
       setIsAuthenticatingWithEmail(true);
       return;
@@ -277,22 +343,55 @@ const ModalBase = ({
 
     // if any wallet option is selected
     if (activeTabIndex === 0) {
+      console.log(`[ModalBase] Wallet option selected: ${option}`);
+
       // if wallet connect option is selected, open the EVM wallet list modal
       if (option === 'walletconnect' && !isEVMWalletsModalVisible) {
+        console.log('[ModalBase] Opening EVM wallets modal for WalletConnect');
         setIsEVMWalletsModalVisible(true);
         return;
       }
 
-      // @ts-expect-error <StrictNullChecks>
-      await onWalletSelect(wallets.find((wallet) => wallet.name === option));
+      // Find the wallet in the list
+      const selectedWallet = wallets.find((wallet) => wallet.name === option);
+      console.log(`[ModalBase] Looking for wallet with name: ${option}`);
+      console.log(
+        `[ModalBase] Available wallets: ${wallets.map((w) => `${w.name}(${w.label})`).join(', ')}`,
+      );
+      console.log(
+        `[ModalBase] Found wallet: ${selectedWallet ? selectedWallet.label : 'undefined'}, chain: ${selectedWallet?.chain}`,
+      );
+
+      if (!selectedWallet) {
+        console.error(`[ModalBase] Wallet ${option} not found in wallet list!`);
+        return;
+      }
+
+      try {
+        console.log(
+          `[ModalBase] Calling onWalletSelect with wallet: ${selectedWallet.name}`,
+        );
+        await onWalletSelect(selectedWallet);
+        console.log(`[ModalBase] Wallet selection completed for ${option}`);
+      } catch (error) {
+        console.error(`[ModalBase] Error selecting wallet ${option}:`, error);
+      }
     }
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
+      console.log(`[ModalBase] SSO option selected: ${option}`);
       // TODO: decide if twitter references are to be updated to 'x'
-      await onSocialLogin(
-        option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
-      );
+      try {
+        await onSocialLogin(
+          option === 'x'
+            ? WalletSsoSource.Twitter
+            : (option as WalletSsoSource),
+        );
+        console.log(`[ModalBase] Social login completed for ${option}`);
+      } catch (error) {
+        console.error(`[ModalBase] Error with social login ${option}:`, error);
+      }
     }
   };
 
