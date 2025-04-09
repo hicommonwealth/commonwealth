@@ -187,6 +187,8 @@ describe('User lifecycle', () => {
       expect(logs.length).to.equal(4);
       expect(logs.map((l) => l.toJSON())).to.deep.equal([
         {
+          id: 1,
+          name: null,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -196,6 +198,8 @@ describe('User lifecycle', () => {
           created_at: logs[0].created_at,
         },
         {
+          id: 2,
+          name: null,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -205,6 +209,8 @@ describe('User lifecycle', () => {
           created_at: logs[1].created_at,
         },
         {
+          id: 3,
+          name: null,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -214,6 +220,8 @@ describe('User lifecycle', () => {
           created_at: logs[2].created_at,
         },
         {
+          id: 4,
+          name: null,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -459,45 +467,55 @@ describe('User lifecycle', () => {
       const last = logs.slice(-5); // last 5 event logs
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
+          id: 5,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
+          name: null,
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
         },
         {
+          id: 6,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
+          name: null,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
         },
         {
+          id: 7,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
+          name: null,
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
         },
         {
+          id: 8,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
+          name: null,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
         },
         {
+          id: 9,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
+          name: null,
           action_meta_id: -1, // this is system quest action
           creator_user_id: member.user.id,
           creator_xp_points: 4,

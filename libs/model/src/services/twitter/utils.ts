@@ -4,10 +4,10 @@ import { delay } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 import z from 'zod';
-import { config } from '../../config';
+import { config as envConfig } from '../../config';
 import { RequiredTwitterBotConfig, TwitterBotConfig } from './types';
 
-const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
+const log = logger(import.meta, undefined, envConfig.TWITTER.LOG_LEVEL);
 
 function mustHaveAuth(
   config: TwitterBotConfig,
@@ -73,7 +73,9 @@ export const generateSignature = (
     encodeURIComponent(paramString),
   ].join('&');
 
-  const signingKey = `${encodeURIComponent(credentials.consumerSecret)}&${encodeURIComponent(credentials.accessTokenSecret)}`;
+  const signingKey = `${encodeURIComponent(
+    credentials.consumerSecret,
+  )}&${encodeURIComponent(credentials.accessTokenSecret)}`;
 
   const signature = crypto
     .createHmac('sha1', signingKey)
