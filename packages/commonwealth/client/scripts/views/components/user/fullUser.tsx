@@ -51,8 +51,6 @@ export const FullUser = ({
       enabled: !!userCommunityId,
     });
 
-  console.log('userCommunity', userCommunity);
-
   if (showSkeleton || isLoadingUserCommunity) {
     return (
       <UserSkeleton
@@ -86,11 +84,11 @@ export const FullUser = ({
   const capitalizeRole = roleInCommunity
     ? roleInCommunity.charAt(0).toUpperCase() +
       roleInCommunity.slice(1).toLowerCase()
-    : '';
+    : 'Member';
 
   const roleTags = (
     <>
-      {shouldShowRole && roleInCommunity && (
+      {shouldShowRole && (
         <CWTag label={capitalizeRole} type="proposal" classNames="role-tag" />
       )}
     </>
