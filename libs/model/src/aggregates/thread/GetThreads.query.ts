@@ -66,7 +66,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         pastWinners: ' AND CON.end_time <= NOW()',
         all: '',
       };
-      const responseThreadsQuery = models.sequelize.query<
+      const threads = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView>
       >(
         `
@@ -256,23 +256,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       );
 
-      const numVotingThreadsQuery = models.Thread.count({
-        where: {
-          community_id,
-          stage: 'voting',
-        },
-      });
-
-      const [threads, numVotingThreads] = await Promise.all([
-        responseThreadsQuery,
-        numVotingThreadsQuery,
-      ]);
-
       return {
         limit: replacements.limit,
         page: replacements.page,
         threads,
-        numVotingThreads,
         threadCount: threads.at(0)?.total_num_thread_results || 0,
       };
     },

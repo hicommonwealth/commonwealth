@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ComponentType } from '../types';
 import './cw_icon.scss';
-import { iconLookup } from './cw_icon_lookup';
+import { customIconLookup, iconLookup } from './cw_icon_lookup';
 import type { IconComponentProps } from './types';
 
 export const CWIcon = (props: IconComponentProps) => {
@@ -18,7 +18,15 @@ export const CWIcon = (props: IconComponentProps) => {
     ...otherProps
   } = props;
 
-  const Icon = iconLookup[iconName];
+  // Try to get icon from both lookups
+  const Icon =
+    iconLookup[iconName as keyof typeof iconLookup] ||
+    customIconLookup[iconName as keyof typeof customIconLookup];
+
+  if (!Icon) {
+    console.warn(`Icon not found: ${iconName}`);
+    return null;
+  }
 
   return (
     <Icon
