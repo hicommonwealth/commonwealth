@@ -6,7 +6,7 @@ interface IOSBannerProps {
   onDismiss?: () => void;
 }
 
-const IOSBanner: React.FC<IOSBannerProps> = ({ onDismiss }) => {
+const IOSBanner = ({ onDismiss }: IOSBannerProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
   const handleDismiss = () => {
