@@ -34,13 +34,15 @@ top_threads AS (
   FROM "Threads" T
   ${
     user_id
-      ? 'JOIN user_communities C ON C.community_id = T.community_id'
-      : 'JOIN "Communities" C ON T.community_id = C.id'
+      ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
+      : ''
   }
+  JOIN "Communities" C ON C.id = T.community_id
   WHERE T.deleted_at IS NULL 
       AND T.marked_as_spam_at IS NULL 
       AND C.active IS TRUE 
       AND C.tier != ${CommunityTierMap.SpamCommunity}
+      AND C.id != 'ethereum'
   ORDER BY T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
 )
@@ -128,6 +130,7 @@ ORDER BY
     type: QueryTypes.SELECT,
     raw: true,
     replacements: { user_id, limit, comment_limit, offset },
+    logging: console.log,
   });
 
   const formattedThreads = threads.map((item) => ({
