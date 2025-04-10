@@ -135,7 +135,8 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                   {filters.withCommunityEcosystem ||
                   filters.withNetwork ||
                   filters.withStakeEnabled ||
-                  filters.withTagsIds
+                  (filters.withTagsIds && filters.withTagsIds.length > 0) ||
+                  filters.withCommunityType
                     ? ` for the applied filters.`
                     : '.'}
                   <br />

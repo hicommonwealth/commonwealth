@@ -1,5 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import { ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -106,7 +106,7 @@ const CommunitiesPage = () => {
   const [filters, setFilters] = useState<CommunityFilters>({
     withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
-    withTagsIds: undefined,
+    withTagsIds: [],
     withCommunitySortBy: CommunitySortOptions.MemberCount,
     withCommunitySortOrder: CommunitySortDirections.Descending,
     withCommunityType: undefined,
@@ -168,10 +168,11 @@ const CommunitiesPage = () => {
       : undefined,
     stake_enabled: filters.withStakeEnabled,
     cursor: 1,
-    tag_ids: filters.withTagsIds,
-    community_type: filters.withCommunityType
-      ? CommunityType[filters.withCommunityType]
-      : undefined,
+    tag_ids:
+      filters.withTagsIds && filters.withTagsIds.length > 0
+        ? filters.withTagsIds
+        : undefined,
+    community_type: filters.withCommunityType,
   });
 
   // Wrap fetchMoreCommunities to return Promise<void>
