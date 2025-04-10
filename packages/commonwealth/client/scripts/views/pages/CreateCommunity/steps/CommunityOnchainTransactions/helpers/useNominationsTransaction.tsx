@@ -43,14 +43,17 @@ const useNominationsTransaction = ({
         errorText: '',
       });
 
-      await configureNominations({
-        namespaceName: namespace,
-        creatorOnly: true,
-        walletAddress: userAddress,
-        maxNominations: 5,
-        ethChainId: parseInt(chainId),
-        chainRpc,
-      });
+      const testing = true;
+      testing
+        ? await new Promise((resolve) => setTimeout(resolve, 1000))
+        : await configureNominations({
+            namespaceName: namespace,
+            creatorOnly: true,
+            walletAddress: userAddress,
+            maxNominations: 5,
+            ethChainId: parseInt(chainId),
+            chainRpc,
+          });
 
       setTransactionData({
         state: 'completed',
