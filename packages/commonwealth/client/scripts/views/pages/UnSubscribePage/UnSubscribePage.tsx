@@ -1,5 +1,4 @@
-import { splitAndDecodeURL } from '@hicommonwealth/shared';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useUnSubscribeEmailMutation } from 'state/api/trpc/subscription/useUnSubscribeEmailMutation';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -15,12 +14,12 @@ const UnSubscribePage = () => {
     setModalOpen(false);
     navigate('/dashboard');
   };
-  const id = splitAndDecodeURL(window.location.pathname);
+  const userId = window.location.pathname.split('/').at(-1);
 
   const handleUnsubscribe = async () => {
-    if (id) {
+    if (userId) {
       await unSubscribeEmail({
-        user_uuid: id,
+        user_uuid: userId,
         email_notifications_enabled: false,
       }).catch(console.error);
       navigate('/dashboard');
@@ -34,10 +33,10 @@ const UnSubscribePage = () => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (userId) {
       setModalOpen(true);
     }
-  }, [id]);
+  }, [userId]);
 
   return (
     <CWPageLayout>
