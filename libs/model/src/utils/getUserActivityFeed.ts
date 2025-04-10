@@ -42,7 +42,7 @@ top_threads AS (
       AND T.marked_as_spam_at IS NULL 
       AND C.active IS TRUE 
       AND C.tier != ${CommunityTierMap.SpamCommunity}
-      AND C.id != 'ethereum'
+      AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
   ORDER BY T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
 )
