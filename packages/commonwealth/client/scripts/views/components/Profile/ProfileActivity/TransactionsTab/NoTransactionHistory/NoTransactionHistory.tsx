@@ -1,4 +1,3 @@
-import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import noTransactionHistory from 'assets/img/noTransactionHistory.svg';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -23,7 +22,7 @@ const NoTransactionHistory = ({
             You have not purchased assets in any communities{' '}
             {withSelectedAddress ? 'with the selected address' : ''}
           </CWText>
-          <CWText type="b1">
+          {/* <CWText type="b1">
             <span>
               Purchasing assets like community stake gives you more upvote power
               within your communities.{' '}
@@ -33,7 +32,7 @@ const NoTransactionHistory = ({
                 Learn more
               </a>
             </span>
-          </CWText>
+          </CWText> */}
         </div>
         <CWButton
           label="Explore"
