@@ -22,17 +22,6 @@ const NoTransactionHistory = ({
             You have not purchased assets in any communities{' '}
             {withSelectedAddress ? 'with the selected address' : ''}
           </CWText>
-          {/* <CWText type="b1">
-            <span>
-              Purchasing assets like community stake gives you more upvote power
-              within your communities.{' '}
-              <a
-                href={`https://${BLOG_SUBDOMAIN}/community-stake-100-owners-around-any-idea/`}
-              >
-                Learn more
-              </a>
-            </span>
-          </CWText> */}
         </div>
         <CWButton
           label="Explore"
