@@ -7,6 +7,8 @@ import CommonTrade from 'client/scripts/views/pages/CommunityHome/TokenPerforman
 import UniswapTrade from 'client/scripts/views/pages/CommunityHome/TokenPerformance/UniswapTrade/UniswapTrade';
 import React, { useEffect, useState } from 'react';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
+import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { CWText } from '../../component_kit/cw_text';
 import './TokenWidget.scss';
 
 const TokenWidget = () => {
@@ -46,6 +48,18 @@ const TokenWidget = () => {
               tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
             />
           )}
+
+      <div className="notice-box">
+        <CWText type="h4" fontWeight="semiBold">
+          <CWIcon iconName="infoEmpty" className="blue-icon" />
+          Payout Notice
+        </CWText>
+
+        <CWText type="b1">
+          You'II automatically receive 1% of the token supply when creating this
+          thread.
+        </CWText>
+      </div>
     </div>
   );
 };

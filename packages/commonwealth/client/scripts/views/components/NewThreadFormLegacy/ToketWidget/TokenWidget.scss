@@ -12,4 +12,21 @@
     padding: 12px;
     overflow: hidden;
   }
+
+  .notice-box {
+    margin-top: 16px;
+    border: 2px solid $primary-300;
+    border-radius: 12px;
+    padding: 12px;
+    width: 370px;
+    background-color: rgba($primary-300, 0.05);
+
+    .Text {
+      color: $primary-500;
+
+      .blue-icon {
+        margin-right: 8px;
+      }
+    }
+  }
 }
