@@ -39,7 +39,11 @@ const useConfigureVerificationTransaction = ({
         errorText: '',
       });
 
-      await namespaceFactory.configureVerification(namespace, userAddress);
+      await namespaceFactory.configureVerification(
+        namespace,
+        userAddress,
+        chainId,
+      );
 
       setTransactionData({
         state: 'completed',

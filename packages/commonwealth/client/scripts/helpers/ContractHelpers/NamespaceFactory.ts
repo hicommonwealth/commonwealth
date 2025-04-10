@@ -351,9 +351,10 @@ class NamespaceFactory extends ContractBase {
   async configureVerification(
     namespaceName: string,
     walletAddress: string,
+    chainId: string,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
@@ -367,7 +368,6 @@ class NamespaceFactory extends ContractBase {
           maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
-      console.log(error);
       throw new Error('Transaction failed');
     }
     return txReceipt;
