@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import app from 'state';
 import useConfigureNominationsMutation from 'state/api/contests/configureNominations';
 import {
   TransactionData,
@@ -23,6 +24,8 @@ const useNominationsTransaction = ({
     defaultTransactionState,
   );
 
+  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+
   const { mutateAsync: configureNominations } =
     useConfigureNominationsMutation();
 
@@ -46,7 +49,7 @@ const useNominationsTransaction = ({
         walletAddress: userAddress,
         maxNominations: 5,
         ethChainId: parseInt(chainId),
-        chainRpc: '',
+        chainRpc,
       });
 
       setTransactionData({

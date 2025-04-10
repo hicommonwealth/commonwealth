@@ -30,7 +30,6 @@ const OnchainVerificationIntegration = () => {
 
   const communityChainId = String(community?.ChainNode?.eth_chain_id);
 
-  // Get the current user's active address
   const selectedAddress =
     user.activeAccount &&
     ({
@@ -52,7 +51,6 @@ const OnchainVerificationIntegration = () => {
   };
 
   const handleTransactionCancel = () => {
-    // Navigate back to the integrations page
     navigate('/manage/integrations');
   };
 
