@@ -12,7 +12,7 @@ import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useNominationsTransaction from './helpers/useNominationsTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
 import useVerificationTokenTransaction from './helpers/useVerificationTokenTransaction';
-import { StakeData, TransactionConfig } from './types';
+import { NamespaceData, TransactionConfig } from './types';
 
 interface CommunityOnchainTransactionsProps {
   createdCommunityName?: string;
@@ -23,7 +23,7 @@ interface CommunityOnchainTransactionsProps {
   transactionTypes: TransactionType[];
   namespace?: string | null;
   symbol?: string;
-  onConfirmNamespaceData?: (data: StakeData) => void;
+  onConfirmNamespaceData?: (data: NamespaceData) => void;
   onConfirmNamespaceDataStepCancel?: () => void;
   onSignTransactionDeployNamespace?: () => void;
   onSignTransactionConfigureStake?: () => void;
@@ -50,22 +50,19 @@ const CommunityOnchainTransactions = ({
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
-  const onlyNamespace =
-    transactionTypes.length === 1 &&
-    transactionTypes[0] === TransactionType.DeployNamespace;
 
   const [confirmNamespaceDataPage, setConfirmNamespaceDataPage] = useState(
     hasNamespaceReserved ? false : true,
   );
-  const [communityStakeData, setCommunityStakeData] = useState({
+  const [communityNamespaceData, setCommunityNamespaceData] = useState({
     namespace: namespace || createdCommunityName || '',
     symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
   const namespaceTransaction = useNamespaceTransaction({
     communityId: createdCommunityId,
-    namespace: communityStakeData.namespace,
-    symbol: communityStakeData.symbol,
+    namespace: communityNamespaceData.namespace,
+    symbol: communityNamespaceData.symbol,
     userAddress: selectedAddress?.address,
     chainId,
     onSuccess: onSignTransactionDeployNamespace,
@@ -73,7 +70,7 @@ const CommunityOnchainTransactions = ({
   });
 
   const stakeTransaction = useStakeTransaction({
-    namespace: communityStakeData.namespace,
+    namespace: communityNamespaceData.namespace,
     communityId: createdCommunityId,
     userAddress: selectedAddress?.address,
     chainId,
@@ -81,21 +78,21 @@ const CommunityOnchainTransactions = ({
   });
 
   const nominationsTransaction = useNominationsTransaction({
-    namespace: communityStakeData.namespace,
+    namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
     onSuccess: onSignTransactionConfigureNominations,
   });
 
   const verificationTokenTransaction = useVerificationTokenTransaction({
-    namespace: communityStakeData.namespace,
+    namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
     onSuccess: onSignTransactionMintVerificationToken,
   });
 
-  const handleConfirmNamespaceDataStepSuccess = (data: StakeData) => {
-    setCommunityStakeData(data);
+  const handleConfirmNamespaceDataStepSuccess = (data: NamespaceData) => {
+    setCommunityNamespaceData(data);
     setConfirmNamespaceDataPage(false);
     onConfirmNamespaceData?.(data);
   };
@@ -107,9 +104,7 @@ const CommunityOnchainTransactions = ({
   const handleSignTransactionsStepCancel = () => {
     openConfirmation({
       title: 'Are you sure you want to cancel?',
-      description: onlyNamespace
-        ? 'Namespace has not been enabled for your community yet'
-        : 'Community Stake has not been enabled for your community yet',
+      description: 'Onchain transactions are not completed yet.',
       buttons: [
         {
           label: 'Cancel',
@@ -155,15 +150,14 @@ const CommunityOnchainTransactions = ({
     <div className="CommunityOnchainTransactions">
       {confirmNamespaceDataPage ? (
         <ConfirmNamespaceData
-          communityStakeData={communityStakeData}
+          communityNamespaceData={communityNamespaceData}
           chainId={chainId}
-          onlyNamespace={onlyNamespace}
           confirmButton={{
-            label: 'Yes',
+            label: 'Confirm',
             action: handleConfirmNamespaceDataStepSuccess,
           }}
           backButton={{
-            label: isTopicFlow ? 'Back' : 'No',
+            label: isTopicFlow ? 'Back' : 'Cancel',
             action: handleConfirmNamespaceDataStepCancel,
           }}
         />

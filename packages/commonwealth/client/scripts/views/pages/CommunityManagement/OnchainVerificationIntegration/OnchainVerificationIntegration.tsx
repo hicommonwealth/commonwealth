@@ -57,7 +57,8 @@ const OnchainVerificationIntegration = () => {
         <CWText type="h2">Onchain Verification</CWText>
         <CWText type="b1" className="description">
           This page allows you to mint a verification token for your community.
-          A verification token proves that your community is verified on-chain.
+          <br />A verification token proves that your community is verified
+          on-chain.
         </CWText>
 
         {communityId && selectedAddress && chainId && (
@@ -72,6 +73,7 @@ const OnchainVerificationIntegration = () => {
               TransactionType.MintVerificationToken,
             ]}
             namespace={namespace}
+            onConfirmNamespaceDataStepCancel={handleTransactionCancel}
             onSignTransactionMintVerificationToken={handleVerificationSuccess}
             onSignTransactionsStepCancel={handleTransactionCancel}
           />

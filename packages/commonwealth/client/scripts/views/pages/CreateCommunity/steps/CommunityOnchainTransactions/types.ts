@@ -1,6 +1,6 @@
 import { ActionStepProps } from 'views/pages/CreateCommunity/components/ActionSteps/types';
 
-export type StakeData = {
+export type NamespaceData = {
   symbol: string;
   namespace: string;
 };
