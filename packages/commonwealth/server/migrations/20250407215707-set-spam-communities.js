@@ -4,6 +4,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (t) => {
+      const now = new Date();
       await queryInterface.sequelize.query(
         `
           UPDATE "Communities"
@@ -18,12 +19,12 @@ module.exports = {
                                  'tienvagai-community');
 
           UPDATE "Threads" T
-          SET marked_as_spam_at = NOW()
+          SET marked_as_spam_at = ${now.toISOString()}
           FROM "thread_ids" ti
           WHERE T.id = ti.id;
 
           UPDATE "Comments" C
-          SET marked_as_spam_at = NOW()
+          SET marked_as_spam_at = ${now.toISOString()}
           FROM "thread_ids" ti
           WHERE ti.id = C."thread_id";
         `,
