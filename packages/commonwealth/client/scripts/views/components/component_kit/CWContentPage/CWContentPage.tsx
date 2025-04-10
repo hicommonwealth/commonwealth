@@ -207,6 +207,7 @@ export const CWContentPage = ({
         versionHistory={thread?.versionHistory || []}
         activeThreadVersionId={activeThreadVersionId}
         onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
+        shouldShowRole
       />
     </div>
   );
