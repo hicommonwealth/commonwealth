@@ -33,6 +33,20 @@ module.exports = {
         `CREATE INDEX idx_threads_is_not_spam ON "Threads" ((marked_as_spam_at IS NULL));`,
         { transaction: t },
       );
+
+      await queryInterface.removeIndex(
+        'Threads',
+        'threads_activity_rank_date',
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `
+        CREATE INDEX threads_activity_rank_date
+        ON "Threads" (activity_rank_date DESC NULLS LAST)
+        WHERE marked_as_spam_at IS NULL;
+      `,
+        { transaction: t },
+      );
     });
   },
 
