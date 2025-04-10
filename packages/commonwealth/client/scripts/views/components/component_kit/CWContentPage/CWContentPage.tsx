@@ -217,6 +217,7 @@ export const CWContentPage = ({
         activeThreadVersionId={activeThreadVersionId}
         onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
         shareUrl={shareUrl}
+        shouldShowRole
       />
     </div>
   );

@@ -43,7 +43,9 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
-  const [createdAt, setCreatedAt] = useState();
+  const [createdAt, setCreatedAt] = useState<
+    moment.Moment | number | undefined
+  >();
   const [selectedCodeEditorType, setSelectedCodeEditorType] = useState(
     CodeEditorType.Code,
   );
@@ -80,8 +82,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     threads,
   } = useSnapshotProposal({
     identifier: proposalId,
-    // @ts-expect-error <StrictNullChecks/>
-    snapshotId: querySnapshotId,
+    snapshotId: querySnapshotId!,
     enabled: queryType === 'cosmos' ? false : true,
   });
   const snapShotVotingResult = React.useMemo(() => {
@@ -121,19 +122,14 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   useManageDocumentTitle('View proposal', proposalTitle);
   useEffect(() => {
     if (proposal || snapshotProposal) {
-      if (queryType === 'cosmos') {
-        // @ts-expect-error <StrictNullChecks/>
+      if (queryType === 'cosmos' && proposal) {
         setTitle(proposal?.title);
         // @ts-expect-error <StrictNullChecks/>
         setAuthor(proposal?.author);
-        // @ts-expect-error <StrictNullChecks/>
         setCreatedAt(proposal?.createdAt);
-      } else {
-        // @ts-expect-error <StrictNullChecks/>
+      } else if (snapshotProposal) {
         setTitle(snapshotProposal?.title);
-        // @ts-expect-error <StrictNullChecks/>
         setAuthor(snapshotProposal?.author);
-        // @ts-expect-error <StrictNullChecks/>
         setCreatedAt(snapshotProposal?.created);
       }
     }

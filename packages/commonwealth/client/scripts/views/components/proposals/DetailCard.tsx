@@ -1,8 +1,8 @@
 import React from 'react';
 
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import moment from 'moment';
-import { useNavigate } from 'react-router';
 import { formatAddressShort } from 'shared/utils';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
@@ -27,8 +27,7 @@ const DetailCard = ({
   id = '',
   Threads = [],
 }: DetailCardProps) => {
-  const navigate = useNavigate();
-
+  const navigate = useCommonNavigate();
   return (
     <CWContentPageCard
       header="Details"
@@ -91,7 +90,9 @@ const DetailCard = ({
                   className="link"
                   onClick={() =>
                     navigate(
-                      `/${scope}/discussion/${thread.id}-${thread.title}`,
+                      `/discussion/${thread.id}-${thread.title}`,
+                      {},
+                      scope,
                     )
                   }
                   key={thread.id}

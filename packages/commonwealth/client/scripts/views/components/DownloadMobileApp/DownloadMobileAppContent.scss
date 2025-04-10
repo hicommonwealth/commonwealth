@@ -1,0 +1,27 @@
+@import '../../../styles/shared.scss';
+
+.DownloadMobileAppContent {
+  .Background {
+    text-align: center;
+
+    img {
+      width: 200px;
+      height: 200px;
+    }
+
+    p {
+      margin: 12px;
+    }
+  }
+
+  .Copy {
+    cursor: pointer;
+
+    * .text-input-icon svg,
+    input,
+    input * {
+      cursor: pointer;
+      background: $neutral-100 !important;
+    }
+  }
+}

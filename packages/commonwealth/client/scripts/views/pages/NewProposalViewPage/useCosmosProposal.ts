@@ -78,7 +78,6 @@ export const useCosmosProposal = ({
   useEffect(() => {
     if (cosmosProposal) {
       // @ts-expect-error <StrictNullChecks/>
-
       setProposal(cosmosProposal);
       setTitle(cosmosProposal.title || '');
       setDescription(cosmosProposal.description || '');
