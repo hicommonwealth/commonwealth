@@ -12,12 +12,14 @@ import {
 } from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
+import { useFetchTagsQuery } from 'state/api/tags';
 import { useDebounce } from 'usehooks-ts';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import DirectoryPageContent from 'views/pages/DirectoryPage/DirectoryPageContent';
 import useDirectoryPageData, {
@@ -49,6 +51,12 @@ const DirectoryPage = () => {
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const { data: nodes } = useFetchNodesQuery();
+  const { data: tagsForFIlter } = useFetchTagsQuery();
+
+  const tagsList = tagsForFIlter?.map((tag) => ({
+    label: tag.name,
+    value: tag.id,
+  }));
 
   const communityId = app.activeChainId() || '';
 
@@ -253,6 +261,9 @@ const DirectoryPage = () => {
   if (isLoadingTagsAndCommunities) {
     return <CWCircleMultiplySpinner />;
   }
+  const handleFilterClickTest = (value) => {
+    console.log('value :::::', value);
+  };
 
   return (
     <CWPageLayout>
@@ -282,6 +293,12 @@ const DirectoryPage = () => {
                 fullWidth
                 placeholder="Search communities"
                 iconLeft={<MagnifyingGlass size={24} weight="regular" />}
+              />
+            </div>
+            <div className="tag-selection-list">
+              <CWSelectList
+                options={tagsList}
+                onClick={handleFilterClickTest}
               />
             </div>
             <div className="toggle-view-icons">

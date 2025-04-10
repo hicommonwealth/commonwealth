@@ -22,6 +22,7 @@ type CustomCWSelectListProps = {
   ) => Promise<void>;
   showCopyIcon?: boolean;
   instructionalMessage?: string;
+  onClick?: (value: OptionProps) => void;
 };
 
 type OptionProps = {
@@ -114,6 +115,7 @@ export const CWSelectList = <
               // @ts-expect-error <StrictNullChecks/>
               formContext.setError(name, null);
           }
+          props?.onClick?.(newValue);
         }}
         styles={{
           control: (baseStyles) => ({
