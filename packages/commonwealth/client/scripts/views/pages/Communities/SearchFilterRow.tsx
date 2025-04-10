@@ -44,7 +44,7 @@ interface SearchFilterRowProps {
   inlineFilters?: InlineFilter[];
 }
 
-const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
+const SearchFilterRow = ({
   searchValue,
   onSearchChange,
   selectedViewType,
@@ -54,7 +54,7 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
   placeholder = 'Search',
   showViewToggle = true,
   inlineFilters = [],
-}) => {
+}: SearchFilterRowProps) => {
   return (
     <div className="search-filter-container">
       <div className="search-filter-row">

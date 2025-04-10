@@ -33,7 +33,7 @@ interface CommunitiesTabContentProps {
   fetchMoreCommunities?: () => Promise<void>;
 }
 
-const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
+const CommunitiesTabContent = ({
   isLoading,
   isInitialCommunitiesLoading,
   communitiesList,
@@ -44,7 +44,7 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
   setSelectedCommunityId,
   hasNextPage,
   fetchMoreCommunities,
-}) => {
+}: CommunitiesTabContentProps) => {
   const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
 
@@ -68,10 +68,7 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                   return null;
                 }
 
-                const canBuyStake = !!user.addresses.find?.(
-                  (address) => address?.community?.base === community?.base,
-                );
-
+                // Map historical prices using the original approach
                 const historicalPriceMap: Map<string, string | undefined> =
                   new Map(
                     Object.entries(
@@ -87,6 +84,11 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                       ),
                     ),
                   );
+
+                // Use the original canBuyStake logic
+                const canBuyStake = !!user.addresses.find?.(
+                  (address) => address?.community?.base === community?.base,
+                );
 
                 return (
                   <Fragment

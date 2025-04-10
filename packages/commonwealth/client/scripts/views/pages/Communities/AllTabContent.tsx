@@ -18,10 +18,7 @@ interface AllTabContentProps {
   filters: CommunityFilters;
 }
 
-const AllTabContent: React.FC<AllTabContentProps> = ({
-  containerRef,
-  filters,
-}) => {
+const AllTabContent = ({ containerRef, filters }: AllTabContentProps) => {
   const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
