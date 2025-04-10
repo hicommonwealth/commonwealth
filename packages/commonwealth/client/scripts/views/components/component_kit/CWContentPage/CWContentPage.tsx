@@ -20,6 +20,8 @@ import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
 import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
 import './CWContentPage.scss';
@@ -32,6 +34,7 @@ export type ContentPageSidebarItem = {
 
 // tuple
 export type SidebarComponents = [
+  item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
@@ -83,6 +86,9 @@ type ContentPageProps = {
   onChangeVersionHistoryNumber?: (id: number) => void;
   editingDisabled?: boolean;
   onCommentClick?: () => void;
+  shareUrl?: string;
+  proposalDetailSidebar?: SidebarComponents;
+  showActionIcon?: boolean;
 };
 
 export const CWContentPage = ({
@@ -123,12 +129,15 @@ export const CWContentPage = ({
   onChangeVersionHistoryNumber,
   editingDisabled,
   onCommentClick,
+  shareUrl,
+  proposalDetailSidebar,
+  showActionIcon = false,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const communityId = app.activeChainId() || '';
 
   const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
@@ -207,6 +216,7 @@ export const CWContentPage = ({
         versionHistory={thread?.versionHistory || []}
         activeThreadVersionId={activeThreadVersionId}
         onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
+        shareUrl={shareUrl}
         shouldShowRole
       />
     </div>
@@ -316,10 +326,35 @@ export const CWContentPage = ({
           {mainBody}
           {showSidebar && (
             <div className="sidebar">
-              {sidebarComponents?.map((c) => (
-                // @ts-expect-error <StrictNullChecks/>
-                <React.Fragment key={c.label}>{c.item}</React.Fragment>
-              ))}
+              {showActionIcon && (
+                <div className="actions">
+                  <div className="left-container">
+                    <CWIcon
+                      iconName="squaresFour"
+                      iconSize="medium"
+                      weight="bold"
+                    />
+                    <CWText type="h5" fontWeight="semiBold">
+                      Actions
+                    </CWText>
+                  </div>
+                  <CWIcon
+                    iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                    iconSize="small"
+                    className="caret-icon"
+                    weight="bold"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                  />
+                </div>
+              )}
+              {!isCollapsed &&
+                sidebarComponents?.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
+              {proposalDetailSidebar &&
+                proposalDetailSidebar.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
             </div>
           )}
         </div>

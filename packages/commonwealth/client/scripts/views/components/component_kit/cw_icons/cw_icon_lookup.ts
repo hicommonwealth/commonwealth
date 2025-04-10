@@ -72,6 +72,7 @@ import {
   Notepad,
   PaperPlaneTilt,
   PencilSimple,
+  Play,
   Plus,
   PlusCircle,
   PushPin,
@@ -323,6 +324,7 @@ export const iconLookup = {
   xTwitter: withPhosphorIcon(XLogo),
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
+  play: withPhosphorIcon(Play),
   starFour: withPhosphorIcon(StarFour),
   // Chain icons with distinct names
   solanaChain: CustomIcons.CWSolana,
