@@ -1,33 +1,29 @@
 import { useState } from 'react';
-import app from 'state';
-import useConfigureNominationsMutation from 'state/api/contests/configureNominations';
 import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
 } from '../types';
+import useNamespaceFactory from './useNamespaceFactory';
 
-interface UseNominationsTransactionProps {
+interface UseConfigureVerificationTransactionProps {
   namespace: string;
   userAddress: string;
   chainId: string;
   onSuccess?: () => void;
 }
 
-const useNominationsTransaction = ({
+const useConfigureVerificationTransaction = ({
   namespace,
   userAddress,
   chainId,
   onSuccess,
-}: UseNominationsTransactionProps): TransactionHookResult => {
+}: UseConfigureVerificationTransactionProps): TransactionHookResult => {
   const [transactionData, setTransactionData] = useState<TransactionData>(
     defaultTransactionState,
   );
 
-  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
-
-  const { mutateAsync: configureNominations } =
-    useConfigureNominationsMutation();
+  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
 
   const action = async () => {
     if (
@@ -43,18 +39,7 @@ const useNominationsTransaction = ({
         errorText: '',
       });
 
-      const testing = false;
-      testing
-        ? await new Promise((resolve) => setTimeout(resolve, 1000))
-        : await configureNominations({
-            namespaceName: namespace,
-            creatorOnly: true,
-            walletAddress: userAddress,
-            maxNominations: 5,
-            ethChainId: parseInt(chainId),
-            chainRpc,
-            judgeId: 101,
-          });
+      await namespaceFactory.configureVerification(namespace, userAddress);
 
       setTransactionData({
         state: 'completed',
@@ -63,10 +48,10 @@ const useNominationsTransaction = ({
 
       onSuccess?.();
     } catch (err) {
-      console.log(err);
+      console.error(err);
 
       const error =
-        'There was an issue configuring nominations. Please try again.';
+        'There was an issue configuring verification. Please try again.';
 
       setTransactionData({
         state: 'not-started',
@@ -82,4 +67,4 @@ const useNominationsTransaction = ({
   };
 };
 
-export default useNominationsTransaction;
+export default useConfigureVerificationTransaction;

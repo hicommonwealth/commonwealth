@@ -5,6 +5,7 @@ export enum TransactionType {
   ConfigureStakes = 'configureStakes',
   ConfigureNominations = 'configureNominations',
   MintVerificationToken = 'mintVerificationToken',
+  ConfigureVerification = 'configureVerification',
 }
 
 export interface TransactionDefinition {
@@ -36,6 +37,11 @@ export const TRANSACTION_DEFINITIONS: Record<
     id: 'verificationToken',
     label: 'Mint verification token',
     description: 'Create verification credentials for your community.',
+  },
+  [TransactionType.ConfigureVerification]: {
+    id: 'verification',
+    label: 'Configure verification',
+    description: 'This transaction configures verification for your community.',
   },
 };
 
