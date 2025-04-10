@@ -1,7 +1,7 @@
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import EnableStake from './EnableStake';
+import ConfirmNamespaceData from './ConfirmNamespaceData';
 import SignCommunityTransactions from './SignCommunityTransactions';
 import {
   TransactionType,
@@ -23,8 +23,8 @@ interface CommunityOnchainTransactionsProps {
   transactionTypes: TransactionType[];
   namespace?: string | null;
   symbol?: string;
-  onEnableStakeStepSucess?: (data: StakeData) => void;
-  onEnableStakeStepCancel?: () => void;
+  onConfirmNamespaceData?: (data: StakeData) => void;
+  onConfirmNamespaceDataStepCancel?: () => void;
   onSignTransactionDeployNamespace?: () => void;
   onSignTransactionConfigureStake?: () => void;
   onSignTransactionConfigureNominations?: () => void;
@@ -41,8 +41,8 @@ const CommunityOnchainTransactions = ({
   transactionTypes,
   namespace,
   symbol,
-  onEnableStakeStepSucess,
-  onEnableStakeStepCancel,
+  onConfirmNamespaceData,
+  onConfirmNamespaceDataStepCancel,
   onSignTransactionDeployNamespace,
   onSignTransactionConfigureStake,
   onSignTransactionConfigureNominations,
@@ -54,7 +54,7 @@ const CommunityOnchainTransactions = ({
     transactionTypes.length === 1 &&
     transactionTypes[0] === TransactionType.DeployNamespace;
 
-  const [enableStakePage, setEnableStakePage] = useState(
+  const [confirmNamespaceDataPage, setConfirmNamespaceDataPage] = useState(
     hasNamespaceReserved ? false : true,
   );
   const [communityStakeData, setCommunityStakeData] = useState({
@@ -94,14 +94,14 @@ const CommunityOnchainTransactions = ({
     onSuccess: onSignTransactionMintVerificationToken,
   });
 
-  const handleEnableStakeStepSuccess = (data: StakeData) => {
+  const handleConfirmNamespaceDataStepSuccess = (data: StakeData) => {
     setCommunityStakeData(data);
-    setEnableStakePage(false);
-    onEnableStakeStepSucess?.(data);
+    setConfirmNamespaceDataPage(false);
+    onConfirmNamespaceData?.(data);
   };
 
-  const handleEnableStakeStepCancel = () => {
-    onEnableStakeStepCancel?.();
+  const handleConfirmNamespaceDataStepCancel = () => {
+    onConfirmNamespaceDataStepCancel?.();
   };
 
   const handleSignTransactionsStepCancel = () => {
@@ -153,18 +153,18 @@ const CommunityOnchainTransactions = ({
 
   return (
     <div className="CommunityOnchainTransactions">
-      {enableStakePage ? (
-        <EnableStake
+      {confirmNamespaceDataPage ? (
+        <ConfirmNamespaceData
           communityStakeData={communityStakeData}
           chainId={chainId}
           onlyNamespace={onlyNamespace}
           confirmButton={{
             label: 'Yes',
-            action: handleEnableStakeStepSuccess,
+            action: handleConfirmNamespaceDataStepSuccess,
           }}
           backButton={{
             label: isTopicFlow ? 'Back' : 'No',
-            action: handleEnableStakeStepCancel,
+            action: handleConfirmNamespaceDataStepCancel,
           }}
         />
       ) : (

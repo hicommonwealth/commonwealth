@@ -12,9 +12,9 @@ import { StakeData } from '../types';
 import { validationSchema } from './validations';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
-import './EnableStake.scss';
+import './ConfirmNamespaceData.scss';
 
-interface EnableStakeProps {
+interface ConfirmNamespaceDataProps {
   communityStakeData: StakeData;
   chainId: string;
   onlyNamespace?: boolean;
@@ -28,13 +28,13 @@ interface EnableStakeProps {
   };
 }
 
-const EnableStake = ({
+const ConfirmNamespaceData = ({
   communityStakeData,
   chainId,
   onlyNamespace,
   backButton,
   confirmButton,
-}: EnableStakeProps) => {
+}: ConfirmNamespaceDataProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
@@ -68,7 +68,7 @@ const EnableStake = ({
   };
 
   return (
-    <div className="EnableStake">
+    <div className="ConfirmNamespaceData">
       <section className="header">
         <CWText type="h2">
           {onlyNamespace
@@ -163,4 +163,4 @@ const EnableStake = ({
   );
 };
 
-export default EnableStake;
+export default ConfirmNamespaceData;

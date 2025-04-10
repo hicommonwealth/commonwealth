@@ -162,7 +162,7 @@ export const Topics = () => {
             chainId={String(community?.ChainNode?.eth_chain_id)}
             transactionTypes={[TransactionType.DeployNamespace]}
             isTopicFlow
-            onEnableStakeStepCancel={goToMethodSelectionStep}
+            onConfirmNamespaceDataStepCancel={goToMethodSelectionStep}
             onSignTransactionDeployNamespace={() =>
               setCreateTopicStep(CreateTopicStep.WVERC20Details)
             }

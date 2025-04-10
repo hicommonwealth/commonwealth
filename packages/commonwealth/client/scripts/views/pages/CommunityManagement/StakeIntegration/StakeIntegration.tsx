@@ -146,7 +146,7 @@ const StakeIntegration = ({
               TransactionType.ConfigureStakes,
             ]}
             isTopicFlow={isTopicFlow}
-            onEnableStakeStepCancel={goBack}
+            onConfirmNamespaceDataStepCancel={goBack}
             onSignTransactionConfigureStake={
               handleSignTransactionsStepLaunchStakeSuccess
             }

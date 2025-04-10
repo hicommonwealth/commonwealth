@@ -268,7 +268,7 @@ Set one up first.`
             selectedAddress={selectedAddress!}
             chainId={String(ethChainId)}
             transactionTypes={[TransactionType.DeployNamespace]}
-            onEnableStakeStepCancel={gotToContestTypeSelection}
+            onConfirmNamespaceDataStepCancel={gotToContestTypeSelection}
             onSignTransactionDeployNamespace={goToLaunchFarcasterContest}
             onSignTransactionsStepCancel={gotToContestTypeSelection}
           />

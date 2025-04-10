@@ -93,7 +93,7 @@ const CreateCommunity = () => {
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
             chainId={selectedChainId || ''}
-            onEnableStakeStepCancel={goToSuccessStep}
+            onConfirmNamespaceDataStepCancel={goToSuccessStep}
             onSignTransactionsStepCancel={goToSuccessStep}
             {...communityOnchainTransactionsConfig}
           />
