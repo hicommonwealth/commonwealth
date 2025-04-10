@@ -123,7 +123,6 @@ export const LinkedProposalsCard = ({
     (initialSnapshotLinks.length > 0 && snapshotProposalsLoaded) ||
     linkedProposals?.source === 'snapshot';
 
-  console.log('xxxxxx', { linkedProposals, initialProposalLinks });
   return (
     <>
       <CWContentPageCard
@@ -147,7 +146,7 @@ export const LinkedProposalsCard = ({
                       {linkedProposals?.source === 'proposal' ? (
                         <ReactRouterLink
                           key={linkedProposals.identifier}
-                          to={'#'}
+                          to={`/${communityId}/proposal-details/${linkedProposals.proposalId}?type=cosmos`}
                         >
                           {`${linkedProposals?.title ?? 'Proposal'} #${linkedProposals?.identifier}`}
                         </ReactRouterLink>
@@ -172,7 +171,8 @@ export const LinkedProposalsCard = ({
                   {(linkedProposals?.source === 'snapshot' || showSnapshot) &&
                     (linkedProposals?.source === 'snapshot' ? (
                       <ReactRouterLink
-                        to={`https://snapshot.org/#/${linkedProposals.snapshotIdentifier}/proposal/${linkedProposals.proposalId}`}
+                        // eslint-disable-next-line max-len
+                        to={`/${communityId}/proposal-details/${linkedProposals.proposalId}?snapshotId=${linkedProposals.snapshotIdentifier}&type=snapshot`}
                       >
                         Snapshot: {linkedProposals.title ?? snapshotTitle}
                       </ReactRouterLink>

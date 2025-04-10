@@ -50,7 +50,7 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import { LinkSource } from '@hicommonwealth/shared';
+import { DisabledCommunitySpamTier, LinkSource } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
   SnapshotSpace,
@@ -99,6 +99,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+  const [linkedProposals, setLinkedProposals] =
+    useState<ProposalState | null>();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -120,7 +122,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [selectedCommunityId, setSelectedCommunityId] = useState(
     app.activeChainId() || '',
   );
-  console.log({ selectedCommunityId });
+
   const [userSelectedAddress, setUserSelectedAddress] = useState(
     user?.activeAccount?.address,
   );
@@ -173,12 +175,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
     topicId: threadTopic?.id,
   });
-  // adding the thread
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     communityId: app.activeChainId() || '',
   });
-  //
+
   const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -439,6 +440,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isTurnstileEnabled,
     turnstileToken,
     resetTurnstile,
+    addThreadLinks,
+    linkedProposals,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -523,8 +526,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   );
   const forceRerender = useForceRerender();
 
-  const [linkedProposals, setLinkedProposals] =
-    useState<ProposalState | null>();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const snapshotLink = linkedProposals?.source === 'snapshot';
@@ -592,9 +593,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     : snapshotProposal
       ? 'snapshot'
       : '';
-  const status =
-    // @ts-expect-error <StrictNullChecks/>
-    snapshotProposal?.state || proposal?.status;
+  const status = snapshotProposal?.state || proposal?.status;
 
   const toggleShowVotesDrawer = (newModalState: boolean) => {
     setShowVotesDrawer(newModalState);
@@ -631,7 +630,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
             label: 'Detail',
             item: (
               <DetailCard
-                status={status}
+                status={status || ''}
                 governanceType={governanceType}
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={snapshotProposal?.created || proposal.createdAt}
@@ -669,6 +668,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       : []),
   ];
 
+  console.log({ linkedProposals });
   return (
     <>
       <CWPageLayout>
@@ -864,7 +864,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
                 {community &&
                   userProfile &&
-                  community.spam_tier_level >= 0 &&
+                  community.spam_tier_level !== DisabledCommunitySpamTier &&
                   userProfile.tier <= community.spam_tier_level && (
                     <CWBanner
                       type="warning"
@@ -875,7 +875,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       className="spam-trust-banner"
                     />
                   )}
+
                 {isTurnstileEnabled && <TurnstileWidget />}
+
                 <div className="buttons-row">
                   <CWButton
                     buttonType="tertiary"
@@ -896,20 +898,22 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     />
                   )}
 
-                  <div className="ai-toggle-wrapper">
-                    <CWToggle
-                      className="ai-toggle"
-                      icon="sparkle"
-                      iconColor="#757575"
-                      checked={aiCommentsToggleEnabled}
-                      onChange={() => {
-                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                      }}
-                    />
-                    <CWText type="caption" className="toggle-label">
-                      AI initial comment
-                    </CWText>
-                  </div>
+                  {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                    <div className="ai-toggle-wrapper">
+                      <CWToggle
+                        className="ai-toggle"
+                        icon="sparkle"
+                        iconColor="#757575"
+                        checked={aiCommentsToggleEnabled}
+                        onChange={() => {
+                          setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                        }}
+                      />
+                      <CWText type="caption" className="toggle-label">
+                        AI initial comment
+                      </CWText>
+                    </div>
+                  )}
 
                   <CWButton
                     label="Create"
@@ -959,7 +963,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
               {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
                   <DetailCard
-                    status={status}
+                    status={status || ''}
                     governanceType={governanceType}
                     publishDate={
                       // @ts-expect-error <StrictNullChecks/>
