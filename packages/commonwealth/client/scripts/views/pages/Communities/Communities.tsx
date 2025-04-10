@@ -22,11 +22,13 @@ import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsR
 import { Feed } from '../../components/feed';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import useCommunityContests from '../CommunityManagement/Contests/useCommunityContests';
 import XPTable, { QuestOption } from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import './Communities.scss';
 import CommunitiesTabContent from './CommunitiesTabContent';
 import ExploreContestList from './ExploreContestList';
+import { ContestStage as ExploreContestStage } from './ExploreContestList/ExploreContestList';
 import {
   CommunityFilters,
   CommunitySortDirections,
@@ -51,6 +53,15 @@ type ExtendedCommunitySliceType = [
   ExtendedCommunityType,
   ExtendedCommunityType,
 ];
+
+// Contest stage constants
+const CONTEST_STAGE = {
+  ALL: 'all',
+  ACTIVE: 'active',
+  PAST: 'past',
+} as const;
+
+type ContestStageType = (typeof CONTEST_STAGE)[keyof typeof CONTEST_STAGE];
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
@@ -432,15 +443,62 @@ const CommunitiesPage = () => {
     return filterTags;
   };
 
+  // Contest tab filter state
+  const [selectedContestStage, setSelectedContestStage] =
+    useState<ContestStageType>(CONTEST_STAGE.ALL);
+  const [selectedContestCommunityId, setSelectedContestCommunityId] =
+    useState<string>('');
+  const [contestFilterTags, setContestFilterTags] = useState<FilterTag[]>([]);
+
+  // Pre-fetch contest data and community options for the contest tab to avoid hook rendering issues
+  const {
+    contestsData: { active: activeContests, finished: pastContests },
+  } = useCommunityContests({
+    fetchAll: true,
+  });
+
+  // Collect all unique community IDs from contests
+  const contestCommunityIds = useMemo(
+    () => [
+      ...new Set([
+        ...activeContests.map((contest) => contest.community_id),
+        ...pastContests.map((contest) => contest.community_id),
+      ]),
+    ],
+    [activeContests, pastContests],
+  );
+
+  // Fetch community data for dropdown options
+  const communityQueries = trpc.useQueries((t) =>
+    contestCommunityIds.map((id) =>
+      t.community.getCommunity({ id: id!, include_node_info: true }),
+    ),
+  );
+
+  // Create options for community dropdown
+  const contestCommunityOptions = useMemo(() => {
+    return [
+      { value: '', label: 'All Communities' },
+      ...contestCommunityIds.map((id, index) => {
+        const communityData = communityQueries[index].data;
+        // Truncate community names to prevent overflow
+        const communityName = communityData?.name || 'Unknown Community';
+        const shortenedName =
+          communityName.length > 20
+            ? `${communityName.substring(0, 18)}...`
+            : communityName;
+
+        return {
+          value: id || '',
+          label: shortenedName,
+          fullLabel: communityName, // Keep full name for filter tags
+        };
+      }),
+    ];
+  }, [contestCommunityIds, communityQueries]);
+
   const getContestsFilterTags = (): FilterTag[] => {
-    return searchValue
-      ? [
-          {
-            label: `Search: ${searchValue}`,
-            onRemove: () => setSearchValue(''),
-          },
-        ]
-      : [];
+    return contestFilterTags;
   };
 
   const getQuestsFilterTags = (): FilterTag[] => {
@@ -465,13 +523,25 @@ const CommunitiesPage = () => {
       : [];
   };
 
+  // Add state for Threads tab filters
+  const [threadsFilterCommunityId, setThreadsFilterCommunityId] =
+    useState<string>('');
+  const [threadsSortOption, setThreadsSortOption] = useState<string>('newest');
+  const [threadsFilterTags, setThreadsFilterTags] = useState<FilterTag[]>([]);
+
+  // Add state for Tokens tab filters
+  const [tokensFilterTag, setTokensFilterTag] = useState<string>('');
+  const [tokensSortOption, setTokensSortOption] =
+    useState<string>('mostRecent');
+  const [tokensFilterTags, setTokensFilterTags] = useState<FilterTag[]>([]);
+
   // Get the appropriate filter tags based on the active tab
   const getFilterTagsByActiveTab = (): FilterTag[] => {
     switch (activeTab) {
       case 'communities':
         return getCommunitiesFilterTags();
       case 'threads':
-        return getThreadsFilterTags();
+        return threadsFilterTags;
       case 'users':
         return getUsersFilterTags();
       case 'contests':
@@ -479,7 +549,7 @@ const CommunitiesPage = () => {
       case 'quests':
         return getQuestsFilterTags();
       case 'tokens':
-        return getTokensFilterTags();
+        return tokensFilterTags;
       default:
         return [];
     }
@@ -490,6 +560,9 @@ const CommunitiesPage = () => {
     switch (activeTab) {
       case 'communities':
         return () => setIsFilterDrawerOpen(true);
+      // Don't show filter icon for contests since we use inline filters
+      case 'contests':
+        return undefined;
       // For users tab we're now using inline filters
       default:
         return undefined;
@@ -512,6 +585,289 @@ const CommunitiesPage = () => {
         },
       ];
     }
+
+    if (activeTab === 'contests') {
+      return [
+        {
+          type: 'select',
+          label: 'Filter by:',
+          placeholder: 'Select Contest Stage',
+          value: {
+            value: selectedContestStage,
+            label:
+              selectedContestStage === CONTEST_STAGE.ALL
+                ? 'All'
+                : selectedContestStage === CONTEST_STAGE.ACTIVE
+                  ? 'Active'
+                  : 'Past',
+          },
+          onChange: (option) => {
+            // Update selected stage
+            const newStage = option.value as ContestStageType;
+            setSelectedContestStage(newStage);
+
+            // Update filter tags
+            const newTags = contestFilterTags.filter(
+              (tag) =>
+                !tag.label.startsWith('All') &&
+                !tag.label.startsWith('Active') &&
+                !tag.label.startsWith('Past'),
+            );
+
+            if (newStage !== CONTEST_STAGE.ALL) {
+              newTags.push({
+                label:
+                  newStage === CONTEST_STAGE.ACTIVE
+                    ? 'Active Contests'
+                    : 'Past Contests',
+                onRemove: () => {
+                  setSelectedContestStage(CONTEST_STAGE.ALL);
+                  setContestFilterTags((prevTags) =>
+                    prevTags.filter(
+                      (tag) =>
+                        !tag.label.startsWith('Active') &&
+                        !tag.label.startsWith('Past'),
+                    ),
+                  );
+                },
+              });
+            }
+
+            setContestFilterTags(newTags);
+          },
+          options: [
+            { value: CONTEST_STAGE.ALL, label: 'All' },
+            { value: CONTEST_STAGE.ACTIVE, label: 'Active' },
+            { value: CONTEST_STAGE.PAST, label: 'Past' },
+          ],
+          isClearable: false,
+          isSearchable: false,
+        },
+        {
+          type: 'select',
+          label: 'Community:',
+          placeholder: 'Select Community',
+          className: 'community-filter',
+          value:
+            contestCommunityOptions.find(
+              (opt) => opt.value === selectedContestCommunityId,
+            ) || contestCommunityOptions[0],
+          onChange: (option) => {
+            // Update selected community
+            setSelectedContestCommunityId(option.value);
+
+            // Update filter tags
+            const newTags = contestFilterTags.filter(
+              (tag) => !tag.label.startsWith('Community:'),
+            );
+
+            if (option.value) {
+              // Use fullLabel if available for the filter tag
+              const displayName = option.fullLabel || option.label;
+              newTags.push({
+                label: `Community: ${displayName}`,
+                onRemove: () => {
+                  setSelectedContestCommunityId('');
+                  setContestFilterTags((prevTags) =>
+                    prevTags.filter(
+                      (tag) => !tag.label.startsWith('Community:'),
+                    ),
+                  );
+                },
+              });
+            }
+
+            setContestFilterTags(newTags);
+          },
+          options: contestCommunityOptions,
+          isClearable: true,
+          isSearchable: true,
+        },
+      ];
+    }
+
+    if (activeTab === 'threads') {
+      // Create community options for threads filter
+      const threadsCommunityOptions = [
+        { value: '', label: 'All Communities' },
+        ...(communities?.pages || [])
+          .flatMap((page) => page.results)
+          .map((community) => ({
+            value: community.id || '',
+            label: community.name || 'Unknown Community',
+            fullLabel: community.name || 'Unknown Community',
+          })),
+      ];
+
+      return [
+        {
+          type: 'select',
+          label: 'Community:',
+          placeholder: 'Select Community',
+          className: 'community-filter',
+          value:
+            threadsCommunityOptions.find(
+              (opt) => opt.value === threadsFilterCommunityId,
+            ) || threadsCommunityOptions[0],
+          onChange: (option) => {
+            setThreadsFilterCommunityId(option.value);
+
+            // Update filter tags
+            const newTags = threadsFilterTags.filter(
+              (tag) => !tag.label.startsWith('Community:'),
+            );
+
+            if (option.value) {
+              const displayName = option.fullLabel || option.label;
+              newTags.push({
+                label: `Community: ${displayName}`,
+                onRemove: () => {
+                  setThreadsFilterCommunityId('');
+                  setThreadsFilterTags((prevTags) =>
+                    prevTags.filter(
+                      (tag) => !tag.label.startsWith('Community:'),
+                    ),
+                  );
+                },
+              });
+            }
+
+            setThreadsFilterTags(newTags);
+          },
+          options: threadsCommunityOptions,
+          isClearable: true,
+          isSearchable: true,
+        },
+        {
+          type: 'select',
+          label: 'Sort by:',
+          placeholder: 'Sort Threads',
+          value: {
+            value: threadsSortOption,
+            label: threadsSortOption === 'newest' ? 'Newest' : 'Most Upvotes',
+          },
+          onChange: (option) => {
+            setThreadsSortOption(option.value);
+
+            // Update filter tags
+            const newTags = threadsFilterTags.filter(
+              (tag) => !tag.label.startsWith('Sort:'),
+            );
+
+            newTags.push({
+              label: `Sort: ${option.value === 'newest' ? 'Newest' : 'Most Upvotes'}`,
+              onRemove: () => {
+                setThreadsSortOption('newest');
+                setThreadsFilterTags((prevTags) =>
+                  prevTags.filter((tag) => !tag.label.startsWith('Sort:')),
+                );
+              },
+            });
+
+            setThreadsFilterTags(newTags);
+          },
+          options: [
+            { value: 'newest', label: 'Newest' },
+            { value: 'upvotes', label: 'Most Upvotes' },
+          ],
+          isClearable: false,
+          isSearchable: false,
+        },
+      ];
+    }
+
+    if (activeTab === 'tokens' && launchpadEnabled) {
+      // Create token sort options
+      const tokenSortOptions = [
+        { value: 'mostRecent', label: 'Most Recent' },
+        { value: 'marketCap', label: 'Market Cap' },
+        { value: 'oldest', label: 'Oldest' },
+        { value: 'gain24h', label: '24h Gain' },
+        { value: 'lastActivity', label: 'Latest Activity' },
+      ];
+
+      // Create tag options for tokens filter
+      const tokenTagOptions = [
+        { value: '', label: 'All Tags' },
+        ...(tags || []).map((tag) => ({
+          value: String(tag.id),
+          label: tag.name,
+        })),
+      ];
+
+      return [
+        {
+          type: 'select',
+          label: 'Filter by:',
+          placeholder: 'Select Tag',
+          className: 'tag-filter',
+          value:
+            tokenTagOptions.find((opt) => opt.value === tokensFilterTag) ||
+            tokenTagOptions[0],
+          onChange: (option) => {
+            setTokensFilterTag(option.value);
+
+            // Update filter tags
+            const newTags = tokensFilterTags.filter(
+              (tag) => !tag.label.startsWith('Tag:'),
+            );
+
+            if (option.value) {
+              newTags.push({
+                label: `Tag: ${option.label}`,
+                onRemove: () => {
+                  setTokensFilterTag('');
+                  setTokensFilterTags((prevTags) =>
+                    prevTags.filter((tag) => !tag.label.startsWith('Tag:')),
+                  );
+                },
+              });
+            }
+
+            setTokensFilterTags(newTags);
+          },
+          options: tokenTagOptions,
+          isClearable: true,
+          isSearchable: true,
+        },
+        {
+          type: 'select',
+          label: 'Sort by:',
+          placeholder: 'Sort Tokens',
+          value:
+            tokenSortOptions.find((opt) => opt.value === tokensSortOption) ||
+            tokenSortOptions[0],
+          onChange: (option) => {
+            setTokensSortOption(option.value);
+
+            // Update filter tags
+            const newTags = tokensFilterTags.filter(
+              (tag) => !tag.label.startsWith('Sort:'),
+            );
+
+            const sortLabel =
+              tokenSortOptions.find((opt) => opt.value === option.value)
+                ?.label || option.label;
+
+            newTags.push({
+              label: `Sort: ${sortLabel}`,
+              onRemove: () => {
+                setTokensSortOption('mostRecent');
+                setTokensFilterTags((prevTags) =>
+                  prevTags.filter((tag) => !tag.label.startsWith('Sort:')),
+                );
+              },
+            });
+
+            setTokensFilterTags(newTags);
+          },
+          options: tokenSortOptions,
+          isClearable: false,
+          isSearchable: false,
+        },
+      ];
+    }
+
     return [];
   };
 
@@ -575,18 +931,43 @@ const CommunitiesPage = () => {
         {/* Conditionally render content based on active tab */}
         {launchpadEnabled
           ? activeTab === 'tokens' && (
-              <TokensList filters={filters} hideHeader />
+              <TokensList
+                filters={{
+                  ...filters,
+                  withTagsIds: tokensFilterTag
+                    ? [parseInt(tokensFilterTag, 10)]
+                    : [],
+                  sortBy: tokensSortOption,
+                }}
+                hideHeader
+              />
             )
           : null}
         {questsEnabled
           ? activeTab === 'quests' && <QuestList hideHeader />
           : null}
-        {activeTab === 'contests' && <ExploreContestList hideHeader />}
+        {activeTab === 'contests' && (
+          <ExploreContestList
+            hideHeader
+            contestStage={
+              selectedContestStage === CONTEST_STAGE.ALL
+                ? undefined
+                : selectedContestStage === CONTEST_STAGE.ACTIVE
+                  ? ExploreContestStage.Active
+                  : ExploreContestStage.Past
+            }
+            selectedCommunityId={selectedContestCommunityId}
+          />
+        )}
         {activeTab === 'threads' && (
           <div className="threads-tab">
             <Feed
               query={useFetchGlobalActivityQuery}
               customScrollParent={containerRef.current}
+              queryOptions={{
+                community_id: threadsFilterCommunityId || undefined,
+                sort_by: threadsSortOption,
+              }}
             />
           </div>
         )}

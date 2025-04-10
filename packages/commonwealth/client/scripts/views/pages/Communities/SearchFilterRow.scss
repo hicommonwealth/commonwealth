@@ -1,17 +1,35 @@
+@import '../../../styles/shared';
+
 .search-filter-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 20px;
   width: 100%;
+
+  /* Hide all scrollbars within the filter container */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+      width: 0;
+      height: 0;
+    }
+  }
 
   .search-filter-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
     .search-container {
-      max-width: 520px;
+      flex: 0 1 auto;
+      max-width: 500px;
       width: 100%;
       min-width: 120px;
       flex: 1;
@@ -30,109 +48,244 @@
 
     .right-side-controls {
       display: flex;
-      align-items: center;
-      gap: 16px;
+      gap: 24px;
+      flex-wrap: nowrap;
       justify-content: flex-end;
-      flex-wrap: nowrap;
-      flex-shrink: 0;
-    }
-
-    .inline-filters {
-      display: flex;
-      gap: 12px;
       align-items: center;
-      flex-wrap: nowrap;
-
-      .inline-filter-select {
-        min-width: 180px;
-        max-width: 220px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .filter-label {
-          white-space: nowrap;
-          font-size: 14px;
-          color: var(--neutral-600);
-        }
-      }
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-
-      .view-toggle {
-        display: flex;
-        gap: 8px;
-        cursor: pointer;
-
-        .icon-container {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-
-          &.selected {
-            background-color: var(--neutral-50);
-            border-radius: 6px;
-          }
-
-          svg {
-            color: black;
-          }
-        }
-      }
-    }
-
-    @media (max-width: 992px) {
-      flex-wrap: nowrap;
-
-      .search-container {
-        min-width: 120px;
-        max-width: none;
-      }
-
-      .right-side-controls {
-        width: auto;
-        justify-content: flex-end;
-        margin-top: 0;
-      }
+      flex: 0 0 auto;
+      margin-left: auto;
 
       .inline-filters {
-        flex: 0 1 auto;
-        min-width: 120px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        width: auto;
 
         .inline-filter-select {
+          display: flex;
+          gap: 8px;
+          align-items: center;
           min-width: 120px;
+          max-width: 200px;
+          flex: 0 0 auto;
 
-          @media (max-width: 768px) {
-            min-width: 110px;
+          // Special styling for community filter
+          &.community-filter {
+            min-width: 160px;
+            max-width: 240px;
+          }
+
+          .filter-label {
+            white-space: nowrap;
+            color: $neutral-500;
+            font-weight: 500;
+            font-size: 14px;
+          }
+
+          // Style the select dropdown
+          .select__control {
+            min-height: 40px;
+            border-color: $neutral-200;
+            min-width: 120px;
+            width: 100%;
+
+            &:hover {
+              border-color: $neutral-300;
+            }
+
+            &.select__control--is-focused {
+              border-color: $primary-500;
+              box-shadow: 0 0 0 1px $primary-500;
+            }
+
+            .select__value-container {
+              padding: 2px 8px;
+            }
+
+            .select__single-value {
+              max-width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .select__menu {
+              /* Ensure dropdown menus still scroll, just without visible scrollbars */
+              overflow-y: auto;
+              -webkit-overflow-scrolling: touch;
+            }
           }
         }
-      }
-    }
 
-    @media (max-width: 768px) {
-      .right-side-controls {
-        flex-wrap: nowrap;
-        gap: 8px;
-      }
-
-      .inline-filters {
-        order: 0;
-        width: auto;
-
-        .filter-label {
-          display: none;
+        .inline-filter-toggle {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          flex: 0 0 auto;
         }
       }
 
       .actions {
-        order: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        margin-left: 8px;
+
+        .view-toggle {
+          display: flex;
+          border-radius: 6px;
+          overflow: hidden;
+          background-color: $neutral-100;
+
+          .icon-container {
+            padding: 6px;
+            cursor: pointer;
+            color: $neutral-500;
+
+            &.selected {
+              background-color: $neutral-200;
+              color: $neutral-800;
+            }
+          }
+        }
+      }
+    }
+
+    // Medium screens
+    @include medium {
+      .right-side-controls {
+        .inline-filters {
+          gap: 16px;
+          white-space: nowrap;
+
+          .inline-filter-select {
+            min-width: 100px;
+            max-width: 160px;
+
+            &.community-filter {
+              min-width: 140px;
+              max-width: 180px;
+            }
+
+            .filter-label {
+              font-size: 13px;
+            }
+
+            .select__control {
+              min-width: 100px;
+            }
+          }
+        }
+      }
+    }
+
+    // Small screens
+    @include small {
+      .search-container {
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .right-side-controls {
+        width: auto;
+        margin-top: 12px;
+        margin-left: auto;
+        flex-wrap: nowrap;
+
+        .inline-filters {
+          flex-wrap: nowrap;
+          justify-content: flex-end;
+          gap: 12px;
+          width: auto;
+          overflow: visible;
+
+          .inline-filter-select {
+            min-width: 90px;
+            width: auto;
+            flex: 0 0 auto;
+
+            &.community-filter {
+              min-width: 100px;
+              flex: 0 0 auto;
+            }
+
+            .filter-label {
+              font-size: 12px;
+            }
+
+            .select__control {
+              min-width: 90px;
+              padding: 0 8px;
+
+              .select__value-container {
+                padding: 2px 6px;
+              }
+            }
+          }
+        }
+
+        .actions {
+          margin-left: 4px;
+        }
+      }
+    }
+
+    // Extra small screens - keep filters in single row
+    @include extraSmall {
+      .search-container {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .right-side-controls {
+        width: 100%;
+        margin-top: 12px;
+        margin-left: 0;
+        justify-content: flex-end;
+        gap: 4px; /* Even smaller gap */
+        flex-wrap: nowrap; /* Keep in a single row */
+
+        .inline-filters {
+          flex-wrap: nowrap;
+          justify-content: flex-end;
+          gap: 4px; /* Keep gaps minimal */
+
+          .inline-filter-select,
+          .inline-filter-toggle {
+            width: auto;
+            min-width: 68px; /* Minimum possible width */
+            max-width: 120px;
+            padding: 0;
+
+            .filter-label {
+              font-size: 11px;
+              display: none; /* Hide labels to save space */
+            }
+
+            .select__control {
+              min-width: 68px;
+              padding: 0;
+
+              .select__value-container {
+                padding: 2px 4px;
+              }
+
+              .select__indicators {
+                padding: 0 4px;
+
+                .select__indicator {
+                  padding: 4px;
+                }
+              }
+            }
+          }
+        }
+
+        .actions {
+          margin-left: 4px;
+        }
       }
     }
   }
@@ -140,12 +293,14 @@
   .applied-filters-row {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    margin-top: 8px;
+    justify-content: flex-start;
 
     .applied-filters {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      justify-content: flex-start;
 
       /* Style for filter tags */
       .Tag {

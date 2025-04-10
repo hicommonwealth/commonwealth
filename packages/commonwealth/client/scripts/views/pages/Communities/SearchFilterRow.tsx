@@ -21,14 +21,15 @@ export interface FilterTag {
 }
 
 export interface InlineFilter {
-  type: 'select';
-  placeholder: string;
+  type: 'select' | 'toggle';
+  placeholder?: string;
   value: any;
   onChange: (value: any) => void;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; fullLabel?: string }>;
   isClearable?: boolean;
   isSearchable?: boolean;
   label?: string;
+  className?: string;
 }
 
 interface SearchFilterRowProps {
@@ -75,7 +76,7 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
                   return (
                     <div
                       key={`inline-filter-${index}`}
-                      className="inline-filter-select"
+                      className={clsx('inline-filter-select', filter.className)}
                     >
                       {filter.label && (
                         <span className="filter-label">{filter.label}</span>
@@ -88,6 +89,27 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
                         isClearable={filter.isClearable}
                         isSearchable={filter.isSearchable}
                       />
+                    </div>
+                  );
+                }
+                if (filter.type === 'toggle') {
+                  return (
+                    <div
+                      key={`inline-filter-${index}`}
+                      className={clsx('inline-filter-toggle', filter.className)}
+                    >
+                      {filter.options.map((option) => (
+                        <CWButton
+                          key={option.value}
+                          label={option.label}
+                          buttonType={
+                            filter.value === option.value
+                              ? 'primary'
+                              : 'secondary'
+                          }
+                          onClick={() => filter.onChange(option.value)}
+                        />
+                      ))}
                     </div>
                   );
                 }

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { trpc } from 'utils/trpcClient';
 import ContestCard from 'views/components/ContestCard/ContestCard';
 import { Skeleton } from 'views/components/Skeleton';
@@ -8,21 +8,58 @@ import useCommunityContests from '../../CommunityManagement/Contests/useCommunit
 
 import './ExploreContestList.scss';
 
+export enum ContestStage {
+  Active = 'active',
+  Past = 'past',
+}
+
 type ExploreContestListProps = {
   hideHeader?: boolean;
+  contestStage?: ContestStage;
+  selectedCommunityId?: string;
 };
 
-const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
+const ExploreContestList = ({
+  hideHeader,
+  contestStage,
+  selectedCommunityId,
+}: ExploreContestListProps) => {
   const {
-    contestsData: { active: activeContests },
+    contestsData: { active: activeContests, finished: pastContests },
     isContestDataLoading,
   } = useCommunityContests({
     fetchAll: true,
   });
 
-  const communityIds = [
-    ...new Set(activeContests.map((contest) => contest.community_id)),
-  ];
+  // First, filter by community if selected
+  const filteredActiveContests = selectedCommunityId
+    ? activeContests.filter(
+        (contest) => contest.community_id === selectedCommunityId,
+      )
+    : activeContests;
+
+  const filteredPastContests = selectedCommunityId
+    ? pastContests.filter(
+        (contest) => contest.community_id === selectedCommunityId,
+      )
+    : pastContests;
+
+  // For ALL selection: show both active and past contests, with active first
+  const contestsToShow = useMemo(() => {
+    if (!contestStage) {
+      // For "All" option, show both active and past, but active first
+      return [...filteredActiveContests, ...filteredPastContests];
+    } else if (contestStage === ContestStage.Active) {
+      return filteredActiveContests;
+    } else {
+      return filteredPastContests;
+    }
+  }, [contestStage, filteredActiveContests, filteredPastContests]);
+
+  const communityIds = useMemo(
+    () => [...new Set(contestsToShow.map((contest) => contest.community_id))],
+    [contestsToShow],
+  );
 
   const communityQueries = trpc.useQueries((t) =>
     communityIds.map((id) =>
@@ -44,13 +81,29 @@ const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
     };
   }, {});
 
+  // Create a display message based on filters and contest availability
+  const getEmptyStateMessage = () => {
+    if (selectedCommunityId) {
+      if (!contestStage) {
+        return 'No contests found for the selected community';
+      }
+      return `No ${contestStage === ContestStage.Active ? 'active' : 'past'} contests found for the selected community`;
+    }
+
+    if (!contestStage) {
+      return 'No contests found';
+    }
+    return `No ${contestStage === ContestStage.Active ? 'active' : 'past'} contests found`;
+  };
+
   return (
     <div className="ExploreContestList">
       {!hideHeader && <CWText type="h2">Contests</CWText>}
+
       <>
-        {!isContestDataLoading && activeContests.length === 0 && (
+        {!isContestDataLoading && contestsToShow.length === 0 && (
           <CWText type="h2" className="empty-contests">
-            No active contests found
+            {getEmptyStateMessage()}
           </CWText>
         )}
         {isContestDataLoading ? (
@@ -62,7 +115,7 @@ const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
           </div>
         ) : (
           <div className="content">
-            {activeContests.map((contest) => {
+            {contestsToShow.map((contest) => {
               const sortedContests = (contest?.contests || []).toSorted(
                 (a, b) => (moment(a.end_time).isBefore(b.end_time) ? -1 : 1),
               );
