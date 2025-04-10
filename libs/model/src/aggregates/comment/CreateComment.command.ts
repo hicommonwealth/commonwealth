@@ -8,7 +8,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
-import { authThread, tiered } from '../../middleware';
+import { authThread, tiered, turnstile } from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
 import {
@@ -34,6 +34,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       }),
       verifyCommentSignature,
       tiered({ creates: true }),
+      turnstile({ widgetName: 'create-comment' }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address, thread } = mustBeAuthorizedThread(actor, context);
@@ -68,6 +69,11 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       });
       mustExist('User', user);
 
+      const marked_as_spam_at =
+        address.role === 'member' && user.tier <= community.spam_tier_level
+          ? new Date()
+          : null;
+
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
@@ -90,8 +96,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               content_url: contentUrl,
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
-              marked_as_spam_at:
-                user.tier <= community.spam_tier_level ? new Date() : null,
+              marked_as_spam_at,
             },
             {
               transaction,

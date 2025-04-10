@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isS3URL } from 'helpers/awsHelpers';
@@ -48,6 +49,8 @@ export const QuickTokenLaunchForm = ({
   generateIdeaOnMount = false,
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
     generateIdea,
@@ -201,6 +204,7 @@ export const QuickTokenLaunchForm = ({
               iconUrl: generatedCommunityInfo.communityProfileImageURL,
               socialLinks: [],
               chainNodeId: baseNode.id,
+              tokenizeCommunity: tokenizedThreadsEnabled ? true : false,
             });
             const response = await createCommunityMutation(communityPayload)
               .then(() => true)

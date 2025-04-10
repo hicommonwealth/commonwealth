@@ -1,4 +1,8 @@
-import type { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  UserTierMap,
+  type WalletId,
+  type WalletSsoSource,
+} from '@hicommonwealth/shared';
 import moment from 'moment';
 import { userStore } from '../state/ui/user';
 import Account, { AccountCommunity } from './Account';
@@ -48,6 +52,7 @@ class AddressInfo extends Account {
           '', // user avatar url - not needed for auth user
           community.id,
           foundAddress?.lastActive?.toDate?.() || null,
+          UserTierMap.IncompleteUser,
         );
         return profile;
       })(),

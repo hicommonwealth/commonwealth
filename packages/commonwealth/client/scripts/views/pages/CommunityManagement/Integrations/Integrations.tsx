@@ -13,6 +13,7 @@ import Snapshots from './Snapshots';
 import SpamLevel from './SpamLevel';
 import Stake from './Stake';
 import Token from './Token';
+import Tokenization from './Tokenization';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
@@ -39,6 +40,7 @@ const Integrations = () => {
         {isJudgementEnabled && <OnchainVerification />}
         <Stake />
         {showSnapshotIntegration && <Snapshots />}
+        <Tokenization />
         <Discord />
         <Webhooks />
         <CustomTOS />

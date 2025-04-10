@@ -1,7 +1,8 @@
-import { Role } from '@hicommonwealth/shared';
+import { Role, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
@@ -43,6 +44,7 @@ export type AddressInfo = {
   stake_balance: number;
   role: string;
   referred_by: string | null;
+  wallet_id?: WalletId;
 };
 
 type MembersSectionProps = {
@@ -170,9 +172,10 @@ const MembersSection = ({
                   return (
                     <div key={index} className="address-item">
                       <CWTag
-                        label={formatAddressShort(address.address)}
                         type="address"
-                        iconName="ethereum"
+                        label={formatAddressShort(address.address)}
+                        iconName={getChainIcon(address, community?.base)}
+                        classNames="address-tag"
                       />
                     </div>
                   );

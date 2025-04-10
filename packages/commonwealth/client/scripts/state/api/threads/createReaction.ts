@@ -1,10 +1,11 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { AxiosError } from 'axios';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { notifyError } from 'controllers/app/notifications';
 import { signThreadReaction } from 'controllers/server/sessions';
+import { resetXPCacheForUser } from 'helpers/quest';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
@@ -62,9 +63,7 @@ const useCreateThreadReactionMutation = ({
 
   return trpc.thread.createThreadReaction.useMutation({
     onSuccess: (newReaction) => {
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       const reaction: any = {
         id: newReaction.id,
