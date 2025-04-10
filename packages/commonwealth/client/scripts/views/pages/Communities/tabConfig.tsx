@@ -583,7 +583,7 @@ export function createTabsConfig() {
             },
             tagPrefix: 'Tag',
           }),
-          createSelectFilter({
+          createSortFilter({
             label: 'Sort by:',
             placeholder: 'Sort Tokens',
             options: tokenSortOptions,
@@ -592,9 +592,11 @@ export function createTabsConfig() {
               setSelectedValue: props.setTokensSortOption || (() => {}),
               filterTags: props.tokensFilterTags || [],
               setFilterTags: props.setTokensFilterTags,
+              forceRefreshKey: props.threadFilterKey,
+              setForceRefreshKey: props.setThreadFilterKey,
             },
-            getTagLabel: (option) => option.label,
             tagPrefix: 'Sort',
+            defaultValue: 'mostRecent',
           }),
         ];
       },
