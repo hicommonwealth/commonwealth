@@ -1,1 +1,3 @@
-export * from './TokenWidget';
+import TokenWidget from './TokenWidget';
+
+export { TokenWidget };
