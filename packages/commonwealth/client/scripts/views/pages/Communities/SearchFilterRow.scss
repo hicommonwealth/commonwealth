@@ -24,15 +24,14 @@
     align-items: center;
     gap: 16px;
     width: 100%;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
 
     .search-container {
-      flex: 0 1 auto;
-      max-width: 500px;
-      width: 100%;
-      min-width: 120px;
-      flex: 1;
+      flex: 0 0 auto;
+      width: 350px;
+      min-width: 200px;
+      max-width: 350px;
 
       .input-and-icon-container {
         .text-input-left-icon > svg {
@@ -52,8 +51,8 @@
       flex-wrap: nowrap;
       justify-content: flex-end;
       align-items: center;
-      flex: 0 0 auto;
-      margin-left: auto;
+      flex: 1;
+      margin-left: 8px;
 
       .inline-filters {
         display: flex;
@@ -62,6 +61,19 @@
         flex-wrap: nowrap;
         justify-content: flex-end;
         width: auto;
+
+        // When there are multiple filters, apply special styling
+        &:has(> .inline-filter-select + .inline-filter-select),
+        &:has(> .inline-filter-select + .inline-filter-toggle),
+        &:has(> .inline-filter-toggle + .inline-filter-select),
+        &.multiple-filters {
+          @include medium {
+            // Hide labels when there are multiple filters on medium screens
+            .filter-label {
+              display: none;
+            }
+          }
+        }
 
         .inline-filter-select {
           display: flex;
@@ -155,6 +167,12 @@
 
     // Medium screens
     @include medium {
+      .search-container {
+        width: 300px;
+        min-width: 180px;
+        max-width: 300px;
+      }
+
       .right-side-controls {
         .inline-filters {
           gap: 16px;
@@ -183,15 +201,17 @@
 
     // Small screens
     @include small {
+      flex-wrap: nowrap;
+
       .search-container {
-        max-width: 100%;
-        width: 100%;
+        width: 250px;
+        min-width: 150px;
+        max-width: 250px;
       }
 
       .right-side-controls {
         width: auto;
-        margin-top: 12px;
-        margin-left: auto;
+        margin-left: 8px;
         flex-wrap: nowrap;
 
         .inline-filters {
@@ -213,6 +233,7 @@
 
             .filter-label {
               font-size: 12px;
+              display: none; /* Hide all labels on small screens */
             }
 
             .select__control {
@@ -235,56 +256,44 @@
     // Extra small screens - keep filters in single row
     @include extraSmall {
       .search-container {
-        width: 100%;
-        max-width: 100%;
+        width: 180px;
+        min-width: 120px;
+        max-width: 180px;
       }
 
       .right-side-controls {
-        width: 100%;
-        margin-top: 12px;
-        margin-left: 0;
+        margin-left: 4px;
         justify-content: flex-end;
         gap: 4px; /* Even smaller gap */
         flex-wrap: nowrap; /* Keep in a single row */
 
         .inline-filters {
+          gap: 8px;
           flex-wrap: nowrap;
-          justify-content: flex-end;
-          gap: 4px; /* Keep gaps minimal */
+          width: auto;
+          overflow-x: auto;
 
-          .inline-filter-select,
-          .inline-filter-toggle {
-            width: auto;
-            min-width: 68px; /* Minimum possible width */
+          .inline-filter-select {
+            min-width: 80px;
             max-width: 120px;
-            padding: 0;
+
+            &.community-filter {
+              min-width: 80px;
+              max-width: 120px;
+            }
 
             .filter-label {
-              font-size: 11px;
-              display: none; /* Hide labels to save space */
+              display: none; /* Hide labels on extra small screens */
             }
+          }
 
-            .select__control {
-              min-width: 68px;
-              padding: 0;
-
-              .select__value-container {
-                padding: 2px 4px;
-              }
-
-              .select__indicators {
-                padding: 0 4px;
-
-                .select__indicator {
-                  padding: 4px;
-                }
-              }
-            }
+          .inline-filter-toggle {
+            gap: 2px;
           }
         }
 
         .actions {
-          margin-left: 4px;
+          margin-left: 2px;
         }
       }
     }
@@ -293,21 +302,14 @@
   .applied-filters-row {
     display: flex;
     align-items: center;
-    margin-top: 8px;
-    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
 
     .applied-filters {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      justify-content: flex-start;
-
-      /* Style for filter tags */
-      .Tag {
-        .Text {
-          text-transform: capitalize;
-        }
-      }
     }
   }
 }

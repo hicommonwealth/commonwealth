@@ -96,6 +96,79 @@ export function createToggleFilter<T extends string>({
 }
 
 /**
+ * Create a sort filter with simpler selection for sort options
+ */
+export function createSortFilter<T extends string>({
+  label,
+  placeholder,
+  className,
+  options,
+  state: {
+    selectedValue,
+    setSelectedValue,
+    filterTags,
+    setFilterTags,
+    forceRefreshKey,
+    setForceRefreshKey,
+  },
+  tagPrefix,
+  defaultValue,
+}: {
+  label: string;
+  placeholder: string;
+  className?: string;
+  options: FilterOption[];
+  state: FilterState<T>;
+  tagPrefix: string;
+  defaultValue?: T;
+}): InlineFilter {
+  return {
+    type: 'sort',
+    label,
+    placeholder,
+    className,
+    value: options.find((opt) => opt.value === selectedValue),
+    onChange: (option) => {
+      if (!option) return;
+
+      // Update selected value
+      const newValue = option.value as T;
+      setSelectedValue(newValue);
+
+      // Force refresh if needed
+      if (setForceRefreshKey) {
+        setForceRefreshKey((prevKey) => prevKey + 1);
+      }
+
+      // Update filter tags
+      const newTags = filterTags.filter(
+        (tag) => !tag.label.startsWith(`${tagPrefix}:`),
+      );
+
+      if (newValue !== defaultValue) {
+        newTags.push({
+          label: `${tagPrefix}: ${option.label}`,
+          onRemove: () => {
+            setSelectedValue(defaultValue as T);
+            if (setForceRefreshKey) {
+              setForceRefreshKey((prevKey) => prevKey + 1);
+            }
+            setFilterTags((prevTags) =>
+              prevTags.filter((tag) => !tag.label.startsWith(`${tagPrefix}:`)),
+            );
+          },
+        });
+      }
+
+      setFilterTags(newTags);
+    },
+    options,
+    isClearable: false,
+    isSearchable: false,
+  };
+}
+
+/**
  * Create a select filter (like community selection) with proper filter tag management
  */
 export function createSelectFilter<T extends string>({
@@ -183,13 +256,9 @@ export function createSelectFilter<T extends string>({
 export function createSearchFilterTag(
   searchValue: string,
   setSearchValue: (value: string) => void,
-): FilterTag {
+): FilterTag | undefined {
   if (!searchValue) {
-    // Return a dummy tag that won't be used
-    return {
-      label: '',
-      onRemove: () => {},
-    };
+    return undefined;
   }
 
   return {

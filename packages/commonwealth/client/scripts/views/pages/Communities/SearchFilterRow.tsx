@@ -21,7 +21,7 @@ export interface FilterTag {
 }
 
 export interface InlineFilter {
-  type: 'select' | 'toggle';
+  type: 'select' | 'toggle' | 'sort';
   placeholder?: string;
   value: any;
   onChange: (value: any) => void;
@@ -55,6 +55,9 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
   showViewToggle = true,
   inlineFilters = [],
 }) => {
+  // Check if there are multiple filters
+  const hasMultipleFilters = inlineFilters.length > 1;
+
   return (
     <div className="search-filter-container">
       <div className="search-filter-row">
@@ -70,9 +73,13 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
 
         <div className="right-side-controls">
           {inlineFilters.length > 0 && (
-            <div className="inline-filters">
+            <div
+              className={clsx('inline-filters', {
+                'multiple-filters': hasMultipleFilters,
+              })}
+            >
               {inlineFilters.map((filter, index) => {
-                if (filter.type === 'select') {
+                if (filter.type === 'select' || filter.type === 'sort') {
                   return (
                     <div
                       key={`inline-filter-${index}`}
@@ -108,6 +115,7 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
                               : 'secondary'
                           }
                           onClick={() => filter.onChange(option.value)}
+                          buttonHeight="sm"
                         />
                       ))}
                     </div>
@@ -125,6 +133,7 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
                 iconRight="funnelSimple"
                 buttonType="secondary"
                 onClick={onFilterClick}
+                buttonHeight="sm"
               />
             )}
 

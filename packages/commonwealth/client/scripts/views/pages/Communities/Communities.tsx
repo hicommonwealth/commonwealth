@@ -50,9 +50,31 @@ import {
   FilterOption,
   createSearchFilterTag,
   createSelectFilter,
+  createSortFilter,
   createToggleFilter,
 } from './filters';
 import { getCommunityCountsString } from './helpers';
+
+// Add the FilteredThreadsFeed component
+const FilteredThreadsFeed = ({
+  communityId,
+  sortOption,
+  customScrollParent,
+  filterKey,
+}) => {
+  // Use the global feed query
+  const query = ({ limit }) => {
+    return useFetchGlobalActivityQuery({ limit });
+  };
+
+  return (
+    <Feed
+      key={`threads-feed-${filterKey}`}
+      query={query}
+      customScrollParent={customScrollParent}
+    />
+  );
+};
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
@@ -357,10 +379,10 @@ const CommunitiesPage = () => {
     const filterTags: FilterTag[] = [];
 
     if (searchValue) {
-      filterTags.push({
-        label: `Search: ${searchValue}`,
-        onRemove: () => setSearchValue(''),
-      });
+      const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+      if (searchTag) {
+        filterTags.push(searchTag);
+      }
     }
 
     if (filters.withCommunitySortBy) {
@@ -433,18 +455,18 @@ const CommunitiesPage = () => {
 
   // Sample filter tags for other tabs (for demonstration)
   const getThreadsFilterTags = (): FilterTag[] => {
-    return searchValue
-      ? [
-          {
-            label: `Search: ${searchValue}`,
-            onRemove: () => setSearchValue(''),
-          },
-        ]
-      : [];
+    const tags: FilterTag[] = [];
+
+    const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+    if (searchTag) {
+      tags.push(searchTag);
+    }
+
+    return tags;
   };
 
   const getUsersFilterTags = (): FilterTag[] => {
-    const tags = [];
+    const tags: FilterTag[] = [];
 
     const searchTag = createSearchFilterTag(searchValue, setSearchValue);
     if (searchTag) {
@@ -529,44 +551,47 @@ const CommunitiesPage = () => {
 
   // Get the appropriate filter tags based on the active tab
   const getFilterTagsByActiveTab = (): FilterTag[] => {
-    // Add search filter tag if there's a search value
-    // We no longer need this line since createSearchFilterTag handles empty values safely
-
     switch (activeTab) {
       case 'communities':
         return getCommunitiesFilterTags();
       case 'threads': {
         // Handle each case separately with proper typing
         const tags = [...threadsFilterTags];
-        if (searchValue) {
-          tags.push(createSearchFilterTag(searchValue, setSearchValue));
+        const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+        if (searchTag) {
+          tags.push(searchTag);
         }
         return tags;
       }
       case 'users': {
-        if (searchValue) {
-          return [createSearchFilterTag(searchValue, setSearchValue)];
+        const tags: FilterTag[] = [];
+        const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+        if (searchTag) {
+          tags.push(searchTag);
         }
-        return [];
+        return tags;
       }
       case 'contests': {
         const tags = [...contestFilterTags];
-        if (searchValue) {
-          tags.push(createSearchFilterTag(searchValue, setSearchValue));
+        const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+        if (searchTag) {
+          tags.push(searchTag);
         }
         return tags;
       }
       case 'quests': {
         const tags = [...questFilterTags];
-        if (searchValue) {
-          tags.push(createSearchFilterTag(searchValue, setSearchValue));
+        const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+        if (searchTag) {
+          tags.push(searchTag);
         }
         return tags;
       }
       case 'tokens': {
         const tags = [...tokensFilterTags];
-        if (searchValue) {
-          tags.push(createSearchFilterTag(searchValue, setSearchValue));
+        const searchTag = createSearchFilterTag(searchValue, setSearchValue);
+        if (searchTag) {
+          tags.push(searchTag);
         }
         return tags;
       }
@@ -719,7 +744,7 @@ const CommunitiesPage = () => {
           },
           tagPrefix: 'Community',
         }),
-        createSelectFilter({
+        createSortFilter({
           label: 'Sort by:',
           placeholder: 'Sort Threads',
           options: [
@@ -734,8 +759,8 @@ const CommunitiesPage = () => {
             forceRefreshKey: threadFilterKey,
             setForceRefreshKey: setThreadFilterKey,
           },
-          getTagLabel: (option) => option.label,
           tagPrefix: 'Sort',
+          defaultValue: 'newest',
         }),
       ];
     }
@@ -773,7 +798,7 @@ const CommunitiesPage = () => {
           },
           tagPrefix: 'Tag',
         }),
-        createSelectFilter({
+        createSortFilter({
           label: 'Sort by:',
           placeholder: 'Sort Tokens',
           options: tokenSortOptions,
@@ -783,8 +808,8 @@ const CommunitiesPage = () => {
             filterTags: tokensFilterTags,
             setFilterTags: setTokensFilterTags,
           },
-          getTagLabel: (option) => option.label,
           tagPrefix: 'Sort',
+          defaultValue: 'mostRecent',
         }),
       ];
     }
@@ -884,14 +909,11 @@ const CommunitiesPage = () => {
         )}
         {activeTab === 'threads' && (
           <div className="threads-tab">
-            <Feed
-              key={`threads-feed-${threadFilterKey}`}
-              query={useFetchGlobalActivityQuery}
+            <FilteredThreadsFeed
+              communityId={threadsFilterCommunityId}
+              sortOption={threadsSortOption}
               customScrollParent={containerRef.current}
-              queryOptions={{
-                community_id: threadsFilterCommunityId || undefined,
-                sort_by: threadsSortOption,
-              }}
+              filterKey={threadFilterKey}
             />
           </div>
         )}
