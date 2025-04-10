@@ -19,16 +19,16 @@ module.exports = {
                                  'tienvagai-community');
 
           UPDATE "Threads" T
-          SET marked_as_spam_at = ${now.toISOString()}
+          SET marked_as_spam_at = :now
           FROM "thread_ids" ti
           WHERE T.id = ti.id;
 
           UPDATE "Comments" C
-          SET marked_as_spam_at = ${now.toISOString()}
+          SET marked_as_spam_at = :now
           FROM "thread_ids" ti
           WHERE ti.id = C."thread_id";
         `,
-        { transaction: t },
+        { transaction: t, replacements: { now } },
       );
       await queryInterface.sequelize.query(
         `CREATE INDEX idx_threads_is_not_spam ON "Threads" ((marked_as_spam_at IS NULL));`,
