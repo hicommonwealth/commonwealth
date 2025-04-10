@@ -22,12 +22,14 @@ type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
   hideHeader?: boolean;
+  stage?: 'all' | 'active' | 'past';
 };
 
 const QuestList = ({
   minQuests = 8,
   questsForCommunityId,
   hideHeader,
+  stage = 'all',
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
@@ -45,7 +47,12 @@ const QuestList = ({
     }),
     cursor: 1,
     limit: minQuests,
-    end_after: moment().startOf('week').toDate(),
+    // Filter by stage: for 'active' show only current quests, for 'past' show only past quests
+    ...(stage === 'active'
+      ? { end_after: moment().startOf('day').toDate() }
+      : stage === 'past'
+        ? { end_before: moment().startOf('day').toDate() }
+        : { end_after: moment().startOf('week').toDate() }), // default: show quests from this week
     // dont show system quests in quest lists for communities
     include_system_quests: questsForCommunityId ? false : true,
     enabled: xpEnabled,
@@ -78,7 +85,15 @@ const QuestList = ({
 
   return (
     <div className="QuestList">
-      {!hideHeader && <CWText type="h2">Quests</CWText>}
+      {!hideHeader && (
+        <CWText type="h2">
+          {stage === 'active'
+            ? 'Active Quests'
+            : stage === 'past'
+              ? 'Past Quests'
+              : 'Quests'}
+        </CWText>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (

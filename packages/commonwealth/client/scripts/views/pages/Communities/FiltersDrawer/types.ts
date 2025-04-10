@@ -22,6 +22,7 @@ export type CommunityFilters = {
   withCommunityType?: CommunityType;
   withCommunitySortBy?: CommunitySortOptions;
   withCommunitySortOrder?: CommunitySortDirections;
+  sortBy?: string;
 };
 
 export type FiltersDrawerProps = {
