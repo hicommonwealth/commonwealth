@@ -1,7 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import React from 'react';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -126,33 +125,6 @@ const SearchFilterRow = ({
                 buttonType="secondary"
                 onClick={onFilterClick}
               />
-            )}
-
-            {showViewToggle && (
-              <div className="view-toggle">
-                <div
-                  className={clsx('icon-container', {
-                    selected: selectedViewType === ViewType.List,
-                  })}
-                >
-                  <CWIconButton
-                    iconName="rows"
-                    weight="light"
-                    onClick={() => onViewTypeChange(ViewType.List)}
-                  />
-                </div>
-                <div
-                  className={clsx('icon-container', {
-                    selected: selectedViewType === ViewType.Cards,
-                  })}
-                >
-                  <CWIconButton
-                    iconName="squaresFour"
-                    weight="light"
-                    onClick={() => onViewTypeChange(ViewType.Cards)}
-                  />
-                </div>
-              </div>
             )}
           </div>
         </div>
