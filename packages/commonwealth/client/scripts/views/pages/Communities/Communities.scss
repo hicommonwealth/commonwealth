@@ -24,7 +24,7 @@
   .header-section {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -81,6 +81,8 @@
         .search-container {
           max-width: 520px;
           width: 100%;
+          min-width: 180px;
+          flex: 1;
 
           .input-and-icon-container {
             .text-input-left-icon > svg {
@@ -114,6 +116,7 @@
           display: flex;
           align-items: center;
           gap: 12px;
+          flex-shrink: 0;
 
           .view-toggle {
             display: flex;
@@ -140,16 +143,31 @@
         }
 
         @include mediumSmall {
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
 
           .search-container {
-            max-width: 100%;
+            min-width: 120px;
+            max-width: none;
+            flex: 1;
           }
 
           .inline-filters {
-            order: 3;
-            margin-top: 8px;
-            width: 100%;
+            flex: 0 1 auto;
+            min-width: 120px;
+
+            .inline-filter-select {
+              min-width: 120px;
+            }
+          }
+        }
+
+        @include extraSmall {
+          .inline-filters {
+            min-width: 110px;
+
+            .inline-filter-select {
+              min-width: 110px;
+            }
           }
         }
       }
@@ -280,12 +298,79 @@
       width: 100%;
       overflow-x: auto;
 
-      .XPEarningsTable {
+      .XPTable {
         width: 100%;
         max-width: 100%;
 
         @include extraSmall {
           font-size: 14px;
+        }
+      }
+
+      // Add card view styling
+      &.cards-view {
+        .CWTable {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 20px;
+
+          .table-head {
+            display: none;
+          }
+
+          .table-row {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            background-color: $white;
+            position: relative;
+
+            td {
+              padding: 8px 0;
+              border-bottom: none;
+
+              &:first-child {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: $primary-50;
+                color: $primary-600;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                padding: 0;
+              }
+
+              &:nth-child(2) {
+                padding-top: 0;
+
+                .table-cell {
+                  .user-info {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+
+                    .Avatar {
+                      width: 64px;
+                      height: 64px;
+                    }
+
+                    p {
+                      text-align: center;
+                      font-size: 16px;
+                      font-weight: 500;
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

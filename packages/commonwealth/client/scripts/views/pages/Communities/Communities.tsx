@@ -196,6 +196,7 @@ const CommunitiesPage = () => {
     isLoadingHistoricalPrices ||
     isLoadingEthUsdRate;
 
+  // Create the base communities list
   const communitiesList = useMemo(() => {
     const flatList = (communities?.pages || []).flatMap((page) => page.results);
 
@@ -210,6 +211,48 @@ const CommunitiesPage = () => {
 
     return twoCommunitiesPerEntry;
   }, [communities?.pages]);
+
+  // Filter communities list based on search value
+  const filteredCommunitiesList = useMemo(() => {
+    if (!searchValue) {
+      return communitiesList;
+    }
+
+    const searchLower = searchValue.toLowerCase().trim();
+    const flatList = (communities?.pages || []).flatMap((page) => page.results);
+
+    // Filter based on name or description
+    const filteredList = flatList.filter((community) => {
+      return (
+        community &&
+        (community.name?.toLowerCase()?.includes(searchLower) ||
+          community.description?.toLowerCase()?.includes(searchLower))
+      );
+    });
+
+    // Recreate the sliced structure
+    const SLICE_SIZE = 2;
+    const filteredSlices: ExtendedCommunitySliceType[] = [];
+
+    for (let i = 0; i < filteredList.length; i += SLICE_SIZE) {
+      const slice = filteredList.slice(i, i + SLICE_SIZE);
+      // Only add slices with valid items
+      if (slice.length === SLICE_SIZE) {
+        filteredSlices.push(slice as ExtendedCommunitySliceType);
+      } else if (slice.length === 1) {
+        // For the last odd item, create a slice with undefined as the second item
+        // But make sure the first item is valid
+        if (slice[0] && slice[0].id) {
+          filteredSlices.push([
+            slice[0],
+            undefined as any,
+          ] as ExtendedCommunitySliceType);
+        }
+      }
+    }
+
+    return filteredSlices;
+  }, [communitiesList, communities?.pages, searchValue]);
 
   const removeStakeFilter = () => {
     setFilters({
@@ -285,6 +328,13 @@ const CommunitiesPage = () => {
   // Get filter tags for current communities tab
   const getCommunitiesFilterTags = (): FilterTag[] => {
     const filterTags: FilterTag[] = [];
+
+    if (searchValue) {
+      filterTags.push({
+        label: `Search: ${searchValue}`,
+        onRemove: () => setSearchValue(''),
+      });
+    }
 
     if (filters.withCommunitySortBy) {
       filterTags.push({
@@ -451,7 +501,8 @@ const CommunitiesPage = () => {
       return [
         {
           type: 'select',
-          placeholder: 'Filter by Quest',
+          label: 'Filter by:',
+          placeholder: 'Select Quest',
           value: selectedQuestFilter,
           onChange: (option) => setSelectedQuestFilter(option),
           options: questOptions,
@@ -462,6 +513,11 @@ const CommunitiesPage = () => {
     }
     return [];
   };
+
+  // Implement function to determine which tabs should show view toggle
+  const shouldShowViewToggle = useCallback((tabName: string) => {
+    return ['communities', 'all', 'users'].includes(tabName);
+  }, []);
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -509,9 +565,7 @@ const CommunitiesPage = () => {
               onFilterClick={getFilterClickHandler()}
               filterTags={getFilterTagsByActiveTab()}
               placeholder={`Search ${activeTab}`}
-              showViewToggle={['communities', 'contests', 'tokens'].includes(
-                activeTab,
-              )}
+              showViewToggle={shouldShowViewToggle(activeTab)}
               inlineFilters={getInlineFiltersByActiveTab()}
             />
           )}
@@ -537,7 +591,9 @@ const CommunitiesPage = () => {
         )}
         {activeTab === 'users' && (
           <div className="users-tab">
-            <div className="users-xp-table">
+            <div
+              className={`users-xp-table ${selectedViewType === ViewType.Cards ? 'cards-view' : 'list-view'}`}
+            >
               <XPTable
                 hideHeader={true}
                 selectedQuest={selectedQuestFilter}
@@ -570,7 +626,9 @@ const CommunitiesPage = () => {
             <CommunitiesTabContent
               isLoading={isLoading}
               isInitialCommunitiesLoading={isInitialCommunitiesLoading}
-              communitiesList={communitiesList}
+              communitiesList={
+                searchValue ? filteredCommunitiesList : communitiesList
+              }
               containerRef={containerRef}
               filters={filters}
               historicalPrices={historicalPrices}

@@ -6,6 +6,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import './SearchFilterRow.scss';
 
 export enum ViewType {
   List = 'list',
@@ -15,6 +16,8 @@ export enum ViewType {
 export interface FilterTag {
   label: string;
   onRemove: () => void;
+  type?: string;
+  id?: number;
 }
 
 export interface InlineFilter {
@@ -25,6 +28,7 @@ export interface InlineFilter {
   options: Array<{ value: string; label: string }>;
   isClearable?: boolean;
   isSearchable?: boolean;
+  label?: string;
 }
 
 interface SearchFilterRowProps {
@@ -63,67 +67,72 @@ const SearchFilterRow: React.FC<SearchFilterRowProps> = ({
           />
         </div>
 
-        {inlineFilters.length > 0 && (
-          <div className="inline-filters">
-            {inlineFilters.map((filter, index) => {
-              if (filter.type === 'select') {
-                return (
-                  <div
-                    key={`inline-filter-${index}`}
-                    className="inline-filter-select"
-                  >
-                    <CWSelectList
-                      placeholder={filter.placeholder}
-                      value={filter.value}
-                      onChange={filter.onChange}
-                      options={filter.options}
-                      isClearable={filter.isClearable}
-                      isSearchable={filter.isSearchable}
-                    />
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        )}
-
-        <div className="actions">
-          {onFilterClick && inlineFilters.length === 0 && (
-            <CWButton
-              label="Filters"
-              iconRight="funnelSimple"
-              buttonType="secondary"
-              onClick={onFilterClick}
-            />
-          )}
-
-          {showViewToggle && (
-            <div className="view-toggle">
-              <div
-                className={clsx('icon-container', {
-                  selected: selectedViewType === ViewType.List,
-                })}
-              >
-                <CWIconButton
-                  iconName="rows"
-                  weight="light"
-                  onClick={() => onViewTypeChange(ViewType.List)}
-                />
-              </div>
-              <div
-                className={clsx('icon-container', {
-                  selected: selectedViewType === ViewType.Cards,
-                })}
-              >
-                <CWIconButton
-                  iconName="squaresFour"
-                  weight="light"
-                  onClick={() => onViewTypeChange(ViewType.Cards)}
-                />
-              </div>
+        <div className="right-side-controls">
+          {inlineFilters.length > 0 && (
+            <div className="inline-filters">
+              {inlineFilters.map((filter, index) => {
+                if (filter.type === 'select') {
+                  return (
+                    <div
+                      key={`inline-filter-${index}`}
+                      className="inline-filter-select"
+                    >
+                      {filter.label && (
+                        <span className="filter-label">{filter.label}</span>
+                      )}
+                      <CWSelectList
+                        placeholder={filter.placeholder}
+                        value={filter.value}
+                        onChange={filter.onChange}
+                        options={filter.options}
+                        isClearable={filter.isClearable}
+                        isSearchable={filter.isSearchable}
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           )}
+
+          <div className="actions">
+            {onFilterClick && inlineFilters.length === 0 && (
+              <CWButton
+                label="Filters"
+                iconRight="funnelSimple"
+                buttonType="secondary"
+                onClick={onFilterClick}
+              />
+            )}
+
+            {showViewToggle && (
+              <div className="view-toggle">
+                <div
+                  className={clsx('icon-container', {
+                    selected: selectedViewType === ViewType.List,
+                  })}
+                >
+                  <CWIconButton
+                    iconName="rows"
+                    weight="light"
+                    onClick={() => onViewTypeChange(ViewType.List)}
+                  />
+                </div>
+                <div
+                  className={clsx('icon-container', {
+                    selected: selectedViewType === ViewType.Cards,
+                  })}
+                >
+                  <CWIconButton
+                    iconName="squaresFour"
+                    weight="light"
+                    onClick={() => onViewTypeChange(ViewType.Cards)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

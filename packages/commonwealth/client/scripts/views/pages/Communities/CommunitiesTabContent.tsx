@@ -62,51 +62,61 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
           data={isInitialCommunitiesLoading ? [] : communitiesList}
           customScrollParent={containerRef.current}
           itemContent={(listIndex, slicedCommunities) => {
-            return slicedCommunities.map((community, sliceIndex) => {
-              const canBuyStake = !!user.addresses.find?.(
-                (address) => address?.community?.base === community?.base,
-              );
+            return slicedCommunities
+              .map((community, sliceIndex) => {
+                if (!community) {
+                  return null;
+                }
 
-              const historicalPriceMap: Map<string, string | undefined> =
-                new Map(
-                  Object.entries(
-                    (historicalPrices || [])?.reduce(
-                      (
-                        acc: Record<string, string | undefined>,
-                        { community_id, old_price },
-                      ) => {
-                        acc[community_id] = old_price || undefined;
-                        return acc;
-                      },
-                      {},
-                    ),
-                  ),
+                const canBuyStake = !!user.addresses.find?.(
+                  (address) => address?.community?.base === community?.base,
                 );
 
-              return (
-                <Fragment key={community.id}>
-                  <CWRelatedCommunityCard
-                    community={community}
-                    memberCount={community.profile_count || 0}
-                    threadCount={community.lifetime_thread_count || 0}
-                    canBuyStake={canBuyStake}
-                    onStakeBtnClick={() =>
-                      setSelectedCommunityId(community?.id || '')
-                    }
-                    ethUsdRate={ethUsdRate.toString()}
-                    {...(historicalPriceMap &&
-                      community.id && {
-                        historicalPrice: historicalPriceMap?.get(community.id),
-                      })}
-                    onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
-                  />
-                  {listIndex === communitiesList.length - 1 &&
-                    sliceIndex === slicedCommunities.length - 1 && (
-                      <NewCommunityCard />
-                    )}
-                </Fragment>
-              );
-            });
+                const historicalPriceMap: Map<string, string | undefined> =
+                  new Map(
+                    Object.entries(
+                      (historicalPrices || [])?.reduce(
+                        (
+                          acc: Record<string, string | undefined>,
+                          { community_id, old_price },
+                        ) => {
+                          acc[community_id] = old_price || undefined;
+                          return acc;
+                        },
+                        {},
+                      ),
+                    ),
+                  );
+
+                return (
+                  <Fragment
+                    key={community.id || `community-${listIndex}-${sliceIndex}`}
+                  >
+                    <CWRelatedCommunityCard
+                      community={community}
+                      memberCount={community.profile_count || 0}
+                      threadCount={community.lifetime_thread_count || 0}
+                      canBuyStake={canBuyStake}
+                      onStakeBtnClick={() =>
+                        setSelectedCommunityId(community?.id || '')
+                      }
+                      ethUsdRate={ethUsdRate.toString()}
+                      {...(historicalPriceMap &&
+                        community.id && {
+                          historicalPrice: historicalPriceMap?.get(
+                            community.id,
+                          ),
+                        })}
+                      onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
+                    />
+                    {listIndex === communitiesList.length - 1 &&
+                      sliceIndex === slicedCommunities.length - 1 && (
+                        <NewCommunityCard />
+                      )}
+                  </Fragment>
+                );
+              })
+              .filter(Boolean);
           }}
           endReached={() => {
             hasNextPage && fetchMoreCommunities?.().catch(console.error);
