@@ -1,7 +1,3 @@
-import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
-import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
-import { CosmosProposalV1 } from 'client/scripts/controllers/chain/cosmos/gov/v1/proposal-v1';
-import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { LinkSource } from 'client/scripts/models/Thread';
 import { useGetThreadsByLinkQuery } from 'client/scripts/state/api/threads';
 import _ from 'lodash';
@@ -32,14 +28,7 @@ export const useCosmosProposal = ({
   proposalId,
   enabled = true,
 }: UseCosmosProposalProps) => {
-  const [proposal, setProposal] = useState<
-    | AnyProposal
-    | undefined
-    | CosmosProposal
-    | CosmosProposalV1
-    | CosmosProposalGovgen
-    | CosmosProposalV1AtomOne
-  >(undefined);
+  const [proposal, setProposal] = useState<AnyProposal | undefined>(undefined);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
@@ -55,6 +44,7 @@ export const useCosmosProposal = ({
 
   const { data: metadata, isFetching: isFetchingMetadata } =
     // @ts-expect-error <StrictNullChecks/>
+
     useCosmosProposalMetadataQuery(proposal || null);
 
   const { data: threadsData } = useGetThreadsByLinkQuery({
@@ -76,7 +66,8 @@ export const useCosmosProposal = ({
     poolValue,
   );
   // @ts-expect-error <StrictNullChecks/>
-  const { data: tally } = useCosmosProposalTallyQuery(proposal);
+
+  const { data: tally } = useCosmosProposalTallyQuery(proposal || null);
 
   const { data: deposits } = useCosmosProposalDepositsQuery(
     // @ts-expect-error <StrictNullChecks/>
@@ -86,6 +77,7 @@ export const useCosmosProposal = ({
 
   useEffect(() => {
     if (cosmosProposal) {
+      // @ts-expect-error <StrictNullChecks/>
       setProposal(cosmosProposal);
       setTitle(cosmosProposal.title || '');
       setDescription(cosmosProposal.description || '');
