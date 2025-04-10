@@ -62,6 +62,7 @@ export type AuthorAndPublishInfoProps = {
   hideSpamTag?: boolean;
   hideTrendingTag?: boolean;
   communityHomeLayout?: boolean;
+  shouldShowRole?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -93,6 +94,7 @@ export const AuthorAndPublishInfo = ({
   hideSpamTag,
   hideTrendingTag,
   communityHomeLayout = false,
+  shouldShowRole = false,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -176,6 +178,7 @@ export const AuthorAndPublishInfo = ({
           popoverPlacement={popoverPlacement}
           // @ts-expect-error <StrictNullChecks>
           profile={profile}
+          shouldShowRole={shouldShowRole}
         />
       )}
       {fromDiscordBot && (
