@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100%;
 
   /* Hide all scrollbars within the filter container */
@@ -25,7 +25,7 @@
     gap: 16px;
     width: 100%;
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: space-between;
 
     .search-container {
       flex: 0 0 auto;
@@ -51,8 +51,7 @@
       flex-wrap: nowrap;
       justify-content: flex-end;
       align-items: center;
-      flex: 1;
-      margin-left: 8px;
+      margin-left: auto;
 
       .inline-filters {
         display: flex;
@@ -199,35 +198,70 @@
       }
     }
 
+    // Medium-small breakpoint (905-1239px)
+    @media screen and (max-width: $breakpoint-medium-small-max-px) and (min-width: $breakpoint-medium-small-min-px) {
+      flex-wrap: nowrap;
+
+      .search-container {
+        width: 280px;
+        min-width: 180px;
+        max-width: 280px;
+      }
+
+      .right-side-controls {
+        gap: 16px;
+
+        .inline-filters {
+          gap: 12px;
+
+          .inline-filter-select {
+            min-width: 90px;
+            max-width: 140px;
+
+            &.community-filter {
+              min-width: 110px;
+              max-width: 150px;
+            }
+
+            .filter-label {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
     // Small screens
     @include small {
       flex-wrap: nowrap;
 
       .search-container {
-        width: 250px;
+        width: 200px;
         min-width: 150px;
-        max-width: 250px;
+        max-width: 200px;
       }
 
       .right-side-controls {
         width: auto;
-        margin-left: 8px;
+        margin-left: auto;
+        margin-top: 0;
         flex-wrap: nowrap;
+        gap: 12px;
 
         .inline-filters {
           flex-wrap: nowrap;
           justify-content: flex-end;
-          gap: 12px;
+          gap: 8px;
           width: auto;
           overflow: visible;
 
           .inline-filter-select {
-            min-width: 90px;
+            min-width: 80px;
             width: auto;
             flex: 0 0 auto;
 
             &.community-filter {
-              min-width: 100px;
+              min-width: 80px;
               flex: 0 0 auto;
             }
 
@@ -237,7 +271,7 @@
             }
 
             .select__control {
-              min-width: 90px;
+              min-width: 80px;
               padding: 0 8px;
 
               .select__value-container {
@@ -256,39 +290,61 @@
     // Extra small screens - keep filters in single row
     @include extraSmall {
       .search-container {
-        width: 180px;
+        width: 140px;
         min-width: 120px;
-        max-width: 180px;
+        max-width: 140px;
       }
 
       .right-side-controls {
-        margin-left: 4px;
+        margin-left: auto;
         justify-content: flex-end;
         gap: 4px; /* Even smaller gap */
         flex-wrap: nowrap; /* Keep in a single row */
 
         .inline-filters {
-          gap: 8px;
+          gap: 6px;
           flex-wrap: nowrap;
           width: auto;
           overflow-x: auto;
 
           .inline-filter-select {
-            min-width: 80px;
-            max-width: 120px;
+            min-width: 75px;
+            max-width: 110px;
 
             &.community-filter {
-              min-width: 80px;
-              max-width: 120px;
+              min-width: 75px;
+              max-width: 110px;
             }
 
             .filter-label {
               display: none; /* Hide labels on extra small screens */
             }
+
+            .select__control {
+              min-width: 75px;
+              padding: 0 4px;
+
+              .select__value-container {
+                padding: 2px 4px;
+              }
+
+              .select__indicators {
+                padding: 0 4px;
+
+                .select__indicator {
+                  padding: 4px;
+                }
+              }
+            }
           }
 
           .inline-filter-toggle {
             gap: 2px;
+
+            button {
+              padding: 4px 8px;
+              font-size: 12px;
+            }
           }
         }
 

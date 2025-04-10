@@ -8,8 +8,6 @@
   padding-top: 0;
   height: 100%;
   overflow-y: auto;
-  width: 100%;
-  max-width: 1280px;
 
   /* Hide scrollbar but maintain scroll functionality for all browsers */
   scrollbar-width: none; /* Firefox */
@@ -27,8 +25,8 @@
 
 .CommunitiesPage {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  width: 100%;
   overflow: hidden;
 
   /* Hide all inner scrollbars throughout the page */
@@ -44,11 +42,9 @@
   }
 
   .header-section {
-    margin-top: 32px;
-    margin-bottom: 32px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 12px;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -66,19 +62,27 @@
 
     .description {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 12px;
 
       .actions {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 16px;
-      }
+        flex-wrap: wrap;
+        gap: 8px;
 
-      .communities-count {
-        color: $neutral-500;
-        margin-top: 4px;
+        .communities-count {
+          color: $neutral-500;
+          height: fit-content;
+          margin-right: 12px;
+        }
+
+        .CreateCommunityButton {
+          padding: 0;
+        }
       }
     }
 
@@ -243,12 +247,16 @@
     }
 
     .explore-tabs-row {
-      margin-bottom: 20px;
+      margin: 8px 0 0px;
+      width: 100%;
+      border-bottom: 1px solid $neutral-200;
       overflow-x: auto;
-      max-width: 100%;
 
-      .CWTab {
-        white-space: nowrap;
+      /* Extra styles to ensure horizontal scrolling works without scrollbar */
+      -webkit-overflow-scrolling: touch;
+
+      @include extraSmall {
+        padding-bottom: 4px;
       }
     }
   }
@@ -291,12 +299,9 @@
 
   // Specific styles for the Threads tab
   .threads-tab {
-    height: calc(100vh - 300px);
-    min-height: 500px;
     width: 100%;
 
     .Feed {
-      height: 100%;
       width: 100%;
       min-height: 400px;
       overflow: hidden; /* Hide any scrollbars in Feed */
@@ -313,7 +318,7 @@
   // Specific styles for the Users tab
   .users-tab {
     .users-xp-table {
-      margin-top: 20px;
+      margin-top: 16px;
       width: 100%;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -393,11 +398,6 @@
           }
         }
       }
-
-      // List view specific styling
-      &.list-view {
-        // Implementation needed
-      }
     }
   }
 
@@ -456,54 +456,6 @@
       }
     }
   }
-
-  // Section container for the All tab
-  .section-container {
-    margin-bottom: 40px;
-  }
-
-  // Small screens
-  @include medium {
-    .header-section {
-      margin-top: 24px;
-      margin-bottom: 24px;
-
-      .description {
-        flex-wrap: wrap;
-      }
-    }
-  }
-
-  @include small {
-    .header-section {
-      margin-top: 16px;
-      margin-bottom: 20px;
-      gap: 16px;
-
-      .description {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-
-        .actions {
-          width: 100%;
-          justify-content: space-between;
-        }
-      }
-    }
-
-    .threads-tab {
-      height: calc(100vh - 250px);
-    }
-  }
-
-  @include extraSmall {
-    .header-section {
-      margin-top: 12px;
-      margin-bottom: 16px;
-      gap: 12px;
-    }
-  }
 }
 
 .section-container {
@@ -519,6 +471,7 @@
   }
 
   .heading-container {
+    margin-top: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;

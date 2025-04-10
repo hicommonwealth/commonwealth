@@ -55,27 +55,6 @@ import {
 } from './filters';
 import { getCommunityCountsString } from './helpers';
 
-// Add the FilteredThreadsFeed component
-const FilteredThreadsFeed = ({
-  communityId,
-  sortOption,
-  customScrollParent,
-  filterKey,
-}) => {
-  // Use the global feed query
-  const query = ({ limit }) => {
-    return useFetchGlobalActivityQuery({ limit });
-  };
-
-  return (
-    <Feed
-      key={`threads-feed-${filterKey}`}
-      query={query}
-      customScrollParent={customScrollParent}
-    />
-  );
-};
-
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 type ExtendedCommunitySliceType = [
   ExtendedCommunityType,
@@ -379,10 +358,10 @@ const CommunitiesPage = () => {
     const filterTags: FilterTag[] = [];
 
     if (searchValue) {
-      const searchTag = createSearchFilterTag(searchValue, setSearchValue);
-      if (searchTag) {
-        filterTags.push(searchTag);
-      }
+      filterTags.push({
+        label: `Search: ${searchValue}`,
+        onRemove: () => setSearchValue(''),
+      });
     }
 
     if (filters.withCommunitySortBy) {
@@ -798,7 +777,7 @@ const CommunitiesPage = () => {
           },
           tagPrefix: 'Tag',
         }),
-        createSortFilter({
+        createSelectFilter({
           label: 'Sort by:',
           placeholder: 'Sort Tokens',
           options: tokenSortOptions,
@@ -808,8 +787,8 @@ const CommunitiesPage = () => {
             filterTags: tokensFilterTags,
             setFilterTags: setTokensFilterTags,
           },
+          getTagLabel: (option) => option.label,
           tagPrefix: 'Sort',
-          defaultValue: 'mostRecent',
         }),
       ];
     }
@@ -821,6 +800,27 @@ const CommunitiesPage = () => {
   const shouldShowViewToggle = useCallback((tabName: string) => {
     return ['all'].includes(tabName);
   }, []);
+
+  // Add the FilteredThreadsFeed component
+  const FilteredThreadsFeed = ({
+    communityId,
+    sortOption,
+    customScrollParent,
+    filterKey,
+  }) => {
+    // Use the global feed query
+    const query = ({ limit }) => {
+      return useFetchGlobalActivityQuery({ limit });
+    };
+
+    return (
+      <Feed
+        key={`threads-feed-${filterKey}`}
+        query={query}
+        customScrollParent={customScrollParent}
+      />
+    );
+  };
 
   return (
     // @ts-expect-error <StrictNullChecks/>
