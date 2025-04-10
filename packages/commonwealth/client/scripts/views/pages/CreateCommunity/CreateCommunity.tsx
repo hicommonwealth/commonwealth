@@ -54,7 +54,7 @@ const CreateCommunity = () => {
     ? {
         transactionTypes: [
           TransactionType.DeployNamespace,
-          TransactionType.ConfigureNominations,
+          TransactionType.ConfigureVerification,
           TransactionType.MintVerificationToken,
         ],
         onSignTransactionMintVerificationToken: goToSuccessStep,

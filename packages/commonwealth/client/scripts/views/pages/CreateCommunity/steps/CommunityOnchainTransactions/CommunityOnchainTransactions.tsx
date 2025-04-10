@@ -8,6 +8,7 @@ import {
   createTransaction,
   getTransactionText,
 } from './helpers/transactionUtils';
+import useConfigureVerificationTransaction from './helpers/useConfigureVerificationTransaction';
 import useNamespaceTransaction from './helpers/useNamespaceTransaction';
 import useNominationsTransaction from './helpers/useNominationsTransaction';
 import useStakeTransaction from './helpers/useStakeTransaction';
@@ -29,6 +30,7 @@ interface CommunityOnchainTransactionsProps {
   onSignTransactionConfigureStake?: () => void;
   onSignTransactionConfigureNominations?: () => void;
   onSignTransactionMintVerificationToken?: () => void;
+  onSignTransactionConfigureVerification?: () => void;
   onSignTransactionsStepCancel?: () => void;
 }
 
@@ -47,6 +49,7 @@ const CommunityOnchainTransactions = ({
   onSignTransactionConfigureStake,
   onSignTransactionConfigureNominations,
   onSignTransactionMintVerificationToken,
+  onSignTransactionConfigureVerification,
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
@@ -91,6 +94,13 @@ const CommunityOnchainTransactions = ({
     onSuccess: onSignTransactionMintVerificationToken,
   });
 
+  const verificationTransaction = useConfigureVerificationTransaction({
+    namespace: communityNamespaceData.namespace,
+    userAddress: selectedAddress?.address,
+    chainId,
+    onSuccess: onSignTransactionConfigureVerification,
+  });
+
   const handleConfirmNamespaceDataStepSuccess = (data: NamespaceData) => {
     setCommunityNamespaceData(data);
     setConfirmNamespaceDataPage(false);
@@ -127,6 +137,7 @@ const CommunityOnchainTransactions = ({
       [TransactionType.ConfigureStakes]: stakeTransaction,
       [TransactionType.ConfigureNominations]: nominationsTransaction,
       [TransactionType.MintVerificationToken]: verificationTokenTransaction,
+      [TransactionType.ConfigureVerification]: verificationTransaction,
     };
 
     let previousTransactionCompleted = true;
