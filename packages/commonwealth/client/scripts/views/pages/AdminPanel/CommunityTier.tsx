@@ -22,12 +22,10 @@ const getTierLabel = (tier: CommunityTierMap) => {
   return label;
 };
 
-const communityTierOptions = Object.entries(COMMUNITY_TIERS).map(
-  ([key, value]) => ({
-    value: key,
-    label: getTierLabel(parseInt(key) as CommunityTierMap),
-  }),
-);
+const communityTierOptions = Object.keys(COMMUNITY_TIERS).map((key) => ({
+  value: key,
+  label: getTierLabel(parseInt(key) as CommunityTierMap),
+}));
 
 const CommunityTier = () => {
   const [communityId, setCommunityId] = useState<string>('');
@@ -98,8 +96,8 @@ const CommunityTier = () => {
     <div className="TaskGroup">
       <CWText type="h4">Update Community Tier</CWText>
       <CWText type="caption">
-        Updates a community's tier. If the community is large (greater than 500
-        threads/users) please contact engineering before executing.
+        Updates a community&apos;s tier. If the community is large (greater than
+        500 threads/users) please contact engineering before executing.
       </CWText>
       <div className="TaskRow">
         <CWTextInput
