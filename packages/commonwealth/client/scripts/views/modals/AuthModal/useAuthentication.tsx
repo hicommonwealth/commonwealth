@@ -235,6 +235,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   // New callback for handling social login
   const onSocialLogin = async (provider: WalletSsoSource) => {
+    console.log('FIXME: onSocialLogin 111');
     setIsMagicLoading(true);
 
     try {
@@ -319,6 +320,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (app.activeChainId() && user.isLoggedIn) {
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
+
+      console.log('FIXME: sign-in 1');
       await signIn(session, {
         community_id: account.community.id,
         address: account.address,
@@ -355,6 +358,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       try {
         // @ts-expect-error StrictNullChecks
         const session = await getSessionFromWallet(walletToUse);
+
+        console.log('FIXME: sign-in 2');
         await signIn(session, {
           community_id: account.community.id,
           address: account.address,
@@ -395,7 +400,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      if (session && account)
+      if (session && account) {
+        console.log('FIXME: sign-in 3');
         await signIn(session, {
           address: account.address,
           community_id: account.community.id,
@@ -403,6 +409,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
+      }
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
@@ -523,6 +530,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         chainIdentifier,
       );
 
+      console.log('FIXME: sign-in 4');
+
       const {
         account: signingAccount,
         newlyCreated,
@@ -631,6 +640,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object
+
+    console.log('FIXME: sign-in 5');
+
     const { account } = await signIn(session, {
       address,
       community_id: chainIdentifier,
@@ -687,6 +699,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
       const session = await getSessionFromWallet(farcasterWallet);
       const chainIdentifier = app.chain?.id || ChainBase.Ethereum;
+
+      console.log('FIXME: sign-in 6');
 
       const { account, newlyCreated, joinedCommunity } = await signIn(session, {
         address: farcasterWallet.accounts[0],

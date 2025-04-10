@@ -23,6 +23,8 @@ export function useSignIn() {
     session: Session,
     payload: Omit<z.infer<typeof SignIn.input>, 'session'>,
   ) => {
+    console.log('FIXME 666 signIn');
+
     const address = await mutation.mutateAsync({
       ...payload,
       session: serializeCanvas(session),

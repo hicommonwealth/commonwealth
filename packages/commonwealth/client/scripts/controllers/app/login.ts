@@ -533,6 +533,8 @@ export async function handleSocialLoginCallback({
     referrer_address,
   };
 
+  // FIXME: this is the part we we would have to refactor.
+
   try {
     response = await axios.post(`${SERVER_URL}/auth/magic`, data, {
       withCredentials: true,
