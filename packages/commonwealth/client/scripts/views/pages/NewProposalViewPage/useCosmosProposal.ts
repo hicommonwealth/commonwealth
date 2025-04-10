@@ -44,7 +44,6 @@ export const useCosmosProposal = ({
 
   const { data: metadata, isFetching: isFetchingMetadata } =
     // @ts-expect-error <StrictNullChecks/>
-
     useCosmosProposalMetadataQuery(proposal || null);
 
   const { data: threadsData } = useGetThreadsByLinkQuery({
@@ -66,8 +65,7 @@ export const useCosmosProposal = ({
     poolValue,
   );
   // @ts-expect-error <StrictNullChecks/>
-
-  const { data: tally } = useCosmosProposalTallyQuery(proposal || null);
+  const { data: tally } = useCosmosProposalTallyQuery(proposal);
 
   const { data: deposits } = useCosmosProposalDepositsQuery(
     // @ts-expect-error <StrictNullChecks/>
@@ -77,8 +75,6 @@ export const useCosmosProposal = ({
 
   useEffect(() => {
     if (cosmosProposal) {
-      // @ts-expect-error <StrictNullChecks/>
-
       setProposal(cosmosProposal);
       setTitle(cosmosProposal.title || '');
       setDescription(cosmosProposal.description || '');
