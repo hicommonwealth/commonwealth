@@ -67,6 +67,7 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
+import TokenWidget from './ToketWidget/TokenWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -495,7 +496,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       label: 'Links',
       item: (
         <div className="cards-colum">
-          <>Custom Components</>
+          <TokenWidget />
         </div>
       ),
     },

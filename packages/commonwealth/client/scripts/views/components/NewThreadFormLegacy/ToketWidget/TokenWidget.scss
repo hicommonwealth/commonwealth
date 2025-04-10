@@ -1,0 +1,15 @@
+@import './../../../../styles/shared.scss';
+
+.TokenWidget {
+  margin: 16px 0;
+
+  .CommonTrade {
+    overflow-y: scroll;
+    padding-left: 8px;
+    width: 370px;
+    border: 2px solid $primary-300;
+    border-radius: 12px;
+    padding: 12px;
+    overflow: hidden;
+  }
+}
