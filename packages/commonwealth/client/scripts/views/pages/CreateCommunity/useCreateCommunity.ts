@@ -6,7 +6,7 @@ import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
-    useState<CreateCommunityStep>(CreateCommunityStep.OnchainTransactions);
+    useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
   const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
     // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
