@@ -1,4 +1,5 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { DisabledCommunitySpamTier } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import {
   SessionKeyError,
@@ -14,6 +15,11 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useAiCompletion } from 'state/api/ai';
+import {
+  generateThreadPrompt,
+  generateThreadTitlePrompt,
+} from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
@@ -33,6 +39,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
@@ -40,12 +47,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-// eslint-disable-next-line max-len
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateThreadPrompt,
-  generateThreadTitlePrompt,
-} from 'state/api/ai/prompts';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -61,7 +62,6 @@ import {
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
-import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
@@ -228,6 +228,15 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         : undefined,
   });
 
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: 'create-thread',
+  });
+
   const buttonDisabled =
     !user.activeAccount ||
     !userSelectedAddress ||
@@ -237,7 +246,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
     isDisabled ||
-    isGenerating;
+    isGenerating ||
+    (isTurnstileEnabled && !turnstileToken);
 
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
@@ -246,6 +256,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
+      return;
+    }
+
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
       return;
     }
 
@@ -303,6 +318,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           bech32_prefix: community?.bech32_prefix || '',
           eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
         }),
+        turnstileToken,
       });
 
       const thread = await createThread(input);
@@ -321,7 +337,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       if (err instanceof SessionKeyError) {
         console.log('NewThreadForm: Session key error detected');
         checkForSessionKeyRevalidationErrors(err);
-        return;
+
+        // Reset turnstile if there's an error
+        resetTurnstile();
       }
 
       if (err?.message?.includes('Exceeded content creation limit')) {
@@ -337,11 +355,15 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         notifyError(
           'Limit of submitted threads in selected contest has been exceeded.',
         );
-        return;
+        // Reset turnstile if there's an error
+        resetTurnstile();
       }
 
       console.error('NewThreadForm: Unhandled error:', err?.message);
       notifyError('Failed to create thread');
+
+      // Reset turnstile if there's an error
+      resetTurnstile();
     } finally {
       setIsSaving(false);
       if (!isInsideCommunity) {
@@ -371,6 +393,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     checkForSessionKeyRevalidationErrors,
     user,
     aiInteractionsToggleEnabled,
+    isTurnstileEnabled,
+    turnstileToken,
+    resetTurnstile,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -387,9 +412,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const showBanner =
     selectedCommunityId && !userSelectedAddress && isBannerVisible;
-
-  const contestThreadBannerVisible =
-    isContestAvailable && hasTopicOngoingContest;
 
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
@@ -413,6 +435,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const prompt = generateThreadPrompt(context);
 
       const threadContent = await generateCompletion(prompt, {
+        model: 'gpt-4o-mini',
         stream: true,
         onError: (error) => {
           console.error('Error generating AI thread:', error);
@@ -639,8 +662,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {!!contestThreadBannerVisible && <ContestThreadBanner />}
-
               <MessageRow
                 hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
@@ -650,7 +671,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
               {community &&
                 userProfile &&
-                community.spam_tier_level >= 0 &&
+                community.spam_tier_level !== DisabledCommunitySpamTier &&
                 userProfile.tier <= community.spam_tier_level && (
                   <CWBanner
                     type="warning"
@@ -661,6 +682,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     className="spam-trust-banner"
                   />
                 )}
+
+              {isTurnstileEnabled && <TurnstileWidget />}
 
               <div className="buttons-row">
                 <CWButton
@@ -682,20 +705,22 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   />
                 )}
 
-                <div className="ai-toggle-wrapper">
-                  <CWToggle
-                    className="ai-toggle"
-                    icon="sparkle"
-                    iconColor="#757575"
-                    checked={aiCommentsToggleEnabled}
-                    onChange={() => {
-                      setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                    }}
-                  />
-                  <CWText type="caption" className="toggle-label">
-                    AI initial comment
-                  </CWText>
-                </div>
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <div className="ai-toggle-wrapper">
+                    <CWToggle
+                      className="ai-toggle"
+                      icon="sparkle"
+                      iconColor="#757575"
+                      checked={aiCommentsToggleEnabled}
+                      onChange={() => {
+                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                      }}
+                    />
+                    <CWText type="caption" className="toggle-label">
+                      AI initial comment
+                    </CWText>
+                  </div>
+                )}
 
                 <CWButton
                   label="Create"

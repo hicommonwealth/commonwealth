@@ -4,7 +4,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { BalanceSourceType, WalletId } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  UserTierMap,
+  WalletId,
+} from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -21,6 +25,7 @@ import { CreateThread } from '../../src/aggregates/thread';
 import {
   GetUserProfile,
   GetXps,
+  GetXpsRanked,
   UpdateUser,
   Xp,
 } from '../../src/aggregates/user';
@@ -389,7 +394,7 @@ describe('User lifecycle', () => {
 
       // upgrade tier for testing
       await models.User.update(
-        { tier: 4 },
+        { tier: UserTierMap.ManuallyVerified },
         { where: { id: new_address!.user_id! } },
       );
 
@@ -554,9 +559,11 @@ describe('User lifecycle', () => {
         payload: { user_id: new_actor.user.id },
       });
       expect(xps5!.length).to.equal(2);
-      xps5?.filter(x => x.action_meta_id > 0)?.forEach((xp) => {
-        expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
-      });
+      xps5
+        ?.filter((x) => x.action_meta_id > 0)
+        ?.forEach((xp) => {
+          expect(['CommunityJoined'].includes(xp.event_name)).to.be.true;
+        });
 
       // 3 CommentCreated events for admin
       const xps6 = await query(GetXps(), {
@@ -898,6 +905,22 @@ describe('User lifecycle', () => {
       // 10 from system quest wallet linking
       // 13 from wallet linking with balance
       expect(after!.xp_points).toBe(before!.xp_points! + 10 + 13);
+    });
+
+    it('should query ranked by xp points', async () => {
+      const xps1 = await query(GetXpsRanked(), {
+        actor: admin,
+        payload: { top: 10 },
+      });
+      expect(xps1!.length).to.equal(4);
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([147, 50, 37, 11]);
+
+      const xps2 = await query(GetXpsRanked(), {
+        actor: admin,
+        payload: { top: 10, quest_id: -1 },
+      });
+      expect(xps2!.length).to.equal(2);
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 10]);
     });
   });
 });

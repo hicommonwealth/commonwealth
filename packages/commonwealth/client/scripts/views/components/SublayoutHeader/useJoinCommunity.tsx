@@ -3,6 +3,7 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { setActiveAccount } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
+import { resetXPCacheForUser } from 'helpers/quest';
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import app from 'state';
@@ -23,9 +24,7 @@ const useJoinCommunity = () => {
   const { mutateAsync: joinCommunity } =
     trpc.community.joinCommunity.useMutation({
       onSuccess: () => {
-        // reset xp cache
-        utils.quest.getQuests.invalidate().catch(console.error);
-        utils.user.getXps.invalidate().catch(console.error);
+        resetXPCacheForUser(utils);
       },
     });
 

@@ -1,23 +1,16 @@
-export enum SpamLevels {
-  Disabled = -1,
-  Unverified = 0,
-  OneWeekOld = 1,
-  UsersWithIncompleteProfiles = 2,
-}
+import { USER_TIERS, UserTierMap } from '@hicommonwealth/shared';
 
 export const SpamLevelOptions = [
   {
-    label: '🚫: Users with unverified wallet will be flagged: ',
-    value: SpamLevels.Unverified,
+    label: `${
+      USER_TIERS[UserTierMap.NewlyVerifiedWallet].clientInfo.icon
+    }: Users with a wallet less than 1 week old will be flagged`,
+    value: UserTierMap.NewlyVerifiedWallet,
   },
   {
-    label:
-      '🐣: Users with no balance or social account (and below) will be flagged',
-    value: SpamLevels.OneWeekOld,
-  },
-  {
-    label:
-      '⏳: Users with 1 week old account, no balance, or social account (and below) will be flagged',
-    value: SpamLevels.UsersWithIncompleteProfiles,
+    label: `${
+      USER_TIERS[UserTierMap.SocialVerified].clientInfo.icon
+    }: Users with no social account connected will be flagged`,
+    value: UserTierMap.VerifiedWallet,
   },
 ];
