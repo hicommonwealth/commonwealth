@@ -1,0 +1,18 @@
+@import '../../../styles/shared';
+
+.quest-filter-modal {
+  padding: 16px;
+
+  .modal-content {
+    margin-top: 16px;
+
+    .description {
+      margin-bottom: 16px;
+      color: $neutral-600;
+    }
+
+    .quest-select {
+      width: 100%;
+    }
+  }
+}

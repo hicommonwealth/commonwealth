@@ -1,6 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
-import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -8,6 +7,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
+import { useFetchQuestsQuery } from 'state/api/quest';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -16,15 +16,13 @@ import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/ind
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { Feed } from '../../components/feed';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import XPTable from '../Leaderboard/XPTable/XPTable';
+import XPTable, { QuestOption } from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import './Communities.scss';
 import CommunitiesTabContent from './CommunitiesTabContent';
@@ -40,6 +38,11 @@ import {
 } from './FiltersDrawer';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
+import SearchFilterRow, {
+  FilterTag,
+  InlineFilter,
+  ViewType,
+} from './SearchFilterRow';
 import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
@@ -75,6 +78,31 @@ const CommunitiesPage = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
+  // Common states for all tabs
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedViewType, setSelectedViewType] = useState(ViewType.Cards);
+
+  // Users tab filter state
+  const [selectedQuestFilter, setSelectedQuestFilter] =
+    useState<QuestOption | null>(null);
+
+  // Fetch quests for the Users tab inline filter
+  const { data: questsList } = useFetchQuestsQuery({
+    limit: 50,
+    include_system_quests: true,
+    cursor: 1,
+    enabled: questsEnabled,
+  });
+
+  const questOptions = useMemo(() => {
+    const quests = (questsList?.pages || []).flatMap((page) => page.results);
+    return quests.map((quest) => ({
+      value: quest.id.toString(),
+      label: quest.name,
+    }));
+  }, [questsList]);
+
+  // State for Communities tab
   const [filters, setFilters] = useState<CommunityFilters>({
     withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
@@ -85,6 +113,8 @@ const CommunitiesPage = () => {
     withEcosystemChainId: undefined,
     withNetwork: undefined,
   });
+
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
 
@@ -159,8 +189,6 @@ const CommunitiesPage = () => {
       tokenSymbol: 'ETH',
     });
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
-
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const isLoading =
     isLoadingTags ||
@@ -248,6 +276,191 @@ const CommunitiesPage = () => {
     const params = new URLSearchParams(searchParams);
     params.set('tab', tabValue);
     navigate(`/explore?${params.toString()}`);
+
+    // Reset search input and filters when changing tabs
+    setSearchValue('');
+    setSelectedQuestFilter(null);
+  };
+
+  // Get filter tags for current communities tab
+  const getCommunitiesFilterTags = (): FilterTag[] => {
+    const filterTags: FilterTag[] = [];
+
+    if (filters.withCommunitySortBy) {
+      filterTags.push({
+        label: `${filters.withCommunitySortBy}${
+          filters.withCommunitySortOrder &&
+          filters.withCommunitySortBy !== CommunitySortOptions.MostRecent
+            ? ` : ${filters.withCommunitySortOrder}`
+            : ''
+        }`,
+        onRemove: removeCommunitySortByFilter,
+      });
+    }
+
+    if (filters.withCommunityType) {
+      filterTags.push({
+        label: String(filters.withCommunityType),
+        onRemove: removeCommunityTypeFilter,
+      });
+    }
+
+    if (filters.withNetwork) {
+      filterTags.push({
+        label: String(filters.withNetwork),
+        onRemove: removeChainNetworkFilter,
+      });
+    }
+
+    if (filters.withCommunityEcosystem) {
+      filterTags.push({
+        label: String(filters.withCommunityEcosystem),
+        onRemove: removeCommunityEcosystemFilter,
+      });
+    }
+
+    if (filters.withEcosystemChainId) {
+      const chainName = Object.entries(communityChains).find(
+        ([_, v]) => filters.withEcosystemChainId === v,
+      )?.[0];
+
+      if (chainName) {
+        filterTags.push({
+          label: chainName,
+          onRemove: removeEcosystemChainIdFilter,
+        });
+      }
+    }
+
+    if (filters.withStakeEnabled) {
+      filterTags.push({
+        label: 'Stake',
+        onRemove: removeStakeFilter,
+      });
+    }
+
+    if (filters.withTagsIds) {
+      filters.withTagsIds.forEach((id) => {
+        const tagName = (tags || []).find((t) => t.id === id)?.name;
+        if (tagName) {
+          filterTags.push({
+            label: tagName,
+            onRemove: () => removeTagFilter(id),
+          });
+        }
+      });
+    }
+
+    return filterTags;
+  };
+
+  // Sample filter tags for other tabs (for demonstration)
+  const getThreadsFilterTags = (): FilterTag[] => {
+    return searchValue
+      ? [
+          {
+            label: `Search: ${searchValue}`,
+            onRemove: () => setSearchValue(''),
+          },
+        ]
+      : [];
+  };
+
+  const getUsersFilterTags = (): FilterTag[] => {
+    const filterTags: FilterTag[] = [];
+
+    if (searchValue) {
+      filterTags.push({
+        label: `Search: ${searchValue}`,
+        onRemove: () => setSearchValue(''),
+      });
+    }
+
+    // Don't add quest filter tags here since we're using inline filters now
+
+    return filterTags;
+  };
+
+  const getContestsFilterTags = (): FilterTag[] => {
+    return searchValue
+      ? [
+          {
+            label: `Search: ${searchValue}`,
+            onRemove: () => setSearchValue(''),
+          },
+        ]
+      : [];
+  };
+
+  const getQuestsFilterTags = (): FilterTag[] => {
+    return searchValue
+      ? [
+          {
+            label: `Search: ${searchValue}`,
+            onRemove: () => setSearchValue(''),
+          },
+        ]
+      : [];
+  };
+
+  const getTokensFilterTags = (): FilterTag[] => {
+    return searchValue
+      ? [
+          {
+            label: `Search: ${searchValue}`,
+            onRemove: () => setSearchValue(''),
+          },
+        ]
+      : [];
+  };
+
+  // Get the appropriate filter tags based on the active tab
+  const getFilterTagsByActiveTab = (): FilterTag[] => {
+    switch (activeTab) {
+      case 'communities':
+        return getCommunitiesFilterTags();
+      case 'threads':
+        return getThreadsFilterTags();
+      case 'users':
+        return getUsersFilterTags();
+      case 'contests':
+        return getContestsFilterTags();
+      case 'quests':
+        return getQuestsFilterTags();
+      case 'tokens':
+        return getTokensFilterTags();
+      default:
+        return [];
+    }
+  };
+
+  // Get the appropriate filter click handler based on active tab
+  const getFilterClickHandler = () => {
+    switch (activeTab) {
+      case 'communities':
+        return () => setIsFilterDrawerOpen(true);
+      // For users tab we're now using inline filters
+      default:
+        return undefined;
+    }
+  };
+
+  // Get inline filters configuration based on the active tab
+  const getInlineFiltersByActiveTab = (): InlineFilter[] => {
+    if (activeTab === 'users' && questsEnabled) {
+      return [
+        {
+          type: 'select',
+          placeholder: 'Filter by Quest',
+          value: selectedQuestFilter,
+          onChange: (option) => setSelectedQuestFilter(option),
+          options: questOptions,
+          isClearable: true,
+          isSearchable: true,
+        },
+      ];
+    }
+    return [];
   };
 
   return (
@@ -260,7 +473,7 @@ const CommunitiesPage = () => {
               type="h1"
               {...(launchpadEnabled && { fontWeight: 'semiBold' })}
             >
-              Explore {launchpadEnabled ? '' : 'Communities'}
+              Explore
             </CWText>
 
             {isWindowSmallInclusive ? communitiesCount : <></>}
@@ -285,6 +498,23 @@ const CommunitiesPage = () => {
               />
             ))}
           </CWTabsRow>
+
+          {/* Search and filter row for all tabs except 'all' */}
+          {activeTab !== 'all' && (
+            <SearchFilterRow
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              selectedViewType={selectedViewType}
+              onViewTypeChange={setSelectedViewType}
+              onFilterClick={getFilterClickHandler()}
+              filterTags={getFilterTagsByActiveTab()}
+              placeholder={`Search ${activeTab}`}
+              showViewToggle={['communities', 'contests', 'tokens'].includes(
+                activeTab,
+              )}
+              inlineFilters={getInlineFiltersByActiveTab()}
+            />
+          )}
         </div>
 
         {/* Conditionally render content based on active tab */}
@@ -308,7 +538,12 @@ const CommunitiesPage = () => {
         {activeTab === 'users' && (
           <div className="users-tab">
             <div className="users-xp-table">
-              <XPTable />
+              <XPTable
+                hideHeader={true}
+                selectedQuest={selectedQuestFilter}
+                onQuestChange={setSelectedQuestFilter}
+                searchTerm={searchValue}
+              />
             </div>
           </div>
         )}
@@ -326,89 +561,12 @@ const CommunitiesPage = () => {
         {/* Communities Tab Content */}
         {activeTab === 'communities' && (
           <>
-            <div
-              className={clsx('filters', {
-                hasAppliedFilter:
-                  Object.values(filters).filter(Boolean).length === 1
-                    ? !filters.withCommunitySortOrder
-                    : Object.values(filters).filter(Boolean).length > 0,
-              })}
-            >
-              <CWButton
-                label="Filters"
-                iconRight="funnelSimple"
-                buttonType="secondary"
-                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-              />
-              {filters.withCommunitySortBy && (
-                <CWTag
-                  label={`${filters.withCommunitySortBy}${
-                    filters.withCommunitySortOrder &&
-                    filters.withCommunitySortBy !==
-                      CommunitySortOptions.MostRecent
-                      ? ` : ${filters.withCommunitySortOrder}`
-                      : ''
-                  }
-                  `}
-                  type="filter"
-                  onCloseClick={removeCommunitySortByFilter}
-                />
-              )}
-              {filters.withCommunityType && (
-                <CWTag
-                  label={filters.withCommunityType}
-                  type="filter"
-                  onCloseClick={removeCommunityTypeFilter}
-                />
-              )}
-              {filters.withNetwork && (
-                <CWTag
-                  label={filters.withNetwork}
-                  type="filter"
-                  onCloseClick={removeChainNetworkFilter}
-                />
-              )}
-              {filters.withCommunityEcosystem && (
-                <CWTag
-                  label={filters.withCommunityEcosystem}
-                  type="filter"
-                  onCloseClick={removeCommunityEcosystemFilter}
-                />
-              )}
-              {filters.withEcosystemChainId && (
-                <CWTag
-                  label={
-                    Object.entries(communityChains).find(
-                      ([_, v]) => filters.withEcosystemChainId === v,
-                    )?.[0] as string
-                  }
-                  type="filter"
-                  onCloseClick={removeEcosystemChainIdFilter}
-                />
-              )}
-              {filters.withStakeEnabled && (
-                <CWTag
-                  label="Stake"
-                  type="filter"
-                  onCloseClick={removeStakeFilter}
-                />
-              )}
-              {filters.withTagsIds &&
-                filters.withTagsIds.map((id) => (
-                  <CWTag
-                    key={id}
-                    type="filter"
-                    label={(tags || []).find((t) => t.id === id)?.name || ''}
-                    onCloseClick={() => removeTagFilter(id)}
-                  />
-                ))}
-              <FiltersDrawer
-                isOpen={isFilterDrawerOpen}
-                onClose={() => setIsFilterDrawerOpen(false)}
-                filters={filters}
-                onFiltersChange={(newFilters) => setFilters(newFilters)}
-              />
-            </div>
+            <FiltersDrawer
+              isOpen={isFilterDrawerOpen}
+              onClose={() => setIsFilterDrawerOpen(false)}
+              filters={filters}
+              onFiltersChange={(newFilters) => setFilters(newFilters)}
+            />
             <CommunitiesTabContent
               isLoading={isLoading}
               isInitialCommunitiesLoading={isInitialCommunitiesLoading}

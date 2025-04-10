@@ -66,6 +66,114 @@
       }
     }
 
+    .search-filter-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+
+      .search-filter-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+
+        .search-container {
+          max-width: 520px;
+          width: 100%;
+
+          .input-and-icon-container {
+            .text-input-left-icon > svg {
+              left: 16px;
+              color: $neutral-400;
+            }
+
+            input.hasLeftIcon {
+              padding-left: 48px;
+            }
+          }
+        }
+
+        .inline-filters {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          flex-wrap: nowrap;
+
+          .inline-filter-select {
+            min-width: 180px;
+            max-width: 220px;
+
+            @include extraSmall {
+              min-width: 150px;
+            }
+          }
+        }
+
+        .actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .view-toggle {
+            display: flex;
+            gap: 8px;
+            cursor: pointer;
+
+            .icon-container {
+              width: 32px;
+              height: 32px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              &.selected {
+                background-color: $neutral-50;
+                border-radius: 6px;
+              }
+
+              svg {
+                color: $black;
+              }
+            }
+          }
+        }
+
+        @include mediumSmall {
+          flex-wrap: wrap;
+
+          .search-container {
+            max-width: 100%;
+          }
+
+          .inline-filters {
+            order: 3;
+            margin-top: 8px;
+            width: 100%;
+          }
+        }
+      }
+
+      .applied-filters-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .applied-filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          /* Style for filter tags */
+          .Tag {
+            .Text {
+              text-transform: capitalize;
+            }
+          }
+        }
+      }
+    }
+
     .filters {
       display: flex;
       align-items: center;
