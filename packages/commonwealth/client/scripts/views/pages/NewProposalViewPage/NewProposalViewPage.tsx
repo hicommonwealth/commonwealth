@@ -159,6 +159,9 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   };
   const governanceUrl = `https://snapshot.box/#/s:${querySnapshotId}/proposal/${identifier}`;
   const shareUrl = window.location.href;
+
+  const status =
+    queryType === 'cosmos' ? proposal?.status : snapshotProposal?.state;
   return (
     <CWPageLayout>
       <CWContentPage
@@ -212,14 +215,8 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
                 />
 
                 <DetailCard
-                  status={
-                    queryType === 'cosmos'
-                      ? // @ts-expect-error <StrictNullChecks/>
-                        proposal?.status
-                      : snapshotProposal?.state
-                  }
-                  // @ts-expect-error <StrictNullChecks/>
-                  governanceType={queryType}
+                  status={status || ''}
+                  governanceType={queryType || ''}
                   // @ts-expect-error <StrictNullChecks/>
                   publishDate={createdAt}
                   id={identifier}
@@ -289,14 +286,8 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
             label: 'Links',
             item: (
               <DetailCard
-                status={
-                  queryType === 'cosmos'
-                    ? // @ts-expect-error <StrictNullChecks/>
-                      proposal?.status
-                    : snapshotProposal?.state
-                }
-                // @ts-expect-error <StrictNullChecks/>
-                governanceType={queryType}
+                status={status || ''}
+                governanceType={queryType || ''}
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={createdAt}
                 id={identifier}

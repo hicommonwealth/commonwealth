@@ -324,7 +324,6 @@ export const NewThreadForm = () => {
       ? 'snapshot'
       : '';
   const status =
-    // @ts-expect-error <StrictNullChecks/>
     snapshotProposal?.state || proposal?.status ? proposal?.status : '';
 
   const toggleShowVotesDrawer = (newModalState: boolean) => {
@@ -362,7 +361,7 @@ export const NewThreadForm = () => {
             label: 'Detail',
             item: (
               <DetailCard
-                status={status}
+                status={status || ''}
                 governanceType={governanceType}
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={snapshotProposal?.created || proposal.createdAt}
@@ -584,7 +583,7 @@ export const NewThreadForm = () => {
               {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
                   <DetailCard
-                    status={status}
+                    status={status || ''}
                     governanceType={governanceType}
                     publishDate={
                       // @ts-expect-error <StrictNullChecks/>
