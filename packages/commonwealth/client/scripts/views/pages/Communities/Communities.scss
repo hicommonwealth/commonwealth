@@ -91,6 +91,7 @@
       flex-direction: column;
       gap: 12px;
       width: 100%;
+      margin-bottom: 0;
 
       .search-filter-row {
         display: flex;
@@ -195,7 +196,7 @@
       .applied-filters-row {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 0;
 
         .applied-filters {
           display: flex;
