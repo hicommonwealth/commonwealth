@@ -54,6 +54,11 @@ export function CreateLaunchpadTrade(): Command<
       });
       const block = await client.getBlock({ blockNumber: tx.blockNumber });
 
+      // This case happens when liquidity is bought out
+      if (result.tokenAmount === BigInt(0)) {
+        return;
+      }
+
       const trade = await models.LaunchpadTrade.create({
         eth_chain_id,
         transaction_hash,

@@ -61,9 +61,9 @@ export const factoryContracts = {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
-    lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
-    tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
+    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
@@ -116,11 +116,12 @@ export const factoryContracts = {
   [ValidChains.Anvil]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
-    lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
-    tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
+    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;

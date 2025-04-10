@@ -4,7 +4,6 @@ import {
   createPrivateEvmClient,
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
-import { createPublicClient, http, parseEventLogs } from 'viem';
 import { Web3 } from 'web3';
 
 export const launchToken = async (
@@ -33,7 +32,7 @@ export const launchToken = async (
       tokenCommunityManager,
       connectorWeight,
     )
-    .send({ from: walletAddress, value: 4.4400042e14 - 0.000444e18 });
+    .send({ from: walletAddress, value: 4.4400042e14 });
   return txReceipt;
 };
 
@@ -98,8 +97,8 @@ export const getAmountIn = async (
   cw: number,
 ) => {
   const data = await Promise.all([
-    contract.methods._getFloatingTokenSupply(tokenAddress),
-    contract.methods.liquidity(tokenAddress),
+    contract.methods._getFloatingTokenSupply(tokenAddress).call(),
+    contract.methods.liquidity(tokenAddress).call(),
   ]);
   const delta =
     ((BigInt(amountOut) + BigInt(data[0])) / BigInt(data[0])) **
@@ -144,48 +143,6 @@ export const getTargetMarketCap = (
   const price = x * y;
   return price * totalSupply;
 };
-
-export async function getLaunchpadTradeTransaction({
-  rpc,
-  transactionHash,
-}: {
-  rpc: string;
-  transactionHash: string;
-}) {
-  const client = createPublicClient({
-    transport: http(rpc),
-  });
-
-  const receipt = await client.getTransactionReceipt({
-    hash: transactionHash as `0x${string}`,
-  });
-
-  if (!receipt) {
-    return;
-  }
-
-  const parsedLogs = parseEventLogs({
-    abi: LPBondingCurveAbi,
-    eventName: 'Trade',
-    logs: receipt.logs,
-  });
-
-  if (parsedLogs.length === 0) return;
-
-  return {
-    txReceipt,
-    block,
-    parsedArgs: {
-      traderAddress: traderAddress as string,
-      tokenAddress: tokenAddress as string,
-      isBuy: isBuy as boolean,
-      communityTokenAmount: communityTokenAmount as bigint,
-      ethAmount: ethAmount as bigint,
-      protocolEthAmount: protocolEthAmount as bigint,
-      floatingSupply: floatingSupply as bigint,
-    },
-  };
-}
 
 export async function getLaunchpadTokenCreatedTransaction({
   rpc,
