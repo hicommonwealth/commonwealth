@@ -70,17 +70,18 @@ const CommunityTier = () => {
           label: 'Update',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: async () => {
-            try {
-              await setCommunityTier({
-                community_id: communityId,
-                tier: selectedCommunityTier,
+          onClick: () => {
+            setCommunityTier({
+              community_id: communityId,
+              tier: selectedCommunityTier,
+            })
+              .then(() => {
+                notifySuccess('Community tier updated');
+              })
+              .catch((e) => {
+                notifyError('Error updating community tier');
+                console.error(e);
               });
-              notifySuccess('Community tier updated');
-            } catch (e) {
-              notifyError('Error updating community tier');
-              console.error(e);
-            }
           },
         },
         {
