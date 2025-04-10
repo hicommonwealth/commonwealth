@@ -27,6 +27,7 @@ import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
+import useGetTokenizedThreadsAllowedQuery from 'state/api/tokens/getTokenizedThreadsAllowed';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
@@ -256,6 +257,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   // Define default values for title and body
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
+
+  const { data: tokenizedThreadsAllowed } = useGetTokenizedThreadsAllowedQuery({
+    community_id: selectedCommunityId,
+    topic_id: threadTopic?.id || 0,
+  });
 
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
@@ -636,6 +642,23 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       }
                     }}
                   />
+                )}
+
+                {tokenizedThreadsAllowed && (
+                  <div className="tokenized-status">
+                    <CWText
+                      type="caption"
+                      className={
+                        tokenizedThreadsAllowed.tokenized_threads_enabled
+                          ? 'tokenized-enabled'
+                          : 'tokenized-disabled'
+                      }
+                    >
+                      {tokenizedThreadsAllowed.tokenized_threads_enabled
+                        ? 'This topic allows tokenized threads'
+                        : 'This topic does not allow tokenized threads'}
+                    </CWText>
+                  </div>
                 )}
 
                 {!!contestTopicAffordanceVisible && (
