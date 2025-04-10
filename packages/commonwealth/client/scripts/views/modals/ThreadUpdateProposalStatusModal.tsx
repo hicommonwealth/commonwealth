@@ -258,7 +258,7 @@ export const ThreadUpdateProposalStatusModal = ({
   const handleRemoveProposal = async () => {
     try {
       await deleteThreadLinks({
-        communityId: app.activeChainId(),
+        communityId: app.activeChainId() || '',
         threadId: thread.id,
         links: [
           {

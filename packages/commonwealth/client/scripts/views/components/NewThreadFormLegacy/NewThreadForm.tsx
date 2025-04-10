@@ -23,7 +23,10 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
-import { useCreateThreadMutation } from 'state/api/threads';
+import {
+  useAddThreadLinksMutation,
+  useCreateThreadMutation,
+} from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -47,6 +50,7 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
+import { LinkSource } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
   SnapshotSpace,
@@ -169,7 +173,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
     topicId: threadTopic?.id,
   });
+  // adding the thread
 
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    communityId: app.activeChainId() || '',
+  });
+  //
   const { generateCompletion } = useAiCompletion();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -343,6 +352,19 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       });
 
       const thread = await createThread(input);
+      if (thread && linkedProposals) {
+        addThreadLinks({
+          communityId: app.activeChainId() || '',
+          threadId: thread.id!,
+          links: [
+            {
+              source: linkedProposals.source as LinkSource,
+              identifier: linkedProposals.identifier,
+              title: linkedProposals.title,
+            },
+          ],
+        });
+      }
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
@@ -601,7 +623,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       ),
     },
   ];
-  console.log({ status, snapshotProposal });
+
   const proposalDetailSidebar = [
     ...(!isWindowSmallInclusive && (snapshotProposal || proposal)
       ? [
@@ -853,7 +875,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       className="spam-trust-banner"
                     />
                   )}
-
+                {isTurnstileEnabled && <TurnstileWidget />}
                 <div className="buttons-row">
                   <CWButton
                     buttonType="tertiary"
