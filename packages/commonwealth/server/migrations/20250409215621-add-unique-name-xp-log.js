@@ -32,20 +32,21 @@ module.exports = {
         transaction,
       });
 
-      // Create a unique index with the original columns in pkey plus name
-      await queryInterface.addIndex('XpLogs', {
-        fields: ['user_id', 'action_meta_id', 'event_created_at', 'name'],
-        unique: true,
-        name: 'xp_logs_user_id_action_meta_id_event_created_at_name',
-        transaction,
-      });
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "XpLogs"
+          ADD CONSTRAINT xp_logs_user_id_action_meta_id_event_created_at_name
+            UNIQUE NULLS NOT DISTINCT (user_id, action_meta_id, event_created_at, name)
+      `,
+        { transaction },
+      );
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       // Remove the unique index
-      await queryInterface.removeIndex(
+      await queryInterface.removeConstraint(
         'XpLogs',
         'xp_logs_user_id_action_meta_id_event_created_at_name',
         { transaction },
