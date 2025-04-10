@@ -5,6 +5,7 @@ import AddressInfo from 'models/AddressInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -21,9 +22,13 @@ const OnchainVerificationIntegration = () => {
   const [isTransactionComplete, setIsTransactionComplete] = useState(false);
 
   const communityId = app.activeChainId();
-  const chainId = app.chain?.meta?.ChainNode?.eth_chain_id?.toString() || '';
-  const communityName = app.chain?.meta?.name;
-  const namespace = app.chain?.meta?.namespace;
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId || '',
+    includeNodeInfo: true,
+  });
+
+  const communityChainId = String(community?.ChainNode?.eth_chain_id);
 
   // Get the current user's active address
   const selectedAddress =
@@ -61,18 +66,18 @@ const OnchainVerificationIntegration = () => {
           on-chain.
         </CWText>
 
-        {communityId && selectedAddress && chainId && (
+        {communityId && selectedAddress && communityChainId && (
           <CommunityOnchainTransactions
-            createdCommunityName={communityName}
+            createdCommunityName={community?.name}
             createdCommunityId={communityId}
             selectedAddress={selectedAddress}
-            chainId={chainId}
+            chainId={communityChainId}
             transactionTypes={[
               TransactionType.DeployNamespace,
               TransactionType.ConfigureNominations,
               TransactionType.MintVerificationToken,
             ]}
-            namespace={namespace}
+            namespace={community?.namespace}
             onConfirmNamespaceDataStepCancel={handleTransactionCancel}
             onSignTransactionMintVerificationToken={handleVerificationSuccess}
             onSignTransactionsStepCancel={handleTransactionCancel}
