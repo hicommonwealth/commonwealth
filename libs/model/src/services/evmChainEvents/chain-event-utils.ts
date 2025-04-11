@@ -302,21 +302,12 @@ const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
     topics: event.rawLog.topics,
   });
 
-  const args = decoded.args as Record<string, unknown>;
-  const operatorAddress = args.operator as string;
-  const fromAddress = args.from as string;
-  const toAddress = args.to as string;
-
   return {
     event_name: 'NamespaceTransferSingle',
     event_payload: {
       ...event,
       parsedArgs: {
-        operator: operatorAddress as `0x${string}`,
-        from: fromAddress as `0x${string}`,
-        to: toAddress as `0x${string}`,
-        id: BigInt((args.id as string) || '0'),
-        value: BigInt((args.value as string) || '0'),
+        ...decoded.args,
         block_number: Number(event.block.number),
       },
     },
