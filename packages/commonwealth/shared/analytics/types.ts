@@ -30,6 +30,7 @@ export const enum MixpanelCommunityInteractionEvent {
   UPDATE_GROUP = 'Update Group',
   DIRECTORY_PAGE_ENABLED = 'Directory Page Enabled',
   DIRECTORY_PAGE_DISABLED = 'Directory Page Disabled',
+  DIRECTORY_SETTINGS_CHANGED = 'Directory Settings CHanged',
 }
 
 export const enum MixpanelCommunityStakeEvent {

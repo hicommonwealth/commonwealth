@@ -17,6 +17,7 @@ interface FetchRelatedCommunitiesResponse {
   lifetime_thread_count: string;
   namespace: string;
   chain_node_id: number;
+  tag_ids: string[];
 }
 
 const fetchRelatedCommunities = async ({

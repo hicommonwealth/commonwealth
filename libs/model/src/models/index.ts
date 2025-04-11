@@ -54,6 +54,7 @@ export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
+export * from './community_directory_tags';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';

@@ -1,10 +1,15 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
+import {
+  useGetCommunityByIdQuery,
+  useGetCommunitySelectedTagsAndCommunities,
+  useUpdateCommunityDirectoryTags,
+} from 'state/api/communities';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getNodeById } from 'state/api/nodes/utils';
 import { useDebounce } from 'usehooks-ts';
@@ -19,20 +24,34 @@ import useDirectoryPageData, {
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelPageViewEvent,
+} from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './DirectoryPage.scss';
+import DirectorySettingsDrawer from './DirectorySettingsDrawer';
+import ShowAddedCommunities from './ShowAddedCommunities';
+import ShowAddedTags from './ShowAddedTags';
 
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
+  const [isDirectorySettingsDrawerOpen, setIsDirectorySettingsDrawerOpen] =
+    useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
+  const [filteredCommunities, setFilteredCommunities] = useState<any[]>([]);
+  const [filteredTableData, setFilteredTableData] = useState<any[]>([]);
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const { data: nodes } = useFetchNodesQuery();
 
   const communityId = app.activeChainId() || '';
+
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
       id: communityId,
@@ -61,9 +80,158 @@ const DirectoryPage = () => {
     selectedViewType,
   });
 
+  const {
+    data: communityTagsAndCommunities,
+    isLoading: isLoadingTagsAndCommunities,
+    error: tagsAndCommunitiesError,
+  } = useGetCommunitySelectedTagsAndCommunities({
+    community_id: communityId,
+    enabled: !!communityId,
+  });
+
+  const { mutateAsync: updateCommunityDirectoryTags } =
+    useUpdateCommunityDirectoryTags();
+
+  const getFilteredCommunities = useCallback(
+    (communities: any[], tags: string[], manualSelections: string[]) => {
+      if (!communities) {
+        return [];
+      }
+
+      if (tags.length === 0 && manualSelections.length === 0) {
+        return communities;
+      }
+
+      return communities.filter((comm) => {
+        const matchesTags =
+          tags.length > 0 && tags.some((tag) => comm.tag_ids?.includes(tag));
+
+        const matchesManualSelection =
+          manualSelections.length > 0 && manualSelections.includes(comm.id);
+
+        return matchesTags || matchesManualSelection;
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (isLoadingTagsAndCommunities) {
+      return;
+    }
+
+    if (tagsAndCommunitiesError) {
+      console.error(
+        'Error loading tags and communities:',
+        tagsAndCommunitiesError,
+      );
+      return;
+    }
+
+    const communityData = communityTagsAndCommunities?.[0] || {
+      tag_names: [],
+      selected_community_ids: [],
+    };
+
+    const initialTags = Array.isArray(communityData.tag_names)
+      ? communityData.tag_names
+      : [];
+    const initialCommunities = Array.isArray(
+      communityData.selected_community_ids,
+    )
+      ? communityData.selected_community_ids
+      : [];
+
+    setSelectedTags(initialTags);
+    setSelectedCommunities(initialCommunities);
+
+    if (filteredRelatedCommunitiesData) {
+      const initialFilteredCommunities = getFilteredCommunities(
+        filteredRelatedCommunitiesData,
+        initialTags,
+        initialCommunities,
+      );
+
+      setFilteredCommunities(initialFilteredCommunities);
+
+      if (tableData) {
+        const newTableData = tableData.filter((row) =>
+          initialFilteredCommunities.some(
+            (filteredItem) => filteredItem.id === row.id,
+          ),
+        );
+        setFilteredTableData(newTableData);
+      }
+    }
+  }, [
+    communityTagsAndCommunities,
+    isLoadingTagsAndCommunities,
+    tagsAndCommunitiesError,
+    filteredRelatedCommunitiesData,
+    tableData,
+    getFilteredCommunities,
+  ]);
+
+  useEffect(() => {
+    if (!filteredRelatedCommunitiesData || !tableData) return;
+
+    const newFilteredCommunities = getFilteredCommunities(
+      filteredRelatedCommunitiesData,
+      selectedTags,
+      selectedCommunities,
+    );
+
+    setFilteredCommunities(newFilteredCommunities);
+
+    const newTableData = tableData.filter((row) =>
+      newFilteredCommunities.some((filteredItem) => filteredItem.id === row.id),
+    );
+    setFilteredTableData(newTableData);
+  }, [
+    selectedTags,
+    selectedCommunities,
+    filteredRelatedCommunitiesData,
+    tableData,
+    getFilteredCommunities,
+  ]);
+
   const handleCreateCommunity = () => {
     navigate('/createCommunity', {}, null);
   };
+
+  const { trackAnalytics } = useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
+
+  const handleSaveChanges = async () => {
+    try {
+      const validTags = selectedTags || [];
+      const validCommunities = selectedCommunities || [];
+
+      await updateCommunityDirectoryTags({
+        community_id: communityId,
+        tag_names: validTags,
+        selected_community_ids: validCommunities,
+      });
+
+      setIsDirectorySettingsDrawerOpen(false);
+      trackAnalytics({
+        event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+        isPWA: isAddedToHomeScreen,
+      });
+    } catch (error) {
+      console.log(error);
+      notifyError('Failed to update Directory Settings');
+    }
+  };
+
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -80,6 +248,10 @@ const DirectoryPage = () => {
     return (
       <ErrorPage message="Directory Page is not enabled for this community." />
     );
+  }
+
+  if (isLoadingTagsAndCommunities) {
+    return <CWCircleMultiplySpinner />;
   }
 
   return (
@@ -101,39 +273,59 @@ const DirectoryPage = () => {
         <CWText type="h4" className="subtitle">
           {baseChain?.name} ecosystem
         </CWText>
-        <div className="search-row">
-          <div className="community-search">
-            <CWTextInput
-              value={communitySearch}
-              onInput={(e: any) => setCommunitySearch(e.target.value)}
-              fullWidth
-              placeholder="Search communities"
-              iconLeft={<MagnifyingGlass size={24} weight="regular" />}
-            />
+        <div className="search-row-and-filter">
+          <div className="search-row">
+            <div className="community-search">
+              <CWTextInput
+                value={communitySearch}
+                onInput={(e: any) => setCommunitySearch(e.target.value)}
+                fullWidth
+                placeholder="Search communities"
+                iconLeft={<MagnifyingGlass size={24} weight="regular" />}
+              />
+            </div>
+            <div className="toggle-view-icons">
+              <div
+                className={clsx('icon-container', {
+                  selected: selectedViewType === ViewType.Rows,
+                })}
+              >
+                <CWIconButton
+                  onClick={() => setSelectedViewType(ViewType.Rows)}
+                  iconName="rows"
+                  weight="light"
+                />
+              </div>
+              <div
+                className={clsx('icon-container', {
+                  selected: selectedViewType === ViewType.Tiles,
+                })}
+              >
+                <CWIconButton
+                  onClick={() => setSelectedViewType(ViewType.Tiles)}
+                  iconName="squaresFour"
+                  weight="light"
+                />
+              </div>
+              {isAdmin && (
+                <CWButton
+                  iconLeft="gear"
+                  buttonType="secondary"
+                  label="Directory Settings"
+                  onClick={() => setIsDirectorySettingsDrawerOpen(true)}
+                />
+              )}
+            </div>
           </div>
-          <div className="toggle-view-icons">
-            <div
-              className={clsx('icon-container', {
-                selected: selectedViewType === ViewType.Rows,
-              })}
-            >
-              <CWIconButton
-                onClick={() => setSelectedViewType(ViewType.Rows)}
-                iconName="rows"
-                weight="light"
-              />
-            </div>
-            <div
-              className={clsx('icon-container', {
-                selected: selectedViewType === ViewType.Tiles,
-              })}
-            >
-              <CWIconButton
-                onClick={() => setSelectedViewType(ViewType.Tiles)}
-                iconName="squaresFour"
-                weight="light"
-              />
-            </div>
+          <div>
+            <ShowAddedTags
+              selectedTags={selectedTags}
+              isLoading={isLoadingTagsAndCommunities}
+            />
+            <ShowAddedCommunities
+              selectedCommunities={selectedCommunities}
+              isLoading={isLoadingTagsAndCommunities}
+            />
           </div>
         </div>
 
@@ -143,9 +335,19 @@ const DirectoryPage = () => {
           noCommunitiesInChain={noCommunitiesInChain}
           chainName={baseChain?.name}
           communitySearch={communitySearch}
-          filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
-          tableData={tableData}
+          filteredRelatedCommunitiesData={filteredCommunities}
+          tableData={filteredTableData}
           selectedViewType={selectedViewType}
+        />
+        <DirectorySettingsDrawer
+          isOpen={isDirectorySettingsDrawerOpen}
+          onClose={() => setIsDirectorySettingsDrawerOpen(false)}
+          filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags}
+          selectedCommunities={selectedCommunities}
+          setSelectedCommunities={setSelectedCommunities}
+          handleSaveChanges={handleSaveChanges}
         />
       </div>
     </CWPageLayout>

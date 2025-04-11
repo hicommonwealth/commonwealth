@@ -68,6 +68,11 @@ export const trpcRouter = trpc.router({
     },
   }),
   getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community),
+  // Add this to the existing router
+  getCommunitySelectedTagsAndCommunities: trpc.query(
+    Community.GetCommunitySelectedTagsAndCommunities,
+    trpc.Tag.Community,
+  ),
   getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
   getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
   getStakeHistoricalPrice: trpc.query(
@@ -159,6 +164,10 @@ export const trpcRouter = trpc.router({
   unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
   updateCommunityTags: trpc.command(
     Community.UpdateCommunityTags,
+    trpc.Tag.Community,
+  ),
+  updateCommunityDirectoryTags: trpc.command(
+    Community.UpdateCommunityDirectoryTags,
     trpc.Tag.Community,
   ),
 });
