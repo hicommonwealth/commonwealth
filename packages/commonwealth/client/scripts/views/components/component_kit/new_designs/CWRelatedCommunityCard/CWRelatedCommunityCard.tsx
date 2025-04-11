@@ -1,4 +1,4 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Community } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
@@ -24,7 +24,7 @@ import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
-  community: z.infer<typeof ExtendedCommunity>;
+  community: z.infer<typeof Community>;
   memberCount: string | number;
   threadCount: string | number;
   canBuyStake?: boolean;

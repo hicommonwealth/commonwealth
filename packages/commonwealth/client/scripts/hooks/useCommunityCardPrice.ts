@@ -1,4 +1,4 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Community } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
 import { convertTokenAmountToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
@@ -17,7 +17,7 @@ export const useCommunityCardPrice = ({
   ethUsdRate,
   historicalPrice,
 }: {
-  community: z.infer<typeof ExtendedCommunity>;
+  community: z.infer<typeof Community>;
   stakeId: number;
   ethUsdRate: string;
   historicalPrice: string;

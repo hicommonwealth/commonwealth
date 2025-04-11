@@ -8,7 +8,7 @@ import {
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
@@ -22,12 +22,16 @@ type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
   hideHeader?: boolean;
+  stage?: 'all' | 'active' | 'past';
+  searchValue?: string;
 };
 
 const QuestList = ({
   minQuests = 8,
   questsForCommunityId,
   hideHeader,
+  stage = 'all',
+  searchValue,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
@@ -45,7 +49,12 @@ const QuestList = ({
     }),
     cursor: 1,
     limit: minQuests,
-    end_after: moment().startOf('week').toDate(),
+    // Filter by stage: for 'active' show only current quests, for 'past' show only past quests
+    ...(stage === 'active'
+      ? { end_after: moment().startOf('day').toDate() }
+      : stage === 'past'
+        ? { end_before: moment().startOf('day').toDate() }
+        : { end_after: moment().startOf('week').toDate() }), // default: show quests from this week
     // dont show system quests in quest lists for communities
     include_system_quests: questsForCommunityId ? false : true,
     enabled: xpEnabled,
@@ -59,6 +68,19 @@ const QuestList = ({
       to: moment().endOf('week').toDate(),
       enabled: user.isLoggedIn && xpEnabled,
     });
+
+  // Memoize filtered quests
+  const filteredQuests = useMemo(() => {
+    if (!searchValue) {
+      return quests;
+    }
+    const lowerSearchValue = searchValue.toLowerCase();
+    return quests.filter(
+      (quest) =>
+        quest.name.toLowerCase().includes(lowerSearchValue) ||
+        quest.description?.toLowerCase().includes(lowerSearchValue),
+    );
+  }, [quests, searchValue]);
 
   const handleFetchMoreQuests = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -78,10 +100,18 @@ const QuestList = ({
 
   return (
     <div className="QuestList">
-      {!hideHeader && <CWText type="h2">Quests</CWText>}
+      {!hideHeader && (
+        <CWText type="h2">
+          {stage === 'active'
+            ? 'Active Quests'
+            : stage === 'past'
+              ? 'Past Quests'
+              : 'Quests'}
+        </CWText>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
-      ) : quests.length === 0 ? (
+      ) : filteredQuests.length === 0 ? (
         <div
           className={clsx('empty-placeholder', {
             'my-16': xpEnabled,
@@ -93,7 +123,7 @@ const QuestList = ({
         </div>
       ) : (
         <div className="list">
-          {(quests || []).map((quest) => {
+          {filteredQuests.map((quest) => {
             const totalUserXP = calculateTotalXPForQuestActions({
               questActions: (quest.action_metas as QuestAction[]) || [],
               isUserReferred: !!user.referredByAddress,
@@ -136,12 +166,15 @@ const QuestList = ({
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && quests.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreQuests}
-        />
+        // Conditionally render 'See more' only if not searching
+        !searchValue && (
+          <CWButton
+            label="See more"
+            buttonType="tertiary"
+            containerClassName="ml-auto"
+            onClick={handleFetchMoreQuests}
+          />
+        )
       ) : (
         <></>
       )}

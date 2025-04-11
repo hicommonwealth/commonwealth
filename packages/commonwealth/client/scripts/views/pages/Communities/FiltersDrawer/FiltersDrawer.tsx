@@ -16,7 +16,6 @@ import {
   communityChains,
   communityNetworks,
   communitySortOptionsLabelToKeysMap,
-  communityTypes,
   sortOrderLabelsToDirectionsMap,
 } from './constants';
 import {
@@ -77,23 +76,24 @@ export const FiltersDrawer = ({
     });
   };
 
-  const onCommunityTypeChange = (type: CommunityType) => {
-    onFiltersChange({
-      ...filters,
-      withCommunityType: filters.withCommunityType === type ? undefined : type,
-    });
-  };
-
   const onCommunitySortOptionChange = (sortOption: CommunitySortOptions) => {
     onFiltersChange({
       ...filters,
       withCommunitySortOrder: (sortOption === CommunitySortOptions.MostRecent
         ? Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+            ([_, v]) =>
+              v ===
+              sortOrderLabelsToDirectionsMap[
+                CommunitySortDirections.Descending
+              ],
           )?.[0]
         : filters.withCommunitySortOrder ||
           Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+            ([_, v]) =>
+              v ===
+              sortOrderLabelsToDirectionsMap[
+                CommunitySortDirections.Descending
+              ],
           )?.[0]) as CommunitySortDirections,
       withCommunitySortBy:
         filters.withCommunitySortBy === sortOption ? undefined : sortOption,
@@ -126,17 +126,6 @@ export const FiltersDrawer = ({
         <div className="content-container">
           <CWText type="h3">Community Filters</CWText>
           <div className="filter-content">
-            <div className="stake-filter">
-              <CWText type="h5" fontWeight="semiBold">
-                Stake
-              </CWText>
-              <CWToggle
-                size="small"
-                checked={filters.withStakeEnabled}
-                onChange={() => onStakeFilterChange()}
-              />
-            </div>
-
             {launchpadEnabled && (
               <>
                 <CWAccordion
@@ -192,28 +181,31 @@ export const FiltersDrawer = ({
                   }
                 />
 
-                <CWAccordion
-                  header="Community Type"
-                  content={
-                    <div className="options-list">
-                      {communityTypes.map((type) => (
-                        <CWRadioButton
-                          key={type}
-                          groupName="community-type"
-                          value={type}
-                          label={type}
-                          checked={filters.withCommunityType === type}
-                          onChange={() => onCommunityTypeChange(type)}
-                        />
-                      ))}
-                    </div>
-                  }
-                />
+                <div className="token-filter">
+                  <CWText type="h5" fontWeight="semiBold">
+                    Has Tradeable Token
+                  </CWText>
+                  <CWToggle
+                    size="small"
+                    checked={
+                      filters.withCommunityType === CommunityType.Launchpad
+                    }
+                    onChange={() =>
+                      onFiltersChange({
+                        ...filters,
+                        withCommunityType:
+                          filters.withCommunityType === CommunityType.Launchpad
+                            ? undefined
+                            : CommunityType.Launchpad,
+                      })
+                    }
+                  />
+                </div>
               </>
             )}
 
             <CWAccordion
-              header="Community Preferences"
+              header="Community Tags"
               content={
                 <div className="options-list">
                   {(tags || [])?.map((t) => (
@@ -285,6 +277,17 @@ export const FiltersDrawer = ({
                 </div>
               }
             />
+
+            <div className="stake-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Has Member Stake
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.withStakeEnabled}
+                onChange={() => onStakeFilterChange()}
+              />
+            </div>
           </div>
         </div>
       </CWDrawer>
