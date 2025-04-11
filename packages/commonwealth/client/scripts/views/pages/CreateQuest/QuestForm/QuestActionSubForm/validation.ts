@@ -1,4 +1,6 @@
 import {
+  EVM_ADDRESS_STRICT_REGEX,
+  EVM_EVENT_SIGNATURE_STRICT_REGEX,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -156,15 +158,25 @@ export const buildQuestSubFormValidationSchema = (
   }
   if (requiresChainEvent) {
     baseSchema = baseSchema.extend({
-      contractAddress: z
-        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
       ethChainId: z
         .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+      contractAddress: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000`,
+          ),
+        }),
       eventSignature: z
         .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000000000000000000000000000`,
+          ),
+        }),
     }) as unknown as typeof baseSchema;
   }
 
