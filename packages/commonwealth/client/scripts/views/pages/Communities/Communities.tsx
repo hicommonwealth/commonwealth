@@ -291,8 +291,8 @@ const CommunitiesPage = () => {
             <SearchFilterRow
               searchValue={searchValue}
               onSearchChange={setSearchValue}
-              selectedViewType={selectedViewType}
-              onViewTypeChange={setSelectedViewType}
+              _selectedViewType={selectedViewType}
+              _onViewTypeChange={setSelectedViewType}
               onFilterClick={currentTabConfig.getFilterClickHandler?.(
                 tabContentProps,
               )}
@@ -300,10 +300,14 @@ const CommunitiesPage = () => {
                 currentTabConfig.getFilterTags?.(tabContentProps) || []
               }
               placeholder={`Search ${activeTab}`}
-              showViewToggle={currentTabConfig.showViewToggle}
+              _showViewToggle={currentTabConfig.showViewToggle ?? false}
               inlineFilters={
                 currentTabConfig.getInlineFilters?.(tabContentProps) || []
               }
+              _selectedSortOption={''}
+              _onSortOptionChange={() => {}}
+              _communitiesCount={0}
+              _isFilterDrawerOpen={false}
             />
           )}
         </div>

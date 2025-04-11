@@ -81,11 +81,19 @@ export const FiltersDrawer = ({
       ...filters,
       withCommunitySortOrder: (sortOption === CommunitySortOptions.MostRecent
         ? Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+            ([_, v]) =>
+              v ===
+              sortOrderLabelsToDirectionsMap[
+                CommunitySortDirections.Descending
+              ],
           )?.[0]
         : filters.withCommunitySortOrder ||
           Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+            ([_, v]) =>
+              v ===
+              sortOrderLabelsToDirectionsMap[
+                CommunitySortDirections.Descending
+              ],
           )?.[0]) as CommunitySortDirections,
       withCommunitySortBy:
         filters.withCommunitySortBy === sortOption ? undefined : sortOption,

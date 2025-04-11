@@ -1,5 +1,4 @@
 import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
-import { Thread } from 'models/Thread';
 import React, {
   MutableRefObject,
   ReactNode,
@@ -7,8 +6,11 @@ import React, {
   useCallback,
 } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
-import useSearchThreadsQuery from 'state/api/threads/searchThreads';
-import { APIOrderBy, APIOrderDirection } from '../../../helpers/constants';
+import useSearchThreadsQuery, {
+  APIOrderBy,
+  APIOrderDirection,
+} from 'state/api/threads/searchThreads';
+import { ThreadResult } from 'views/pages/search/helpers';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
@@ -23,7 +25,7 @@ import {
 import { CommunityFilters, FiltersDrawer } from './FiltersDrawer';
 import { safeScrollParent } from './helpers';
 import QuestList from './QuestList';
-import { SearchableThreadsFeed } from './SearchableThreadsFeed';
+import SearchableThreadsFeed from './SearchableThreadsFeed';
 import { FilterTag, InlineFilter, ViewType } from './SearchFilterRow';
 import TokensList from './TokensList';
 
@@ -153,23 +155,19 @@ const FilteredThreadsFeed = ({
     orderDirection,
     threadTitleOnly: false,
     includeCount: true,
-    queryKeyParam: filterKey,
     enabled: !!searchTerm && searchTerm.length > 0,
   });
 
   // Determine if we need to use search or standard feed
   if (searchTerm && searchTerm.length > 0) {
-    // Prepare props for SearchableThreadsFeed
-    const threads =
+    const rawThreads: ThreadResult[] =
       searchResults.data?.pages.flatMap((page) => page.results) || [];
-    // Map raw search results to Thread instances if necessary
-    const mappedThreads = threads.map((threadData) => new Thread(threadData));
 
     return (
       <SearchableThreadsFeed
         customScrollParent={customScrollParent}
         searchTerm={searchTerm}
-        threads={mappedThreads}
+        threads={rawThreads}
         isLoading={searchResults.isLoading}
         error={searchResults.error}
         hasNextPage={searchResults.hasNextPage}

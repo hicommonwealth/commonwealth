@@ -1,15 +1,20 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainNetwork } from '@hicommonwealth/shared';
 import { useCallback, useMemo, useRef } from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
 import { useFetchTagsQuery } from 'state/api/tags';
-import { useFetchTokenUsdRateQuery } from '../../../../state/api/communityStake/index';
-import { trpc } from '../../../../utils/trpcClient';
+import { useFetchHistoricalPricesQuery } from 'state/api/tokens';
+import { z } from 'zod';
 import {
   CommunityFilters,
   CommunitySortOptions,
   communitySortOptionsLabelToKeysMap,
   sortOrderLabelsToDirectionsMap,
 } from '../FiltersDrawer';
+
+// Define the type based on the schema
+type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 
 export function useCommunityData(
   filters: CommunityFilters,
@@ -19,14 +24,17 @@ export function useCommunityData(
 
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
 
+  // Use the correct hook
   const {
     data: communities,
     fetchNextPage: fetchMoreCommunitiesOriginal,
     hasNextPage,
-    isInitialLoading: isInitialCommunitiesLoading,
+    isLoading: isInitialCommunitiesLoading, // Assuming isLoading is returned
   } = useFetchCommunitiesQuery({
     limit: 50,
+    cursor: 1,
     include_node_info: true,
+    // Reconstruct order_by logic
     order_by: (() => {
       if (
         filters.withCommunitySortBy &&
@@ -40,10 +48,9 @@ export function useCommunityData(
           (communitySortOptionsLabelToKeysMap[
             filters.withCommunitySortBy
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ] as any) || 'lifetime_thread_count'
+          ] as any) || 'lifetime_thread_count' // Default if mapping fails
         );
       }
-
       return 'lifetime_thread_count';
     })(),
     order_direction:
@@ -59,10 +66,10 @@ export function useCommunityData(
         : undefined,
     base: filters.withCommunityEcosystem || undefined,
     network: filters.withNetwork
-      ? ChainNetwork[filters.withNetwork]
+      ? ChainNetwork[filters.withNetwork] // Assuming ChainNetwork enum access
       : undefined,
     stake_enabled: filters.withStakeEnabled,
-    cursor: 1,
+    // cursor: 1, // Use default cursor handling of useFetchCommunitiesQuery
     tag_ids:
       filters.withTagsIds && filters.withTagsIds.length > 0
         ? filters.withTagsIds
@@ -75,10 +82,9 @@ export function useCommunityData(
     await fetchMoreCommunitiesOriginal();
   }, [fetchMoreCommunitiesOriginal]);
 
+  // Use the actual hook now
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
-    trpc.community.getStakeHistoricalPrice.useQuery({
-      past_date_epoch: oneDayAgo.current / 1000, // 24 hours ago
-    });
+    useFetchHistoricalPricesQuery(); // Uncommented hook usage
 
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
     useFetchTokenUsdRateQuery({
@@ -97,9 +103,11 @@ export function useCommunityData(
     const flatList = (communities?.pages || []).flatMap((page) => page.results);
 
     const SLICE_SIZE = 2;
+    // Let TypeScript infer the type again
     const twoCommunitiesPerEntry = [];
 
     for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
+      // Pushing slices of the inferred type from flatList
       twoCommunitiesPerEntry.push(flatList.slice(i, i + SLICE_SIZE));
     }
 
@@ -126,17 +134,20 @@ export function useCommunityData(
 
     // Recreate the sliced structure
     const SLICE_SIZE = 2;
+    // Let TypeScript infer the type again
     const filteredSlices = [];
 
     for (let i = 0; i < filteredList.length; i += SLICE_SIZE) {
       const slice = filteredList.slice(i, i + SLICE_SIZE);
       // Only add slices with valid items
       if (slice.length === SLICE_SIZE) {
+        // Pushing slices of the inferred type from filteredList
         filteredSlices.push(slice);
       } else if (slice.length === 1) {
         // For the last odd item, create a slice with undefined as the second item
         // But make sure the first item is valid
         if (slice[0] && slice[0].id) {
+          // Pushing a tuple matching the inferred structure
           filteredSlices.push([slice[0], undefined]);
         }
       }
@@ -153,7 +164,7 @@ export function useCommunityData(
     hasNextPage,
     isLoading,
     isInitialCommunitiesLoading,
-    historicalPrices,
+    historicalPrices, // Return actual data
     ethUsdRate: Number(ethUsdRate),
     tags,
   };

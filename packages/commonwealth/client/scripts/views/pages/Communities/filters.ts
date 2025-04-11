@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
+import { CommunityFilters } from './FiltersDrawer/types';
 import { FilterTag, InlineFilter } from './SearchFilterRow';
 
 /**
@@ -34,7 +35,7 @@ export function createToggleFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    _forceRefreshKey,
+    forceRefreshKey,
     setForceRefreshKey,
   },
   getLabel,
@@ -108,7 +109,7 @@ export function createSortFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    _forceRefreshKey,
+    forceRefreshKey,
     setForceRefreshKey,
   },
   tagPrefix,
@@ -181,7 +182,7 @@ export function createSelectFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    _forceRefreshKey,
+    forceRefreshKey,
     setForceRefreshKey,
   },
   getTagLabel,
@@ -268,27 +269,30 @@ export function createSearchFilterTag(
 }
 
 export const getCommunityFilters = (
-  _filters: CommunityFilter,
+  filters: CommunityFilters,
   _forceRefreshKey?: string,
 ): InlineFilter[] => {
-  // ... existing code ...
+  // TODO: Implement actual filter logic
+  return [];
 };
 
 export const getThreadsFilters = (
   _communityId: string,
   _sortOption: string,
   _filterTags: string[],
-  _forceRefreshKey?: string,
   _handleFilterChange: (filterKey: string, value: string) => void,
+  _forceRefreshKey?: string,
 ): InlineFilter[] => {
-  // ... existing code ...
+  // TODO: Implement actual filter logic
+  return [];
 };
 
 export const getTokensFilters = (
   _filterTag: string,
   _sortOption: string,
-  _forceRefreshKey?: string,
   _handleFilterChange: (filterKey: string, value: string) => void,
+  _forceRefreshKey?: string,
 ): InlineFilter[] => {
-  // ... existing code ...
+  // TODO: Implement actual filter logic
+  return [];
 };
