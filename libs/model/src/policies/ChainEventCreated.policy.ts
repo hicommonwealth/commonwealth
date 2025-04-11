@@ -43,6 +43,7 @@ export function ChainEventPolicy(): Policy<
       NamespaceDeployed: handleNamespaceDeployed,
       NamespaceDeployedWithReferral: handleNamespaceDeployedWithReferral,
       ReferralFeeDistributed: handleReferralFeeDistributed,
+      JudgeNominated: handleJudgeNominated,
       // TokenStaking
       TokenLocked: handleTokenLocked,
       TokenLockDurationIncreased: handleTokenLockDurationIncreased,
@@ -51,7 +52,6 @@ export function ChainEventPolicy(): Policy<
       TokenDelegated: handleTokenDelegated,
       TokenUndelegated: handleTokenUndelegated,
       TokenMerged: handleTokenMerged,
-      JudgeNominated: handleJudgeNominated,
     },
   };
 }
