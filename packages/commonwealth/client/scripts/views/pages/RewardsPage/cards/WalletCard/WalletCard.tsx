@@ -6,6 +6,7 @@ import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
@@ -20,6 +21,7 @@ import {
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
+import { DepositModal, WithdrawModal } from 'views/modals/WalletModals';
 import RewardsCard from '../../RewardsCard';
 import './WalletCard.scss';
 import useUserWalletHoldings from './useUserWalletHoldings';
@@ -33,6 +35,8 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   const user = useUserStore();
 
@@ -54,6 +58,16 @@ const WalletCard = () => {
     useUserWalletHoldings({
       userSelectedAddress,
     });
+
+  const handleDeposit = async (amount: string) => {
+    // TODO: Implement deposit logic
+    console.log('Depositing:', amount);
+  };
+
+  const handleWithdraw = async (amount: string) => {
+    // TODO: Implement withdraw logic
+    console.log('Withdrawing:', amount);
+  };
 
   return (
     <RewardsCard title="Wallet Balance" icon="cardholder">
@@ -136,6 +150,39 @@ const WalletCard = () => {
             <CWText isCentered>🚧 Coming Soon, Hang tight!</CWText>
           )}
         </div>
+
+        <div className="wallet-actions">
+          <CWButton
+            label="Deposit Funds"
+            buttonWidth="full"
+            onClick={() => setIsDepositModalOpen(true)}
+          />
+          <CWButton
+            label="Withdraw Funds"
+            buttonWidth="full"
+            onClick={() => setIsWithdrawModalOpen(true)}
+          />
+        </div>
+
+        <DepositModal
+          isOpen={isDepositModalOpen}
+          onClose={() => setIsDepositModalOpen(false)}
+          currentBalance={
+            userTokens.find((t) => t.symbol === 'ETH')?.balance.toString() ||
+            '0'
+          }
+          onDeposit={handleDeposit}
+        />
+
+        <WithdrawModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          currentBalance={
+            userTokens.find((t) => t.symbol === 'ETH')?.balance.toString() ||
+            '0'
+          }
+          onWithdraw={handleWithdraw}
+        />
       </div>
     </RewardsCard>
   );

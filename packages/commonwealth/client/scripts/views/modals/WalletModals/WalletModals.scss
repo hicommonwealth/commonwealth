@@ -1,0 +1,51 @@
+@import '../../../styles/shared';
+
+.WalletModal {
+  .current-balance-row {
+    display: flex;
+    justify-content: space-between;
+    color: $neutral-500;
+    margin-bottom: 16px;
+
+    .balance-and-magic {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+  }
+
+  .amount-input-section {
+    margin-top: 24px;
+
+    .amount-input-with-currency {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .CWTextInput {
+        flex: 1;
+
+        input[type='number'] {
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          -moz-appearance: textfield;
+        }
+      }
+
+      .currency-label {
+        color: $neutral-600;
+      }
+    }
+  }
+
+  .actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
