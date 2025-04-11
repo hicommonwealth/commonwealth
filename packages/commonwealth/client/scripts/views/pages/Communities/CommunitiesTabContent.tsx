@@ -1,4 +1,4 @@
-import { Community, ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Community } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, MutableRefObject } from 'react';
@@ -15,12 +15,6 @@ import { CommunityFilters } from './FiltersDrawer';
 // Define local types (assuming Community is imported or available)
 type CommunityItem = z.infer<typeof Community>; // Need to ensure Community is imported/available
 type CommunityPair = [CommunityItem, CommunityItem | undefined];
-
-// Define the type for a single community item - Requires Community schema import if not already present
-// import { Community } from '@hicommonwealth/schemas'; // Uncomment if needed
-// type CommunityItem = z.infer<typeof Community>;
-
-type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
 
 interface CommunitiesTabContentProps {
   isLoading: boolean;
