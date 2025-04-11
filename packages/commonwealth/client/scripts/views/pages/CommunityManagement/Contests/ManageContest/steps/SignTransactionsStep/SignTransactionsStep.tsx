@@ -227,6 +227,8 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
+        // TODO: get from backend
+        judgeId: 101,
       });
 
       setConfigureNominationsData((prevState) => ({

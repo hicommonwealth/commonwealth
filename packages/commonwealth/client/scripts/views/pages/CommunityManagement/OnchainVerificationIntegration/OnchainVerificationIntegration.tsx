@@ -72,7 +72,7 @@ const OnchainVerificationIntegration = () => {
             chainId={communityChainId}
             transactionTypes={[
               TransactionType.DeployNamespace,
-              TransactionType.ConfigureNominations,
+              TransactionType.ConfigureVerification,
               TransactionType.MintVerificationToken,
             ]}
             namespace={community?.namespace}
