@@ -56,8 +56,8 @@ const TokenWidget = () => {
         </CWText>
 
         <CWText type="b1">
-          You'II automatically receive 1% of the token supply when creating this
-          thread.
+          You&apos;ll automatically receive 1% of the token supply when creating
+          this thread.
         </CWText>
       </div>
     </div>
