@@ -1,8 +1,5 @@
 import { pluralize } from 'helpers';
-import {
-  TransactionConfig as BaseTransactionConfig,
-  TransactionHookResult,
-} from '../types';
+import { TransactionConfig, TransactionHookResult } from '../types';
 
 export enum TransactionType {
   DeployNamespace = 'deployNamespace',
@@ -17,8 +14,6 @@ export interface TransactionDefinition {
   label: string;
   description?: string;
 }
-
-export type TransactionConfig = BaseTransactionConfig;
 
 export const TRANSACTION_DEFINITIONS: Record<
   TransactionType,
