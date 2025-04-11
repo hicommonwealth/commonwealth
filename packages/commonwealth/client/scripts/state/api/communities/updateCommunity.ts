@@ -1,4 +1,9 @@
-import { ChainType, DefaultPage } from '@hicommonwealth/shared';
+import {
+  ChainType,
+  DefaultPage,
+  DisabledCommunitySpamTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { initAppState } from 'state';
 import { trpc } from 'utils/trpcClient';
 import useUserStore, { userStore } from '../../ui/user';
@@ -25,6 +30,10 @@ interface UpdateCommunityProps {
   chainNodeId?: string;
   type?: ChainType;
   defaultPage?: DefaultPage;
+  spamTierLevel?:
+    | typeof DisabledCommunitySpamTier
+    | UserTierMap.NewlyVerifiedWallet
+    | UserTierMap.VerifiedWallet;
 }
 
 export const buildUpdateCommunityInput = ({
@@ -48,6 +57,7 @@ export const buildUpdateCommunityInput = ({
   chainNodeId,
   type,
   defaultPage,
+  spamTierLevel,
 }: UpdateCommunityProps) => {
   return {
     jwt: userStore.getState().jwt,
@@ -88,6 +98,9 @@ export const buildUpdateCommunityInput = ({
     ...(typeof type !== 'undefined' && { type: type }),
     ...(typeof defaultPage !== 'undefined' && {
       default_page: defaultPage,
+    }),
+    ...(typeof spamTierLevel !== 'undefined' && {
+      spam_tier_level: spamTierLevel,
     }),
   };
 };

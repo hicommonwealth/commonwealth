@@ -5,6 +5,7 @@ import {
   XpLogView,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
@@ -66,21 +67,29 @@ export const doesActionRequireChainEvent = (action: QuestActionType) => {
   return action === 'XpChainEventCreated';
 };
 
+export const doesActionAllowRepetition = (action: QuestActionType) => {
+  return action !== 'TweetEngagement';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,
   minutes,
+  seconds,
 }: {
   days: number;
   hours: number;
   minutes: number;
+  seconds: number;
 }) => {
   if (Math.abs(days) > 0)
-    return `${Math.abs(days)} day${Math.abs(days) ? 's' : ''}`;
+    return `${Math.abs(days)} day${Math.abs(days) > 1 ? 's' : ''}`;
   if (Math.abs(hours) > 0)
-    return `${Math.abs(hours)} hour${Math.abs(hours) ? 's' : ''}`;
+    return `${Math.abs(hours)} hour${Math.abs(hours) > 1 ? 's' : ''}`;
   if (Math.abs(minutes) > 0)
-    return `${Math.abs(minutes)} minute${Math.abs(minutes) ? 's' : ''}`;
+    return `${Math.abs(minutes)} minute${Math.abs(minutes) > 1 ? 's' : ''}`;
+  if (Math.abs(seconds) > 0)
+    return `${Math.abs(seconds)} second${Math.abs(seconds) > 1 ? 's' : ''}`;
   return ``;
 };
 
@@ -96,10 +105,12 @@ export const calculateQuestTimelineLabel = ({
   const startHoursRemaining = moment(startDate).diff(moment(), 'hours');
   const startDaysRemaining = moment(startDate).diff(moment(), 'days');
   const startMinutesRemaining = moment(startDate).diff(moment(), 'minutes');
+  const startSecondsRemaining = moment(startDate).diff(moment(), 'seconds');
   const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
   const endDaysRemaining = moment(endDate).diff(moment(), 'days');
   const endMinutesRemaining = moment(endDate).diff(moment(), 'minutes');
   const endYearsRemaining = moment(endDate).diff(moment(), 'years');
+  const endSecondsRemaining = moment(endDate).diff(moment(), 'seconds');
 
   if (isEnded) {
     return `Ended
@@ -114,6 +125,7 @@ export const calculateQuestTimelineLabel = ({
     days: Math.abs(isStarted ? endDaysRemaining : startDaysRemaining),
     hours: Math.abs(isStarted ? endHoursRemaining : startHoursRemaining),
     minutes: Math.abs(isStarted ? endMinutesRemaining : startMinutesRemaining),
+    seconds: Math.abs(isStarted ? endSecondsRemaining : startSecondsRemaining),
   })}`;
 };
 
@@ -193,4 +205,13 @@ export const isQuestActionComplete = (
     ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
     : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
         questAction.participation_times_per_period;
+};
+
+export const resetXPCacheForUser = (
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
+) => {
+  // reset xp cache after gaining xp
+  trpcUtils.quest.getQuests.invalidate().catch(console.error);
+  trpcUtils.user.getXps.invalidate().catch(console.error);
+  trpcUtils.user.getXpsRanked.invalidate().catch(console.error);
 };

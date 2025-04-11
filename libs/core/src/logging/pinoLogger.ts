@@ -30,9 +30,6 @@ export const getPinoLogger: GetLogger = (
   ids: LoggerIds,
   logLevel?: LogLevel,
 ) => {
-  if (ids[0] === 'twitterWorker.ts') {
-    console.log('>>>>>>>>>>>>>>> logLevel', logLevel);
-  }
   const logger = pino(
     {
       level: logLevel ?? config.LOGGING.LOG_LEVEL,

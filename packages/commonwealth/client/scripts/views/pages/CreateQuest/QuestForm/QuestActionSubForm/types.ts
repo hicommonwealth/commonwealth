@@ -57,6 +57,7 @@ export type QuestActionSubFormFields = {
 
 export type QuestActionSubFormConfig = {
   requires_creator_points: boolean;
+  is_action_repeatable: boolean;
   with_optional_topic_id: boolean;
   with_optional_thread_id: boolean;
   with_optional_comment_id: boolean;
@@ -76,6 +77,7 @@ export type QuestActionSubFormProps = {
   config?: QuestActionSubFormConfig;
   isRemoveable?: boolean;
   onRemove?: () => void;
+  availableActions: QuestAction[];
   hiddenActions?: QuestAction[];
   internalRefs?: QuestActionSubFormInternalRefs;
 };

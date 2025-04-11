@@ -8,6 +8,7 @@ import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
 import { ContestType } from '../types';
+import { isJudgedContest } from '../utils';
 import './ManageContest.scss';
 import {
   ContestLiveStep,
@@ -40,6 +41,8 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   } = useManageContestForm({
     contestAddress,
   });
+
+  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
 
   const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
   const { data: tokenMetadata } = useTokenMetadataQuery({
@@ -93,6 +96,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
             isFarcasterContest={isFarcasterContest}
+            isJudgedContest={judgedContest}
             fundingTokenTicker={fundingTokenTicker}
             fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />

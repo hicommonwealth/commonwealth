@@ -3,6 +3,7 @@ import {
   INamespaceResHookAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -109,7 +110,10 @@ class NamespaceFactory extends ContractBase {
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
-          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+          maxPriorityFeePerGas:
+            this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+              ? BigInt(0.00012 * 1e9)
+              : this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
       throw new Error('Transaction failed: ' + error);
@@ -194,7 +198,10 @@ class NamespaceFactory extends ContractBase {
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
-          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+          maxPriorityFeePerGas:
+            this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+              ? BigInt(0.00012 * 1e9)
+              : this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch {
       throw new Error('Transaction failed');
@@ -253,7 +260,11 @@ class NamespaceFactory extends ContractBase {
             from: walletAddress,
             type: '0x2',
             maxFeePerGas: maxFeePerGasEst?.toString(),
-            maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+            maxPriorityFeePerGas:
+              this.chainId &&
+              parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+                ? BigInt(0.00012 * 1e9)
+                : this.web3.utils.toWei('0.001', 'gwei'),
           });
       }
     } catch (error) {
@@ -307,6 +318,7 @@ class NamespaceFactory extends ContractBase {
     voterShare: number,
     walletAddress: string,
     exchangeToken: string,
+    judgeId: number,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true);
@@ -321,6 +333,7 @@ class NamespaceFactory extends ContractBase {
           winnerShares,
           voterShare,
           exchangeToken,
+          judgeId,
         )
         .send({
           from: walletAddress,

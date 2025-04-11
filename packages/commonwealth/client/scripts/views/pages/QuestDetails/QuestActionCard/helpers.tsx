@@ -3,6 +3,7 @@ import React from 'react';
 
 export const actionCopies = {
   title: {
+    ['SignUpFlowCompleted']: 'Sign in to Common',
     ['CommunityCreated']: 'Create a community',
     ['CommunityJoined']: 'Join a community',
     ['ThreadCreated']: 'Create a thread',
@@ -15,6 +16,7 @@ export const actionCopies = {
     ['CommonDiscordServerJoined']: "Join Common's Discord Community",
   },
   pre_reqs: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -29,6 +31,7 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
   },
   explainer: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -38,17 +41,34 @@ export const actionCopies = {
     ['WalletLinked']: () => '',
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
-      <>
-        XP rewarded to participants after any of these tweet metrics are met.
-        <br />
-        {likes > 0 ? `${pluralize(likes, 'Like')}, ` : ''}
-        {retweets > 0 ? `${pluralize(retweets, 'Retweet')}, ` : ''}
-        {replies > 0 ? `${pluralize(replies, 'Replies')}` : ''}.
-      </>
+      <div>
+        <ul>
+          <li>
+            ● XP rewarded to participants after any of these tweet metrics are
+            met -{' '}
+            {[
+              likes > 0 ? `${pluralize(likes, 'Like')}` : '',
+              retweets > 0 ? `${pluralize(retweets, 'Retweet')}` : '',
+              replies > 0 ? `${pluralize(replies, 'Reply')}` : '',
+            ]
+              .filter(Boolean)
+              .join(', ')}
+            .
+          </li>
+          <li>
+            ● This action is not bound by the max Aura limit for this quest.
+          </li>
+          <li>
+            ● Aura is awarded to the first engagements of the tweet regardless
+            of when the quest starts.
+          </li>
+        </ul>
+      </div>
     ),
     ['CommonDiscordServerJoined']: '',
   },
   shares: {
+    ['SignUpFlowCompleted']: '',
     ['CommunityCreated']: 'referrer',
     ['CommunityJoined']: 'referrer',
     ['ThreadCreated']: '',

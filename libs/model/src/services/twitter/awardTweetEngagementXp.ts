@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import { XpLogName } from '@hicommonwealth/schemas';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -18,11 +19,13 @@ async function awardBatchTweetEngagementXp({
   action_meta,
   twitterUsernames,
   transaction,
+  name,
 }: {
   quest: QuestAttributes;
   action_meta: QuestActionMetaAttributes;
   twitterUsernames: string[];
   transaction: Transaction;
+  name: z.infer<typeof XpLogName>;
 }) {
   const addresses = await models.Address.findAll({
     attributes: [
@@ -55,6 +58,7 @@ async function awardBatchTweetEngagementXp({
       action_meta_id: action_meta.id!,
       event_created_at: action_meta.created_at!,
       created_at: now,
+      name,
     })),
     { transaction },
   );
@@ -132,6 +136,7 @@ export const awardTweetEngagementXp = async (
         action_meta: quest.action_metas![0],
         twitterUsernames: likes.map((like) => like.username),
         transaction,
+        name: 'tweet_engagement_like',
       });
       questTweet.like_xp_awarded = true;
       await models.QuestTweets.update(
@@ -164,6 +169,7 @@ export const awardTweetEngagementXp = async (
           )
           .map((reply) => reply.username),
         transaction,
+        name: 'tweet_engagement_reply',
       });
       questTweet.reply_xp_awarded = true;
       await models.QuestTweets.update(
@@ -194,6 +200,7 @@ export const awardTweetEngagementXp = async (
         action_meta: quest.action_metas![0],
         twitterUsernames: retweets.map((retweet) => retweet.username),
         transaction,
+        name: 'tweet_engagement_retweet',
       });
       questTweet.retweet_xp_awarded = true;
       await models.QuestTweets.update(

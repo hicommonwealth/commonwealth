@@ -1,4 +1,11 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  CommunityTierMap,
+  DisabledCommunitySpamTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -55,7 +62,7 @@ export const e2eTestEntities = async function (
                     avatar_url: `testAvatarUrl${-i - 1}`,
                     email: `test${-i - 1}@gmail.com`,
                   },
-                  tier: 4,
+                  tier: UserTierMap.ManuallyVerified,
                 },
               })
             )[0],
@@ -95,8 +102,8 @@ export const e2eTestEntities = async function (
         [
           {
             id: 'cmntest',
-            tier: 0,
-            spam_tier_level: 0,
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 9999,
             name: 'cmntest',
             network: ChainNetwork.Ethereum,
@@ -111,8 +118,8 @@ export const e2eTestEntities = async function (
           },
           {
             id: 'cmntest2',
-            tier: 0,
-            spam_tier_level: 0,
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 99999,
             name: 'cmntest2',
             network: ChainNetwork.Ethereum,

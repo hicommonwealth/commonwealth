@@ -1,5 +1,5 @@
 import { AddressView } from '@hicommonwealth/schemas';
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
 import { z } from 'zod';
 
@@ -9,6 +9,7 @@ export type UserProfile = {
   address: string;
   lastActive: string;
   avatarUrl: string;
+  tier?: number;
 };
 
 export function addressToUserProfile(
@@ -16,9 +17,10 @@ export function addressToUserProfile(
 ): UserProfile {
   return {
     userId: address.user_id ?? address.User?.id ?? 0,
-    avatarUrl: address.User?.profile.avatar_url ?? '',
-    name: address.User?.profile.name ?? DEFAULT_NAME,
+    avatarUrl: address.User?.profile?.avatar_url ?? '',
+    name: address.User?.profile?.name ?? DEFAULT_NAME,
     address: address?.address,
+    tier: address.User?.tier ?? UserTierMap.IncompleteUser,
     lastActive: (
       address?.last_active ??
       address.User?.created_at ??
@@ -35,6 +37,7 @@ class MinimumProfile {
   private _chain: string;
   private _lastActive: Date | null;
   private _initialized: boolean;
+  private _tier: number;
 
   get userId() {
     return this._userId;
@@ -65,6 +68,10 @@ class MinimumProfile {
     return this._initialized;
   }
 
+  get tier() {
+    return this._tier;
+  }
+
   constructor(address, chain) {
     this._address = address;
     this._chain = chain;
@@ -77,6 +84,7 @@ class MinimumProfile {
     avatarUrl: string,
     chain: string,
     lastActive: Date | null,
+    tier: number,
   ) {
     this._userId = userId;
     this._name = name;
@@ -84,6 +92,7 @@ class MinimumProfile {
     this._avatarUrl = avatarUrl;
     this._chain = chain;
     this._lastActive = lastActive;
+    this._tier = tier;
     this._initialized = true;
   }
 
@@ -102,6 +111,7 @@ class MinimumProfile {
       address: this._address,
       lastActive: this._lastActive?.toString() ?? '',
       avatarUrl: this._avatarUrl,
+      tier: this._tier,
     };
   }
 }

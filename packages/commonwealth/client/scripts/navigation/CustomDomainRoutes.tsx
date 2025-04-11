@@ -98,9 +98,7 @@ const SnapshotProposalPage = lazy(
 const ViewMultipleSnapshotsPage = lazy(
   () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
-const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
-);
+
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
@@ -113,6 +111,10 @@ const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
+
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
 );
 
 const CustomDomainRoutes = () => {
@@ -293,6 +295,13 @@ const CustomDomainRoutes = () => {
       })}
     />,
     <Route
+      key="/:scope/proposal-details/:identifier"
+      path="/:scope/proposal-details/:identifier"
+      element={withLayout(newProposalViewPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
       key="/governance"
       path="/governance"
       element={withLayout(GovernancePage, {
@@ -463,9 +472,15 @@ const CustomDomainRoutes = () => {
     <Route
       key="/snapshot/:snapshotId/:identifier"
       path="/snapshot/:snapshotId/:identifier"
-      element={withLayout(ViewSnapshotsProposalPage, {
-        scoped: true,
-      })}
+      // redirect to proposal detail page
+      element={
+        <Navigate
+          to={(parameters) =>
+            // eslint-disable-next-line max-len
+            `/${parameters.scope}/proposal-details/${parameters.identifier}?snapshotId=${parameters.snapshotId}&type=snapshot`
+          }
+        />
+      }
     />,
     <Route
       key="/new/snapshot/:snapshotId"
@@ -577,7 +592,11 @@ const CustomDomainRoutes = () => {
       key="/:scope/proposal/:identifier"
       path="/:scope/proposal/:identifier"
       element={
-        <Navigate to={(parameters) => `/proposal/${parameters.identifier}`} />
+        <Navigate
+          to={(parameters) =>
+            `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+          }
+        />
       }
     />,
     <Route

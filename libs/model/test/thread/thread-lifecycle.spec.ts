@@ -28,6 +28,7 @@ import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
@@ -98,10 +99,13 @@ describe('Thread lifecycle', () => {
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
       isAdmin: role === 'admin',
-      tier: role === 'member' ? 1 : 4,
+      tier:
+        role === 'member'
+          ? UserTierMap.NewlyVerifiedWallet
+          : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
-      spam_tier_level: 1,
+      spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
       active: true,
