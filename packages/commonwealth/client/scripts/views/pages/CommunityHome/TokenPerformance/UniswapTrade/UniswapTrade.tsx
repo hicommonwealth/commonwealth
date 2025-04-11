@@ -15,8 +15,10 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
+import { formatJsonRpcMap } from 'views/modals/TradeTokenModel/UniswapTradeModal/useJsonRpcUrlMap';
 import './UniswapTrade.scss';
 
 interface UniswapTradeProps {
@@ -47,6 +49,9 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
       rpcUrl: tokenCommunity?.ChainNode?.url,
       provider: uniswapWidget.provider,
     });
+
+  const nodes = fetchCachedNodes();
+  const jsonRpcUrlMap = formatJsonRpcMap(nodes);
 
   const logo =
     (tradeConfig.token as ExternalToken).logo ||
@@ -91,7 +96,7 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
             className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
             tokenList={uniswapWidget.tokensList}
             routerUrl={uniswapWidget.routerURLs.default}
-            jsonRpcUrlMap={{ [ethChainId!]: [rpcUrl!] }}
+            jsonRpcUrlMap={jsonRpcUrlMap}
             theme={uniswapWidget.theme}
             defaultInputTokenAddress={uniswapWidget.defaultTokenAddress.input}
             defaultOutputTokenAddress={uniswapWidget.defaultTokenAddress.output}

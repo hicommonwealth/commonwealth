@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import React, { useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal } from 'views/modals/AuthModal';
+import { formatJsonRpcMap } from 'views/modals/TradeTokenModel/UniswapTradeModal/useJsonRpcUrlMap';
 import { LaunchpadToken } from '../CommonTradeModal/types';
 import TokenIcon from '../TokenIcon';
 import './UniswapTradeModal.scss';
@@ -109,6 +111,9 @@ const UniswapTradeModal = ({
     uniswapWidget.connectWallet,
   ]);
 
+  const nodes = fetchCachedNodes();
+  const jsonRpcUrlMap = formatJsonRpcMap(nodes);
+
   const logo =
     (tradeConfig.token as ExternalToken).logo ||
     (tradeConfig.token as LaunchpadToken).icon_url;
@@ -183,7 +188,7 @@ const UniswapTradeModal = ({
                     className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
                     tokenList={uniswapWidget.tokensList}
                     routerUrl={uniswapWidget.routerURLs.default}
-                    jsonRpcUrlMap={{ [ethChainId!]: [rpcUrl!] }}
+                    jsonRpcUrlMap={jsonRpcUrlMap}
                     theme={uniswapWidget.theme}
                     defaultInputTokenAddress={
                       uniswapWidget.defaultTokenAddress.input
