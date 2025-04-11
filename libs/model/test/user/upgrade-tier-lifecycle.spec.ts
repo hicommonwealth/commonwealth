@@ -2,7 +2,12 @@ import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
-import { UserTierMap, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import {
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  NAMESPACE_MIN_NOMINATION_BALANCE,
+  UserTierMap,
+  ZERO_ADDRESS,
+} from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import {
@@ -135,15 +140,15 @@ describe('Upgrade Tiers lifecycle', () => {
   describe('Nomination Upgrade Policy', async () => {
     test('should upgrade user to ChainVerified tier when 5 or more nomination tokens are held', async () => {
       const userBefore = await models.User.findByPk(user.id);
-      expect(userBefore?.tier).toBe(0);
+      expect(userBefore?.tier).toBe(UserTierMap.IncompleteUser);
 
       await emitEvent(models.Outbox, [
         buildNamespaceTransferSingleEvent(
           community.namespace_address!,
           ZERO_ADDRESS,
           userAddress,
-          '3',
-          '5',
+          NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID.toString(),
+          NAMESPACE_MIN_NOMINATION_BALANCE.toString(),
         ) as EventPair<'NamespaceTransferSingle'>,
       ]);
 
