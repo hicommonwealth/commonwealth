@@ -8,6 +8,8 @@ export const chainNames: Record<string, string> = {
   '0xa4b1': 'Arbitrum',
   '0x2105': 'Base',
   '0x14a33': 'Base Goerli',
+  '0x14a34': 'Base Sepolia',
+  '0x7a69': 'Anvil',
 };
 
 interface UseNetworkSwitchingProps {

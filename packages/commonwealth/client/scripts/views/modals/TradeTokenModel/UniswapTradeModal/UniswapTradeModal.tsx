@@ -147,7 +147,7 @@ const UniswapTradeModal = ({
                           }
                         >
                           {' '}
-                          {networkName}
+                          {currentChain}
                         </span>
                         {isWrongNetwork && (
                           <>
@@ -161,7 +161,7 @@ const UniswapTradeModal = ({
                               true,
                             )}
                             <CWButton
-                              label="Switch to Base"
+                              label={`Switch to ${networkName}`}
                               buttonHeight="sm"
                               buttonType="secondary"
                               onClick={() => void promptNetworkSwitch()}
