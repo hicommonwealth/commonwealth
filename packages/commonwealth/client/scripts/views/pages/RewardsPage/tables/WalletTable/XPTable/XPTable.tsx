@@ -1,7 +1,5 @@
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
@@ -20,16 +18,16 @@ const columns: CWTableColumnInfo[] = [
     numeric: false,
     sortable: true,
   },
-  {
-    key: 'xp',
-    header: () => (
-      <CWText className="table-header">
-        <CWIcon iconName="help" iconSize="regular" /> Aura
-      </CWText>
-    ),
-    numeric: true,
-    sortable: true,
-  },
+  // {
+  //   key: 'xp',
+  //   header: () => (
+  //     <CWText className="table-header">
+  //       <CWIcon iconName="help" iconSize="regular" /> Aura
+  //     </CWText>
+  //   ),
+  //   numeric: true,
+  //   sortable: true,
+  // },
 ];
 
 const sampleData = [

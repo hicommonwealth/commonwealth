@@ -475,11 +475,7 @@ export const HeaderWithFilters = ({
                         ...stages.map((s) => ({
                           id: s,
                           value: s,
-                          label: `${threadStageToLabel(s)} ${
-                            s === ThreadStage.Voting
-                              ? community?.numVotingThreads || 0
-                              : ''
-                          }`,
+                          label: `${threadStageToLabel(s)}`,
                         })),
                       ]}
                       dropdownPosition={rightFiltersDropdownPosition}

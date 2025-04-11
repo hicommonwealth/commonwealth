@@ -47,7 +47,8 @@ export const CWTooltip: FC<TooltipProps> = ({
 export const withTooltip = (
   children: ReactNode,
   content: string,
-  shouldDisplay,
+  shouldDisplay: boolean,
+  containerClassName?: string,
 ) => {
   if (!shouldDisplay) return children;
 
@@ -56,7 +57,11 @@ export const withTooltip = (
       placement="bottom"
       content={content}
       renderTrigger={(handleInteraction) => (
-        <span onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+        <span
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+          className={containerClassName}
+        >
           {children}
         </span>
       )}

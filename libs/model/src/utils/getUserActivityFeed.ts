@@ -44,6 +44,7 @@ SELECT
       'community_icon', C.icon_url,
       'id', T.id,
       'user_id', U.id,
+      'user_tier', U.tier,
       'user_address', A.address,
       'profile_name', U.profile->>'name',
       'profile_avatar', U.profile->>'avatar_url',
@@ -62,6 +63,7 @@ SELECT
       'read_only', T.read_only,
       'has_poll', T.has_poll,
       'discord_meta', T.discord_meta,
+      'is_linking_token', T.is_linking_token,
       'topic', jsonb_build_object(
         'id', T.topic_id,
         'name', Tp.name,
@@ -74,6 +76,7 @@ SELECT
         'id', C.id,
         'address', C.address,
         'user_id', C.user_id,
+        'user_tier', C.user_tier,
         'profile_name', C.profile_name,
         'profile_avatar', C.profile_avatar,
         'body', C.body,
@@ -89,6 +92,7 @@ SELECT
             C.*,
             A.address,
             U.id as user_id,
+            U.tier as user_tier,
             U.profile->>'name' as profile_name, 
             U.profile->>'avatar_url' as profile_avatar, 
             ROW_NUMBER() OVER (PARTITION BY C.thread_id ORDER BY C.created_at DESC) AS rn

@@ -1,5 +1,6 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signComment } from 'controllers/server/sessions';
+import { resetXPCacheForUser } from 'helpers/quest';
 import Comment from 'models/Comment';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
@@ -17,6 +18,7 @@ interface CreateCommentProps {
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
   existingNumberOfComments: number;
+  turnstileToken?: string | null;
 }
 
 export const buildCreateCommentInput = async ({
@@ -26,6 +28,7 @@ export const buildCreateCommentInput = async ({
   unescapedText,
   parentCommentId = null,
   parentCommentMsgId = null,
+  turnstileToken,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(address, {
     thread_id: threadMsgId ?? null,
@@ -39,6 +42,7 @@ export const buildCreateCommentInput = async ({
     parent_id: parentCommentId ?? undefined,
     body: unescapedText,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
+    turnstile_token: turnstileToken,
   };
 };
 
@@ -66,9 +70,7 @@ const useCreateCommentMutation = ({
       // reset comments cache state
       utils.comment.getComments.invalidate().catch(console.error);
 
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       updateThreadInAllCaches(communityId || '', threadId, {
         numberOfComments: existingNumberOfComments + 1,

@@ -1,7 +1,8 @@
-import { Command, InvalidInput } from '@hicommonwealth/core';
+import { Command, InvalidInput, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import {
@@ -14,10 +15,11 @@ import { QuestInstance } from '../../models/quest';
 import {
   GraphileTaskNames,
   removeJob,
-  rescheduleJobs,
   scheduleTask,
 } from '../../services/graphileWorker';
 import { getDelta, tweetExists } from '../../utils';
+
+const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 async function updateQuestInstance(
   quest: QuestInstance,
@@ -55,9 +57,7 @@ async function updateQuestInstance(
 async function updateChannelQuest(
   eventName: 'TweetEngagement',
   quest: QuestInstance,
-  actionMetas:
-    | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>[]
-    | undefined,
+  actionMetas: z.infer<typeof schemas.ActionMetaInput>[] | undefined,
   payload: z.infer<(typeof schemas.UpdateQuest)['input']>,
 ) {
   if (quest.quest_type !== 'channel') return;
@@ -100,21 +100,44 @@ async function updateChannelQuest(
       throw new InvalidInput('TweetEngagement action must have a Tweet url');
     const [, ...rest] = actionMeta.content_id.split(':'); // this has been validated by the schema
     const tweetUrl = rest.join(':');
-    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetUrl));
+    const tweetId = tweetUrl.split('/').at(-1)!;
+    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetId));
     mustExist(`Tweet engagement caps`, actionMeta.tweet_engagement_caps);
 
     await models.sequelize.transaction(async (transaction) => {
       await updateQuestInstance(quest, payload, transaction);
-      const [actionMetaInstance, created] = await models.QuestActionMeta.upsert(
+
+      const existingActionMeta = await models.QuestActionMeta.findOne({
+        where: {
+          quest_id: quest.id!,
+        },
+        transaction,
+      });
+      if (existingActionMeta) {
+        await models.QuestTweets.destroy({
+          where: {
+            quest_action_meta_id: existingActionMeta.id!,
+          },
+          transaction,
+        });
+        await existingActionMeta.destroy({ transaction });
+        if (quest.scheduled_job_id) {
+          await removeJob({
+            jobId: quest.scheduled_job_id,
+            transaction,
+          });
+        }
+      }
+      const actionMetaInstance = await models.QuestActionMeta.create(
         {
           ...actionMeta,
           quest_id: quest.id!,
         },
         { transaction },
       );
-      await models.QuestTweets.upsert(
+      await models.QuestTweets.create(
         {
-          tweet_id: tweetUrl.split('/').at(-1)!,
+          tweet_id: tweetId,
           tweet_url: tweetUrl,
           quest_action_meta_id: actionMetaInstance.id!,
           like_cap: actionMeta.tweet_engagement_caps!.likes,
@@ -123,35 +146,21 @@ async function updateChannelQuest(
         },
         { transaction },
       );
-      if (created) {
-        const job = await scheduleTask(
-          GraphileTaskNames.AwardTwitterQuestXp,
-          {
-            quest_id: quest.id!,
-            quest_ended: true,
-          },
-          {
-            transaction,
-          },
-        );
-        quest.scheduled_job_id = job.id;
-        await quest.save({ transaction });
-      }
-
-      // If quest end date is updated then reschedule the job
-      if (
-        quest.end_date !== payload.end_date &&
-        !created &&
-        quest.scheduled_job_id
-      ) {
-        await rescheduleJobs({
-          jobIds: [quest.scheduled_job_id],
-          options: {
-            runAt: payload.end_date,
-          },
+      log.trace(`Created quest tweet ${tweetId} for quest ${quest.id}`);
+      const job = await scheduleTask(
+        GraphileTaskNames.AwardTwitterQuestXp,
+        {
+          quest_id: quest.id!,
+          quest_ended: true,
+        },
+        {
+          runAt: quest.end_date,
           transaction,
-        });
-      }
+        },
+      );
+      log.trace(`Scheduled job ${job.id} for quest ${quest.id}`);
+      quest.scheduled_job_id = job.id;
+      await quest.save({ transaction });
     });
   }
 }
@@ -165,15 +174,6 @@ async function updateCommonQuest(
     const c_id = community_id || quest.community_id;
     await Promise.all(
       action_metas.map(async (action_meta) => {
-        // enforce comment upvoted action is scoped to a thread
-        if (
-          action_meta.event_name === 'CommentUpvoted' &&
-          !action_meta.content_id?.startsWith('thread:')
-        ) {
-          throw new InvalidInput(
-            'CommentUpvoted action must be scoped to a thread',
-          );
-        }
         if (action_meta.content_id) {
           // make sure content_id exists
           const [content, id] = action_meta.content_id.split(':'); // this has been validated by the schema

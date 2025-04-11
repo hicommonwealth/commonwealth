@@ -1,3 +1,4 @@
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
@@ -13,6 +14,7 @@ abstract class ContractBase {
   protected initialized: boolean;
   protected walletEnabled: boolean;
   protected rpc: string;
+  protected chainId: string;
   private abi: any;
 
   constructor(contractAddress: string, abi: any, rpc: string) {
@@ -27,6 +29,7 @@ abstract class ContractBase {
   ): Promise<void> {
     if (!this.initialized || withWallet) {
       try {
+        this.chainId = chainId || '1';
         let provider = this.rpc;
         if (withWallet) {
           this.wallet = WebWalletController.Instance.availableWallets(
@@ -72,6 +75,9 @@ abstract class ContractBase {
   }
 
   async estimateGas(): Promise<bigint | null> {
+    if (this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST) {
+      return BigInt(0.00012 * 1e9);
+    }
     try {
       const latestBlock = await this.web3.eth.getBlock('latest');
 

@@ -106,6 +106,7 @@ const EditProfile = () => {
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       // @ts-expect-error <StrictNullChecks/>
@@ -168,7 +169,18 @@ const EditProfile = () => {
 
   if (!error && profile) {
     const handleSubmit = (values: z.infer<typeof editProfileValidation>) => {
-      if (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false) {
+      const filledLinks = links.filter((x) => x.value);
+      if (filledLinks.length > 0 && !areLinksValid()) {
+        // Find the invalid links to show informative error message
+        const invalidLinks = filledLinks.filter(
+          (link) => link.error || !isLinkValid(link.value),
+        );
+        console.log('Invalid links found:', invalidLinks);
+        if (invalidLinks.length > 0) {
+          notifyError(
+            'Some social links are invalid. Please update them to include "https://" at the beginning.',
+          );
+        }
         return;
       }
 

@@ -1,25 +1,12 @@
 import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import {
-  questSubFormValidationSchema,
-  questSubFormValidationSchemaWithContentLink,
-  questSubFormValidationSchemaWithCreatorPoints,
-  questSubFormValidationSchemaWithCreatorPointsWithContentLink,
-} from './QuestActionSubForm/validation';
-import { questFormValidationSchema } from './validation';
+import { QuestActionSubFormFields } from './QuestActionSubForm';
+import { buildDynamicQuestFormValidationSchema } from './validation';
 
-export type QuestActionSubFormValues = z.infer<
-  typeof questSubFormValidationSchema
->;
-export type QuestActionSubFormValuesWithContentLink = z.infer<
-  typeof questSubFormValidationSchemaWithContentLink
->;
-export type QuestActionSubFormValuesWithCreatorPoints = z.infer<
-  typeof questSubFormValidationSchemaWithCreatorPoints
->;
-export type QuestActionSubFormValuesWithCreatorPointsWithContentLink = z.infer<
-  typeof questSubFormValidationSchemaWithCreatorPointsWithContentLink
->;
+export enum QuestTypes {
+  Channel = 'channel',
+  Common = 'common',
+}
 
 export type QuestFormProps =
   | {
@@ -30,15 +17,12 @@ export type QuestFormProps =
   | {
       mode: 'update';
       questId: number;
-      initialValues: z.infer<typeof questFormValidationSchema> & {
+      initialValues: z.infer<
+        ReturnType<typeof buildDynamicQuestFormValidationSchema>
+      > & {
         participation_period?: QuestParticipationPeriod;
         participation_times_per_period?: number;
       } & {
-        subForms: (
-          | QuestActionSubFormValues
-          | QuestActionSubFormValuesWithContentLink
-          | QuestActionSubFormValuesWithCreatorPoints
-          | QuestActionSubFormValuesWithCreatorPointsWithContentLink
-        )[];
+        subForms: QuestActionSubFormFields[];
       };
     };
