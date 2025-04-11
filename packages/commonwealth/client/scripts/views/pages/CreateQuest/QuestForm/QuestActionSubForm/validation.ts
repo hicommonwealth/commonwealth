@@ -10,8 +10,9 @@ import {
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
+import { QuestActionSubFormConfig } from './types';
 
-export const questSubFormValidationSchema = z.object({
+const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
@@ -26,45 +27,131 @@ export const questSubFormValidationSchema = z.object({
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
-export const questSubFormValidationSchemaWithContentLink =
-  questSubFormValidationSchema.extend({
-    contentIdScope: z.enum(['thread', 'topic']).optional(), // this is a placeholder, not used for validation
-    contentLink: linkValidationSchema.optional,
-  });
+export const buildQuestSubFormValidationSchema = (
+  config?: QuestActionSubFormConfig,
+) => {
+  const allowsOptionalContentId =
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id;
+  const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
+  const requiresDiscordServerURL = config?.requires_discord_server_url;
+  const requiresCreatorPoints = config?.requires_creator_points;
 
-const questSubFormValidationSchemaWithCreatorPointsTemp =
-  questSubFormValidationSchema.extend({
-    creatorRewardAmount: numberNonDecimalValidationSchema,
-  });
+  const needsExtension =
+    requiresCreatorPoints ||
+    allowsOptionalContentId ||
+    requiresTwitterEngagement ||
+    requiresDiscordServerURL;
 
-const refineSchemaForCreatorRewardWeightValidation = (schema: z.AnyZodObject) =>
-  schema.refine(
-    (data) => {
-      try {
-        const creatorRewardAmount = numberValidationSchema.parse(
-          data.creatorRewardAmount,
-        );
-        const rewardAmount = numberValidationSchema.parse(data.rewardAmount);
-        // verify creatorRewardAmount is less or equal to rewardAmount
-        return parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10);
-      } catch {
-        return false;
-      }
-    },
-    {
-      message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
-      path: ['creatorRewardAmount'],
-    },
-  );
+  if (!needsExtension) return questSubFormValidationSchema;
 
-export const questSubFormValidationSchemaWithCreatorPoints =
-  refineSchemaForCreatorRewardWeightValidation(
-    questSubFormValidationSchemaWithCreatorPointsTemp,
-  );
+  let baseSchema = questSubFormValidationSchema;
 
-export const questSubFormValidationSchemaWithCreatorPointsWithContentLink =
-  refineSchemaForCreatorRewardWeightValidation(
-    questSubFormValidationSchemaWithCreatorPointsTemp.extend({
+  if (requiresCreatorPoints) {
+    baseSchema = baseSchema
+      .extend({
+        creatorRewardAmount: numberNonDecimalValidationSchema.required,
+      })
+      .refine(
+        (data) => {
+          try {
+            const creatorRewardAmount = numberValidationSchema.required.parse(
+              data.creatorRewardAmount,
+            );
+            const rewardAmount = numberValidationSchema.required.parse(
+              data.rewardAmount,
+            );
+            // verify creatorRewardAmount is less or equal to rewardAmount
+            return (
+              parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
+            );
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
+          path: ['creatorRewardAmount'],
+        },
+      ) as unknown as typeof baseSchema;
+  }
+  if (allowsOptionalContentId) {
+    baseSchema = baseSchema.extend({
       contentLink: linkValidationSchema.optional,
-    }),
-  );
+    }) as unknown as typeof baseSchema;
+  }
+  if (requiresTwitterEngagement) {
+    baseSchema = baseSchema
+      .extend({
+        contentLink: linkValidationSchema.required.refine(
+          (url) => {
+            // validate twitter tweet URL
+            const twitterRegex = /https:\/\/x\.com\/\w+\/status\/\d+/;
+            return twitterRegex.test(url);
+          },
+          {
+            message: VALIDATION_MESSAGES.TWITTER_TWEET_FORMAT,
+          },
+        ),
+        noOfLikes: numberNonDecimalValidationSchema.optional,
+        noOfRetweets: numberNonDecimalValidationSchema.optional,
+        noOfReplies: numberNonDecimalValidationSchema.optional,
+      })
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfLikes'],
+        },
+      )
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfReplies'],
+        },
+      )
+      .refine(
+        (data) => {
+          const likes = parseInt(data.noOfLikes || '0', 10);
+          const retweets = parseInt(data.noOfRetweets || '0', 10);
+          const replies = parseInt(data.noOfReplies || '0', 10);
+          return likes > 0 || retweets > 0 || replies > 0;
+        },
+        {
+          message:
+            'One of Likes, Retweets, or Replies count must be greater than 0.',
+          path: ['noOfRetweets'],
+        },
+      ) as unknown as typeof baseSchema;
+  }
+  if (requiresDiscordServerURL) {
+    baseSchema = baseSchema.extend({
+      contentLink: linkValidationSchema.required.refine(
+        (url) => {
+          // validate discord server URL
+          const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
+          return discordRegex.test(url);
+        },
+        {
+          message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
+        },
+      ),
+    }) as unknown as typeof baseSchema;
+  }
+
+  return baseSchema;
+};

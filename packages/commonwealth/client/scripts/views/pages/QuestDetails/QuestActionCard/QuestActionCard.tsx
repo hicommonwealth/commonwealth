@@ -10,6 +10,7 @@ import {
 } from 'helpers/quest';
 import React from 'react';
 import useUserStore from 'state/ui/user';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -18,29 +19,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { z } from 'zod';
 import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
 import './QuestActionCard.scss';
-
-const actionCopies = {
-  title: {
-    ['SignUpFlowCompleted']: 'Sign in to Common',
-    ['CommunityCreated']: 'Create a community',
-    ['CommunityJoined']: 'Join a community',
-    ['ThreadCreated']: 'Create a thread',
-    ['ThreadUpvoted']: 'Upvote a thread',
-    ['CommentCreated']: 'Create a comment',
-    ['CommentUpvoted']: 'Upvote a comment',
-    ['WalletLinked']: 'Link a new wallet',
-    ['SSOLinked']: 'Link a new social (SSO)',
-  },
-  shares: {
-    ['CommunityCreated']: 'referrer',
-    ['CommunityJoined']: 'referrer',
-    ['ThreadCreated']: '',
-    ['ThreadUpvoted']: '',
-    ['CommentCreated']: '',
-    ['CommentUpvoted']: 'comment creator',
-    ['UserMentioned']: '',
-  },
-};
+import { actionCopies } from './helpers';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
@@ -115,6 +94,24 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
+            {(questAction.event_name === 'TweetEngagement' ||
+              questAction.event_name === 'CommonDiscordServerJoined') && (
+              <>
+                <CWDivider />
+                <CWText type="caption" fontWeight="semiBold">
+                  {actionCopies.pre_reqs[questAction.event_name]()}
+                </CWText>
+                {questAction.event_name === 'TweetEngagement' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.QuestTweet?.like_cap || 0,
+                      questAction?.QuestTweet?.retweet_cap || 0,
+                      questAction?.QuestTweet?.replies_cap || 0,
+                    )}
+                  </CWText>
+                )}
+              </>
+            )}
             {!hideShareSplit &&
               doesActionRequireRewardShare(questAction.event_name) &&
               creatorXP.percentage > 0 && (
