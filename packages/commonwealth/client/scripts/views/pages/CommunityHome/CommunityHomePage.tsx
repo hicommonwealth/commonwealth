@@ -63,14 +63,12 @@ const CommunityHome = () => {
           content={
             <ManageCommunityStakeModal
               mode={modeOfManageCommunityStakeModal}
-              // @ts-expect-error <StrictNullChecks/>
               onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               denomination={
                 findDenominationString(selectedCommunityId || '') || 'ETH'
               }
             />
           }
-          // @ts-expect-error <StrictNullChecks/>
           onClose={() => setModeOfManageCommunityStakeModal(null)}
           open={!!modeOfManageCommunityStakeModal}
         />

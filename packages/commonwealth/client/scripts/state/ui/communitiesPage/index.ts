@@ -17,7 +17,7 @@ import {
 import { createBoundedUseStore } from '../utils';
 
 // Define the type for the quest filter option
-interface QuestFilterOption {
+export interface QuestFilterOption {
   label: {
     name: string;
     imageURL?: string;

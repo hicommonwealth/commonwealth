@@ -1,4 +1,4 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Community, ExtendedCommunity } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, MutableRefObject } from 'react';
@@ -12,19 +12,23 @@ import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CommunityFilters } from './FiltersDrawer';
 
+// Define local types (assuming Community is imported or available)
+type CommunityItem = z.infer<typeof Community>; // Need to ensure Community is imported/available
+type CommunityPair = [CommunityItem, CommunityItem | undefined];
+
+// Define the type for a single community item - Requires Community schema import if not already present
+// import { Community } from '@hicommonwealth/schemas'; // Uncomment if needed
+// type CommunityItem = z.infer<typeof Community>;
+
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
-type ExtendedCommunitySliceType = [
-  ExtendedCommunityType,
-  ExtendedCommunityType,
-];
 
 interface CommunitiesTabContentProps {
   isLoading: boolean;
   isInitialCommunitiesLoading: boolean;
-  communitiesList: ExtendedCommunitySliceType[];
+  communitiesList: CommunityPair[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices:
+  historicalPrices?:
     | { community_id: string; old_price?: string | null }[]
     | undefined;
   ethUsdRate: number;

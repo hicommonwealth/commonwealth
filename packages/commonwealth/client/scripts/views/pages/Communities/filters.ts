@@ -128,7 +128,7 @@ export function createSortFilter<T extends string>({
     label,
     placeholder,
     className,
-    value: options.find((opt) => opt.value === selectedValue),
+    value: options.find((opt) => opt.value === selectedValue) || null,
     onChange: (option) => {
       if (!option) return;
 
@@ -201,7 +201,7 @@ export function createSelectFilter<T extends string>({
     label,
     placeholder,
     className,
-    value: options.find((opt) => opt.value === selectedValue),
+    value: options.find((opt) => opt.value === selectedValue) || null,
     onChange: (option) => {
       if (!option) {
         // Handle clearing the selection

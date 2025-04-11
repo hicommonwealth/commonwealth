@@ -1,8 +1,8 @@
-import { Community } from '@hicommonwealth/schemas';
+import { Community, GetCommunities } from '@hicommonwealth/schemas';
 import { ChainNetwork } from '@hicommonwealth/shared';
 import { useCallback, useMemo } from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
-import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
+import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate';
 import { useFetchTagsQuery } from 'state/api/tags';
 import { z } from 'zod';
 import { trpc } from '../../../../utils/trpcClient';
@@ -13,11 +13,21 @@ import {
   sortOrderLabelsToDirectionsMap,
 } from '../FiltersDrawer';
 
-// Define the type for a single community item
-type CommunityItem = z.infer<typeof Community>;
+// Define the type for valid order_by values based on the schema/query input
+type CommunityOrderBy = z.infer<typeof GetCommunities.input>['order_by'];
 
-// Define the type for a pair of community items (or one item and undefined)
-type CommunityPair = [CommunityItem, CommunityItem | undefined];
+// Define the type for a single community item (with Date types)
+type CommunityItemWithDates = z.infer<typeof Community>;
+
+// Define the type for a pair of community items (with Date types)
+type CommunityPairWithDates = [
+  CommunityItemWithDates,
+  CommunityItemWithDates | undefined,
+];
+
+// Define the type for the raw API result (potential string dates)
+// Extend GetCommunities.output to reflect the raw structure if necessary
+// type RawCommunityPage = z.infer<typeof GetCommunities.output>; // Removed unused type
 
 export function useCommunityData(
   filters: CommunityFilters,
@@ -26,15 +36,14 @@ export function useCommunityData(
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
 
   const {
-    data: communities,
+    data: communities, // This holds the raw InfiniteData potentially with string dates
     fetchNextPage: fetchMoreCommunitiesOriginal,
     hasNextPage,
-    isLoading: isInitialCommunitiesLoading, // Assuming isLoading is returned
+    isLoading: isInitialCommunitiesLoading,
   } = useFetchCommunitiesQuery({
     limit: 50,
     cursor: 1,
     include_node_info: true,
-    // Reconstruct order_by logic
     order_by: (() => {
       if (
         filters.withCommunitySortBy &&
@@ -44,12 +53,11 @@ export function useCommunityData(
           CommunitySortOptions.MostRecent,
         ].includes(filters.withCommunitySortBy)
       ) {
-        return (
-          (communitySortOptionsLabelToKeysMap[
-            filters.withCommunitySortBy
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ] as any) || 'lifetime_thread_count' // Default if mapping fails
-        );
+        // Ensure the mapped key is a valid CommunityOrderBy type
+        const mappedKey = communitySortOptionsLabelToKeysMap[
+          filters.withCommunitySortBy
+        ] as CommunityOrderBy;
+        return mappedKey || 'lifetime_thread_count';
       }
       return 'lifetime_thread_count';
     })(),
@@ -66,10 +74,9 @@ export function useCommunityData(
         : undefined,
     base: filters.withCommunityEcosystem || undefined,
     network: filters.withNetwork
-      ? ChainNetwork[filters.withNetwork] // Assuming ChainNetwork enum access
+      ? ChainNetwork[filters.withNetwork]
       : undefined,
     stake_enabled: filters.withStakeEnabled,
-    // cursor: 1, // Use default cursor handling of useFetchCommunitiesQuery
     tag_ids:
       filters.withTagsIds && filters.withTagsIds.length > 0
         ? filters.withTagsIds
@@ -77,27 +84,53 @@ export function useCommunityData(
     community_type: filters.withCommunityType,
   });
 
-  // Wrap fetchMoreCommunities to return Promise<void>
+  // Memoize processed data with correct Date types
+  const processedCommunitiesData = useMemo(() => {
+    if (!communities) return undefined;
+    return {
+      ...communities,
+      pages: communities.pages.map((page) => ({
+        ...page,
+        results: page.results.map((community) => ({
+          ...community,
+          created_at: community.created_at
+            ? new Date(community.created_at)
+            : undefined,
+          updated_at: community.updated_at
+            ? new Date(community.updated_at)
+            : undefined,
+          topics: community.topics?.map((topic) => ({
+            ...topic,
+            created_at: topic.created_at
+              ? new Date(topic.created_at)
+              : undefined,
+            updated_at: topic.updated_at
+              ? new Date(topic.updated_at)
+              : undefined,
+            archived_at: topic.archived_at
+              ? new Date(topic.archived_at)
+              : undefined,
+          })),
+        })) as CommunityItemWithDates[], // Assert results conform to the type with Dates
+      })),
+    };
+  }, [communities]);
+
+  // Wrap fetchMoreCommunities
   const fetchMoreCommunities = useCallback(async () => {
     await fetchMoreCommunitiesOriginal();
   }, [fetchMoreCommunitiesOriginal]);
 
-  // Use the correct tRPC hook now
+  // Fetch historical prices and ETH rate (existing logic)
   const { data: historicalPricesData, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({
-      // Provide input
-      past_date_epoch: Math.floor(Date.now() / 1000) - 24 * 60 * 60, // 24 hours ago
-      // community_id: filters.communityId, // Optional: Add if filtering by specific community
-      // stake_id: filters.stakeId, // Optional: Defaults to 2 if not provided
+      past_date_epoch: Math.floor(Date.now() / 1000) - 24 * 60 * 60,
     });
-
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
     useFetchTokenUsdRateQuery({
-      // tokenSymbol: 'ETH', // Incorrect prop
-      // TODO: Replace with the correct WETH/ETH contract address for the target chain
-      tokenContractAddress: '0x...', // Use tokenContractAddress instead
+      tokenContractAddress: '0x...',
     });
-  const ethUsdRate = ethUsdRateData?.data?.data?.amount; // Adjust path if needed based on the correct hook's response
+  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const isLoading =
     isLoadingTags ||
@@ -105,34 +138,31 @@ export function useCommunityData(
     isLoadingHistoricalPrices ||
     isLoadingEthUsdRate;
 
-  // Create the base communities list
+  // Create communitiesList using processed data
   const communitiesList = useMemo(() => {
-    const flatList = (communities?.pages || []).flatMap((page) => page.results);
-
+    const flatList = (processedCommunitiesData?.pages || []).flatMap(
+      (page) => page.results,
+    );
     const SLICE_SIZE = 2;
-    // TODO: Refine the type for twoCommunitiesPerEntry
-    const twoCommunitiesPerEntry: CommunityPair[] = []; // Use the defined CommunityPair type
-
+    const twoCommunitiesPerEntry: CommunityPairWithDates[] = [];
     for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
-      // Pushing slices of the inferred type from flatList
-      twoCommunitiesPerEntry.push(
-        flatList.slice(i, i + SLICE_SIZE) as CommunityPair,
-      );
+      const item1 = flatList[i];
+      const item2 = flatList[i + 1]; // Can be undefined
+      twoCommunitiesPerEntry.push([item1, item2]);
     }
-
     return twoCommunitiesPerEntry;
-  }, [communities?.pages]);
+  }, [processedCommunitiesData]);
 
-  // Filter communities list based on search value
+  // Filter communitiesList using processed data
   const filteredCommunitiesList = useMemo(() => {
     if (!searchValue) {
       return communitiesList;
     }
-
     const searchLower = searchValue.toLowerCase().trim();
-    const flatList = (communities?.pages || []).flatMap((page) => page.results);
+    const flatList = (processedCommunitiesData?.pages || []).flatMap(
+      (page) => page.results,
+    );
 
-    // Filter based on name or description
     const filteredList = flatList.filter((community) => {
       return (
         community &&
@@ -141,39 +171,27 @@ export function useCommunityData(
       );
     });
 
-    // Recreate the sliced structure
     const SLICE_SIZE = 2;
-    // TODO: Refine the type for filteredSlices
-    const filteredSlices: CommunityPair[] = []; // Use the defined CommunityPair type
-
+    const filteredSlices: CommunityPairWithDates[] = [];
     for (let i = 0; i < filteredList.length; i += SLICE_SIZE) {
-      const slice = filteredList.slice(i, i + SLICE_SIZE);
-      // Only add slices with valid items
-      if (slice.length === SLICE_SIZE) {
-        // Pushing slices of the inferred type from filteredList
-        filteredSlices.push(slice as CommunityPair);
-      } else if (slice.length === 1) {
-        // For the last odd item, create a slice with undefined as the second item
-        // But make sure the first item is valid
-        if (slice[0] && slice[0].id) {
-          // Pushing a tuple matching the inferred structure
-          filteredSlices.push([slice[0], undefined]);
-        }
+      const item1 = filteredList[i];
+      const item2 = filteredList[i + 1];
+      if (item1?.id) {
+        filteredSlices.push([item1, item2]);
       }
     }
-
     return filteredSlices;
-  }, [communitiesList, communities?.pages, searchValue]);
+  }, [communitiesList, processedCommunitiesData, searchValue]);
 
   return {
-    communities,
-    communitiesList,
-    filteredCommunitiesList,
+    communities: processedCommunitiesData, // Return the processed data
+    communitiesList, // This now uses processed data
+    filteredCommunitiesList, // This now uses processed data
     fetchMoreCommunities,
     hasNextPage,
     isLoading,
     isInitialCommunitiesLoading,
-    historicalPrices: historicalPricesData, // Use data from the correct hook
+    historicalPrices: historicalPricesData,
     ethUsdRate: Number(ethUsdRate),
     tags,
   };

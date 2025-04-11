@@ -1,5 +1,6 @@
 import { Community, GetCommunities } from '@hicommonwealth/schemas';
 import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
+import { InfiniteData } from '@tanstack/react-query';
 import React, {
   MutableRefObject,
   ReactNode,
@@ -24,7 +25,11 @@ import {
   createSortFilter,
   createToggleFilter,
 } from './filters';
-import { CommunityFilters, FiltersDrawer } from './FiltersDrawer';
+import {
+  CommunityFilters,
+  CommunitySortDirections,
+  CommunitySortOptions,
+} from './FiltersDrawer';
 import { safeScrollParent } from './helpers';
 import QuestList from './QuestList';
 import { SearchableThreadsFeed } from './SearchableThreadsFeed';
@@ -93,10 +98,10 @@ export interface TabContentProps {
   historicalPrices?:
     | { community_id: string; old_price?: string | null }[]
     | undefined;
-  ethUsdRate?: number;
+  ethUsdRate: number;
   selectedCommunityId?: string;
-  setSelectedCommunityId?: (id: string) => void;
-  communities?: z.infer<typeof GetCommunities.output>;
+  setSelectedCommunityId: (id: string) => void;
+  communities?: InfiniteData<z.infer<typeof GetCommunities.output>>;
   tags?: Tag[];
   selectedQuestFilter?: QuestFilterOption | null;
   setSelectedQuestFilter?: (filter: QuestFilterOption | null) => void;
@@ -187,7 +192,7 @@ const FilteredThreadsFeed = ({
         customScrollParent={customScrollParent}
         threads={rawThreads}
         isLoading={searchResults.isLoading}
-        error={searchResults.error}
+        error={searchResults.error as Error | null}
         hasNextPage={searchResults.hasNextPage}
         fetchNextPage={searchResults.fetchNextPage}
         isFetchingNextPage={searchResults.isFetchingNextPage}
@@ -225,38 +230,111 @@ export function createTabsConfig() {
     {
       key: 'communities',
       label: 'Communities',
-      getFilterClickHandler: (props) => () => props.setIsFilterDrawerOpen(true),
+      showViewToggle: true,
+      getInlineFilters: (props) => {
+        return [
+          createSortFilter({
+            label: 'Sort by',
+            placeholder: '',
+            options: [
+              {
+                value: CommunitySortOptions.MemberCount,
+                label: 'Members',
+              },
+              {
+                value: CommunitySortOptions.MostRecent,
+                label: 'Newest',
+              },
+              {
+                value: CommunitySortOptions.MarketCap,
+                label: 'Market Cap',
+              },
+              {
+                value: CommunitySortOptions.Price,
+                label: 'Price',
+              },
+              {
+                value: CommunitySortOptions.ThreadCount,
+                label: 'Activity',
+              },
+            ],
+            state: {
+              selectedValue:
+                props.filters.withCommunitySortBy ||
+                CommunitySortOptions.MemberCount,
+              setSelectedValue: (value) =>
+                props.setFilters({
+                  ...props.filters,
+                  withCommunitySortBy: value as
+                    | CommunitySortOptions
+                    | undefined,
+                }),
+              filterTags: [], // Managed separately
+              setFilterTags: () => {},
+            },
+            tagPrefix: 'Sort',
+            defaultValue: CommunitySortOptions.MemberCount,
+          }),
+        ];
+      },
+      getFilterClickHandler: (props) => {
+        return () => props.setIsFilterDrawerOpen(true);
+      },
       getFilterTags: (props) => {
-        const filterTags: FilterTag[] = [];
+        const tags: FilterTag[] = [];
 
-        if (props.searchValue) {
-          filterTags.push({
-            label: `Search: ${props.searchValue}`,
-            onRemove: () => props.setSearchValue(''),
-          });
-        }
-
-        if (props.filters.withCommunitySortBy) {
-          filterTags.push({
-            label: `${props.filters.withCommunitySortBy}${
-              props.filters.withCommunitySortOrder &&
-              props.filters.withCommunitySortBy !== 'Newest'
-                ? ` : ${props.filters.withCommunitySortOrder}`
-                : ''
-            }`,
+        if (props.filters.withCommunityEcosystem) {
+          tags.push({
+            label: `Ecosystem: ${props.filters.withCommunityEcosystem}`,
             onRemove: () =>
               props.setFilters({
                 ...props.filters,
-                withCommunitySortBy: undefined,
-                withCommunitySortOrder: undefined,
+                withCommunityEcosystem: undefined,
+                withEcosystemChainId: undefined,
               }),
           });
         }
 
-        // Add more filter tags as needed
+        if (props.filters.withNetwork) {
+          tags.push({
+            label: `Network: ${props.filters.withNetwork}`,
+            onRemove: () =>
+              props.setFilters({ ...props.filters, withNetwork: undefined }),
+          });
+        }
+
+        if (props.filters.withStakeEnabled) {
+          tags.push({
+            label: 'Stake Enabled',
+            onRemove: () =>
+              props.setFilters({
+                ...props.filters,
+                withStakeEnabled: undefined,
+              }),
+          });
+        }
+
+        if (props.filters.withTagsIds && props.filters.withTagsIds.length > 0) {
+          props.filters.withTagsIds.forEach((tagId) => {
+            const tag = props.tags?.find((t) => t.id === tagId);
+            if (tag) {
+              tags.push({
+                label: `Tag: ${tag.name}`,
+                onRemove: () =>
+                  props.setFilters({
+                    ...props.filters,
+                    withTagsIds: props.filters.withTagsIds?.filter(
+                      (id) => id !== tagId,
+                    ),
+                  }),
+              });
+            }
+          });
+        }
+
         if (props.filters.withCommunityType) {
-          filterTags.push({
-            label: String(props.filters.withCommunityType),
+          tags.push({
+            label: `Type: ${props.filters.withCommunityType}`,
             onRemove: () =>
               props.setFilters({
                 ...props.filters,
@@ -265,92 +343,30 @@ export function createTabsConfig() {
           });
         }
 
-        if (props.filters.withNetwork) {
-          filterTags.push({
-            label: String(props.filters.withNetwork),
+        if (
+          props.filters.withCommunitySortBy &&
+          props.filters.withCommunitySortBy !== CommunitySortOptions.MemberCount // Don't show default sort
+        ) {
+          tags.push({
+            label: `Sort: ${props.filters.withCommunitySortBy}`,
             onRemove: () =>
               props.setFilters({
                 ...props.filters,
-                withNetwork: undefined,
+                withCommunitySortBy: CommunitySortOptions.MemberCount,
+                withCommunitySortOrder: CommunitySortDirections.Descending,
               }),
           });
         }
 
-        if (props.filters.withCommunityEcosystem) {
-          filterTags.push({
-            label: String(props.filters.withCommunityEcosystem),
-            onRemove: () =>
-              props.setFilters({
-                ...props.filters,
-                withCommunityEcosystem: undefined,
-              }),
-          });
-        }
-
-        if (props.filters.withStakeEnabled) {
-          filterTags.push({
-            label: 'Stake',
-            onRemove: () =>
-              props.setFilters({
-                ...props.filters,
-                withStakeEnabled: false,
-              }),
-          });
-        }
-
-        if (props.filters.withTagsIds) {
-          props.filters.withTagsIds.forEach((id) => {
-            const tagName = (props.tags || []).find((t) => t.id === id)?.name;
-            if (tagName) {
-              filterTags.push({
-                label: tagName,
-                onRemove: () =>
-                  props.setFilters({
-                    ...props.filters,
-                    withTagsIds: [...(props.filters.withTagsIds || [])].filter(
-                      (tagId) => tagId !== id,
-                    ),
-                  }),
-              });
-            }
-          });
-        }
-
-        return filterTags;
+        return tags;
       },
-      getContent: (props) => {
-        // Ensure setSelectedCommunityId is defined
-        const setCommunityId = props.setSelectedCommunityId || (() => {});
-
-        return (
-          <>
-            <FiltersDrawer
-              isOpen={props.isFilterDrawerOpen}
-              onClose={() => props.setIsFilterDrawerOpen(false)}
-              filters={props.filters}
-              onFiltersChange={(newFilters) => props.setFilters(newFilters)}
-            />
-            <CommunitiesTabContent
-              isLoading={props.isLoading}
-              isInitialCommunitiesLoading={props.isInitialCommunitiesLoading}
-              communitiesList={
-                props.searchValue
-                  ? props.filteredCommunitiesList
-                  : props.communitiesList
-              }
-              containerRef={safeContainerRef(props.containerRef)}
-              filters={props.filters}
-              historicalPrices={props.historicalPrices}
-              ethUsdRate={Number(props.ethUsdRate)}
-              setSelectedCommunityId={setCommunityId}
-              hasNextPage={props.hasNextPage || false}
-              fetchMoreCommunities={
-                props.fetchMoreCommunities || (async () => {})
-              }
-            />
-          </>
-        );
-      },
+      getContent: (props) => (
+        <CommunitiesTabContent
+          {...props}
+          communitiesList={props.filteredCommunitiesList}
+          containerRef={safeContainerRef(props.containerRef)}
+        />
+      ),
     },
     {
       key: 'users',
@@ -364,7 +380,10 @@ export function createTabsConfig() {
             label: 'Filter by:',
             placeholder: 'Select Quest',
             value: props.selectedQuestFilter,
-            onChange: (option) => props.setSelectedQuestFilter?.(option),
+            onChange: (option) =>
+              props.setSelectedQuestFilter?.(
+                option as QuestFilterOption | null,
+              ),
             options: props.questOptions,
             isClearable: true,
             isSearchable: true,
@@ -388,8 +407,19 @@ export function createTabsConfig() {
           >
             <XPTable
               hideHeader={true}
-              selectedQuest={props.selectedQuestFilter}
-              onQuestChange={props.setSelectedQuestFilter}
+              selectedQuest={{
+                value: props.selectedQuestFilter?.value.toString() || '',
+                label: props.selectedQuestFilter?.label.name || '',
+              }}
+              onQuestChange={(quest) => {
+                const filterOption: QuestFilterOption | null = quest
+                  ? {
+                      value: parseInt(quest.value, 10),
+                      label: { name: quest.label },
+                    }
+                  : null;
+                props.setSelectedQuestFilter?.(filterOption);
+              }}
               searchTerm={props.searchValue}
             />
           </div>
