@@ -49,9 +49,10 @@ class communityNominations extends ContractBase {
   async mintVerificationToken(
     namespace: string,
     verfiedAddress: string,
+    chainId: string,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;

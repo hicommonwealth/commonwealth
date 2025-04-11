@@ -66,6 +66,10 @@ export const EvmEventSignatures = {
     TokenMerged:
       '0xe7eeebf74838dceecbee54a09b6a6f12b27cab64859c8f8a9fe2e492d226afad',
   },
+  Namespace: {
+    TransferSingle:
+      '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+  },
 } as const;
 
 type Values<T> = T[keyof T];

@@ -1,10 +1,12 @@
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import CommunityNominations from 'helpers/ContractHelpers/CommunityNominations';
 import { useState } from 'react';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
 } from '../types';
-import useNamespaceFactory from './useNamespaceFactory';
 
 interface UseVerificationTokenTransactionProps {
   namespace: string;
@@ -23,7 +25,13 @@ const useVerificationTokenTransaction = ({
     defaultTransactionState,
   );
 
-  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
+  const { data: nodes } = useFetchNodesQuery();
+
+  const chainRpc = nodes?.find(
+    (node) => node.ethChainId === parseInt(chainId),
+  )?.url;
+
+  const contractAddress = factoryContracts?.[chainId]?.communityNomination;
 
   const action = async () => {
     if (
@@ -39,13 +47,23 @@ const useVerificationTokenTransaction = ({
         errorText: '',
       });
 
-      await namespaceFactory.mintNamespaceTokens(
+      if (!chainRpc) {
+        throw new Error('Chain RPC not found');
+      }
+
+      if (!contractAddress) {
+        throw new Error('Contract address not found');
+      }
+
+      const communityNominations = new CommunityNominations(
+        contractAddress,
+        chainRpc,
+      );
+
+      await communityNominations.mintVerificationToken(
         namespace,
-        3,
-        5,
         userAddress,
         chainId,
-        userAddress,
       );
 
       setTransactionData({

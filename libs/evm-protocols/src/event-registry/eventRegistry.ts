@@ -8,6 +8,7 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
+import { erc1155Abi } from '../abis/erc1155Abi';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
@@ -47,6 +48,7 @@ type ContractAddresses = {
 export enum ChildContractNames {
   SingleContest = 'SingleContest',
   RecurringContest = 'RecurringContest',
+  Namespace = 'Namespace',
 }
 
 export type ContractSource = {
@@ -92,6 +94,10 @@ const namespaceFactorySource = {
         EvmEventSignatures.Contests.SingleContestStarted,
         EvmEventSignatures.Contests.SingleContestVoterVoted,
       ],
+    },
+    [ChildContractNames.Namespace]: {
+      abi: erc1155Abi,
+      eventSignatures: [EvmEventSignatures.Namespace.TransferSingle],
     },
   },
 } satisfies ContractSource;

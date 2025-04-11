@@ -163,9 +163,11 @@ export const Topics = () => {
             transactionTypes={[TransactionType.DeployNamespace]}
             isTopicFlow
             onConfirmNamespaceDataStepCancel={goToMethodSelectionStep}
-            onSignTransactionDeployNamespace={() =>
-              setCreateTopicStep(CreateTopicStep.WVERC20Details)
-            }
+            onSignTransaction={(type) => {
+              if (type === TransactionType.DeployNamespace) {
+                setCreateTopicStep(CreateTopicStep.WVERC20Details);
+              }
+            }}
             onSignTransactionsStepCancel={goToMethodSelectionStep}
           />
         );

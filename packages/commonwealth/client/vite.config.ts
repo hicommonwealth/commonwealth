@@ -60,6 +60,9 @@ export default defineConfig(({ mode }) => {
       env.FLAG_TOKENIZED_THREADS,
     ),
     'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
+    'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
+      env.FLAG_PARTNERSHIP_WALLET,
+    ),
   };
 
   const config = {

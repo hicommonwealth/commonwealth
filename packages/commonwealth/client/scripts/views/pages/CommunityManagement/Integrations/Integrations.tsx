@@ -17,7 +17,7 @@ import Tokenization from './Tokenization';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
-  const showSnapshotIntegration = app.chain.meta.base === ChainBase.Ethereum;
+  const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
 
   const isJudgementEnabled = useFlag('judgeContest');
 
@@ -37,9 +37,9 @@ const Integrations = () => {
         <Directory />
         <SpamLevel />
         <Token />
-        {isJudgementEnabled && <OnchainVerification />}
+        {isEthereum && isJudgementEnabled && <OnchainVerification />}
         <Stake />
-        {showSnapshotIntegration && <Snapshots />}
+        {isEthereum && <Snapshots />}
         <Tokenization />
         <Discord />
         <Webhooks />

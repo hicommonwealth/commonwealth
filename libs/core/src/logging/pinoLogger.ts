@@ -1,5 +1,7 @@
 import pino, { DestinationStream } from 'pino';
+import { ZodError } from 'zod';
 import { config } from '../config';
+import { LogLevel } from '../ports/enums';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
 import { rollbar } from './rollbar';
 
@@ -24,10 +26,13 @@ if (config.NODE_ENV !== 'production') {
   });
 }
 
-export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
+export const getPinoLogger: GetLogger = (
+  ids: LoggerIds,
+  logLevel?: LogLevel,
+) => {
   const logger = pino(
     {
-      level: config.LOGGING.LOG_LEVEL,
+      level: logLevel ?? config.LOGGING.LOG_LEVEL,
       formatters: {
         level: (label) => {
           return { level: label.toUpperCase() };
@@ -68,8 +73,12 @@ export const getPinoLogger: GetLogger = (ids: LoggerIds) => {
       logger.warn({ ...context }, msg);
     },
     error(msg: string, error?: Error, context?: LogContext) {
-      logger.error({ ...context, err: error || undefined }, msg);
+      let err: Error | Record<string, unknown> | undefined = error;
+      if (error instanceof ZodError) {
+        err = error.format();
+      }
 
+      logger.error({ ...context, err: err || undefined }, msg);
       if (context) rollbar.error(msg, error ?? '', context);
       else rollbar.error(msg, error ?? '');
     },

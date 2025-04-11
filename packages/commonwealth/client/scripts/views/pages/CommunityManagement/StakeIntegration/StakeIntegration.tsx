@@ -147,9 +147,11 @@ const StakeIntegration = ({
             ]}
             isTopicFlow={isTopicFlow}
             onConfirmNamespaceDataStepCancel={goBack}
-            onSignTransactionConfigureStake={
-              handleSignTransactionsStepLaunchStakeSuccess
-            }
+            onSignTransaction={(type) => {
+              if (type === TransactionType.ConfigureStakes) {
+                handleSignTransactionsStepLaunchStakeSuccess();
+              }
+            }}
             onSignTransactionsStepCancel={goBack}
           />
         )}

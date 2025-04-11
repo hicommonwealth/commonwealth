@@ -26,11 +26,7 @@ interface CommunityOnchainTransactionsProps {
   symbol?: string;
   onConfirmNamespaceData?: (data: NamespaceData) => void;
   onConfirmNamespaceDataStepCancel?: () => void;
-  onSignTransactionDeployNamespace?: () => void;
-  onSignTransactionConfigureStake?: () => void;
-  onSignTransactionConfigureNominations?: () => void;
-  onSignTransactionMintVerificationToken?: () => void;
-  onSignTransactionConfigureVerification?: () => void;
+  onSignTransaction?: (type: TransactionType) => void;
   onSignTransactionsStepCancel?: () => void;
 }
 
@@ -45,11 +41,7 @@ const CommunityOnchainTransactions = ({
   symbol,
   onConfirmNamespaceData,
   onConfirmNamespaceDataStepCancel,
-  onSignTransactionDeployNamespace,
-  onSignTransactionConfigureStake,
-  onSignTransactionConfigureNominations,
-  onSignTransactionMintVerificationToken,
-  onSignTransactionConfigureVerification,
+  onSignTransaction,
   onSignTransactionsStepCancel,
 }: CommunityOnchainTransactionsProps) => {
   const hasNamespaceReserved = !!namespace;
@@ -68,7 +60,7 @@ const CommunityOnchainTransactions = ({
     symbol: communityNamespaceData.symbol,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionDeployNamespace,
+    onSuccess: () => onSignTransaction?.(TransactionType.DeployNamespace),
     hasNamespaceReserved,
   });
 
@@ -77,28 +69,28 @@ const CommunityOnchainTransactions = ({
     communityId: createdCommunityId,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionConfigureStake,
+    onSuccess: () => onSignTransaction?.(TransactionType.ConfigureStakes),
   });
 
   const nominationsTransaction = useNominationsTransaction({
     namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionConfigureNominations,
+    onSuccess: () => onSignTransaction?.(TransactionType.ConfigureNominations),
   });
 
   const verificationTokenTransaction = useVerificationTokenTransaction({
     namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionMintVerificationToken,
+    onSuccess: () => onSignTransaction?.(TransactionType.MintVerificationToken),
   });
 
   const verificationTransaction = useConfigureVerificationTransaction({
     namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
-    onSuccess: onSignTransactionConfigureVerification,
+    onSuccess: () => onSignTransaction?.(TransactionType.ConfigureVerification),
   });
 
   const handleConfirmNamespaceDataStepSuccess = (data: NamespaceData) => {

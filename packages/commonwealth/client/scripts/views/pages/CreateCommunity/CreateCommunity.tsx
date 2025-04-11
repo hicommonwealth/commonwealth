@@ -57,11 +57,19 @@ const CreateCommunity = () => {
           TransactionType.ConfigureVerification,
           TransactionType.MintVerificationToken,
         ],
-        onSignTransactionMintVerificationToken: goToSuccessStep,
+        onSignTransaction: (type: TransactionType) => {
+          if (type === TransactionType.MintVerificationToken) {
+            goToSuccessStep();
+          }
+        },
       }
     : {
         transactionTypes: [TransactionType.DeployNamespace],
-        onSignTransactionDeployNamespace: goToSuccessStep,
+        onSignTransaction: (type: TransactionType) => {
+          if (type === TransactionType.DeployNamespace) {
+            goToSuccessStep();
+          }
+        },
       };
 
   const getCurrentStep = () => {

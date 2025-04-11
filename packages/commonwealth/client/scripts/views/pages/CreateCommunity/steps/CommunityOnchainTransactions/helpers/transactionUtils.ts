@@ -1,3 +1,4 @@
+import { pluralize } from 'helpers';
 import { TransactionConfig, TransactionHookResult } from '../types';
 
 export enum TransactionType {
@@ -59,6 +60,7 @@ export const createTransaction = (
     description: definition.description,
     state: transaction?.state,
     errorText: transaction?.errorText,
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     action: transaction?.action,
     shouldShowActionButton: showActionButton,
     isActionButtonDisabled:
@@ -72,10 +74,10 @@ export const getTransactionText = (transactionTypes: TransactionType[]) => {
   const count = transactionTypes.length;
 
   return {
-    title: `Sign ${count > 1 ? 'transactions' : 'transaction'}`,
+    title: `Sign ${pluralize(count, 'transaction')}`,
     description:
       count > 1
-        ? `You need to sign ${count} transactions. Please complete them in sequence.`
+        ? `You need to sign ${pluralize(count, 'transaction')}. Please complete them in sequence.`
         : 'Please sign this transaction to proceed.',
   };
 };

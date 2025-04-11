@@ -17,8 +17,8 @@ import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import TrustLevelRole from '../TrustLevelRole';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { UserSkeleton } from './UserSkeleton';
 import './user.scss';
@@ -81,12 +81,15 @@ export const FullUser = ({
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
 
+  const capitalizeRole = roleInCommunity
+    ? roleInCommunity.charAt(0).toUpperCase() +
+      roleInCommunity.slice(1).toLowerCase()
+    : 'Member';
+
   const roleTags = (
     <>
-      {shouldShowRole && roleInCommunity && (
-        <div className="role-tag-container">
-          <CWText className="role-tag-text">{roleInCommunity}</CWText>
-        </div>
+      {shouldShowRole && (
+        <CWTag label={capitalizeRole} type="proposal" classNames="role-tag" />
       )}
     </>
   );
@@ -246,7 +249,8 @@ export const FullUser = ({
                 level={profile?.tier || UserTierMap.IncompleteUser}
               />
             </Link>
-          )}
+          )}{' '}
+          {roleTags}
           {profile?.address && (
             <div className="address-container">
               <div className="user-address">
@@ -278,7 +282,6 @@ export const FullUser = ({
           {friendlyCommunityName && (
             <div className="user-chain">{friendlyCommunityName}</div>
           )}
-          {roleTags}
           {/* If Admin Allow Banning */}
           {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">

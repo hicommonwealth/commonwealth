@@ -1,4 +1,5 @@
 import { PopperPlacementType } from '@mui/base/Popper';
+import { SharePopover } from 'client/scripts/views/components/SharePopover';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
@@ -62,6 +63,8 @@ export type AuthorAndPublishInfoProps = {
   hideSpamTag?: boolean;
   hideTrendingTag?: boolean;
   communityHomeLayout?: boolean;
+  shareUrl?: string;
+  shouldShowRole?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -93,6 +96,8 @@ export const AuthorAndPublishInfo = ({
   hideSpamTag,
   hideTrendingTag,
   communityHomeLayout = false,
+  shareUrl,
+  shouldShowRole = false,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -176,6 +181,7 @@ export const AuthorAndPublishInfo = ({
           popoverPlacement={popoverPlacement}
           // @ts-expect-error <StrictNullChecks>
           profile={profile}
+          shouldShowRole={shouldShowRole}
         />
       )}
       {fromDiscordBot && (
@@ -315,6 +321,7 @@ export const AuthorAndPublishInfo = ({
           </CWText>
         </>
       )}
+
       {!hidePublishDate && (
         <NewThreadTag threadCreatedAt={moment(publishDate)} />
       )}
@@ -328,6 +335,7 @@ export const AuthorAndPublishInfo = ({
           updatedAt={moment(lastUpdated)}
         />
       )}
+      {shareUrl && <SharePopover linkToShare={shareUrl} buttonLabel="Share" />}
     </div>
   );
 };

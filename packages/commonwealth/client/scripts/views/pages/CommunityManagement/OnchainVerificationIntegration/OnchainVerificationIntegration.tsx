@@ -72,12 +72,16 @@ const OnchainVerificationIntegration = () => {
             chainId={communityChainId}
             transactionTypes={[
               TransactionType.DeployNamespace,
-              TransactionType.ConfigureNominations,
+              TransactionType.ConfigureVerification,
               TransactionType.MintVerificationToken,
             ]}
             namespace={community?.namespace}
             onConfirmNamespaceDataStepCancel={handleTransactionCancel}
-            onSignTransactionMintVerificationToken={handleVerificationSuccess}
+            onSignTransaction={(type) => {
+              if (type === TransactionType.MintVerificationToken) {
+                handleVerificationSuccess();
+              }
+            }}
             onSignTransactionsStepCancel={handleTransactionCancel}
           />
         )}

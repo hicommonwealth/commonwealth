@@ -26,7 +26,7 @@ const useNominationsTransaction = ({
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
 
-  const { mutateAsync: configureNominations } =
+  const { mutateAsync: configureNominationsMutation } =
     useConfigureNominationsMutation();
 
   const action = async () => {
@@ -43,18 +43,16 @@ const useNominationsTransaction = ({
         errorText: '',
       });
 
-      const testing = false;
-      testing
-        ? await new Promise((resolve) => setTimeout(resolve, 1000))
-        : await configureNominations({
-            namespaceName: namespace,
-            creatorOnly: true,
-            walletAddress: userAddress,
-            maxNominations: 5,
-            ethChainId: parseInt(chainId),
-            chainRpc,
-            judgeId: 101,
-          });
+      await configureNominationsMutation({
+        namespaceName: namespace,
+        creatorOnly: true,
+        walletAddress: userAddress,
+        maxNominations: 5,
+        ethChainId: parseInt(chainId),
+        chainRpc,
+        // TODO: get from backend in https://github.com/hicommonwealth/commonwealth/issues/10993
+        judgeId: 101,
+      });
 
       setTransactionData({
         state: 'completed',

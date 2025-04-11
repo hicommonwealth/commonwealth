@@ -2,14 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { notifyError } from 'controllers/app/notifications';
 import {
-  getPower,
   getResults,
-  Power,
   SnapshotProposal,
   SnapshotProposalVote,
   SnapshotSpace,
   VoteResults,
-  VoteResultsData,
 } from 'helpers/snapshot_utils';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
@@ -31,7 +28,6 @@ import {
   ClosedProposalPill,
 } from 'views/components/proposal_pills';
 import { SnapshotInformationCard } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotInformationCard';
-import { SnapshotPollCardContainer } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { SnapshotVotesTable } from 'views/pages/Snapshots/ViewSnapshotProposal/SnapshotVotesTable';
 
 type ViewSnapshotProposalProps = {
@@ -47,7 +43,6 @@ const ViewSnapshotProposal = ({
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
-  const [power, setPower] = useState<Power | null>(null);
 
   const user = useUserStore();
 
@@ -65,7 +60,6 @@ const ViewSnapshotProposal = ({
   const { data: proposalsData } = useGetSnapshotProposalsQuery({
     space: snapshotId,
   });
-
   const threads = data || [];
 
   useEffect(() => {
@@ -75,20 +69,9 @@ const ViewSnapshotProposal = ({
   }, [error, isLoading]);
 
   const symbol: string = space?.symbol || '';
-  const validatedAgainstStrategies: boolean = !power
-    ? true
-    : power.totalScore > 0;
 
-  const totalScore: number = power?.totalScore || 0;
   const votes: SnapshotProposalVote[] = voteResults?.votes || [];
-  const totals: VoteResultsData = voteResults?.results || {
-    resultsByVoteBalance: [],
-    resultsByStrategyScore: [],
-    sumOfResultsBalance: 0,
-  };
 
-  const activeUserAddress =
-    user.activeAccount?.address || user.addresses?.[0]?.address;
   const activeCommunityId = app.activeChainId();
   const proposalAuthor = useMemo(() => {
     if (!proposal || !activeCommunityId) {
@@ -124,16 +107,8 @@ const ViewSnapshotProposal = ({
       // @ts-expect-error <StrictNullChecks/>
       const results = await getResults(spaceData, currentProposal);
       setVoteResults(results);
-
-      const powerRes = await getPower(
-        spaceData!,
-        currentProposal!,
-        activeUserAddress,
-      );
-
-      setPower(powerRes);
     },
-    [activeUserAddress, proposalsData, spaceData],
+    [proposalsData, spaceData],
   );
 
   useNecessaryEffect(() => {
@@ -191,25 +166,6 @@ const ViewSnapshotProposal = ({
                 proposal={proposal}
                 threads={threads}
                 spaceId={space?.id}
-              />
-            ),
-          },
-          {
-            label: 'Poll',
-            item: (
-              <SnapshotPollCardContainer
-                activeUserAddress={activeUserAddress}
-                fetchedPower={!!power}
-                identifier={identifier}
-                proposal={proposal}
-                scores={[]} // unused?
-                space={space}
-                symbol={symbol}
-                totals={totals}
-                totalScore={totalScore}
-                validatedAgainstStrategies={validatedAgainstStrategies}
-                votes={votes}
-                loadVotes={async () => loadVotes(identifier)}
               />
             ),
           },
