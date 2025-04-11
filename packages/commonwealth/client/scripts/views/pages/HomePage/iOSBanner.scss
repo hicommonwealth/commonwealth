@@ -1,0 +1,124 @@
+@import '../../../styles/shared.scss';
+
+.bannerContainer {
+  background: linear-gradient(90deg, #F8F8FF 0%, #E8E8FF 100%);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  padding: 32px;
+  margin: 24px 0;
+
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+    margin: 16px 0;
+  }
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 60%;
+  z-index: 1;
+  position: relative;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    gap: 16px;
+  }
+}
+
+.bannerImage {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+
+  @media (max-width: 768px) {
+    opacity: 0.15;
+    width: 100%;
+    height: auto;
+    right: -20%;
+  }
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #4D4D4D;
+  margin: 0;
+  line-height: 1.5;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.downloadButton {
+  background: #4B37CF;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #3928A9;
+  }
+
+  @media (max-width: 768px) {
+    text-align: center;
+    padding: 10px 20px;
+  }
+}
+
+.dismissButton {
+  background: transparent;
+  border: 1px solid #4B37CF;
+  color: #4B37CF;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(75, 55, 207, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px 20px;
+  }
+} 

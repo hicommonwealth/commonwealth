@@ -41,10 +41,7 @@ import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  buildURLFromContentId,
-  ContentIdType,
-} from '../CreateQuest/QuestForm/helpers';
+import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -165,11 +162,9 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'ThreadCreated': {
         if (actionContentId) {
-          const url = buildURLFromContentId(
-            actionContentId?.split?.(':')?.[1],
-            actionContentId?.split?.(':')?.[0] as ContentIdType,
-            { newThread: true },
-          ).split(window.location.origin)[1];
+          const url = buildURLFromContentId(actionContentId, {
+            newThread: true,
+          }).split(window.location.origin)[1];
           navigate(url, {}, null);
           return;
         }
@@ -188,10 +183,9 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(
-              actionContentId.split(':')[1],
-              actionContentId.split(':')[0] as ContentIdType,
-            ).split(window.location.origin)[1],
+            buildURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
             {},
             null,
           );
@@ -208,10 +202,9 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(
-                  actionContentId.split(':')[1],
-                  actionContentId.split(':')[0] as ContentIdType,
-                ).split(window.location.origin)[1]
+              ? buildURLFromContentId(actionContentId).split(
+                  window.location.origin,
+                )[1]
               : `/explore?tab=threads`,
             {},
             null,
@@ -227,6 +220,14 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'UserMentioned': {
         // TODO: user mention is not implemented in app
+        break;
+      }
+      case 'TweetEngagement': {
+        if (actionContentId) {
+          window.open(buildURLFromContentId(actionContentId), '_blank');
+        } else {
+          notifyError(`Linked twitter tweet url is invalid`);
+        }
         break;
       }
       default:

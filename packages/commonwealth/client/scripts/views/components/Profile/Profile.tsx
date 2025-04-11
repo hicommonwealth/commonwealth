@@ -57,11 +57,29 @@ const Profile = ({ userId }: ProfileProps) => {
         data.threads.map((t) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { Comments, ...rest } = t; // comments aren't needed for display here
-          return new Thread({ ...rest });
+          return new Thread({ ...rest, user_tier: data.tier });
         }),
       );
-      // @ts-expect-error <StrictNullChecks/>
-      const responseComments = data.comments.map((c) => new Comment(c));
+      const responseComments = data.comments.map(
+        (c) =>
+          // @ts-expect-error <StrictNullChecks/>
+          new Comment({
+            ...c,
+            Address: {
+              ...c.Address,
+              User: {
+                ...(c.Address?.User || {}),
+                tier: data.tier,
+                profile: {
+                  ...(c.Address?.User?.profile || {}),
+                  tier: data.tier,
+                  name: data.profile.name,
+                  avatar_url: data.profile.avatar_url,
+                },
+              },
+            },
+          }),
+      );
 
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(

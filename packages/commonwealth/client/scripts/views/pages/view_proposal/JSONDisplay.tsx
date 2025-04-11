@@ -75,6 +75,7 @@ export const JSONDisplay = ({ data, title }: JSONDisplayProps) => {
           <CWDivider />
         </>
       )}
+      <JSONViewer data={data} />
       {Array.isArray(data) ? (
         data.map((d, i) => <JSONViewer data={d} key={i} />)
       ) : (

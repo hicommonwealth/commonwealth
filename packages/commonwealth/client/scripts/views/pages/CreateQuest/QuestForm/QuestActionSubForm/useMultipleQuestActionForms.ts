@@ -2,8 +2,10 @@ import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
+  doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionAllowTwitterTweetURL,
   doesActionRequireRewardShare,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -20,12 +22,7 @@ import {
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
 } from './types';
-import {
-  questSubFormValidationSchema,
-  questSubFormValidationSchemaWithContentLink,
-  questSubFormValidationSchemaWithCreatorPoints,
-  questSubFormValidationSchemaWithCreatorPointsWithContentLink,
-} from './validation';
+import { buildQuestSubFormValidationSchema } from './validation';
 
 const useQuestActionMultiFormsState = ({
   minSubForms,
@@ -40,22 +37,26 @@ const useQuestActionMultiFormsState = ({
     (subForm) => Object.keys(subForm.errors || {}).length > 0,
   );
 
+  const setQuestActionSubFormsInitialState = () => {
+    if (minSubForms) {
+      setQuestActionSubForms([
+        ...Array.from({ length: minSubForms }, (_, index) => ({
+          values: {
+            participationLimit: QuestParticipationLimit.OncePerQuest,
+            contentIdScope: QuestActionContentIdScope.Topic,
+          },
+          refs: {
+            runParticipationLimitValidator: () => {},
+          },
+          id: index + (questActionSubForms.length + 1),
+        })),
+      ]);
+    }
+  };
+
   useRunOnceOnCondition({
     callback: () => {
-      if (minSubForms) {
-        setQuestActionSubForms(
-          Array.from({ length: minSubForms }, (_, index) => ({
-            values: {
-              participationLimit: QuestParticipationLimit.OncePerQuest,
-              contentIdScope: QuestActionContentIdScope.Topic,
-            },
-            refs: {
-              runParticipationLimitValidator: () => {},
-            },
-            id: index + 1,
-          })),
-        );
-      }
+      setQuestActionSubFormsInitialState();
     },
     shouldRun: true,
   });
@@ -76,26 +77,6 @@ const useQuestActionMultiFormsState = ({
     ]);
   };
 
-  const buildValidationSchema = (config?: QuestActionSubFormConfig) => {
-    if (
-      config?.with_optional_comment_id ||
-      config?.with_optional_thread_id ||
-      config?.with_optional_topic_id
-    ) {
-      if (config?.requires_creator_points) {
-        return questSubFormValidationSchemaWithCreatorPointsWithContentLink;
-      }
-
-      return questSubFormValidationSchemaWithContentLink;
-    }
-
-    if (config?.requires_creator_points) {
-      return questSubFormValidationSchemaWithCreatorPoints;
-    }
-
-    return questSubFormValidationSchema;
-  };
-
   const validateFormValues = (
     values: QuestActionSubFormFields,
     refs?: QuestActionSubFormInternalRefs,
@@ -105,7 +86,7 @@ const useQuestActionMultiFormsState = ({
 
     // validate via zod
     try {
-      const schema = buildValidationSchema(config);
+      const schema = buildQuestSubFormValidationSchema(config);
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
@@ -162,16 +143,28 @@ const useQuestActionMultiFormsState = ({
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
+      const allowsTwitterTweetUrl =
+        allowsContentId && doesActionAllowTwitterTweetURL(chosenAction);
+      const isActionRepeatable = doesActionAllowRepetition(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
         with_optional_comment_id:
           allowsContentId && doesActionAllowCommentId(chosenAction),
         with_optional_thread_id:
           allowsContentId && doesActionAllowThreadId(chosenAction),
+        with_required_twitter_tweet_link:
+          allowsContentId && doesActionAllowTwitterTweetURL(chosenAction),
       };
+
+      // set fixed action repitition per certain actions
+      if (!isActionRepeatable) {
+        updatedSubForms[index].values.participationLimit =
+          QuestParticipationLimit.OncePerQuest;
+      }
 
       // reset errors/values if action doesn't require creator points
       if (!requiresCreatorPoints) {
@@ -191,6 +184,12 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
+      // set fixed contentIdScope per certain actions
+      if (updateBody.action === 'TweetEngagement') {
+        updatedSubForms[index].values.contentIdScope =
+          QuestActionContentIdScope.TwitterTweet;
+      }
+
       // set/reset default values/config if action allows content link
       if (allowsContentId) {
         updatedSubForms[index].values.contentIdScope =
@@ -199,9 +198,12 @@ const useQuestActionMultiFormsState = ({
           QuestActionContentIdScope.Thread;
 
         if (
-          updatedSubForms[index].values.contentIdScope ===
+          (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Topic &&
-          !allowsTopicId
+            !allowsTopicId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.TwitterTweet &&
+            !allowsTwitterTweetUrl)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;
@@ -234,6 +236,7 @@ const useQuestActionMultiFormsState = ({
     addSubForm,
     removeSubFormByIndex,
     updateSubFormByIndex,
+    setQuestActionSubFormsInitialState,
     setQuestActionSubForms,
     validateSubFormByIndex,
     validateSubForms,
