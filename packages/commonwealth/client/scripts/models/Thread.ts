@@ -1,5 +1,9 @@
 import * as schemas from '@hicommonwealth/schemas';
-import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
+import {
+  ProposalType,
+  UserTierMap,
+  getDecodedString,
+} from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
@@ -237,6 +241,7 @@ export class Thread implements IUniqueId {
       reactionWeights?: number[];
       userId?: number;
       user_id?: number;
+      user_tier?: number;
       avatar_url?: string | null;
       address_last_active?: string;
       associatedReactions?: ReactionView[];
@@ -374,6 +379,7 @@ export class Thread implements IUniqueId {
         address: t.Address?.address ?? '',
         lastActive: t.address_last_active ?? '',
         avatarUrl: t.avatar_url ?? '',
+        tier: t.user_tier ?? UserTierMap.IncompleteUser,
       };
     }
   }

@@ -2,6 +2,7 @@ import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
+  doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
@@ -37,22 +38,26 @@ const useQuestActionMultiFormsState = ({
     (subForm) => Object.keys(subForm.errors || {}).length > 0,
   );
 
+  const setQuestActionSubFormsInitialState = () => {
+    if (minSubForms) {
+      setQuestActionSubForms([
+        ...Array.from({ length: minSubForms }, (_, index) => ({
+          values: {
+            participationLimit: QuestParticipationLimit.OncePerQuest,
+            contentIdScope: QuestActionContentIdScope.Topic,
+          },
+          refs: {
+            runParticipationLimitValidator: () => {},
+          },
+          id: index + (questActionSubForms.length + 1),
+        })),
+      ]);
+    }
+  };
+
   useRunOnceOnCondition({
     callback: () => {
-      if (minSubForms) {
-        setQuestActionSubForms(
-          Array.from({ length: minSubForms }, (_, index) => ({
-            values: {
-              participationLimit: QuestParticipationLimit.OncePerQuest,
-              contentIdScope: QuestActionContentIdScope.Topic,
-            },
-            refs: {
-              runParticipationLimitValidator: () => {},
-            },
-            id: index + 1,
-          })),
-        );
-      }
+      setQuestActionSubFormsInitialState();
     },
     shouldRun: true,
   });
@@ -143,10 +148,12 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerURL =
         doesActionRequireDiscordServerURL(chosenAction);
+      const isActionRepeatable = doesActionAllowRepetition(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
         requires_creator_points: requiresCreatorPoints,
+        is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
         with_optional_comment_id:
           allowsContentId && doesActionAllowCommentId(chosenAction),
@@ -156,6 +163,12 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_url: requiresDiscordServerURL,
       };
+
+      // set fixed action repitition per certain actions
+      if (!isActionRepeatable) {
+        updatedSubForms[index].values.participationLimit =
+          QuestParticipationLimit.OncePerQuest;
+      }
 
       // reset errors/values if action doesn't require creator points
       if (!requiresCreatorPoints) {
@@ -241,6 +254,7 @@ const useQuestActionMultiFormsState = ({
     addSubForm,
     removeSubFormByIndex,
     updateSubFormByIndex,
+    setQuestActionSubFormsInitialState,
     setQuestActionSubForms,
     validateSubFormByIndex,
     validateSubForms,

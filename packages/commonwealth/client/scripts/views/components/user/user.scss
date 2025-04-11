@@ -96,6 +96,7 @@
     cursor: inherit;
     text-decoration: initial;
     display: flex;
+    align-items: center;
   }
 
   .profile-name {
@@ -131,15 +132,8 @@
     @include roleIcon();
   }
 
-  .role-tag-container {
-    display: inline-block;
-
-    .role-tag-text.Text {
-      background-color: $neutral-200;
-      border-radius: $border-radius-rounded-corners;
-      margin-left: 6px;
-      padding: 2px 8px;
-    }
+  .role-tag {
+    margin-left: 6px;
   }
 }
 
@@ -157,6 +151,9 @@
   box-shadow: $elevation-3;
   padding: 8px;
   text-align: center !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .user-avatar,
   .user-name {

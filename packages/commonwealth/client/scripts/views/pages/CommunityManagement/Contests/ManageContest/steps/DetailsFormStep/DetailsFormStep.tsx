@@ -26,7 +26,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
 import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
-import { CONTEST_FAQ_URL } from '../../../utils';
+import { CONTEST_FAQ_URL, isJudgedContest } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -135,22 +135,25 @@ const DetailsFormStep = ({
         }));
 
   const getInitialValues = () => {
+    const selectedTopic = availableTopics.find(
+      (t) => t.value === contestFormData?.contestTopic?.value,
+    );
+    const judgedContestSelected = isJudgedContest(selectedTopic);
+
     return {
       contestName: contestFormData?.contestName,
-      contestTopic: availableTopics.find(
-        (t) => t.value === contestFormData?.contestTopic?.value,
-      ),
+      contestTopic: selectedTopic,
       contestDescription: contestFormData?.contestDescription,
       contestImage: contestFormData?.contestImage,
       feeType:
         contestFormData?.feeType ||
-        (isFarcasterContest
+        (isFarcasterContest || judgedContestSelected
           ? ContestFeeType.DirectDeposit
           : ContestFeeType.CommunityStake),
       fundingTokenAddress: contestFormData?.fundingTokenAddress,
       contestRecurring:
         contestFormData?.contestRecurring ||
-        (isFarcasterContest
+        (isFarcasterContest || judgedContestSelected
           ? ContestRecurringType.No
           : ContestRecurringType.Yes),
     };
@@ -199,17 +202,20 @@ const DetailsFormStep = ({
     const selectedTopic = (availableTopics || []).find(
       (t) => t.value === values?.contestTopic?.value,
     );
-    const feeType = isFarcasterContest
-      ? ContestFeeType.DirectDeposit
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const judgedContestSelected = isJudgedContest(selectedTopic);
+    const feeType =
+      isFarcasterContest || judgedContestSelected
         ? ContestFeeType.DirectDeposit
-        : ContestFeeType.CommunityStake;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestFeeType.DirectDeposit
+          : ContestFeeType.CommunityStake;
 
-    const contestRecurring = isFarcasterContest
-      ? ContestRecurringType.No
-      : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+    const contestRecurring =
+      isFarcasterContest || judgedContestSelected
         ? ContestRecurringType.No
-        : ContestRecurringType.Yes;
+        : selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+          ? ContestRecurringType.No
+          : ContestRecurringType.Yes;
 
     const formData: ContestFormData = {
       contestName: values.contestName,
@@ -322,7 +328,7 @@ const DetailsFormStep = ({
                       if (
                         t?.weightedVoting === TopicWeightedVoting.ERC20 ||
                         // Non-weighted topic for judge nominated contests
-                        !t?.weightedVoting
+                        isJudgedContest(t)
                       ) {
                         const token = topicsData?.find(
                           (topic) => topic.id === t?.value,
@@ -403,7 +409,7 @@ const DetailsFormStep = ({
               {watch('contestTopic')?.weightedVoting ===
                 TopicWeightedVoting.ERC20 ||
               // Non-weighted topic for judge nominated contests
-              !watch('contestTopic')?.weightedVoting ? (
+              isJudgedContest(watch('contestTopic')) ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>

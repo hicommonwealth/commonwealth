@@ -23,6 +23,7 @@ export const CreateThread = {
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
     is_linking_token: z.boolean().optional(),
+    turnstile_token: z.string().nullish(),
   }),
   output: Thread,
   context: TopicContext,
