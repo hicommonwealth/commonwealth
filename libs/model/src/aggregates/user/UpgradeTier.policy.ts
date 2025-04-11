@@ -4,6 +4,8 @@ import { events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  NAMESPACE_MIN_NOMINATION_BALANCE,
+  UserTierMap,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
@@ -65,9 +67,9 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           log.warn(`User not found for address ${userAddress}`);
           return;
         }
-        if (nominatedAddress.User.tier >= 4) return;
+        if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
 
-        // if user has sufficient balance of community nomination token, upgrade to tier 4
+        // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
         const balances = await tokenBalanceCache.getBalances({
           addresses: [nominatedAddress.address],
           balanceSourceType: BalanceSourceType.ERC1155,
@@ -79,9 +81,12 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           cacheRefresh: true,
         });
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
-        if (balance < 5) return;
+        if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-        await upgradeUserTier(nominatedAddress.User.id!, 4);
+        await upgradeUserTier(
+          nominatedAddress.User.id!,
+          UserTierMap.ChainVerified,
+        );
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
@@ -119,9 +124,9 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           );
           return;
         }
-        if (tokenCreatorAddress.User.tier >= 4) return;
+        if (tokenCreatorAddress.User.tier >= UserTierMap.ChainVerified) return;
 
-        // if token has been traded above min amount, upgrade token creator to tier 4
+        // if token has been traded above min amount, upgrade token creator to ChainVerified tier
         const [totalTraded] = await models.sequelize.query<{
           sum: number;
         }>(
@@ -133,7 +138,10 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         );
 
         if (totalTraded.sum > UPGRADE_MIN_TRADE_AMOUNT) {
-          await upgradeUserTier(tokenCreatorAddress.User.id!, 4);
+          await upgradeUserTier(
+            tokenCreatorAddress.User.id!,
+            UserTierMap.ChainVerified,
+          );
         }
       },
       ContestContentAdded: async ({ payload }) => {
@@ -208,7 +216,7 @@ const onContestActivity = async ({
     return;
   }
 
-  if (contestCreatorAddress.User.tier >= 4) return;
+  if (contestCreatorAddress.User.tier >= UserTierMap.ChainVerified) return;
 
   const rpc = getChainNodeUrl({
     url: contestManager!.Community!.ChainNode!.url,
@@ -252,8 +260,11 @@ const onContestActivity = async ({
     (isUSDC && contestBalanceInt >= UPGRADE_MIN_USDC_BALANCE) ||
     (isLaunchpadToken && contestBalanceInt >= UPGRADE_MIN_LAUNCHPAD_BALANCE)
   ) {
-    // contest has been funded, upgrade contest creator to tier 4
-    await upgradeUserTier(contestCreatorAddress.User.id!, 4);
+    // contest has been funded, upgrade contest creator to ChainVerified tier
+    await upgradeUserTier(
+      contestCreatorAddress.User.id!,
+      UserTierMap.ChainVerified,
+    );
   } else {
     log.warn(
       `Contest funding token not approved for contest ${contest_address}`,
