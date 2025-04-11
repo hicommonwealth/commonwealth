@@ -1,7 +1,10 @@
 import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import TokenIcon from 'client/scripts/views/modals/TradeTokenModel/TokenIcon';
-import { UniswapTradeTokenModalProps } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
+import {
+  ExternalToken,
+  UniswapTradeTokenModalProps,
+} from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import useUniswapTradeModal from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/useUniswapTradeModal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
@@ -13,6 +16,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import './UniswapTrade.scss';
 
 interface UniswapTradeProps {
@@ -44,14 +48,15 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
       provider: uniswapWidget.provider,
     });
 
+  const logo =
+    (tradeConfig.token as ExternalToken).logo ||
+    (tradeConfig.token as LaunchpadToken).icon_url;
   return (
     <div className="UniswapTrade">
       <div className="token-info">
         <CWText type="h4">
           Swap Token - {tradeConfig.token.symbol}{' '}
-          {tradeConfig.token.logo && (
-            <TokenIcon size="large" url={tradeConfig.token.logo} />
-          )}
+          {logo && <TokenIcon size="large" url={logo} />}
         </CWText>
 
         {/* Info tooltip disclaimer */}

@@ -1,14 +1,9 @@
 import { Command, logger } from '@hicommonwealth/core';
-import {
-  commonProtocol as cp,
-  getLaunchpadToken,
-  transferLaunchpadLiquidityToUniswap,
-} from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { config } from '../../config';
 import { models } from '../../database';
-import { chainNodeMustExist } from '../../policies/utils/utils'; // TODO: place in utils
+import { chainNodeMustExist } from '../../policies/utils/utils';
+import { handleCapReached } from './utils'; // TODO: place in utils
 
 const log = logger(import.meta);
 
@@ -36,11 +31,6 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
 
       const token_address = token_address_unformatted.toLowerCase();
 
-      const token = await models.LaunchpadToken.findOne({
-        where: { token_address },
-      });
-      if (!token) throw new Error('Token not found');
-
       const chainNode = await chainNodeMustExist(eth_chain_id);
 
       await models.LaunchpadTrade.findOrCreate({
@@ -59,38 +49,13 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         },
       });
 
-      const contracts = cp.factoryContracts[eth_chain_id as cp.ValidChains];
-      let lpBondingCurveAddress: string;
-      if (contracts && 'lpBondingCurve' in contracts) {
-        lpBondingCurveAddress = contracts.lpBondingCurve;
-      } else {
-        log.error('No lpBondingCurve address found for chain', undefined, {
-          eth_chain_id,
-        });
-        return;
-      }
-
-      const remainingLiquidity =
-        BigInt(token.launchpad_liquidity) - floating_supply;
-      if (!token.liquidity_transferred && remainingLiquidity < BigInt(1000)) {
-        const onChainTokenData = await getLaunchpadToken({
-          rpc: chainNode.private_url!,
-          tokenAddress: token_address,
-          lpBondingCurveAddress,
-        });
-
-        if (!onChainTokenData.funded) {
-          await transferLaunchpadLiquidityToUniswap({
-            rpc: chainNode.private_url!,
-            tokenAddress: token_address,
-            lpBondingCurveAddress,
-            privateKey: config.WEB3.PRIVATE_KEY,
-          });
-        }
-
-        token.liquidity_transferred = true;
-        await token.save();
-      }
+      // If cap reached, transfer to uniswap
+      await handleCapReached(
+        token_address,
+        floating_supply,
+        eth_chain_id,
+        chainNode.private_url!,
+      );
     },
   };
 }

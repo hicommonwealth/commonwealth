@@ -12,7 +12,9 @@ import {
 import WebWalletController from 'controllers/app/web_wallets';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import {
+  ExternalToken,
   UniswapToken,
   UniswapWidgetConfig,
   UseUniswapTradeModalProps,
@@ -156,11 +158,15 @@ const useUniswapTradeModal = ({
           ...customLists,
           {
             name: tradeConfig.token.name,
-            address: tradeConfig.token.contract_address,
+            address:
+              (tradeConfig.token as ExternalToken).contract_address ||
+              (tradeConfig.token as LaunchpadToken).token_address,
             symbol: tradeConfig.token.symbol,
-            decimals: tradeConfig.token.decimals,
+            decimals: (tradeConfig.token as ExternalToken).decimals || 18,
             chainId: ethChainId,
-            logoURI: tradeConfig.token.logo || '',
+            logoURI:
+              (tradeConfig.token as ExternalToken).logo ||
+              (tradeConfig.token as LaunchpadToken).icon_url,
           },
         ];
 
@@ -427,7 +433,9 @@ const useUniswapTradeModal = ({
     tokensList: uniswapTokensList,
     defaultTokenAddress: {
       input: 'NATIVE',
-      output: tradeConfig.token.contract_address,
+      output:
+        (tradeConfig.token as ExternalToken).contract_address ||
+        (tradeConfig.token as LaunchpadToken).token_address,
     },
     convenienceFee: {
       percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,

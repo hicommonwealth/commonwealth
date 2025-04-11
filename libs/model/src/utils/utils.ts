@@ -1,6 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { isEvmAddress } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
@@ -18,9 +17,7 @@ import {
   Transaction,
 } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { createPublicClient, http } from 'viem';
 import { config } from '../config';
-import { mustExist } from '../middleware';
 import type { OutboxAttributes } from '../models/outbox';
 import { parseFarcasterContentUrl } from './farcasterUtils';
 
@@ -313,17 +310,4 @@ export async function tweetExists(tweetId: string) {
   }
 
   return true;
-}
-
-export async function getClient(eth_chain_id: number) {
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      eth_chain_id,
-    },
-  });
-  mustExist('Chain Node', chainNode);
-
-  return createPublicClient({
-    transport: http(chainNode.private_url! || chainNode.url!),
-  });
 }

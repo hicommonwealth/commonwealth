@@ -1,10 +1,11 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import { Command, InvalidState } from '@hicommonwealth/core';
-import { getClient } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { parseEventLogs } from 'viem';
+import { createPublicClient, http, parseEventLogs } from 'viem';
 import z from 'zod';
 import { models } from '../../database';
+import { mustExist } from '../../middleware';
+import { handleCapReached } from './utils';
 
 export function CreateLaunchpadTrade(): Command<
   typeof schemas.CreateLaunchpadTrade
@@ -27,7 +28,18 @@ export function CreateLaunchpadTrade(): Command<
         >;
       }
 
-      const client = await getClient(eth_chain_id);
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: {
+            eth_chain_id,
+          },
+        },
+      );
+      mustExist('Chain Node', chainNode);
+      const url = chainNode.private_url! || chainNode.url!;
+      const client = createPublicClient({
+        transport: http(url),
+      });
 
       const receipt = await client.getTransactionReceipt({
         hash: transaction_hash as `0x${string}`,
@@ -54,6 +66,14 @@ export function CreateLaunchpadTrade(): Command<
       });
       const block = await client.getBlock({ blockNumber: tx.blockNumber });
 
+      // If cap reached, transfer to uniswap
+      await handleCapReached(
+        result.tokenAddress,
+        result.floatingSupply,
+        eth_chain_id,
+        url,
+      );
+
       // This case happens when liquidity is bought out
       if (result.tokenAmount === BigInt(0)) {
         return;
@@ -66,7 +86,8 @@ export function CreateLaunchpadTrade(): Command<
         trader_address: result.trader.toLowerCase(),
         is_buy: result.isBuy,
         community_token_amount: result.tokenAmount,
-        price: Number(result.ethAmount / result.tokenAmount),
+        price:
+          Number((result.ethAmount * BigInt(1e18)) / result.tokenAmount) / 1e18,
         floating_supply: result.floatingSupply,
         timestamp: Number(block.timestamp),
       });

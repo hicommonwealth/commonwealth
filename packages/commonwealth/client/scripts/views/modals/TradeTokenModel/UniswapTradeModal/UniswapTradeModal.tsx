@@ -17,9 +17,10 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal } from 'views/modals/AuthModal';
+import { LaunchpadToken } from '../CommonTradeModal/types';
 import TokenIcon from '../TokenIcon';
 import './UniswapTradeModal.scss';
-import { UniswapTradeTokenModalProps } from './types';
+import { ExternalToken, UniswapTradeTokenModalProps } from './types';
 import useUniswapTradeModal from './useUniswapTradeModal';
 
 const UniswapTradeModal = ({
@@ -35,6 +36,7 @@ const UniswapTradeModal = ({
     includeNodeInfo: true,
   });
   const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
+  const networkName = tokenCommunity?.ChainNode?.name;
   const rpcUrl = tokenCommunity?.ChainNode?.url;
   const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
 
@@ -73,7 +75,6 @@ const UniswapTradeModal = ({
         (args[0].includes('fadeAnimation') ||
           (typeof args[0] === 'string' && args[0].includes('hideOverflow')))
       ) {
-        console.log('here');
         return;
       }
       originalConsoleError(...args);
@@ -108,6 +109,9 @@ const UniswapTradeModal = ({
     uniswapWidget.connectWallet,
   ]);
 
+  const logo =
+    (tradeConfig.token as ExternalToken).logo ||
+    (tradeConfig.token as LaunchpadToken).icon_url;
   return (
     <>
       <CWModal
@@ -124,9 +128,7 @@ const UniswapTradeModal = ({
                 <div className="header-content">
                   <CWText type="h4" className="token-info">
                     Swap Token - {tradeConfig.token.symbol}{' '}
-                    {tradeConfig.token.logo && (
-                      <TokenIcon size="large" url={tradeConfig.token.logo} />
-                    )}
+                    {logo && <TokenIcon size="large" url={logo} />}
                   </CWText>
 
                   {/* Network indicator moved to header */}
@@ -140,7 +142,7 @@ const UniswapTradeModal = ({
                           }
                         >
                           {' '}
-                          {currentChain}
+                          {networkName}
                         </span>
                         {isWrongNetwork && (
                           <>
