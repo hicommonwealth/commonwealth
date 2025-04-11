@@ -97,15 +97,11 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.Namespace]: {
-      abi: erc1155Abi,
+      abi: [...erc1155Abi, ...communityNominationsAbi],
       eventSignatures: [
         EvmEventSignatures.Namespace.TransferSingle,
         EvmEventSignatures.Namespace.JudgeNominated,
       ],
-    },
-    [ChildContractNames.CommunityNominations]: {
-      abi: communityNominationsAbi,
-      eventSignatures: [],
     },
   },
 } satisfies ContractSource;
