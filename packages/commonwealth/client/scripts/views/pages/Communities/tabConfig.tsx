@@ -1,11 +1,16 @@
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
+import { Thread } from 'models/Thread';
 import React, {
   MutableRefObject,
   ReactNode,
   RefObject,
   useCallback,
-  useMemo,
 } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
+import useSearchThreadsQuery, {
+  APIOrderBy,
+  APIOrderDirection,
+} from 'state/api/threads/searchThreads';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
@@ -20,7 +25,7 @@ import {
 import { CommunityFilters, FiltersDrawer } from './FiltersDrawer';
 import { safeScrollParent } from './helpers';
 import QuestList from './QuestList';
-import { SearchableThreadsFeed } from './SearchableThreadsFeed';
+import SearchableThreadsFeed from './SearchableThreadsFeed';
 import { FilterTag, InlineFilter, ViewType } from './SearchFilterRow';
 import TokensList from './TokensList';
 
@@ -128,22 +133,50 @@ const FilteredThreadsFeed = ({
   filterKey?: number;
   searchTerm?: string;
 }) => {
-  // Define a stable query function that doesn't call hooks directly
-  // This avoids the React hooks consistency error
-  const getQuery = useCallback(({ limit }: { limit: number }) => {
-    // When this function is actually called by Feed component,
-    // it will safely call the hook
-    return useFetchGlobalActivityQuery({ limit });
-  }, []);
+  // Hook for standard feed
+  const fetchGlobalActivity = useFetchGlobalActivityQuery;
+  const getQuery = useCallback(
+    ({ limit }: { limit: number }) => {
+      return fetchGlobalActivity({ limit });
+    },
+    [fetchGlobalActivity],
+  );
+
+  // Hook for searchable feed
+  const orderBy =
+    sortOption === 'upvotes' ? APIOrderBy.Rank : APIOrderBy.CreatedAt;
+  const orderDirection = APIOrderDirection.Desc;
+
+  const searchResults = useSearchThreadsQuery({
+    communityId: communityId || ALL_COMMUNITIES,
+    searchTerm: searchTerm || '',
+    limit: 20,
+    orderBy,
+    orderDirection,
+    threadTitleOnly: false,
+    includeCount: true,
+    queryKeyParam: filterKey,
+    enabled: !!searchTerm && searchTerm.length > 0,
+  });
 
   // Determine if we need to use search or standard feed
   if (searchTerm && searchTerm.length > 0) {
+    // Prepare props for SearchableThreadsFeed
+    const threads =
+      searchResults.data?.pages.flatMap((page) => page.results) || [];
+    // Map raw search results to Thread instances if necessary
+    const mappedThreads = threads.map((threadData) => new Thread(threadData));
+
     return (
       <SearchableThreadsFeed
-        communityId={communityId}
-        sortOption={sortOption}
         customScrollParent={customScrollParent}
         searchTerm={searchTerm}
+        threads={mappedThreads}
+        isLoading={searchResults.isLoading}
+        error={searchResults.error}
+        hasNextPage={searchResults.hasNextPage}
+        fetchNextPage={searchResults.fetchNextPage}
+        isFetchingNextPage={searchResults.isFetchingNextPage}
       />
     );
   }
@@ -505,15 +538,11 @@ export function createTabsConfig() {
       },
       getContent: (props) => {
         // Generate a stable key for the filtered thread feed
-        // Use useMemo to avoid recalculating on every render
-        const refreshKey = useMemo(() => {
-          return `${props.threadFilterKey || 0}-${props.searchValue || ''}-${props.threadsFilterCommunityId || ''}-${props.threadsSortOption || 'newest'}`;
-        }, [
-          props.threadFilterKey,
-          props.searchValue,
-          props.threadsFilterCommunityId,
-          props.threadsSortOption,
-        ]);
+        const baseKey = props.threadFilterKey || 0;
+        const searchKey = props.searchValue || '';
+        const communityKey = props.threadsFilterCommunityId || '';
+        const sortKey = props.threadsSortOption || 'newest';
+        const refreshKey = `${baseKey}-${searchKey}-${communityKey}-${sortKey}`;
 
         return (
           <div className="threads-tab">

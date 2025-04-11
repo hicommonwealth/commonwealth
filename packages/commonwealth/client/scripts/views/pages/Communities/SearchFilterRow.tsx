@@ -34,24 +34,32 @@ export interface InlineFilter {
 interface SearchFilterRowProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
-  selectedViewType: ViewType;
-  onViewTypeChange: (viewType: ViewType) => void;
+  _selectedViewType: ViewType;
+  _onViewTypeChange: (viewType: ViewType) => void;
+  _selectedSortOption: string;
+  _onSortOptionChange: (option: string) => void;
+  _showViewToggle: boolean;
   onFilterClick?: () => void;
+  _communitiesCount: number;
+  _isFilterDrawerOpen: boolean;
   filterTags?: FilterTag[];
   placeholder?: string;
-  showViewToggle?: boolean;
   inlineFilters?: InlineFilter[];
 }
 
 const SearchFilterRow = ({
   searchValue,
   onSearchChange,
-  selectedViewType,
-  onViewTypeChange,
+  _selectedViewType,
+  _onViewTypeChange,
+  _selectedSortOption,
+  _onSortOptionChange,
+  _showViewToggle,
   onFilterClick,
+  _communitiesCount,
+  _isFilterDrawerOpen,
   filterTags = [],
   placeholder = 'Search',
-  showViewToggle = true,
   inlineFilters = [],
 }: SearchFilterRowProps) => {
   return (

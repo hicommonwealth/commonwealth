@@ -178,7 +178,7 @@ const CommunitiesPage = () => {
       launchpad: launchpadEnabled,
       xp: questsEnabled,
     });
-  }, [launchpadEnabled, questsEnabled]);
+  }, [launchpadEnabled, questsEnabled, getEnabledTabs]);
 
   // Function to handle tab switching
   const handleTabClick = useCallback(

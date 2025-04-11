@@ -76,13 +76,6 @@ export const FiltersDrawer = ({
     });
   };
 
-  const onCommunityTypeChange = (type: CommunityType) => {
-    onFiltersChange({
-      ...filters,
-      withCommunityType: filters.withCommunityType === type ? undefined : type,
-    });
-  };
-
   const onCommunitySortOptionChange = (sortOption: CommunitySortOptions) => {
     onFiltersChange({
       ...filters,

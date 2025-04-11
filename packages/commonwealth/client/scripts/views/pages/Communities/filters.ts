@@ -34,7 +34,7 @@ export function createToggleFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    _forceRefreshKey,
     setForceRefreshKey,
   },
   getLabel,
@@ -108,7 +108,7 @@ export function createSortFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    _forceRefreshKey,
     setForceRefreshKey,
   },
   tagPrefix,
@@ -181,7 +181,7 @@ export function createSelectFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    _forceRefreshKey,
     setForceRefreshKey,
   },
   getTagLabel,
@@ -266,3 +266,29 @@ export function createSearchFilterTag(
     onRemove: () => setSearchValue(''),
   };
 }
+
+export const getCommunityFilters = (
+  _filters: CommunityFilter,
+  _forceRefreshKey?: string,
+): InlineFilter[] => {
+  // ... existing code ...
+};
+
+export const getThreadsFilters = (
+  _communityId: string,
+  _sortOption: string,
+  _filterTags: string[],
+  _forceRefreshKey?: string,
+  _handleFilterChange: (filterKey: string, value: string) => void,
+): InlineFilter[] => {
+  // ... existing code ...
+};
+
+export const getTokensFilters = (
+  _filterTag: string,
+  _sortOption: string,
+  _forceRefreshKey?: string,
+  _handleFilterChange: (filterKey: string, value: string) => void,
+): InlineFilter[] => {
+  // ... existing code ...
+};
