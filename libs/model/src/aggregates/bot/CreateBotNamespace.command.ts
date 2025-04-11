@@ -80,6 +80,7 @@ export function CreateBotNamespace(): Command<
         directory_page_enabled: false,
         snapshot_spaces: [],
         stages_enabled: true,
+        namespace_verified: false,
       });
       return {
         community,
