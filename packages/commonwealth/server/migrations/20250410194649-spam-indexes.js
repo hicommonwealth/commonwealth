@@ -11,7 +11,7 @@ module.exports = {
 
         CREATE INDEX threads_title_trgm_idx
         ON "Threads" USING gin (title gin_trgm_ops)
-        WHERE marked_as_spam_at IS NULL;
+        WHERE marked_as_spam_at IS NULL AND deleted_at IS NULL;
       `,
         { transaction },
       );
@@ -26,11 +26,11 @@ module.exports = {
 
         UPDATE "Threads"
         SET search = null
-        WHERE marked_as_spam_at IS NULL;
+        WHERE marked_as_spam_at IS NOT NULL OR deleted_at IS NOT NULL;
 
         CREATE INDEX threads_search
         ON "Threads" USING gin(search)
-        WHERE marked_as_spam_at IS NULL;
+        WHERE marked_as_spam_at IS NULL AND deleted_at IS NULL;
       `,
         { transaction },
       );
@@ -45,11 +45,11 @@ module.exports = {
 
         UPDATE "Comments"
         SET search = null
-        WHERE marked_as_spam_at IS NULL;
+        WHERE marked_as_spam_at IS NOT NULL OR deleted_at IS NOT NULL;
 
         CREATE INDEX comments_search
         ON "Comments" USING gin(search)
-        WHERE marked_as_spam_at IS NULL;
+        WHERE marked_as_spam_at IS NULL AND deleted_at IS NULL;
       `,
         { transaction },
       );
