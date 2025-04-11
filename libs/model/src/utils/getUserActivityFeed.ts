@@ -130,7 +130,6 @@ ORDER BY
     type: QueryTypes.SELECT,
     raw: true,
     replacements: { user_id, limit, comment_limit, offset },
-    logging: console.log,
   });
 
   const formattedThreads = threads.map((item) => ({

@@ -19,7 +19,7 @@ module.exports = {
       // Update Threads.search column + index
       await queryInterface.sequelize.query(
         `
-        DROP INDEX IF EXISTS OffchainThreads_search;
+        DROP INDEX IF EXISTS "OffchainThreads_search";
 
         ALTER TABLE "Threads"
         ALTER COLUMN search DROP NOT NULL;
