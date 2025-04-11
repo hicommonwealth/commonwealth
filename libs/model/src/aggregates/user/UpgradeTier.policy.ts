@@ -38,18 +38,12 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           parsedArgs: { from, to: userAddress, id: tokenId },
           rawLog: { address: namespaceAddress },
         } = payload;
-        if (tokenId !== 3n) return; // must be community nomination token
+        if (tokenId !== BigInt(NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID)) return; // must be community nomination token
 
         if (from !== ZERO_ADDRESS) return; // must be minted
 
         const community = await models.Community.findOne({
           where: { namespace_address: namespaceAddress },
-          include: [
-            {
-              model: models.ChainNode,
-              required: true,
-            },
-          ],
         });
         if (!community) {
           log.warn(
@@ -78,7 +72,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           addresses: [nominatedAddress.address],
           balanceSourceType: BalanceSourceType.ERC1155,
           sourceOptions: {
-            evmChainId: community.ChainNode!.eth_chain_id!,
+            evmChainId: payload.eventSource.ethChainId,
             contractAddress: community.namespace_address!,
             tokenId: NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
           },
