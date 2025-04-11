@@ -60,6 +60,7 @@ export const createTransaction = (
     description: definition.description,
     state: transaction?.state,
     errorText: transaction?.errorText,
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     action: transaction?.action,
     shouldShowActionButton: showActionButton,
     isActionButtonDisabled:
