@@ -296,6 +296,10 @@
 
     // Extra small screens - keep filters in single row
     @include extraSmall {
+      .search-filter-row {
+        overflow: visible;
+      }
+
       .search-container {
         width: 140px;
         min-width: 120px;
@@ -307,16 +311,20 @@
         justify-content: flex-end;
         gap: 4px; /* Even smaller gap */
         flex-wrap: nowrap; /* Keep in a single row */
+        overflow: visible;
 
         .inline-filters {
           gap: 6px;
           flex-wrap: nowrap;
           width: auto;
           overflow-x: auto;
+          overflow-y: visible;
+          overflow: visible;
 
           .inline-filter-select {
             min-width: 75px;
             max-width: 110px;
+            overflow: visible;
 
             &.community-filter {
               min-width: 75px;
