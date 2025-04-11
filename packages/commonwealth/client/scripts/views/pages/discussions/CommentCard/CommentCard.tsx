@@ -376,6 +376,7 @@ export const CommentCard = ({
                   content_url: cvh.content_url || '',
                 }),
               )}
+              shouldShowRole
               onChangeVersionHistoryNumber={handleVersionHistoryChange}
             />
           )}

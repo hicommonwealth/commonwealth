@@ -1,5 +1,5 @@
 import { AddressView } from '@hicommonwealth/schemas';
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
 import { z } from 'zod';
 
@@ -17,10 +17,10 @@ export function addressToUserProfile(
 ): UserProfile {
   return {
     userId: address.user_id ?? address.User?.id ?? 0,
-    avatarUrl: address.User?.profile.avatar_url ?? '',
-    name: address.User?.profile.name ?? DEFAULT_NAME,
+    avatarUrl: address.User?.profile?.avatar_url ?? '',
+    name: address.User?.profile?.name ?? DEFAULT_NAME,
     address: address?.address,
-    tier: address.User?.tier ?? 0,
+    tier: address.User?.tier ?? UserTierMap.IncompleteUser,
     lastActive: (
       address?.last_active ??
       address.User?.created_at ??

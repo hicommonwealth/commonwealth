@@ -85,6 +85,7 @@ export enum WalletId {
   Solflare = 'solflare',
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
+  OKX = 'okx',
 }
 
 // Passed directly to Magic login.
