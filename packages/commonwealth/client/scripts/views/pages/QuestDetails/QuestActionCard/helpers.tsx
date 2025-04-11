@@ -13,6 +13,7 @@ export const actionCopies = {
     ['WalletLinked']: 'Link a new wallet',
     ['SSOLinked']: 'Link a new social (SSO)',
     ['TweetEngagement']: 'Engage on Tweet',
+    ['CommonDiscordServerJoined']: "Join Common's Discord Community",
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -25,7 +26,9 @@ export const actionCopies = {
     ['WalletLinked']: () => '',
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
-      `Requires Twitter/X linked to ${displayFor === 'admin' ? 'user' : 'your'} profile.`,
+      `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
+    ['CommonDiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -62,6 +65,7 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    ['CommonDiscordServerJoined']: '',
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -75,5 +79,6 @@ export const actionCopies = {
     ['SSOLinked']: '',
     ['UserMentioned']: '',
     ['TweetEngagement']: '',
+    ['CommonDiscordServerJoined']: '',
   },
 };
