@@ -8,6 +8,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -85,6 +86,20 @@ const UpdateQuest = ({ id }: { id: number }) => {
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
 
+  // TODO: 11069 remove after platform get quest fixes are in
+  if (quest?.action_metas?.[0]) {
+    quest.action_metas[0].ChainEventXpSource = {
+      chain_node_id: 1358,
+      contract_address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      event_signature:
+        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+      quest_action_meta_id: 53,
+      active: true,
+      created_at: `2025-04-11T16:37:12.769Z`,
+      updated_at: `2025-04-11T16:37:12.769Z`,
+    };
+  }
+
   return (
     <CWPageLayout>
       <div className="UpdateQuest">
@@ -143,7 +158,14 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
                 contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
-                ethChainId: `${action.ChainEventXpSource?.chain_node_id || ''}`,
+                ethChainId: action.ChainEventXpSource?.chain_node_id
+                  ? `${
+                      fetchCachedNodes()?.find(
+                        (x) =>
+                          x.id === action.ChainEventXpSource?.chain_node_id,
+                      )?.ethChainId || ''
+                    }`
+                  : ``,
                 eventSignature: `${action.ChainEventXpSource?.event_signature || ''}`,
               })),
             }}

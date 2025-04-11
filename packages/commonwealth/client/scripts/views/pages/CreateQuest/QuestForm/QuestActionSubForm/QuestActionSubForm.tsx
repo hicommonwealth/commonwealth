@@ -136,8 +136,11 @@ const QuestActionSubForm = ({
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_url;
 
-  const ethereumChainOptions = fetchCachedNodes()
-    ?.filter((chainNode) => !!chainNode.ethChainId && chainNode.alchemyMetadata)
+  const ethereumChains = fetchCachedNodes()?.filter(
+    (chainNode) => !!chainNode.ethChainId && chainNode.alchemyMetadata,
+  );
+
+  const ethereumChainOptions = ethereumChains
     ?.map((chainNode) => ({
       value: chainNode.ethChainId as number,
       label: `${chainNode.name} - ${chainNode.ethChainId}`,
@@ -437,7 +440,7 @@ const QuestActionSubForm = ({
               customError={errors?.contractAddress}
             />
             <CWSelectList
-              key={`contractAddress-${defaultValues?.action}`}
+              key={`ethChainId-${defaultValues?.action}`}
               name="ethChainId"
               isClearable={false}
               label="Ethereum Chain"
@@ -447,9 +450,16 @@ const QuestActionSubForm = ({
                 newValue && onChange?.({ ethChainId: `${newValue.value}` })
               }
               {...(defaultValues?.ethChainId && {
-                value: ethereumChainOptions?.find(
-                  (x) => `${x.value}` === `${defaultValues?.ethChainId}`,
-                ),
+                value: {
+                  value: parseInt(`${defaultValues?.ethChainId}`),
+                  label: `${
+                    ethereumChains?.find(
+                      (x) =>
+                        x.ethChainId ===
+                        parseInt(`${defaultValues?.ethChainId}`),
+                    )?.name
+                  } - ${defaultValues.ethChainId}`,
+                },
               })}
               customError={errors?.ethChainId}
             />
@@ -462,7 +472,7 @@ const QuestActionSubForm = ({
               label="Event Signature"
               placeholder="0xd2b4b1d70d7f76d55b524ea788ab85e9ab2d01d99ebbeedfb0b69ab0735bc5c9"
               {...(defaultValues?.eventSignature && {
-                defaultValue: defaultValues?.eventSignature,
+                value: defaultValues?.eventSignature,
               })}
               onInput={(e) =>
                 onChange?.({ eventSignature: e?.target?.value?.trim() })
