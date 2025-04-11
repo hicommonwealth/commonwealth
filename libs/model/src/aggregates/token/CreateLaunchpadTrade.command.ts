@@ -68,7 +68,7 @@ export function CreateLaunchpadTrade(): Command<
 
       // If cap reached, transfer to uniswap
       await handleCapReached(
-        result.tokenAddress,
+        result.tokenAddress.toLowerCase(),
         result.floatingSupply,
         eth_chain_id,
         url,

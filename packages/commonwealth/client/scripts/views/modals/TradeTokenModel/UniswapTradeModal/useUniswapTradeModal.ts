@@ -13,6 +13,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
+import { uniswapTokenListConfig } from 'views/modals/TradeTokenModel/UniswapTradeModal/tokenListConfig';
 import {
   ExternalToken,
   UniswapToken,
@@ -31,57 +32,6 @@ import {
 const tempWindow = window as any;
 tempWindow.Browser = {
   T: () => {},
-};
-
-// Keep token list and router URLs config
-
-const uniswapTokenListConfig = {
-  default: {
-    // UNISWAP_WIDGET_HACK: By default the widget uses https://gateway.ipfs.io/ipns/tokens.uniswap.org for tokens
-    // list, but it doesn't work (DNS_PROBE_FINISHED_NXDOMAIN) for me (@malik). The original
-    // url resolved to https://ipfs.io/ipns/tokens.uniswap.org, i am passing this as a param to
-    // the uniswap widget. See: https://github.com/Uniswap/widgets/issues/580#issuecomment-2086094025
-    // for more context.
-    chains: { 1: { url: 'https://ipfs.io/ipns/tokens.uniswap.org' } },
-  },
-  custom: {
-    chains: {
-      8453: {
-        list: [
-          {
-            name: 'Tether USD',
-            address: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2',
-            symbol: 'USDT',
-            decimals: 6,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
-          },
-          {
-            name: 'USD Coin',
-            address: '0xec267c53f53807c2337c257f8ac3fc3cc07cc0ed',
-            symbol: 'USDC',
-            decimals: 6,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-          },
-          {
-            name: 'Wrapped Ether',
-            address: '0x4200000000000000000000000000000000000006',
-            symbol: 'WETH',
-            decimals: 18,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4200000000000000000000000000000000000006/logo.png',
-          },
-        ],
-      },
-    },
-  },
 };
 
 const uniswapRouterURLs = {
