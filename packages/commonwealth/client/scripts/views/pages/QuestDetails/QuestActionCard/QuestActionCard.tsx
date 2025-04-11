@@ -95,7 +95,8 @@ const QuestActionCard = ({
               {actionCopies.title[questAction.event_name]}
             </CWText>
             {(questAction.event_name === 'TweetEngagement' ||
-              questAction.event_name === 'CommonDiscordServerJoined') && (
+              questAction.event_name === 'CommonDiscordServerJoined' ||
+              questAction.event_name === 'XpChainEventCreated') && (
               <>
                 <CWDivider />
                 <CWText type="caption" fontWeight="semiBold">
@@ -107,6 +108,16 @@ const QuestActionCard = ({
                       questAction?.QuestTweet?.like_cap || 0,
                       questAction?.QuestTweet?.retweet_cap || 0,
                       questAction?.QuestTweet?.replies_cap || 0,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'XpChainEventCreated' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.ChainEventXpSource?.contract_address || '',
+                      // TODO: 11069 - platform - return chain node in response
+                      questAction?.ChainEventXpSource?.ChainNode
+                        ?.eth_chain_id || '',
                     )}
                   </CWText>
                 )}
