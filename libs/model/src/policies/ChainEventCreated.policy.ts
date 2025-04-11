@@ -2,6 +2,7 @@ import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
+import { handleJudgeNominated } from './handlers/handleJudgeNominated';
 import { handleNamespaceDeployed } from './handlers/handleNamespaceDeployed';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
@@ -28,6 +29,7 @@ const chainEventInputs = {
   TokenDelegated: events.TokenDelegated,
   TokenUndelegated: events.TokenUndelegated,
   TokenMerged: events.TokenMerged,
+  JudgeNominated: events.JudgeNominated,
 };
 
 export function ChainEventPolicy(): Policy<
@@ -49,6 +51,7 @@ export function ChainEventPolicy(): Policy<
       TokenDelegated: handleTokenDelegated,
       TokenUndelegated: handleTokenUndelegated,
       TokenMerged: handleTokenMerged,
+      JudgeNominated: handleJudgeNominated,
     },
   };
 }

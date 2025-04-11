@@ -142,6 +142,10 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      namespace_nominations: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
       redirect: { type: Sequelize.TEXT, allowNull: true },
