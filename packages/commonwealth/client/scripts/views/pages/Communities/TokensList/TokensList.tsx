@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
@@ -32,9 +32,10 @@ const TokenWithCommunity = TokenView.extend({
 type TokensListProps = {
   filters: CommunityFilters;
   hideHeader?: boolean;
+  searchValue?: string;
 };
 
-const TokensList = ({ filters, hideHeader }: TokensListProps) => {
+const TokensList = ({ filters, hideHeader, searchValue }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -82,6 +83,19 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
 
+  // Memoize filtered tokens
+  const filteredTokens = useMemo(() => {
+    if (!searchValue) {
+      return tokens;
+    }
+    const lowerSearchValue = searchValue.toLowerCase();
+    return tokens.filter(
+      (token) =>
+        token.name.toLowerCase().includes(lowerSearchValue) ||
+        token.symbol.toLowerCase().includes(lowerSearchValue),
+    );
+  }, [tokens, searchValue]);
+
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -123,7 +137,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => {
+          {filteredTokens.map((token) => {
             const pricing = calculateTokenPricing(
               token as z.infer<typeof TokenView>,
               ethToUsdRate,
@@ -172,12 +186,14 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && tokens.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreTokens}
-        />
+        !searchValue && (
+          <CWButton
+            label="See more"
+            buttonType="tertiary"
+            containerClassName="ml-auto"
+            onClick={handleFetchMoreTokens}
+          />
+        )
       ) : (
         <></>
       )}

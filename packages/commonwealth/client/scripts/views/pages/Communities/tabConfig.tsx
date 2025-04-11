@@ -454,6 +454,7 @@ export function createTabsConfig() {
                 : ExploreContestStage.Past
           }
           selectedCommunityId={props.selectedContestCommunityId}
+          searchValue={props.searchValue}
         />
       ),
     },
@@ -604,7 +605,11 @@ export function createTabsConfig() {
         return tags;
       },
       getContent: (props) => (
-        <QuestList hideHeader stage={props.selectedQuestStage} />
+        <QuestList
+          hideHeader
+          stage={props.selectedQuestStage}
+          searchValue={props.searchValue}
+        />
       ),
     },
     {
@@ -688,6 +693,7 @@ export function createTabsConfig() {
             sortBy: props.tokensSortOption,
           }}
           hideHeader
+          searchValue={props.searchValue}
         />
       ),
     },

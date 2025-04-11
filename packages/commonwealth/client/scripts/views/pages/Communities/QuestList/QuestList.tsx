@@ -8,7 +8,7 @@ import {
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
@@ -23,6 +23,7 @@ type QuestListProps = {
   questsForCommunityId?: string;
   hideHeader?: boolean;
   stage?: 'all' | 'active' | 'past';
+  searchValue?: string;
 };
 
 const QuestList = ({
@@ -30,6 +31,7 @@ const QuestList = ({
   questsForCommunityId,
   hideHeader,
   stage = 'all',
+  searchValue,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
@@ -67,6 +69,19 @@ const QuestList = ({
       enabled: user.isLoggedIn && xpEnabled,
     });
 
+  // Memoize filtered quests
+  const filteredQuests = useMemo(() => {
+    if (!searchValue) {
+      return quests;
+    }
+    const lowerSearchValue = searchValue.toLowerCase();
+    return quests.filter(
+      (quest) =>
+        quest.name.toLowerCase().includes(lowerSearchValue) ||
+        quest.description?.toLowerCase().includes(lowerSearchValue),
+    );
+  }, [quests, searchValue]);
+
   const handleFetchMoreQuests = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -96,7 +111,7 @@ const QuestList = ({
       )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
-      ) : quests.length === 0 ? (
+      ) : filteredQuests.length === 0 ? (
         <div
           className={clsx('empty-placeholder', {
             'my-16': xpEnabled,
@@ -108,7 +123,7 @@ const QuestList = ({
         </div>
       ) : (
         <div className="list">
-          {(quests || []).map((quest) => {
+          {filteredQuests.map((quest) => {
             const totalUserXP = calculateTotalXPForQuestActions({
               questActions: (quest.action_metas as QuestAction[]) || [],
               isUserReferred: !!user.referredByAddress,
@@ -151,12 +166,15 @@ const QuestList = ({
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && quests.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreQuests}
-        />
+        // Conditionally render 'See more' only if not searching
+        !searchValue && (
+          <CWButton
+            label="See more"
+            buttonType="tertiary"
+            containerClassName="ml-auto"
+            onClick={handleFetchMoreQuests}
+          />
+        )
       ) : (
         <></>
       )}

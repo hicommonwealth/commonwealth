@@ -17,12 +17,14 @@ type ExploreContestListProps = {
   hideHeader?: boolean;
   contestStage?: ContestStage;
   selectedCommunityId?: string;
+  searchValue?: string;
 };
 
 const ExploreContestList = ({
   hideHeader,
   contestStage,
   selectedCommunityId,
+  searchValue,
 }: ExploreContestListProps) => {
   const {
     contestsData: { active: activeContests, finished: pastContests },
@@ -55,6 +57,17 @@ const ExploreContestList = ({
       return filteredPastContests;
     }
   }, [contestStage, filteredActiveContests, filteredPastContests]);
+
+  // Add search filtering
+  const searchedContestsToShow = useMemo(() => {
+    if (!searchValue) {
+      return contestsToShow;
+    }
+    const lowerSearchValue = searchValue.toLowerCase();
+    return contestsToShow.filter((contest) =>
+      contest.name?.toLowerCase().includes(lowerSearchValue),
+    );
+  }, [contestsToShow, searchValue]);
 
   const communityIds = useMemo(
     () => [...new Set(contestsToShow.map((contest) => contest.community_id))],
@@ -101,7 +114,7 @@ const ExploreContestList = ({
       {!hideHeader && <CWText type="h2">Contests</CWText>}
 
       <>
-        {!isContestDataLoading && contestsToShow.length === 0 && (
+        {!isContestDataLoading && searchedContestsToShow.length === 0 && (
           <CWText type="h2" className="empty-contests">
             {getEmptyStateMessage()}
           </CWText>
@@ -115,7 +128,7 @@ const ExploreContestList = ({
           </div>
         ) : (
           <div className="content">
-            {contestsToShow.map((contest) => {
+            {searchedContestsToShow.map((contest) => {
               const sortedContests = (contest?.contests || []).toSorted(
                 (a, b) => (moment(a.end_time).isBefore(b.end_time) ? -1 : 1),
               );
