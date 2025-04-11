@@ -6,11 +6,9 @@ import React, {
   useCallback,
 } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
-import useSearchThreadsQuery, {
-  APIOrderBy,
-  APIOrderDirection,
-} from 'state/api/threads/searchThreads';
+import useSearchThreadsQuery from 'state/api/threads/searchThreads';
 import { ThreadResult } from 'views/pages/search/helpers';
+import { APIOrderBy, APIOrderDirection } from '../../../helpers/constants';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
@@ -25,7 +23,7 @@ import {
 import { CommunityFilters, FiltersDrawer } from './FiltersDrawer';
 import { safeScrollParent } from './helpers';
 import QuestList from './QuestList';
-import SearchableThreadsFeed from './SearchableThreadsFeed';
+import { SearchableThreadsFeed } from './SearchableThreadsFeed';
 import { FilterTag, InlineFilter, ViewType } from './SearchFilterRow';
 import TokensList from './TokensList';
 

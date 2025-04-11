@@ -1,10 +1,9 @@
+import { Thread } from 'models/Thread';
+import { ThreadKind, ThreadStage } from 'models/types'; // Uncomment imports
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
-import { useDebouncedCallback } from 'use-debounce'; // Uncomment import
 import { ThreadResult } from 'views/pages/search/helpers';
-import Thread, { ThreadView } from '../../../models/Thread'; // Import Thread and ThreadView
-import { ThreadKind, ThreadStage } from '../../../models/types'; // Uncomment imports
 import { ThreadCard } from '../../discussions/ThreadCard';
 import { safeScrollParent } from '../helpers'; // Assuming safeScrollParent is in helpers
 import './SearchableThreadsFeed.scss';
@@ -38,12 +37,11 @@ const SearchableThreadsFeed = ({
 }: SearchableThreadsFeedProps) => {
   const navigate = useNavigate();
 
-  // Debounce fetchNextPage - Uncommented
-  const handleEndReached = useDebouncedCallback(async () => {
+  const handleEndReached = async () => {
     if (!isFetchingNextPage && hasNextPage) {
       await fetchNextPage();
     }
-  }, 300);
+  };
 
   if (isLoading && (!threads || threads.length === 0)) {
     return <div className="loading-spinner">Loading threads...</div>;

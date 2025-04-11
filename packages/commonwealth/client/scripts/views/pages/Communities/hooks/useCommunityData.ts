@@ -2,10 +2,10 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainNetwork } from '@hicommonwealth/shared';
 import { useCallback, useMemo, useRef } from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
-import { useFetchTokenUsdRateQuery } from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
+import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
 import { useFetchTagsQuery } from 'state/api/tags';
-import { useFetchHistoricalPricesQuery } from 'state/api/tokens';
 import { z } from 'zod';
+import { trpc } from '../../../../utils/trpcClient';
 import {
   CommunityFilters,
   CommunitySortOptions,
@@ -82,9 +82,9 @@ export function useCommunityData(
     await fetchMoreCommunitiesOriginal();
   }, [fetchMoreCommunitiesOriginal]);
 
-  // Use the actual hook now
-  const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
-    useFetchHistoricalPricesQuery(); // Uncommented hook usage
+  // Use the correct tRPC hook now
+  const { data: historicalPricesData, isLoading: isLoadingHistoricalPrices } =
+    trpc.community.getStakeHistoricalPrice.useQuery(); // Corrected hook usage
 
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
     useFetchTokenUsdRateQuery({
@@ -164,7 +164,7 @@ export function useCommunityData(
     hasNextPage,
     isLoading,
     isInitialCommunitiesLoading,
-    historicalPrices, // Return actual data
+    historicalPrices: historicalPricesData, // Use data from the correct hook
     ethUsdRate: Number(ethUsdRate),
     tags,
   };
