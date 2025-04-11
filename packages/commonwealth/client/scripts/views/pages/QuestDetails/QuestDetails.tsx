@@ -313,6 +313,26 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isCompleted = gainedXP === totalUserXP && isStarted;
 
+  const getQuestActionBlockedReason = () => {
+    if ((isSystemQuest && user.isLoggedIn) || !isStarted || isEnded) {
+      if (isSystemQuest && user.isLoggedIn)
+        return 'Only available for new users';
+      if (!isStarted) return 'Only available when quest starts';
+      if (isEnded) return 'Unavailable, quest has ended';
+    }
+
+    return undefined;
+  };
+
+  const getXpLogsForActions = (action: QuestActionType) => {
+    return xpProgressions
+      .filter((log) => log.action_meta_id === action.id)
+      .map((log) => ({
+        id: log.action_meta_id,
+        createdAt: new Date(log.event_created_at),
+      }));
+  };
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -448,31 +468,23 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
                   questAction={action as QuestActionType}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
                   isActionCompleted={isQuestActionComplete(
+                    new Date(quest.start_date),
+                    new Date(quest.end_date),
                     action as QuestActionType,
                     xpProgressions as unknown as XPLog[],
                   )}
-                  xpLogsForActions={xpProgressions
-                    .filter((log) => log.action_meta_id === action.id)
-                    .map((log) => ({
-                      id: log.action_meta_id,
-                      createdAt: new Date(log.event_created_at),
-                    }))}
+                  xpLogsForActions={getXpLogsForActions(
+                    action as QuestActionType,
+                  )}
                   canStartAction={
                     isSystemQuest
                       ? !user.isLoggedIn && isStarted && !isEnded
                       : isStarted && !isEnded
                   }
-                  {...(((isSystemQuest && user.isLoggedIn) ||
-                    !isStarted ||
-                    isEnded) && {
-                    actionStartBlockedReason:
-                      isSystemQuest && user.isLoggedIn
-                        ? `Only available for new users`
-                        : !isStarted
-                          ? 'Only available when quest starts'
-                          : 'Unavailable, quest has ended',
-                  })}
+                  actionStartBlockedReason={getQuestActionBlockedReason()}
                 />
               ))}
             </div>
@@ -496,6 +508,8 @@ const QuestDetails = ({ id }: { id: number }) => {
                       completed: (quest.action_metas || [])
                         .map((action) =>
                           isQuestActionComplete(
+                            new Date(q.start_date),
+                            new Date(q.end_date),
                             action as QuestActionType,
                             xpProgressions as unknown as XPLog[],
                           ),

@@ -139,16 +139,6 @@ export const calculateTotalXPForQuestActions = ({
   return (
     questActions
       ?.map((action) => {
-        // calc repetition
-        const isRepeateable =
-          action.participation_limit === QuestParticipationLimit.OncePerPeriod;
-        const isRepeateableDaily =
-          action.participation_period === QuestParticipationPeriod.Daily;
-        const isRepeateableWeekly =
-          action.participation_period === QuestParticipationPeriod.Weekly;
-        const isRepeateableMonthly =
-          action.participation_period === QuestParticipationPeriod.Monthly;
-
         // calc reward per attempt with option creator share
         const userRewardPerAttempt = action.reward_amount;
         const creatorRewardPerAttempt =
@@ -160,29 +150,13 @@ export const calculateTotalXPForQuestActions = ({
         const finalRewardPerAttempt =
           userRewardPerAttempt - creatorRewardPerAttempt;
 
-        // calc total attempts per repetition
-        const totalAttemptsPerSession = isRepeateable
-          ? action.participation_times_per_period || 1
-          : 1;
-
-        // calc no of rewards that can be assigned per repetition schedule
-        const startDate = moment(questStartDate);
-        const endDate = moment(questEndDate);
-        const noOfDays = endDate.diff(startDate, 'days') || 1;
-        const noOfWeeks = Math.ceil(
-          endDate.diff(startDate, 'weeks', true) || 1,
-        );
-        const noOfMonths = Math.ceil(
-          endDate.diff(startDate, 'months', true) || 1,
-        );
-        const repititionSessions = isRepeateableDaily
-          ? noOfDays
-          : isRepeateableWeekly
-            ? noOfWeeks
-            : isRepeateableMonthly
-              ? noOfMonths
-              : 1;
-        const totalSessions = isRepeateable ? repititionSessions : 1;
+        // calculate total sessions
+        const { totalSessions, totalAttemptsPerSession } =
+          getTotalRepititionCountsForQuestAction(
+            questStartDate,
+            questEndDate,
+            action,
+          );
 
         // calc final reward for action
         return finalRewardPerAttempt * totalAttemptsPerSession * totalSessions;
@@ -191,7 +165,51 @@ export const calculateTotalXPForQuestActions = ({
   );
 };
 
+export const getTotalRepititionCountsForQuestAction = (
+  questStartDate: Date,
+  questEndDate: Date,
+  questAction: QuestAction,
+) => {
+  // calc repetition
+  const isRepeateable =
+    questAction.participation_limit === QuestParticipationLimit.OncePerPeriod;
+  const isRepeateableDaily =
+    questAction.participation_period === QuestParticipationPeriod.Daily;
+  const isRepeateableWeekly =
+    questAction.participation_period === QuestParticipationPeriod.Weekly;
+  const isRepeateableMonthly =
+    questAction.participation_period === QuestParticipationPeriod.Monthly;
+
+  // calc total attempts per repetition
+  const totalAttemptsPerSession = isRepeateable
+    ? questAction.participation_times_per_period || 1
+    : 1;
+
+  // calc no of rewards that can be assigned per repetition schedule
+  const startDate = moment(questStartDate);
+  const endDate = moment(questEndDate);
+  const noOfDays = endDate.diff(startDate, 'days') || 1;
+  const noOfWeeks = Math.ceil(endDate.diff(startDate, 'weeks', true) || 1);
+  const noOfMonths = Math.ceil(endDate.diff(startDate, 'months', true) || 1);
+  const repititionSessions = isRepeateableDaily
+    ? noOfDays
+    : isRepeateableWeekly
+      ? noOfWeeks
+      : isRepeateableMonthly
+        ? noOfMonths
+        : 1;
+  const totalSessions = isRepeateable ? repititionSessions : 1;
+
+  return {
+    totalAttemptsPerSession,
+    totalSessions,
+    totalRepititions: totalAttemptsPerSession * totalSessions,
+  };
+};
+
 export const isQuestActionComplete = (
+  questStartDate: Date,
+  questEndDate: Date,
   questAction: QuestAction,
   xpLogs: XPLog[],
 ) => {
@@ -200,7 +218,11 @@ export const isQuestActionComplete = (
     QuestParticipationLimit.OncePerQuest
     ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
     : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
-        questAction.participation_times_per_period;
+        getTotalRepititionCountsForQuestAction(
+          questStartDate,
+          questEndDate,
+          questAction,
+        ).totalRepititions;
 };
 
 export const resetXPCacheForUser = (
