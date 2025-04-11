@@ -18,6 +18,7 @@ import {
   CreateUnverifiedUser,
   DiscordBotPolicy,
   FarcasterWorker,
+  LaunchpadPolicy,
   TwitterEngagementPolicy,
   User,
   models,
@@ -98,6 +99,9 @@ export async function bootstrapBindings(
 
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
+
+  const launchpadSubRes = await brokerInstance.subscribe(LaunchpadPolicy);
+  checkSubscriptionResponse(launchpadSubRes, LaunchpadPolicy.name);
 
   const createUnverifiedUserSubRes =
     await brokerInstance.subscribe(CreateUnverifiedUser);

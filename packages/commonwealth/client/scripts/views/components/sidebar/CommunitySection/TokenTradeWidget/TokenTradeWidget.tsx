@@ -88,6 +88,7 @@ export const TokenTradeWidget = ({
     (communityToken as LaunchpadToken)?.icon_url ||
     (communityToken as ExternalToken)?.logo;
 
+  const isLaunched = (communityToken as LaunchpadToken).liquidity_transferred;
   return (
     <section className="TokenTradeWidget">
       <div className="pad-8 header">
@@ -176,10 +177,11 @@ export const TokenTradeWidget = ({
           )}
           <div
             className={clsx('action-btns', {
-              [`cols-${isPinnedToken ? 1 : 2}`]: true,
+              [`cols-${isPinnedToken || isLaunched ? 1 : 2}`]: true,
             })}
           >
-            {!isPinnedToken ? (
+            {!isPinnedToken &&
+            !(communityToken as LaunchpadToken).liquidity_transferred ? (
               [TradingMode.Buy, TradingMode.Sell].map((mode) => (
                 <CWButton
                   key={mode}

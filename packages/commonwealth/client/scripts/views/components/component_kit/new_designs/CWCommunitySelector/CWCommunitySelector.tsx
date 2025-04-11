@@ -13,11 +13,13 @@ import './CWCommunitySelector.scss';
 export enum CommunityType {
   Blast = 'blast',
   Base = 'base',
+  BaseSepolia = 'base sepolia',
   Ethereum = 'ethereum',
   Cosmos = 'cosmos',
   Polygon = 'polygon',
   Solana = 'solana',
   Skale = 'skale',
+  CommonwealthAnvil = 'commonwealth anvil',
 }
 
 export type SelectedCommunity = {

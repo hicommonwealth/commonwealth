@@ -1,5 +1,4 @@
 import { notifyError } from 'controllers/app/notifications';
-import { BASE_CHAIN_ID, BASE_GOERLI_CHAIN_ID } from 'helpers/constants';
 import { useEffect, useState } from 'react';
 
 export const chainNames: Record<string, string> = {
@@ -12,13 +11,15 @@ export const chainNames: Record<string, string> = {
 };
 
 interface UseNetworkSwitchingProps {
-  jsonRpcUrlMap: Record<number, string[]>;
+  ethChainId?: number | null;
+  rpcUrl?: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   provider?: any;
 }
 
 export function useNetworkSwitching({
-  jsonRpcUrlMap,
+  ethChainId,
+  rpcUrl,
   provider,
 }: UseNetworkSwitchingProps) {
   const [currentChain, setCurrentChain] = useState<string | null>(null);
@@ -34,9 +35,7 @@ export function useNetworkSwitching({
       const activeProvider =
         windowEthereum.ethereum ||
         provider?.provider ||
-        (jsonRpcUrlMap && Object.keys(jsonRpcUrlMap).length > 0
-          ? { request: () => null }
-          : null);
+        (rpcUrl ?? { request: () => null });
 
       if (!activeProvider) return;
 
@@ -46,14 +45,8 @@ export function useNetworkSwitching({
           method: 'eth_chainId',
         });
 
-        // Get target chain ID for Base network
-        const baseChainId = Object.keys(jsonRpcUrlMap).find(
-          (id) =>
-            Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
-        ); // Base mainnet or testnet
-
-        const baseChainIdHex = baseChainId
-          ? `0x${Number(baseChainId).toString(16)}`
+        const formattedChainId = ethChainId
+          ? `0x${Number(ethChainId).toString(16)}`
           : null;
 
         // Set current chain name
@@ -64,7 +57,7 @@ export function useNetworkSwitching({
 
         // Check if on the wrong network
         setIsWrongNetwork(
-          baseChainIdHex !== null && currentChainIdHex !== baseChainIdHex,
+          formattedChainId !== null && currentChainIdHex !== formattedChainId,
         );
       } catch (error) {
         console.error('Failed to check current network:', error);
@@ -72,26 +65,18 @@ export function useNetworkSwitching({
     };
 
     void checkCurrentNetwork();
-  }, [provider, jsonRpcUrlMap, windowEthereum]);
+  }, [ethChainId, provider, rpcUrl, windowEthereum]);
 
   const promptNetworkSwitch = async () => {
     if (!isWrongNetwork || !windowEthereum.ethereum) return;
 
-    // Find Base chain ID
-    const baseChainId = Object.keys(jsonRpcUrlMap).find(
-      (id) =>
-        Number(id) === BASE_CHAIN_ID || Number(id) === BASE_GOERLI_CHAIN_ID,
-    );
-
-    if (!baseChainId) return;
-
-    const baseChainIdHex = `0x${Number(baseChainId).toString(16)}`;
+    const formattedChainId = `0x${Number(ethChainId).toString(16)}`;
 
     try {
       // Try to switch to Base network
       await windowEthereum.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: baseChainIdHex }],
+        params: [{ chainId: formattedChainId }],
       });
 
       // Update status after switching
@@ -110,16 +95,14 @@ export function useNetworkSwitching({
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: baseChainIdHex,
+                chainId: formattedChainId,
                 chainName: 'Base Mainnet',
                 nativeCurrency: {
                   name: 'ETH',
                   symbol: 'ETH',
                   decimals: 18,
                 },
-                rpcUrls: jsonRpcUrlMap[Number(baseChainId)] || [
-                  'https://mainnet.base.org',
-                ],
+                rpcUrls: [rpcUrl],
                 blockExplorerUrls: ['https://basescan.org'],
               },
             ],

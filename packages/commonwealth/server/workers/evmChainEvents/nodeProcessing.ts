@@ -155,11 +155,13 @@ export async function scheduleNodeProcessing(
   const ethChainIds = Object.keys(evmSources);
   const betweenInterval = interval / numEvmSources;
 
-  ethChainIds.forEach((ethChainId, index) => {
-    const delay = index * betweenInterval;
+  ethChainIds
+    .filter((c) => c === '31337')
+    .forEach((ethChainId, index) => {
+      const delay = index * betweenInterval;
 
-    setTimeout(async () => {
-      await processFn(+ethChainId, evmSources[ethChainId]);
-    }, delay);
-  });
+      setTimeout(async () => {
+        await processFn(+ethChainId, evmSources[ethChainId]);
+      }, delay);
+    });
 }
