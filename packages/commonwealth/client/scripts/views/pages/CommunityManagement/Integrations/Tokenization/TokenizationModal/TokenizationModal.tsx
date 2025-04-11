@@ -1,7 +1,6 @@
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
 import {
   CWModalBody,
   CWModalFooter,
@@ -15,6 +14,7 @@ import useEditCommunityTokenMutation from 'state/api/communities/editCommunityTo
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import TokenFinder from 'views/components/TokenFinder/TokenFinder';
 import useTokenFinder from 'views/components/TokenFinder/useTokenFinder';
 import './TokenizationModal.scss';
 
@@ -37,7 +37,6 @@ const TokenizationModal = ({
   const [isSaving, setIsSaving] = useState(false);
   const [deselectedTopics, setDeselectedTopics] = useState<string[]>([]);
   const [showInfoBox, setShowInfoBox] = useState(true);
-  const [localTokenValue, setLocalTokenValue] = useState('');
 
   const communityId = app.activeChainId() || '';
   const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
@@ -53,17 +52,16 @@ const TokenizationModal = ({
     enabled: !!communityId,
   });
 
-  useEffect(() => {
-    if (community?.thread_purchase_token) {
-      setLocalTokenValue(community.thread_purchase_token);
-    }
-  }, [community]);
-
-  const { tokenMetadata, tokenMetadataLoading, getTokenError, setTokenValue } =
-    useTokenFinder({
-      nodeEthChainId,
-      initialTokenValue: localTokenValue || undefined,
-    });
+  const {
+    tokenMetadata,
+    tokenMetadataLoading,
+    getTokenError,
+    setTokenValue,
+    tokenValue,
+  } = useTokenFinder({
+    nodeEthChainId,
+    initialTokenValue: community?.thread_purchase_token || undefined,
+  });
 
   const { mutateAsync: editTopic } = useEditTopicMutation();
   const { mutateAsync: editCommunityToken } = useEditCommunityTokenMutation();
@@ -109,17 +107,9 @@ const TokenizationModal = ({
     }
   };
 
-  const handleTokenInput = (e: React.FormEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
-    setLocalTokenValue(value);
-    setTokenValue(value);
-  };
-
   const handleSaveChanges = async () => {
-    if (localTokenValue.trim()) {
-      console.log('Validating token:', localTokenValue);
+    if (tokenValue.trim()) {
       const tokenError = getTokenError(true);
-      console.log('Token error:', tokenError);
       if (tokenError) {
         notifyError(tokenError);
         return;
@@ -146,12 +136,10 @@ const TokenizationModal = ({
 
       await Promise.all([...updatePromises, ...deselectPromises]);
 
-      if (localTokenValue.trim()) {
-        await editCommunityToken({
-          community_id: communityId,
-          thread_purchase_token: localTokenValue.trim(),
-        });
-      }
+      await editCommunityToken({
+        community_id: communityId,
+        thread_purchase_token: tokenValue.trim(),
+      });
 
       notifySuccess('Topics updated successfully');
       onSaveChanges();
@@ -241,26 +229,15 @@ const TokenizationModal = ({
             Enter a token to purchase and sell threads in this community.
           </CWText>
 
-          <CWTextInput
-            value={localTokenValue}
-            onInput={handleTokenInput}
+          <TokenFinder
+            tokenValue={tokenValue}
+            setTokenValue={setTokenValue}
+            tokenError={getTokenError()}
+            debouncedTokenValue={tokenValue}
+            tokenMetadataLoading={tokenMetadataLoading}
+            tokenMetadata={tokenMetadata}
             placeholder="Enter token address"
           />
-          {localTokenValue.trim() && tokenMetadataLoading && (
-            <CWText type="caption" className="mt-2">
-              Loading token metadata...
-            </CWText>
-          )}
-          {localTokenValue.trim() && tokenMetadata?.name && (
-            <CWText type="caption" className="mt-2">
-              Token: {tokenMetadata.name} ({tokenMetadata.symbol})
-            </CWText>
-          )}
-          {localTokenValue.trim() && getTokenError() && (
-            <CWText type="caption" className="mt-2 error">
-              {getTokenError()}
-            </CWText>
-          )}
         </div>
       </CWModalBody>
 
