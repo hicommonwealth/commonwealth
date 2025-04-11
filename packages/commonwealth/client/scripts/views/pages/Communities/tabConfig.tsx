@@ -157,14 +157,16 @@ const FilteredThreadsFeed = ({
   });
 
   // Determine if we need to use search or standard feed
-  if (searchTerm && searchTerm.length > 0) {
+  const searchResultsLength = searchResults.data?.pages.flatMap(
+    (page) => page.results,
+  ).length;
+  if (searchResultsLength && searchResultsLength > 0) {
     const rawThreads: ThreadResult[] =
       searchResults.data?.pages.flatMap((page) => page.results) || [];
 
     return (
       <SearchableThreadsFeed
         customScrollParent={customScrollParent}
-        searchTerm={searchTerm}
         threads={rawThreads}
         isLoading={searchResults.isLoading}
         error={searchResults.error}

@@ -102,6 +102,11 @@ const SearchableThreadsFeed = ({
         address: threadData.address,
         community_id: threadData.address_community_id,
         id: threadData.address_id,
+        // Add missing properties with default values
+        ghost_address: false,
+        is_user_default: false,
+        role: 'member', // Default role to member
+        is_banned: false,
         // Minimal User/Profile structure (assuming no name/avatar from ThreadResult)
         User: {
           id: threadData.address_user_id,
@@ -151,7 +156,5 @@ const SearchableThreadsFeed = ({
     </div>
   );
 };
-
-SearchableThreadsFeed.displayName = 'SearchableThreadsFeed';
 
 export default SearchableThreadsFeed;

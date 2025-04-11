@@ -76,13 +76,20 @@ export function useCommunityData(
 
   // Use the correct tRPC hook now
   const { data: historicalPricesData, isLoading: isLoadingHistoricalPrices } =
-    trpc.community.getStakeHistoricalPrice.useQuery(); // Corrected hook usage
+    trpc.community.getStakeHistoricalPrice.useQuery({
+      // Provide input
+      past_date_epoch: Math.floor(Date.now() / 1000) - 24 * 60 * 60, // 24 hours ago
+      // community_id: filters.communityId, // Optional: Add if filtering by specific community
+      // stake_id: filters.stakeId, // Optional: Defaults to 2 if not provided
+    });
 
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
     useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
+      // tokenSymbol: 'ETH', // Incorrect prop
+      // TODO: Replace with the correct WETH/ETH contract address for the target chain
+      tokenContractAddress: '0x...', // Use tokenContractAddress instead
     });
-  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+  const ethUsdRate = ethUsdRateData?.data?.data?.amount; // Adjust path if needed based on the correct hook's response
 
   const isLoading =
     isLoadingTags ||
@@ -95,8 +102,8 @@ export function useCommunityData(
     const flatList = (communities?.pages || []).flatMap((page) => page.results);
 
     const SLICE_SIZE = 2;
-    // Let TypeScript infer the type again
-    const twoCommunitiesPerEntry = [];
+    // TODO: Refine the type for twoCommunitiesPerEntry
+    const twoCommunitiesPerEntry: any[] = []; // Explicitly type the array
 
     for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
       // Pushing slices of the inferred type from flatList
@@ -126,8 +133,8 @@ export function useCommunityData(
 
     // Recreate the sliced structure
     const SLICE_SIZE = 2;
-    // Let TypeScript infer the type again
-    const filteredSlices = [];
+    // TODO: Refine the type for filteredSlices
+    const filteredSlices: any[] = []; // Explicitly type the array
 
     for (let i = 0; i < filteredList.length; i += SLICE_SIZE) {
       const slice = filteredList.slice(i, i + SLICE_SIZE);
