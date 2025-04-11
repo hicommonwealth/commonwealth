@@ -90,6 +90,7 @@ describe('Upgrade Tiers lifecycle', () => {
           last_active: new Date().toISOString(),
         },
       ],
+      namespace_verified: false,
     });
 
     const [topic1] = await seed('Topic', {
@@ -141,6 +142,8 @@ describe('Upgrade Tiers lifecycle', () => {
     test('should upgrade user to ChainVerified tier when 5 or more nomination tokens are held', async () => {
       const userBefore = await models.User.findByPk(user.id);
       expect(userBefore?.tier).toBe(UserTierMap.IncompleteUser);
+      const communityBefore = await models.Community.findByPk(community.id);
+      expect(communityBefore?.namespace_verified).toBe(false);
 
       await emitEvent(models.Outbox, [
         buildNamespaceTransferSingleEvent(
@@ -156,6 +159,8 @@ describe('Upgrade Tiers lifecycle', () => {
 
       const userAfter = await models.User.findByPk(user.id);
       expect(userAfter?.tier).toBe(UserTierMap.ChainVerified);
+      const communityAfter = await models.Community.findByPk(community.id);
+      expect(communityAfter?.namespace_verified).toBe(true);
     });
   });
 

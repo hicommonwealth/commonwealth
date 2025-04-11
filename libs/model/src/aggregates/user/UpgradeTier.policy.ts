@@ -8,7 +8,7 @@ import {
   UserTierMap,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import { Op, QueryTypes } from 'sequelize';
+import { Op, QueryTypes, Transaction } from 'sequelize';
 import { models } from '../../database';
 import { tokenBalanceCache } from '../../services';
 import {
@@ -83,10 +83,17 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
         if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-        await upgradeUserTier(
-          nominatedAddress.User.id!,
-          UserTierMap.ChainVerified,
-        );
+        await models.sequelize.transaction(async (transaction) => {
+          await upgradeUserTier(
+            nominatedAddress!.User!.id!,
+            UserTierMap.ChainVerified,
+            transaction,
+          );
+          await models.Community.update(
+            { namespace_verified: true },
+            { where: { id: community.id }, transaction },
+          );
+        });
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
@@ -154,7 +161,11 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
   };
 }
 
-const upgradeUserTier = async (userId: number, toTier: number) => {
+const upgradeUserTier = async (
+  userId: number,
+  toTier: number,
+  transaction?: Transaction,
+) => {
   await models.User.update(
     { tier: toTier },
     {
@@ -164,6 +175,7 @@ const upgradeUserTier = async (userId: number, toTier: number) => {
           [Op.lt]: toTier,
         },
       },
+      transaction,
     },
   );
 };
