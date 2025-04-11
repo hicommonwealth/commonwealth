@@ -227,7 +227,7 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
-        // TODO: get from backend
+        // TODO: get from backend in https://github.com/hicommonwealth/commonwealth/issues/10993
         judgeId: 101,
       });
 
