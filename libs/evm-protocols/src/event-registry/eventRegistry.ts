@@ -8,6 +8,7 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
+import { communityNominationsAbi } from '../abis/communityNominationsAbi';
 import { erc1155Abi } from '../abis/erc1155Abi';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
@@ -97,7 +98,14 @@ const namespaceFactorySource = {
     },
     [ChildContractNames.Namespace]: {
       abi: erc1155Abi,
-      eventSignatures: [EvmEventSignatures.Namespace.TransferSingle],
+      eventSignatures: [
+        EvmEventSignatures.Namespace.TransferSingle,
+        EvmEventSignatures.Namespace.JudgeNominated,
+      ],
+    },
+    [ChildContractNames.CommunityNominations]: {
+      abi: communityNominationsAbi,
+      eventSignatures: [],
     },
   },
 } satisfies ContractSource;

@@ -69,6 +69,9 @@ export const EvmEventSignatures = {
   Namespace: {
     TransferSingle:
       '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+    JudgeNominated:
+      // TODO: get real event signature
+      '0xbb6a94f1e31af2431404c2fa9955afb0eb15b8fad6307d8d8e19cf8c59d6c71f',
   },
 } as const;
 

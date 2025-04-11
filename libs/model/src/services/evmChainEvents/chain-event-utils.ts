@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
@@ -322,6 +323,22 @@ const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
   };
 };
 
+const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'JudgeNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'JudgeNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -345,6 +362,7 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
 
   // Namespace
   [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
+  [EvmEventSignatures.Namespace.JudgeNominated]: judgeNominatedMapper,
 
   // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:

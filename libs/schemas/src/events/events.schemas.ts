@@ -519,6 +519,18 @@ export const events = {
     }),
   }),
 
+  JudgeNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      judge: EVM_ADDRESS_STRICT.describe('Judge address'),
+      judgeId: z.coerce.bigint().describe('Judge ID'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+      currentNominations: z.coerce
+        .bigint()
+        .describe('Current nomination count'),
+    }),
+  }),
+
   NamespaceLinked: z.object({
     namespace_address: z.string(),
     deployer_address: z.string(),

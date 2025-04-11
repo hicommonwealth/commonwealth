@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
@@ -170,24 +170,42 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             where: {
               eth_chain_id: community.ChainNode!.eth_chain_id!,
               contract_address: namespace_address,
-              event_signature: EvmEventSignatures.Namespace.TransferSingle,
+              event_signature: {
+                [Op.in]: [
+                  EvmEventSignatures.Namespace.TransferSingle,
+                  EvmEventSignatures.Namespace.JudgeNominated,
+                ],
+              },
             },
             transaction,
           });
         } else {
-          // create namespace EvmEventSource to track namespace token transfers
+          // create namespace EvmEventSource to track namespace events
           const ethChainId = community.ChainNode!.eth_chain_id!;
           if (cp.isValidChain(ethChainId)) {
-            await models.EvmEventSource.create(
-              {
-                eth_chain_id: ethChainId,
-                contract_address: namespace_address,
-                event_signature: EvmEventSignatures.Namespace.TransferSingle,
-                contract_name: ChildContractNames.Namespace,
-                parent_contract_address:
-                  cp.factoryContracts[ethChainId].factory,
-                created_at_block: Number(block_number),
-              },
+            await models.EvmEventSource.bulkCreate(
+              [
+                // TransferSingle event
+                {
+                  eth_chain_id: ethChainId,
+                  contract_address: namespace_address,
+                  event_signature: EvmEventSignatures.Namespace.TransferSingle,
+                  contract_name: ChildContractNames.Namespace,
+                  parent_contract_address:
+                    cp.factoryContracts[ethChainId].factory,
+                  created_at_block: Number(block_number),
+                },
+                // JudgeNominated event
+                {
+                  eth_chain_id: ethChainId,
+                  contract_address: namespace_address,
+                  event_signature: EvmEventSignatures.Namespace.JudgeNominated,
+                  contract_name: ChildContractNames.Namespace,
+                  parent_contract_address:
+                    cp.factoryContracts[ethChainId].factory,
+                  created_at_block: Number(block_number),
+                },
+              ],
               { transaction },
             );
           }
