@@ -26,7 +26,7 @@ const addThreadLinks = async ({
 
 interface UseAddThreadLinksMutationProps {
   communityId: string;
-  threadId: number;
+  threadId?: number;
 }
 
 const useAddThreadLinksMutation = ({
@@ -36,8 +36,10 @@ const useAddThreadLinksMutation = ({
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(communityId, threadId, updatedThread);
-      return updatedThread;
+      if (threadId) {
+        updateThreadInAllCaches(communityId, threadId, updatedThread);
+        return updatedThread;
+      }
     },
   });
 };

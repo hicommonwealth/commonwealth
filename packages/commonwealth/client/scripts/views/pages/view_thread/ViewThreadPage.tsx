@@ -661,7 +661,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     : snapshotProposal
       ? 'snapshot'
       : '';
-  // @ts-expect-error <StrictNullChecks/>
   const status = snapshotProposal?.state || proposal?.status;
 
   const proposalDetailSidebar = [
@@ -671,8 +670,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             label: 'Detail',
             item: (
               <DetailCard
-                status={status}
-                governanceType={governanceType}
+                status={status || ''}
+                governanceType={governanceType || ''}
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={snapshotProposal?.created || proposal.createdAt}
                 id={proposalId || proposalLink?.identifier}
@@ -957,8 +956,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
                   <DetailCard
-                    status={status}
-                    governanceType={governanceType}
+                    status={status || ''}
+                    governanceType={governanceType || ''}
                     publishDate={
                       // @ts-expect-error <StrictNullChecks/>
                       snapshotProposal?.created || proposal.createdAt

@@ -39,6 +39,7 @@ abstract class Proposal<
   public threadId: number;
 
   public abstract title: string;
+  public abstract status: string;
 
   public abstract get description(): string;
 
