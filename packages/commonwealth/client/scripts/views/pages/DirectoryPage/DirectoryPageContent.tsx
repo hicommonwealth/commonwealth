@@ -125,9 +125,7 @@ const DirectoryPageContent = ({
         return (
           <CommunityDirectoryCard
             key={community.id}
-            communityId={community.id}
-            membersCount={community.members}
-            threadsCount={community.threads}
+            communityData={community}
           />
         );
       })}
