@@ -1,3 +1,4 @@
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import CommunityNominations from 'helpers/ContractHelpers/CommunityNominations';
 import { useState } from 'react';
 import { useFetchNodesQuery } from 'state/api/nodes';
@@ -11,7 +12,6 @@ interface UseVerificationTokenTransactionProps {
   namespace: string;
   userAddress: string;
   chainId: string;
-  contractAddress: string;
   onSuccess?: () => void;
 }
 
@@ -19,7 +19,6 @@ const useVerificationTokenTransaction = ({
   namespace,
   userAddress,
   chainId,
-  contractAddress,
   onSuccess,
 }: UseVerificationTokenTransactionProps): TransactionHookResult => {
   const [transactionData, setTransactionData] = useState<TransactionData>(
@@ -31,6 +30,8 @@ const useVerificationTokenTransaction = ({
   const chainRpc = nodes?.find(
     (node) => node.ethChainId === parseInt(chainId),
   )?.url;
+
+  const contractAddress = factoryContracts?.[chainId]?.communityNomination;
 
   const action = async () => {
     if (
@@ -50,12 +51,20 @@ const useVerificationTokenTransaction = ({
         throw new Error('Chain RPC not found');
       }
 
+      if (!contractAddress) {
+        throw new Error('Contract address not found');
+      }
+
       const communityNominations = new CommunityNominations(
         contractAddress,
         chainRpc,
       );
 
-      await communityNominations.mintVerificationToken(namespace, userAddress);
+      await communityNominations.mintVerificationToken(
+        namespace,
+        userAddress,
+        chainId,
+      );
 
       setTransactionData({
         state: 'completed',
