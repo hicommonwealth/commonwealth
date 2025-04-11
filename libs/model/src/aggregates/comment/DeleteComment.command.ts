@@ -36,9 +36,16 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         //   }
         // }
 
-        await comment.destroy({ transaction });
+        await models.sequelize.query(
+          `
+          UPDATE "Comments"
+          SET search = null,
+              deleted_at = NOW()
+          WHERE id = :commentId;
+        `,
+          { replacements: { commentId: comment.id }, transaction },
+        );
       });
-      // == end of transaction boundary ==
 
       return {
         comment_id: comment.id!,

@@ -1,3 +1,4 @@
+import { COMMUNITY_SPAM_TIER } from '@hicommonwealth/schemas';
 import { DisabledCommunitySpamTier, UserTierMap } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
@@ -11,9 +12,9 @@ import {
 } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { z } from 'zod';
 import './SpamLevel.scss';
 import { SpamLevelOptions } from './utils';
-
 const SpamLevel = () => {
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
@@ -30,9 +31,7 @@ const SpamLevel = () => {
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [spamTierLevel, setSpamTierLevel] = useState<
-    | typeof DisabledCommunitySpamTier
-    | UserTierMap.VerifiedWallet
-    | UserTierMap.NewlyVerifiedWallet
+    z.infer<typeof COMMUNITY_SPAM_TIER>
   >(DisabledCommunitySpamTier);
 
   useEffect(() => {

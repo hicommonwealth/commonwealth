@@ -14,7 +14,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('User Dashboard API', () => {
-  const chain = 'ethereum';
+  const chain = 'sushi';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
@@ -151,7 +151,7 @@ describe('User Dashboard API', () => {
       topicId,
     };
     //
-    // // create a thread in both 'ethereum' and 'alex' communities
+    // // create a thread in both 'sushi' and 'alex' communities
     const threadTwo = await server.seeder.createThread(threadTwoArgs);
     expect(threadTwo.status).to.equal('Success');
     expect(threadTwo.result).to.not.be.null;
@@ -196,7 +196,7 @@ describe('User Dashboard API', () => {
         },
         raw: true,
       });
-      expect(chains).to.deep.equal([{ community_id: 'ethereum' }]);
+      expect(chains).to.deep.equal([{ community_id: chain }]);
     });
 
     test('should return user activity for newly joined communities', async () => {
@@ -232,8 +232,8 @@ describe('User Dashboard API', () => {
         raw: true,
       });
       expect(chains).to.deep.equal([
-        { community_id: 'alex' },
-        { community_id: 'ethereum' },
+        { community_id: chain2 },
+        { community_id: chain },
       ]);
     });
 

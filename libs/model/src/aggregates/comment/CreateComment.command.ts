@@ -8,7 +8,12 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
-import { authThread, tiered, turnstile } from '../../middleware';
+import {
+  authThread,
+  mustBeValidCommunity,
+  tiered,
+  turnstile,
+} from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
 import {
@@ -59,9 +64,10 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
 
       const community = await models.Community.findOne({
         where: { id: thread.community_id },
-        attributes: ['spam_tier_level'],
+        attributes: ['spam_tier_level', 'tier', 'active'],
       });
       mustExist('Community', community);
+      mustBeValidCommunity(community);
 
       const user = await models.User.findOne({
         where: { id: actor.user.id },

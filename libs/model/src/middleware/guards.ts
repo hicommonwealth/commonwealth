@@ -7,10 +7,13 @@ import {
 import {
   AuthContext,
   CommentContext,
+  Community,
   PollContext,
   ThreadContext,
 } from '@hicommonwealth/schemas';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import moment from 'moment';
+import { z } from 'zod';
 import type {
   AddressInstance,
   CommentInstance,
@@ -180,4 +183,13 @@ export function mustNotBeStarted(start_date: Date) {
       `Start date ${start.format('YYYY-MM-DD')} already passed`,
       { start_date },
     );
+}
+
+export function mustBeValidCommunity(community: z.infer<typeof Community>) {
+  if (community.tier === CommunityTierMap.SpamCommunity) {
+    throw new InvalidState('Community marked as spam');
+  }
+  if (!community.active) {
+    throw new InvalidState('Community is deactivated');
+  }
 }

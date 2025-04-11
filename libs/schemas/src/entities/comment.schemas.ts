@@ -49,7 +49,7 @@ export const Comment = z.object({
       return /^[0-9]+$/.test(str); // only numbers
     })
     .nullish(),
-  search: z.union([z.string(), z.record(z.any())]),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
 
   Address: Address.nullish(),
   Thread: Thread.nullish(),

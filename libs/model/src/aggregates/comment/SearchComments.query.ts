@@ -71,6 +71,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
+      "Comments".marked_as_spam_at IS NULL AND
       query @@ "Comments".search
     ${paginationSort}
   `;
@@ -85,6 +86,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
+      "Comments".marked_as_spam_at IS NULL AND
       query @@ "Comments".search
   `;
 
