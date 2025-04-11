@@ -1,6 +1,39 @@
 @import '../../../styles/shared';
 
 .WalletModal {
+  .wallet-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px; // Adjust padding as needed
+    border-bottom: 1px solid $neutral-100; // Add border if needed
+
+    .Text {
+      // Title styles - already h3 bold
+    }
+
+    .swap-icon {
+      cursor: pointer;
+      color: $neutral-500;
+      // Add margin if needed to space from title
+      margin-left: auto; // Push close icon to the right
+      margin-right: 16px;
+    }
+
+    .close-icon {
+      cursor: pointer;
+      color: $neutral-500;
+    }
+  }
+
+  .CWModalBody {
+    padding: 16px 24px 24px 24px; // Adjust padding
+  }
+
+  .CWSelectList {
+    margin-bottom: 16px; // Space below address selector
+  }
+
   .current-balance-row {
     display: flex;
     justify-content: space-between;
@@ -16,17 +49,34 @@
 
   .amount-input-section {
     margin-top: 24px;
+    background-color: $neutral-25; // Light grey background from design
+    padding: 16px;
+    border-radius: $border-radius-md;
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Center align input and tags
 
     .amount-input-with-currency {
       display: flex;
       align-items: center;
+      justify-content: center; // Center horizontally
       gap: 8px;
       margin-top: 8px;
+      margin-bottom: 16px; // Space before presets
+      width: fit-content; // Allow centering
 
       .CWTextInput {
-        flex: 1;
+        flex: none; // Don't flex grow
+        width: 120px; // Adjust width as needed
 
-        input[type='number'] {
+        input {
+          text-align: center;
+          font-size: 24px; // Larger font size
+          font-weight: 500; // Use numeric value for medium weight
+          padding: 8px 12px; // Adjust padding
+          border: 1px solid $primary-300; // Border color from design
+          border-radius: $border-radius-corners;
+
           &::-webkit-outer-spin-button,
           &::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -37,7 +87,27 @@
       }
 
       .currency-label {
-        color: $neutral-600;
+        color: $neutral-800; // Darker color
+        // Styles already h3 bold
+      }
+    }
+
+    .preset-amounts {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      width: 100%;
+
+      .preset-tag {
+        cursor: pointer;
+        background-color: $neutral-100; // Lighter background for tags
+        border: 1px solid $neutral-200;
+        color: $neutral-700;
+        padding: 4px 12px;
+
+        &:hover {
+          background-color: $neutral-200;
+        }
       }
     }
   }
@@ -47,5 +117,16 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    // Specific styling for the main action button if needed (looks slightly green in design)
+    .CWButton:first-child {
+      // background-color: $green-100; // Example: Light green background
+      // border: 1px solid $green-300; // Example: Green border
+      // color: $green-700; // Example: Green text
+
+      // &:hover {
+      //   background-color: $green-200;
+      // }
+    }
   }
 }

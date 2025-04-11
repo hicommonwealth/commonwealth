@@ -19,9 +19,11 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
-import { DepositModal, WithdrawModal } from 'views/modals/WalletModals';
+import {
+  WalletModal,
+  WalletModalMode,
+} from 'views/modals/WalletModals/WalletModal';
 import RewardsCard from '../../RewardsCard';
 import './WalletCard.scss';
 import useUserWalletHoldings from './useUserWalletHoldings';
@@ -35,8 +37,9 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [walletModalMode, setWalletModalMode] =
+    useState<WalletModalMode>('deposit');
 
   const user = useUserStore();
 
@@ -59,15 +62,30 @@ const WalletCard = () => {
       userSelectedAddress,
     });
 
-  const handleDeposit = async (amount: string) => {
-    // TODO: Implement deposit logic
-    console.log('Depositing:', amount);
+  const handleWalletAction = async (amount: string, mode: WalletModalMode) => {
+    if (mode === 'deposit') {
+      // TODO: Implement actual deposit logic
+      console.log('Depositing:', amount, 'to', userSelectedAddress);
+    } else {
+      // TODO: Implement actual withdraw logic
+      console.log('Withdrawing:', amount, 'from', userSelectedAddress);
+    }
+    // Add any necessary UI updates or refetches here
   };
 
-  const handleWithdraw = async (amount: string) => {
-    // TODO: Implement withdraw logic
-    console.log('Withdrawing:', amount);
+  const openModal = (mode: WalletModalMode) => {
+    setWalletModalMode(mode);
+    setIsWalletModalOpen(true);
   };
+
+  const toggleModalMode = () => {
+    setWalletModalMode((prevMode) =>
+      prevMode === 'deposit' ? 'withdraw' : 'deposit',
+    );
+  };
+
+  const currentEthBalance =
+    userTokens.find((t) => t.symbol === 'ETH')?.balance.toString() || '0';
 
   return (
     <RewardsCard title="Wallet Balance" icon="cardholder">
@@ -155,33 +173,26 @@ const WalletCard = () => {
           <CWButton
             label="Deposit Funds"
             buttonWidth="full"
-            onClick={() => setIsDepositModalOpen(true)}
+            onClick={() => openModal('deposit')}
           />
           <CWButton
             label="Withdraw Funds"
             buttonWidth="full"
-            onClick={() => setIsWithdrawModalOpen(true)}
+            onClick={() => openModal('withdraw')}
           />
         </div>
 
-        <DepositModal
-          isOpen={isDepositModalOpen}
-          onClose={() => setIsDepositModalOpen(false)}
-          currentBalance={
-            userTokens.find((t) => t.symbol === 'ETH')?.balance.toString() ||
-            '0'
-          }
-          onDeposit={handleDeposit}
-        />
-
-        <WithdrawModal
-          isOpen={isWithdrawModalOpen}
-          onClose={() => setIsWithdrawModalOpen(false)}
-          currentBalance={
-            userTokens.find((t) => t.symbol === 'ETH')?.balance.toString() ||
-            '0'
-          }
-          onWithdraw={handleWithdraw}
+        <WalletModal
+          isOpen={isWalletModalOpen}
+          onClose={() => setIsWalletModalOpen(false)}
+          mode={walletModalMode}
+          onModeChange={toggleModalMode}
+          currentEthBalance={currentEthBalance}
+          addresses={uniqueAddresses}
+          selectedAddress={userSelectedAddress}
+          onAddressChange={setUserSelectedAddress}
+          onAction={handleWalletAction}
+          userWallets={user.addresses}
         />
       </div>
     </RewardsCard>

@@ -1,2 +1,2 @@
-export { DepositModal } from './DepositModal';
-export { WithdrawModal } from './WithdrawModal';
+export { WalletModal } from './WalletModal';
+export type { WalletModalMode } from './WalletModal';
