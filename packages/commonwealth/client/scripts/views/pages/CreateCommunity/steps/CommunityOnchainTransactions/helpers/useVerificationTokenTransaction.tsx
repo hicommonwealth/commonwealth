@@ -1,15 +1,17 @@
+import CommunityNominations from 'helpers/ContractHelpers/CommunityNominations';
 import { useState } from 'react';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import {
   TransactionData,
   TransactionHookResult,
   defaultTransactionState,
 } from '../types';
-import useNamespaceFactory from './useNamespaceFactory';
 
 interface UseVerificationTokenTransactionProps {
   namespace: string;
   userAddress: string;
   chainId: string;
+  contractAddress: string;
   onSuccess?: () => void;
 }
 
@@ -17,13 +19,18 @@ const useVerificationTokenTransaction = ({
   namespace,
   userAddress,
   chainId,
+  contractAddress,
   onSuccess,
 }: UseVerificationTokenTransactionProps): TransactionHookResult => {
   const [transactionData, setTransactionData] = useState<TransactionData>(
     defaultTransactionState,
   );
 
-  const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
+  const { data: nodes } = useFetchNodesQuery();
+
+  const chainRpc = nodes?.find(
+    (node) => node.ethChainId === parseInt(chainId),
+  )?.url;
 
   const action = async () => {
     if (
@@ -39,14 +46,16 @@ const useVerificationTokenTransaction = ({
         errorText: '',
       });
 
-      await namespaceFactory.mintNamespaceTokens(
-        namespace,
-        3,
-        5,
-        userAddress,
-        chainId,
-        userAddress,
+      if (!chainRpc) {
+        throw new Error('Chain RPC not found');
+      }
+
+      const communityNominations = new CommunityNominations(
+        contractAddress,
+        chainRpc,
       );
+
+      await communityNominations.mintVerificationToken(namespace, userAddress);
 
       setTransactionData({
         state: 'completed',

@@ -91,6 +91,8 @@ const CommunityOnchainTransactions = ({
     namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
+    // TODO: Add contract address
+    contractAddress: '',
     onSuccess: onSignTransactionMintVerificationToken,
   });
 
