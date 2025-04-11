@@ -35,7 +35,7 @@ export function createToggleFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    forceRefreshKey: _forceRefreshKey,
     setForceRefreshKey,
   },
   getLabel,
@@ -109,7 +109,7 @@ export function createSortFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    forceRefreshKey: _forceRefreshKey,
     setForceRefreshKey,
   },
   tagPrefix,
@@ -182,7 +182,7 @@ export function createSelectFilter<T extends string>({
     setSelectedValue,
     filterTags,
     setFilterTags,
-    forceRefreshKey,
+    forceRefreshKey: _forceRefreshKey,
     setForceRefreshKey,
   },
   getTagLabel,
@@ -269,7 +269,7 @@ export function createSearchFilterTag(
 }
 
 export const getCommunityFilters = (
-  filters: CommunityFilters,
+  _filters: CommunityFilters,
   _forceRefreshKey?: string,
 ): InlineFilter[] => {
   // TODO: Implement actual filter logic

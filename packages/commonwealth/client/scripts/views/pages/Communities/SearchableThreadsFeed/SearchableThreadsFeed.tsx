@@ -1,22 +1,18 @@
-import { Thread } from 'models/Thread';
+import { Thread, ThreadView } from 'models/Thread';
 import { ThreadKind, ThreadStage } from 'models/types'; // Uncomment imports
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom'; // Removed unused import
 import { Virtuoso } from 'react-virtuoso';
 import { ThreadResult } from 'views/pages/search/helpers';
-import { ThreadCard } from '../../discussions/ThreadCard';
+// import { ThreadCard } from '../../discussions/ThreadCard'; // Removed unused import
 import { safeScrollParent } from '../helpers'; // Assuming safeScrollParent is in helpers
+import FeedFooter from './FeedFooter'; // Import the new component
+import FeedItem from './FeedItem'; // Import the new FeedItem component
 import './SearchableThreadsFeed.scss';
-
-// Placeholder slugify if import fails
-// const slugify = (str: string | undefined): string => str ? str.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '') : '';
-
-// Placeholder Thread model if import fails
-// const Thread = class { constructor(data: any) { Object.assign(this, data); } };
 
 interface SearchableThreadsFeedProps {
   customScrollParent?: HTMLElement | null;
-  searchTerm: string;
+  // searchTerm: string; // Removed unused prop
   threads: ThreadResult[];
   isLoading: boolean;
   error: any;
@@ -25,9 +21,25 @@ interface SearchableThreadsFeedProps {
   isFetchingNextPage: boolean;
 }
 
+// Render function for Virtuoso itemContent - moved outside component scope
+const renderFeedItem = (index: number, thread: Thread) => (
+  <FeedItem index={index} thread={thread} />
+);
+
+// Render function for Virtuoso Footer component - moved outside component scope
+const renderFeedFooter = (props: {
+  isFetchingNextPage: boolean;
+  hasNextPage?: boolean;
+}) => (
+  <FeedFooter
+    isFetchingNextPage={props.isFetchingNextPage}
+    hasNextPage={props.hasNextPage}
+  />
+);
+
 const SearchableThreadsFeed = ({
   customScrollParent,
-  searchTerm,
+  // searchTerm, // Removed unused prop
   threads,
   isLoading,
   error,
@@ -35,7 +47,7 @@ const SearchableThreadsFeed = ({
   fetchNextPage,
   isFetchingNextPage,
 }: SearchableThreadsFeedProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Removed unused variable
 
   const handleEndReached = async () => {
     if (!isFetchingNextPage && hasNextPage) {
@@ -130,37 +142,10 @@ const SearchableThreadsFeed = ({
         totalCount={mappedThreads.length}
         data={mappedThreads}
         style={{ height: '100%' }}
-        itemContent={(index, thread) => {
-          // thread is now a Thread instance
-          const communitySlug = thread.communityId
-            ? slugify(thread.communityId)
-            : 'unknown';
-          const discussionLink = `/${communitySlug}/discussion/${thread.id}-${slugify(thread.title)}`;
-
-          return (
-            <ThreadCard
-              key={index}
-              thread={thread}
-              layoutType="community-first"
-              hideReactionButton
-              hideUpvotesDrawer
-              threadHref={discussionLink}
-              onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusComments=true`)
-              }
-            />
-          );
-        }}
+        itemContent={renderFeedItem}
         endReached={handleEndReached}
         components={{
-          Footer: () =>
-            isFetchingNextPage ? (
-              <div className="loading-spinner small">
-                Loading more threads...
-              </div>
-            ) : hasNextPage ? null : (
-              <div className="end-of-feed-message">End of results</div>
-            ),
+          Footer: () => renderFeedFooter({ isFetchingNextPage, hasNextPage }), // Use the render function
         }}
       />
     </div>

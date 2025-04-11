@@ -304,7 +304,7 @@ const CommunitiesPage = () => {
               inlineFilters={
                 currentTabConfig.getInlineFilters?.(tabContentProps) || []
               }
-              _selectedSortOption={''}
+              _selectedSortOption=""
               _onSortOptionChange={() => {}}
               _communitiesCount={0}
               _isFilterDrawerOpen={false}

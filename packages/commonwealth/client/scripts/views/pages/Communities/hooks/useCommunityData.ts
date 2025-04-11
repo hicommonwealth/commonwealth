@@ -1,10 +1,8 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainNetwork } from '@hicommonwealth/shared';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
 import { useFetchTagsQuery } from 'state/api/tags';
-import { z } from 'zod';
 import { trpc } from '../../../../utils/trpcClient';
 import {
   CommunityFilters,
@@ -13,18 +11,12 @@ import {
   sortOrderLabelsToDirectionsMap,
 } from '../FiltersDrawer';
 
-// Define the type based on the schema
-type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
-
 export function useCommunityData(
   filters: CommunityFilters,
   searchValue: string,
 ) {
-  const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
-
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
 
-  // Use the correct hook
   const {
     data: communities,
     fetchNextPage: fetchMoreCommunitiesOriginal,
