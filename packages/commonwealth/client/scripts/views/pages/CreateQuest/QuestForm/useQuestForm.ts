@@ -48,6 +48,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'CommentUpvoted',
       'WalletLinked',
       'SSOLinked',
+      'CommonDiscordServerJoined',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };
@@ -237,7 +238,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             (subForm.config?.with_optional_comment_id ||
               subForm.config?.with_optional_thread_id ||
               subForm.config?.with_optional_topic_id ||
-              subForm.config?.requires_twitter_tweet_link) && {
+              subForm.config?.requires_twitter_tweet_link ||
+              subForm.config?.requires_discord_server_url) && {
               content_id: await buildContentIdFromURL(
                 subForm.values.contentLink,
                 contentIdScope,
