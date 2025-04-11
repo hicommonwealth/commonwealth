@@ -2,7 +2,7 @@ import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { UserTierMap, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import {
@@ -70,7 +70,7 @@ describe('Upgrade Tiers lifecycle', () => {
       eth_chain_id: 1,
     });
     const [user1] = await seed('User', {
-      tier: 0,
+      tier: UserTierMap.IncompleteUser,
     });
     const [community1] = await seed('Community', {
       chain_node_id: node1!.id,
@@ -133,7 +133,7 @@ describe('Upgrade Tiers lifecycle', () => {
   });
 
   describe('Nomination Upgrade Policy', async () => {
-    test('should upgrade user to tier 4 when 5 or more nomination tokens are held', async () => {
+    test('should upgrade user to ChainVerified tier when 5 or more nomination tokens are held', async () => {
       const userBefore = await models.User.findByPk(user.id);
       expect(userBefore?.tier).toBe(0);
 
@@ -150,16 +150,19 @@ describe('Upgrade Tiers lifecycle', () => {
       await drainOutbox(['NamespaceTransferSingle'], UpgradeTierPolicy);
 
       const userAfter = await models.User.findByPk(user.id);
-      expect(userAfter?.tier).toBe(4);
+      expect(userAfter?.tier).toBe(UserTierMap.ChainVerified);
     });
   });
 
   describe('Contest Upgrade Policy', async () => {
-    test('should upgrade user to tier 4 when contest is funded and there is contest activity', async () => {
-      await models.User.update({ tier: 0 }, { where: { id: user.id } });
+    test('should upgrade user to ChainVerified tier when contest is funded and there is contest activity', async () => {
+      await models.User.update(
+        { tier: UserTierMap.IncompleteUser },
+        { where: { id: user.id } },
+      );
 
       const userBefore = await models.User.findByPk(user.id);
-      expect(userBefore?.tier).toBe(0);
+      expect(userBefore?.tier).toBe(UserTierMap.IncompleteUser);
 
       vi.spyOn(commonProtocol, 'getContestScore').mockResolvedValue({
         contestBalance: (UPGRADE_MIN_USDC_BALANCE - 1n).toString(),
@@ -184,7 +187,7 @@ describe('Upgrade Tiers lifecycle', () => {
       expect(
         userAfter!.tier,
         'user tier should not change since contest balance is insufficient',
-      ).toBe(0);
+      ).toBe(UserTierMap.IncompleteUser);
 
       vi.spyOn(commonProtocol, 'getContestScore').mockResolvedValue({
         contestBalance: UPGRADE_MIN_USDC_BALANCE.toString(),
@@ -208,8 +211,8 @@ describe('Upgrade Tiers lifecycle', () => {
       const userAfter2 = await models.User.findByPk(user.id);
       expect(
         userAfter2!.tier,
-        'balance is sufficient, user should be upgraded to tier 4',
-      ).toBe(4);
+        'balance is sufficient, user should be upgraded to ChainVerified tier',
+      ).toBe(UserTierMap.ChainVerified);
     });
   });
 });
