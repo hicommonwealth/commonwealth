@@ -1,4 +1,6 @@
 import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -264,9 +266,13 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           }),
           ...(subForm.config?.requires_chain_event && {
             chain_event: {
-              contract_address: subForm.values.contractAddress!,
               eth_chain_id: parseInt(`${subForm.values.ethChainId}`, 10),
-              event_signature: subForm.values.eventSignature!,
+              contract_address: subForm.values.contractAddress! as z.infer<
+                typeof EVM_ADDRESS_STRICT
+              >,
+              event_signature: subForm.values.eventSignature! as z.infer<
+                typeof EVM_EVENT_SIGNATURE_STRICT
+              >,
             },
           }),
           participation_limit: subForm.values.participationLimit,
