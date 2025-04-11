@@ -22,9 +22,9 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
-import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStakeStep';
-
 import { CWDivider } from '../../../../components/component_kit/cw_divider';
+import CommunityOnchainTransactions from '../../../CreateCommunity/steps/CommunityOnchainTransactions';
+import { TransactionType } from '../../../CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 import ContestsList from '../ContestsList';
 import EmptyContestsList from '../EmptyContestsList';
 import { ContestType, ContestView } from '../types';
@@ -213,14 +213,20 @@ const AdminContestsPage = () => {
                 img={commonUrl}
                 title="Launch on Common"
                 subtitle={
-                  hasAtLeastOneWeightedVotingTopic
-                    ? `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
-                    : `For weighted contests, you need at least one topic with weighted voting enabled. 
-You can still proceed to set up your contest.`
+                  !community?.namespace
+                    ? `You need a namespace for your community to run Common contests. Set one up first.`
+                    : !hasAtLeastOneWeightedVotingTopic
+                      ? `You have a namespace, but no topics with weighted voting. You can still run a 
+                      judged contest, but weighted topics are necessary for weighted voting contests.`
+                      : `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
                 }
                 button={{
-                  label: 'Launch Common contest',
-                  handler: goToLaunchCommonContest,
+                  label: community?.namespace
+                    ? 'Launch Common contest'
+                    : 'Create a namespace',
+                  handler: community?.namespace
+                    ? goToLaunchCommonContest
+                    : () => setContestView(ContestView.NamespaceEnablemenement),
                 }}
               />
             ) : (
@@ -256,16 +262,18 @@ Set one up first.`
             />
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
-          <CommunityStakeStep
+          <CommunityOnchainTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
             chainId={String(ethChainId)}
-            onlyNamespace
-            onEnableStakeStepCancel={gotToContestTypeSelection}
-            onSignTransactionsStepReserveNamespaceSuccess={
-              goToLaunchFarcasterContest
-            }
+            transactionTypes={[TransactionType.DeployNamespace]}
+            onConfirmNamespaceDataStepCancel={gotToContestTypeSelection}
+            onSignTransaction={(type) => {
+              if (type === TransactionType.DeployNamespace) {
+                goToLaunchFarcasterContest();
+              }
+            }}
             onSignTransactionsStepCancel={gotToContestTypeSelection}
           />
         ) : null}

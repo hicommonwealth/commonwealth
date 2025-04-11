@@ -5,8 +5,9 @@ import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
+import CommunityOnchainTransactions from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
+import { TransactionType } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 
-import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
 import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
 import WVERC20Details from './WVERC20Details';
@@ -154,17 +155,19 @@ export const Topics = () => {
         );
       case CreateTopicStep.WVNamespaceEnablement:
         return (
-          <CommunityStakeStep
+          <CommunityOnchainTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
             chainId={String(community?.ChainNode?.eth_chain_id)}
-            onlyNamespace
+            transactionTypes={[TransactionType.DeployNamespace]}
             isTopicFlow
-            onEnableStakeStepCancel={goToMethodSelectionStep}
-            onSignTransactionsStepReserveNamespaceSuccess={() =>
-              setCreateTopicStep(CreateTopicStep.WVERC20Details)
-            }
+            onConfirmNamespaceDataStepCancel={goToMethodSelectionStep}
+            onSignTransaction={(type) => {
+              if (type === TransactionType.DeployNamespace) {
+                setCreateTopicStep(CreateTopicStep.WVERC20Details);
+              }
+            }}
             onSignTransactionsStepCancel={goToMethodSelectionStep}
           />
         );

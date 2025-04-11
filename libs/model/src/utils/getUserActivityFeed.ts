@@ -1,4 +1,5 @@
 import * as schemas from '@hicommonwealth/schemas';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -29,10 +30,19 @@ user_communities AS (
     WHERE user_id = :user_id
 ),
 top_threads AS (
-  SELECT T.*, count(*) OVER() AS total
+  SELECT T.*, count(*) OVER() AS total, C.icon_url
   FROM "Threads" T
-  ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
-  WHERE T.deleted_at IS NULL
+  ${
+    user_id
+      ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
+      : ''
+  }
+  JOIN "Communities" C ON C.id = T.community_id
+  WHERE T.deleted_at IS NULL 
+      AND T.marked_as_spam_at IS NULL 
+      AND C.active IS TRUE 
+      AND C.tier != ${CommunityTierMap.SpamCommunity}
+      AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
   ORDER BY T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
 )
@@ -40,10 +50,11 @@ top_threads AS (
 SELECT 
   jsonb_set(
     jsonb_build_object(
-      'community_id', C.id,
-      'community_icon', C.icon_url,
+      'community_id', T.community_id,
+      'community_icon', T.icon_url,
       'id', T.id,
       'user_id', U.id,
+      'user_tier', U.tier,
       'user_address', A.address,
       'profile_name', U.profile->>'name',
       'profile_avatar', U.profile->>'avatar_url',
@@ -75,6 +86,7 @@ SELECT
         'id', C.id,
         'address', C.address,
         'user_id', C.user_id,
+        'user_tier', C.user_tier,
         'profile_name', C.profile_name,
         'profile_avatar', C.profile_avatar,
         'body', C.body,
@@ -90,6 +102,7 @@ SELECT
             C.*,
             A.address,
             U.id as user_id,
+            U.tier as user_tier,
             U.profile->>'name' as profile_name, 
             U.profile->>'avatar_url' as profile_avatar, 
             ROW_NUMBER() OVER (PARTITION BY C.thread_id ORDER BY C.created_at DESC) AS rn
@@ -104,7 +117,6 @@ SELECT
   T.total 
 FROM
   top_threads T
-  JOIN "Communities" C ON T.community_id = C.id
   JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
   JOIN "Users" U ON U.id = A.user_id
   JOIN "Topics" Tp ON Tp.id = T.topic_id
@@ -118,6 +130,7 @@ ORDER BY
     type: QueryTypes.SELECT,
     raw: true,
     replacements: { user_id, limit, comment_limit, offset },
+    logging: console.log,
   });
 
   const formattedThreads = threads.map((item) => ({

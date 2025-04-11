@@ -12,6 +12,7 @@ class NewProfile {
   private _socials: string[];
   private _isOwner: boolean;
   private _backgroundImage: z.infer<typeof Image>;
+  private _tier: number;
 
   get userId() {
     return this._userId;
@@ -53,6 +54,10 @@ class NewProfile {
     return this._backgroundImage;
   }
 
+  get tier() {
+    return this._tier;
+  }
+
   constructor({
     userId,
     isOwner,
@@ -64,7 +69,12 @@ class NewProfile {
     slug,
     socials,
     background_image,
-  }: z.infer<typeof UserProfile> & { userId: number; isOwner: boolean }) {
+    tier,
+  }: z.infer<typeof UserProfile> & {
+    userId: number;
+    isOwner: boolean;
+    tier: number;
+  }) {
     this._userId = userId;
     this._isOwner = isOwner;
     this._name = name!;
@@ -75,6 +85,7 @@ class NewProfile {
     this._slug = slug!;
     this._socials = socials!;
     this._backgroundImage = background_image ?? { url: '', imageBehavior: '' };
+    this._tier = tier!;
   }
 
   public static fromJSON(json) {

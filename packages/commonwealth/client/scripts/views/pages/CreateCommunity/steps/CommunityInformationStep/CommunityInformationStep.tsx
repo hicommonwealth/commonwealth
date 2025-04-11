@@ -11,6 +11,7 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
+import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
@@ -35,6 +36,15 @@ const CommunityInformationStep = ({
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: 'create-community',
+  });
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
   >({
@@ -53,6 +63,11 @@ const CommunityInformationStep = ({
       (chain) => String(chain.value) === values?.chain?.value,
     );
 
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
+
     try {
       const input = buildCreateCommunityInput({
         id: values.communityId,
@@ -62,11 +77,17 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
+        turnstileToken: turnstileToken || undefined,
+        tokenizeCommunity: values.tokenizeCommunity,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
     } catch (err) {
       notifyError(err.message);
+      // Reset turnstile if there's an error
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
     }
   };
 
@@ -111,7 +132,8 @@ const CommunityInformationStep = ({
       <FeatureHint
         title="Chain selection cannot be changed"
         hint={`
-              Choose the chain that your Ethereum project is built on. Chain selection 
+              Choose the chain your project is built on. You can choose between Solana, Ethereum,
+               or Cosmos based chains. Chain selection 
               determines availability of features such as Contests, Stakes, and Weighted Voting.
             `}
       />
@@ -124,6 +146,9 @@ const CommunityInformationStep = ({
         withSocialLinks={false} // TODO: Set this when design figures out how we will integrate the social links
         isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Launch Community"
+        isTurnstileEnabled={isTurnstileEnabled}
+        turnstileToken={turnstileToken}
+        TurnstileWidget={isTurnstileEnabled ? TurnstileWidget : undefined}
       />
     </div>
   );

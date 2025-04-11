@@ -1,4 +1,4 @@
-import { Roles, WalletId } from '@hicommonwealth/shared';
+import { Roles, UserTierMap, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Tags } from './tag.schemas';
@@ -38,7 +38,8 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
-export const USER_TIER = z.number().int().min(0).max(5);
+export const USER_TIER = z.nativeEnum(UserTierMap);
+
 export const User = z.object({
   id: PG_INT.optional(),
   tier: USER_TIER,
@@ -63,6 +64,7 @@ export const User = z.object({
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
+  privy_id: z.string().max(255).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),

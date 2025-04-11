@@ -1,7 +1,48 @@
 import axios from 'axios';
+import {
+  doesActionAllowThreadId,
+  doesActionAllowTopicId,
+  doesActionRequireDiscordServerURL,
+  doesActionRequireTwitterTweetURL,
+} from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
+import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 
-export type ContentIdType = 'comment' | 'thread' | 'topic';
+export type ContentIdType =
+  | 'comment'
+  | 'thread'
+  | 'topic'
+  | 'tweet_url'
+  | 'discord_server_url';
+
+export const inferContentIdTypeFromContentId = (
+  action: QuestAction,
+  contentId?: string,
+) => {
+  if (!contentId) {
+    if (doesActionAllowTopicId(action as QuestAction))
+      return QuestActionContentIdScope.Topic;
+    if (doesActionRequireTwitterTweetURL(action as QuestAction))
+      return QuestActionContentIdScope.TwitterTweet;
+    if (doesActionRequireDiscordServerURL(action as QuestAction))
+      return QuestActionContentIdScope.DiscordServer;
+    if (doesActionAllowThreadId(action as QuestAction))
+      return QuestActionContentIdScope.Thread;
+    return undefined;
+  }
+
+  const scope = contentId.split(':')[0];
+  switch (scope) {
+    case 'topic':
+      return QuestActionContentIdScope.Topic;
+    case 'tweet_url':
+      return QuestActionContentIdScope.TwitterTweet;
+    case 'discord_server_url':
+      return QuestActionContentIdScope.DiscordServer;
+    default:
+      return QuestActionContentIdScope.Thread;
+  }
+};
 
 export const buildContentIdFromURL = async (
   url: string,
@@ -50,23 +91,33 @@ export const buildContentIdFromURL = async (
     if (foundTopic) return `${idType}:${foundTopic.id}`;
     throw new Error(`invalid topic url ${url}`);
   }
+  if (idType === 'tweet_url') {
+    return `${idType}:${url}`;
+  }
+  if (idType === 'discord_server_url') {
+    return `${idType}:${url}`;
+  }
 };
 
-export const buildURLFromContentId = (
-  id: string,
-  idType: ContentIdType,
-  withParams = {},
-) => {
-  if (idType === 'thread') return `${window.location.origin}/discussion/${id}`;
-  if (idType === 'comment') {
-    return `${window.location.origin}/discussion/comment/${id}`;
-  }
+export const buildURLFromContentId = (contentId: string, withParams = {}) => {
+  const [id, ...rest] = contentId.split(':');
+  const idType = id as ContentIdType;
+  const idOrURL = Array.isArray(rest) ? rest.join(':') : rest;
+
+  const origin = window.location.origin;
+  const params =
+    Object.keys(withParams || {}).length > 0
+      ? `?${new URLSearchParams(withParams).toString()}`
+      : '';
+
+  if (idType === 'thread') return `${origin}/discussion/${idOrURL}${params}`;
+  if (idType === 'comment')
+    return `${origin}/discussion/comment/${idOrURL}${params}`;
+  if (idType === 'tweet_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
   if (idType === 'topic') {
-    const params =
-      Object.keys(withParams || {}).length > 0
-        ? new URLSearchParams(withParams).toString()
-        : '';
-    return `${window.location.origin}/discussion/topic/${id}${params ? `?${params}` : ''}`;
+    return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
+
   return '';
 };

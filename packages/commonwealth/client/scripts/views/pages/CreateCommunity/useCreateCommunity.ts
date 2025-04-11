@@ -23,7 +23,7 @@ const useCreateCommunity = () => {
       forward,
       createCommunityStep,
       setCreateCommunityStep,
-      showCommunityStakeStep,
+      showOnchainTransactionsStep,
     );
   };
 
@@ -38,14 +38,14 @@ const useCreateCommunity = () => {
 
   const isValidStepToShowCommunityStakeFormStep = [
     CreateCommunityStep.CommunityInformation,
-    CreateCommunityStep.CommunityStake,
+    CreateCommunityStep.OnchainTransactions,
   ].includes(createCommunityStep);
 
   const isSupportedChainSelected = chainIdsWithStakeEnabled.some(
     (chainId) => chainId === parseInt(selectedChainId || ''),
   );
 
-  const showCommunityStakeStep =
+  const showOnchainTransactionsStep =
     isValidStepToShowCommunityStakeFormStep && isSupportedChainSelected;
 
   return {
@@ -59,7 +59,7 @@ const useCreateCommunity = () => {
     createdCommunityName,
     handleCompleteCommunityInformationStep,
     onChangeStep,
-    showCommunityStakeStep,
+    showOnchainTransactionsStep,
     selectedChainId,
   };
 };

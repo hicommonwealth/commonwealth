@@ -1,14 +1,15 @@
 import { type Command } from '@hicommonwealth/core';
 import { getSaltedApiKeyHash } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { randomBytes } from 'crypto';
 import { models } from '../../database';
-import { authVerified } from '../../middleware/auth';
+import { authVerified, tiered } from '../../middleware';
 
 export function CreateApiKey(): Command<typeof schemas.CreateApiKey> {
   return {
     ...schemas.CreateApiKey,
-    auth: [authVerified()],
+    auth: [authVerified(), tiered({ minTier: UserTierMap.SocialVerified })],
     secure: true,
     body: async ({ actor }) => {
       const apiKey = randomBytes(32).toString('base64url');

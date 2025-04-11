@@ -9,7 +9,9 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   DefaultPage,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
@@ -58,7 +60,8 @@ export function CreateBotNamespace(): Command<
           .replace(/^-|-$/g, '')
           .toLowerCase(),
         name,
-        tier: 0,
+        tier: CommunityTierMap.Unverified,
+        spam_tier_level: DisabledCommunitySpamTier,
         default_symbol: symbol,
         icon_url,
         description,

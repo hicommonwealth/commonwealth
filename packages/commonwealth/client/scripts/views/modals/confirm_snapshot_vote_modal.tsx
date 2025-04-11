@@ -100,7 +100,7 @@ export const ConfirmSnapshotVoteModal = (
               {`${formatBigNumberShort(
                 totalScore,
                 8,
-              )} ${space.symbol.slice(0, 6).trim()}...`}
+              )} ${space?.symbol?.slice(0, 6).trim()}...`}
             </CWText>
           </div>
         </div>

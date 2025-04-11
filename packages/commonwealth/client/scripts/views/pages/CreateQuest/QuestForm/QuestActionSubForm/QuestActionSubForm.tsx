@@ -17,7 +17,9 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
 import {
   QuestAction,
@@ -39,19 +41,11 @@ const QuestActionSubForm = ({
   defaultValues,
   config,
   onChange,
+  availableActions,
   hiddenActions,
   internalRefs,
 }: QuestActionSubFormProps) => {
-  const actionOptions = [
-    'CommunityCreated',
-    'CommunityJoined',
-    'ThreadCreated',
-    'ThreadUpvoted',
-    'CommentCreated',
-    'CommentUpvoted',
-    'WalletLinked',
-    'SSOLinked',
-  ]
+  const actionOptions = availableActions
     .map((event) => ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
@@ -67,50 +61,78 @@ const QuestActionSubForm = ({
       sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
       sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
+      twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
+      discordServerUrl: `https://discord.gg/commonwealth`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
       commentId: 'Comment Link (optional)',
       topicId: 'Topic Link (optional)',
+      twitterTweetUrl: 'Tweet URL',
+      discordServerUrl: 'Discord Server URL',
     },
   };
 
   const getContentIdInputLabel = () => {
     if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
-      if (config?.with_optional_thread_id)
+      if (config?.with_optional_thread_id) {
         return contentIdInputConfig.labels.threadId;
-      if (config?.with_optional_comment_id)
+      }
+      if (config?.with_optional_comment_id) {
         return contentIdInputConfig.labels.commentId;
+      }
     }
     if (
       config?.with_optional_topic_id ||
       defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
-    )
+    ) {
       return contentIdInputConfig.labels.topicId;
+    }
+
+    if (config?.requires_twitter_tweet_link) {
+      return contentIdInputConfig.labels.twitterTweetUrl;
+    }
+
+    if (config?.requires_discord_server_url) {
+      return contentIdInputConfig.labels.discordServerUrl;
+    }
 
     return 'Content Id';
   };
 
   const getContentIdInputPlaceholder = () => {
     if (defaultValues?.contentIdScope === QuestActionContentIdScope.Thread) {
-      if (config?.with_optional_thread_id)
+      if (config?.with_optional_thread_id) {
         return contentIdInputConfig.placeholders.sampleThreadLink;
-      if (config?.with_optional_comment_id)
+      }
+      if (config?.with_optional_comment_id) {
         return contentIdInputConfig.placeholders.sampleCommentLink;
+      }
     }
     if (
       config?.with_optional_topic_id ||
       defaultValues?.contentIdScope === QuestActionContentIdScope.Topic
-    )
+    ) {
       return contentIdInputConfig.placeholders.sampleTopicLink;
+    }
+
+    if (config?.requires_twitter_tweet_link) {
+      return contentIdInputConfig.placeholders.twitterTweetUrl;
+    }
+
+    if (config?.requires_discord_server_url) {
+      return contentIdInputConfig.placeholders.discordServerUrl;
+    }
 
     return 'Content Id';
   };
 
-  const withOptionalContentId =
+  const allowsContentId =
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
-    config?.with_optional_topic_id;
+    config?.with_optional_topic_id ||
+    config?.requires_twitter_tweet_link ||
+    config?.requires_discord_server_url;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -250,6 +272,11 @@ const QuestActionSubForm = ({
     });
   }, [participationPeriod, defaultValues?.participationPeriod, onChange]);
 
+  const doesPreventRepetition =
+    typeof config?.is_action_repeatable !== 'undefined'
+      ? !config?.is_action_repeatable
+      : false;
+
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
       {isRemoveable && (
@@ -264,23 +291,29 @@ const QuestActionSubForm = ({
         <CWText type="caption" fontWeight="semiBold">
           Action Schedule
         </CWText>
-        <CWRepetitionCycleRadioButton
-          customError={repetitionCycleRadio.error}
-          {...repetitionCycleRadio.props}
-          className="radio-btn mt-8"
-          value={QuestParticipationLimit.OncePerPeriod}
-          groupName={`participationLimit-${defaultValues?.action}`}
-          {...(defaultValues?.participationLimit ===
-            QuestParticipationLimit.OncePerPeriod && {
-            checked: true,
-          })}
-          onChange={(e) =>
-            e.target.checked &&
-            onChange?.({
-              participationLimit: QuestParticipationLimit.OncePerPeriod,
-            })
-          }
-        />
+        {withTooltip(
+          <CWRepetitionCycleRadioButton
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
+            className="radio-btn mt-8"
+            value={QuestParticipationLimit.OncePerPeriod}
+            groupName={`participationLimit-${defaultValues?.action}`}
+            {...(defaultValues?.participationLimit ===
+              QuestParticipationLimit.OncePerPeriod && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                participationLimit: QuestParticipationLimit.OncePerPeriod,
+              })
+            }
+            disabled={doesPreventRepetition}
+          />,
+          `Selected action does not allow repetition`,
+          doesPreventRepetition,
+          'w-fit',
+        )}
         <CWRadioButton
           className="radio-btn"
           value={QuestParticipationLimit.OncePerQuest}
@@ -315,6 +348,14 @@ const QuestActionSubForm = ({
           },
         })}
         customError={errors?.action}
+        instructionalMessage={
+          ((defaultValues?.action === 'TweetEngagement' ||
+            defaultValues?.action === 'CommonDiscordServerJoined') &&
+            actionCopies.pre_reqs[defaultValues?.action as QuestAction](
+              'admin',
+            )) ||
+          ''
+        }
       />
 
       <div
@@ -368,6 +409,51 @@ const QuestActionSubForm = ({
         )}
       </div>
 
+      {config?.requires_twitter_tweet_link && (
+        <div className="grid-row cols-3">
+          <CWTextInput
+            key={`noOfLikes-${defaultValues?.action}`}
+            name="noOfLikes"
+            label="Likes Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfLikes !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfLikes,
+            })}
+            onInput={(e) => onChange?.({ noOfLikes: e?.target?.value?.trim() })}
+            customError={errors?.noOfLikes}
+          />
+          <CWTextInput
+            key={`noOfRetweets-${defaultValues?.action}`}
+            name="noOfRetweets"
+            label="Retweets Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfRetweets !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfRetweets,
+            })}
+            onInput={(e) =>
+              onChange?.({ noOfRetweets: e?.target?.value?.trim() })
+            }
+            customError={errors?.noOfRetweets}
+          />
+          <CWTextInput
+            key={`noOfReplies-${defaultValues?.action}`}
+            name="noOfReplies"
+            label="Replies Count"
+            placeholder="0"
+            fullWidth
+            {...(defaultValues?.noOfReplies !== 'undefiend' && {
+              defaultValue: defaultValues?.noOfReplies,
+            })}
+            onInput={(e) =>
+              onChange?.({ noOfReplies: e?.target?.value?.trim() })
+            }
+            customError={errors?.noOfReplies}
+          />
+        </div>
+      )}
+
       {config?.with_optional_thread_id && (
         <div className="content-id-type-selector">
           <CWText type="caption">Action Scope</CWText>
@@ -408,13 +494,8 @@ const QuestActionSubForm = ({
         </div>
       )}
 
-      <div
-        className={clsx(
-          'grid-row',
-          withOptionalContentId ? 'cols-2' : 'cols-1',
-        )}
-      >
-        {withOptionalContentId && (
+      <div className={clsx('grid-row', allowsContentId ? 'cols-2' : 'cols-1')}>
+        {allowsContentId && (
           <CWTextInput
             key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
             name="contentLink"
