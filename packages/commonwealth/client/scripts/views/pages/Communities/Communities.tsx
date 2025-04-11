@@ -321,15 +321,13 @@ const CommunitiesPage = () => {
           content={
             <ManageCommunityStakeModal
               mode={modeOfManageCommunityStakeModal}
-              onModalClose={() =>
-                setModeOfManageCommunityStakeModal(null as any)
-              }
+              onModalClose={() => setModeOfManageCommunityStakeModal(null)}
               denomination={
                 findDenominationString(selectedCommunityId || '') || 'ETH'
               }
             />
           }
-          onClose={() => setModeOfManageCommunityStakeModal(null as any)}
+          onClose={() => setModeOfManageCommunityStakeModal(null)}
           open={!!modeOfManageCommunityStakeModal}
         />
       </div>

@@ -51,7 +51,7 @@ export function createToggleFilter<T extends string>({
   getRemoveTagsFilter: (tags: FilterTag[]) => FilterTag[];
   defaultValue: T;
   tagPrefix: string;
-}): InlineFilter {
+}): InlineFilter<FilterOption | null> {
   return {
     type: 'select',
     label,
@@ -122,7 +122,7 @@ export function createSortFilter<T extends string>({
   state: FilterState<T>;
   tagPrefix: string;
   defaultValue?: T;
-}): InlineFilter {
+}): InlineFilter<FilterOption | null> {
   return {
     type: 'sort',
     label,
@@ -195,7 +195,7 @@ export function createSelectFilter<T extends string>({
   state: FilterState<T>;
   getTagLabel?: (option: FilterOption) => string;
   tagPrefix: string;
-}): InlineFilter {
+}): InlineFilter<FilterOption | null> {
   return {
     type: 'select',
     label,
@@ -271,7 +271,7 @@ export function createSearchFilterTag(
 export const getCommunityFilters = (
   _filters: CommunityFilters,
   _forceRefreshKey?: string,
-): InlineFilter[] => {
+): InlineFilter<FilterOption | null>[] => {
   // TODO: Implement actual filter logic
   return [];
 };
@@ -282,7 +282,7 @@ export const getThreadsFilters = (
   _filterTags: string[],
   _handleFilterChange: (filterKey: string, value: string) => void,
   _forceRefreshKey?: string,
-): InlineFilter[] => {
+): InlineFilter<FilterOption | null>[] => {
   // TODO: Implement actual filter logic
   return [];
 };
@@ -292,7 +292,7 @@ export const getTokensFilters = (
   _sortOption: string,
   _handleFilterChange: (filterKey: string, value: string) => void,
   _forceRefreshKey?: string,
-): InlineFilter[] => {
+): InlineFilter<FilterOption | null>[] => {
   // TODO: Implement actual filter logic
   return [];
 };

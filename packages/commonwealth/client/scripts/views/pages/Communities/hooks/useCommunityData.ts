@@ -1,8 +1,10 @@
+import { Community } from '@hicommonwealth/schemas';
 import { ChainNetwork } from '@hicommonwealth/shared';
 import { useCallback, useMemo } from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate'; // Updated import path
 import { useFetchTagsQuery } from 'state/api/tags';
+import { z } from 'zod';
 import { trpc } from '../../../../utils/trpcClient';
 import {
   CommunityFilters,
@@ -10,6 +12,12 @@ import {
   communitySortOptionsLabelToKeysMap,
   sortOrderLabelsToDirectionsMap,
 } from '../FiltersDrawer';
+
+// Define the type for a single community item
+type CommunityItem = z.infer<typeof Community>;
+
+// Define the type for a pair of community items (or one item and undefined)
+type CommunityPair = [CommunityItem, CommunityItem | undefined];
 
 export function useCommunityData(
   filters: CommunityFilters,
@@ -103,11 +111,13 @@ export function useCommunityData(
 
     const SLICE_SIZE = 2;
     // TODO: Refine the type for twoCommunitiesPerEntry
-    const twoCommunitiesPerEntry: any[] = []; // Explicitly type the array
+    const twoCommunitiesPerEntry: CommunityPair[] = []; // Use the defined CommunityPair type
 
     for (let i = 0; i < flatList.length; i += SLICE_SIZE) {
       // Pushing slices of the inferred type from flatList
-      twoCommunitiesPerEntry.push(flatList.slice(i, i + SLICE_SIZE));
+      twoCommunitiesPerEntry.push(
+        flatList.slice(i, i + SLICE_SIZE) as CommunityPair,
+      );
     }
 
     return twoCommunitiesPerEntry;
@@ -134,14 +144,14 @@ export function useCommunityData(
     // Recreate the sliced structure
     const SLICE_SIZE = 2;
     // TODO: Refine the type for filteredSlices
-    const filteredSlices: any[] = []; // Explicitly type the array
+    const filteredSlices: CommunityPair[] = []; // Use the defined CommunityPair type
 
     for (let i = 0; i < filteredList.length; i += SLICE_SIZE) {
       const slice = filteredList.slice(i, i + SLICE_SIZE);
       // Only add slices with valid items
       if (slice.length === SLICE_SIZE) {
         // Pushing slices of the inferred type from filteredList
-        filteredSlices.push(slice);
+        filteredSlices.push(slice as CommunityPair);
       } else if (slice.length === 1) {
         // For the last odd item, create a slice with undefined as the second item
         // But make sure the first item is valid

@@ -3,6 +3,7 @@ import { FilterTag } from '../SearchFilterRow';
 import { createSearchFilterTag } from '../filters';
 
 // Define an interface for tab state configuration
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TabStateConfig<T = any> {
   initialState?: T;
   initialFilterTags?: FilterTag[];

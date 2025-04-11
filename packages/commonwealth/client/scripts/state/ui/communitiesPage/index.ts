@@ -16,6 +16,15 @@ import {
 } from '../../../views/pages/Communities/tabConfig';
 import { createBoundedUseStore } from '../utils';
 
+// Define the type for the quest filter option
+interface QuestFilterOption {
+  label: {
+    name: string;
+    imageURL?: string;
+  };
+  value: number; // Assuming quest ID is a number
+}
+
 interface CommunitiesPageState {
   // Common state
   searchValue: string;
@@ -30,8 +39,8 @@ interface CommunitiesPageState {
   setIsFilterDrawerOpen: (isOpen: boolean) => void;
 
   // Users tab
-  selectedQuestFilter: any | null;
-  setSelectedQuestFilter: (filter: any | null) => void;
+  selectedQuestFilter: QuestFilterOption | null;
+  setSelectedQuestFilter: (filter: QuestFilterOption | null) => void;
 
   // Quests tab
   selectedQuestStage: QuestStageType;

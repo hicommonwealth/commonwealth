@@ -1,4 +1,4 @@
-export type ManageCommunityStakeModalMode = 'buy' | 'sell';
+export type ManageCommunityStakeModalMode = 'buy' | 'sell' | null;
 
 export interface ManageCommunityStakeModalProps {
   onModalClose: () => void;

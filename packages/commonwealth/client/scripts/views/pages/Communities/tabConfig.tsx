@@ -1,3 +1,4 @@
+import { Community, GetCommunities } from '@hicommonwealth/schemas';
 import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import React, {
   MutableRefObject,
@@ -8,7 +9,10 @@ import React, {
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import useSearchThreadsQuery from 'state/api/threads/searchThreads';
 import { ThreadResult } from 'views/pages/search/helpers';
+import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../../../helpers/constants';
+import Tag from '../../../models/Tag';
+import { QuestFilterOption } from '../../../state/ui/communitiesPage';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
@@ -45,16 +49,29 @@ export const QUEST_STAGE = {
 
 export type QuestStageType = (typeof QUEST_STAGE)[keyof typeof QUEST_STAGE];
 
+// Define the type for a single community item
+type CommunityItem = z.infer<typeof Community>;
+
+// Define the type for a pair of community items (or one item and undefined)
+type CommunityPair = [CommunityItem, CommunityItem | undefined];
+
 // Define types for tab configuration
 export interface TabConfig {
   key: string;
   label: string;
   featureFlag?: string; // Optional feature flag to enable/disable the tab
-  getInlineFilters?: (props: TabContentProps) => InlineFilter[];
+  getInlineFilters?: (props: TabContentProps) => InlineFilter<unknown>[];
   getFilterClickHandler?: (props: TabContentProps) => (() => void) | undefined;
   getFilterTags?: (props: TabContentProps) => FilterTag[];
   showViewToggle?: boolean;
   getContent: (props: TabContentProps) => ReactNode;
+}
+
+// Define a generic type for Select options
+interface SelectOption {
+  value: string;
+  label: string;
+  fullLabel?: string;
 }
 
 // Common props passed to all tab-related functions
@@ -67,21 +84,22 @@ export interface TabContentProps {
   setFilters: (filters: CommunityFilters) => void;
   isFilterDrawerOpen: boolean;
   setIsFilterDrawerOpen: (isOpen: boolean) => void;
-  communitiesList: any[];
-  filteredCommunitiesList: any[];
+  communitiesList: CommunityPair[];
+  filteredCommunitiesList: CommunityPair[];
   isLoading: boolean;
   isInitialCommunitiesLoading: boolean;
   hasNextPage?: boolean;
   fetchMoreCommunities?: () => Promise<void>;
-  historicalPrices?: any;
+  historicalPrices?:
+    | { community_id: string; old_price?: string | null }[]
+    | undefined;
   ethUsdRate?: number;
   selectedCommunityId?: string;
   setSelectedCommunityId?: (id: string) => void;
-  communities?: any;
-  tags?: any[];
-  // Tab-specific states
-  selectedQuestFilter?: any;
-  setSelectedQuestFilter?: (filter: any) => void;
+  communities?: z.infer<typeof GetCommunities.output>;
+  tags?: Tag[];
+  selectedQuestFilter?: QuestFilterOption | null;
+  setSelectedQuestFilter?: (filter: QuestFilterOption | null) => void;
   selectedQuestStage?: QuestStageType;
   setSelectedQuestStage?: (stage: QuestStageType) => void;
   questFilterTags?: FilterTag[];
@@ -106,8 +124,8 @@ export interface TabContentProps {
   setTokensSortOption?: (option: string) => void;
   tokensFilterTags?: FilterTag[];
   setTokensFilterTags?: (tags: FilterTag[]) => void;
-  contestCommunityOptions?: any[];
-  questOptions?: any[];
+  contestCommunityOptions?: SelectOption[];
+  questOptions?: SelectOption[];
 }
 
 // Helper function to safely cast container reference

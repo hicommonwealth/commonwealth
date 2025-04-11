@@ -15,9 +15,9 @@ interface SearchableThreadsFeedProps {
   // searchTerm: string; // Removed unused prop
   threads: ThreadResult[];
   isLoading: boolean;
-  error: any;
+  error: Error | null;
   hasNextPage?: boolean;
-  fetchNextPage: () => Promise<any>;
+  fetchNextPage: () => Promise<unknown>;
   isFetchingNextPage: boolean;
 }
 
@@ -49,9 +49,12 @@ const SearchableThreadsFeed = ({
 }: SearchableThreadsFeedProps) => {
   // const navigate = useNavigate(); // Removed unused variable
 
-  const handleEndReached = async () => {
+  const handleEndReached = () => {
     if (!isFetchingNextPage && hasNextPage) {
-      await fetchNextPage();
+      fetchNextPage().catch((err) => {
+        // Handle or log the error appropriately
+        console.error('Error fetching next page:', err);
+      });
     }
   };
 

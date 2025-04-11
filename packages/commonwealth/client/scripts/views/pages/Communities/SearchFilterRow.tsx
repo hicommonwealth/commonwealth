@@ -19,11 +19,11 @@ export interface FilterTag {
   id?: number;
 }
 
-export interface InlineFilter {
+export interface InlineFilter<T = unknown> {
   type: 'select' | 'toggle' | 'sort';
   placeholder?: string;
-  value: any;
-  onChange: (value: any) => void;
+  value: T;
+  onChange: (value: T) => void;
   options: Array<{ value: string; label: string; fullLabel?: string }>;
   isClearable?: boolean;
   isSearchable?: boolean;
