@@ -1,4 +1,3 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { findDenominationString } from 'helpers/findDenomination';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -9,7 +8,6 @@ import { useFetchQuestsQuery } from 'state/api/quest';
 import useCommunitiesPageStore from 'state/ui/communitiesPage';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { z } from 'zod';
 import { trpc } from '../../../utils/trpcClient';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -24,30 +22,6 @@ import SearchFilterRow from './SearchFilterRow';
 import { getCommunityCountsString } from './helpers';
 import { useCommunityData } from './hooks/useCommunityData';
 import { createTabsConfig } from './tabConfig';
-
-type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
-type ExtendedCommunitySliceType = [
-  ExtendedCommunityType,
-  ExtendedCommunityType,
-];
-
-// Contest stage constants
-const CONTEST_STAGE = {
-  ALL: 'all',
-  ACTIVE: 'active',
-  PAST: 'past',
-} as const;
-
-type ContestStageType = (typeof CONTEST_STAGE)[keyof typeof CONTEST_STAGE];
-
-// Quest stage constants
-const QUEST_STAGE = {
-  ALL: 'all',
-  ACTIVE: 'active',
-  PAST: 'past',
-} as const;
-
-type QuestStageType = (typeof QUEST_STAGE)[keyof typeof QUEST_STAGE];
 
 const CommunitiesPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);

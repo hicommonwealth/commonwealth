@@ -1,0 +1,101 @@
+@import '../../../../styles/shared';
+
+.SearchableThreadsFeed {
+  height: 100%;
+  overflow: hidden;
+
+  // Thread results container
+  .thread-result {
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: $neutral-50;
+    border: 1px solid $neutral-200;
+    border-radius: 8px;
+    cursor: pointer;
+    transition:
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+      border-color: $neutral-300;
+    }
+
+    // Thread header with metadata
+    .thread-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+
+      .community-label {
+        display: inline-block;
+        background-color: $neutral-100;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: $neutral-700;
+        font-weight: 500;
+      }
+
+      .thread-date {
+        color: $neutral-500;
+        font-size: 13px;
+      }
+    }
+
+    // Thread title
+    .thread-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: $neutral-900;
+      line-height: 1.3;
+    }
+
+    // Thread body
+    .thread-body {
+      color: $neutral-700;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  // Loading indicators
+  .loading-threads,
+  .error-threads,
+  .empty-search-results,
+  .loading-more {
+    padding: 32px 16px;
+    text-align: center;
+    color: $neutral-600;
+
+    &.loading-more {
+      padding: 16px;
+      font-size: 14px;
+    }
+  }
+
+  // Error states
+  .error-threads {
+    color: $rorange-500;
+  }
+
+  // Empty state
+  .empty-search-results {
+    font-size: 16px;
+    color: $neutral-600;
+
+    &::before {
+      content: '🔍';
+      display: block;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+  }
+}

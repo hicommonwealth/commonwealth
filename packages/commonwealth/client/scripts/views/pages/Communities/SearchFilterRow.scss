@@ -273,10 +273,17 @@
             .select__control {
               min-width: 80px;
               padding: 0 8px;
+              width: 100%;
 
               .select__value-container {
                 padding: 2px 6px;
               }
+            }
+
+            // Fix dropdown menu width for small screens
+            .select__menu {
+              min-width: 120px;
+              width: max-content;
             }
           }
         }
@@ -323,6 +330,7 @@
             .select__control {
               min-width: 75px;
               padding: 0 4px;
+              width: 100%;
 
               .select__value-container {
                 padding: 2px 4px;
@@ -335,6 +343,12 @@
                   padding: 4px;
                 }
               }
+            }
+
+            // Fix dropdown menu width for extra small screens
+            .select__menu {
+              min-width: 120px;
+              width: max-content;
             }
           }
 
@@ -367,6 +381,69 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+    }
+  }
+}
+
+// Thread search results styles
+.search-results-container {
+  padding: 16px 0;
+
+  .thread-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .thread-result {
+      border: 1px solid $neutral-200;
+      border-radius: 8px;
+      padding: 16px;
+      background-color: white;
+      transition: box-shadow 0.15s ease-in-out;
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+        color: $neutral-900;
+      }
+
+      p {
+        margin: 0;
+        color: $neutral-600;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .loading-threads,
+  .error-threads,
+  .no-results {
+    padding: 32px;
+    text-align: center;
+    color: $neutral-600;
+    font-size: 16px;
+  }
+
+  .load-more-button {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background-color: $primary-500;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: center;
+
+    &:hover {
+      background-color: darken($primary-500, 5%);
     }
   }
 }

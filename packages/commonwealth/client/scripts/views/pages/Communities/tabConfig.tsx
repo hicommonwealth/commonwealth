@@ -1,4 +1,4 @@
-import React, { MutableRefObject, ReactNode, RefObject } from 'react';
+import React, { MutableRefObject, ReactNode, RefObject, useMemo } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
@@ -12,7 +12,9 @@ import {
   createToggleFilter,
 } from './filters';
 import { CommunityFilters, FiltersDrawer } from './FiltersDrawer';
+import { safeScrollParent } from './helpers';
 import QuestList from './QuestList';
+import { SearchableThreadsFeed } from './SearchableThreadsFeed';
 import { FilterTag, InlineFilter, ViewType } from './SearchFilterRow';
 import TokensList from './TokensList';
 
@@ -99,37 +101,55 @@ export interface TabContentProps {
   questOptions?: any[];
 }
 
-// Helper component for threads tab
-const FilteredThreadsFeed = ({
-  communityId,
-  sortOption,
-  customScrollParent,
-  filterKey,
-}: {
-  communityId?: string;
-  sortOption?: string;
-  customScrollParent?: any;
-  filterKey?: number;
-}) => {
-  // Use the global feed query
-  const query = ({ limit }: { limit: number }) => {
-    return useFetchGlobalActivityQuery({ limit });
-  };
-
-  return (
-    <Feed
-      key={`threads-feed-${filterKey}`}
-      query={query}
-      customScrollParent={customScrollParent}
-    />
-  );
-};
-
 // Helper function to safely cast container reference
 const safeContainerRef = (
   ref: RefObject<HTMLDivElement>,
 ): MutableRefObject<HTMLElement | undefined> => {
   return ref as unknown as MutableRefObject<HTMLElement | undefined>;
+};
+
+// FilteredThreadsFeed component that conditionally renders feed or search results
+const FilteredThreadsFeed = ({
+  communityId,
+  sortOption,
+  customScrollParent,
+  filterKey,
+  searchTerm,
+}: {
+  communityId?: string;
+  sortOption?: string;
+  customScrollParent?: HTMLElement | null;
+  filterKey?: number;
+  searchTerm?: string;
+}) => {
+  // Define a stable query function that doesn't call hooks directly
+  // This avoids the React hooks consistency error
+  const getQuery = useCallback(({ limit }: { limit: number }) => {
+    // When this function is actually called by Feed component,
+    // it will safely call the hook
+    return useFetchGlobalActivityQuery({ limit });
+  }, []);
+
+  // Determine if we need to use search or standard feed
+  if (searchTerm && searchTerm.length > 0) {
+    return (
+      <SearchableThreadsFeed
+        communityId={communityId}
+        sortOption={sortOption}
+        customScrollParent={customScrollParent}
+        searchTerm={searchTerm}
+      />
+    );
+  }
+
+  // If no search term, use the standard Feed component
+  return (
+    <Feed
+      key={`threads-feed-${filterKey}`}
+      query={getQuery}
+      customScrollParent={safeScrollParent(customScrollParent)}
+    />
+  );
 };
 
 // Export the function to create tabs configuration
@@ -464,7 +484,11 @@ export function createTabsConfig() {
         ];
       },
       getFilterTags: (props) => {
-        const tags = [...(props.threadsFilterTags || [])];
+        // Ensure props.threadsFilterTags is an array before spreading
+        const baseTags = Array.isArray(props.threadsFilterTags)
+          ? props.threadsFilterTags
+          : [];
+        const tags = [...baseTags];
         if (props.searchValue) {
           tags.push({
             label: `Search: ${props.searchValue}`,
@@ -473,16 +497,31 @@ export function createTabsConfig() {
         }
         return tags;
       },
-      getContent: (props) => (
-        <div className="threads-tab">
-          <FilteredThreadsFeed
-            communityId={props.threadsFilterCommunityId}
-            sortOption={props.threadsSortOption}
-            customScrollParent={props.containerRef.current}
-            filterKey={props.threadFilterKey}
-          />
-        </div>
-      ),
+      getContent: (props) => {
+        // Generate a stable key for the filtered thread feed
+        // Use useMemo to avoid recalculating on every render
+        const refreshKey = useMemo(() => {
+          return `${props.threadFilterKey || 0}-${props.searchValue || ''}-${props.threadsFilterCommunityId || ''}-${props.threadsSortOption || 'newest'}`;
+        }, [
+          props.threadFilterKey,
+          props.searchValue,
+          props.threadsFilterCommunityId,
+          props.threadsSortOption,
+        ]);
+
+        return (
+          <div className="threads-tab">
+            <FilteredThreadsFeed
+              key={refreshKey}
+              communityId={props.threadsFilterCommunityId}
+              sortOption={props.threadsSortOption}
+              customScrollParent={props.containerRef.current}
+              filterKey={Number(refreshKey)}
+              searchTerm={props.searchValue}
+            />
+          </div>
+        );
+      },
     },
     {
       key: 'quests',

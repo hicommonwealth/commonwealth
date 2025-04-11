@@ -91,7 +91,7 @@ export const AdminActions = ({
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic!.id!,
+    currentTopicId: thread.topic?.id ?? 0,
   });
 
   const handleDeleteThread = () => {
