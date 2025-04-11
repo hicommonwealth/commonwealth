@@ -1,4 +1,6 @@
 import {
+  EVM_ADDRESS_STRICT_REGEX,
+  EVM_EVENT_SIGNATURE_STRICT_REGEX,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -36,13 +38,15 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_topic_id;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerURL = config?.requires_discord_server_url;
+  const requiresChainEvent = config?.requires_chain_event;
   const requiresCreatorPoints = config?.requires_creator_points;
 
   const needsExtension =
     requiresCreatorPoints ||
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
-    requiresDiscordServerURL;
+    requiresDiscordServerURL ||
+    requiresChainEvent;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -150,6 +154,29 @@ export const buildQuestSubFormValidationSchema = (
           message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
         },
       ),
+    }) as unknown as typeof baseSchema;
+  }
+  if (requiresChainEvent) {
+    baseSchema = baseSchema.extend({
+      ethChainId: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+      contractAddress: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000`,
+          ),
+        }),
+      eventSignature: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000000000000000000000000000`,
+          ),
+        }),
     }) as unknown as typeof baseSchema;
   }
 

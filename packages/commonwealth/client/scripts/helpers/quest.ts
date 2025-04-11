@@ -63,6 +63,10 @@ export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
   return action === 'CommonDiscordServerJoined';
 };
 
+export const doesActionRequireChainEvent = (action: QuestActionType) => {
+  return action === 'XpChainEventCreated';
+};
+
 export const doesActionAllowRepetition = (action: QuestActionType) => {
   return action !== 'TweetEngagement';
 };

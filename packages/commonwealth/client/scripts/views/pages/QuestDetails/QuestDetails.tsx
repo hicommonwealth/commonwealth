@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
@@ -238,6 +239,26 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'XpChainEventCreated': {
+        // build block explorer url with contract address and redirect to it
+        try {
+          const foundAction = quest?.action_metas?.find(
+            (x) => x.event_name === `XpChainEventCreated`,
+          );
+          if (!foundAction) throw new Error(`Invalid url`);
+
+          const foundBlockExplorer = fetchCachedNodes()?.find(
+            (x) => x.id === foundAction?.ChainEventXpSource?.chain_node_id,
+          )?.block_explorer;
+          if (!foundBlockExplorer) throw new Error(`Invalid url`);
+
+          const url = `${foundBlockExplorer}/address/${foundAction?.ChainEventXpSource?.contract_address}`;
+          window.open(url, '_blank');
+        } catch {
+          notifyError(`Failed to redirect to block explorer`);
+        }
+        break;
+      }
       default:
         return;
     }
@@ -312,6 +333,20 @@ const QuestDetails = ({ id }: { id: number }) => {
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
 
   const isCompleted = gainedXP === totalUserXP && isStarted;
+
+  // TODO: 11069 remove after platform get quest fixes are in
+  if (quest?.action_metas?.[0]) {
+    quest.action_metas[0].ChainEventXpSource = {
+      chain_node_id: 1358,
+      contract_address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      event_signature:
+        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+      quest_action_meta_id: 53,
+      active: true,
+      created_at: `2025-04-11T16:37:12.769Z`,
+      updated_at: `2025-04-11T16:37:12.769Z`,
+    };
+  }
 
   return (
     <CWPageLayout>

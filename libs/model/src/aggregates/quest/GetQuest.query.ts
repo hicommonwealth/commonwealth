@@ -20,6 +20,10 @@ export function GetQuest(): Query<typeof schemas.GetQuest> {
                 model: models.QuestTweets,
                 required: false,
               },
+              {
+                model: models.ChainEventXpSource,
+                required: false,
+              },
             ],
           },
         ],

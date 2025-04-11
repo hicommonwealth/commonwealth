@@ -5,6 +5,7 @@ import {
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerURL,
   doesActionRequireRewardShare,
   doesActionRequireTwitterTweetURL,
@@ -162,6 +163,7 @@ const useQuestActionMultiFormsState = ({
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_url: requiresDiscordServerURL,
+        requires_chain_event: doesActionRequireChainEvent(chosenAction),
       };
 
       // set fixed action repitition per certain actions
