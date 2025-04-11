@@ -1,4 +1,10 @@
-import React, { MutableRefObject, ReactNode, RefObject, useMemo } from 'react';
+import React, {
+  MutableRefObject,
+  ReactNode,
+  RefObject,
+  useCallback,
+  useMemo,
+} from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import { Feed } from '../../components/feed';
 import XPTable from '../Leaderboard/XPTable/XPTable';
