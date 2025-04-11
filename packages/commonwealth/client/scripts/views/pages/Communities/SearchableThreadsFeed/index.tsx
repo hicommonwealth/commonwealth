@@ -1,1 +1,1 @@
-export { SearchableThreadsFeed } from './SearchableThreadsFeed';
+export { default as SearchableThreadsFeed } from './SearchableThreadsFeed';
