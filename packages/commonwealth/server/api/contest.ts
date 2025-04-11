@@ -3,6 +3,10 @@ import { Contest } from '@hicommonwealth/model';
 
 export const trpcRouter = trpc.router({
   getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Community),
+  getLastJudgedContest: trpc.query(
+    Contest.GetLastJudgedContest,
+    trpc.Tag.Community,
+  ),
   createContestMetadata: trpc.command(
     Contest.CreateContestManagerMetadata,
     trpc.Tag.Community,

@@ -26,6 +26,13 @@ export const GetAllContests = {
   output: z.array(ContestResults),
 };
 
+export const GetLastJudgedContest = {
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: ContestManager,
+};
+
 export const GetContest = {
   input: z.object({
     contest_address: z.string(),

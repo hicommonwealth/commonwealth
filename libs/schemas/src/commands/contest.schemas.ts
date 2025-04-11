@@ -52,6 +52,7 @@ export const UpdateContestManagerMetadata = {
     description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
+    namespace_judge_token_id: PG_INT.optional(),
   }),
   output: z.object({
     contest_managers: z.array(
