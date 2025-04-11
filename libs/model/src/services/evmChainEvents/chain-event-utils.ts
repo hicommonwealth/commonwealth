@@ -305,10 +305,18 @@ const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
   return {
     event_name: 'NamespaceTransferSingle',
     event_payload: {
-      ...event,
+      rawLog: {
+        ...event.rawLog,
+        address: getEvmAddress(event.rawLog.address) as `0x${string}`,
+      },
+      eventSource: {
+        ethChainId: event.eventSource.ethChainId,
+      },
       parsedArgs: {
-        ...decoded.args,
-        block_number: Number(event.block.number),
+        from: decoded.args.from,
+        to: decoded.args.to,
+        id: decoded.args.id,
+        value: decoded.args.value,
       },
     },
   };
