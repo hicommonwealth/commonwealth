@@ -12,6 +12,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import './UniswapTrade.scss';
 
 interface UniswapTradeProps {
@@ -19,10 +20,27 @@ interface UniswapTradeProps {
 }
 
 const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
-  const { uniswapWidget } = useUniswapTradeModal({ tradeConfig });
+  const { data: tokenCommunity } = useGetCommunityByIdQuery({
+    id: tradeConfig.token.community_id,
+    enabled: !!tradeConfig.token.community_id,
+    includeNodeInfo: true,
+  });
+
+  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
+  const rpcUrl = tokenCommunity?.ChainNode?.url;
+  const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
+
+  const { uniswapWidget } = useUniswapTradeModal({
+    tradeConfig,
+    ethChainId,
+    rpcUrl,
+    blockExplorerUrl,
+  });
+
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
     useNetworkSwitching({
-      jsonRpcUrlMap: uniswapWidget.jsonRpcUrlMap,
+      ethChainId: tokenCommunity?.ChainNode?.eth_chain_id,
+      rpcUrl: tokenCommunity?.ChainNode?.url,
       provider: uniswapWidget.provider,
     });
 
@@ -68,7 +86,7 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
             className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
             tokenList={uniswapWidget.tokensList}
             routerUrl={uniswapWidget.routerURLs.default}
-            jsonRpcUrlMap={uniswapWidget.jsonRpcUrlMap}
+            jsonRpcUrlMap={{ [ethChainId!]: [rpcUrl!] }}
             theme={uniswapWidget.theme}
             defaultInputTokenAddress={uniswapWidget.defaultTokenAddress.input}
             defaultOutputTokenAddress={uniswapWidget.defaultTokenAddress.output}

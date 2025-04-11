@@ -4,6 +4,7 @@ import '@uniswap/widgets/fonts.css';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import React, { useEffect, useState } from 'react';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -26,13 +27,24 @@ const UniswapTradeModal = ({
   onModalClose,
   tradeConfig,
 }: UniswapTradeTokenModalProps) => {
-  const { uniswapWidget, isMagicUser, isMagicConfigured } =
-    useUniswapTradeModal({ tradeConfig });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const { data: tokenCommunity } = useGetCommunityByIdQuery({
+    id: tradeConfig.token.community_id,
+    enabled: !!tradeConfig.token.community_id,
+    includeNodeInfo: true,
+  });
+  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
+  const rpcUrl = tokenCommunity?.ChainNode?.url;
+  const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
+
+  const { uniswapWidget, isMagicUser, isMagicConfigured } =
+    useUniswapTradeModal({ tradeConfig, ethChainId, rpcUrl, blockExplorerUrl });
 
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
     useNetworkSwitching({
-      jsonRpcUrlMap: uniswapWidget.jsonRpcUrlMap,
+      ethChainId,
+      rpcUrl,
       provider: uniswapWidget.provider,
     });
 
@@ -82,7 +94,6 @@ const UniswapTradeModal = ({
       !uniswapWidget.provider
     ) {
       uniswapWidget.connectWallet().catch(() => {
-        console.log('here');
         notifyError(
           'There was an error connecting your wallet. Please try again.',
         );
@@ -170,7 +181,7 @@ const UniswapTradeModal = ({
                     className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
                     tokenList={uniswapWidget.tokensList}
                     routerUrl={uniswapWidget.routerURLs.default}
-                    jsonRpcUrlMap={uniswapWidget.jsonRpcUrlMap}
+                    jsonRpcUrlMap={{ [ethChainId!]: [rpcUrl!] }}
                     theme={uniswapWidget.theme}
                     defaultInputTokenAddress={
                       uniswapWidget.defaultTokenAddress.input

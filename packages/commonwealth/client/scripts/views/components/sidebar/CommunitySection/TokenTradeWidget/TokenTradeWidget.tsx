@@ -179,7 +179,8 @@ export const TokenTradeWidget = ({
               [`cols-${isPinnedToken ? 1 : 2}`]: true,
             })}
           >
-            {!isPinnedToken ? (
+            {!isPinnedToken &&
+            !(communityToken as LaunchpadToken).liquidity_transferred ? (
               [TradingMode.Buy, TradingMode.Sell].map((mode) => (
                 <CWButton
                   key={mode}

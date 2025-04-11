@@ -30,6 +30,9 @@ export type UniswapTradeTokenModalProps = {
 };
 
 export type UseUniswapTradeModalProps = {
+  ethChainId?: number | null;
+  rpcUrl?: string | null;
+  blockExplorerUrl?: string | null;
   tradeConfig: UniswapTradingConfig;
 };
 
@@ -39,7 +42,6 @@ export type UniswapWidgetConfig = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme: any;
   tokensList?: UniswapToken[];
-  jsonRpcUrlMap: { [chainId: number]: string[] };
   defaultTokenAddress: {
     input: string;
     output: string;

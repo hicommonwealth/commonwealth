@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   ChainBase,
   UNISWAP_CONVENIENCE_FEE_PERCENT,
@@ -12,9 +11,7 @@ import {
 } from 'client/scripts/utils/magicNetworkUtils';
 import WebWalletController from 'controllers/app/web_wallets';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import NodeInfo from 'models/NodeInfo';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchCachedNodes } from 'state/api/nodes';
 import {
   UniswapToken,
   UniswapWidgetConfig,
@@ -105,57 +102,29 @@ const uniswapWidgetTheme: Theme = {
   secondary: '#666666', // secondary text color
 };
 
-const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
+const useUniswapTradeModal = ({
+  tradeConfig,
+  ethChainId,
+  rpcUrl,
+  blockExplorerUrl,
+}: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
   const [ethersProvider, setEthersProvider] = useState<
     Web3Provider | undefined
   >(undefined);
   const [uniswapTokensList, setUniswapTokensList] = useState<UniswapToken[]>();
-  const [jsonRpcUrlMap, setJsonRpcUrlMap] = useState<{
-    [chainId: number]: string[];
-  }>({});
   const [isMagicConfigured, setIsMagicConfigured] = useState(false);
-
-  // Use cached nodes - only fetch once
-  const nodes = fetchCachedNodes();
 
   // Check if user is logged in with Magic
   const userIsMagicUser = useMemo(() => checkIfMagicUser(), []);
 
-  // Process nodes to create RPC URL map
-  useEffect(() => {
-    if (nodes) {
-      const rpcMap = nodes.reduce(
-        (acc, node) => {
-          if (node.ethChainId && node.url) {
-            const urls = node.url.split(',').map((url) => url.trim());
-            acc[node.ethChainId] = urls;
-          }
-          return acc;
-        },
-        {} as { [chainId: number]: string[] },
-      );
-
-      setJsonRpcUrlMap(rpcMap);
-    }
-  }, [nodes]);
-
-  // Find base chain node
-  const baseNode = useMemo(
-    () =>
-      nodes?.find((n) => n.ethChainId === commonProtocol.ValidChains.Base) as
-        | NodeInfo
-        | undefined,
-    [nodes],
-  );
-
   // Automatically configure Magic provider for Magic users
   useEffect(() => {
-    if (userIsMagicUser && !isMagicConfigured && baseNode?.ethChainId) {
+    if (userIsMagicUser && !isMagicConfigured && ethChainId) {
       const configureMagicProvider = () => {
         try {
-          if (!baseNode?.ethChainId) return;
-          const magic = getMagicForChain(baseNode.ethChainId);
+          if (!ethChainId) return;
+          const magic = getMagicForChain(ethChainId);
           if (!magic) return;
 
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
@@ -168,7 +137,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
       void configureMagicProvider();
     }
-  }, [userIsMagicUser, baseNode, isMagicConfigured]);
+  }, [userIsMagicUser, isMagicConfigured, ethChainId]);
 
   // Initialize token list
   useRunOnceOnCondition({
@@ -176,14 +145,13 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       const handleTokensInit = () => {
         setIsLoadingInitialState(true);
 
-        if (!baseNode?.ethChainId) {
+        if (!ethChainId) {
           return;
         }
 
         // Set tokens list with custom token
         const customLists =
-          uniswapTokenListConfig.custom.chains?.[baseNode.ethChainId]?.list ||
-          [];
+          uniswapTokenListConfig.custom.chains?.[ethChainId]?.list || [];
         const tokensList = [
           ...customLists,
           {
@@ -191,7 +159,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
             address: tradeConfig.token.contract_address,
             symbol: tradeConfig.token.symbol,
             decimals: tradeConfig.token.decimals,
-            chainId: baseNode.ethChainId,
+            chainId: ethChainId,
             logoURI: tradeConfig.token.logo || '',
           },
         ];
@@ -202,7 +170,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
       handleTokensInit();
     },
-    shouldRun: !!baseNode?.ethChainId,
+    shouldRun: !!ethChainId,
   });
 
   // Connect wallet handler - manages Magic and regular wallet connections
@@ -215,14 +183,14 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       return true;
     }
 
-    if (!baseNode?.ethChainId) {
-      console.log('[Network Debug] No baseNode.ethChainId available');
+    if (!ethChainId) {
+      console.log('[Network Debug] No ethChainId available');
       return false;
     }
 
-    const baseChainIdHex = `0x${baseNode.ethChainId.toString(16)}`;
+    const baseChainIdHex = `0x${ethChainId.toString(16)}`;
     console.log(
-      `[Network Debug] Target Base chain ID: ${baseNode.ethChainId} (hex: ${baseChainIdHex})`,
+      `[Network Debug] Target Base chain ID: ${ethChainId} (hex: ${baseChainIdHex})`,
     );
 
     try {
@@ -230,7 +198,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       if (userIsMagicUser) {
         console.log('[Network Debug] Using Magic authentication flow');
         // Use the utility function to get Magic instance for the Base chain
-        const magic = getMagicForChain(baseNode.ethChainId);
+        const magic = getMagicForChain(ethChainId);
 
         if (!magic) {
           return false;
@@ -388,10 +356,8 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
                             symbol: 'ETH',
                             decimals: 18,
                           },
-                          rpcUrls: jsonRpcUrlMap[baseNode.ethChainId] || [
-                            'https://mainnet.base.org',
-                          ],
-                          blockExplorerUrls: ['https://basescan.org'],
+                          rpcUrls: [rpcUrl],
+                          blockExplorerUrls: [blockExplorerUrl],
                         },
                       ],
                     });
@@ -421,9 +387,9 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
           try {
             console.log(
-              `[Network Debug] Calling enable for chain ID: ${baseNode.ethChainId}`,
+              `[Network Debug] Calling enable for chain ID: ${ethChainId}`,
             );
-            await selectedWallet.enable(`${baseNode.ethChainId}`);
+            await selectedWallet.enable(`${ethChainId}`);
 
             // Create an ethers provider from the wallet's provider
             const ethersCompatibleProvider = new Web3Provider(
@@ -451,21 +417,14 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       );
       return false;
     }
-  }, [
-    baseNode,
-    userIsMagicUser,
-    isMagicConfigured,
-    ethersProvider,
-    jsonRpcUrlMap,
-  ]);
+  }, [userIsMagicUser, isMagicConfigured, ethersProvider, ethChainId]);
 
   // Create and return the widget config
   const widgetConfig: UniswapWidgetConfig = {
-    isReady: !isLoadingInitialState && Object.keys(jsonRpcUrlMap).length > 0,
+    isReady: !isLoadingInitialState && !!rpcUrl,
     provider: ethersProvider, // Now has the correct type
     theme: uniswapWidgetTheme,
     tokensList: uniswapTokensList,
-    jsonRpcUrlMap,
     defaultTokenAddress: {
       input: 'NATIVE',
       output: tradeConfig.token.contract_address,
@@ -473,7 +432,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
     convenienceFee: {
       percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,
       recipient: {
-        [baseNode?.ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+        [ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
       },
     },
     routerURLs: uniswapRouterURLs,
