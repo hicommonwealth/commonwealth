@@ -387,6 +387,23 @@ export const events = {
     }),
   }),
 
+  NamespaceTransferSingle: z
+    .object({
+      rawLog: z.object({
+        address: EVM_ADDRESS_STRICT,
+      }),
+      eventSource: z.object({
+        ethChainId: z.number(),
+      }),
+      parsedArgs: z.object({
+        from: EVM_ADDRESS_STRICT,
+        to: EVM_ADDRESS_STRICT,
+        id: z.coerce.bigint(),
+        value: z.coerce.bigint(),
+      }),
+    })
+    .describe('When a namespace token is transferred'),
+
   LaunchpadTokenCreated: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),

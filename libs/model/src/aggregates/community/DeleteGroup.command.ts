@@ -13,7 +13,7 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
   return {
     ...schemas.DeleteGroup,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload }) => {
+    body: async ({ payload }) => {
       const { community_id, group_id } = payload;
 
       const group = await models.Group.findOne({
@@ -21,7 +21,8 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
       });
       mustExist('Group', group);
 
-      if (group.is_system_managed && !actor.user.isAdmin)
+      // no one can delete system-managed groups
+      if (group.is_system_managed)
         throw new InvalidInput(DeleteGroupErrors.SystemManaged);
 
       await models.sequelize.transaction(async (transaction) => {
