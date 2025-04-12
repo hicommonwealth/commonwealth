@@ -87,7 +87,7 @@ export const ThreadUpdateProposalStatusModal = ({
       onAction: true,
     });
 
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = () => {
     buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId() || '',
@@ -255,9 +255,9 @@ export const ThreadUpdateProposalStatusModal = ({
       });
   };
 
-  const handleRemoveProposal = async () => {
+  const handleRemoveProposal = () => {
     try {
-      await deleteThreadLinks({
+      deleteThreadLinks({
         communityId: app.activeChainId() || '',
         threadId: thread.id,
         links: [
@@ -266,9 +266,15 @@ export const ThreadUpdateProposalStatusModal = ({
             identifier: initialSnapshotLinks[0]?.identifier ?? '',
           },
         ],
-      });
-      setTempSnapshotProposals([]); // Clear local state after removal
-      onModalClose();
+      })
+        .then(() => {
+          setTempSnapshotProposals([]);
+          onModalClose();
+        })
+        .catch((error) => {
+          console.error(error);
+          notifyError('Failed to remove linked proposal');
+        });
     } catch (error) {
       console.error(error);
       notifyError('Failed to remove linked proposal');

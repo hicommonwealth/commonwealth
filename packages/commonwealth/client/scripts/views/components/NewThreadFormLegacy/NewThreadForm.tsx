@@ -365,7 +365,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
               title: linkedProposals.title,
             },
           ],
-        });
+        }).catch(console.error);
       }
 
       setThreadContentDelta(createDeltaFromText(''));
