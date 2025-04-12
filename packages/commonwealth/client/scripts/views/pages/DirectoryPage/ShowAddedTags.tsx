@@ -20,10 +20,10 @@ const ShowAddedTags = ({ selectedTags, isLoading }: ShowAddedTagsProps) => {
 
   return (
     <div className="ShowAddedTags">
-      <CWText>Added Tags</CWText>
+      <CWText>Added Tags by Admin</CWText>
       <div className="added-tags-container">
         {selectedTags.map((tag) => (
-          <CWTag key={tag} label={tag} type="filter" />
+          <CWTag classNames="tag-button" key={tag} label={tag} type="filter" />
         ))}
       </div>
     </div>

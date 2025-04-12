@@ -33,9 +33,9 @@ import {
 import useAppStatus from '../../../hooks/useAppStatus';
 import Permissions from '../../../utils/Permissions';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import AppliedFiltersAndTagsRow from './AppliedFiltersAndTagsRow';
 import './DirectoryPage.scss';
 import DirectorySettingsDrawer from './DirectorySettingsDrawer';
-import ShowAddedCommunities from './ShowAddedCommunities';
 import ShowAddedTags from './ShowAddedTags';
 
 const DirectoryPage = () => {
@@ -48,15 +48,39 @@ const DirectoryPage = () => {
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
   const [filteredCommunities, setFilteredCommunities] = useState<any[]>([]);
   const [filteredTableData, setFilteredTableData] = useState<any[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const { data: nodes } = useFetchNodesQuery();
-  const { data: tagsForFIlter } = useFetchTagsQuery();
+  const { data: tagsForFilter } = useFetchTagsQuery();
 
-  const tagsList = tagsForFIlter?.map((tag) => ({
-    label: tag.name,
-    value: tag.id,
-  }));
+  const [filteredTagsList, setFilteredTagsList] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  useEffect(() => {
+    const getFilteredTags = () => {
+      const filteredTags = tagsForFilter
+        ?.filter((tag) => selectedTags.includes(tag.name))
+        .map((tag) => ({
+          label: tag.name,
+          value: String(tag.id),
+        }));
+
+      if (selectedCommunities.length > 0) {
+        return [
+          ...(filteredTags || []),
+          { label: 'Admin picked', value: 'admin-picked' },
+        ];
+      }
+
+      return filteredTags;
+    };
+    const filteredTags = getFilteredTags() || [];
+    setFilteredTagsList(filteredTags);
+  }, [tagsForFilter, selectedTags, selectedCommunities]);
 
   const communityId = app.activeChainId() || '';
 
@@ -180,29 +204,6 @@ const DirectoryPage = () => {
     getFilteredCommunities,
   ]);
 
-  useEffect(() => {
-    if (!filteredRelatedCommunitiesData || !tableData) return;
-
-    const newFilteredCommunities = getFilteredCommunities(
-      filteredRelatedCommunitiesData,
-      selectedTags,
-      selectedCommunities,
-    );
-
-    setFilteredCommunities(newFilteredCommunities);
-
-    const newTableData = tableData.filter((row) =>
-      newFilteredCommunities.some((filteredItem) => filteredItem.id === row.id),
-    );
-    setFilteredTableData(newTableData);
-  }, [
-    selectedTags,
-    selectedCommunities,
-    filteredRelatedCommunitiesData,
-    tableData,
-    getFilteredCommunities,
-  ]);
-
   const handleCreateCommunity = () => {
     navigate('/createCommunity', {}, null);
   };
@@ -213,6 +214,25 @@ const DirectoryPage = () => {
       isPWA: isAddedToHomeScreen,
     },
   });
+
+  const handleFilterClick = (value: { label: string; value: string }) => {
+    if (!appliedFilters.some((filter) => filter.value === value.value)) {
+      setAppliedFilters([...appliedFilters, value]);
+    }
+  };
+
+  const handleRemoveFilter = (filterToRemove: {
+    label: string;
+    value: string;
+  }) => {
+    setAppliedFilters(
+      appliedFilters.filter((filter) => filter.value !== filterToRemove.value),
+    );
+  };
+
+  const handleClearAllFilters = () => {
+    setAppliedFilters([]);
+  };
 
   const handleSaveChanges = async () => {
     try {
@@ -261,9 +281,6 @@ const DirectoryPage = () => {
   if (isLoadingTagsAndCommunities) {
     return <CWCircleMultiplySpinner />;
   }
-  const handleFilterClickTest = (value) => {
-    console.log('value :::::', value);
-  };
 
   return (
     <CWPageLayout>
@@ -297,8 +314,9 @@ const DirectoryPage = () => {
             </div>
             <div className="tag-selection-list">
               <CWSelectList
-                options={tagsList}
-                onClick={handleFilterClickTest}
+                options={filteredTagsList}
+                onClick={handleFilterClick}
+                placeholder="Filter"
               />
             </div>
             <div className="toggle-view-icons">
@@ -334,13 +352,16 @@ const DirectoryPage = () => {
               )}
             </div>
           </div>
+          <div className="applied-filters-and-tags-row">
+            <AppliedFiltersAndTagsRow
+              onCloseClick={handleClearAllFilters}
+              appliedFilters={appliedFilters}
+              onRemoveFilter={handleRemoveFilter}
+            />
+          </div>
           <div>
             <ShowAddedTags
               selectedTags={selectedTags}
-              isLoading={isLoadingTagsAndCommunities}
-            />
-            <ShowAddedCommunities
-              selectedCommunities={selectedCommunities}
               isLoading={isLoadingTagsAndCommunities}
             />
           </div>
