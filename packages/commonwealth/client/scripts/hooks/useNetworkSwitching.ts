@@ -54,7 +54,7 @@ export function useNetworkSwitching({
         // Set current chain name
         setCurrentChain(
           chainNames[currentChainIdHex as string] ||
-            `Chain ID ${currentChainIdHex}`,
+            `Chain ID ${parseInt(currentChainIdHex, 16)}`,
         );
 
         // Check if on the wrong network
@@ -83,7 +83,10 @@ export function useNetworkSwitching({
 
       // Update status after switching
       setIsWrongNetwork(false);
-      setCurrentChain('Base');
+      setCurrentChain(
+        chainNames[formattedChainId] ||
+          parseInt(formattedChainId, 16).toString(),
+      );
     } catch (switchError: unknown) {
       // This error code indicates that the chain has not been added to MetaMask
       if (
