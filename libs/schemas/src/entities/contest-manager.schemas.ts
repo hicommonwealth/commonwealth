@@ -84,6 +84,7 @@ export const ContestManager = z
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
     namespace_judge_token_id: PG_INT.nullish(),
+    namespace_judges: z.array(z.string()).nullish(),
     environment: ContestManagerEnvironmentsSchema.optional(),
     deleted_at: z.coerce.date().nullish().describe('Soft deletion timestamp'),
   })

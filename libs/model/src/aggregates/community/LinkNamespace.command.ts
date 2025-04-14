@@ -201,6 +201,8 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             > = [];
 
             // TODO: support base mainnet when contract address is available
+
+            // TODO: make these parent contracts
             if (ethChainId === ValidChains.SepoliaBase) {
               // JudgeNominated event
               eventSourcesToAdd.push({

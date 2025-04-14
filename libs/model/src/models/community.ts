@@ -143,7 +143,7 @@ export default (
         defaultValue: false,
       },
       namespace_nominations: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: true },

@@ -66,6 +66,10 @@ export default (
       farcaster_author_cast_hash: { type: Sequelize.STRING, allowNull: true },
       environment: { type: Sequelize.STRING, allowNull: false },
       namespace_judge_token_id: { type: Sequelize.INTEGER, allowNull: true },
+      namespace_judges: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
       deleted_at: { type: Sequelize.DATE, allowNull: true },
     },
     {
