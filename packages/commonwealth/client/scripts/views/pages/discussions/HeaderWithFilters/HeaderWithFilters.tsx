@@ -230,7 +230,7 @@ export const HeaderWithFilters = ({
             {!user.activeAccount && (
               <div className="join-community-header-button">
                 <CWButton
-                  label="Join community"
+                  label="Join Community"
                   buttonType="primary"
                   buttonHeight="sm"
                   onClick={handleJoinCommunity}
