@@ -1,7 +1,6 @@
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
 import {
   CWModalBody,
   CWModalFooter,
@@ -15,6 +14,8 @@ import useEditCommunityTokenMutation from 'state/api/communities/editCommunityTo
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import TokenFinder from 'views/components/TokenFinder/TokenFinder';
+import useTokenFinder from 'views/components/TokenFinder/useTokenFinder';
 import './TokenizationModal.scss';
 
 interface TokenizationModalProps {
@@ -35,10 +36,11 @@ const TokenizationModal = ({
   const [tokenizeAllTopics, setTokenizeAllTopics] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deselectedTopics, setDeselectedTopics] = useState<string[]>([]);
-  const [threadPurchaseToken, setThreadPurchaseToken] = useState('');
   const [showInfoBox, setShowInfoBox] = useState(true);
 
   const communityId = app.activeChainId() || '';
+  const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
+
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
     includeArchivedTopics: false,
@@ -48,6 +50,17 @@ const TokenizationModal = ({
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId,
     enabled: !!communityId,
+  });
+
+  const {
+    tokenMetadata,
+    tokenMetadataLoading,
+    getTokenError,
+    setTokenValue,
+    tokenValue,
+  } = useTokenFinder({
+    nodeEthChainId,
+    initialTokenValue: community?.thread_purchase_token || undefined,
   });
 
   const { mutateAsync: editTopic } = useEditTopicMutation();
@@ -60,12 +73,6 @@ const TokenizationModal = ({
       .filter(Boolean);
     setSelectedTopics(tokenizedTopicIds);
   }, [topics]);
-
-  useEffect(() => {
-    if (community?.thread_purchase_token) {
-      setThreadPurchaseToken(community.thread_purchase_token);
-    }
-  }, [community]);
 
   const topicOptions = topics.map((topic) => ({
     label: topic.name,
@@ -101,6 +108,14 @@ const TokenizationModal = ({
   };
 
   const handleSaveChanges = async () => {
+    if (tokenValue.trim()) {
+      const tokenError = getTokenError(true);
+      if (tokenError) {
+        notifyError(tokenError);
+        return;
+      }
+    }
+
     setIsSaving(true);
     try {
       const updatePromises = selectedTopics.map((topicId) =>
@@ -121,12 +136,10 @@ const TokenizationModal = ({
 
       await Promise.all([...updatePromises, ...deselectPromises]);
 
-      if (threadPurchaseToken.trim()) {
-        await editCommunityToken({
-          community_id: communityId,
-          thread_purchase_token: threadPurchaseToken.trim(),
-        });
-      }
+      await editCommunityToken({
+        community_id: communityId,
+        thread_purchase_token: tokenValue.trim(),
+      });
 
       notifySuccess('Topics updated successfully');
       onSaveChanges();
@@ -216,11 +229,13 @@ const TokenizationModal = ({
             Enter a token to purchase and sell threads in this community.
           </CWText>
 
-          <CWTextInput
-            value={threadPurchaseToken}
-            onInput={(e: React.FormEvent<HTMLInputElement>) =>
-              setThreadPurchaseToken(e.currentTarget.value)
-            }
+          <TokenFinder
+            tokenValue={tokenValue}
+            setTokenValue={setTokenValue}
+            tokenError={getTokenError()}
+            debouncedTokenValue={tokenValue}
+            tokenMetadataLoading={tokenMetadataLoading}
+            tokenMetadata={tokenMetadata}
             placeholder="Enter token address"
           />
         </div>

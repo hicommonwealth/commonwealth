@@ -30,6 +30,8 @@ export const getActionSteps = ({
     ? [
         {
           label: 'Register and mint judge tokens',
+          description:
+            'This transaction registers and mints judge tokens for the contest.',
           state: configureNominationsData.state,
           errorText: configureNominationsData.errorText,
           actionButton: {
@@ -52,6 +54,9 @@ export const getActionSteps = ({
       label: isDirectDepositSelected
         ? 'Launch contest'
         : 'Launch contest & re-route fees',
+      description: isDirectDepositSelected
+        ? 'This transaction launches a contest.'
+        : 'This transaction launches a contest and re-routes fees to the community.',
       state: launchContestData.state,
       errorText: launchContestData.errorText,
       actionButton: {

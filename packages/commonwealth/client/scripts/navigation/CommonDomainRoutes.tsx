@@ -90,6 +90,10 @@ const CommunityStakeIntegration = lazy(
 const CommunityTokenIntegration = lazy(
   () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
+const CommunityOnchainVerificationIntegration = lazy(
+  () =>
+    import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -525,6 +529,14 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/onchain-verification"
+    path="/:scope/manage/integrations/onchain-verification"
+    element={withLayout(CommunityOnchainVerificationIntegration, {
       scoped: true,
     })}
   />,

@@ -83,7 +83,7 @@ export const factoryContracts = {
     tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
-    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
+    communityNomination: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
