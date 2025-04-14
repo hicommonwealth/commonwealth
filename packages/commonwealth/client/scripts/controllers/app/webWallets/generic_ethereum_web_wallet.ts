@@ -31,7 +31,10 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
   public readonly defaultNetwork = ChainNetwork.Ethereum;
   public readonly chain = ChainBase.Ethereum;
 
-  public constructor(private etheriumProvider: () => any) {}
+  public constructor(
+    private etheriumProvider: () => any,
+    private signMessageProvider: (message: string) => Promise<string>,
+  ) {}
 
   public get available() {
     return !!this.etheriumProvider();
@@ -78,16 +81,14 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
   }
 
   public getSessionSigner() {
+    const signMessageProvider = this.signMessageProvider;
+
     return new SIWESigner({
       signer: {
-        signMessage: (message) =>
-          // FIXME need to re-implement this for privy
-          // Dillon thinks we just return a string...
-          // FIXME: assume it returns a string
-          this._web3.givenProvider.request({
-            method: 'personal_sign',
-            params: [this.accounts[0], message],
-          }),
+        signMessage: (message) => {
+          return signMessageProvider(message);
+        },
+
         getAddress: () => this.accounts[0],
       },
       chainId: parseInt(this.getChainId()),
@@ -108,7 +109,7 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
 
       const Web3 = (await import('web3')).default;
 
-      let ethereum = this.etheriumProvider();
+      let ethereum = await this.etheriumProvider();
 
       if (ethereum.providers?.length) {
         ethereum.providers.forEach(async (p) => {
@@ -133,6 +134,11 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
             };
 
       // TODO: does this come after?
+      if (!this._web3) throw new Error('No web3');
+      if (!this._web3.givenProvider) throw new Error('No web3.givenProvider');
+      if (!this._web3.givenProvider.request)
+        throw new Error('No web3.givenProvider.request');
+
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
@@ -199,6 +205,7 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
+      console.error(error);
       let errorMsg = `Failed to enable Metamask: ${error.message}`;
       if (error.code === 4902) {
         errorMsg = `Failed to enable Metamask: Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;

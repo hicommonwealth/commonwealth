@@ -1,3 +1,4 @@
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import {
   useIdentityToken,
   useLoginWithEmail,
@@ -5,6 +6,8 @@ import {
   useSignMessage,
   useWallets,
 } from '@privy-io/react-auth';
+import { GenericEthereumWebWalletController } from 'client/scripts/controllers/app/webWallets/generic_ethereum_web_wallet';
+import { getSessionFromWallet } from 'controllers/server/sessions';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSignIn } from 'state/api/user';
 
@@ -29,75 +32,89 @@ function useMemoizedFunction<Args extends any[], Output>(
     return delegateRef.current(...args);
   }, []);
 }
+function useValueRef<Value>(value: Value) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
+}
+
 function useSignMessageMemo() {
   const { signMessage } = useSignMessage();
   return useMemoizedFunction(signMessage);
+}
+
+function useIdentityTokenRef() {
+  const { identityToken } = useIdentityToken();
+  return useValueRef(identityToken);
 }
 
 export const LoginWithEmail = () => {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const { sendCode, loginWithCode } = useLoginWithEmail();
-  const { authenticated, user, logout, createWallet } = usePrivy();
+  const { authenticated, user, logout, createWallet, getAccessToken } =
+    usePrivy();
   const wallets = useWallets();
-  const identityToken = useIdentityToken();
   const { signIn } = useSignIn();
+  const identityTokenRef = useIdentityTokenRef();
 
   const signMessage = useSignMessageMemo();
 
   useEffect(() => {
     async function doAsync() {
-      // if (authenticated) {
-      //   const uiOptions = {
-      //     title: 'You are voting for foobar project',
-      //   };
-      //   await signMessage({ message: 'hello world' }, { uiOptions });
-      // }
-      // if (wallets.wallets && wallets.wallets.length > 0) {
-      //   console.log('FIXME GOT A WALLET');
-      //   console.log('FIXME: Getting ethereum provider....');
-      //   const wallet = wallets.wallets[0];
-      //
-      //   const uiOptions = {
-      //     title: 'You are voting for foobar project',
-      //   };
-      //
-      //   //
-      //
-      //   // FIXME this triggers the useEffect...
-      //   await signMessage({ message: 'hello world' }, { uiOptions });
-      //
-      //   // console.log('FIXME: wallet: ', wallet);
-      //   // const ethereumProvider = await wallet.getEthereumProvider();
-      //   // console.log('FIXME: ethereumProvider: ', ethereumProvider);
-      //   // const webWallet = new GenericEthereumWebWalletController(
-      //   //   () => ethereumProvider,
-      //   // );
-      //   // await webWallet.enable();
-      //
-      //   // TODO: get an embedded wallet... verify it is embedded?
-      //   // FIXME: signMessage is being called.
-      //   // const session = await getSessionFromWallet(webWallet, {
-      //   //   newSession: true,
-      //   // });
-      //   //
-      //   // await signIn(session, {
-      //   //   address: wallet.address,
-      //   //   community_id: ChainBase.Ethereum,
-      //   //   wallet_id: WalletId.Privy,
-      //   // });
-      //   //
-      //   // console.log('FIXME: session: ', session);
-      // } else {
-      //   console.log('FIXME: No wallets... ', {
-      //     wallets,
-      //   });
-      //   //await createWallet();
-      // }
+      console.log('FIXME: authenticated: ', authenticated);
+      console.log('FIXME: wallets: ', wallets);
+      if (authenticated && wallets.wallets.length > 0) {
+        const wallet = wallets.wallets[0];
+
+        const ethereumProvider = async () => await wallet.getEthereumProvider();
+        const signMessageProvider = async (
+          message: string,
+        ): Promise<string> => {
+          const uiOptions = {
+            title: 'You are authenticating',
+          };
+
+          const { signature } = await signMessage({ message }, { uiOptions });
+          return signature;
+        };
+
+        const webWallet = new GenericEthereumWebWalletController(
+          ethereumProvider,
+          signMessageProvider,
+        );
+
+        await webWallet.enable();
+        const session = await getSessionFromWallet(webWallet, {
+          newSession: true,
+        });
+
+        console.log('FIXME: session: ', session);
+
+        const accessToken = await getAccessToken();
+
+        await signIn(session, {
+          address: wallet.address,
+          community_id: ChainBase.Ethereum,
+          wallet_id: WalletId.Privy,
+          privy: {
+            identityToken: identityTokenRef.current!,
+            //ssoOAuthToken: accessToken,
+            // FIXME: now I need an oauth token here...
+          },
+        });
+        //   //
+        //   // console.log('FIXME: session: ', session);
+        // } else {
+        //   console.log('FIXME: No wallets... ', {
+        //     wallets,
+        //   });
+        //   //await createWallet();
+      }
     }
 
     doAsync().catch(console.error);
-  }, [authenticated]);
+  }, [authenticated, signMessage, wallets.wallets, identityTokenRef]);
 
   // call the MAIN signIn hook...
 
