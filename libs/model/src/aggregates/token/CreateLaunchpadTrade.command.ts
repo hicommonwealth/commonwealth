@@ -1,7 +1,8 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import { Command, InvalidState } from '@hicommonwealth/core';
+import { getPublicClient } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { createPublicClient, http, parseEventLogs } from 'viem';
+import { parseEventLogs } from 'viem';
 import z from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';
@@ -37,8 +38,9 @@ export function CreateLaunchpadTrade(): Command<
       );
       mustExist('Chain Node', chainNode);
       const url = chainNode.private_url! || chainNode.url!;
-      const client = createPublicClient({
-        transport: http(url),
+      const client = getPublicClient({
+        eth_chain_id,
+        rpc: url,
       });
 
       const receipt = await client.getTransactionReceipt({
