@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+  doesActionAllowChainId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
@@ -13,7 +14,8 @@ export type ContentIdType =
   | 'thread'
   | 'topic'
   | 'tweet_url'
-  | 'discord_server_url';
+  | 'discord_server_url'
+  | 'chain';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -28,6 +30,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
+    if (doesActionAllowChainId(action as QuestAction))
+      return QuestActionContentIdScope.Chain;
     return undefined;
   }
 
@@ -39,13 +43,15 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_url':
       return QuestActionContentIdScope.DiscordServer;
+    case 'chain':
+      return QuestActionContentIdScope.Chain;
     default:
       return QuestActionContentIdScope.Thread;
   }
 };
 
 export const buildContentIdFromURL = async (
-  url: string,
+  url: string, // TODO: 11580 rename to indetifier or something
   idType: ContentIdType,
 ) => {
   if (idType === 'comment') {
@@ -91,10 +97,10 @@ export const buildContentIdFromURL = async (
     if (foundTopic) return `${idType}:${foundTopic.id}`;
     throw new Error(`invalid topic url ${url}`);
   }
-  if (idType === 'tweet_url') {
+  if (idType === 'tweet_url' || idType === 'discord_server_url') {
     return `${idType}:${url}`;
   }
-  if (idType === 'discord_server_url') {
+  if (idType === 'chain') {
     return `${idType}:${url}`;
   }
 };
@@ -116,6 +122,10 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
   if (idType === 'discord_server_url') return `${idOrURL}${params}`;
   if (idType === 'topic') {
+    return `${origin}/discussion/topic/${idOrURL}${params}`;
+  }
+  if (idType === 'chain') {
+    // TODO: 11580 correct this url
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
 

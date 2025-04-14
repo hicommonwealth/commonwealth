@@ -7,6 +7,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
   calculateTotalXPForQuestActions,
+  doesActionAllowChainId,
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
@@ -118,6 +119,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_url:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
+                  with_optional_chain_id:
+                    allowsContentId && doesActionAllowChainId(chosenAction),
                 },
               };
             }),
@@ -218,6 +221,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           if (scope === QuestActionContentIdScope.DiscordServer)
             return 'discord_server_url';
           if (scope === QuestActionContentIdScope.Topic) return 'topic';
+          if (scope === QuestActionContentIdScope.Chain) return 'chain';
           if (scope === QuestActionContentIdScope.Thread) {
             if (subForm.config?.with_optional_comment_id) return 'comment';
             return 'thread';
@@ -237,6 +241,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           ...(subForm.values.contentLink &&
             (subForm.config?.with_optional_comment_id ||
               subForm.config?.with_optional_thread_id ||
+              subForm.config?.with_optional_chain_id ||
               subForm.config?.with_optional_topic_id ||
               subForm.config?.requires_twitter_tweet_link ||
               subForm.config?.requires_discord_server_url) && {
@@ -317,7 +322,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (
+  // TODO: 11580 remove async
+  const handleSubmit = async (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const subFormErrors = validateSubForms();
@@ -325,6 +331,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
+
+    // TODO: 11580 remove
+    // console.log('values => ', { values, questActionSubForms, subFormErrors, action_metas: await buildActionMetasPayload(), });
+    // return;
 
     const handleAsync = async () => {
       try {

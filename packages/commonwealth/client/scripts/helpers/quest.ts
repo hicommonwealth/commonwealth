@@ -35,7 +35,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommentUpvoted' ||
     action === 'ThreadUpvoted' ||
     action === 'TweetEngagement' ||
-    action === 'CommonDiscordServerJoined'
+    action === 'CommonDiscordServerJoined' ||
+    action === 'CommunityCreated'
   );
 };
 
@@ -65,6 +66,10 @@ export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
 
 export const doesActionAllowRepetition = (action: QuestActionType) => {
   return action !== 'TweetEngagement';
+};
+
+export const doesActionAllowChainId = (action: QuestActionType) => {
+  return action === 'CommunityCreated';
 };
 
 const convertTimeRemainingToLabel = ({

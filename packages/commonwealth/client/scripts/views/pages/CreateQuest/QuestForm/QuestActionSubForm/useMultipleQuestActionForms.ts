@@ -1,5 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
+  doesActionAllowChainId,
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
@@ -144,6 +145,8 @@ const useQuestActionMultiFormsState = ({
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
+      const allowsChainId =
+        allowsContentId && doesActionAllowChainId(chosenAction);
       const allowsTwitterTweetUrl =
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerURL =
@@ -162,6 +165,8 @@ const useQuestActionMultiFormsState = ({
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_url: requiresDiscordServerURL,
+        with_optional_chain_id:
+          allowsContentId && doesActionAllowChainId(chosenAction),
       };
 
       // set fixed action repitition per certain actions
@@ -181,6 +186,7 @@ const useQuestActionMultiFormsState = ({
 
       // reset errors/values if action doesn't require content link
       if (!allowsContentId) {
+        // TODO: 11580 add chain id reset here?
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
@@ -198,6 +204,12 @@ const useQuestActionMultiFormsState = ({
         case 'CommonDiscordServerJoined': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.DiscordServer;
+          break;
+        }
+        // TODO: 11580 - verify these work correctly
+        case 'CommunityCreated': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Chain;
           break;
         }
         default: {
@@ -221,7 +233,10 @@ const useQuestActionMultiFormsState = ({
             !allowsTwitterTweetUrl) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
-            !requiresDiscordServerURL)
+            !requiresDiscordServerURL) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Chain &&
+            !allowsChainId)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;

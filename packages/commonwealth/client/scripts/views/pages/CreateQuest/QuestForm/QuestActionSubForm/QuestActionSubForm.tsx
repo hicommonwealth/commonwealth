@@ -9,6 +9,7 @@ import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useEffect } from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import CWRepetitionCycleRadioButton, {
   useCWRepetitionCycleRadioButton,
 } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
@@ -63,6 +64,7 @@ const QuestActionSubForm = ({
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
       discordServerUrl: `https://discord.gg/commonwealth`,
+      chainId: `Select community chain`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -70,6 +72,7 @@ const QuestActionSubForm = ({
       topicId: 'Topic Link (optional)',
       twitterTweetUrl: 'Tweet URL',
       discordServerUrl: 'Discord Server URL',
+      chainId: 'Chain Id (optional)',
     },
   };
 
@@ -95,6 +98,10 @@ const QuestActionSubForm = ({
 
     if (config?.requires_discord_server_url) {
       return contentIdInputConfig.labels.discordServerUrl;
+    }
+
+    if (config?.with_optional_chain_id) {
+      return contentIdInputConfig.labels.chainId;
     }
 
     return 'Content Id';
@@ -124,6 +131,10 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.discordServerUrl;
     }
 
+    if (config?.with_optional_chain_id) {
+      return contentIdInputConfig.placeholders.chainId;
+    }
+
     return 'Content Id';
   };
 
@@ -132,7 +143,8 @@ const QuestActionSubForm = ({
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
-    config?.requires_discord_server_url;
+    config?.requires_discord_server_url ||
+    config?.with_optional_chain_id;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
@@ -190,6 +202,14 @@ const QuestActionSubForm = ({
 
     return { error: undefined };
   };
+
+  const chainNodes = fetchCachedNodes()
+    ?.map((node) => ({
+      // TODO: 11580 fix null chain id display
+      label: `${node.name} - (Chain Id = ${node?.ethChainId || node?.cosmosChainId})`,
+      value: node.id,
+    }))
+    ?.sort((a, b) => a.label.localeCompare(b.label));
 
   const {
     error: repetitionCycleRadioError,
@@ -495,22 +515,48 @@ const QuestActionSubForm = ({
       )}
 
       <div className={clsx('grid-row', allowsContentId ? 'cols-2' : 'cols-1')}>
-        {allowsContentId && (
-          <CWTextInput
-            key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
-            name="contentLink"
-            label={getContentIdInputLabel()}
-            placeholder={getContentIdInputPlaceholder()}
-            fullWidth
-            {...(defaultValues?.contentLink && {
-              defaultValue: defaultValues?.contentLink,
-            })}
-            onInput={(e) =>
-              onChange?.({ contentLink: e?.target?.value?.trim() })
-            }
-            customError={errors?.contentLink}
-          />
-        )}
+        {/* TODO: 11580 - make this better */}
+        {allowsContentId &&
+          (config.with_optional_chain_id ? (
+            <CWSelectList
+              key={`contentLink-${defaultValues?.action}`}
+              name="contentLink"
+              isClearable={false}
+              label="Chain Node"
+              placeholder="Select a chain node"
+              options={chainNodes}
+              onChange={(newValue) =>
+                newValue && onChange?.({ contentLink: `${newValue.value}` })
+              }
+              {...(defaultValues?.contentLink && {
+                value: {
+                  value: parseInt(`${defaultValues?.contentLink}`),
+                  label: `${
+                    chainNodes?.find(
+                      (x) =>
+                        x.value === parseInt(`${defaultValues?.contentLink}`),
+                    )?.label
+                  }`,
+                },
+              })}
+              customError={errors?.contentLink}
+            />
+          ) : (
+            <CWTextInput
+              key={`contentLink-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
+              name="contentLink"
+              label={getContentIdInputLabel()}
+              placeholder={getContentIdInputPlaceholder()}
+              fullWidth
+              {...(defaultValues?.contentLink && {
+                defaultValue: defaultValues?.contentLink,
+              })}
+              onInput={(e) =>
+                onChange?.({ contentLink: e?.target?.value?.trim() })
+              }
+              customError={errors?.contentLink}
+            />
+          ))}
 
         <CWTextInput
           label="Instructions Link (optional)"
