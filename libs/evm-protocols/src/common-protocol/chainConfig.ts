@@ -46,6 +46,8 @@ type factoryContractsType = {
     referralFeeManager?: string;
     veBridge?: string;
     communityNomination?: string;
+    postTokenLaunchpad?: string;
+    postTokenBondingCurve?: string;
     chainId: number;
   };
 };
