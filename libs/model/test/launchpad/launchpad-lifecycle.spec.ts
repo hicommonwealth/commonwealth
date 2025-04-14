@@ -81,7 +81,7 @@ describe('Launchpad Lifecycle', () => {
       parsedArgs: {
         namespace: community!.namespace!,
         tokenAddress: TOKEN_ADDRESS,
-        launchpadLiquidity: 1000n,
+        launchpadLiquidity: 594115082271506067334n,
         curveId: 1n,
         totalSupply: 1000n,
         reserveRation: 1n,
@@ -148,7 +148,7 @@ describe('Launchpad Lifecycle', () => {
       eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
       transaction_hash: TRADE_TOKEN_TXN_HASH,
       token_address: TOKEN_ADDRESS.toLowerCase(),
-      trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
+      trader_address: '0x2ce1f5d4f84b583ab320cac0948adde52a131fbe',
       is_buy: true,
       community_token_amount: '534115082271506067334',
       price: 3.98859030778e-7,
