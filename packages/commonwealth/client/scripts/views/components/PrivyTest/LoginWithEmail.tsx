@@ -8,8 +8,10 @@ import {
 } from '@privy-io/react-auth';
 import { GenericEthereumWebWalletController } from 'client/scripts/controllers/app/webWallets/generic_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSignIn } from 'state/api/user';
+import { useMemoizedFunction } from 'views/components/PrivyTest/UseMemoizedFunction';
+import { useValueRef } from 'views/components/PrivyTest/UseValueRef';
 
 // function useMemoizedFunction<Input, Output>(
 //   delegate: (input: Input) => Output,
@@ -21,22 +23,6 @@ import { useSignIn } from 'state/api/user';
 //     return delegateRef.current(input);
 //   }, []);
 // }
-
-function useMemoizedFunction<Args extends any[], Output>(
-  delegate: (...args: Args) => Output,
-): (...args: Args) => Output {
-  const delegateRef = useRef(delegate);
-  delegateRef.current = delegate;
-
-  return useCallback((...args: Args) => {
-    return delegateRef.current(...args);
-  }, []);
-}
-function useValueRef<Value>(value: Value) {
-  const ref = useRef(value);
-  ref.current = value;
-  return ref;
-}
 
 function useSignMessageMemo() {
   const { signMessage } = useSignMessage();
