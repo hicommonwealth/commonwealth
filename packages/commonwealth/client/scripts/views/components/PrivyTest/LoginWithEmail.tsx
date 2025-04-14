@@ -1,38 +1,11 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
-import {
-  useIdentityToken,
-  useLoginWithEmail,
-  usePrivy,
-  useSignMessage,
-  useWallets,
-} from '@privy-io/react-auth';
+import { useLoginWithEmail, usePrivy, useWallets } from '@privy-io/react-auth';
 import { GenericEthereumWebWalletController } from 'client/scripts/controllers/app/webWallets/generic_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSignIn } from 'state/api/user';
-import { useMemoizedFunction } from 'views/components/PrivyTest/UseMemoizedFunction';
-import { useValueRef } from 'views/components/PrivyTest/UseValueRef';
-
-// function useMemoizedFunction<Input, Output>(
-//   delegate: (input: Input) => Output,
-// ): (input: Input) => Output {
-//   const delegateRef = useRef(delegate);
-//   delegateRef.current = delegate;
-//
-//   return useCallback((input) => {
-//     return delegateRef.current(input);
-//   }, []);
-// }
-
-function useSignMessageMemo() {
-  const { signMessage } = useSignMessage();
-  return useMemoizedFunction(signMessage);
-}
-
-function useIdentityTokenRef() {
-  const { identityToken } = useIdentityToken();
-  return useValueRef(identityToken);
-}
+import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
+import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
 
 export const LoginWithEmail = () => {
   const [email, setEmail] = useState('');
