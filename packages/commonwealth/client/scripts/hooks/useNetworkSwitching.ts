@@ -2,17 +2,6 @@ import { getChainHex, getChainName } from '@hicommonwealth/evm-protocols';
 import { notifyError } from 'controllers/app/notifications';
 import { useEffect, useState } from 'react';
 
-export const chainNames: Record<string, string> = {
-  '0x1': 'Ethereum',
-  '0x89': 'Polygon',
-  '0xa': 'Optimism',
-  '0xa4b1': 'Arbitrum',
-  '0x2105': 'Base',
-  '0x14a33': 'Base Goerli',
-  '0x14a34': 'Base Sepolia',
-  '0x7a69': 'Anvil',
-};
-
 interface UseNetworkSwitchingProps {
   ethChainId?: number | null;
   rpcUrl?: string | null;

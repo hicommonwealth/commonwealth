@@ -43,68 +43,6 @@ export const uniswapTokenListConfig = {
           },
         ],
       },
-      [ValidChains.SepoliaBase]: {
-        list: [
-          {
-            name: 'Tether USD',
-            address: '0x323e78f944A9a1FcF3a10efcC5319DBb0bB6e673',
-            symbol: 'USDT',
-            decimals: 6,
-            chainId: ValidChains.SepoliaBase,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
-          },
-          {
-            name: 'USD Coin',
-            address: '0x5deac602762362fe5f135fa5904351916053cf70',
-            symbol: 'USDC',
-            decimals: 6,
-            chainId: ValidChains.SepoliaBase,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-          },
-          {
-            name: 'Wrapped Ether',
-            address: '0x4200000000000000000000000000000000000006',
-            symbol: 'WETH',
-            decimals: 18,
-            chainId: ValidChains.SepoliaBase,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4200000000000000000000000000000000000006/logo.png',
-          },
-        ],
-      },
-      [ValidChains.Anvil]: {
-        list: [
-          {
-            name: 'Tether USD',
-            address: '0x323e78f944A9a1FcF3a10efcC5319DBb0bB6e673',
-            symbol: 'USDT',
-            decimals: 6,
-            chainId: ValidChains.Anvil,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
-          },
-          {
-            name: 'USD Coin',
-            address: '0x5deac602762362fe5f135fa5904351916053cf70',
-            symbol: 'USDC',
-            decimals: 6,
-            chainId: ValidChains.Anvil,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-          },
-          {
-            name: 'Wrapped Ether',
-            address: '0x4200000000000000000000000000000000000006',
-            symbol: 'WETH',
-            decimals: 18,
-            chainId: ValidChains.Anvil,
-            logoURI:
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4200000000000000000000000000000000000006/logo.png',
-          },
-        ],
-      },
     },
   },
 };
