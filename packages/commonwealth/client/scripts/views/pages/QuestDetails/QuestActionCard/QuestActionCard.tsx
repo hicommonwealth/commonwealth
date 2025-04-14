@@ -9,6 +9,7 @@ import {
   doesActionRewardShareForReferrer,
 } from 'helpers/quest';
 import React from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -44,6 +45,7 @@ const QuestActionCard = ({
   inEligibilityReason,
   questAction,
 }: QuestActionCardProps) => {
+  console.log('questAction => ', questAction);
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
       questAction.creator_reward_weight * 100,
@@ -94,8 +96,11 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
-            {(questAction.event_name === 'TweetEngagement' ||
-              questAction.event_name === 'CommonDiscordServerJoined') && (
+            {[
+              'TweetEngagement',
+              'CommonDiscordServerJoined',
+              'CommunityCreated',
+            ].includes(questAction.event_name) && (
               <>
                 <CWDivider />
                 <CWText type="caption" fontWeight="semiBold">
@@ -110,6 +115,18 @@ const QuestActionCard = ({
                     )}
                   </CWText>
                 )}
+                {questAction.event_name === 'CommunityCreated' &&
+                  questAction.content_id && (
+                    <CWText type="caption">
+                      {actionCopies.explainer[questAction.event_name](
+                        fetchCachedNodes()?.find?.(
+                          (node) =>
+                            `${questAction.content_id?.split(`:`)?.at(-1)}` ===
+                            `${node.id}`,
+                        )?.name,
+                      )}
+                    </CWText>
+                  )}
               </>
             )}
             {!hideShareSplit &&

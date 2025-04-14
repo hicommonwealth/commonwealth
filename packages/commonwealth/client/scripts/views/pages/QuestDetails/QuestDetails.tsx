@@ -157,6 +157,9 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
+        // TODO: 11580: use alphabeticallyStakeWiseSortedChains as sortedChains, in quest creation
+        // and update create community flow to work with these chains redirected via url and update
+        // login system to work on the same
         navigate(`/createCommunity`, {}, null);
         break;
       }
