@@ -226,7 +226,7 @@ export const QuickTokenLaunchForm = ({
               return;
             }
 
-            if (response === true) {
+            if (response) {
               // store community id for this submitted token info, incase user submits
               // the form again we won't create another community for the same token info
               setCreatedCommunityIdsToTokenInfoMap((prev) => ({
