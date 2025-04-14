@@ -31,7 +31,7 @@ export async function handleCapReached(
       .lpBondingCurve;
 
     const onChainTokenData = await getLaunchpadToken({
-      rpc: url!,
+      rpc: url,
       tokenAddress: token_address,
       lpBondingCurveAddress,
     });
