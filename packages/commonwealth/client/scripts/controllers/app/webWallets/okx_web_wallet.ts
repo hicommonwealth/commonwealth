@@ -9,6 +9,7 @@ import type IWebWallet from '../../../models/IWebWallet';
 import { hexToNumber } from 'web3-utils';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { getChainHex } from '@hicommonwealth/evm-protocols';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
@@ -117,7 +118,7 @@ class OkxWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
-      const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
+      const chainIdHex = getChainHex(parseInt(chainId, 10));
       try {
         const config = fetchCachedConfiguration();
 
@@ -208,7 +209,7 @@ class OkxWebWalletController implements IWebWallet<string> {
     try {
       // Get current chain ID
       const communityChain = chainId ?? this.getChainId();
-      const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
+      const chainIdHex = getChainHex(parseInt(communityChain, 10));
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
