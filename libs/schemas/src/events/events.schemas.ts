@@ -529,7 +529,20 @@ export const events = {
         .bigint()
         .describe('Current nomination count'),
     }),
-  }),
+  }).describe('Contest judge nominated'),
+
+  NominatorNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+    }),
+  }).describe('Nomination token (ID 3) minted'),
+
+  NominatorSettled: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+    }),
+  }).describe('Nomination configured'),
 
   NamespaceLinked: z.object({
     namespace_address: z.string(),

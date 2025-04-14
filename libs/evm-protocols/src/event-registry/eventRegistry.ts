@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
@@ -8,8 +9,6 @@ import {
   ReferralFeeManagerAbi,
   TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
-import { communityNominationsAbi } from '../abis/communityNominationsAbi';
-import { erc1155Abi } from '../abis/erc1155Abi';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
@@ -49,7 +48,7 @@ type ContractAddresses = {
 export enum ChildContractNames {
   SingleContest = 'SingleContest',
   RecurringContest = 'RecurringContest',
-  Namespace = 'Namespace',
+  CommunityNominations = 'CommunityNominations',
 }
 
 export type ContractSource = {
@@ -96,11 +95,12 @@ const namespaceFactorySource = {
         EvmEventSignatures.Contests.SingleContestVoterVoted,
       ],
     },
-    [ChildContractNames.Namespace]: {
-      abi: [...erc1155Abi, ...communityNominationsAbi],
+    [ChildContractNames.CommunityNominations]: {
+      abi: CommunityNominationsAbi,
       eventSignatures: [
-        EvmEventSignatures.Namespace.TransferSingle,
-        EvmEventSignatures.Namespace.JudgeNominated,
+        EvmEventSignatures.CommunityNominations.NominatorSettled,
+        EvmEventSignatures.CommunityNominations.NominatorNominated,
+        EvmEventSignatures.CommunityNominations.JudgeNominated,
       ],
     },
   },

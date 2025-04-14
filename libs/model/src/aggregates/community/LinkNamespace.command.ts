@@ -2,11 +2,12 @@ import { logger, type Command } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
+  ValidChains,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
@@ -166,16 +167,28 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
 
         if (log_removed) {
           // remove namespace EvmEventSource
+          const eventSourcesToDelete: WhereOptions<
+            z.infer<typeof schemas.EvmEventSource>
+          >[] = [];
+
+          const ethChainId = community.ChainNode!.eth_chain_id!;
+          // TODO: support base mainnet when contract address is available
+          if (ethChainId === ValidChains.SepoliaBase) {
+            eventSourcesToDelete.push({
+              contract_address:
+                cp.factoryContracts[ethChainId].communityNomination!,
+              event_signature: {
+                [Op.in]: [
+                  EvmEventSignatures.CommunityNominations.JudgeNominated,
+                  EvmEventSignatures.CommunityNominations.NominatorSettled,
+                ],
+              },
+            });
+          }
           await models.EvmEventSource.destroy({
             where: {
               eth_chain_id: community.ChainNode!.eth_chain_id!,
-              contract_address: namespace_address,
-              event_signature: {
-                [Op.in]: [
-                  EvmEventSignatures.Namespace.TransferSingle,
-                  EvmEventSignatures.Namespace.JudgeNominated,
-                ],
-              },
+              [Op.or]: eventSourcesToDelete,
             },
             transaction,
           });
@@ -183,31 +196,42 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
           // create namespace EvmEventSource to track namespace events
           const ethChainId = community.ChainNode!.eth_chain_id!;
           if (cp.isValidChain(ethChainId)) {
-            await models.EvmEventSource.bulkCreate(
-              [
-                // TransferSingle event
-                {
-                  eth_chain_id: ethChainId,
-                  contract_address: namespace_address,
-                  event_signature: EvmEventSignatures.Namespace.TransferSingle,
-                  contract_name: ChildContractNames.Namespace,
-                  parent_contract_address:
-                    cp.factoryContracts[ethChainId].factory,
-                  created_at_block: Number(block_number),
-                },
-                // JudgeNominated event
-                {
-                  eth_chain_id: ethChainId,
-                  contract_address: namespace_address,
-                  event_signature: EvmEventSignatures.Namespace.JudgeNominated,
-                  contract_name: ChildContractNames.Namespace,
-                  parent_contract_address:
-                    cp.factoryContracts[ethChainId].factory,
-                  created_at_block: Number(block_number),
-                },
-              ],
-              { transaction },
-            );
+            const eventSourcesToAdd: Array<
+              z.infer<typeof schemas.EvmEventSource>
+            > = [];
+
+            // TODO: support base mainnet when contract address is available
+            if (ethChainId === ValidChains.SepoliaBase) {
+              // JudgeNominated event
+              eventSourcesToAdd.push({
+                eth_chain_id: ethChainId,
+                contract_address: namespace_address,
+                event_signature:
+                  EvmEventSignatures.CommunityNominations.JudgeNominated,
+                contract_name: ChildContractNames.CommunityNominations,
+                parent_contract_address:
+                  cp.factoryContracts[ethChainId].communityNomination!,
+                created_at_block: Number(block_number),
+              });
+
+              // NominatorSettled event
+              eventSourcesToAdd.push({
+                eth_chain_id: ethChainId,
+                contract_address: namespace_address,
+                event_signature:
+                  EvmEventSignatures.CommunityNominations.NominatorSettled,
+                contract_name: ChildContractNames.CommunityNominations,
+                parent_contract_address:
+                  cp.factoryContracts[ethChainId].communityNomination!,
+                created_at_block: Number(block_number),
+              });
+            }
+
+            if (eventSourcesToAdd.length > 0) {
+              await models.EvmEventSource.bulkCreate(eventSourcesToAdd, {
+                transaction,
+              });
+            }
           }
         }
 
