@@ -1,3 +1,4 @@
+import { getChainName } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
@@ -139,9 +140,9 @@ const UniswapTradeModal = ({
             />
             <CWModalBody>
               <CWText>
-                The connected network with chain ID {ethChainId} is not
-                supported. Please switch to a supported network such as Base or
-                Mainnet.
+                The community connected network:{' '}
+                {getChainName({ id: ethChainId! })} is not supported on Uniswap.
+                Please switch to a supported network such as Base or Mainnet.
               </CWText>
             </CWModalBody>
             <CWModalFooter>
