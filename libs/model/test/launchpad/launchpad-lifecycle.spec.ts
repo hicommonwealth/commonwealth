@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
@@ -32,6 +32,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       namespace: 'DogeMoonLanding',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,

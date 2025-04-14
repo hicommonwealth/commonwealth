@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
@@ -7,42 +8,52 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityStake } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
-import { ActionState, defaultActionState } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
+import {
+  TransactionData,
+  TransactionHookResult,
+  defaultTransactionState,
+} from '../types';
+import useNamespaceFactory from './useNamespaceFactory';
 
-interface UseLaunchCommunityStakeProps {
+interface UseStakeTransactionProps {
   namespace: string;
   communityId: string;
-  goToSuccessStep: () => void;
-  selectedAddress: string;
+  userAddress: string;
   chainId: string;
+  onSuccess?: () => void;
 }
 
-const useLaunchCommunityStake = ({
+const useStakeTransaction = ({
   namespace,
   communityId,
-  goToSuccessStep,
-  selectedAddress,
+  userAddress,
   chainId,
-}: UseLaunchCommunityStakeProps) => {
-  const [launchStakeData, setLaunchStakeData] =
-    useState<ActionState>(defaultActionState);
+  onSuccess,
+}: UseStakeTransactionProps): TransactionHookResult => {
+  const [transactionData, setTransactionData] = useState<TransactionData>(
+    defaultTransactionState,
+  );
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunityStake } = useUpdateCommunityStake();
 
   const { isAddedToHomeScreen } = useAppStatus();
-
   const user = useUserStore();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
 
-  const handleLaunchCommunityStake = async () => {
+  const action = async () => {
+    if (
+      transactionData.state === 'loading' ||
+      transactionData.state === 'completed'
+    ) {
+      return;
+    }
+
     try {
-      setLaunchStakeData({
+      setTransactionData({
         state: 'loading',
         errorText: '',
       });
@@ -50,7 +61,7 @@ const useLaunchCommunityStake = ({
       await namespaceFactory.configureCommunityStakes(
         namespace,
         commonProtocol.STAKE_ID,
-        selectedAddress,
+        userAddress,
         chainId,
       );
 
@@ -59,7 +70,7 @@ const useLaunchCommunityStake = ({
         stakeId: commonProtocol.STAKE_ID,
       });
 
-      setLaunchStakeData({
+      setTransactionData({
         state: 'completed',
         errorText: '',
       });
@@ -68,25 +79,29 @@ const useLaunchCommunityStake = ({
         event: MixpanelCommunityStakeEvent.LAUNCHED_COMMUNITY_STAKE,
         community: chainId,
         userId: user.activeAccount?.profile?.userId,
-        userAddress: selectedAddress,
+        userAddress: userAddress,
         isPWA: isAddedToHomeScreen,
       });
 
-      goToSuccessStep();
+      onSuccess?.();
     } catch (err) {
       console.log(err);
 
       const error =
         'There was an issue launching community stakes. Please try again.';
 
-      setLaunchStakeData({
+      setTransactionData({
         state: 'not-started',
         errorText: error,
       });
     }
   };
 
-  return { handleLaunchCommunityStake, launchStakeData };
+  return {
+    state: transactionData.state,
+    errorText: transactionData.errorText,
+    action,
+  };
 };
 
-export default useLaunchCommunityStake;
+export default useStakeTransaction;

@@ -5,6 +5,7 @@ import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
   CANVAS_TOPIC,
   ChainBase,
+  CommunityTierMap,
   getSessionSigners,
   serializeCanvas,
   WalletId,
@@ -560,6 +561,7 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have ref.actor join it
         const [community2] = await tester.seed('Community', {
+          tier: CommunityTierMap.CommunityVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,
@@ -678,6 +680,7 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have 2nd user join it
         const [community2] = await tester.seed('Community', {
+          tier: CommunityTierMap.CommunityVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,

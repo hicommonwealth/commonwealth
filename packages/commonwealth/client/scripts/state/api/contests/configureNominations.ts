@@ -7,6 +7,7 @@ export interface ConfigureNominationsProps {
   namespaceName: string;
   creatorOnly: boolean;
   walletAddress: string;
+  judgeId: number;
   maxNominations?: number;
   ethChainId: number;
   chainRpc: string;
@@ -16,6 +17,7 @@ const configureNominations = async ({
   namespaceName,
   creatorOnly,
   walletAddress,
+  judgeId,
   maxNominations,
   ethChainId,
   chainRpc,
@@ -27,6 +29,7 @@ const configureNominations = async ({
     namespaceName,
     creatorOnly,
     walletAddress,
+    judgeId,
     maxNominations,
   );
 };

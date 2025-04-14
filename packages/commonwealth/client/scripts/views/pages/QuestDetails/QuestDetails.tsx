@@ -230,6 +230,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'CommonDiscordServerJoined': {
+        if (actionContentId) {
+          window.open(buildURLFromContentId(actionContentId), '_blank');
+        } else {
+          notifyError(`Linked discord server url is invalid`);
+        }
+        break;
+      }
       default:
         return;
     }

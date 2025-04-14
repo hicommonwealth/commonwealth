@@ -1,7 +1,7 @@
 @import '../../../styles/shared.scss';
 
 .bannerContainer {
-  background: linear-gradient(90deg, #F8F8FF 0%, #E8E8FF 100%);
+  background: linear-gradient(90deg, #f8f8ff 0%, #e8e8ff 100%);
   border-radius: 12px;
   position: relative;
   overflow: hidden;
@@ -54,7 +54,7 @@
 .title {
   font-size: 24px;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #1a1a1a;
   margin: 0;
 
   @media (max-width: 768px) {
@@ -64,7 +64,7 @@
 
 .subtitle {
   font-size: 16px;
-  color: #4D4D4D;
+  color: #4d4d4d;
   margin: 0;
   line-height: 1.5;
 
@@ -86,7 +86,7 @@
 }
 
 .downloadButton {
-  background: #4B37CF;
+  background: #4b37cf;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -95,7 +95,7 @@
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: #3928A9;
+    background: #3928a9;
   }
 
   @media (max-width: 768px) {
@@ -106,8 +106,8 @@
 
 .dismissButton {
   background: transparent;
-  border: 1px solid #4B37CF;
-  color: #4B37CF;
+  border: 1px solid #4b37cf;
+  color: #4b37cf;
   padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
@@ -121,4 +121,4 @@
   @media (max-width: 768px) {
     padding: 10px 20px;
   }
-} 
+}

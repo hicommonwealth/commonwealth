@@ -34,7 +34,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommentCreated' ||
     action === 'CommentUpvoted' ||
     action === 'ThreadUpvoted' ||
-    action === 'TweetEngagement'
+    action === 'TweetEngagement' ||
+    action === 'CommonDiscordServerJoined'
   );
 };
 
@@ -54,8 +55,12 @@ export const doesActionAllowTopicId = (action: QuestActionType) => {
   );
 };
 
-export const doesActionAllowTwitterTweetURL = (action: QuestActionType) => {
+export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
   return action === 'TweetEngagement';
+};
+
+export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
+  return action === 'CommonDiscordServerJoined';
 };
 
 export const doesActionAllowRepetition = (action: QuestActionType) => {

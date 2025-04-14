@@ -44,6 +44,19 @@
   }
 
   .token-section {
+    .TextInput {
+      width: 100%;
+
+      .input-and-icon-container {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+
+    .TokenBanner {
+      padding: 12px;
+    }
+
     .caption {
       margin-bottom: 8px;
     }
