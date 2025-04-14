@@ -1,4 +1,4 @@
-import { getChainName } from '@hicommonwealth/evm-protocols';
+import { getChainHex, getChainName } from '@hicommonwealth/evm-protocols';
 import { notifyError } from 'controllers/app/notifications';
 import { useEffect, useState } from 'react';
 
@@ -50,9 +50,7 @@ export function useNetworkSwitching({
           method: 'eth_chainId',
         });
 
-        const formattedChainId = ethChainId
-          ? `0x${Number(ethChainId).toString(16)}`
-          : null;
+        const formattedChainId = ethChainId ? getChainHex(ethChainId) : null;
 
         // Set current chain name
         setCurrentChain(`Chain ID ${getChainName({ hex: currentChainIdHex })}`);
@@ -72,7 +70,7 @@ export function useNetworkSwitching({
   const promptNetworkSwitch = async () => {
     if (!isWrongNetwork || !windowEthereum.ethereum) return;
 
-    const chainHex = `0x${Number(ethChainId).toString(16)}`;
+    const chainHex = getChainHex(Number(ethChainId));
 
     try {
       // Try to switch to Base network

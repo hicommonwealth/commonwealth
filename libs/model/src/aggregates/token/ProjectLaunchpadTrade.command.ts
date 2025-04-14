@@ -1,11 +1,9 @@
-import { Command, logger } from '@hicommonwealth/core';
+import { Command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../../policies/utils/utils';
 import { handleCapReached } from './utils'; // TODO: place in utils
-
-const log = logger(import.meta);
 
 const schema = {
   input: events.LaunchpadTokenTraded,

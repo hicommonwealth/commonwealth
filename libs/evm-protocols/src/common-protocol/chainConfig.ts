@@ -18,19 +18,6 @@ const chains = Object.entries(ValidChains)
   .filter(([key]) => isNaN(Number(key)))
   .map(([name, id]) => ({ name, id: id as number }));
 
-export const getChainId = (input: {
-  name?: string;
-  hex?: string;
-}): number | undefined => {
-  if (input.name) {
-    return chains.find((c) => c.name === input.name)?.id;
-  } else if (input.hex) {
-    const id = parseInt(input.hex, 16);
-    return chains.find((c) => c.id === id)?.id;
-  }
-  return undefined;
-};
-
 export const getChainName = (input: {
   id?: number;
   hex?: string;
@@ -40,12 +27,8 @@ export const getChainName = (input: {
   return chains.find((c) => c.id === id)?.name ?? String(id);
 };
 
-export const getChainHex = (input: {
-  id?: number;
-  name?: string;
-}): string | undefined => {
-  const id = input.id ?? chains.find((c) => c.name === input.name)?.id;
-  return id !== undefined ? '0x' + id.toString(16) : undefined;
+export const getChainHex = (id: number): string => {
+  return '0x' + id.toString(16);
 };
 
 /**

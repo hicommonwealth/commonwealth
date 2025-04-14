@@ -80,7 +80,7 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
 
       {/* Network indicator */}
       <NetworkIndicator
-        currentChain={currentChain}
+        currentChain={currentChain!}
         isWrongNetwork={isWrongNetwork}
         onSwitchNetwork={() => void promptNetworkSwitch()}
       />

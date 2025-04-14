@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { getChainHex } from '@hicommonwealth/evm-protocols';
 import {
   ChainBase,
   UNISWAP_CONVENIENCE_FEE_PERCENT,
@@ -144,7 +145,7 @@ const useUniswapTradeModal = ({
       return false;
     }
 
-    const baseChainIdHex = `0x${ethChainId.toString(16)}`;
+    const baseChainIdHex = getChainHex(ethChainId);
     console.log(
       `[Network Debug] Target Base chain ID: ${ethChainId} (hex: ${baseChainIdHex})`,
     );
@@ -373,7 +374,14 @@ const useUniswapTradeModal = ({
       );
       return false;
     }
-  }, [userIsMagicUser, isMagicConfigured, ethersProvider, ethChainId]);
+  }, [
+    userIsMagicUser,
+    isMagicConfigured,
+    ethersProvider,
+    ethChainId,
+    rpcUrl,
+    blockExplorerUrl,
+  ]);
 
   // Create and return the widget config
   const widgetConfig: UniswapWidgetConfig = {
