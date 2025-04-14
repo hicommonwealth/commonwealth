@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatAddressShort } from 'shared/utils';
+import { useCommunityStake } from 'views/components/CommunityStake';
 import './GovernanceUserProfile.scss';
 
 const GovernanceUserProfile = () => {
@@ -19,6 +20,10 @@ const GovernanceUserProfile = () => {
 
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
+  });
+
+  const { currentVoteWeight, stakeValue } = useCommunityStake({
+    walletAddress: userData.activeAccount?.address || '',
   });
 
   if (!data) return null;
@@ -87,8 +92,10 @@ const GovernanceUserProfile = () => {
       </div>
 
       <div className="profile-body">
-        <CWText>Total stake:</CWText>
-        <CWText>Total voting power:</CWText>
+        <CWText>Total stake: {stakeValue}</CWText>
+        <CWText>
+          Total voting power: {currentVoteWeight?.toString() || '0'}
+        </CWText>
       </div>
 
       <Link to={`/profile/id/${userData.id}`} className="user-info">
