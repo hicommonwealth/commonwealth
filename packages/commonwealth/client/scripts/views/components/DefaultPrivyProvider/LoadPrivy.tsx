@@ -24,7 +24,9 @@ export const LoadPrivy = memo(function LoadPrivy(props: DefaultPrivyProvider) {
           logo: 'https://common.xyz/brand_assets/common.png',
         },
         embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
+          ethereum: {
+            createOnLogin: 'users-without-wallets',
+          },
         },
       }}
     >

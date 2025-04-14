@@ -81,6 +81,9 @@ export class GenericEthereumWebWalletController implements IWebWallet<string> {
     return new SIWESigner({
       signer: {
         signMessage: (message) =>
+          // FIXME need to re-implement this for privy
+          // Dillon thinks we just return a string...
+          // FIXME: assume it returns a string
           this._web3.givenProvider.request({
             method: 'personal_sign',
             params: [this.accounts[0], message],
