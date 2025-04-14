@@ -2,6 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'client/scripts/controllers/app/login';
 import Account from 'client/scripts/models/Account';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
+import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
 import { useState } from 'react';
@@ -11,10 +12,14 @@ import {
 } from 'shared/analytics/types';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import useAppStatus from '../../../../../../hooks/useAppStatus';
-import { ActionState, defaultActionState } from '../types';
-import useNamespaceFactory from '../useNamespaceFactory';
-interface UseReserveCommunityNamespaceProps {
+import {
+  TransactionData,
+  TransactionHookResult,
+  defaultTransactionState,
+} from '../types';
+import useNamespaceFactory from './useNamespaceFactory';
+
+interface UseNamespaceTransactionProps {
   communityId: string;
   namespace: string;
   symbol: string;
@@ -25,7 +30,7 @@ interface UseReserveCommunityNamespaceProps {
   referrerAddress?: string | null;
 }
 
-const useReserveCommunityNamespace = ({
+const useNamespaceTransaction = ({
   communityId,
   namespace,
   symbol,
@@ -34,11 +39,11 @@ const useReserveCommunityNamespace = ({
   onSuccess,
   hasNamespaceReserved,
   referrerAddress,
-}: UseReserveCommunityNamespaceProps) => {
-  const [reserveNamespaceData, setReserveNamespaceData] = useState<ActionState>(
+}: UseNamespaceTransactionProps): TransactionHookResult => {
+  const [transactionData, setTransactionData] = useState<TransactionData>(
     hasNamespaceReserved
       ? { state: 'completed', errorText: '' }
-      : defaultActionState,
+      : defaultTransactionState,
   );
 
   const onchainReferralsEnabled = useFlag('onchainReferrals');
@@ -56,14 +61,20 @@ const useReserveCommunityNamespace = ({
     onAction: true,
   });
 
-  const handleReserveCommunityNamespace = async () => {
+  const action = async () => {
+    if (
+      transactionData.state === 'loading' ||
+      transactionData.state === 'completed'
+    ) {
+      return;
+    }
+
     try {
-      setReserveNamespaceData({
+      setTransactionData({
         state: 'loading',
         errorText: '',
       });
 
-      // set active account so that updateCommunity works
       await setActiveAccount(
         new Account({
           community: {
@@ -99,7 +110,7 @@ const useReserveCommunityNamespace = ({
         }),
       );
 
-      setReserveNamespaceData({
+      setTransactionData({
         state: 'completed',
         errorText: '',
       });
@@ -120,14 +131,18 @@ const useReserveCommunityNamespace = ({
         ? 'Namespace already reserved'
         : 'There was an issue creating the namespace. Please try again.';
 
-      setReserveNamespaceData({
+      setTransactionData({
         state: 'not-started',
         errorText: error,
       });
     }
   };
 
-  return { handleReserveCommunityNamespace, reserveNamespaceData };
+  return {
+    state: transactionData.state,
+    errorText: transactionData.errorText,
+    action,
+  };
 };
 
-export default useReserveCommunityNamespace;
+export default useNamespaceTransaction;

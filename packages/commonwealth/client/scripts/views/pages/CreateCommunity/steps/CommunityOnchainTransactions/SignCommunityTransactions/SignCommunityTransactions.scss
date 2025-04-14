@@ -1,6 +1,6 @@
 @import '../../../../../../styles/shared';
 
-.SignStakeTransactions {
+.SignCommunityTransactions {
   display: flex;
 
   .FeatureHint {
@@ -60,6 +60,22 @@
     .action-buttons {
       display: flex;
       justify-content: space-between;
+    }
+  }
+
+  .ActionSteps {
+    margin-top: 32px;
+  }
+
+  @include smallInclusive {
+    .FeatureHint {
+      &.desktop {
+        display: none;
+      }
+
+      &.mobile {
+        display: flex;
+      }
     }
   }
 }

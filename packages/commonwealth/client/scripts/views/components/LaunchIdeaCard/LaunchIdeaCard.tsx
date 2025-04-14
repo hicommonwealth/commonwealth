@@ -26,7 +26,7 @@ const LaunchIdeaCard = ({
   return (
     <section className="LaunchIdeaCard">
       <div className="gradiant-container">
-        <CWText type="h3">Launch an idea</CWText>
+        <CWText type="h3">Launch your idea</CWText>
         <CWTextInput
           placeholder="Type your idea or select randomize to launch a token...."
           fullWidth

@@ -39,6 +39,7 @@ const featureFlags = {
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
+  partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
