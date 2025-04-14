@@ -14,8 +14,8 @@
 
     .swap-icon {
       cursor: pointer;
-      color: $neutral-500;
-      // Add margin if needed to space from title
+      // color: $primary-600; // CSS color might not affect SVG fill
+      fill: $primary-600; // Set SVG fill color directly
       margin-left: auto; // Push close icon to the right
       margin-right: 16px;
     }
@@ -98,16 +98,10 @@
       justify-content: center;
       width: 100%;
 
-      .preset-tag {
-        cursor: pointer;
-        background-color: $neutral-100; // Lighter background for tags
-        border: 1px solid $neutral-200;
-        color: $neutral-700;
-        padding: 4px 12px;
-
-        &:hover {
-          background-color: $neutral-200;
-        }
+      // Add specific styles for .preset-button if CWButton defaults aren't enough
+      .preset-button {
+        // Example: Adjust padding or font size if needed
+        // padding: 2px 10px;
       }
     }
   }

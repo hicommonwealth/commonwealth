@@ -8,7 +8,6 @@ import {
   CWModalBody,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import {
@@ -166,30 +165,38 @@ export const WalletModal = ({
 
               <div className="preset-amounts">
                 {presetAmounts.map((preset) => (
-                  <CWTag
+                  <CWButton
                     key={preset}
-                    type="filter"
+                    buttonType={preset === 'MAX' ? 'primary' : 'secondary'}
+                    buttonHeight="sm"
+                    buttonWidth="narrow"
                     label={preset === 'MAX' ? 'MAX' : `${preset} ETH`}
                     onClick={() => handlePresetClick(preset)}
-                    classNames="preset-tag"
+                    className="preset-button"
                   />
                 ))}
               </div>
             </div>
 
             <div className="actions">
-              <CWButton
-                label={isDepositMode ? 'Deposit' : 'Withdraw'}
-                buttonWidth="full"
-                disabled={isActionDisabled}
-                onClick={handleAction}
-              />
+              {/* Only show Withdraw button in withdraw mode */}
+              {!isDepositMode && (
+                <CWButton
+                  label="Withdraw"
+                  buttonWidth="full"
+                  disabled={isActionDisabled}
+                  onClick={handleAction}
+                />
+              )}
+              {/* Always show Magic button in deposit mode if applicable */}
               {isDepositMode && isSelectedAddressMagic && (
                 <CWButton
                   label="Add funds with Magic"
                   buttonWidth="full"
-                  buttonHeight="sm"
-                  onClick={() => openMagicWallet()}
+                  // buttonHeight="sm" // Removed to use default (med)
+                  // buttonType="secondary" // Removed to use default (primary)
+                  // buttonAlt="green" // Removed
+                  onClick={() => openMagicWallet().catch(console.error)}
                 />
               )}
             </div>
