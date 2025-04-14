@@ -5,7 +5,11 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityTierMap,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -49,6 +53,7 @@ describe('userMentioned Event Handler', () => {
     [user] = await tester.seed('User', {});
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 2,

@@ -1,5 +1,5 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { CommunityGoalType } from '@hicommonwealth/shared';
+import { CommunityGoalType, CommunityTierMap } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -86,6 +86,7 @@ describe('community goals lifecycle', () => {
     superadmin = actors.superadmin;
 
     const [target] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       base: community!.base,
       chain_node_id: community!.chain_node_id!,
       active: true,

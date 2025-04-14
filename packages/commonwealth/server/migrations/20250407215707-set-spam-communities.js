@@ -27,6 +27,8 @@ module.exports = {
           SET marked_as_spam_at = :now
           FROM "thread_ids" ti
           WHERE ti.id = C."thread_id";
+
+          ALTER TABLE "Communities" ALTER COLUMN tier SET DEFAULT 1;
         `,
         { transaction: t, replacements: { now } },
       );
