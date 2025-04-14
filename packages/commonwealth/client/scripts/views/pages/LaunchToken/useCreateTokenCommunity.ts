@@ -8,7 +8,7 @@ const useCreateTokenCommunity = () => {
   // get base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.Anvil,
+    (n) => n.ethChainId === commonProtocol.ValidChains.Base,
   ) as NodeInfo; // this is expected to exist
 
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();
