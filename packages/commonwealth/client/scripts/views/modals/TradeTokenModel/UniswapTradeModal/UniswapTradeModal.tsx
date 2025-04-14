@@ -1,5 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { SwapWidget } from '@uniswap/widgets';
+import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -117,6 +117,47 @@ const UniswapTradeModal = ({
   const logo =
     (tradeConfig.token as ExternalToken).logo ||
     (tradeConfig.token as LaunchpadToken).icon_url;
+
+  const supportedChainIds = Object.values(SupportedChainId).filter(
+    (value) => typeof value === 'number',
+  ) as number[];
+
+  if (!supportedChainIds.includes(ethChainId!)) {
+    return (
+      <CWModal
+        open={isOpen}
+        onClose={() => {
+          onModalClose?.();
+        }}
+        size="medium"
+        className="UnsupportedChainModal"
+        content={
+          <>
+            <CWModalHeader
+              label={<CWText type="h4">Unsupported Network</CWText>}
+              onModalClose={onModalClose || (() => {})}
+            />
+            <CWModalBody>
+              <CWText>
+                The connected network with chain ID {ethChainId} is not
+                supported. Please switch to a supported network such as Base or
+                Mainnet.
+              </CWText>
+            </CWModalBody>
+            <CWModalFooter>
+              <CWButton
+                label="Close"
+                buttonType="primary"
+                onClick={() => {
+                  onModalClose?.();
+                }}
+              />
+            </CWModalFooter>
+          </>
+        }
+      />
+    );
+  }
   return (
     <>
       <CWModal

@@ -1,3 +1,4 @@
+import { getChainName } from '@hicommonwealth/evm-protocols';
 import { notifyError } from 'controllers/app/notifications';
 import { useEffect, useState } from 'react';
 
@@ -24,7 +25,9 @@ export function useNetworkSwitching({
   rpcUrl,
   provider,
 }: UseNetworkSwitchingProps) {
-  const [currentChain, setCurrentChain] = useState<string | null>(null);
+  const [currentChain, setCurrentChain] = useState<string | undefined>(
+    undefined,
+  );
   const [isWrongNetwork, setIsWrongNetwork] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,10 +55,7 @@ export function useNetworkSwitching({
           : null;
 
         // Set current chain name
-        setCurrentChain(
-          chainNames[currentChainIdHex as string] ||
-            `Chain ID ${parseInt(currentChainIdHex, 16)}`,
-        );
+        setCurrentChain(`Chain ID ${getChainName({ hex: currentChainIdHex })}`);
 
         // Check if on the wrong network
         setIsWrongNetwork(
@@ -72,21 +72,18 @@ export function useNetworkSwitching({
   const promptNetworkSwitch = async () => {
     if (!isWrongNetwork || !windowEthereum.ethereum) return;
 
-    const formattedChainId = `0x${Number(ethChainId).toString(16)}`;
+    const chainHex = `0x${Number(ethChainId).toString(16)}`;
 
     try {
       // Try to switch to Base network
       await windowEthereum.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: formattedChainId }],
+        params: [{ chainId: chainHex }],
       });
 
       // Update status after switching
       setIsWrongNetwork(false);
-      setCurrentChain(
-        chainNames[formattedChainId] ||
-          parseInt(formattedChainId, 16).toString(),
-      );
+      setCurrentChain(getChainName({ hex: chainHex }));
     } catch (switchError: unknown) {
       // This error code indicates that the chain has not been added to MetaMask
       if (
@@ -100,7 +97,7 @@ export function useNetworkSwitching({
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: formattedChainId,
+                chainId: chainHex,
                 chainName: 'Base Mainnet',
                 nativeCurrency: {
                   name: 'ETH',
@@ -120,7 +117,7 @@ export function useNetworkSwitching({
           notifyError('Failed to add the Base network to your wallet.');
         }
       } else {
-        notifyError('Failed to switch to the Base network.');
+        notifyError('Failed to switch to networks.');
       }
     }
   };

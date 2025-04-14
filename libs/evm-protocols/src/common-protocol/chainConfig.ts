@@ -14,6 +14,40 @@ export enum ValidChains {
   Anvil = 31337,
 }
 
+const chains = Object.entries(ValidChains)
+  .filter(([key]) => isNaN(Number(key)))
+  .map(([name, id]) => ({ name, id: id as number }));
+
+export const getChainId = (input: {
+  name?: string;
+  hex?: string;
+}): number | undefined => {
+  if (input.name) {
+    return chains.find((c) => c.name === input.name)?.id;
+  } else if (input.hex) {
+    const id = parseInt(input.hex, 16);
+    return chains.find((c) => c.id === id)?.id;
+  }
+  return undefined;
+};
+
+export const getChainName = (input: {
+  id?: number;
+  hex?: string;
+}): string | undefined => {
+  const id = input.id ?? (input.hex ? parseInt(input.hex, 16) : undefined);
+  if (id === undefined) return undefined;
+  return chains.find((c) => c.id === id)?.name ?? String(id);
+};
+
+export const getChainHex = (input: {
+  id?: number;
+  name?: string;
+}): string | undefined => {
+  const id = input.id ?? chains.find((c) => c.name === input.name)?.id;
+  return id !== undefined ? '0x' + id.toString(16) : undefined;
+};
+
 /**
  * Type guard to verify if a given number is a value in the ValidChains enum.
  * @param chainId - The number to verify.
