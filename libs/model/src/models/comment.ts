@@ -79,7 +79,7 @@ export default (
       },
       search: {
         type: Sequelize.TSVECTOR,
-        allowNull: false,
+        allowNull: true,
       },
       content_url: { type: Sequelize.STRING, allowNull: true },
     },

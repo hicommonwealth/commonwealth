@@ -6,7 +6,7 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -58,6 +58,7 @@ describe('Recap email lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     [community] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,

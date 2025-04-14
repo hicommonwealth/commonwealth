@@ -2,7 +2,11 @@ import { EventContext, dispose } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
-import { BalanceType, ChainBase } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  ChainBase,
+  CommunityTierMap,
+} from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { handleJudgeNominated } from 'model/src/policies/handlers/handleJudgeNominated';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
@@ -86,6 +90,7 @@ describe('ChainEventCreated Policy', () => {
     });
 
     [community] = await tester.seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: chainNode?.id,
       namespace_address: namespaceAddress,
       lifetime_thread_count: 0,
