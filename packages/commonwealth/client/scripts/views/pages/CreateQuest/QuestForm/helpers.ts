@@ -125,8 +125,7 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
   if (idType === 'chain') {
-    // TODO: 11580 correct this url
-    return `${origin}/discussion/topic/${idOrURL}${params}`;
+    return `${idOrURL}`;
   }
 
   return '';
