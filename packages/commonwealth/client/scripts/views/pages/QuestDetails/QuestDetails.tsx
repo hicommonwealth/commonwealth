@@ -157,9 +157,8 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
-        // TODO: 11580: use alphabeticallyStakeWiseSortedChains as sortedChains, in quest creation
-        // and update create community flow to work with these chains redirected via url and update
-        // login system to work on the same
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/11847
+        // Update create community flow to select a specific chain via url params
         navigate(`/createCommunity`, {}, null);
         break;
       }
