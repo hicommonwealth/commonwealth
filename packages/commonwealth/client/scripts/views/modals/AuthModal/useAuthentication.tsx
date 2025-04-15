@@ -700,8 +700,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const session = await getSessionFromWallet(farcasterWallet);
       const chainIdentifier = app.chain?.id || ChainBase.Ethereum;
 
-      console.log('FIXME: sign-in 6');
-
       const { account, newlyCreated, joinedCommunity } = await signIn(session, {
         address: farcasterWallet.accounts[0],
         community_id: chainIdentifier,

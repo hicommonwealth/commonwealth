@@ -19,19 +19,17 @@ export const LoginWithGoogle = () => {
 
   useOAuthTokens({
     onOAuthTokenGrant: (params) => {
-      console.log('FIXME: onOAuthTokenGrant', params);
       setOAuthAccessToken(params.oAuthTokens.accessToken);
     },
   });
 
-  const { state, loading, initOAuth } = useLoginWithOAuth();
+  const { loading, initOAuth } = useLoginWithOAuth();
   const { authenticated, user, logout, createWallet } = usePrivy();
   const wallets = useWallets();
   const identityTokenRef = useIdentityTokenRef();
   const signMessage = useSignMessageMemo();
   const { signIn } = useSignIn();
 
-  console.log('wallets: ', wallets);
   const handleLogin = async () => {
     try {
       // The user will be redirected to OAuth provider's login page
@@ -121,6 +119,7 @@ export const LoginWithGoogle = () => {
     identityTokenRef,
     signIn,
     wallets.ready,
+    createWallet,
   ]);
 
   // user must have an embedded wallet...
