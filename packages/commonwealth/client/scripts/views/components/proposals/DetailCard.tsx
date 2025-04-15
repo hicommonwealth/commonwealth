@@ -14,7 +14,7 @@ type DetailCardProps = {
   status: string;
   scope?: string;
   governanceType: string;
-  publishDate: moment.Moment | number;
+  publishDate?: moment.Moment | number;
   id?: string;
   Threads: { id: number; title: string }[];
 };
@@ -44,10 +44,11 @@ const DetailCard = ({
             <CWText className="label">Date Proposed</CWText>
 
             <CWText className="detail">
-              {moment(publishDate, 'X')
-                ?.utc?.()
-                ?.local?.()
-                ?.format('DD/MM/YYYY')}
+              {publishDate &&
+                moment(publishDate, 'X')
+                  ?.utc?.()
+                  ?.local?.()
+                  ?.format('DD/MM/YYYY')}
             </CWText>
 
             <CWText className="label">ID</CWText>
