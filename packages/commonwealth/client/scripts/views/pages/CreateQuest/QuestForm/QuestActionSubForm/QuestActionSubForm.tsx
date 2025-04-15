@@ -361,7 +361,8 @@ const QuestActionSubForm = ({
         name="action"
         options={actionOptions}
         onChange={(newValue) =>
-          newValue && onChange?.({ action: newValue.value, contentLink: '' })
+          newValue &&
+          onChange?.({ action: newValue.value, contentIdentifier: '' })
         }
         {...(defaultValues?.action && {
           value: {
@@ -491,7 +492,7 @@ const QuestActionSubForm = ({
             onChange={(e) =>
               e.target.checked &&
               onChange?.({
-                contentLink: '',
+                contentIdentifier: '',
                 contentIdScope: QuestActionContentIdScope.Topic,
               })
             }
@@ -508,7 +509,7 @@ const QuestActionSubForm = ({
             onChange={(e) =>
               e.target.checked &&
               onChange?.({
-                contentLink: '',
+                contentIdentifier: '',
                 contentIdScope: QuestActionContentIdScope.Thread,
               })
             }
@@ -521,42 +522,44 @@ const QuestActionSubForm = ({
         {allowsContentId &&
           (config.with_optional_chain_id ? (
             <CWSelectList
-              key={`contentLink-${defaultValues?.action}`}
-              name="contentLink"
+              key={`contentIdentifier-${defaultValues?.action}`}
+              name="contentIdentifier"
               isClearable={false}
               label="Chain Node"
               placeholder="Select a chain node"
               options={chainNodes}
               onChange={(newValue) =>
-                newValue && onChange?.({ contentLink: `${newValue.value}` })
+                newValue &&
+                onChange?.({ contentIdentifier: `${newValue.value}` })
               }
-              {...(defaultValues?.contentLink && {
+              {...(defaultValues?.contentIdentifier && {
                 value: {
-                  value: parseInt(`${defaultValues?.contentLink}`),
+                  value: parseInt(`${defaultValues?.contentIdentifier}`),
                   label: `${
                     chainNodes?.find(
                       (x) =>
-                        x.value === parseInt(`${defaultValues?.contentLink}`),
+                        x.value ===
+                        parseInt(`${defaultValues?.contentIdentifier}`),
                     )?.label
                   }`,
                 },
               })}
-              customError={errors?.contentLink}
+              customError={errors?.contentIdentifier}
             />
           ) : (
             <CWTextInput
-              key={`contentLink-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
-              name="contentLink"
+              key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
+              name="contentIdentifier"
               label={getContentIdInputLabel()}
               placeholder={getContentIdInputPlaceholder()}
               fullWidth
-              {...(defaultValues?.contentLink && {
-                defaultValue: defaultValues?.contentLink,
+              {...(defaultValues?.contentIdentifier && {
+                defaultValue: defaultValues?.contentIdentifier,
               })}
               onInput={(e) =>
-                onChange?.({ contentLink: e?.target?.value?.trim() })
+                onChange?.({ contentIdentifier: e?.target?.value?.trim() })
               }
-              customError={errors?.contentLink}
+              customError={errors?.contentIdentifier}
             />
           ))}
 

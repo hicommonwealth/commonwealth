@@ -184,12 +184,12 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
-      // reset errors/values if action doesn't require content link
+      // reset errors/values if action doesn't require content identifier
       if (!allowsContentId) {
-        updatedSubForms[index].values.contentLink = undefined;
+        updatedSubForms[index].values.contentIdentifier = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
 
@@ -215,7 +215,7 @@ const useQuestActionMultiFormsState = ({
         }
       }
 
-      // set/reset default values/config if action allows content link
+      // set/reset default values/config if action allows content identifier
       if (allowsContentId) {
         updatedSubForms[index].values.contentIdScope =
           updateBody.contentIdScope ||
@@ -243,7 +243,7 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdScope: undefined,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
     }

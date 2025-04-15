@@ -24,7 +24,7 @@ export type QuestActionSubFormErrors = {
   participationLimit?: string;
   // specific for certain quest action types
   contentIdScope?: string;
-  contentLink?: string;
+  contentIdentifier?: string;
   // specific to twitter actions
   noOfLikes?: string;
   noOfRetweets?: string;
@@ -41,7 +41,10 @@ export type QuestActionSubFormFields = {
   participationTimesPerPeriod?: string | number;
   // specific for certain quest action types
   contentIdScope?: QuestActionContentIdScope;
-  contentLink?: string;
+  // a string containing content identifier
+  // this string can be a url ex: `https://common.xyz/discussion/{identifier}`
+  // or just the identifier itself ex: `{identifier}`
+  contentIdentifier?: string;
   // specific to twitter actions
   noOfLikes?: string | number;
   noOfRetweets?: string | number;

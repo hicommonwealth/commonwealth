@@ -56,7 +56,7 @@ export const buildQuestSubFormValidationSchema = (
         creatorRewardAmount: numberNonDecimalValidationSchema.required,
         // TODO: 11580 rename it to contentIdentifier which can be anything i.e string(?link) number or others
         // TODO: 11580 move it to if (allowsOptionalContentId) { below
-        contentLink: numberValidationSchema.optional,
+        contentIdentifier: numberValidationSchema.optional,
       })
       .refine(
         (data) => {
@@ -84,13 +84,13 @@ export const buildQuestSubFormValidationSchema = (
   if (allowsOptionalContentId) {
     // TODO: 11580 do something for this? like waht? and add this back
     // baseSchema = baseSchema.extend({
-    //   contentLink: linkValidationSchema.optional,
+    //   contentIdentifier: linkValidationSchema.optional,
     // }) as unknown as typeof baseSchema;
   }
   if (requiresTwitterEngagement) {
     baseSchema = baseSchema
       .extend({
-        contentLink: linkValidationSchema.required.refine(
+        contentIdentifier: linkValidationSchema.required.refine(
           (url) => {
             // validate twitter tweet URL
             const twitterRegex = /https:\/\/x\.com\/\w+\/status\/\d+/;
@@ -146,7 +146,7 @@ export const buildQuestSubFormValidationSchema = (
   }
   if (requiresDiscordServerURL) {
     baseSchema = baseSchema.extend({
-      contentLink: linkValidationSchema.required.refine(
+      contentIdentifier: linkValidationSchema.required.refine(
         (url) => {
           // validate discord server URL
           const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
