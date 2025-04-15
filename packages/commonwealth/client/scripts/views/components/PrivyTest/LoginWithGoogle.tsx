@@ -10,6 +10,7 @@ import { getSessionFromWallet } from 'controllers/server/sessions';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSignIn } from 'state/api/user';
 import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
+import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
 import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
 
 export const LoginWithGoogle = () => {
@@ -24,11 +25,14 @@ export const LoginWithGoogle = () => {
   });
 
   const { loading, initOAuth } = useLoginWithOAuth();
-  const { authenticated, user, logout, createWallet } = usePrivy();
   const wallets = useWallets();
   const identityTokenRef = useIdentityTokenRef();
   const signMessage = useSignMessageMemo();
   const { signIn } = useSignIn();
+  const privy = usePrivy();
+  const { authenticated, user, logout } = privy;
+
+  const createWallet = useMemoizedFunction(privy.createWallet);
 
   const handleLogin = async () => {
     try {
@@ -112,14 +116,14 @@ export const LoginWithGoogle = () => {
 
     doAsync().catch(console.error);
   }, [
-    oAuthAccessToken,
     authenticated,
-    signMessage,
-    wallets.wallets,
-    identityTokenRef,
-    signIn,
     wallets.ready,
+    wallets.wallets,
+    oAuthAccessToken,
+    signIn,
+    identityTokenRef,
     createWallet,
+    signMessage,
   ]);
 
   // user must have an embedded wallet...

@@ -10,6 +10,7 @@ import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSignIn } from 'state/api/user';
 import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
+import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
 import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
 
 type OnSuccess = {
@@ -37,22 +38,18 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   });
 
   const { loading, initOAuth } = useLoginWithOAuth();
-  const { authenticated, user, logout, createWallet } = usePrivy();
   const wallets = useWallets();
   const signMessage = useSignMessageMemo();
   const { signIn } = useSignIn();
   const identityTokenRef = useIdentityTokenRef();
-  const [authStarted, setAuthStarted] = useState(false);
+
+  const privy = usePrivy();
+  const { authenticated, user, logout } = privy;
+
+  const createWallet = useMemoizedFunction(privy.createWallet);
 
   useEffect(() => {
     async function doAsync() {
-      if (!authStarted) {
-        // necessary so that we do not attempt to trigger auth unnecessarily if
-        // we're already logged in.
-        console.warn('Auth not started');
-        return;
-      }
-
       if (!authenticated) {
         console.warn('Not authenticated with privy');
         return;
@@ -114,30 +111,30 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
       });
 
       console.log('Authenticated successfully! ');
-      onSuccess({ address: wallet.address });
+      //onSuccess({ address: wallet.address });
     }
 
     doAsync().catch((err) => {
       console.error(err);
-      onError(err);
+      //onError(err);
     });
+
+    // WARN: do not have signIn in the list of effects below.
   }, [
-    authStarted,
     authenticated,
     wallets.ready,
     wallets.wallets,
     oAuthAccessToken,
-    signIn,
+    // signIn,
     identityTokenRef,
-    onSuccess,
     createWallet,
     signMessage,
-    onError,
+    // onError,
+    // onSuccess,
   ]);
 
   const onPrivyOAuth = useCallback(() => {
     async function doAsync() {
-      setAuthStarted(true);
       await initOAuth({ provider: 'google' });
     }
 

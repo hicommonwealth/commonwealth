@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { usePrivyOAuth } from 'views/components/PrivyTest/usePrivyOAuth';
 
 export const LoginWithGoogle2 = () => {
+  const handleSuccess = useCallback(() => {
+    console.log('success!');
+  }, []);
+
+  const handleError = useCallback((err: Error) => {
+    console.log('error: ', err);
+  }, []);
+
   const { onPrivyOAuth, authenticated, loading, logout } = usePrivyOAuth({
-    onSuccess: () => {
-      console.log('success!');
-    },
-    onError: (err) => {
-      console.log('error: ', err);
-    },
+    onSuccess: handleSuccess,
+    onError: handleError,
   });
 
   if (authenticated) {
