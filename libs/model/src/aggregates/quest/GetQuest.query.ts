@@ -23,6 +23,12 @@ export function GetQuest(): Query<typeof schemas.GetQuest> {
               {
                 model: models.ChainEventXpSource,
                 required: false,
+                include: [
+                  {
+                    model: models.ChainNode,
+                    required: true,
+                  },
+                ],
               },
             ],
           },
