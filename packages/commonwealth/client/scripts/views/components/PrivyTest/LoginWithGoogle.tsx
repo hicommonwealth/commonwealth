@@ -119,6 +119,8 @@ export const LoginWithGoogle = () => {
     signMessage,
     wallets.wallets,
     identityTokenRef,
+    signIn,
+    wallets.ready,
   ]);
 
   // user must have an embedded wallet...
