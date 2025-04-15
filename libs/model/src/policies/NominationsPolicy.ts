@@ -24,7 +24,12 @@ export function NominationsPolicy(): Policy<typeof inputs, ZodUndefined> {
             namespace: payload.parsedArgs.namespace,
           },
         });
-        mustExist('Community', community);
+        if (!community) {
+          log.warn(
+            `Community not found for namespace ${payload.parsedArgs.namespace}`,
+          );
+          return;
+        }
 
         community.namespace_verified = true;
         await community.save();
@@ -37,7 +42,12 @@ export function NominationsPolicy(): Policy<typeof inputs, ZodUndefined> {
             namespace: payload.parsedArgs.namespace,
           },
         });
-        mustExist('Community', community);
+        if (!community) {
+          log.warn(
+            `Community not found for namespace ${payload.parsedArgs.namespace}`,
+          );
+          return;
+        }
 
         // append address to community nominations
         await models.sequelize.query(

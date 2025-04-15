@@ -11,5 +11,4 @@ export * from './GetContest.query';
 export * from './GetContestLog.query';
 export * from './GetFarcasterContestCasts.query';
 export * from './GetFarcasterUpvoteActionMetadata.query';
-export * from './GetLastJudgedContest.query';
 export * from './UpdateContestManagerMetadata.command';

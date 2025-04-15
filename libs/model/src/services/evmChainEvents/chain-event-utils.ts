@@ -10,7 +10,6 @@ import {
 import {
   EvmEventSignatures,
   decodeLog,
-  erc1155Abi,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
@@ -293,32 +292,38 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   };
 };
 
-const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
+const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
   event: EvmEvent,
 ) => {
   const decoded = decodeLog({
-    abi: erc1155Abi,
-    eventName: 'TransferSingle',
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorSettled',
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-
   return {
-    event_name: 'NamespaceTransferSingle',
+    event_name: 'NominatorSettled',
     event_payload: {
-      rawLog: {
-        ...event.rawLog,
-        address: getEvmAddress(event.rawLog.address) as `0x${string}`,
-      },
-      eventSource: {
-        ethChainId: event.eventSource.ethChainId,
-      },
-      parsedArgs: {
-        from: decoded.args.from,
-        to: decoded.args.to,
-        id: decoded.args.id,
-        value: decoded.args.value,
-      },
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
     },
   };
 };
@@ -360,9 +365,13 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
 
-  // Namespace
-  [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
-  [EvmEventSignatures.Namespace.JudgeNominated]: judgeNominatedMapper,
+  // Community Nominations
+  [EvmEventSignatures.CommunityNominations.NominatorSettled]:
+    nominatorSettledMapper,
+  [EvmEventSignatures.CommunityNominations.NominatorNominated]:
+    nominatorNominatedMapper,
+  [EvmEventSignatures.CommunityNominations.JudgeNominated]:
+    judgeNominatedMapper,
 
   // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
