@@ -38,6 +38,7 @@ export const buildQuestSubFormValidationSchema = (
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerURL = config?.requires_discord_server_url;
   const requiresCreatorPoints = config?.requires_creator_points;
+  const allowsChainIdAsContentId = config?.with_optional_chain_id;
 
   const needsExtension =
     requiresCreatorPoints ||
@@ -49,13 +50,21 @@ export const buildQuestSubFormValidationSchema = (
 
   let baseSchema = questSubFormValidationSchema;
 
-  // TODO: 11580 fix these schema validations they dont work correctly when multiple if blocks are involved
+  if (allowsOptionalContentId) {
+    if (allowsChainIdAsContentId) {
+      baseSchema = baseSchema.extend({
+        contentIdentifier: numberValidationSchema.optional,
+      }) as unknown as typeof baseSchema;
+    } else {
+      baseSchema = baseSchema.extend({
+        contentIdentifier: linkValidationSchema.optional,
+      }) as unknown as typeof baseSchema;
+    }
+  }
   if (requiresCreatorPoints) {
     baseSchema = baseSchema
       .extend({
         creatorRewardAmount: numberNonDecimalValidationSchema.required,
-        // TODO: 11580 move it to if (allowsOptionalContentId) { below
-        contentIdentifier: numberValidationSchema.optional,
       })
       .refine(
         (data) => {
@@ -79,12 +88,6 @@ export const buildQuestSubFormValidationSchema = (
           path: ['creatorRewardAmount'],
         },
       ) as unknown as typeof baseSchema;
-  }
-  if (allowsOptionalContentId) {
-    // TODO: 11580 do something for this? like waht? and add this back
-    // baseSchema = baseSchema.extend({
-    //   contentIdentifier: linkValidationSchema.optional,
-    // }) as unknown as typeof baseSchema;
   }
   if (requiresTwitterEngagement) {
     baseSchema = baseSchema
