@@ -186,7 +186,6 @@ const useQuestActionMultiFormsState = ({
 
       // reset errors/values if action doesn't require content link
       if (!allowsContentId) {
-        // TODO: 11580 add chain id reset here?
         updatedSubForms[index].values.contentLink = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
@@ -206,7 +205,6 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.DiscordServer;
           break;
         }
-        // TODO: 11580 - verify these work correctly
         case 'CommunityCreated': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Chain;

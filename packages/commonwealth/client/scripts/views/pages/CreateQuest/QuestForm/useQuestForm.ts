@@ -322,8 +322,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  // TODO: 11580 remove async
-  const handleSubmit = async (
+  const handleSubmit = (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const subFormErrors = validateSubForms();
@@ -331,10 +330,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
-
-    // TODO: 11580 remove
-    // console.log('values => ', { values, questActionSubForms, subFormErrors, action_metas: await buildActionMetasPayload(), });
-    // return;
 
     const handleAsync = async () => {
       try {
