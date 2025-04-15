@@ -4,8 +4,13 @@ import {
 } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { roundDecimalsOrReturnWhole } from 'helpers/number';
+import {
+  doesActionRequireRewardShare,
+  doesActionRewardShareForReferrer,
+} from 'helpers/quest';
 import React from 'react';
 import useUserStore from 'state/ui/user';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -13,34 +18,8 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
 import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
 import './QuestActionCard.scss';
-
-// TODO: fix types with schemas.Events keys
-const actionCopies = {
-  title: {
-    ['CommunityCreated']: 'Create a community',
-    ['CommunityJoined']: 'Join a community',
-    ['ThreadCreated']: 'Create a thread',
-    ['ThreadUpvoted']: 'Upvote a thread',
-    ['CommentCreated']: 'Create a comment',
-    ['CommentUpvoted']: 'Upvote a comment',
-    ['WalletLinked']: 'Link a new wallet',
-    ['SSOLinked']: 'Link a new social (SSO)',
-  },
-  shares: {
-    ['CommunityCreated']: 'referrer',
-    ['CommunityJoined']: 'referrer',
-    ['ThreadCreated']: '',
-    ['ThreadUpvoted']: '',
-    ['CommentCreated']: '',
-    ['CommentUpvoted']: 'comment creator',
-    ['UserMentioned']: '',
-  },
-};
+import { actionCopies } from './helpers';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
@@ -115,23 +94,41 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
+            {(questAction.event_name === 'TweetEngagement' ||
+              questAction.event_name === 'CommonDiscordServerJoined') && (
+              <>
+                <CWDivider />
+                <CWText type="caption" fontWeight="semiBold">
+                  {actionCopies.pre_reqs[questAction.event_name]()}
+                </CWText>
+                {questAction.event_name === 'TweetEngagement' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.QuestTweet?.like_cap || 0,
+                      questAction?.QuestTweet?.retweet_cap || 0,
+                      questAction?.QuestTweet?.replies_cap || 0,
+                    )}
+                  </CWText>
+                )}
+              </>
+            )}
             {!hideShareSplit &&
               doesActionRequireRewardShare(questAction.event_name) &&
               creatorXP.percentage > 0 && (
                 <CWText type="caption" className="xp-shares">
                   <span className="creator-share">
                     {creatorXP.percentage}% (
-                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
+                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} Aura)
                   </span>
                   &nbsp; shared with{' '}
                   {actionCopies.shares[questAction.event_name]}. Your share ={' '}
-                  {Math.abs(questAction.reward_amount - creatorXP.value)} XP
+                  {Math.abs(questAction.reward_amount - creatorXP.value)} Aura
                   {isRepeatableQuest ? ` / attempt` : ''}
                 </CWText>
               )}
             <div className="points-row">
               <CWTag
-                label={`${questAction.reward_amount} XP${isRepeatableQuest ? ` / attempt` : ''}`}
+                label={`${questAction.reward_amount} Aura${isRepeatableQuest ? ` / attempt` : ''}`}
                 type="proposal"
               />
               {isRepeatableQuest &&

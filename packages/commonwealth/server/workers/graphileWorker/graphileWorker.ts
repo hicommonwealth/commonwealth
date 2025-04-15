@@ -1,7 +1,18 @@
-import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
-import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import {
+  HotShotsStats,
+  RedisCache,
+  S3BlobStorage,
+} from '@hicommonwealth/adapters';
+import {
+  blobStorage,
+  cache,
+  dispose,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
 import { GraphileTaskNames, preset } from '@hicommonwealth/model';
 import { Task, parseCronItems, run } from 'graphile-worker';
+import { config } from '../../config';
 import { cronItems } from './cronJobs';
 import { graphileTasks, taskFactory } from './tasks';
 
@@ -12,6 +23,14 @@ blobStorage({
 });
 stats({
   adapter: HotShotsStats(),
+});
+
+if (!config.CACHE.REDIS_URL) {
+  throw new Error('REDIS_URL is not set');
+}
+
+cache({
+  adapter: new RedisCache(config.CACHE.REDIS_URL),
 });
 
 async function startGraphileWorker() {

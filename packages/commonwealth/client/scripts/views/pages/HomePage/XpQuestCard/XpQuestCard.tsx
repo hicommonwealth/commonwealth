@@ -27,7 +27,7 @@ const MAX_CHARS_FOR_LABELS = 14;
 const QuestCard = ({
   name,
   iconURL,
-  xpPoints,
+  // xpPoints,
   endDate,
   className,
   onCardBodyClick,
@@ -96,7 +96,7 @@ const QuestCard = ({
         <div className="quest-list">
           <div className="quest">
             <CWText fontWeight="medium">Complete All Tasks</CWText>
-            <CWText fontWeight="medium">{xpPoints} XP</CWText>
+            {/*<CWText fontWeight="medium">{xpPoints} Aura</CWText>*/}
           </div>
         </div>
 

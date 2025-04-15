@@ -25,7 +25,7 @@ export const CreateLaunchpadTrade = {
     eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
   }),
-  output: LaunchpadTradeView,
+  output: LaunchpadTradeView.nullish(),
 };
 
 export const GetLaunchpadTrades = {
@@ -38,4 +38,15 @@ export const GetLaunchpadTrades = {
   })
     .array()
     .nullish(),
+};
+
+export const GetTokenizedThreadsAllowed = {
+  input: z.object({
+    community_id: z.string(),
+    topic_id: z.number(),
+  }),
+  output: z.object({
+    tokenized_threads_enabled: z.boolean(),
+    thread_purchase_token: z.string().nullish(),
+  }),
 };

@@ -30,6 +30,12 @@ const columns = [
     numeric: false,
     sortable: true,
   },
+  // {
+  //   key: 'aura',
+  //   header: 'Aura',
+  //   numeric: true,
+  //   sortable: true,
+  // },
   {
     key: 'referrals',
     header: 'Referrals',
@@ -86,6 +92,14 @@ const LeaderboardSection = () => {
               />
               <p>{member.profile_name}</p>
             </Link>
+          </div>
+        ),
+      },
+      aura: {
+        sortValue: member.xp_points + member.xp_referrer_points,
+        customElement: (
+          <div className="table-cell text-right">
+            {member.xp_points + member.xp_referrer_points}
           </div>
         ),
       },

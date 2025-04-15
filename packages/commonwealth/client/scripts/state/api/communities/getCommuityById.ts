@@ -1,6 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
-import { ThreadStage } from 'models/types';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { queryClient } from '../config';
@@ -10,6 +9,7 @@ const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins
 type UseGetCommunityByIdProps = {
   id: string;
   includeNodeInfo?: boolean;
+  includeGroups?: boolean;
   enabled?: boolean;
 };
 
@@ -24,42 +24,6 @@ const getQueryKeysForCommunity = (communityId: string) => {
       include_node_info: false,
     },
   ];
-};
-
-export const updateThreadCountsByStageChange = (
-  communityId: string,
-  currentStage: ThreadStage,
-  updatedStage: ThreadStage,
-  trpcUtils: ReturnType<typeof trpc.useUtils>,
-) => {
-  // get all the query keys for this community
-  const queryKeys = getQueryKeysForCommunity(communityId);
-
-  // calc change by value
-  let changeBy = 0;
-  if (currentStage === ThreadStage.Voting) changeBy--;
-  if (updatedStage === ThreadStage.Voting) changeBy++;
-
-  queryKeys.map((key) => {
-    const queryKey = trpc.community.getCommunity.getQueryKey(key);
-
-    // update react query cache
-    const rqData =
-      queryClient.getQueryData<z.infer<typeof ExtendedCommunity>>(queryKey);
-    if (rqData) {
-      queryClient.setQueryData(queryKey, () => {
-        rqData.numVotingThreads = (rqData.numVotingThreads || 0) + changeBy;
-        return { ...rqData };
-      });
-    }
-
-    // update trpc cache
-    const trpcData = trpcUtils.community.getCommunity.getData(key);
-    if (trpcData && trpcData.numVotingThreads >= 0) {
-      trpcData.numVotingThreads += changeBy;
-      trpcUtils.community.getCommunity.setData(key, trpcData);
-    }
-  });
 };
 
 export const updateCommunityThreadCount = (
@@ -82,9 +46,6 @@ export const updateCommunityThreadCount = (
       queryClient.setQueryData(queryKey, () => {
         rqData.lifetime_thread_count =
           (rqData.lifetime_thread_count || 0) + count;
-        if (isVotingThread) {
-          rqData.numVotingThreads = (rqData.numVotingThreads || 0) + count;
-        }
         return { ...rqData };
       });
     }
@@ -161,12 +122,14 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
 const useGetCommunityByIdQuery = ({
   id,
   includeNodeInfo = false,
+  includeGroups = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
   return trpc.community.getCommunity.useQuery(
     {
       id,
       include_node_info: includeNodeInfo,
+      include_groups: includeGroups,
     },
     {
       staleTime: COMMUNITIY_STALE_TIME,

@@ -1,24 +1,25 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
-  QuestAction as QuestActionType,
-  XPLog,
   calculateTotalXPForQuestActions,
   isQuestActionComplete,
+  QuestAction as QuestActionType,
+  XPLog,
 } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
+import app from 'state';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
-import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
-import { useAuthModalStore } from 'state/ui/modals';
+import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -33,7 +34,8 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { AuthModalType } from 'views/modals/AuthModal';
+import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
+import { AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
@@ -60,15 +62,13 @@ const QuestDetails = ({ id }: { id: number }) => {
     enabled: user.isLoggedIn && xpEnabled,
   });
 
-  const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
-    useGetRandomResourceIds({
-      limit: 1,
-      cursor: 1,
-      enabled: true,
-    });
-  const randomResourceId = randomResourceIds?.results?.[0];
-
-  const { setAuthModalType } = useAuthModalStore();
+  const [authModalConfig, setAuthModalConfig] = useState<{
+    type: AuthModalType | undefined;
+    options: AuthOptionTypes[] | undefined;
+  }>({
+    type: undefined,
+    options: undefined,
+  });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
     useDeleteQuestMutation();
@@ -98,7 +98,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  const { pendingWeeklyQuests } = useXPProgress();
+  const { pendingWeeklyQuests } = useXPProgress({ includeSystemQuests: true }); // show system quests in quest details
 
   const popoverProps = usePopover();
 
@@ -106,7 +106,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (isLoading) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -131,19 +131,29 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
-  const isCompleted = gainedXP === totalUserXP;
+  const isSystemQuest = quest.id < 0;
 
   const handleActionStart = (
     actionName: QuestAction,
     actionContentId?: string,
   ) => {
     switch (actionName) {
+      case 'SignUpFlowCompleted': {
+        setAuthModalConfig({
+          type: AuthModalType.CreateAccount,
+          options: ['wallets', 'sso'],
+        });
+        break;
+      }
       case 'WalletLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['wallets'],
+        });
         break;
       }
       case 'SSOLinked': {
-        setAuthModalType(AuthModalType.SignIn);
+        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
         break;
       }
       case 'CommunityCreated': {
@@ -151,6 +161,13 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'ThreadCreated': {
+        if (actionContentId) {
+          const url = buildURLFromContentId(actionContentId, {
+            newThread: true,
+          }).split(window.location.origin)[1];
+          navigate(url, {}, null);
+          return;
+        }
         navigate(`/new/discussion`, {}, quest?.community_id || null);
         break;
       }
@@ -166,10 +183,9 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(
-              actionContentId.split(':')[1],
-              'thread',
-            ).split(window.location.origin)[1],
+            buildURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
             {},
             null,
           );
@@ -186,13 +202,10 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(
-                  actionContentId.split(':')[1],
-                  'comment',
-                ).split(window.location.origin)[1]
-              : `/discussion/${
-                  randomResourceId?.thread_id
-                }?comment=${randomResourceId?.comment_id}`,
+              ? buildURLFromContentId(actionContentId).split(
+                  window.location.origin,
+                )[1]
+              : `/explore?tab=threads`,
             {},
             null,
           );
@@ -207,6 +220,22 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'UserMentioned': {
         // TODO: user mention is not implemented in app
+        break;
+      }
+      case 'TweetEngagement': {
+        if (actionContentId) {
+          window.open(buildURLFromContentId(actionContentId), '_blank');
+        } else {
+          notifyError(`Linked twitter tweet url is invalid`);
+        }
+        break;
+      }
+      case 'CommonDiscordServerJoined': {
+        if (actionContentId) {
+          window.open(buildURLFromContentId(actionContentId), '_blank');
+        } else {
+          notifyError(`Linked discord server url is invalid`);
+        }
         break;
       }
       default:
@@ -244,7 +273,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           {isDeletionAllowed
             ? 'Deletion would remove this quest and its sub-tasks entirely for every user.'
             : // eslint-disable-next-line max-len
-              `With cancelation, users who earned XP for this quest will retain that XP. However new submissions to this quest won't be allowed and won't reward any XP to users.`}
+              `With cancellation, users who earned any aura for this quest will retain that aura. However new submissions to this quest won't be allowed and won't reward any aura to users.`}
         </>
       ),
       buttons: [
@@ -271,7 +300,7 @@ const QuestDetails = ({ id }: { id: number }) => {
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
@@ -281,6 +310,8 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isSiteAdmin = Permissions.isSiteAdmin();
 
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
+
+  const isCompleted = gainedXP === totalUserXP && isStarted;
 
   return (
     <CWPageLayout>
@@ -333,14 +364,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                     body={
                       <div>
                         <CWText type="b2">
-                          Indicates the maximum xp allocation before this quest
-                          is considered complete.
+                          Indicates the maximum Aura allocation before this
+                          quest is considered complete.
                         </CWText>
                         <br />
 
                         <CWText type="b2">
                           The quest automatically transitions to completed
-                          status, if max XP is alloted before quest end date.
+                          status, if max Aura is alloted before quest end date.
                         </CWText>
                       </div>
                     }
@@ -402,10 +433,10 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Complete tasks to earn XP
+                Create action to earn aura
               </CWText>
               <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} XP`}
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
                 type="proposal"
               />
             </div>
@@ -427,11 +458,20 @@ const QuestDetails = ({ id }: { id: number }) => {
                       id: log.action_meta_id,
                       createdAt: new Date(log.event_created_at),
                     }))}
-                  canStartAction={isStarted && !isEnded}
-                  {...((!isStarted || isEnded) && {
-                    actionStartBlockedReason: !isStarted
-                      ? 'Only available when quest starts'
-                      : 'Unavailable, quest has ended',
+                  canStartAction={
+                    isSystemQuest
+                      ? !user.isLoggedIn && isStarted && !isEnded
+                      : isStarted && !isEnded
+                  }
+                  {...(((isSystemQuest && user.isLoggedIn) ||
+                    !isStarted ||
+                    isEnded) && {
+                    actionStartBlockedReason:
+                      isSystemQuest && user.isLoggedIn
+                        ? `Only available for new users`
+                        : !isStarted
+                          ? 'Only available when quest starts'
+                          : 'Unavailable, quest has ended',
                   })}
                 />
               ))}
@@ -475,6 +515,17 @@ const QuestDetails = ({ id }: { id: number }) => {
           </div>
         )}
       </section>
+      <AuthModal
+        type={authModalConfig.type}
+        onClose={() =>
+          setAuthModalConfig({ type: undefined, options: undefined })
+        }
+        showWalletsFor={
+          (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
+        }
+        showAuthOptionTypesFor={authModalConfig.options}
+        isOpen={!!(authModalConfig.type && authModalConfig.options)}
+      />
     </CWPageLayout>
   );
 };

@@ -27,6 +27,7 @@ type StatusResp = {
   loggedIn?: boolean;
   user?: {
     id: number;
+    tier: number;
     email?: string | null;
     emailVerified?: boolean | null;
     emailInterval?: EmailNotificationInterval;
@@ -38,6 +39,8 @@ type StatusResp = {
     disableRichText?: boolean;
     communities: StarredCommunityResponse[];
     referred_by_address?: string;
+    xp_points: number;
+    xp_referrer_points: number;
   };
   communityWithRedirects?: CommunityWithRedirects[];
   evmTestEnv?: string;
@@ -113,6 +116,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   return {
     user: {
       id: user.id,
+      tier: user.tier,
       email: user.email,
       emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
@@ -126,6 +130,8 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       disableRichText,
       communities: userCommunities || [],
       referred_by_address: user.referred_by_address || undefined,
+      xp_points: user.xp_points || 0,
+      xp_referrer_points: user.xp_referrer_points || 0,
     },
     id: user.id,
     email: user.email,

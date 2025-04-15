@@ -6,7 +6,13 @@ import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCi
 import './ActionStep.scss';
 import { ActionStepProps } from './types';
 
-const ActionStep = ({ state, index, label, actionButton }: ActionStepProps) => {
+const ActionStep = ({
+  state,
+  index,
+  label,
+  actionButton,
+  description,
+}: ActionStepProps) => {
   const isCompleted = state === 'completed';
   const isLoading = state === 'loading';
 
@@ -27,10 +33,17 @@ const ActionStep = ({ state, index, label, actionButton }: ActionStepProps) => {
           </CWText>
         )}
       </div>
+      <div className="content">
+        <CWText type="h5" className="label">
+          {label}
+        </CWText>
 
-      <CWText type="h5" className="label">
-        {label}
-      </CWText>
+        {description && (
+          <CWText type="b1" className="description">
+            {description}
+          </CWText>
+        )}
+      </div>
 
       {actionButton && (
         <div className="action-btn">

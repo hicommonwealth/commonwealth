@@ -66,7 +66,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         pastWinners: ' AND CON.end_time <= NOW()',
         all: '',
       };
-      const responseThreadsQuery = models.sequelize.query<
+      const threads = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView>
       >(
         `
@@ -120,6 +120,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                     'community_id', A.community_id
                 ) as "Address",
                 U.id as user_id,
+                U.tier as user_tier,
                 A.last_active as address_last_active,
                 U.profile->>'avatar_url' as avatar_url,
                 U.profile->>'name' as profile_name
@@ -142,7 +143,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                             'address', A.address,
                             'lastActive', A.last_active::text,
                             'avatarUrl', editor_profiles.profile->>'avatar_url'
-                          )
+                          ),
+                          'tier', editor_profiles.tier
                         )
                     )))
                 ELSE '[]'::json
@@ -217,6 +219,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'profile_name', U.profile->>'name',
                   'profile_avatar', U.profile->>'avatar_url',
                   'user_id', U.id,
+                  'user_tier', U.tier,
                   'content_url', COM.content_url
               ))) as "recentComments"
               FROM (
@@ -253,23 +256,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       );
 
-      const numVotingThreadsQuery = models.Thread.count({
-        where: {
-          community_id,
-          stage: 'voting',
-        },
-      });
-
-      const [threads, numVotingThreads] = await Promise.all([
-        responseThreadsQuery,
-        numVotingThreadsQuery,
-      ]);
-
       return {
         limit: replacements.limit,
         page: replacements.page,
         threads,
-        numVotingThreads,
         threadCount: threads.at(0)?.total_num_thread_results || 0,
       };
     },

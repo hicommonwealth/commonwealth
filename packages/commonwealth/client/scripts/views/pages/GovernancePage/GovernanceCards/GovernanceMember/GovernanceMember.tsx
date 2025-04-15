@@ -7,7 +7,7 @@ import './GovernanceMember.scss';
 const GovernanceMember = () => {
   const navigate = useCommonNavigate();
 
-  const member_count = app.chain.meta.profile_count;
+  const memberCount = app?.chain?.meta?.profile_count;
 
   return (
     <div className="GovernanceMemberCard">
@@ -20,7 +20,7 @@ const GovernanceMember = () => {
         </CWText>
       </div>
       <CWText fontWeight="semiBold" type="h1">
-        {member_count}
+        {memberCount}
       </CWText>
       <CWText fontWeight="regular">Delegates</CWText>
       <CWText fontWeight="regular">token holders</CWText>

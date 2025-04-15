@@ -116,6 +116,7 @@ describe('Referral lifecycle', () => {
         directory_page_enabled: true,
         social_links: [],
         tags: [],
+        allow_tokenized_threads: false,
       },
     });
     expect(result).toBeTruthy();

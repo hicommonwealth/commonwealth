@@ -34,6 +34,7 @@ type TrendingThreadListProps = {
   defaultCount?: number;
   customScrollParent?: HTMLElement;
   communityIdFilter?: string;
+  hideHeader?: boolean;
 };
 
 type FeedThreadProps = {
@@ -163,6 +164,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
+      // If we expect to do tokenized stuff on the community homepage, modify this
+      allow_tokenized_threads: false,
     },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
@@ -179,6 +182,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     profile_name: thread.profile_name ?? '',
     avatar_url: thread.profile_avatar ?? '',
     user_id: thread.user_id,
+    user_tier: thread.user_tier,
     userId: thread.user_id,
     last_edited: thread.updated_at ?? '',
     last_commented_on: '',
@@ -214,6 +218,7 @@ const TrendingThreadList = ({
   query,
   customScrollParent,
   communityIdFilter,
+  hideHeader,
 }: TrendingThreadListProps) => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -247,23 +252,29 @@ const TrendingThreadList = ({
 
   if (communityIdFilter) {
     allThreads = Array.isArray(communityThreads)
-      ? communityThreads.slice(0, 3)
+      ? communityThreads
+          .filter((thread) => !thread.marked_as_spam_at)
+          .slice(0, 3)
       : [];
   } else if (feed?.pages) {
-    allThreads = feed.pages.flatMap((page) => page.results || []);
+    allThreads = feed.pages
+      .flatMap((page) => page.results || [])
+      .filter((thread) => !thread.marked_as_spam_at);
   }
-  const redirectPath = communityId ? '/discussions' : '/explore';
+  const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 
   if (!allThreads?.length) {
     return (
       <div className="TrendingThreadList">
-        <div className="heading-container">
-          <CWText type="h2">Trending Threads</CWText>
-          <div className="link-right" onClick={() => navigate(redirectPath)}>
-            <CWText className="link">See all threads</CWText>
-            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+        {!hideHeader && (
+          <div className="heading-container">
+            <CWText type="h2">Trending Threads</CWText>
+            <div className="link-right" onClick={() => navigate(redirectPath)}>
+              <CWText className="link">See all threads</CWText>
+              <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+            </div>
           </div>
-        </div>
+        )}
         <>
           <CWText type="h2" className="empty-thread">
             No threads found
@@ -275,13 +286,15 @@ const TrendingThreadList = ({
 
   return (
     <div className="TrendingThreadList">
-      <div className="heading-container">
-        <CWText type="h2">Trending Threads</CWText>
-        <div className="link-right" onClick={() => navigate(redirectPath)}>
-          <CWText className="link">See all threads</CWText>
-          <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+      {!hideHeader && (
+        <div className="heading-container">
+          <CWText type="h2">Trending Threads</CWText>
+          <div className="link-right" onClick={() => navigate(redirectPath)}>
+            <CWText className="link">See all threads</CWText>
+            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+          </div>
         </div>
-      </div>
+      )}
       <>
         {!isLoading && !feed && (
           <CWText type="h2" className="empty-thread">

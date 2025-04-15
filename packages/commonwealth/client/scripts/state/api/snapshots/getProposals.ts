@@ -92,7 +92,11 @@ const getProposals = async ({ space }: UseGetSnapshotProposalsQueryProps) => {
 
 export const getSnapshotProposalsQuery = async ({
   space,
+  enabled = true,
 }: UseGetSnapshotProposalsQueryProps) => {
+  if (!enabled) {
+    return null;
+  }
   return await queryClient.fetchQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', space],
     queryFn: () => getProposals({ space }),

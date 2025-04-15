@@ -25,7 +25,7 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
         include: [
           {
             model: models.User,
-            attributes: ['id', 'profile', 'created_at'],
+            attributes: ['id', 'profile', 'created_at', 'tier'],
             required: true,
           },
         ],
@@ -37,6 +37,7 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
         address: address.address,
         lastActive: address.last_active ?? address.User!.created_at!,
         avatarUrl: address.User?.profile.avatar_url,
+        tier: address.User?.tier,
       }));
     },
   };

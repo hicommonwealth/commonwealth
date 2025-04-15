@@ -2,11 +2,10 @@
 
 .GovernanceMemberCard {
   width: 250px;
-  padding: 1.5rem;
-  border: 1px solid #eaeaea;
+  padding: 24px;
+  border: 1px solid $neutral-100;
   border-radius: 8px;
   background-color: $white;
-  font-family: Arial, sans-serif;
 
   .member-header {
     display: flex;
@@ -16,7 +15,6 @@
   }
 
   .link {
-    font-size: 1rem;
     color: $primary-600;
     cursor: pointer;
     text-decoration: none;

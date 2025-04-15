@@ -5,14 +5,89 @@ import {
   XpLogView,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/helpers';
+import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
 export type QuestAction = z.infer<typeof QuestActionMeta>;
 export type XPLog = z.infer<typeof XpLogView>;
+
+export const doesActionRequireRewardShare = (action: QuestActionType) => {
+  return (
+    action === 'CommunityCreated' ||
+    action === 'CommunityJoined' ||
+    action === 'CommentUpvoted'
+  );
+};
+
+export const doesActionRewardShareForReferrer = (action: QuestActionType) => {
+  return action === 'CommunityCreated' || action === 'CommunityJoined';
+};
+
+export const doesActionRewardShareForCreator = (action: QuestActionType) => {
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowContentId = (action: QuestActionType) => {
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'CommentUpvoted' ||
+    action === 'ThreadUpvoted' ||
+    action === 'TweetEngagement' ||
+    action === 'CommonDiscordServerJoined'
+  );
+};
+
+export const doesActionAllowThreadId = (action: QuestActionType) => {
+  return action === 'CommentCreated' || action === 'ThreadUpvoted';
+};
+
+export const doesActionAllowCommentId = (action: QuestActionType) => {
+  return action === 'CommentUpvoted';
+};
+
+export const doesActionAllowTopicId = (action: QuestActionType) => {
+  return (
+    action === 'ThreadCreated' ||
+    action === 'CommentCreated' ||
+    action === 'ThreadUpvoted'
+  );
+};
+
+export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
+  return action === 'TweetEngagement';
+};
+
+export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
+  return action === 'CommonDiscordServerJoined';
+};
+
+export const doesActionAllowRepetition = (action: QuestActionType) => {
+  return action !== 'TweetEngagement';
+};
+
+const convertTimeRemainingToLabel = ({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) => {
+  if (Math.abs(days) > 0)
+    return `${Math.abs(days)} day${Math.abs(days) > 1 ? 's' : ''}`;
+  if (Math.abs(hours) > 0)
+    return `${Math.abs(hours)} hour${Math.abs(hours) > 1 ? 's' : ''}`;
+  if (Math.abs(minutes) > 0)
+    return `${Math.abs(minutes)} minute${Math.abs(minutes) > 1 ? 's' : ''}`;
+  if (Math.abs(seconds) > 0)
+    return `${Math.abs(seconds)} second${Math.abs(seconds) > 1 ? 's' : ''}`;
+  return ``;
+};
 
 export const calculateQuestTimelineLabel = ({
   startDate,
@@ -25,9 +100,13 @@ export const calculateQuestTimelineLabel = ({
   const isEnded = moment().isSameOrAfter(moment(endDate));
   const startHoursRemaining = moment(startDate).diff(moment(), 'hours');
   const startDaysRemaining = moment(startDate).diff(moment(), 'days');
+  const startMinutesRemaining = moment(startDate).diff(moment(), 'minutes');
+  const startSecondsRemaining = moment(startDate).diff(moment(), 'seconds');
   const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
   const endDaysRemaining = moment(endDate).diff(moment(), 'days');
+  const endMinutesRemaining = moment(endDate).diff(moment(), 'minutes');
   const endYearsRemaining = moment(endDate).diff(moment(), 'years');
+  const endSecondsRemaining = moment(endDate).diff(moment(), 'seconds');
 
   if (isEnded) {
     return `Ended
@@ -38,21 +117,12 @@ export const calculateQuestTimelineLabel = ({
     return `Ongoing`;
   }
 
-  if (isStarted) {
-    return `Ends in
-            ${
-              endHoursRemaining <= 24
-                ? `${endHoursRemaining} hours`
-                : `${endDaysRemaining} day${endDaysRemaining ? 's' : ''}`
-            }`;
-  }
-
-  // else it yet to start
-  return `Starts in ${
-    startHoursRemaining <= 24
-      ? `${startHoursRemaining} hour${startHoursRemaining > 1 ? 's' : ''}`
-      : `${startDaysRemaining} day${startDaysRemaining > 1 ? 's' : ''}`
-  }`;
+  return `${isStarted ? 'Ends' : 'Starts'} in ${convertTimeRemainingToLabel({
+    days: Math.abs(isStarted ? endDaysRemaining : startDaysRemaining),
+    hours: Math.abs(isStarted ? endHoursRemaining : startHoursRemaining),
+    minutes: Math.abs(isStarted ? endMinutesRemaining : startMinutesRemaining),
+    seconds: Math.abs(isStarted ? endSecondsRemaining : startSecondsRemaining),
+  })}`;
 };
 
 export const calculateTotalXPForQuestActions = ({
@@ -131,4 +201,13 @@ export const isQuestActionComplete = (
     ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
     : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
         questAction.participation_times_per_period;
+};
+
+export const resetXPCacheForUser = (
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
+) => {
+  // reset xp cache after gaining xp
+  trpcUtils.quest.getQuests.invalidate().catch(console.error);
+  trpcUtils.user.getXps.invalidate().catch(console.error);
+  trpcUtils.user.getXpsRanked.invalidate().catch(console.error);
 };

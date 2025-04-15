@@ -1,6 +1,7 @@
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContext } from '../context';
+import { AuthContext, VerifiedContext } from '../context';
 import { Address, User } from '../entities';
 
 export const SignIn = {
@@ -11,6 +12,26 @@ export const SignIn = {
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
+    privy: z
+      .object({
+        identityToken: z.string(),
+        ssoOAuthToken: z
+          .string()
+          .optional()
+          .describe(
+            'The OAuth token of the SSO service the user signed in with e.g. Google, Github, etc.',
+          ),
+        ssoProvider: z
+          .union([
+            z.literal('google_oauth'),
+            z.literal('github_oauth'),
+            z.literal('discord_oauth'),
+            z.literal('apple_oauth'),
+            z.literal('twitter_oauth'),
+          ])
+          .optional(),
+      })
+      .optional(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),
@@ -34,12 +55,16 @@ export const SignIn = {
 };
 
 export const UpdateUser = {
-  input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({
+  input: User.omit({
+    is_welcome_onboard_flow_complete: true,
+    tier: true,
+  }).extend({
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
   }),
   output: User,
+  context: VerifiedContext,
 };
 
 export const GetNewContent = {
@@ -54,6 +79,7 @@ export const CreateApiKey = {
   output: z.object({
     api_key: z.string(),
   }),
+  context: VerifiedContext,
 };
 
 export const GetApiKey = {
@@ -69,4 +95,17 @@ export const DeleteApiKey = {
   output: z.object({
     deleted: z.boolean(),
   }),
+  context: VerifiedContext,
+};
+
+export const DistributeSkale = {
+  input: z.object({
+    address: z.string(),
+    eth_chain_id: z
+      .number()
+      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
+        message: `eth_chain_id must be a Skale chain Id`,
+      }),
+  }),
+  output: z.undefined(),
 };

@@ -53,6 +53,8 @@ export default (
     'Community',
     {
       id: { type: Sequelize.STRING, primaryKey: true },
+      tier: { type: Sequelize.INTEGER, allowNull: false },
+      spam_tier_level: { type: Sequelize.INTEGER, allowNull: false },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community
       name: { type: Sequelize.STRING, allowNull: false },
       discord_config_id: { type: Sequelize.INTEGER, allowNull: true }, // null if no bot enabled
@@ -131,6 +133,10 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      namespace_creator_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
       redirect: { type: Sequelize.TEXT, allowNull: true },
@@ -145,6 +151,15 @@ export default (
       },
       banner_text: {
         type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      allow_tokenized_threads: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      thread_purchase_token: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
     },

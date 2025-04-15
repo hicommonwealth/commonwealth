@@ -20,11 +20,16 @@
     right: 12px;
   }
 
-  .repeatition-selector {
+  .repeatition-selector,
+  .content-id-type-selector {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 100%;
+
+    .caption .Text {
+      color: $neutral-600 !important;
+    }
 
     .b1 {
       color: $neutral-600 !important;
@@ -54,7 +59,23 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    &.cols-3 {
+      @include mediumSmallInclusive {
+        grid-template-columns: 1fr;
+      }
+
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
     gap: 24px;
     align-items: flex-start;
+  }
+
+  .MessageRow {
+    gap: 4px;
+
+    .feedback-message-text.Text {
+      text-align: left !important;
+    }
   }
 }

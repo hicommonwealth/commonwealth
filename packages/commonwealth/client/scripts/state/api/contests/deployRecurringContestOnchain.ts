@@ -34,6 +34,7 @@ const deployRecurringContestOnchain = async ({
     '',
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
+    ethChainId,
   );
 
   return await contest.newRecurringContest(

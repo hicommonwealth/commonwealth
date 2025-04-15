@@ -1,5 +1,8 @@
-import { Role } from '@hicommonwealth/shared';
+import { Role, WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
@@ -41,6 +44,7 @@ export type AddressInfo = {
   stake_balance: number;
   role: string;
   referred_by: string | null;
+  wallet_id?: WalletId;
 };
 
 type MembersSectionProps = {
@@ -52,6 +56,7 @@ type MembersSectionProps = {
   handleCheckboxChange?: (address: string) => void;
   refetch?: () => void;
   extraColumns?: (member: Member) => object;
+  canManagePermissions?: boolean;
 };
 
 const MembersSection = ({
@@ -63,7 +68,20 @@ const MembersSection = ({
   handleCheckboxChange,
   refetch,
   extraColumns,
+  canManagePermissions = false,
 }: MembersSectionProps) => {
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+    includeGroups: true,
+  });
+
+  const chainRpc =
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const namespace = community?.namespace || '';
+  const chainId = community?.id || app.activeChainId() || '';
+
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   const [selectedUserAddresses, setSelectedUserAddresses] = useState<
@@ -154,9 +172,10 @@ const MembersSection = ({
                   return (
                     <div key={index} className="address-item">
                       <CWTag
-                        label={formatAddressShort(address.address)}
                         type="address"
-                        iconName="ethereum"
+                        label={formatAddressShort(address.address)}
+                        iconName={getChainIcon(address, community?.base)}
+                        classNames="address-tag"
                       />
                     </div>
                   );
@@ -164,15 +183,25 @@ const MembersSection = ({
               </div>
             ),
           },
-          actions: {
-            customElement: (
-              <CWButton
-                label="Manage On Chain Role Privileges"
-                buttonType="secondary"
-                onClick={() => handleManageOnchainClick(member?.addresses)}
-              />
-            ),
-          },
+          ...(canManagePermissions
+            ? {
+                actions: {
+                  customElement: (
+                    <CWButton
+                      label={
+                        community?.namespace
+                          ? 'Manage On Chain Role Privileges'
+                          : 'Manage Role'
+                      }
+                      buttonType="secondary"
+                      onClick={() =>
+                        handleManageOnchainClick(member?.addresses)
+                      }
+                    />
+                  ),
+                },
+              }
+            : {}),
           // @ts-expect-error <StrictNullChecks/>
           ...extraColumns(member),
         }))}
@@ -188,6 +217,11 @@ const MembersSection = ({
             }}
             Addresses={selectedUserAddresses}
             refetch={refetch}
+            namespace={namespace}
+            chainRpc={chainRpc}
+            ethChainId={ethChainId}
+            chainId={chainId}
+            communityNamespace={!!community?.namespace}
           />
         }
         onClose={() => {

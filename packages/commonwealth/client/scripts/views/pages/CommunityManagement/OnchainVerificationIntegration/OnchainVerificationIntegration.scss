@@ -1,0 +1,12 @@
+@import '../../../../styles/shared';
+
+.OnchainVerificationIntegration {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .action-buttons {
+    display: flex;
+    gap: 16px;
+  }
+}

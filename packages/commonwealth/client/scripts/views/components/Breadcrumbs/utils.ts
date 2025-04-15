@@ -53,6 +53,7 @@ export const generateBreadcrumbs = (
   customDomain: string,
   currentDiscussion?: CurrentDiscussion,
   userId?: number,
+  currentProposal?: string,
 ) => {
   let link: string;
   let label: string;
@@ -207,6 +208,24 @@ export const generateBreadcrumbs = (
       }
 
       // handle contests
+    }
+    if (
+      pathSegments.includes('proposal-details') &&
+      index === pathSegments.length - 1
+    ) {
+      label = currentProposal || label;
+    } else {
+      label =
+        index === pathSegments.length - 1 &&
+        !!currentDiscussion?.currentThreadName
+          ? currentDiscussion.currentThreadName
+          : matchedBreadcrumb
+            ? matchedBreadcrumb.breadcrumb
+            : removedThreadId;
+    }
+
+    if (pathSegments.includes('proposal-details')) {
+      label = truncateText(label);
     }
 
     // Create the breadcrumb object.

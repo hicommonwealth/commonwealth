@@ -481,9 +481,10 @@ export const formatWeiToDecimal = (wei: string): string => {
 
 export const formatDecimalToWei = (
   decimal: string,
+  numDecimals: number = 18,
   defaultValue: number = 0,
 ): string => {
-  const value = parseFloat(decimal) * 10 ** 18;
+  const value = parseFloat(decimal) * 10 ** numDecimals;
   return (value || defaultValue).toString();
 };
 
@@ -520,3 +521,8 @@ export function serializeBigIntObj(
 
   return traverse(obj) as Record<string | number | symbol, unknown>;
 }
+
+export type TurnstileWidgetNames =
+  | 'create-community'
+  | 'create-thread'
+  | 'create-comment';

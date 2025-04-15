@@ -21,9 +21,14 @@ import './QuestList.scss';
 type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
+  hideHeader?: boolean;
 };
 
-const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
+const QuestList = ({
+  minQuests = 8,
+  questsForCommunityId,
+  hideHeader,
+}: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
@@ -42,7 +47,7 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
     limit: minQuests,
     end_after: moment().startOf('week').toDate(),
     // dont show system quests in quest lists for communities
-    include_system_quests: questsForCommunityId ? false : !user.isLoggedIn,
+    include_system_quests: questsForCommunityId ? false : true,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -66,14 +71,14 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
   };
 
   const handleLeaderboardClick = () => {
-    navigate('/leaderboard');
+    navigate('/leaderboard', {}, null);
   };
 
   if (!xpEnabled || (isLoadingXPProgression && user.isLoggedIn)) return <></>;
 
   return (
     <div className="QuestList">
-      <CWText type="h2">Quests</CWText>
+      {!hideHeader && <CWText type="h2">Quests</CWText>}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
@@ -82,7 +87,7 @@ const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
             'my-16': xpEnabled,
           })}
         >
-          <CWText type="h5" isCentered>
+          <CWText type="h2" className="empty-quests" isCentered>
             No quests found
           </CWText>
         </div>

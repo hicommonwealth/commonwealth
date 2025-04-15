@@ -1,5 +1,6 @@
 import { notificationsProvider, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { authVerified } from '../../middleware/auth';
 
 export function RegisterClientRegistrationToken(): Command<
   typeof schemas.RegisterClientRegistrationToken
@@ -7,7 +8,7 @@ export function RegisterClientRegistrationToken(): Command<
   const notifications = notificationsProvider();
   return {
     ...schemas.RegisterClientRegistrationToken,
-    auth: [],
+    auth: [authVerified()],
     secure: true,
     body: async ({ payload, actor }) => {
       if (!actor.user.id) {

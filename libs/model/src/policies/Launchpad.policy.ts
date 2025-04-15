@@ -1,6 +1,5 @@
 import { Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { ZodUndefined } from 'zod';
 import { CreateToken, ProjectLaunchpadTrade } from '../aggregates/token';
 import { models } from '../database';
 import { systemActor } from '../middleware';
@@ -10,7 +9,7 @@ const inputs = {
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
 };
 
-export function LaunchpadPolicy(): Policy<typeof inputs, ZodUndefined> {
+export function LaunchpadPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {

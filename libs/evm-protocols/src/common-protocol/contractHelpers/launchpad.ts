@@ -2,10 +2,7 @@ import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
   createPrivateEvmClient,
-  decodeParameters,
   EvmEventSignatures,
-  getBlock,
-  getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
@@ -20,6 +17,7 @@ export const launchToken = async (
   walletAddress: string,
   connectorWeight: number,
   tokenCommunityManager: string,
+  value: number = 4.4400042e14,
 ) => {
   const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
@@ -34,7 +32,7 @@ export const launchToken = async (
       tokenCommunityManager,
       connectorWeight,
     )
-    .send({ from: walletAddress, value: 4.4400042e14 });
+    .send({ from: walletAddress, value });
   return txReceipt;
 };
 
@@ -99,8 +97,8 @@ export const getAmountIn = async (
   cw: number,
 ) => {
   const data = await Promise.all([
-    contract.methods._getFloatingTokenSupply(tokenAddress),
-    contract.methods.liquidity(tokenAddress),
+    contract.methods._getFloatingTokenSupply(tokenAddress).call(),
+    contract.methods.liquidity(tokenAddress).call(),
   ]);
   const delta =
     ((BigInt(amountOut) + BigInt(data[0])) / BigInt(data[0])) **
@@ -114,12 +112,14 @@ export const transferLiquidity = async (
   tokenAddress: string,
   walletAddress: string,
 ) => {
-  const remainingTokens = await contract.methods._poolLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods
+    ._poolLiquidity(tokenAddress)
+    .call();
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,
-    remainingTokens,
-    500000,
+    Number(remainingTokens),
+    830000,
   );
 
   const txReceipt = await contract.methods
@@ -143,71 +143,6 @@ export const getTargetMarketCap = (
   const price = x * y;
   return price * totalSupply;
 };
-
-export async function getLaunchpadTradeTransaction({
-  rpc,
-  transactionHash,
-}: {
-  rpc: string;
-  transactionHash: string;
-}) {
-  const { evmClient, txReceipt } = await getTransactionReceipt({
-    rpc,
-    txHash: transactionHash,
-  });
-  if (!txReceipt) {
-    return;
-  }
-
-  const { block } = await getBlock({
-    evmClient: evmClient,
-    rpc,
-    blockHash: txReceipt.blockHash.toString(),
-  });
-
-  const tradeLog = txReceipt.logs.find((l) => {
-    if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
-    }
-    return false;
-  });
-  if (!tradeLog) return;
-
-  const {
-    0: traderAddress,
-    1: tokenAddress,
-    2: isBuy,
-    3: communityTokenAmount,
-    4: ethAmount,
-    5: protocolEthAmount,
-    6: floatingSupply,
-  } = decodeParameters({
-    abiInput: [
-      'address',
-      'address',
-      'bool',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-    ],
-    data: txReceipt.logs[1].data!.toString(),
-  });
-
-  return {
-    txReceipt,
-    block,
-    parsedArgs: {
-      traderAddress: traderAddress as string,
-      tokenAddress: tokenAddress as string,
-      isBuy: isBuy as boolean,
-      communityTokenAmount: communityTokenAmount as bigint,
-      ethAmount: ethAmount as bigint,
-      protocolEthAmount: protocolEthAmount as bigint,
-      floatingSupply: floatingSupply as bigint,
-    },
-  };
-}
 
 export async function getLaunchpadTokenCreatedTransaction({
   rpc,

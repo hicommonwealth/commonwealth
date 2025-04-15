@@ -1,5 +1,5 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import { useGetMembershipsQuery } from '../state/api/groups/getMemberships';
 import Permissions from '../utils/Permissions';
 
 type TopicPermission = { id: number; permissions: PermissionEnum[] };
@@ -18,10 +18,10 @@ const useTopicGating = ({
   topicId,
 }: UseTopicGatingProps) => {
   const { data: memberships = [], isLoading: isLoadingMemberships } =
-    useRefreshMembershipQuery({
-      communityId,
+    useGetMembershipsQuery({
+      community_id: communityId,
       address: userAddress,
-      apiEnabled,
+      enabled: apiEnabled,
     });
 
   const topicPermissions = memberships

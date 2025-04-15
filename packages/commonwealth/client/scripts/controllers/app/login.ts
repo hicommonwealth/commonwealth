@@ -206,6 +206,8 @@ export function updateActiveUser(data) {
       isWelcomeOnboardFlowComplete: false,
       isLoggedIn: false,
       referredByAddress: undefined,
+      xpPoints: 0,
+      xpReferrerPoints: 0,
     });
   } else {
     const addresses = data.addresses.map(
@@ -245,6 +247,9 @@ export function updateActiveUser(data) {
       })),
       isLoggedIn: true,
       referredByAddress: data?.referred_by_address,
+      xpPoints: data?.xp_points,
+      xpReferrerPoints: data?.xp_referrer_points,
+      tier: data?.tier,
     });
   }
 }

@@ -1,4 +1,4 @@
-import { express, trpc } from '@hicommonwealth/adapters';
+import { trpc } from '@hicommonwealth/adapters';
 import {
   Comment,
   Community,
@@ -41,6 +41,7 @@ const {
   deleteGroup,
   joinCommunity,
   banAddress,
+  updateRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -117,6 +118,7 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  updateRole,
   toggleCommentSpam,
   createToken,
   createTrade,
@@ -135,7 +137,6 @@ router.use(
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'api-key', 'address'],
   }),
-  express.statsMiddleware,
 );
 
 // ===============================================================================
@@ -170,4 +171,4 @@ const oasOptions: trpc.OasOptions = {
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
-export { PATH, oasOptions, router, trpcRouter };
+export { oasOptions, PATH, router, trpcRouter };

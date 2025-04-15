@@ -6,8 +6,13 @@ export const VALIDATION_MESSAGES = {
   INVALID_INPUT: 'Invalid input',
   MUST_BE_TYPE: (type: string) => `Must be of ${type} type`,
   MUST_BE_GREATER: (value: string | number) => `Must be greater than ${value}`,
+  MUST_BE_BETWEEN: (rangeStart: string | number, rangeEnd: string | number) =>
+    `Must be between ${rangeStart} - ${rangeEnd}`,
   MUST_BE_LESS_OR_EQUAL: (value: string | number) =>
     `Must be less or equal to ${value}`,
   MUST_BE_APART: (fieldName: string, differenceValue: string | number) =>
     `Must be atleast ${differenceValue} apart from ${fieldName}`,
+  GITHUB_FORMAT: 'Invalid GitHub URL',
+  TWITTER_TWEET_FORMAT: `Invalid Tweet URL`,
+  DISCORD_SERVER_FORMAT: `Invalid Discord Server URL`,
 };

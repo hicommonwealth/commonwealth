@@ -7,6 +7,7 @@ export enum BalanceSourceType {
   CW20 = 'cw20',
   CW721 = 'cw721',
   SPL = 'spl',
+  SOLNFT = 'metaplex',
 }
 
 export enum BalanceType {
@@ -22,11 +23,16 @@ export type ContractSource = {
   source_type:
     | BalanceSourceType.ERC20
     | BalanceSourceType.ERC721
-    | BalanceSourceType.ERC1155
-    | BalanceSourceType.SPL;
+    | BalanceSourceType.ERC1155;
   evm_chain_id: number;
   contract_address: string;
   token_id?: string;
+};
+
+export type SolanaSource = {
+  source_type: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
+  solana_network: string;
+  contract_address: string;
 };
 
 export type NativeSource = {
@@ -48,7 +54,12 @@ export type CosmosContractSource = {
 
 export type ThresholdData = {
   threshold: string;
-  source: ContractSource | NativeSource | CosmosSource | CosmosContractSource;
+  source:
+    | ContractSource
+    | NativeSource
+    | CosmosSource
+    | CosmosContractSource
+    | SolanaSource;
 };
 
 export type AbiType = Record<string, unknown>[];
@@ -58,6 +69,7 @@ export type AbiType = Record<string, unknown>[];
 
 export enum WalletId {
   Magic = 'magic',
+  Privy = 'privy',
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
@@ -69,8 +81,11 @@ export enum WalletId {
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
+  Backpack = 'backpack',
+  Solflare = 'solflare',
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
+  OKX = 'okx',
 }
 
 // Passed directly to Magic login.
@@ -86,6 +101,8 @@ export enum WalletSsoSource {
   Email = 'email',
   Farcaster = 'farcaster',
   SMS = 'SMS',
+
+  // TODO: remove
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
@@ -123,6 +140,24 @@ export enum ChainNetwork {
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
+  ArbitrumMainnet = 'arbitrum_mainnet',
+  Base = 'base',
+  Blast = 'blast',
+  EthereumMainnet = 'ethereum_mainnet',
+  Linea = 'linea',
+  Optimism = 'optimism',
+  Polygon = 'polygon',
+  HorizenEON = 'horizen_eon',
+  Harmony = 'harmony',
+  Gnosis = 'gnosis',
+  FuseMainnet = 'fuse_mainnet',
+  Fantom = 'fantom',
+  Soneium = 'soneium',
+  Core = 'core',
+  Celo = 'celo',
+  BSC = 'bsc',
+  Avalanche = 'avalanche',
+  Arthera = 'arthera',
 }
 
 /**
@@ -141,3 +176,13 @@ export enum CommunityType {
   Launchpad = 'launchpad',
   Basic = 'basic',
 }
+
+export const CommunityGoalTypes = [
+  'groups',
+  'members',
+  'moderators',
+  'social-links',
+  'tags',
+  'threads',
+] as const;
+export type CommunityGoalType = (typeof CommunityGoalTypes)[number];

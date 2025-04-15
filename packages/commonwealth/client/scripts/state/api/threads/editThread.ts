@@ -6,7 +6,6 @@ import { ThreadStage } from 'models/types';
 import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
-import { updateThreadCountsByStageChange } from '../communities/getCommuityById';
 import {
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
@@ -118,10 +117,8 @@ interface UseEditThreadMutationProps {
 const useEditThreadMutation = ({
   communityId,
   threadId,
-  currentStage,
   currentTopicId,
 }: UseEditThreadMutationProps) => {
-  const utils = trpc.useUtils();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.updateThread.useMutation({
@@ -129,14 +126,8 @@ const useEditThreadMutation = ({
       // @ts-expect-error StrictNullChecks
       const updatedThread = new Thread(updated);
       // Update community level thread counters variables
-      if (currentStage !== updatedThread.stage) {
-        updateThreadCountsByStageChange(
-          communityId,
-          currentStage,
-          updatedThread.stage,
-          utils,
-        );
-      }
+
+      // TODO: if (currentStage !== updatedThread.stage) then update threadCount in bulk fetch threads cached result
 
       // add/remove thread from different caches if the topic id was changed
       if (updatedThread.topic?.id !== currentTopicId) {

@@ -6,22 +6,24 @@ import {
   CanvasSignedData,
   DEFAULT_NAME,
   deserializeCanvas,
+  UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
+import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
-import { SharePopover } from 'views/components/SharePopover';
+import ShareButton from 'views/components/ShareButton';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
@@ -76,7 +78,7 @@ type CommentCardProps = {
   className?: string;
   shareURL: string;
   weightType?: TopicWeightedVoting | null;
-  onAIReply?: () => Promise<void>;
+  onAIReply?: (commentText?: string) => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
@@ -133,7 +135,8 @@ export const CommentCard = ({
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
+
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
@@ -215,11 +218,6 @@ export const CommentCard = ({
     createCommentRef.current = createComment;
   }, [createComment]);
 
-  const generateCommentRef = useRef(generateComment);
-  useEffect(() => {
-    generateCommentRef.current = generateComment;
-  }, [generateComment]);
-
   const onStreamingCompleteRef = useRef(onStreamingComplete);
   useEffect(() => {
     onStreamingCompleteRef.current = onStreamingComplete;
@@ -248,13 +246,18 @@ export const CommentCard = ({
           .filter(Boolean)
           .join('\n\n');
 
-        await generateCommentRef.current(contextText || '', (text) => {
-          if (mounted) {
-            // Append incoming chunks so the full comment is built up
-            accumulatedText += text;
-            setStreamingText(accumulatedText);
-            finalText = accumulatedText;
-          }
+        const prompt = generateCommentPrompt(contextText);
+
+        await generateCompletion(prompt, {
+          model: 'gpt-4o-mini',
+          stream: true,
+          onChunk: (chunk) => {
+            if (mounted) {
+              accumulatedText += chunk;
+              setStreamingText(accumulatedText);
+              finalText = accumulatedText;
+            }
+          },
         });
 
         if (mounted && finalText) {
@@ -296,6 +299,7 @@ export const CommentCard = ({
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
+    generateCompletion,
   ]);
 
   useEffect(() => {
@@ -360,6 +364,7 @@ export const CommentCard = ({
                 name: comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
+                tier: comment.user_tier || UserTierMap.IncompleteUser,
               }}
               versionHistory={(comment.CommentVersionHistories || []).map(
                 (cvh) => ({
@@ -371,6 +376,7 @@ export const CommentCard = ({
                   content_url: cvh.content_url || '',
                 }),
               )}
+              shouldShowRole
               onChangeVersionHistoryNumber={handleVersionHistoryChange}
             />
           )}
@@ -457,7 +463,13 @@ export const CommentCard = ({
                   </>
                 )}
 
-                <SharePopover linkToShare={shareURL} buttonLabel="Share" />
+                <ShareButton
+                  url={shareURL}
+                  title={undefined}
+                  text="See my comment and join me on Common"
+                  shareType="comment"
+                  buttonLabel="Share"
+                />
 
                 {!isThreadArchived && replyBtnVisible && (
                   <>
@@ -496,7 +508,7 @@ export const CommentCard = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            void onAIReply?.();
+                            void onAIReply?.(comment.body);
                           }}
                         />
                       )}
