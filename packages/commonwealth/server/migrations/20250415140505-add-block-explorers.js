@@ -3,7 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query(`
+    await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.sequelize.query(
+        `
       UPDATE "ChainNodes"
       SET block_explorer = CASE
         WHEN eth_chain_id = 10 THEN 'https://optimistic.etherscan.io/'
@@ -22,7 +24,15 @@ module.exports = {
           max_ce_block_range = -1,
           updated_at = NOW()
       WHERE eth_chain_id = 1868;
-    `);
+
+      DELETE FROM "ChainEventXpSources";
+
+      ALTER TABLE "ChainEventXpSources"
+      ADD COLUMN "readable_signature" VARCHAR(255) NOT NULL;
+    `,
+        { transaction: t },
+      );
+    });
   },
 
   async down(queryInterface, Sequelize) {
