@@ -12,7 +12,7 @@ const inputs = {
   JudgeNominated: events.JudgeNominated,
 };
 
-export function NominationsPolicy(): Policy<typeof inputs, ZodUndefined> {
+export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
   return {
     inputs,
     body: {

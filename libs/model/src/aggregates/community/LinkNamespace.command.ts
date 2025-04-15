@@ -1,13 +1,7 @@
 import { logger, type Command } from '@hicommonwealth/core';
-import {
-  ChildContractNames,
-  EvmEventSignatures,
-  ValidChains,
-  commonProtocol as cp,
-} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { Op, Transaction, WhereOptions } from 'sequelize';
+import { Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
@@ -93,13 +87,8 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
     ...schemas.LinkNamespace,
     auth: [],
     body: async ({ payload }) => {
-      const {
-        namespace_address,
-        deployer_address,
-        log_removed,
-        referral,
-        block_number,
-      } = payload;
+      const { namespace_address, deployer_address, log_removed, referral } =
+        payload;
 
       const community = await models.Community.findOne({
         where: { namespace_address },
@@ -163,78 +152,6 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             },
             transaction,
           });
-        }
-
-        if (log_removed) {
-          // remove namespace EvmEventSource
-          const eventSourcesToDelete: WhereOptions<
-            z.infer<typeof schemas.EvmEventSource>
-          >[] = [];
-
-          const ethChainId = community.ChainNode!.eth_chain_id!;
-          // TODO: support base mainnet when contract address is available
-          if (ethChainId === ValidChains.SepoliaBase) {
-            eventSourcesToDelete.push({
-              contract_address:
-                cp.factoryContracts[ethChainId].communityNomination!,
-              event_signature: {
-                [Op.in]: [
-                  EvmEventSignatures.CommunityNominations.JudgeNominated,
-                  EvmEventSignatures.CommunityNominations.NominatorSettled,
-                ],
-              },
-            });
-          }
-          await models.EvmEventSource.destroy({
-            where: {
-              eth_chain_id: community.ChainNode!.eth_chain_id!,
-              [Op.or]: eventSourcesToDelete,
-            },
-            transaction,
-          });
-        } else {
-          // create namespace EvmEventSource to track namespace events
-          const ethChainId = community.ChainNode!.eth_chain_id!;
-          if (cp.isValidChain(ethChainId)) {
-            const eventSourcesToAdd: Array<
-              z.infer<typeof schemas.EvmEventSource>
-            > = [];
-
-            // TODO: support base mainnet when contract address is available
-
-            // TODO: make these parent contracts
-            if (ethChainId === ValidChains.SepoliaBase) {
-              // JudgeNominated event
-              eventSourcesToAdd.push({
-                eth_chain_id: ethChainId,
-                contract_address: namespace_address,
-                event_signature:
-                  EvmEventSignatures.CommunityNominations.JudgeNominated,
-                contract_name: ChildContractNames.CommunityNominations,
-                parent_contract_address:
-                  cp.factoryContracts[ethChainId].communityNomination!,
-                created_at_block: Number(block_number),
-              });
-
-              // NominatorSettled event
-              eventSourcesToAdd.push({
-                eth_chain_id: ethChainId,
-                contract_address: namespace_address,
-                event_signature:
-                  EvmEventSignatures.CommunityNominations.NominatorSettled,
-                contract_name: ChildContractNames.CommunityNominations,
-                parent_contract_address:
-                  cp.factoryContracts[ethChainId].communityNomination!,
-                created_at_block: Number(block_number),
-              });
-            }
-
-            if (eventSourcesToAdd.length > 0) {
-              await models.EvmEventSource.bulkCreate(eventSourcesToAdd, {
-                transaction,
-              });
-            }
-          }
         }
 
         // project referral details
