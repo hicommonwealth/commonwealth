@@ -2,7 +2,7 @@ import { Command, InvalidInput, logger } from '@hicommonwealth/core';
 import { verifyEventSource } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
-import { toEventSignature } from 'viem';
+import { toEventHash } from 'viem';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -220,7 +220,7 @@ async function updateChannelQuest(
         {
           chain_node_id: chainNode.id!,
           contract_address: chainEvent.contract_address,
-          event_signature: toEventSignature(chainEvent.event_signature),
+          event_signature: toEventHash(chainEvent.event_signature),
           readable_signature: chainEvent.event_signature,
           quest_action_meta_id: actionMetaInstance.id!,
           active: true,
