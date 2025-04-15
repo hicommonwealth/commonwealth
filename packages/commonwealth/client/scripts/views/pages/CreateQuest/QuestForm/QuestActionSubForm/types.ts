@@ -32,6 +32,7 @@ export type QuestActionSubFormErrors = {
   contractAddress?: string;
   ethChainId?: string;
   eventSignature?: string;
+  transactionHash?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -53,6 +54,7 @@ export type QuestActionSubFormFields = {
   contractAddress?: string;
   ethChainId?: string | number;
   eventSignature?: string;
+  transactionHash?: string;
 };
 
 export type QuestActionSubFormConfig = {

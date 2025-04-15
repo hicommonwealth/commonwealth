@@ -177,6 +177,14 @@ export const buildQuestSubFormValidationSchema = (
             `0x0000000000000000000000000000000000000000000000000000000000000000`,
           ),
         }),
+      transactionHash: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000000000000000000000000000`,
+          ),
+        }),
     }) as unknown as typeof baseSchema;
   }
 
