@@ -279,9 +279,8 @@ export const NewThreadForm = () => {
   });
 
   const { proposal, threads: cosmosThreads } = useCosmosProposal({
-    // @ts-expect-error <StrictNullChecks/>
-    proposalId: linkedProposals?.identifier,
-    enabledApi: !!cosmosLink,
+    proposalId: linkedProposals?.identifier || '',
+    enabled: !!cosmosLink,
   });
 
   useEffect(() => {
@@ -363,8 +362,7 @@ export const NewThreadForm = () => {
               <DetailCard
                 status={status || ''}
                 governanceType={governanceType}
-                // @ts-expect-error <StrictNullChecks/>
-                publishDate={snapshotProposal?.created || proposal.createdAt}
+                publishDate={snapshotProposal?.created || proposal?.createdAt}
                 id={linkedProposals?.proposalId}
                 Threads={threads || cosmosThreads}
                 scope={communityId}

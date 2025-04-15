@@ -550,9 +550,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   });
 
   const { proposal, threads: cosmosThreads } = useCosmosProposal({
-    // @ts-expect-error <StrictNullChecks/>
-    proposalId: linkedProposals?.identifier,
-    enabledApi: !!cosmosLink,
+    proposalId: linkedProposals?.identifier || '',
+    enabled: !!cosmosLink,
   });
 
   useEffect(() => {

@@ -34,14 +34,14 @@ type ThreadUpdateProposalStatusModalProps = {
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
-    id: l.identifier,
-    title: l.title,
+    id: l.identifier || '',
+    title: l.title || '',
   }));
 
 const getInitialCosmosProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
-    identifier: l.identifier,
-    title: l.title,
+    identifier: l.identifier || '',
+    title: l.title || '',
   }));
 
 export const ThreadUpdateProposalStatusModal = ({
@@ -57,11 +57,10 @@ export const ThreadUpdateProposalStatusModal = ({
   const [tempStage, setTempStage] = useState<string | null>(thread.stage);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
-    // @ts-expect-error <StrictNullChecks/>
   >(getInitialSnapshots(thread));
+
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
-    // @ts-expect-error <StrictNullChecks/>
   >(getInitialCosmosProposals(thread));
 
   const { mutateAsync: editThread } = useEditThreadMutation({
