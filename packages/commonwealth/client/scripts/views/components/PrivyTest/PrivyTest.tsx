@@ -1,11 +1,11 @@
 import React from 'react';
-import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
+import { LoginWithGoogle2 } from 'views/components/PrivyTest/LoginWithGoogle2';
 
 export const PrivyTest = () => {
   return (
     <div>
       {/*<LoginWithEmail />*/}
-      <LoginWithGoogle />
+      <LoginWithGoogle2 />
     </div>
   );
 };

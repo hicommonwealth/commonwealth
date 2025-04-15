@@ -7,7 +7,7 @@ import {
 } from '@privy-io/react-auth';
 import { GenericEthereumWebWalletController } from 'controllers/app/webWallets/generic_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSignIn } from 'state/api/user';
 import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
 import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
@@ -21,6 +21,8 @@ type UsePrivyOAuthProps = {
   onError: (err: Error) => void;
 };
 
+// TODO: we have to figure out when to call onSuccess
+// TODO: I need to add support for isNewlyCreated
 export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   const { onSuccess, onError } = props;
 
@@ -40,11 +42,19 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   const signMessage = useSignMessageMemo();
   const { signIn } = useSignIn();
   const identityTokenRef = useIdentityTokenRef();
+  const [authStarted, setAuthStarted] = useState(false);
 
-  return useCallback(() => {
+  useEffect(() => {
     async function doAsync() {
+      if (!authStarted) {
+        // necessary so that we do not attempt to trigger auth unnecessarily if
+        // we're already logged in.
+        console.warn('Auth not started');
+        return;
+      }
+
       if (!authenticated) {
-        console.warn('No wallets');
+        console.warn('Not authenticated with privy');
         return;
       }
 
@@ -112,6 +122,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
       onError(err);
     });
   }, [
+    authStarted,
     authenticated,
     wallets.ready,
     wallets.wallets,
@@ -121,5 +132,22 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
     onSuccess,
     createWallet,
     signMessage,
+    onError,
   ]);
+
+  const onPrivyOAuth = useCallback(() => {
+    async function doAsync() {
+      setAuthStarted(true);
+      await initOAuth({ provider: 'google' });
+    }
+
+    doAsync().catch((err) => {
+      console.error(err);
+      onError(err);
+    });
+  }, [initOAuth, onError]);
+
+  return useMemo(() => {
+    return { onPrivyOAuth, authenticated, logout, loading };
+  }, [authenticated, logout, onPrivyOAuth, loading]);
 }
