@@ -1,4 +1,5 @@
 import { Command, InvalidInput, logger } from '@hicommonwealth/core';
+import { verifyEventSource } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
@@ -186,13 +187,26 @@ async function updateChannelQuest(
         await existingActionMeta.destroy({ transaction });
       }
 
-      const chainNode = await models.ChainNode.findOne({
-        where: {
-          eth_chain_id: chainEvent.eth_chain_id,
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: {
+            eth_chain_id: chainEvent.eth_chain_id,
+          },
+          transaction,
         },
-        transaction,
-      });
+      );
       mustExist(`Chain node`, chainNode);
+
+      const verificationRes = await verifyEventSource({
+        rpc: chainNode.private_url!,
+        contractAddress: chainEvent.contract_address,
+        readableEventSignature: chainEvent.event_signature,
+        txHash: chainEvent.tx_hash,
+      });
+
+      if (!verificationRes.valid) {
+        throw new InvalidInput(verificationRes.reason);
+      }
 
       const actionMetaInstance = await models.QuestActionMeta.create(
         {
