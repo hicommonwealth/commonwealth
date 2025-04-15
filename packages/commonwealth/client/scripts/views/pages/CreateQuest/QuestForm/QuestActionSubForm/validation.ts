@@ -54,7 +54,6 @@ export const buildQuestSubFormValidationSchema = (
     baseSchema = baseSchema
       .extend({
         creatorRewardAmount: numberNonDecimalValidationSchema.required,
-        // TODO: 11580 rename it to contentIdentifier which can be anything i.e string(?link) number or others
         // TODO: 11580 move it to if (allowsOptionalContentId) { below
         contentIdentifier: numberValidationSchema.optional,
       })

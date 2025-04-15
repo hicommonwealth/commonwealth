@@ -102,7 +102,12 @@ const QuestActionCard = ({
               'CommunityCreated',
             ].includes(questAction.event_name) && (
               <>
-                <CWDivider />
+                {questAction.event_name === 'CommunityCreated' &&
+                !questAction.content_id ? (
+                  <></>
+                ) : (
+                  <CWDivider />
+                )}
                 <CWText type="caption" fontWeight="semiBold">
                   {actionCopies.pre_reqs[questAction.event_name]()}
                 </CWText>
