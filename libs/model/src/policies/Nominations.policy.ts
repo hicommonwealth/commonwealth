@@ -32,7 +32,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
           return;
         }
 
-        community.namespace_verified = true;
+        community.namespace_verification_configured = true;
         await community.save();
       },
       NominatorNominated: async ({ payload }) => {
@@ -53,11 +53,12 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
 
         // append address to community nominations
         await models.sequelize.query(
-          `UPDATE "Communities" SET "namespace_nominations" = array_append(COALESCE("namespace_nominations", ARRAY[]::integer[]), :nomination_id)
+          `UPDATE "Communities"
+          SET "namespace_nominations" = array_append(COALESCE("namespace_nominations", ARRAY[]::text[]), :nominator)
           WHERE "id" = :community_id`,
           {
             replacements: {
-              nomination_id: payload.parsedArgs.nominator,
+              nominator: payload.parsedArgs.nominator,
               community_id: community.id,
             },
           },

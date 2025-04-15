@@ -64,7 +64,7 @@ export const Community = z.object({
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
   namespace_creator_address: z.string().nullish(),
-  namespace_verified: z.boolean(),
+  namespace_verification_configured: z.boolean(),
   namespace_nominations: z.array(z.string()).nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),

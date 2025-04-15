@@ -137,7 +137,7 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
-      namespace_verified: {
+      namespace_verification_configured: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
