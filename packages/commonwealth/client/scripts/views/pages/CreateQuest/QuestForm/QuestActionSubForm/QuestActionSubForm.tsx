@@ -204,8 +204,8 @@ const QuestActionSubForm = ({
   };
 
   const chainNodes = fetchCachedNodes()
+    ?.filter((node) => node?.ethChainId || node?.cosmosChainId)
     ?.map((node) => ({
-      // TODO: 11580 fix null chain id display
       label: `${node.name} - (Chain Id = ${node?.ethChainId || node?.cosmosChainId})`,
       value: node.id,
     }))
@@ -352,8 +352,10 @@ const QuestActionSubForm = ({
         />
       </div>
 
+      {/* TODO 11580: make this cleareable */}
       <CWSelectList
-        isClearable={false}
+        isClearable={true}
+        backspaceRemovesValue
         label="Action"
         placeholder="Select an action"
         name="action"
