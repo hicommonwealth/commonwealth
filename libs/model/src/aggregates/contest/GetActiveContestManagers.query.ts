@@ -62,7 +62,8 @@ export function GetActiveContestManagers(): Query<
                     OR
                 cm.interval > 0
                 )
-            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address, co.max_contest_id, co.end_time
+            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address,
+                co.max_contest_id, co.end_time, cm.interval, cm.ending, cm.environment
         `,
         {
           type: QueryTypes.SELECT,
