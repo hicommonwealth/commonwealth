@@ -11,8 +11,17 @@ module.exports = {
         WHEN eth_chain_id = 42161 THEN 'https://arbiscan.io/'
         WHEN eth_chain_id = 137 THEN 'https://polygonscan.com/'
         WHEN eth_chain_id = 59144 THEN 'https://lineascan.build/'
+        WHEN eth_chain_id = 1868 THEN 'https://soneium.blockscout.com/'
       END
       WHERE eth_chain_id IN (10, 1, 42161, 137, 59144);
+
+      UPDATE "ChainNodes"
+      SET alchemy_metadata = '{ "network_id": "soneium-mainnet", "price_api_supported": false, "transfer_api_supported": true }',
+          url = 'https://soneium-mainnet.g.alchemy.com/v2/',
+          private_url = 'https://soneium-mainnet.g.alchemy.com/v2/',
+          max_ce_block_range = -1,
+          updated_at = NOW()
+      WHERE eth_chain_id = 1868;
     `);
   },
 
