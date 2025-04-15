@@ -108,9 +108,11 @@ const QuestActionCard = ({
                 ) : (
                   <CWDivider />
                 )}
-                <CWText type="caption" fontWeight="semiBold">
-                  {actionCopies.pre_reqs[questAction.event_name]()}
-                </CWText>
+                {actionCopies.pre_reqs[questAction.event_name]() && (
+                  <CWText type="caption" fontWeight="semiBold">
+                    {actionCopies.pre_reqs[questAction.event_name]()}
+                  </CWText>
+                )}
                 {questAction.event_name === 'TweetEngagement' && (
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
