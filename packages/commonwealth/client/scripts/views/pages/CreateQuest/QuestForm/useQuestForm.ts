@@ -32,7 +32,7 @@ import { z } from 'zod';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
-import { buildContentIdFromURL } from './helpers';
+import { buildContentIdFromIdentifier } from './helpers';
 import { QuestFormProps } from './types';
 import { buildDynamicQuestFormValidationSchema } from './validation';
 
@@ -245,7 +245,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               subForm.config?.with_optional_topic_id ||
               subForm.config?.requires_twitter_tweet_link ||
               subForm.config?.requires_discord_server_url) && {
-              content_id: await buildContentIdFromURL(
+              content_id: await buildContentIdFromIdentifier(
                 subForm.values.contentLink,
                 contentIdScope,
               ),

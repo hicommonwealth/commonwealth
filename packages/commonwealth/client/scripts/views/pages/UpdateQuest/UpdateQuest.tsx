@@ -19,7 +19,7 @@ import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import {
-  buildURLFromContentId,
+  buildRedirectURLFromContentId,
   inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
 import { QuestTypes } from '../CreateQuest/QuestForm/types';
@@ -138,7 +138,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   action.event_name as QuestAction,
                   action.content_id || undefined,
                 ),
-                contentLink: buildURLFromContentId(action.content_id || ''),
+                contentLink: buildRedirectURLFromContentId(
+                  action.content_id || '',
+                ),
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
