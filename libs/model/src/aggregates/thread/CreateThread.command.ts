@@ -163,6 +163,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               content_url: contentUrl,
               is_linking_token,
               marked_as_spam_at,
+              user_tier_at_creation: user.tier,
             },
             {
               transaction,

@@ -103,6 +103,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
               marked_as_spam_at,
+              user_tier_at_creation: user.tier,
             },
             {
               transaction,

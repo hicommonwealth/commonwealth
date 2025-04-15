@@ -77,6 +77,7 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
 
       //counts
       reaction_count: {

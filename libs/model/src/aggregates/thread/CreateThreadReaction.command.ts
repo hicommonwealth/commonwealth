@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { authThread, tiered } from '../../middleware';
+import { authThread, mustExist, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
@@ -33,6 +33,12 @@ export function CreateThreadReaction(): Command<
         address.address,
       );
 
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
+
       // == mutation transaction boundary ==
       const new_reaction_id = await models.sequelize.transaction(
         async (transaction) => {
@@ -49,6 +55,7 @@ export function CreateThreadReaction(): Command<
               calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
+              user_tier_at_creation: user.tier,
             },
             transaction,
           });
