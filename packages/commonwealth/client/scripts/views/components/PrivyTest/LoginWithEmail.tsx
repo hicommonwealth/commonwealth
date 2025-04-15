@@ -16,7 +16,6 @@ export const LoginWithEmail = () => {
   const wallets = useWallets();
   const { signIn } = useSignIn();
   const identityTokenRef = useIdentityTokenRef();
-
   const signMessage = useSignMessageMemo();
 
   useEffect(() => {

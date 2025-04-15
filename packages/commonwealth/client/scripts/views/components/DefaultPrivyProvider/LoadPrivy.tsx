@@ -18,7 +18,7 @@ export const LoadPrivy = memo(function LoadPrivy(props: DefaultPrivyProvider) {
     <PrivyProvider
       appId={PRIVY_APP_ID}
       config={{
-        loginMethods: ['email', 'wallet', 'sms'],
+        loginMethods: ['email', 'wallet', 'sms', 'google'],
         appearance: {
           theme: darkMode ? 'dark' : 'light',
           logo: 'https://common.xyz/brand_assets/common.png',
