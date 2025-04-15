@@ -103,6 +103,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     contractAddress: subForm.contractAddress,
                     ethChainId: subForm.ethChainId,
                     eventSignature: subForm.eventSignature,
+                    transactionHash: subForm.transactionHash,
                   }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
@@ -271,6 +272,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 typeof EVM_ADDRESS_STRICT
               >,
               event_signature: subForm.values.eventSignature! as z.infer<
+                typeof EVM_EVENT_SIGNATURE_STRICT
+              >,
+              tx_hash: subForm.values.transactionHash! as z.infer<
                 typeof EVM_EVENT_SIGNATURE_STRICT
               >,
             },

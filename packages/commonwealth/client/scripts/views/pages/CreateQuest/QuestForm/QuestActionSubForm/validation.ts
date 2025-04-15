@@ -11,6 +11,7 @@ import {
   numberValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { parseAbiItem } from 'viem';
 import { z } from 'zod';
 import { QuestActionSubFormConfig } from './types';
 
@@ -170,6 +171,22 @@ export const buildQuestSubFormValidationSchema = (
           ),
         }),
       eventSignature: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine(
+          (val) => {
+            try {
+              parseAbiItem(val);
+              return true;
+            } catch (e) {
+              return false;
+            }
+          },
+          {
+            message: 'Invalid event signature: failed to parse ABI',
+          },
+        ),
+      transactionHash: z
         .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
         .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {

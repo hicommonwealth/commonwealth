@@ -93,11 +93,13 @@ const UpdateQuest = ({ id }: { id: number }) => {
       contract_address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
       event_signature:
         '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+      tx_hash:
+        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
       quest_action_meta_id: 53,
       active: true,
       created_at: `2025-04-11T16:37:12.769Z`,
       updated_at: `2025-04-11T16:37:12.769Z`,
-    };
+    } as any;
   }
 
   return (
@@ -167,6 +169,8 @@ const UpdateQuest = ({ id }: { id: number }) => {
                     }`
                   : ``,
                 eventSignature: `${action.ChainEventXpSource?.event_signature || ''}`,
+                // TODO: 11069 fix type + add tx_hash in response
+                transactionHash: `${(action.ChainEventXpSource as any)?.tx_hash || ''}`,
               })),
             }}
           />

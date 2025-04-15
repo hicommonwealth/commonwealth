@@ -425,20 +425,6 @@ const QuestActionSubForm = ({
       {config?.requires_chain_event && (
         <>
           <div className="grid-row cols-2">
-            <CWTextInput
-              key={`contractAddress-${defaultValues?.action}`}
-              name="contractAddress"
-              label="Contract Address"
-              placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F"
-              fullWidth
-              {...(defaultValues?.contractAddress && {
-                defaultValue: defaultValues?.contractAddress,
-              })}
-              onInput={(e) =>
-                onChange?.({ contractAddress: e?.target?.value?.trim() })
-              }
-              customError={errors?.contractAddress}
-            />
             <CWSelectList
               key={`ethChainId-${defaultValues?.action}`}
               name="ethChainId"
@@ -463,9 +449,36 @@ const QuestActionSubForm = ({
               })}
               customError={errors?.ethChainId}
             />
+            <CWTextInput
+              key={`contractAddress-${defaultValues?.action}`}
+              name="contractAddress"
+              label="Contract Address"
+              placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F"
+              fullWidth
+              {...(defaultValues?.contractAddress && {
+                defaultValue: defaultValues?.contractAddress,
+              })}
+              onInput={(e) =>
+                onChange?.({ contractAddress: e?.target?.value?.trim() })
+              }
+              customError={errors?.contractAddress}
+            />
           </div>
 
-          <div className="grid-row cols-1">
+          <div className="grid-row cols-2">
+            <CWTextArea
+              key={`transactionHash-${defaultValues?.action}`}
+              name="transactionHash"
+              label="Transaction Hash"
+              placeholder="0xd2b4b1d70d7f76d55b524ea788ab85e9ab2d01d99ebbeedfb0b69ab0735bc5c9"
+              {...(defaultValues?.transactionHash && {
+                value: defaultValues?.transactionHash,
+              })}
+              onInput={(e) =>
+                onChange?.({ transactionHash: e?.target?.value?.trim() })
+              }
+              customError={errors?.transactionHash}
+            />
             <CWTextArea
               key={`eventSignature-${defaultValues?.action}`}
               name="eventSignature"
