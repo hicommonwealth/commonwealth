@@ -162,6 +162,10 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      environment: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

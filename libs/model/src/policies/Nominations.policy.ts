@@ -1,4 +1,4 @@
-import { logger, Policy } from '@hicommonwealth/core';
+import { config, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { models } from '../database';
@@ -22,6 +22,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
         const community = await models.Community.findOne({
           where: {
             namespace: payload.parsedArgs.namespace,
+            environment: config.APP_ENV,
           },
         });
         if (!community) {
@@ -40,6 +41,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
         const community = await models.Community.findOne({
           where: {
             namespace: payload.parsedArgs.namespace,
+            environment: config.APP_ENV,
           },
         });
         if (!community) {
@@ -67,6 +69,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
         const community = await models.Community.findOne({
           where: {
             namespace: payload.parsedArgs.namespace,
+            environment: config.APP_ENV,
           },
         });
         if (!community) {
@@ -79,6 +82,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
           where: {
             community_id: community.id,
             namespace_judge_token_id: Number(payload.parsedArgs.judgeId),
+            environment: config.APP_ENV,
           },
         });
         mustExist('Contest Manager', contestManager);

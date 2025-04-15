@@ -74,6 +74,7 @@ export const Community = z.object({
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
+  environment: z.string(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
