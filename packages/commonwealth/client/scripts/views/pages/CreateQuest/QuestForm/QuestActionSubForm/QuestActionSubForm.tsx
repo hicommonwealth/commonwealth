@@ -518,7 +518,6 @@ const QuestActionSubForm = ({
       )}
 
       <div className={clsx('grid-row', allowsContentId ? 'cols-2' : 'cols-1')}>
-        {/* TODO: 11580 - make this better */}
         {allowsContentId &&
           (config.with_optional_chain_id ? (
             <CWSelectList
