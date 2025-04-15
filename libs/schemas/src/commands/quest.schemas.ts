@@ -38,7 +38,7 @@ export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
     .object({
       eth_chain_id: z.number(),
       contract_address: EVM_ADDRESS_STRICT,
-      event_signature: EVM_EVENT_SIGNATURE_STRICT,
+      event_signature: z.string(),
       tx_hash: EVM_EVENT_SIGNATURE_STRICT,
     })
     .optional(),
