@@ -30,6 +30,10 @@ export async function handleCapReached(
     const lpBondingCurveAddress = (contracts as { lpBondingCurve: string })
       .lpBondingCurve;
 
+    if (!lpBondingCurveAddress) {
+      throw new Error('Token bondingCurveAddress not found');
+    }
+
     const onChainTokenData = await getLaunchpadToken({
       rpc: url,
       tokenAddress: token_address,
