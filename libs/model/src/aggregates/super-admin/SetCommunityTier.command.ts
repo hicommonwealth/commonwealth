@@ -26,6 +26,7 @@ export function SetCommunityTier(): Command<typeof schemas.SetCommunityTier> {
           await models.Thread.update(
             {
               marked_as_spam_at: now,
+              search: null,
             },
             {
               where: {
@@ -38,8 +39,9 @@ export function SetCommunityTier(): Command<typeof schemas.SetCommunityTier> {
           await models.sequelize.query(
             `
               UPDATE "Comments"
-              SET "marked_as_spam_at" = :now
-                  FROM "Threads"
+              SET marked_as_spam_at = :now,
+                  search = null
+              FROM "Threads"
               WHERE "Threads"."id" = "Comments"."thread_id"
               AND "Threads"."community_id" = :community_id
           `,
