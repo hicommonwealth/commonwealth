@@ -352,10 +352,8 @@ const QuestActionSubForm = ({
         />
       </div>
 
-      {/* TODO 11580: make this cleareable */}
       <CWSelectList
-        isClearable={true}
-        backspaceRemovesValue
+        isClearable={false}
         label="Action"
         placeholder="Select an action"
         name="action"
@@ -521,15 +519,15 @@ const QuestActionSubForm = ({
         {allowsContentId &&
           (config.with_optional_chain_id ? (
             <CWSelectList
+              isClearable={true}
+              backspaceRemovesValue
               key={`contentIdentifier-${defaultValues?.action}`}
               name="contentIdentifier"
-              isClearable={false}
               label="Chain Node"
               placeholder="Select a chain node"
               options={chainNodes}
               onChange={(newValue) =>
-                newValue &&
-                onChange?.({ contentIdentifier: `${newValue.value}` })
+                onChange?.({ contentIdentifier: `${newValue?.value || ''}` })
               }
               {...(defaultValues?.contentIdentifier && {
                 value: {
