@@ -217,7 +217,6 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
                 <DetailCard
                   status={status || ''}
                   governanceType={queryType || ''}
-                  // @ts-expect-error <StrictNullChecks/>
                   publishDate={createdAt}
                   id={identifier}
                   Threads={queryType === 'cosmos' ? cosmosThreads : threads}
@@ -288,7 +287,6 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
               <DetailCard
                 status={status || ''}
                 governanceType={queryType || ''}
-                // @ts-expect-error <StrictNullChecks/>
                 publishDate={createdAt}
                 id={identifier}
                 Threads={queryType === 'cosmos' ? cosmosThreads : threads}
