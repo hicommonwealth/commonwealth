@@ -68,14 +68,11 @@ export const EvmEventSignatures = {
   },
   CommunityNominations: {
     NominatorSettled:
-      // TODO: get real event signature
-      '0xbb6a94f1e31af2431404c2fa9955afb0eb15b8fad6307d8d8e19cf8c59d6c71f',
+      '0x03618668aeac06c0bfc54fabb38080c1f51cd34f257c3773bf66044d2bb8b427',
     NominatorNominated:
-      // TODO: get real event signature
-      '0xbb6a94f1e31af2431404c2fa9955afb0eb15b8fad6307d8d8e19cf8c59d6c71f',
+      '0x7f484f73afbbbc0b24b4cca807c76ab1f6e9eec1cb84afc111f3fd37edd38c97',
     JudgeNominated:
-      // TODO: get real event signature
-      '0xbb6a94f1e31af2431404c2fa9955afb0eb15b8fad6307d8d8e19cf8c59d6c71f',
+      '0xd3381a18ee091ebc453476f9f0f9167642972862d5946a730a557ef658113ac1',
   },
 } as const;
 

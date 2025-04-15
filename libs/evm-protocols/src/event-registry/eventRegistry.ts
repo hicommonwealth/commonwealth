@@ -18,6 +18,11 @@ type ContractAddresses = {
     | (typeof factoryContracts)[key]['factory']
     | (typeof factoryContracts)[key]['communityStake']
     | (key extends keyof typeof factoryContracts
+        ? 'communityNomination' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['communityNomination']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
         ? 'launchpad' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['launchpad']
           : never
@@ -48,7 +53,6 @@ type ContractAddresses = {
 export enum ChildContractNames {
   SingleContest = 'SingleContest',
   RecurringContest = 'RecurringContest',
-  CommunityNominations = 'CommunityNominations',
 }
 
 export type ContractSource = {
@@ -95,15 +99,16 @@ const namespaceFactorySource = {
         EvmEventSignatures.Contests.SingleContestVoterVoted,
       ],
     },
-    [ChildContractNames.CommunityNominations]: {
-      abi: CommunityNominationsAbi,
-      eventSignatures: [
-        EvmEventSignatures.CommunityNominations.NominatorSettled,
-        EvmEventSignatures.CommunityNominations.NominatorNominated,
-        EvmEventSignatures.CommunityNominations.JudgeNominated,
-      ],
-    },
   },
+} satisfies ContractSource;
+
+const communityNominationsSource = {
+  abi: CommunityNominationsAbi,
+  eventSignatures: [
+    EvmEventSignatures.CommunityNominations.NominatorSettled,
+    EvmEventSignatures.CommunityNominations.NominatorNominated,
+    EvmEventSignatures.CommunityNominations.JudgeNominated,
+  ],
 } satisfies ContractSource;
 
 const communityStakesSource = {
@@ -161,6 +166,8 @@ export const EventRegistry = {
   },
   [ValidChains.SepoliaBase]: {
     [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.SepoliaBase].communityNomination]:
+      communityNominationsSource,
     [factoryContracts[ValidChains.SepoliaBase].communityStake]:
       communityStakesSource,
     [factoryContracts[ValidChains.SepoliaBase].launchpad]: launchpadSource,

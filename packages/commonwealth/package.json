@@ -43,6 +43,7 @@
     "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c ../../.eslintrc-diff.cjs test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -w -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "list-neynar-webhooks": "tsx ./scripts/list-neynar-webhooks.ts",
+    "list-event-sigs": "tsx ./scripts/list-event-sigs.ts",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
     "preview": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start' 'vite preview -c ./client/vite.config.ts'",
