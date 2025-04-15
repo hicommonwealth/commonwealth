@@ -6,6 +6,7 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { AuthContext } from '../context';
 import {
   Community,
   CommunityMember,
@@ -292,4 +293,5 @@ export const UpdateCommunityDirectoryTags = {
   output: z.object({
     community_id: z.string(),
   }),
+  context: AuthContext,
 };

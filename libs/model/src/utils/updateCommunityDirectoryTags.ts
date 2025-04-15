@@ -2,12 +2,21 @@ import { AppError } from '@hicommonwealth/core';
 import { Transaction } from 'sequelize';
 import { models } from '../database';
 
+export const MAX_SELECTED_COMMUNITIES = 20;
+
 export const updateCommunityDirectoryTags = async (
   tag_names: string[],
   community_id: string,
   selected_community_ids: string[],
   transaction?: Transaction,
 ) => {
+  // Check for maximum number of selected communities
+  if (selected_community_ids.length > MAX_SELECTED_COMMUNITIES) {
+    throw new AppError(
+      `Cannot select more than ${MAX_SELECTED_COMMUNITIES} communities`,
+    );
+  }
+
   // Get tag IDs from names
   const tags = await models.Tags.findAll({
     where: { name: tag_names },

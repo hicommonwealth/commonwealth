@@ -1,6 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
+import { authRoles } from '../../middleware';
 import { updateCommunityDirectoryTags } from '../../utils/updateCommunityDirectoryTags';
 import { emitEvent } from '../../utils/utils';
 
@@ -9,7 +10,7 @@ export function UpdateCommunityDirectoryTags(): Command<
 > {
   return {
     ...schemas.UpdateCommunityDirectoryTags,
-    auth: [],
+    auth: [authRoles('admin')],
     secure: false,
     body: async ({ payload }) => {
       const { community_id, tag_names, selected_community_ids } = payload;

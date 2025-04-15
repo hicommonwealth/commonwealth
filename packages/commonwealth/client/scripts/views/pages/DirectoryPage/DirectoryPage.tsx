@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -39,7 +39,6 @@ import DirectorySettingsDrawer from './DirectorySettingsDrawer';
 import ShowAddedTags from './ShowAddedTags';
 
 const DirectoryPage = () => {
-  const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
   const [isDirectorySettingsDrawerOpen, setIsDirectorySettingsDrawerOpen] =
@@ -55,32 +54,11 @@ const DirectoryPage = () => {
 
   const { data: nodes } = useFetchNodesQuery();
   const { data: tagsForFilter } = useFetchTagsQuery();
+  const navigate = useCommonNavigate();
 
   const [filteredTagsList, setFilteredTagsList] = useState<
     { label: string; value: string }[]
   >([]);
-
-  useEffect(() => {
-    const getFilteredTags = () => {
-      const filteredTags = tagsForFilter
-        ?.filter((tag) => selectedTags.includes(tag.name))
-        .map((tag) => ({
-          label: tag.name,
-          value: String(tag.id),
-        }));
-
-      if (selectedCommunities.length > 0) {
-        return [
-          ...(filteredTags || []),
-          { label: 'Admin picked', value: 'admin-picked' },
-        ];
-      }
-
-      return filteredTags;
-    };
-    const filteredTags = getFilteredTags() || [];
-    setFilteredTagsList(filteredTags);
-  }, [tagsForFilter, selectedTags, selectedCommunities]);
 
   const communityId = app.activeChainId() || '';
 
@@ -116,6 +94,7 @@ const DirectoryPage = () => {
     data: communityTagsAndCommunities,
     isLoading: isLoadingTagsAndCommunities,
     error: tagsAndCommunitiesError,
+    refetch: refetchTagsAndCommunities,
   } = useGetCommunitySelectedTagsAndCommunities({
     community_id: communityId,
     enabled: !!communityId,
@@ -123,6 +102,18 @@ const DirectoryPage = () => {
 
   const { mutateAsync: updateCommunityDirectoryTags } =
     useUpdateCommunityDirectoryTags();
+
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin() ||
+    Permissions.isCommunityModerator();
+
+  useBrowserAnalyticsTrack({
+    payload: {
+      event: MixpanelPageViewEvent.DIRECTORY_PAGE_VIEW,
+      isPWA: isAddedToHomeScreen,
+    },
+  });
 
   const getFilteredCommunities = useCallback(
     (communities: any[], tags: string[], manualSelections: string[]) => {
@@ -183,15 +174,15 @@ const DirectoryPage = () => {
         initialTags,
         initialCommunities,
       );
-
       setFilteredCommunities(initialFilteredCommunities);
 
       if (tableData) {
-        const newTableData = tableData.filter((row) =>
-          initialFilteredCommunities.some(
-            (filteredItem) => filteredItem.id === row.id,
-          ),
+        const newTableData = getFilteredCommunities(
+          tableData,
+          initialTags,
+          initialCommunities,
         );
+
         setFilteredTableData(newTableData);
       }
     }
@@ -204,16 +195,73 @@ const DirectoryPage = () => {
     getFilteredCommunities,
   ]);
 
-  const handleCreateCommunity = () => {
-    navigate('/createCommunity', {}, null);
-  };
+  useEffect(() => {
+    const getFilteredTags = () => {
+      const filteredTags = tagsForFilter
+        ?.filter((tag) => selectedTags.includes(tag.name))
+        .map((tag) => ({
+          label: tag.name,
+          value: String(tag.id),
+        }));
+
+      if (selectedCommunities.length > 0) {
+        return [
+          ...(filteredTags || []),
+          { label: 'Admin picked', value: 'admin-picked' },
+        ];
+      }
+
+      return filteredTags;
+    };
+    const filteredTags = getFilteredTags() || [];
+    setFilteredTagsList(filteredTags);
+  }, [tagsForFilter, selectedTags, selectedCommunities]);
+
+  useEffect(() => {
+    if (!filteredRelatedCommunitiesData || !tableData) return;
+
+    if (appliedFilters.length === 0) {
+      setFilteredCommunities(filteredRelatedCommunitiesData);
+      setFilteredTableData(tableData);
+      return;
+    }
+
+    const filterLogic = (comm: any) => {
+      return appliedFilters.some((filter) => {
+        if (filter.label === 'Admin picked') {
+          return selectedCommunities.includes(comm.id);
+        }
+
+        return (
+          Array.isArray(comm.tag_ids) && comm.tag_ids.includes(filter.label)
+        );
+      });
+    };
+
+    const newFilteredCommunities =
+      filteredRelatedCommunitiesData.filter(filterLogic);
+    setFilteredCommunities(newFilteredCommunities);
+
+    const newTableData = tableData.filter(filterLogic);
+    setFilteredTableData(newTableData);
+  }, [
+    appliedFilters,
+    filteredRelatedCommunitiesData,
+    tableData,
+    selectedCommunities,
+  ]);
 
   const { trackAnalytics } = useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
       isPWA: isAddedToHomeScreen,
     },
+    onAction: true,
   });
+
+  const handleCreateCommunity = () => {
+    navigate('/createCommunity', {}, null);
+  };
 
   const handleFilterClick = (value: { label: string; value: string }) => {
     if (!appliedFilters.some((filter) => filter.value === value.value)) {
@@ -246,6 +294,8 @@ const DirectoryPage = () => {
       });
 
       setIsDirectorySettingsDrawerOpen(false);
+      await refetchTagsAndCommunities();
+
       trackAnalytics({
         event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
         isPWA: isAddedToHomeScreen,
@@ -256,17 +306,24 @@ const DirectoryPage = () => {
     }
   };
 
-  const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin() ||
-    Permissions.isCommunityModerator();
+  const displayTableData = useMemo(() => {
+    if (appliedFilters.length > 0) {
+      return filteredTableData;
+    }
 
-  useBrowserAnalyticsTrack({
-    payload: {
-      event: MixpanelPageViewEvent.DIRECTORY_PAGE_VIEW,
-      isPWA: isAddedToHomeScreen,
-    },
-  });
+    return getFilteredCommunities(
+      tableData || [],
+      selectedTags,
+      selectedCommunities,
+    );
+  }, [
+    filteredTableData,
+    tableData,
+    appliedFilters.length,
+    selectedTags,
+    selectedCommunities,
+    getFilteredCommunities,
+  ]);
 
   if (isLoadingCommunity) {
     return <CWCircleMultiplySpinner />;
@@ -374,7 +431,7 @@ const DirectoryPage = () => {
           chainName={baseChain?.name}
           communitySearch={communitySearch}
           filteredRelatedCommunitiesData={filteredCommunities}
-          tableData={filteredTableData}
+          tableData={displayTableData}
           selectedViewType={selectedViewType}
         />
         <DirectorySettingsDrawer
