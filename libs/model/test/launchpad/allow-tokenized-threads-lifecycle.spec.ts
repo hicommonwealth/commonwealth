@@ -1,4 +1,5 @@
 import { command, dispose, query } from '@hicommonwealth/core';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { UpdateCommunity, UpdateTopic } from '../../src/aggregates/community';
@@ -25,6 +26,7 @@ describe('allow_tokenized_threads lifecycle', () => {
     });
     await seed('Community', {
       id: community_id,
+      tier: CommunityTierMap.CommunityVerified,
       allow_tokenized_threads: false,
       profile_count: 0,
     });

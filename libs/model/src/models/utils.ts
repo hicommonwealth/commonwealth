@@ -40,10 +40,11 @@ export function oneToOne<Source extends State, Target extends State>(
   target: ModelStatic<Model<Target>> & Associable<Target>,
   options?: OneToOneOptions<Source, Target>,
 ): ModelStatic<Model<Source>> & Associable<Source> {
+  const targetKey = options?.targetKey ?? this.primaryKeyAttribute;
   const foreignKey = options?.foreignKey ?? getDefaultFK(this, target);
 
   // sequelize is not creating fk when fk = pk
-  if (foreignKey === target.primaryKeyAttribute)
+  if (foreignKey === target.primaryKeyAttribute) {
     mapFk(
       target,
       this,
@@ -53,21 +54,21 @@ export function oneToOne<Source extends State, Target extends State>(
         onDelete: options?.onDelete ?? 'NO ACTION',
       },
     );
+  }
 
   target.belongsTo(this, {
+    targetKey,
     foreignKey,
     as: options?.as,
     onUpdate: options?.onUpdate ?? 'NO ACTION',
     onDelete: options?.onDelete ?? 'NO ACTION',
   });
 
-  // TODO: why belongsTo iff targetKey is defined + why not hasOne() instead?
-  options?.targetKey &&
-    this.belongsTo(target, {
-      foreignKey: options?.targetKey,
-      onUpdate: 'NO ACTION',
-      onDelete: 'NO ACTION',
-    });
+  this.hasOne(target, {
+    foreignKey,
+    onUpdate: options?.onUpdate ?? 'NO ACTION',
+    onDelete: options?.onDelete ?? 'NO ACTION',
+  });
 
   // don't forget to return this (fluent)
   return this;
@@ -224,10 +225,6 @@ export function mapFk<Source extends State, Target extends State>(
   const pk = primaryKey.map((k) => target.getAttributes()[k].field!);
   const fk = foreignKey.map((k) => source.getAttributes()[k].field!);
   const name = `${source.tableName}_${target.tableName.toLowerCase()}_${fk}_fkey`;
-  // console.log(
-  //   'mapFk:',
-  //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
-  // );
   source._fks.push({
     name,
     source: source.tableName,

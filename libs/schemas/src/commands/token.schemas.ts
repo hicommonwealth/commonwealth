@@ -25,7 +25,7 @@ export const CreateLaunchpadTrade = {
     eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
   }),
-  output: LaunchpadTradeView,
+  output: LaunchpadTradeView.nullish(),
 };
 
 export const GetLaunchpadTrades = {

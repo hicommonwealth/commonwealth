@@ -127,8 +127,8 @@ const TrendingTokensList = ({
         <div
           className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
         >
-          <CWText type="h2">
-            No tokens found Launch a new token&nbsp;
+          <CWText type="h3">
+            No tokens found. Launch a new token&nbsp;
             <Link to="/createTokenCommunity">here</Link>.
           </CWText>
         </div>

@@ -48,19 +48,20 @@ const useBuyTrade = ({
     tokenCommunity &&
     enabled
   );
+  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id || 0;
   const {
     data: selectedAddressEthBalance = `0.0`,
     isLoading: isLoadingUserEthBalance,
   } = useGetUserEthBalanceQuery({
     chainRpc: tokenCommunity?.ChainNode?.url || '',
-    ethChainId: tokenCommunity?.ChainNode?.eth_chain_id || 0,
+    ethChainId,
     walletAddress: selectedAddress || '',
     apiEnabled: isSelectedAddressEthBalanceQueryEnabled,
   });
 
   const isUnitEthToTokenBuyExchangeRateQueryEnabled = !!(
     chainNode?.url &&
-    chainNode?.ethChainId &&
+    ethChainId &&
     selectedAddress &&
     tokenCommunity &&
     enabled
@@ -70,7 +71,7 @@ const useBuyTrade = ({
     isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
-    ethChainId: chainNode.ethChainId || 0,
+    ethChainId,
     mode: 'buy',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,
@@ -110,7 +111,7 @@ const useBuyTrade = ({
       // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
-        !chainNode?.ethChainId ||
+        !ethChainId ||
         !selectedAddress ||
         !tokenCommunity
       ) {
@@ -120,7 +121,7 @@ const useBuyTrade = ({
       // buy token on chain
       const payload = {
         chainRpc: chainNode.url,
-        ethChainId: chainNode.ethChainId,
+        ethChainId,
         amountEth: baseCurrencyBuyAmountDecimals * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
@@ -129,7 +130,7 @@ const useBuyTrade = ({
 
       // create token trade on db
       await createTokenTrade({
-        eth_chain_id: chainNode?.ethChainId,
+        eth_chain_id: ethChainId,
         transaction_hash: txReceipt.transactionHash,
       });
 
