@@ -25,8 +25,7 @@ export const LoginWithGoogle = () => {
   });
 
   const { state, loading, initOAuth } = useLoginWithOAuth();
-  const { authenticated, user, logout, createWallet, getAccessToken } =
-    usePrivy();
+  const { authenticated, user, logout, createWallet } = usePrivy();
   const wallets = useWallets();
   const identityTokenRef = useIdentityTokenRef();
   const signMessage = useSignMessageMemo();
@@ -92,12 +91,6 @@ export const LoginWithGoogle = () => {
       });
 
       console.log('FIXME: session: ', session);
-
-      const accessToken = await getAccessToken();
-
-      if (!accessToken) {
-        throw new Error('No access token');
-      }
 
       // identityToken is privy identityToken
       // ssoOAuthToken is the access token you get back from whatever provider
