@@ -26,6 +26,7 @@ const useVerificationTokenTransaction = ({
   const communityId = app?.chain?.meta?.id;
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId,
+    enabled: !!communityId,
   });
 
   const [transactionData, setTransactionData] = useState<TransactionData>(
