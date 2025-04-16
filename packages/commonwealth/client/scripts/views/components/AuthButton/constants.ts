@@ -85,7 +85,7 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'OKX Wallet',
     description: {
-      text: '+15 Aura with OKX Wallet',
+      text: '+10 Aura w/ OKX Signup',
       hasBackground: true,
     },
   },
