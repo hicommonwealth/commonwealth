@@ -104,7 +104,7 @@ export const ThreadPollCard = ({
     });
   };
 
-  const userVote = poll.getUserVote(
+  const userVote = poll?.getUserVote?.(
     user.activeAccount?.community?.id || '',
     user.activeAccount?.address || '',
   );
@@ -119,7 +119,7 @@ export const ThreadPollCard = ({
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+          poll?.endsAt && poll?.endsAt?.isBefore(moment().utc()),
         )}
         totalVoteCount={poll.votes?.length}
         voteInformation={poll.options.map((option) => {

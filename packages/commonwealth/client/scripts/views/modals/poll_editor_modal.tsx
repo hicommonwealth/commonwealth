@@ -49,9 +49,10 @@ const customDurationOptions = [
 
 type PollEditorModalProps = {
   onModalClose: () => void;
-  thread: Thread;
+  thread?: Thread;
   pollData?: any;
   isAIresponseCompleted: boolean;
+  setLocalPoll?: any;
 };
 
 export const PollEditorModal = ({
@@ -59,6 +60,7 @@ export const PollEditorModal = ({
   thread,
   pollData,
   isAIresponseCompleted,
+  setLocalPoll,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
@@ -66,9 +68,10 @@ export const PollEditorModal = ({
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
   const user = useUserStore();
-
+  console.log('pollData', { pollData });
   useEffect(() => {
     if (pollData && pollData !== undefined && isAIresponseCompleted) {
+      console.log('pollData', { pollData });
       const newPollData = JSON.parse(pollData);
       setPrompt(newPollData?.question);
       setOptions(newPollData?.options);
@@ -117,16 +120,31 @@ export const PollEditorModal = ({
     }
 
     try {
-      await createPoll({
-        threadId: thread.id,
-        prompt,
-        options,
-        customDuration: customDurationEnabled ? customDuration : undefined,
-        authorCommunity: user.activeAccount?.community?.id || '',
-        address: user.activeAccount?.address || '',
-      });
+      if (thread) {
+        await createPoll({
+          threadId: thread?.id,
+          prompt,
+          options,
+          customDuration: customDurationEnabled ? customDuration : undefined,
+          authorCommunity: user.activeAccount?.community?.id || '',
+          address: user.activeAccount?.address || '',
+        });
 
-      notifySuccess('Poll creation succeeded');
+        notifySuccess('Poll creation succeeded');
+      } else if (setLocalPoll) {
+        setLocalPoll([
+          {
+            options: options,
+            prompt: prompt,
+            communityId: user.activeAccount?.community?.id,
+            customDuration: customDurationEnabled ? customDuration : undefined,
+            address: user.activeAccount?.address || '',
+            createdAt: moment(),
+            endsAt: moment('2025-04-20T19:04:53.661Z'),
+            votes: [],
+          },
+        ]);
+      }
     } catch (err) {
       notifyError('Poll creation failed');
       console.error(err);

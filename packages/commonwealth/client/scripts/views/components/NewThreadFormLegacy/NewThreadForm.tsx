@@ -26,6 +26,7 @@ import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
   useCreateThreadMutation,
+  useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
@@ -58,11 +59,14 @@ import {
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 // eslint-disable-next-line max-len
+import Poll from 'client/scripts/models/Poll';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
 import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
+import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -92,7 +96,9 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
 }
-
+export interface ExtendedPoll extends Poll {
+  customDuration?: string;
+}
 export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -102,6 +108,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [linkedProposals, setLinkedProposals] =
     useState<ProposalState | null>();
+  const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+
+  const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -368,6 +377,17 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         }).catch(console.error);
       }
 
+      if (thread && pollsData && pollsData?.length) {
+        await createPoll({
+          threadId: thread.id,
+          prompt: pollsData[0]?.prompt,
+          options: pollsData[0]?.options,
+          customDuration: pollsData[0]?.customDuration || undefined,
+          authorCommunity: user.activeAccount?.community?.id || '',
+          address: user.activeAccount?.address || '',
+        });
+      }
+
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
@@ -443,6 +463,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     resetTurnstile,
     addThreadLinks,
     linkedProposals,
+    createPoll,
+    pollsData,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -605,7 +627,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-
+  console.log('<<<<<<pollsData>>>>', { pollsData });
   const sidebarComponent = [
     {
       label: 'Links',
@@ -621,6 +643,42 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         </div>
       ),
     },
+    ...((pollsData && pollsData?.length > 0) ||
+    !app.chain?.meta?.admin_only_polling ||
+    isAdmin
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(
+                    pollsData?.map((poll) => [poll?.id, poll]),
+                  ).values(),
+                ].map((poll: Poll) => {
+                  return (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      isTopicMembershipRestricted={isRestrictedMembership}
+                      showDeleteButton={isAdmin}
+                    />
+                  );
+                })}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
+                  <ThreadPollEditorCard
+                    threadAlreadyHasPolling={!pollsData?.length}
+                    setLocalPoll={setPollData}
+                    isCreateThreadPage={true}
+                    threadTitle={threadTitle}
+                    threadContentDelta={threadContentDelta}
+                  />
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const proposalDetailSidebar = [

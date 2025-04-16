@@ -717,6 +717,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
+  console.log('<<<<<<<PPPP>>>>', pollsData);
   return (
     <StickCommentProvider>
       <MetaTags
