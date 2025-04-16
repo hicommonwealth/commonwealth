@@ -5,7 +5,7 @@ import {
   usePrivy,
   useWallets,
 } from '@privy-io/react-auth';
-import { GenericEthereumWebWalletController } from 'controllers/app/webWallets/generic_ethereum_web_wallet';
+import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/privy_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSignIn } from 'state/api/user';
@@ -83,7 +83,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         return signature;
       };
 
-      const webWallet = new GenericEthereumWebWalletController(
+      const webWallet = new PrivyEthereumWebWalletController(
         ethereumProvider,
         signMessageProvider,
       );

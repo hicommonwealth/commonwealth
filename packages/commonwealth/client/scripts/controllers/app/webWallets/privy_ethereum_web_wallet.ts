@@ -18,7 +18,7 @@ import { Web3BaseProvider } from 'web3';
 
 // WARN: this is taken from MetamaskWebWalletController and the two could
 // probably be unified.
-export class GenericEthereumWebWalletController implements IWebWallet<string> {
+export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
