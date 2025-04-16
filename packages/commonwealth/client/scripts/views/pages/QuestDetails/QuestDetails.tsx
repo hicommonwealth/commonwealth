@@ -238,6 +238,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'MembershipsRefreshed': {
+        if (actionContentId) {
+          navigate(buildURLFromContentId(actionContentId), {}, null);
+        } else {
+          notifyError(`Linked group url is invalid`);
+        }
+        break;
+      }
       default:
         return;
     }
