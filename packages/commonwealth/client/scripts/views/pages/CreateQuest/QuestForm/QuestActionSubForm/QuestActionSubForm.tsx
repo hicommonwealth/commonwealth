@@ -63,6 +63,7 @@ const QuestActionSubForm = ({
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
       discordServerUrl: `https://discord.gg/commonwealth`,
+      groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -70,6 +71,7 @@ const QuestActionSubForm = ({
       topicId: 'Topic Link (optional)',
       twitterTweetUrl: 'Tweet URL',
       discordServerUrl: 'Discord Server URL',
+      groupId: 'Group Link',
     },
   };
 
@@ -95,6 +97,10 @@ const QuestActionSubForm = ({
 
     if (config?.requires_discord_server_url) {
       return contentIdInputConfig.labels.discordServerUrl;
+    }
+
+    if (config?.requires_group_id) {
+      return contentIdInputConfig.labels.groupId;
     }
 
     return 'Content Id';
@@ -124,6 +130,10 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.discordServerUrl;
     }
 
+    if (config?.requires_group_id) {
+      return contentIdInputConfig.placeholders.groupId;
+    }
+
     return 'Content Id';
   };
 
@@ -132,7 +142,8 @@ const QuestActionSubForm = ({
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
-    config?.requires_discord_server_url;
+    config?.requires_discord_server_url ||
+    config?.requires_group_id;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
