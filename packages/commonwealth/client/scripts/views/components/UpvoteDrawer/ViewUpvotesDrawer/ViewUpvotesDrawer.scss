@@ -1,74 +1,62 @@
 @import '../../../../styles/shared.scss';
 
 .ViewUpvotesDrawer {
-  .Drawer.upvote-drawer {
-    @include extraSmall {
-      top: 48px !important;
-
-      .content-container {
-        padding: 0 16px;
-      }
-    }
-
-    .empty-upvotes-container {
-      color: $neutral-500;
-    }
-
-    .drawer-actions {
-      position: sticky;
-      top: 0;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 16px 56px 12px 25px;
-
-      @include extraSmall {
-        gap: 4px;
-        padding: 16px 16px 12px 16px;
-      }
-    }
+  .upvote-drawer {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
 
     .content-container {
-      padding: 20px 56px;
-
-      @include extraSmall {
-        padding: 0 16px;
-      }
-
-      div.h3 {
-        margin-bottom: 16px;
-      }
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
 
       .upvoted-content {
-        padding: 16px 0;
-        margin-bottom: 24px;
-
-        .upvoted-content-body {
-          padding: 16px 0 0 18px;
+        .upvoted-content-header {
+          margin-bottom: 16px;
         }
       }
 
-      .upvote-totals {
-        display: flex;
-        justify-content: space-evenly;
+      .CWTabsRow {
+        margin: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+      }
 
-        .upvotes,
-        .weight {
-          padding: 14px 16px;
+      .tab-content {
+        min-height: 300px;
+        padding: 16px 0;
+
+        .upvotes-tab,
+        .holders-tab,
+        .trade-activity-tab {
           display: flex;
-          gap: 10px;
-          justify-content: flex-start;
-          flex-basis: 30%;
+          flex-direction: column;
+          gap: 16px;
+        }
 
-          .Text.caption {
-            color: $neutral-400;
+        .upvote-totals {
+          display: flex;
+          justify-content: space-between;
+          padding: 16px;
+          background-color: var(--bg-light);
+          border-radius: 8px;
+          margin-top: 16px;
+
+          .upvotes,
+          .weight {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
           }
         }
-      }
-    }
 
-    .user-display-name {
-      font-weight: 500;
+        .empty-upvotes-container {
+          text-align: center;
+          padding: 32px;
+          color: var(--text-secondary);
+        }
+      }
     }
   }
 }
