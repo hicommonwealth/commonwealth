@@ -1,4 +1,6 @@
 import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import CommunityNominations from 'helpers/ContractHelpers/CommunityNominations';
 import { useState } from 'react';
 import { useFetchNodesQuery } from 'state/api/nodes';
@@ -21,8 +23,15 @@ const useVerificationTokenTransaction = ({
   chainId,
   onSuccess,
 }: UseVerificationTokenTransactionProps): TransactionHookResult => {
+  const communityId = app?.chain?.meta?.id;
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+  });
+
   const [transactionData, setTransactionData] = useState<TransactionData>(
-    defaultTransactionState,
+    community?.namespace_nominations?.length
+      ? { state: 'completed', errorText: '' }
+      : defaultTransactionState,
   );
 
   const { data: nodes } = useFetchNodesQuery();
