@@ -4,18 +4,20 @@ import { serializeCanvas } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import Account from 'client/scripts/models/Account';
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { z } from 'zod';
 
 export function useSignIn() {
   const utils = trpc.useUtils();
+  const utilsRef = useRef(utils);
+  utilsRef.current = utils;
 
   const handleSuccess = useCallback(() => {
-    utils.quest.getQuest.invalidate().catch(console.error);
-    utils.quest.getQuests.invalidate().catch(console.error);
-  }, [utils.quest.getQuest, utils.quest.getQuests]);
+    utilsRef.current.quest.getQuest.invalidate().catch(console.error);
+    utilsRef.current.quest.getQuests.invalidate().catch(console.error);
+  }, []);
 
-  const handleError = useCallback((error: Error) => {
+  const handleError = useCallback((error: Pick<Error, 'message'>) => {
     notifyError(error.message);
   }, []);
 
@@ -24,12 +26,15 @@ export function useSignIn() {
     onError: handleError,
   });
 
+  const mutationRef = useRef(mutation);
+  mutationRef.current = mutation;
+
   const signIn = useCallback(
     async (
       session: Session,
       payload: Omit<z.infer<typeof SignIn.input>, 'session'>,
     ) => {
-      const address = await mutation.mutateAsync({
+      const address = await mutationRef.current.mutateAsync({
         ...payload,
         session: serializeCanvas(session),
       });
@@ -59,7 +64,7 @@ export function useSignIn() {
         joinedCommunity: address.address_created,
       };
     },
-    [mutation],
+    [],
   );
 
   return useMemo(() => ({ signIn }), [signIn]);

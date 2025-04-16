@@ -125,7 +125,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
     wallets.ready,
     wallets.wallets,
     oAuthAccessToken,
-    // signIn,
+    signIn,
     identityTokenRef,
     createWallet,
     signMessage,
