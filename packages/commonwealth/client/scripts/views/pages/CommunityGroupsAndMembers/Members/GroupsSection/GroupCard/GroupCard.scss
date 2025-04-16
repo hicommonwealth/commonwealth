@@ -20,24 +20,31 @@
       margin-right: auto;
     }
 
-    .group-edit-button {
+    .right {
       display: flex;
-      justify-content: center;
+      flex-direction: row;
       align-items: center;
-      color: $neutral-500;
-      cursor: pointer;
-      outline: none;
-      border: none;
-      background-color: transparent;
       gap: 4px;
 
-      .Icon {
+      .group-edit-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         color: $neutral-500;
-        font-size: 18px;
-      }
+        cursor: pointer;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        gap: 4px;
 
-      .caption {
-        color: $neutral-500;
+        .Icon {
+          color: $neutral-500;
+          font-size: 18px;
+        }
+
+        .caption {
+          color: $neutral-500;
+        }
       }
     }
   }
