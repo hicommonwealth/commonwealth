@@ -1,7 +1,4 @@
 import axios from 'axios';
-
-declare let window: any;
-
 import type Web3 from 'web3';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';

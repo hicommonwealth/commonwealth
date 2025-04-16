@@ -22,7 +22,6 @@ type UsePrivyOAuthProps = {
   onError: (err: Error) => void;
 };
 
-// TODO: we have to figure out when to call onSuccess
 // TODO: I need to add support for isNewlyCreated
 export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   const { onSuccess, onError } = props;
@@ -44,7 +43,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   const identityTokenRef = useIdentityTokenRef();
 
   const privy = usePrivy();
-  const { authenticated, user, logout } = privy;
+  const { authenticated, logout } = privy;
 
   const createWallet = useMemoizedFunction(privy.createWallet);
 
@@ -111,12 +110,12 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
       });
 
       console.log('Authenticated successfully! ');
-      //onSuccess({ address: wallet.address });
+      onSuccess({ address: wallet.address });
     }
 
     doAsync().catch((err) => {
       console.error(err);
-      //onError(err);
+      onError(err);
     });
 
     // WARN: do not have signIn in the list of effects below.
@@ -129,8 +128,8 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
     identityTokenRef,
     createWallet,
     signMessage,
-    // onError,
-    // onSuccess,
+    onError,
+    onSuccess,
   ]);
 
   const onPrivyOAuth = useCallback(() => {
