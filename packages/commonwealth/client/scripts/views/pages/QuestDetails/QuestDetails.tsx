@@ -240,7 +240,13 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'MembershipsRefreshed': {
         if (actionContentId) {
-          navigate(buildURLFromContentId(actionContentId), {}, null);
+          navigate(
+            buildURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
+            {},
+            null,
+          );
         } else {
           notifyError(`Linked group url is invalid`);
         }
