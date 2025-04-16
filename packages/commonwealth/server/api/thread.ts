@@ -1,7 +1,8 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { middleware, Reaction, Thread } from '@hicommonwealth/model';
+import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { config } from '../config';
 import { updateRankOnThreadIneligibility } from './ranking';
 
 const log = logger(import.meta);
@@ -54,6 +55,18 @@ export const trpcRouter = trpc.router({
       trpc.fireAndForget(async (_, __, ctx) => {
         await middleware.incrementUserCount(ctx.actor.user.id!, 'upvotes');
       }),
+      trpc.fireAndForget(
+        async (_, { community_id, thread_id, user_tier_at_creation }) => {
+          await middleware.incrementThreadRank(
+            config.HEURISTIC_WEIGHTS.LIKE_WEIGHT,
+            {
+              community_id,
+              thread_id,
+              user_tier_at_creation: user_tier_at_creation || 1,
+            },
+          );
+        },
+      ),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,
         ({ community_id }) => ({ community: community_id }),
@@ -78,6 +91,24 @@ export const trpcRouter = trpc.router({
     // trpc.fireAndForget(async (input, _, ctx) => {
     //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
     // }),
+    trpc.fireAndForget(async (_, { thread_id, user_tier_at_creation }) => {
+      if (thread_id) {
+        const thread = await models.Thread.findOne({
+          attributes: ['community_id'],
+          where: { id: thread_id },
+        });
+        if (thread) {
+          await middleware.decrementThreadRank(
+            config.HEURISTIC_WEIGHTS.LIKE_WEIGHT,
+            {
+              thread_id,
+              community_id: thread.community_id,
+              user_tier_at_creation: user_tier_at_creation || 1,
+            },
+          );
+        }
+      }
+    }),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
   getThreadsByIds: trpc.query(

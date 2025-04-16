@@ -29,7 +29,7 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
         await comment.save();
       }
 
-      comment.Address = await models.Address.findOne({
+      const address = await models.Address.findOne({
         where: {
           id: comment.address_id,
         },
@@ -40,8 +40,10 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
           },
         ],
       });
+      const formattedComment = comment.get({ plain: true });
+      if (address) formattedComment.Address = address.get({ plain: true });
 
-      return { ...comment, community_id };
+      return { ...formattedComment, community_id };
     },
   };
 }

@@ -25,6 +25,7 @@ export default (
           return BigInt(rank);
         },
       },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       tableName: 'ThreadRanks',

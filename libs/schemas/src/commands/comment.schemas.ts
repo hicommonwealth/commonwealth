@@ -55,6 +55,7 @@ export const DeleteComment = {
     thread_id: PG_INT,
     comment_id: PG_INT,
     community_id: z.string(),
+    user_tier_at_creation: z.number().nullish(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),

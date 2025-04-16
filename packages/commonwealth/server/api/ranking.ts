@@ -1,7 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { CacheNamespaces, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { Comment, Thread } from '@hicommonwealth/schemas';
+import { Thread } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../config';
@@ -13,10 +13,6 @@ const client = redis.client;
 
 // TODO: to round to nearest integer the original float has to be large enough such that
 //  the loss of precision is negligible -> set minimum weights i.e. minimum rank
-
-function toBigInt(value: number) {
-  return BigInt(Math.round(value));
-}
 
 const APPROXIMATE_MAX_SET_SIZE = 500;
 
@@ -79,14 +75,15 @@ async function deleteCachedRank(communityId: string, threadId: number) {
 async function updatePostgresRank(threadId: number, rankIncrease: number) {
   const rank = (await models.sequelize.query(
     `
-    UPDATE "ThreadRanks"
-    SET rank = rank + :rankIncrease
-    WHERE thread_id = :threadId
-    RETURNING rank;
-  `,
+      UPDATE "ThreadRanks"
+      SET rank       = rank + :rankIncrease,
+          updated_at = NOW()
+      WHERE thread_id = :threadId
+      RETURNING rank;
+    `,
     {
       type: QueryTypes.UPDATE,
-      replacements: { rankIncrease: toBigInt(rankIncrease), threadId },
+      replacements: { rankIncrease: Math.round(rankIncrease), threadId },
     },
   )) as unknown as [{ rank: number }[], number];
   return rank[0];
@@ -100,7 +97,7 @@ export async function createThreadRank(thread: z.infer<typeof Thread>) {
       config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT;
   await models.ThreadRank.create({
     thread_id: thread.id!,
-    rank: toBigInt(rank),
+    rank: BigInt(Math.round(rank)),
   });
   await incrementCachedRank(thread.community_id!, thread.id!, rank);
 }
@@ -118,50 +115,38 @@ export async function updateRankOnThreadIneligibility({
   await deleteCachedRank(community_id, thread_id);
 }
 
-export async function updateThreadRankOnComment(
-  comment: z.infer<typeof Comment> & { community_id: string },
+type ThreadRankUpdateParams = {
+  thread_id: number;
+  community_id: string;
+  user_tier_at_creation: number;
+};
+
+export async function incrementThreadRank(
+  updateWeight: number,
+  { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
 ) {
-  const rankIncrease =
-    (comment.user_tier_at_creation || 1) *
-    config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT;
-
-  const rank = await updatePostgresRank(comment.thread_id, rankIncrease);
-
+  const rankIncrease = user_tier_at_creation * updateWeight;
+  const rank = await updatePostgresRank(thread_id, rankIncrease);
   if (rank.length === 0) {
-    log.trace(`No thread rank found for thread ${comment.thread_id}`);
+    log.trace(`No thread rank found for thread ${thread_id}`);
     return;
   }
-
-  await incrementCachedRank(
-    comment.community_id!,
-    comment.thread_id!,
-    Number(rank[0].rank),
-  );
+  await incrementCachedRank(community_id!, thread_id!, Number(rank[0].rank));
 }
 
-export async function updateThreadRankOnCommentIneligibility(comment: {
-  community_id: string;
-  thread_id: number;
-  user_tier_at_creation?: number | null;
-}) {
-  const rankDecrease =
-    (comment.user_tier_at_creation || 1) *
-    config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT;
-
-  const rank = await updatePostgresRank(comment.thread_id, -rankDecrease);
-
+export async function decrementThreadRank(
+  weight: number,
+  { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
+) {
+  const rankDecrease = user_tier_at_creation * weight;
+  const rank = await updatePostgresRank(thread_id, -rankDecrease);
   if (rank.length === 0) {
-    log.trace(`No thread rank found for thread ${comment.thread_id}`);
+    log.trace(`No thread rank found for thread ${thread_id}`);
     return;
   }
-
   // It is possible for a set to contain ranks which are lower than the top ranks in Postgres
   // since we don't replace a decreased rank with the next highest rank from Postgres. This is because:
   // 1. We avoid an index on rank in "ThreadsRank" table
   // 2. Comment deletion/spam is rare
-  await decrementCachedRank(
-    comment.community_id!,
-    comment.thread_id!,
-    Number(rank[0].rank),
-  );
+  await decrementCachedRank(community_id!, thread_id!, Number(rank[0].rank));
 }

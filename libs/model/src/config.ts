@@ -74,6 +74,7 @@ const {
   LIKE_WEIGHT,
   CREATED_DATE_WEIGHT,
   CREATOR_USER_TIER_WEIGHT,
+  DISABLE_TIER_RATE_LIMITS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -249,6 +250,9 @@ export const config = configure(
         ? parseFloat(CREATOR_USER_TIER_WEIGHT)
         : 1,
     },
+    DISABLE_TIER_RATE_LIMITS: ['local', 'CI'].includes(target.APP_ENV)
+      ? true
+      : DISABLE_TIER_RATE_LIMITS === 'true',
   },
   z.object({
     DB: z.object({
@@ -526,5 +530,11 @@ export const config = configure(
       CREATED_DATE_WEIGHT: z.number(),
       CREATOR_USER_TIER_WEIGHT: z.number(),
     }),
+    DISABLE_TIER_RATE_LIMITS: z
+      .boolean()
+      .refine(
+        (data) => !(target.APP_ENV === 'production' && data),
+        'Tier rate limits cannot be disabled in production',
+      ),
   }),
 );

@@ -4,6 +4,7 @@ import {
   Context,
   InvalidActor,
 } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import {
   hasTierRateLimits,
   USER_TIERS,
@@ -28,14 +29,16 @@ export async function incrementUserCount(
   user_id: number,
   counter: 'creates' | 'upvotes',
 ) {
-  const cacheKey = builtKey(user_id, counter);
-  const value = await cache().incrementKey(
-    CacheNamespaces.Tiered_Counter,
-    cacheKey,
-    1,
-    60,
-  );
-  return value;
+  if (!config.DISABLE_TIER_RATE_LIMITS) {
+    const cacheKey = builtKey(user_id, counter);
+    const value = await cache().incrementKey(
+      CacheNamespaces.Tiered_Counter,
+      cacheKey,
+      1,
+      60,
+    );
+    return value;
+  }
 }
 
 export function tiered({

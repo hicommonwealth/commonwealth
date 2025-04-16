@@ -18,6 +18,7 @@ module.exports = {
             onDelete: 'CASCADE',
           },
           rank: { type: Sequelize.BIGINT, allowNull: false },
+          updated_at: { type: Sequelize.DATE, allowNull: false },
         },
         { transaction },
       );
@@ -55,11 +56,17 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.removeColumn('Reactions', 'user_tier_at_creation', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Comments', 'user_tier_at_creation', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Threads', 'user_tier_at_creation', {
+        transaction,
+      });
+      await queryInterface.dropTable('ThreadRanks', { transaction });
+    });
   },
 };
