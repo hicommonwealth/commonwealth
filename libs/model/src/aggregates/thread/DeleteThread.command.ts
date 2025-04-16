@@ -42,6 +42,7 @@ export function DeleteThread(): Command<typeof schemas.DeleteThread> {
         thread_id: thread.id!,
         canvas_signed_data: thread.canvas_signed_data,
         canvas_msg_id: thread.canvas_msg_id,
+        community_id: thread.community_id,
       };
     },
   };

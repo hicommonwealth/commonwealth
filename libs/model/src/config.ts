@@ -69,6 +69,11 @@ const {
   CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
+  VIEW_COUNT_WEIGHT,
+  COMMENT_WEIGHT,
+  LIKE_WEIGHT,
+  CREATED_DATE_WEIGHT,
+  CREATOR_USER_TIER_WEIGHT,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -232,6 +237,17 @@ export const config = configure(
             },
           }),
       },
+    },
+    HEURISTIC_WEIGHTS: {
+      VIEW_COUNT_WEIGHT: VIEW_COUNT_WEIGHT ? parseFloat(VIEW_COUNT_WEIGHT) : 1,
+      COMMENT_WEIGHT: COMMENT_WEIGHT ? parseFloat(COMMENT_WEIGHT) : 1,
+      LIKE_WEIGHT: LIKE_WEIGHT ? parseFloat(LIKE_WEIGHT) : 1,
+      CREATED_DATE_WEIGHT: CREATED_DATE_WEIGHT
+        ? parseFloat(CREATED_DATE_WEIGHT)
+        : 1,
+      CREATOR_USER_TIER_WEIGHT: CREATOR_USER_TIER_WEIGHT
+        ? parseFloat(CREATOR_USER_TIER_WEIGHT)
+        : 1,
     },
   },
   z.object({
@@ -502,6 +518,13 @@ export const config = configure(
             'Turnstile create comment widget keys are required in production',
           ),
       }),
+    }),
+    HEURISTIC_WEIGHTS: z.object({
+      VIEW_COUNT_WEIGHT: z.number(),
+      COMMENT_WEIGHT: z.number(),
+      LIKE_WEIGHT: z.number(),
+      CREATED_DATE_WEIGHT: z.number(),
+      CREATOR_USER_TIER_WEIGHT: z.number(),
     }),
   }),
 );

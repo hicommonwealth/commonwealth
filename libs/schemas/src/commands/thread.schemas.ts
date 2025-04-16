@@ -78,6 +78,7 @@ export const DeleteThread = {
   }),
   output: z.object({
     thread_id: PG_INT,
+    community_id: z.string(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),

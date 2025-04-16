@@ -75,6 +75,10 @@ export class RedisCache implements Cache {
     return 'RedisCache';
   }
 
+  public get client(): RedisClientType {
+    return this._client;
+  }
+
   public async dispose(): Promise<void> {
     try {
       await this._client.disconnect();

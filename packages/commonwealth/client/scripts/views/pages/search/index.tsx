@@ -74,7 +74,7 @@ const SearchPage = () => {
   }, [urlQueryParams]);
 
   const community =
-    queryParams.communityScope || app.activeChainId() || 'all_communities';
+    queryParams.community || app.activeChainId() || 'all_communities';
 
   const activeTab = useMemo(() => {
     if (VALID_SEARCH_SCOPES.includes(queryParams.tab as SearchScope)) {

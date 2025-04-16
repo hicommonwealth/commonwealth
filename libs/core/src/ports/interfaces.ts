@@ -88,6 +88,8 @@ export enum CacheNamespaces {
   Community_Profile_Count_Changed = 'community_profile_count_changed',
   Tiered_Counter = 'tiered_counter',
   External_Api_Usage_Counter = 'api_key_counter',
+  CommunityThreadRanks = 'community_thread_ranks',
+  GlobalThreadRanks = 'global_thread_ranks',
 }
 
 /**

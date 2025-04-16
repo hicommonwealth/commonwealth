@@ -11,7 +11,7 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
       authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
     ],
     body: async ({ actor, payload, context }) => {
-      const { comment } = mustBeAuthorizedComment(actor, context);
+      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
       if (payload.spam && !comment.marked_as_spam_at) {
         comment.marked_as_spam_at = new Date();
@@ -41,7 +41,7 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
         ],
       });
 
-      return comment;
+      return { ...comment, community_id };
     },
   };
 }

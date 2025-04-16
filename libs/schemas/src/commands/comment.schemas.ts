@@ -52,7 +52,9 @@ export const DeleteComment = {
     comment_id: PG_INT,
   }),
   output: z.object({
+    thread_id: PG_INT,
     comment_id: PG_INT,
+    community_id: z.string(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
@@ -64,6 +66,6 @@ export const ToggleCommentSpam = {
     comment_id: PG_INT,
     spam: z.boolean(),
   }),
-  output: Comment,
+  output: Comment.extend({ community_id: z.string() }),
   context: CommentContext,
 };

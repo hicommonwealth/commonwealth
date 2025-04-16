@@ -10,6 +10,9 @@ export const trpcRouter = trpc.router({
     trpc.fireAndForget(async (_, __, ctx) => {
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
+    trpc.fireAndForget(async (_, output) => {
+      await middleware.updateThreadRankOnComment(output);
+    }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_COMMENT,
       (output) => ({ community: output.community_id }),
@@ -38,6 +41,14 @@ export const trpcRouter = trpc.router({
   ),
   searchComments: trpc.query(Comment.SearchComments, trpc.Tag.Comment),
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment),
-  deleteComment: trpc.command(Comment.DeleteComment, trpc.Tag.Comment),
-  toggleCommentSpam: trpc.command(Comment.ToggleCommentSpam, trpc.Tag.Comment),
+  deleteComment: trpc.command(Comment.DeleteComment, trpc.Tag.Comment, [
+    trpc.fireAndForget(async (_, output) => {
+      await middleware.updateThreadRankOnCommentIneligibility(output);
+    }),
+  ]),
+  toggleCommentSpam: trpc.command(Comment.ToggleCommentSpam, trpc.Tag.Comment, [
+    trpc.fireAndForget(async (_, output) => {
+      await middleware.updateThreadRankOnCommentIneligibility(output);
+    }),
+  ]),
 });

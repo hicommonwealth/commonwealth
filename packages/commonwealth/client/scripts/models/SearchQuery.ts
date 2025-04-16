@@ -40,7 +40,7 @@ export default class SearchQuery implements SearchParams {
   constructor(searchTerm = '', params?: SearchParams) {
     this.searchTerm = <Lowercase<string>>searchTerm.toLowerCase();
     this.searchScope = params?.searchScope || [SearchScope.All];
-    this.communityScope = params?.communityScope;
+    this.communityScope = params?.community;
     this.isSearchPreview = !!params?.isSearchPreview;
     this.sort = params?.sort || SearchSort.Best;
   }
@@ -48,7 +48,7 @@ export default class SearchQuery implements SearchParams {
   public toEncodedString() {
     let encodedString =
       this.searchTerm.trim().replace(/\s+/g, '%20') +
-      (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
+      (this.community ? ` communityScope=${this.community}` : '') +
       (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
       (this.sort ? ` sort=${this.sort}` : '');
 

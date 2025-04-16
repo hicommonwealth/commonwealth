@@ -2,6 +2,7 @@ import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { middleware, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { updateRankOnThreadIneligibility } from './ranking';
 
 const log = logger(import.meta);
 
@@ -12,6 +13,9 @@ export const trpcRouter = trpc.router({
     // }),
     trpc.fireAndForget(async (_, __, ctx) => {
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
+    }),
+    trpc.fireAndForget(async (_, output) => {
+      await middleware.createThreadRank(output);
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
@@ -28,6 +32,16 @@ export const trpcRouter = trpc.router({
           ? [MixpanelCommunityInteractionEvent.UPDATE_STAGE, {}]
           : undefined,
       ),
+    ),
+    trpc.fireAndForget(
+      async ({ spam }, { id, community_id, marked_as_spam_at }) => {
+        if (spam === true && marked_as_spam_at !== null) {
+          await updateRankOnThreadIneligibility({
+            thread_id: id!,
+            community_id,
+          });
+        }
+      },
     ),
   ]),
   createThreadReaction: trpc.command(
@@ -55,6 +69,9 @@ export const trpcRouter = trpc.router({
         CacheNamespaces.Query_Response,
         'GetGlobalActivity_{}', // this is the global activity cache key
       );
+    }),
+    trpc.fireAndForget(async (_, output) => {
+      await middleware.updateRankOnThreadIneligibility(output);
     }),
   ]),
   deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [

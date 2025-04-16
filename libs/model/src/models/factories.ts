@@ -40,6 +40,7 @@ import StarredCommunity from './starred_community';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Thread from './thread';
+import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
@@ -93,8 +94,9 @@ export const Factories = {
   Tags,
   SubscriptionPreference,
   Thread,
-  ThreadVersionHistory,
+  ThreadRank,
   ThreadSubscription,
+  ThreadVersionHistory,
   Topic,
   TwitterCursor,
   User,
