@@ -1,5 +1,7 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { memo } from 'react';
+import { PageLoading } from 'views/pages/loading';
+import './WaitForPrivy.scss';
 
 type WaitForPrivyProps = {
   children: React.ReactNode;
@@ -13,8 +15,11 @@ export const WaitForPrivy = memo(function WaitForPrivy(
   const { ready } = usePrivy();
 
   if (!ready) {
-    // TODO: using a loading progress indicator?
-    return <div>Waiting for privy</div>;
+    return (
+      <div className="WaitForPrivy">
+        <PageLoading />;
+      </div>
+    );
   }
 
   return children;
