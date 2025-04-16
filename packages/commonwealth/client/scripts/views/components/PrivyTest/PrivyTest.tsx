@@ -1,10 +1,10 @@
 import React from 'react';
-import { LoginWithGoogle2 } from 'views/components/PrivyTest/LoginWithGoogle2';
+import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
 
 export const PrivyTest = () => {
   return (
     <div>
-      <LoginWithGoogle2 />
+      <LoginWithGoogle />
     </div>
   );
 };

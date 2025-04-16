@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { usePrivyOAuth } from 'views/components/PrivyTest/usePrivyOAuth';
 
-export const LoginWithGoogle2 = () => {
+export const LoginWithGoogle = () => {
   const handleSuccess = useCallback(() => {
     console.log('success!');
   }, []);
