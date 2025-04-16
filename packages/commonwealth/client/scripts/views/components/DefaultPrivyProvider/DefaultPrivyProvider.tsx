@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, { memo } from 'react';
 import { LoadPrivy } from './LoadPrivy';
 import { WaitForPrivy } from './WaitForPrivy';
@@ -10,6 +11,12 @@ export const DefaultPrivyProvider = memo(function DefaultPrivyProvider(
   props: DefaultPrivyProviderProps,
 ) {
   const { children } = props;
+
+  const privyEnabled = useFlag('privy');
+
+  if (!privyEnabled) {
+    return chidren;
+  }
 
   return (
     <LoadPrivy>
