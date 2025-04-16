@@ -206,6 +206,8 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
     [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.Anvil].referralFeeManager]:
+      referralFeeManagerSource,
     [factoryContracts[ValidChains.Anvil].veBridge]: tokenStakingSource,
   },
 } as const satisfies EventRegistryType;
