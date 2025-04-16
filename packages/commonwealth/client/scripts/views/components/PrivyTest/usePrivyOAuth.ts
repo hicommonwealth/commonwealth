@@ -15,6 +15,7 @@ import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMem
 
 type OnSuccess = {
   address: string;
+  isNewlyCreated: boolean;
 };
 
 type UsePrivyOAuthProps = {
@@ -22,7 +23,6 @@ type UsePrivyOAuthProps = {
   onError: (err: Error) => void;
 };
 
-// TODO: I need to add support for isNewlyCreated
 export function usePrivyOAuth(props: UsePrivyOAuthProps) {
   const { onSuccess, onError } = props;
 
@@ -105,7 +105,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
 
       console.log('Attempting to auth... ');
 
-      await signIn(session, {
+      const { newlyCreated } = await signIn(session, {
         address: wallet.address,
         community_id: ChainBase.Ethereum,
         wallet_id: WalletId.Privy,
@@ -117,7 +117,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
       });
 
       console.log('Authenticated successfully! ');
-      onSuccess({ address: wallet.address });
+      onSuccess({ address: wallet.address, isNewlyCreated: newlyCreated });
     }
 
     doAsync().catch((err) => {
