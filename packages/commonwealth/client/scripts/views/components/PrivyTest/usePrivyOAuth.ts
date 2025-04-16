@@ -50,8 +50,6 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
 
   const createWallet = useMemoizedFunction(privy.createWallet);
 
-  console.log(wallets);
-
   useEffect(() => {
     async function doAsync() {
       if (!authenticated) {
@@ -99,12 +97,6 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         newSession: true,
       });
 
-      // identityToken is privy identityToken
-      // ssoOAuthToken is the access token you get back from whatever provider
-      // you are using i.e. matches ssoProvider
-
-      console.log('Attempting to auth... ');
-
       const { newlyCreated } = await signIn(session, {
         address: wallet.address,
         community_id: ChainBase.Ethereum,
@@ -116,7 +108,6 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         },
       });
 
-      console.log('Authenticated successfully! ');
       onSuccess({ address: wallet.address, isNewlyCreated: newlyCreated });
     }
 
