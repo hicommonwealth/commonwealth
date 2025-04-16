@@ -7,7 +7,7 @@ import {
 } from '@privy-io/react-auth';
 import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/privy_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSignIn } from 'state/api/user';
 import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
 import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
@@ -38,6 +38,9 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
 
   const { loading, initOAuth } = useLoginWithOAuth();
   const wallets = useWallets();
+  const walletsRef = useRef(wallets);
+  walletsRef.current = wallets;
+
   const signMessage = useSignMessageMemo();
   const { signIn } = useSignIn();
   const identityTokenRef = useIdentityTokenRef();
@@ -47,6 +50,8 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
 
   const createWallet = useMemoizedFunction(privy.createWallet);
 
+  console.log(wallets);
+
   useEffect(() => {
     async function doAsync() {
       if (!authenticated) {
@@ -54,12 +59,14 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         return;
       }
 
-      if (!wallets.ready) {
+      if (!walletsRef.current.ready) {
         console.warn('Wallets not ready');
         return;
       }
 
-      if (wallets.ready && wallets.wallets.length === 0) {
+      if (walletsRef.current.ready && walletsRef.current.wallets.length === 0) {
+        // WARN: this CAN return no wallets, when the wallets are ready, but
+        // the user STILL does have a connected wallet.
         console.warn('No wallets ... manually creating one.');
         await createWallet();
         return;
@@ -70,7 +77,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         return;
       }
 
-      const wallet = wallets.wallets[0];
+      const wallet = walletsRef.current.wallets[0];
 
       const ethereumProvider = async () => await wallet.getEthereumProvider();
       const signMessageProvider = async (message: string): Promise<string> => {
@@ -121,8 +128,6 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
     // WARN: do not have signIn in the list of effects below.
   }, [
     authenticated,
-    wallets.ready,
-    wallets.wallets,
     oAuthAccessToken,
     signIn,
     identityTokenRef,
