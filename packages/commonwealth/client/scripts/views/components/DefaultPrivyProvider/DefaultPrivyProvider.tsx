@@ -15,7 +15,7 @@ export const DefaultPrivyProvider = memo(function DefaultPrivyProvider(
   const privyEnabled = useFlag('privy');
 
   if (!privyEnabled) {
-    return chidren;
+    return children;
   }
 
   return (

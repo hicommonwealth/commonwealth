@@ -13,7 +13,7 @@ export const WaitForPrivy = memo(function WaitForPrivy(
   const { ready } = usePrivy();
 
   if (!ready) {
-    // TODO: make this prettier somehow.
+    // TODO: using a loading progress indicator?
     return <div>Waiting for privy</div>;
   }
 
