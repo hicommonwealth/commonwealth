@@ -15,7 +15,7 @@ export type ContentIdType =
   | 'topic'
   | 'group'
   | 'tweet_url'
-  | 'discord_server_url';
+  | 'discord_server_id';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -41,7 +41,7 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     case 'tweet_url':
       return QuestActionContentIdScope.TwitterTweet;
-    case 'discord_server_url':
+    case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
     case 'group':
       return QuestActionContentIdScope.Group;
@@ -107,8 +107,8 @@ export const buildContentIdFromURL = async (
   if (idType === 'tweet_url') {
     return `${idType}:${url}`;
   }
-  if (idType === 'discord_server_url') {
-    return `${idType}:${url}`;
+  if (idType === 'discord_server_id') {
+    return `discord_server_id:${url}`;
   }
 };
 
@@ -127,7 +127,7 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'comment')
     return `${origin}/discussion/comment/${idOrURL}${params}`;
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
-  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_id') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }

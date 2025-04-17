@@ -15,6 +15,7 @@ import {
   doesActionRequireDiscordServerURL,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
+  doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -49,7 +50,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'CommentUpvoted',
       'WalletLinked',
       'SSOLinked',
-      'CommonDiscordServerJoined',
+      'DiscordServerJoined',
       'MembershipsRefreshed',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
@@ -89,6 +90,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   instructionsLink: subForm.instructionsLink || '',
                   contentIdScope: subForm.contentIdScope,
                   contentLink: subForm.contentLink || '',
+                  startLink: subForm.startLink || '',
                   rewardAmount: subForm.rewardAmount,
                   ...(subForm?.creatorRewardAmount && {
                     creatorRewardAmount: subForm.creatorRewardAmount,
@@ -117,11 +119,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_twitter_tweet_link:
                     allowsContentId &&
                     doesActionRequireTwitterTweetURL(chosenAction),
-                  requires_discord_server_url:
+                  requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
                   requires_group_id:
                     allowsContentId && doesActionRequireGroupId(chosenAction),
+                  requires_start_link: doesActionRequireStartLink(chosenAction),
                 },
               };
             }),
@@ -220,7 +223,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           if (scope === QuestActionContentIdScope.TwitterTweet)
             return 'tweet_url';
           if (scope === QuestActionContentIdScope.DiscordServer)
-            return 'discord_server_url';
+            return 'discord_server_id';
           if (scope === QuestActionContentIdScope.Topic) return 'topic';
           if (scope === QuestActionContentIdScope.Group) return 'group';
           if (scope === QuestActionContentIdScope.Thread) {
@@ -244,13 +247,16 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               subForm.config?.with_optional_thread_id ||
               subForm.config?.with_optional_topic_id ||
               subForm.config?.requires_twitter_tweet_link ||
-              subForm.config?.requires_discord_server_url ||
+              subForm.config?.requires_discord_server_id ||
               subForm.config?.requires_group_id) && {
               content_id: await buildContentIdFromURL(
                 subForm.values.contentLink,
                 contentIdScope,
               ),
             }),
+          ...(subForm.values.startLink && {
+            start_link: subForm.values.startLink.trim(),
+          }),
           ...((subForm.values.noOfLikes ||
             subForm.values.noOfRetweets ||
             subForm.values.noOfReplies) && {
