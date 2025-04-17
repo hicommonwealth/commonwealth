@@ -155,6 +155,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   action.event_name as QuestAction,
                   action.content_id || undefined,
                 ),
+                startLink: action.start_link || '',
                 contentLink: buildURLFromContentId(action.content_id || ''),
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,

@@ -13,6 +13,7 @@ export enum QuestActionContentIdScope {
   Thread = 'thread',
   TwitterTweet = 'twitter_tweet',
   DiscordServer = 'discord_server',
+  Group = 'group',
 }
 
 export type QuestActionSubFormErrors = {
@@ -24,6 +25,7 @@ export type QuestActionSubFormErrors = {
   // specific for certain quest action types
   contentIdScope?: string;
   contentLink?: string;
+  startLink?: string;
   // specific to twitter actions
   noOfLikes?: string;
   noOfRetweets?: string;
@@ -46,6 +48,7 @@ export type QuestActionSubFormFields = {
   // specific for certain quest action types
   contentIdScope?: QuestActionContentIdScope;
   contentLink?: string;
+  startLink?: string;
   // specific to twitter actions
   noOfLikes?: string | number;
   noOfRetweets?: string | number;
@@ -64,8 +67,10 @@ export type QuestActionSubFormConfig = {
   with_optional_thread_id: boolean;
   with_optional_comment_id: boolean;
   requires_twitter_tweet_link: boolean;
-  requires_discord_server_url: boolean;
+  requires_discord_server_id: boolean;
   requires_chain_event: boolean;
+  requires_group_id: boolean;
+  requires_start_link: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

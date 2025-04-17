@@ -14,7 +14,8 @@ export const actionCopies = {
     ['WalletLinked']: 'Link a new wallet',
     ['SSOLinked']: 'Link a new social (SSO)',
     ['TweetEngagement']: 'Engage on Tweet',
-    ['CommonDiscordServerJoined']: "Join Common's Discord Community",
+    ['DiscordServerJoined']: "Join Common's Discord Community",
+    ['MembershipsRefreshed']: 'Join a Group',
     ['XpChainEventCreated']: 'Engage on Blockchain',
   },
   pre_reqs: {
@@ -29,8 +30,9 @@ export const actionCopies = {
     ['SSOLinked']: () => '',
     ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
-    ['CommonDiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
+    ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
+    ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: () => '',
   },
   explainer: {
@@ -47,8 +49,8 @@ export const actionCopies = {
       <div>
         <ul>
           <li>
-            ● XP rewarded to participants after any of these tweet metrics are
-            met -{' '}
+            ● Aura is awarded when any engagement metric (like, retweet, reply)
+            hits its target. Current Target:{' '}
             {[
               likes > 0 ? `${pluralize(likes, 'Like')}` : '',
               retweets > 0 ? `${pluralize(retweets, 'Retweet')}` : '',
@@ -59,16 +61,29 @@ export const actionCopies = {
             .
           </li>
           <li>
-            ● This action is not bound by the max Aura limit for this quest.
+            ● Instant Aura is granted to all participants for a specific
+            engagement type (e.g., likes) once its target is reached before the
+            quest ends.
           </li>
           <li>
-            ● Aura is awarded to the first engagements of the tweet regardless
-            of when the quest starts.
+            ● If the quest ends before any target is hit, participants earn Aura
+            for all their actions — e.g., if you liked, retweeted, and replied,
+            you get Aura for all three.
+          </li>
+          <li>
+            ● You can earn Aura for each type of engagement once (like, retweet,
+            and reply).
+          </li>
+          <li>● No max Aura limit applies to this quest.</li>
+          <li>
+            ● Aura is awarded to the first engagements on the tweet, regardless
+            of when the quest began.
           </li>
         </ul>
       </div>
     ),
-    ['CommonDiscordServerJoined']: '',
+    ['DiscordServerJoined']: '',
+    ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: (
       contractAddress: string,
       ethChainId: number | string,
@@ -100,7 +115,8 @@ export const actionCopies = {
     ['SSOLinked']: '',
     ['UserMentioned']: '',
     ['TweetEngagement']: '',
-    ['CommonDiscordServerJoined']: '',
+    ['DiscordServerJoined']: '',
+    ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
   },
 };

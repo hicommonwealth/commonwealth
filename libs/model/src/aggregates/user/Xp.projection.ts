@@ -122,6 +122,7 @@ async function recordXpsForQuest(
     amount?: number; // overrides reward_amount if present, used with trades x multiplier
     goal_id?: number; // community goals
     threshold?: number; // rewards when threshold over configured meta value
+    discord_server_id?: string;
   },
 ) {
   const shared_with_address =
@@ -145,7 +146,8 @@ async function recordXpsForQuest(
           (scoped === 'wallet' && id !== scope?.wallet) ||
           (scoped === 'sso' && id !== scope?.sso) ||
           (scoped === 'goal' && +id !== scope?.goal_id) ||
-          (scoped === 'threshold' && +id > (scope?.threshold || 0))
+          (scoped === 'threshold' && +id > (scope?.threshold || 0)) ||
+          (scoped === 'discord_server_id' && id !== scope?.discord_server_id)
         )
           continue;
       }
@@ -563,16 +565,18 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
         );
       },
-      CommonDiscordServerJoined: async ({ payload }) => {
+      DiscordServerJoined: async ({ payload }) => {
         if (payload.user_id) {
           const action_metas = await getQuestActionMetas(
             { created_at: payload.joined_date },
-            'CommonDiscordServerJoined',
+            'DiscordServerJoined',
           );
           await recordXpsForQuest(
             payload.user_id,
             payload.joined_date,
             action_metas,
+            undefined,
+            { discord_server_id: payload.server_id },
           );
         }
       },

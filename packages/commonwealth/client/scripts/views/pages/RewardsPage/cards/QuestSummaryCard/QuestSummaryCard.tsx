@@ -55,7 +55,7 @@ const QuestSummaryCard = () => {
     navigate('/explore?tab=quests');
   };
 
-  const handleCTAClick = (questId: number, communityId?: string) => {
+  const handleCTAClick = (questId: number, communityId?: string | null) => {
     navigate(`/quests/${questId}`, {}, communityId);
   };
 
@@ -106,7 +106,7 @@ const QuestSummaryCard = () => {
                   isActive={isShowingActiveQuests}
                   name={quest.name}
                   onCTAClick={() =>
-                    handleCTAClick(quest.id, quest.community_id || '')
+                    handleCTAClick(quest.id, quest.community_id)
                   }
                 />
               );

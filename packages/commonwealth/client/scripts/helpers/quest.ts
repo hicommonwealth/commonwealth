@@ -35,7 +35,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommentUpvoted' ||
     action === 'ThreadUpvoted' ||
     action === 'TweetEngagement' ||
-    action === 'CommonDiscordServerJoined'
+    action === 'DiscordServerJoined' ||
+    action === 'MembershipsRefreshed'
   );
 };
 
@@ -60,7 +61,7 @@ export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
 };
 
 export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
-  return action === 'CommonDiscordServerJoined';
+  return action === 'DiscordServerJoined';
 };
 
 export const doesActionRequireChainEvent = (action: QuestActionType) => {
@@ -69,6 +70,14 @@ export const doesActionRequireChainEvent = (action: QuestActionType) => {
 
 export const doesActionAllowRepetition = (action: QuestActionType) => {
   return action !== 'TweetEngagement';
+};
+
+export const doesActionRequireGroupId = (action: QuestActionType) => {
+  return action === 'MembershipsRefreshed';
+};
+
+export const doesActionRequireStartLink = (action: QuestActionType) => {
+  return action === 'DiscordServerJoined';
 };
 
 const convertTimeRemainingToLabel = ({

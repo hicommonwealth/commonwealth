@@ -14,6 +14,23 @@ export enum ValidChains {
   Anvil = 31337,
 }
 
+const chains = Object.entries(ValidChains)
+  .filter(([key]) => isNaN(Number(key)))
+  .map(([name, id]) => ({ name, id: id as number }));
+
+export const getChainName = (input: {
+  id?: number;
+  hex?: string;
+}): string | undefined => {
+  const id = input.id ?? (input.hex ? parseInt(input.hex, 16) : undefined);
+  if (id === undefined) return undefined;
+  return chains.find((c) => c.id === id)?.name ?? String(id);
+};
+
+export const getChainHex = (id: number): string => {
+  return '0x' + id.toString(16);
+};
+
 /**
  * Type guard to verify if a given number is a value in the ValidChains enum.
  * @param chainId - The number to verify.
@@ -61,12 +78,12 @@ export const factoryContracts = {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
-    lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
-    tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
+    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
-    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
+    communityNomination: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -114,12 +131,14 @@ export const factoryContracts = {
     chainId: 974399131,
   },
   [ValidChains.Anvil]: {
-    factory: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
-    communityStake: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-    launchpad: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
-    lpBondingCurve: '0xc5a5C42992dECbae36851359345FE25997F5C42d',
-    tokenCommunityManager: '0x851356ae760d987E095750cCeb3bC6014560891C',
-    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE', // TODO: Double check this address
+    factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
+    communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
+    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
+    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
+    referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
+    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;

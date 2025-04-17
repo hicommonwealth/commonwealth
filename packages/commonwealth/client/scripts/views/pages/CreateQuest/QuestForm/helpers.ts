@@ -3,6 +3,7 @@ import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
+  doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
@@ -12,8 +13,9 @@ export type ContentIdType =
   | 'comment'
   | 'thread'
   | 'topic'
+  | 'group'
   | 'tweet_url'
-  | 'discord_server_url';
+  | 'discord_server_id';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -28,6 +30,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
+    if (doesActionRequireGroupId(action as QuestAction))
+      return QuestActionContentIdScope.Group;
     return undefined;
   }
 
@@ -37,8 +41,10 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     case 'tweet_url':
       return QuestActionContentIdScope.TwitterTweet;
-    case 'discord_server_url':
+    case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
+    case 'group':
+      return QuestActionContentIdScope.Group;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -91,11 +97,18 @@ export const buildContentIdFromURL = async (
     if (foundTopic) return `${idType}:${foundTopic.id}`;
     throw new Error(`invalid topic url ${url}`);
   }
+  if (idType === 'group') {
+    return `${idType}:${parseInt(
+      url.includes('group/')
+        ? new URL(url).pathname.split('/').at(-1) || '' // get group id from url pathname
+        : new URLSearchParams(new URL(url).search).get('groupId') || '', // get group id from url search params
+    )}`;
+  }
   if (idType === 'tweet_url') {
     return `${idType}:${url}`;
   }
-  if (idType === 'discord_server_url') {
-    return `${idType}:${url}`;
+  if (idType === 'discord_server_id') {
+    return `discord_server_id:${url}`;
   }
 };
 
@@ -114,9 +127,12 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'comment')
     return `${origin}/discussion/comment/${idOrURL}${params}`;
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
-  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_id') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
+  }
+  if (idType === 'group') {
+    return `${origin}/group/${idOrURL}${params}`;
   }
 
   return '';

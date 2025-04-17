@@ -108,9 +108,9 @@ export const getContestStatus = async (
   endTime: number;
   contestInterval: number;
   lastContentId: string;
-  prizeShare: number;
-  voterShare: number;
-  contestToken: `0x${string}`;
+  // prizeShare: number;
+  // voterShare: number;
+  // contestToken: `0x${string}`;
 }> => {
   const client = getPublicClient(chain);
   const contract = {
@@ -136,18 +136,18 @@ export const getContestStatus = async (
         ...contract,
         functionName: oneOff ? 'contestLength' : 'contestInterval',
       },
-      {
-        ...contract,
-        functionName: 'prizeShare',
-      },
-      {
-        ...contract,
-        functionName: 'voterShare',
-      },
-      {
-        ...contract,
-        functionName: 'contestToken',
-      },
+      // {
+      //   ...contract,
+      //   functionName: 'prizeShare',
+      // },
+      // {
+      //   ...contract,
+      //   functionName: 'voterShare',
+      // },
+      // {
+      //   ...contract,
+      //   functionName: 'contestToken',
+      // },
     ],
     allowFailure: false,
   });
@@ -157,9 +157,9 @@ export const getContestStatus = async (
     endTime: Number(promise[1]),
     contestInterval: Number(promise[2]),
     lastContentId: String(promise[3]),
-    prizeShare: Number(promise[4]),
-    voterShare: Number(promise[5]),
-    contestToken: promise[6] as `0x${string}`,
+    // prizeShare: Number(promise[4]),
+    // voterShare: Number(promise[5]),
+    // contestToken: promise[6] as `0x${string}`,
   };
 };
 

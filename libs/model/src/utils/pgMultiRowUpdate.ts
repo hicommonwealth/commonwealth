@@ -35,32 +35,30 @@ export async function pgMultiRowUpdate(
   for (const { setColumn, rows } of columns) {
     if (rows.length === 0) continue;
     if (updates.length > 0) updates += `, \n`;
-    updates += `${setColumn} = CASE \n${rows
-      .map(() => `\tWHEN ${caseColumn} = ? THEN ?`)
-      .join('\n\t')}`;
+
+    updates += `${setColumn} = CASE `;
+    for (const { whenCaseValue, newValue } of rows) {
+      updates += `\n\tWHEN ${caseColumn} = ? THEN ?`;
+      replacements.push(whenCaseValue, newValue);
+    }
     updates += ` \n\tEND`;
-    replacements.push(
-      ...rows
-        .map(({ whenCaseValue, newValue }) => [whenCaseValue, newValue])
-        .flat(),
-    );
-
-    const caseValues = new Set(
-      columns.map((c) => c.rows.map((r) => r.whenCaseValue)).flat(),
-    );
-    const query = `
-      UPDATE "${tableName}"
-      SET ${updates}
-      WHERE ${caseColumn} IN (?);
-  `;
-    replacements.push(Array.from(caseValues));
-
-    await models.sequelize.query(query, {
-      transaction,
-      type: QueryTypes.UPDATE,
-      logging: composeSequelizeLogger(log, config.TWITTER.LOG_LEVEL),
-      replacements,
-    });
   }
+
+  const caseValues = new Set(
+    columns.map((c) => c.rows.map((r) => r.whenCaseValue)).flat(),
+  );
+  const query = `
+    UPDATE "${tableName}"
+    SET ${updates}
+    WHERE ${caseColumn} IN (?);
+  `;
+  replacements.push(Array.from(caseValues));
+
+  await models.sequelize.query(query, {
+    transaction,
+    type: QueryTypes.UPDATE,
+    logging: composeSequelizeLogger(log, config.TWITTER.LOG_LEVEL),
+    replacements,
+  });
   return true;
 }

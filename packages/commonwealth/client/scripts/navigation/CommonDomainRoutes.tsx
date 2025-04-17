@@ -60,6 +60,9 @@ const ViewThreadPage = lazy(
 );
 const TopicRedirectPage = lazy(() => import('views/pages/topic_redirect'));
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const GroupRedirectPage = lazy(
+  () => import('views/pages/Redirects/GroupRedirect'),
+);
 const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -89,6 +92,10 @@ const CommunityStakeIntegration = lazy(
 );
 const CommunityTokenIntegration = lazy(
   () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
+const CommunityOnchainVerificationIntegration = lazy(
+  () =>
+    import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
 );
 
 const CommunityTopics = lazy(
@@ -451,6 +458,13 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
+    key="/group/:id"
+    path="/group/:id"
+    element={withLayout(GroupRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
     key="/discussion/comment/:identifier"
     path="/discussion/comment/:identifier"
     element={withLayout(CommentRedirectPage, {
@@ -525,6 +539,14 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/onchain-verification"
+    path="/:scope/manage/integrations/onchain-verification"
+    element={withLayout(CommunityOnchainVerificationIntegration, {
       scoped: true,
     })}
   />,
