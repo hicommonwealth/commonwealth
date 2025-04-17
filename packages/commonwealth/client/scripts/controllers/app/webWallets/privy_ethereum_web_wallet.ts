@@ -21,6 +21,7 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: Web3BaseProvider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _web3: Web3 | any;
 
   public readonly name = WalletId.Metamask;
@@ -29,6 +30,7 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Ethereum;
 
   public constructor(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private etheriumProvider: () => any,
     private signMessageProvider: (message: string) => Promise<string>,
   ) {}
@@ -109,6 +111,7 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       let ethereum = await this.etheriumProvider();
 
       if (ethereum.providers?.length) {
+        // eslint-disable-next-line @typescript-eslint/require-await
         ethereum.providers.forEach(async (p) => {
           if (p.isMetaMask) ethereum = p;
         });

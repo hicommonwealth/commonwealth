@@ -15,6 +15,10 @@ export const LoginWithGoogle = () => {
     onError: handleError,
   });
 
+  const handleLogout = useCallback(() => {
+    logout().catch(console.error);
+  }, [logout]);
+
   if (authenticated) {
     return (
       <>
@@ -26,7 +30,7 @@ export const LoginWithGoogle = () => {
   }
 
   return (
-    <button onClick={onPrivyOAuth} disabled={loading}>
+    <button onClick={onPrivyOAuth} disabled={handleLogout}>
       {loading ? 'Logging in...' : 'Log in with Google'}
     </button>
   );
