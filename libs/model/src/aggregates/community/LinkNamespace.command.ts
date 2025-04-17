@@ -1,9 +1,4 @@
 import { type Command } from '@hicommonwealth/core';
-import {
-  ChildContractNames,
-  EvmEventSignatures,
-  commonProtocol as cp,
-} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
@@ -91,13 +86,8 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
     ...schemas.LinkNamespace,
     auth: [],
     body: async ({ payload }) => {
-      const {
-        namespace_address,
-        deployer_address,
-        log_removed,
-        referral,
-        block_number,
-      } = payload;
+      const { namespace_address, deployer_address, log_removed, referral } =
+        payload;
 
       const community = await models.Community.findOne({
         where: { namespace_address },
@@ -199,35 +189,6 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             },
             transaction,
           });
-        }
-
-        if (log_removed) {
-          // remove namespace EvmEventSource
-          await models.EvmEventSource.destroy({
-            where: {
-              eth_chain_id: community.ChainNode!.eth_chain_id!,
-              contract_address: namespace_address,
-              event_signature: EvmEventSignatures.Namespace.TransferSingle,
-            },
-            transaction,
-          });
-        } else {
-          // create namespace EvmEventSource to track namespace token transfers
-          const ethChainId = community.ChainNode!.eth_chain_id!;
-          if (cp.isValidChain(ethChainId)) {
-            await models.EvmEventSource.create(
-              {
-                eth_chain_id: ethChainId,
-                contract_address: namespace_address,
-                event_signature: EvmEventSignatures.Namespace.TransferSingle,
-                contract_name: ChildContractNames.Namespace,
-                parent_contract_address:
-                  cp.factoryContracts[ethChainId].factory,
-                created_at_block: Number(block_number),
-              },
-              { transaction },
-            );
-          }
         }
 
         // project referral details

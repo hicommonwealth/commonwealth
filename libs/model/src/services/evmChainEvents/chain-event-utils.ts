@@ -9,7 +9,6 @@ import {
 import {
   EvmEventSignatures,
   decodeLog,
-  erc1155Abi,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
@@ -292,36 +291,6 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   };
 };
 
-const transferSingleMapper: EvmMapper<'NamespaceTransferSingle'> = (
-  event: EvmEvent,
-) => {
-  const decoded = decodeLog({
-    abi: erc1155Abi,
-    eventName: 'TransferSingle',
-    data: event.rawLog.data,
-    topics: event.rawLog.topics,
-  });
-
-  return {
-    event_name: 'NamespaceTransferSingle',
-    event_payload: {
-      rawLog: {
-        ...event.rawLog,
-        address: getEvmAddress(event.rawLog.address) as `0x${string}`,
-      },
-      eventSource: {
-        ethChainId: event.eventSource.ethChainId,
-      },
-      parsedArgs: {
-        from: decoded.args.from,
-        to: decoded.args.to,
-        id: decoded.args.id,
-        value: decoded.args.value,
-      },
-    },
-  };
-};
-
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -342,9 +311,6 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
-
-  // Namespace
-  [EvmEventSignatures.Namespace.TransferSingle]: transferSingleMapper,
 
   // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
