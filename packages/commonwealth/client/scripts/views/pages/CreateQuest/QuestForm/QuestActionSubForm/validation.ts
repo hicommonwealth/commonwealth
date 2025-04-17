@@ -7,6 +7,7 @@ import {
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
   numberValidationSchema,
+  stringHasNumbersOnlyValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
@@ -152,10 +153,8 @@ export const buildQuestSubFormValidationSchema = (
       ) as unknown as typeof baseSchema;
   }
   if (requiresDiscordServerURL) {
-    // TO FIX: discord-server
-    // 735965332958871634
     baseSchema = baseSchema.extend({
-      contentLink: z.any(),
+      contentLink: stringHasNumbersOnlyValidationSchema,
     }) as unknown as typeof baseSchema;
   }
 
