@@ -47,7 +47,7 @@ export const communityTypeOptions = [
     img: sonieumImg,
     chainBase: ChainBase.Ethereum,
     title: 'Sonieum',
-    isRecommended: true,
+    isRecommended: false,
     description:
       'Empowering individuals and communities to collaborate, create and fill the world with emotion together. Powered by #Sony Block Solutions Labs.',
   },
