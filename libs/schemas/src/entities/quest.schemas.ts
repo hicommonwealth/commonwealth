@@ -3,7 +3,7 @@ import { events } from '../events';
 import { PG_INT } from '../utils';
 
 export const ChannelQuestEvents = {
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  DiscordServerJoined: events.DiscordServerJoined,
   XpChainEventCreated: events.XpChainEventCreated,
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
@@ -101,7 +101,7 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_url:https:\/\/discord\.(com\/invite\/|gg\/?)\w+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
       .nullish(),
     created_at: z.coerce.date().optional(),

@@ -95,7 +95,7 @@ const QuestActionCard = ({
               {actionCopies.title[questAction.event_name]}
             </CWText>
             {(questAction.event_name === 'TweetEngagement' ||
-              questAction.event_name === 'CommonDiscordServerJoined') && (
+              questAction.event_name === 'DiscordServerJoined') && (
               <>
                 <CWDivider />
                 <CWText type="caption" fontWeight="semiBold">

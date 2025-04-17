@@ -198,7 +198,7 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.TwitterTweet;
           break;
         }
-        case 'CommonDiscordServerJoined': {
+        case 'DiscordServerJoined': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.DiscordServer;
           break;

@@ -49,7 +49,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'CommentUpvoted',
       'WalletLinked',
       'SSOLinked',
-      'CommonDiscordServerJoined',
+      'DiscordServerJoined',
       'MembershipsRefreshed',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],

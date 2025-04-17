@@ -230,7 +230,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
-      case 'CommonDiscordServerJoined': {
+      case 'DiscordServerJoined': {
         if (actionContentId) {
           window.open(buildURLFromContentId(actionContentId), '_blank');
         } else {

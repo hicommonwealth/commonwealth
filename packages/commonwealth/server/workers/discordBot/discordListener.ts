@@ -145,8 +145,9 @@ async function startDiscordListener() {
       .then((address) =>
         emitEvent(models.Outbox, [
           {
-            event_name: 'CommonDiscordServerJoined',
+            event_name: 'DiscordServerJoined',
             event_payload: {
+              server_id: member.guild.id,
               user_id: address?.user_id,
               discord_username: member.user.username,
               joined_date: joinedAt,
@@ -155,7 +156,7 @@ async function startDiscordListener() {
         ]),
       )
       .catch((e) => {
-        log.error('Failed to emit CommonDiscordServerJoined event', e, {
+        log.error('Failed to emit DiscordServerJoined event', e, {
           discord_user_id: member.id,
           discord_username: member.user.username,
           discord_server_join_date: joinedAt,
