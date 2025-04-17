@@ -34,6 +34,7 @@ import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
+import { smartTrim } from 'shared/utils';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
@@ -243,9 +244,7 @@ const ContestCard = ({
   }
 
   const isTitleTrimmed = name.length > MAX_CHARS_FOR_TITLE;
-  const trimmedTitle = isTitleTrimmed
-    ? name.slice(0, MAX_CHARS_FOR_TITLE) + '...'
-    : name;
+  const trimmedTitle = smartTrim(name, MAX_CHARS_FOR_TITLE);
 
   const renderTitleWithTooltip = (title: string, isTrimmed: boolean) => {
     if (!isTrimmed) return <CWText type="h4">{title}</CWText>;
