@@ -220,7 +220,8 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  CommonDiscordServerJoined: z.object({
+  DiscordServerJoined: z.object({
+    server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
     joined_date: z.coerce.date(),
@@ -386,23 +387,6 @@ export const events = {
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
-
-  NamespaceTransferSingle: z
-    .object({
-      rawLog: z.object({
-        address: EVM_ADDRESS_STRICT,
-      }),
-      eventSource: z.object({
-        ethChainId: z.number(),
-      }),
-      parsedArgs: z.object({
-        from: EVM_ADDRESS_STRICT,
-        to: EVM_ADDRESS_STRICT,
-        id: z.coerce.bigint(),
-        value: z.coerce.bigint(),
-      }),
-    })
-    .describe('When a namespace token is transferred'),
 
   LaunchpadTokenCreated: z.object({
     block_timestamp: z.coerce.bigint(),

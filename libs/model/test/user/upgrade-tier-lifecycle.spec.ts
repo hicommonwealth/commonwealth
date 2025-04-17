@@ -1,13 +1,8 @@
 import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
-import { Community, EventPair, User } from '@hicommonwealth/schemas';
-import {
-  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
-  NAMESPACE_MIN_NOMINATION_BALANCE,
-  UserTierMap,
-  ZERO_ADDRESS,
-} from '@hicommonwealth/shared';
+import { User } from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import {
@@ -19,54 +14,54 @@ import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCom
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 
-const buildNamespaceTransferSingleEvent = (
-  contractAddress: string,
-  from: string,
-  to: string,
-  id: string,
-  value: string,
-) => ({
-  event_name: 'NamespaceTransferSingle',
-  event_payload: {
-    eventSource: {
-      ethChainId: 1,
-    },
-    rawLog: {
-      address: contractAddress,
-      topics: ['0xabcdef', '0x123456'],
-      data: '0xdata',
-      blockNumber: '123456' as unknown as bigint,
-      blockHash: '0xblockhash',
-      transactionIndex: 0,
-      removed: false,
-      transactionHash: '0xtxhash',
-      logIndex: 0,
-    },
-    block: {
-      number: '123456' as unknown as bigint,
-      timestamp: '1678901234' as unknown as bigint,
-      hash: '0xblockhash',
-      logsBloom: '0xlogsbloom',
-      parentHash: '0xparenthash',
-      miner: '0xminer',
-      gasLimit: '10000000' as unknown as bigint,
-    },
-    parsedArgs: {
-      operator: '0x1234567890123456789012345678901234567890' as `0x${string}`,
-      from: from as `0x${string}`,
-      to: to as `0x${string}`,
-      id: id as unknown as bigint,
-      value: value as unknown as bigint,
-    },
-  },
-});
+// const buildNamespaceTransferSingleEvent = (
+//   contractAddress: string,
+//   from: string,
+//   to: string,
+//   id: string,
+//   value: string,
+// ) => ({
+//   event_name: 'NamespaceTransferSingle',
+//   event_payload: {
+//     eventSource: {
+//       ethChainId: 1,
+//     },
+//     rawLog: {
+//       address: contractAddress,
+//       topics: ['0xabcdef', '0x123456'],
+//       data: '0xdata',
+//       blockNumber: '123456' as unknown as bigint,
+//       blockHash: '0xblockhash',
+//       transactionIndex: 0,
+//       removed: false,
+//       transactionHash: '0xtxhash',
+//       logIndex: 0,
+//     },
+//     block: {
+//       number: '123456' as unknown as bigint,
+//       timestamp: '1678901234' as unknown as bigint,
+//       hash: '0xblockhash',
+//       logsBloom: '0xlogsbloom',
+//       parentHash: '0xparenthash',
+//       miner: '0xminer',
+//       gasLimit: '10000000' as unknown as bigint,
+//     },
+//     parsedArgs: {
+//       operator: '0x1234567890123456789012345678901234567890' as `0x${string}`,
+//       from: from as `0x${string}`,
+//       to: to as `0x${string}`,
+//       id: id as unknown as bigint,
+//       value: value as unknown as bigint,
+//     },
+//   },
+// });
 
 describe('Upgrade Tiers lifecycle', () => {
   const userAddress: string = '0x8888888888888888888888888888888888888888';
   const contestAddress: string = '0x1234567890123456789012345678901234567890';
   const contestId: number = 1;
 
-  let community: z.infer<typeof Community>;
+  // let community: z.infer<typeof Community>;
   let user: z.infer<typeof User>;
 
   beforeAll(async () => {
@@ -126,7 +121,7 @@ describe('Upgrade Tiers lifecycle', () => {
     });
 
     user = user1!;
-    community = community1!;
+    // community = community1!;
 
     vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
       [userAddress]: '5',
@@ -138,31 +133,31 @@ describe('Upgrade Tiers lifecycle', () => {
     vi.restoreAllMocks();
   });
 
-  describe('Nomination Upgrade Policy', async () => {
-    test('should upgrade user to ChainVerified tier when 5 or more nomination tokens are held', async () => {
-      const userBefore = await models.User.findByPk(user.id);
-      expect(userBefore?.tier).toBe(UserTierMap.IncompleteUser);
-      const communityBefore = await models.Community.findByPk(community.id);
-      expect(communityBefore?.namespace_verified).toBe(false);
+  // describe('Nomination Upgrade Policy', async () => {
+  //   test('should upgrade user to ChainVerified tier when 5 or more nomination tokens are held', async () => {
+  //     const userBefore = await models.User.findByPk(user.id);
+  //     expect(userBefore?.tier).toBe(UserTierMap.IncompleteUser);
+  //     const communityBefore = await models.Community.findByPk(community.id);
+  //     expect(communityBefore?.namespace_verified).toBe(false);
 
-      await emitEvent(models.Outbox, [
-        buildNamespaceTransferSingleEvent(
-          community.namespace_address!,
-          ZERO_ADDRESS,
-          userAddress,
-          NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID.toString(),
-          NAMESPACE_MIN_NOMINATION_BALANCE.toString(),
-        ) as EventPair<'NamespaceTransferSingle'>,
-      ]);
+  //     await emitEvent(models.Outbox, [
+  //       buildNamespaceTransferSingleEvent(
+  //         community.namespace_address!,
+  //         ZERO_ADDRESS,
+  //         userAddress,
+  //         NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID.toString(),
+  //         NAMESPACE_MIN_NOMINATION_BALANCE.toString(),
+  //       ) as EventPair<'NamespaceTransferSingle'>,
+  //     ]);
 
-      await drainOutbox(['NamespaceTransferSingle'], UpgradeTierPolicy);
+  //     await drainOutbox(['NamespaceTransferSingle'], UpgradeTierPolicy);
 
-      const userAfter = await models.User.findByPk(user.id);
-      expect(userAfter?.tier).toBe(UserTierMap.ChainVerified);
-      const communityAfter = await models.Community.findByPk(community.id);
-      expect(communityAfter?.namespace_verified).toBe(true);
-    });
-  });
+  //     const userAfter = await models.User.findByPk(user.id);
+  //     expect(userAfter?.tier).toBe(UserTierMap.ChainVerified);
+  //     const communityAfter = await models.Community.findByPk(community.id);
+  //     expect(communityAfter?.namespace_verified).toBe(true);
+  //   });
+  // });
 
   describe('Contest Upgrade Policy', async () => {
     test('should upgrade user to ChainVerified tier when contest is funded and there is contest activity', async () => {

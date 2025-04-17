@@ -40,8 +40,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
-import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -133,10 +132,17 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isSystemQuest = quest.id < 0;
 
-  const handleActionStart = (
-    actionName: QuestAction,
-    actionContentId?: string,
-  ) => {
+  const handleActionStart = (action: z.infer<typeof QuestActionMeta>) => {
+    const actionName = action.event_name;
+    const actionContentId = action.content_id;
+
+    // generic cases when actions have start link (i.e discord requires start link)
+    if (action.start_link) {
+      window.open(action.start_link, '_blank');
+      return;
+    }
+
+    // specific cases when actions don't have start links
     switch (actionName) {
       case 'SignUpFlowCompleted': {
         setAuthModalConfig({
@@ -157,12 +163,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/11847
+        // Update create community flow to select a specific chain via url params
         navigate(`/createCommunity`, {}, null);
         break;
       }
       case 'ThreadCreated': {
         if (actionContentId) {
-          const url = buildURLFromContentId(actionContentId, {
+          const url = buildRedirectURLFromContentId(actionContentId, {
             newThread: true,
           }).split(window.location.origin)[1];
           navigate(url, {}, null);
@@ -183,7 +191,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(actionContentId).split(
+            buildRedirectURLFromContentId(actionContentId).split(
               window.location.origin,
             )[1],
             {},
@@ -202,7 +210,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(actionContentId).split(
+              ? buildRedirectURLFromContentId(actionContentId).split(
                   window.location.origin,
                 )[1]
               : `/explore?tab=threads`,
@@ -224,17 +232,28 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'TweetEngagement': {
         if (actionContentId) {
-          window.open(buildURLFromContentId(actionContentId), '_blank');
+          window.open(buildRedirectURLFromContentId(actionContentId), '_blank');
         } else {
           notifyError(`Linked twitter tweet url is invalid`);
         }
         break;
       }
-      case 'CommonDiscordServerJoined': {
+      case 'DiscordServerJoined': {
+        // requires a start link
+        notifyError(`Start link is invalid for this action`);
+        break;
+      }
+      case 'MembershipsRefreshed': {
         if (actionContentId) {
-          window.open(buildURLFromContentId(actionContentId), '_blank');
+          navigate(
+            buildRedirectURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
+            {},
+            null,
+          );
         } else {
-          notifyError(`Linked discord server url is invalid`);
+          notifyError(`Linked group url is invalid`);
         }
         break;
       }

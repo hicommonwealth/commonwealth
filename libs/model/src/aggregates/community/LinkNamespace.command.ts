@@ -1,7 +1,10 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
-import { Transaction } from 'sequelize';
+import {
+  BalanceSourceType,
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+} from '@hicommonwealth/shared';
+import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
@@ -111,26 +114,37 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
 
-        const GROUP_NAME = 'Namespace Admins';
+        // create on-chain namespace groups if not already created
+        const NAMESPACE_ADMINS_GROUP_NAME = 'Namespace Admins';
+        const COMMUNITY_NOMINATED_GROUP_NAME = 'Community Nominated';
+
         if (log_removed) {
-          // remove namespace admins group
           await models.Group.destroy({
             where: {
               community_id: community.id,
-              metadata: { name: GROUP_NAME, is_system_managed: true },
+              metadata: {
+                name: {
+                  [Op.in]: [
+                    NAMESPACE_ADMINS_GROUP_NAME,
+                    COMMUNITY_NOMINATED_GROUP_NAME,
+                  ],
+                },
+              },
+              is_system_managed: true,
             },
+            transaction,
           });
         } else {
-          // create namespace admins group
           await models.Group.findOrCreate({
             where: {
               community_id: community.id,
-              metadata: { name: GROUP_NAME, is_system_managed: true },
+              metadata: { name: NAMESPACE_ADMINS_GROUP_NAME },
+              is_system_managed: true,
             },
             defaults: {
               community_id: community.id,
               metadata: {
-                name: GROUP_NAME,
+                name: NAMESPACE_ADMINS_GROUP_NAME,
                 description: 'Users with onchain namespace admin privileges',
                 required_requirements: 1,
               },
@@ -138,12 +152,45 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                 {
                   rule: 'threshold',
                   data: {
-                    threshold: '0',
+                    threshold: '0', // must have more than 0 tokens
                     source: {
                       source_type: BalanceSourceType.ERC1155,
                       evm_chain_id: community.ChainNode!.eth_chain_id!,
                       contract_address: namespace_address,
                       token_id: '0',
+                    },
+                  },
+                },
+              ],
+              is_system_managed: true,
+            },
+            transaction,
+          });
+
+          await models.Group.findOrCreate({
+            where: {
+              community_id: community.id,
+              metadata: { name: COMMUNITY_NOMINATED_GROUP_NAME },
+              is_system_managed: true,
+            },
+            defaults: {
+              community_id: community.id,
+              metadata: {
+                name: COMMUNITY_NOMINATED_GROUP_NAME,
+                description: 'Users nominated',
+                required_requirements: 1,
+              },
+              requirements: [
+                {
+                  rule: 'threshold',
+                  data: {
+                    threshold: '4', // must have 5 or more tokens
+                    source: {
+                      source_type: BalanceSourceType.ERC1155,
+                      evm_chain_id: community.ChainNode!.eth_chain_id!,
+                      contract_address: namespace_address,
+                      token_id:
+                        NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID.toString(),
                     },
                   },
                 },
