@@ -65,7 +65,7 @@ export const buildQuestSubFormValidationSchema = (
   }
   if (requiresGroupId) {
     baseSchema = baseSchema.extend({
-      contentLink: linkValidationSchema.required,
+      contentIdentifier: linkValidationSchema.required,
     }) as unknown as typeof baseSchema;
   }
   if (requiresCreatorPoints) {
