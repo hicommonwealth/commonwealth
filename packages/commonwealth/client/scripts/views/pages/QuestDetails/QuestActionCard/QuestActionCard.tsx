@@ -7,6 +7,7 @@ import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
+  getTotalRepititionCountsForQuestAction,
 } from 'helpers/quest';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
@@ -31,6 +32,8 @@ type QuestActionCardProps = {
   inEligibilityReason?: string;
   canStartAction?: boolean;
   actionStartBlockedReason?: string;
+  questStartDate: Date;
+  questEndDate: Date;
 };
 
 const QuestActionCard = ({
@@ -43,6 +46,8 @@ const QuestActionCard = ({
   canStartAction,
   inEligibilityReason,
   questAction,
+  questStartDate,
+  questEndDate,
 }: QuestActionCardProps) => {
   console.log('questAction => ', questAction);
   const creatorXP = {
@@ -63,8 +68,12 @@ const QuestActionCard = ({
   const questRepeatitionCycle = questAction?.participation_period;
   const questParticipationLimitPerCycle =
     questAction?.participation_times_per_period || 0;
-  const attemptsLeft =
-    questParticipationLimitPerCycle - (xpLogsForActions || []).length;
+  const totalActionRepititions = getTotalRepititionCountsForQuestAction(
+    questStartDate,
+    questEndDate,
+    questAction,
+  ).totalRepititions;
+  const attemptsLeft = totalActionRepititions - (xpLogsForActions || []).length;
 
   return (
     <div className="QuestActionCard">
@@ -156,7 +165,7 @@ const QuestActionCard = ({
               />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
-                attemptsLeft !== questParticipationLimitPerCycle && (
+                attemptsLeft !== totalActionRepititions && (
                   <CWTag
                     type="group"
                     label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
