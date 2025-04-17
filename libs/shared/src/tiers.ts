@@ -213,3 +213,10 @@ export function hasTierClientInfo(
 ): tier is TierWithClientInfo {
   return 'clientInfo' in USER_TIERS[tier];
 }
+
+/**
+ * Returns true if a communities tier is equal to or higher than Manually Verified
+ */
+export function canIntegrateDiscord({ tier }: { tier: CommunityTierMap }) {
+  return tier >= CommunityTierMap.ManuallyVerified;
+}
