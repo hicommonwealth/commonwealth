@@ -121,7 +121,7 @@ describe('Upgrade Tiers lifecycle', () => {
     });
 
     user = user1!;
-    community = community1!;
+    // community = community1!;
 
     vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
       [userAddress]: '5',
