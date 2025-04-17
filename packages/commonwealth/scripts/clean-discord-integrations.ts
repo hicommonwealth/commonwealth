@@ -78,7 +78,8 @@ async function main() {
   const client = new Client({
     intents: [GatewayIntentBits.Guilds],
   });
-  client.once('ready', async () => {
+
+  async function leaveGuild() {
     for (const com of cleanedToLeaveCommunities) {
       try {
         const guild = client.guilds.cache.get(com.guild_id);
@@ -103,6 +104,11 @@ async function main() {
         );
       }
     }
+  }
+  client.once('ready', () => {
+    leaveGuild()
+      .then(() => console.log('Guild exodus complete.'))
+      .catch((e) => console.error(e));
   });
 
   await client.login(config.DISCORD.BOT_TOKEN);
