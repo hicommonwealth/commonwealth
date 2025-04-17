@@ -233,7 +233,9 @@ export const HeaderWithFilters = ({
                   label="Join Community"
                   buttonType="primary"
                   buttonHeight="sm"
-                  onClick={handleJoinCommunity}
+                  onClick={() => {
+                    void handleJoinCommunity();
+                  }}
                 />
               </div>
             )}
