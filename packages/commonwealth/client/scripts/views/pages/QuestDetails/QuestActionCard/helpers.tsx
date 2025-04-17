@@ -34,7 +34,8 @@ export const actionCopies = {
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
-    ['CommunityCreated']: () => '',
+    ['CommunityCreated']: (chainName?: string) =>
+      chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
     ['ThreadUpvoted']: () => '',

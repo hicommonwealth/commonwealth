@@ -35,6 +35,7 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommentUpvoted' ||
     action === 'ThreadUpvoted' ||
     action === 'TweetEngagement' ||
+    action === 'CommunityCreated' ||
     action === 'DiscordServerJoined' ||
     action === 'MembershipsRefreshed'
   );
@@ -60,12 +61,16 @@ export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
   return action === 'TweetEngagement';
 };
 
-export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
+export const doesActionRequireDiscordServerId = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
 };
 
 export const doesActionAllowRepetition = (action: QuestActionType) => {
   return action !== 'TweetEngagement';
+};
+
+export const doesActionAllowChainId = (action: QuestActionType) => {
+  return action === 'CommunityCreated';
 };
 
 export const doesActionRequireGroupId = (action: QuestActionType) => {

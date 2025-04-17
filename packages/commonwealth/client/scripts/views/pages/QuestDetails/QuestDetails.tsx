@@ -40,7 +40,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -163,12 +163,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/11847
+        // Update create community flow to select a specific chain via url params
         navigate(`/createCommunity`, {}, null);
         break;
       }
       case 'ThreadCreated': {
         if (actionContentId) {
-          const url = buildURLFromContentId(actionContentId, {
+          const url = buildRedirectURLFromContentId(actionContentId, {
             newThread: true,
           }).split(window.location.origin)[1];
           navigate(url, {}, null);
@@ -189,7 +191,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(actionContentId).split(
+            buildRedirectURLFromContentId(actionContentId).split(
               window.location.origin,
             )[1],
             {},
@@ -208,7 +210,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(actionContentId).split(
+              ? buildRedirectURLFromContentId(actionContentId).split(
                   window.location.origin,
                 )[1]
               : `/explore?tab=threads`,
@@ -230,7 +232,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'TweetEngagement': {
         if (actionContentId) {
-          window.open(buildURLFromContentId(actionContentId), '_blank');
+          window.open(buildRedirectURLFromContentId(actionContentId), '_blank');
         } else {
           notifyError(`Linked twitter tweet url is invalid`);
         }
@@ -244,7 +246,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'MembershipsRefreshed': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(actionContentId).split(
+            buildRedirectURLFromContentId(actionContentId).split(
               window.location.origin,
             )[1],
             {},
