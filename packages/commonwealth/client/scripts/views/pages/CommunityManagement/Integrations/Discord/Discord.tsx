@@ -1,4 +1,8 @@
-import { DOCS_SUBDOMAIN, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import {
+  canIntegrateDiscord,
+  DOCS_SUBDOMAIN,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
@@ -16,7 +20,6 @@ import {
   useSetForumChannelConnectionMutation,
 } from 'state/api/discord';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
@@ -42,8 +45,6 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
-
-  const user = useUserStore();
 
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
@@ -268,7 +269,10 @@ const Discord = () => {
             ? 'Disconnecting Discord...'
             : CTA_TEXT[connectionStatus]
         }
-        disabled={connectionStatus === 'connecting' || !user.isSiteAdmin}
+        disabled={
+          connectionStatus === 'connecting' ||
+          (community !== undefined ? !canIntegrateDiscord(community) : true)
+        }
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>
