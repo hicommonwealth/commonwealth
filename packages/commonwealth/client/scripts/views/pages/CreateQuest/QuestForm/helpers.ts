@@ -108,7 +108,7 @@ export const buildContentIdFromURL = async (
     return `${idType}:${url}`;
   }
   if (idType === 'discord_server_url') {
-    return `${idType}:${url}`;
+    return `discord_server_id:${url}`;
   }
 };
 
