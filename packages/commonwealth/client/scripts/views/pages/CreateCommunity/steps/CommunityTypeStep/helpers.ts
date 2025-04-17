@@ -49,7 +49,8 @@ export const communityTypeOptions = [
     title: 'Sonieum',
     isRecommended: false,
     description:
-      'Empowering individuals and communities to collaborate, create and fill the world with emotion together. Powered by #Sony Block Solutions Labs.',
+      'Empowering individuals and communities to collaborate, create and fill the world ' +
+      'with emotion together. Powered by #Sony Block Solutions Labs.',
   },
   {
     type: CommunityType.Ethereum,
@@ -58,7 +59,8 @@ export const communityTypeOptions = [
     title: 'Ethereum (EVM)',
     isRecommended: false,
     description:
-      'Select this community type to configure to any EVM based chain (such as Optimism or Arbitrum) not featured above.',
+      'Select this community type to configure to any EVM based chain ' +
+      '(such as Optimism or Arbitrum) not featured above.',
   },
   {
     type: CommunityType.Cosmos,
