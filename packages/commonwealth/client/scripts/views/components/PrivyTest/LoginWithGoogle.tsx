@@ -22,7 +22,7 @@ export const LoginWithGoogle = () => {
   if (authenticated) {
     return (
       <>
-        <button onClick={logout} disabled={loading}>
+        <button onClick={handleLogout} disabled={loading}>
           logout
         </button>
       </>
@@ -30,7 +30,7 @@ export const LoginWithGoogle = () => {
   }
 
   return (
-    <button onClick={onPrivyOAuth} disabled={handleLogout}>
+    <button onClick={onPrivyOAuth} disabled={loading}>
       {loading ? 'Logging in...' : 'Log in with Google'}
     </button>
   );
