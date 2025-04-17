@@ -104,6 +104,7 @@ export const QuestActionMeta = z
         /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
       .nullish(),
+    start_link: z.string().url().nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
