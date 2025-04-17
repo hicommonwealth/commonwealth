@@ -65,6 +65,7 @@ const QuestActionSubForm = ({
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
       discordServerUrl: `https://discord.gg/commonwealth`,
       chainId: `Select community chain`,
+      groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -73,6 +74,7 @@ const QuestActionSubForm = ({
       twitterTweetUrl: 'Tweet URL',
       discordServerUrl: 'Discord Server URL',
       chainId: 'Chain Id (optional)',
+      groupId: 'Group Link',
     },
   };
 
@@ -102,6 +104,10 @@ const QuestActionSubForm = ({
 
     if (config?.with_optional_chain_id) {
       return contentIdInputConfig.labels.chainId;
+    }
+
+    if (config?.requires_group_id) {
+      return contentIdInputConfig.labels.groupId;
     }
 
     return 'Content Id';
@@ -135,6 +141,10 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.chainId;
     }
 
+    if (config?.requires_group_id) {
+      return contentIdInputConfig.placeholders.groupId;
+    }
+
     return 'Content Id';
   };
 
@@ -144,7 +154,8 @@ const QuestActionSubForm = ({
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_url ||
-    config?.with_optional_chain_id;
+    config?.with_optional_chain_id ||
+    config?.requires_group_id;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({

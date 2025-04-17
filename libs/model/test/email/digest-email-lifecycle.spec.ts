@@ -2,6 +2,7 @@ import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Community, User } from '@hicommonwealth/schemas';
 
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/aggregates/emails';
@@ -24,6 +25,7 @@ describe('Digest email lifecycle', () => {
     });
 
     [communityOne] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -36,6 +38,7 @@ describe('Digest email lifecycle', () => {
       topics: [{}],
     });
     [communityTwo] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -49,6 +52,7 @@ describe('Digest email lifecycle', () => {
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,

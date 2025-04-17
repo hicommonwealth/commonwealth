@@ -4,6 +4,7 @@ import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
+  doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import { SERVER_URL } from 'state/api/config';
@@ -13,6 +14,7 @@ export type ContentIdType =
   | 'comment'
   | 'thread'
   | 'topic'
+  | 'group'
   | 'tweet_url'
   | 'discord_server_url'
   | 'chain';
@@ -32,6 +34,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Thread;
     if (doesActionAllowChainId(action as QuestAction))
       return QuestActionContentIdScope.Chain;
+    if (doesActionRequireGroupId(action as QuestAction))
+      return QuestActionContentIdScope.Group;
     return undefined;
   }
 
@@ -45,6 +49,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.DiscordServer;
     case 'chain':
       return QuestActionContentIdScope.Chain;
+    case 'group':
+      return QuestActionContentIdScope.Group;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -101,6 +107,13 @@ export const buildContentIdFromIdentifier = async (
   if (idType === 'tweet_url' || idType === 'discord_server_url') {
     return `${idType}:${identifier}`;
   }
+  if (idType === 'group') {
+    return `${idType}:${parseInt(
+      identifier.includes('group/')
+        ? new URL(identifier).pathname.split('/').at(-1) || '' // get group id from url pathname
+        : new URLSearchParams(new URL(identifier).search).get('groupId') || '', // get group id from url search params
+    )}`;
+  }
   if (idType === 'chain') {
     return `${idType}:${identifier}`;
   }
@@ -130,6 +143,9 @@ export const buildRedirectURLFromContentId = (
   }
   if (idType === 'chain') {
     return `${idOrURL}`;
+  }
+  if (idType === 'group') {
+    return `${origin}/group/${idOrURL}${params}`;
   }
 
   return '';

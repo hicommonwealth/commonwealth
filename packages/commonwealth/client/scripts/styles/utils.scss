@@ -48,3 +48,14 @@
 .w-fit {
   width: fit-content;
 }
+
+// this is required for `client/scripts/helpers/html.ts#jumpHighlightElement()`
+.highlighted {
+  background-color: $yellow-200;
+  border-radius: $border-radius-corners;
+
+  &.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+  }
+}

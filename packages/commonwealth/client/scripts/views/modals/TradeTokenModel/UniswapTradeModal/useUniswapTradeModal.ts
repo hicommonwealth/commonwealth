@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { getChainHex } from '@hicommonwealth/evm-protocols';
 import {
   ChainBase,
   UNISWAP_CONVENIENCE_FEE_PERCENT,
@@ -12,10 +12,11 @@ import {
 } from 'client/scripts/utils/magicNetworkUtils';
 import WebWalletController from 'controllers/app/web_wallets';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import NodeInfo from 'models/NodeInfo';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchCachedNodes } from 'state/api/nodes';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
+import { uniswapTokenListConfig } from 'views/modals/TradeTokenModel/UniswapTradeModal/tokenListConfig';
 import {
+  ExternalToken,
   UniswapToken,
   UniswapWidgetConfig,
   UseUniswapTradeModalProps,
@@ -32,57 +33,6 @@ import {
 const tempWindow = window as any;
 tempWindow.Browser = {
   T: () => {},
-};
-
-// Keep token list and router URLs config
-
-const uniswapTokenListConfig = {
-  default: {
-    // UNISWAP_WIDGET_HACK: By default the widget uses https://gateway.ipfs.io/ipns/tokens.uniswap.org for tokens
-    // list, but it doesn't work (DNS_PROBE_FINISHED_NXDOMAIN) for me (@malik). The original
-    // url resolved to https://ipfs.io/ipns/tokens.uniswap.org, i am passing this as a param to
-    // the uniswap widget. See: https://github.com/Uniswap/widgets/issues/580#issuecomment-2086094025
-    // for more context.
-    chains: { 1: { url: 'https://ipfs.io/ipns/tokens.uniswap.org' } },
-  },
-  custom: {
-    chains: {
-      8453: {
-        list: [
-          {
-            name: 'Tether USD',
-            address: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2',
-            symbol: 'USDT',
-            decimals: 6,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
-          },
-          {
-            name: 'USD Coin',
-            address: '0xec267c53f53807c2337c257f8ac3fc3cc07cc0ed',
-            symbol: 'USDC',
-            decimals: 6,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-          },
-          {
-            name: 'Wrapped Ether',
-            address: '0x4200000000000000000000000000000000000006',
-            symbol: 'WETH',
-            decimals: 18,
-            chainId: 8453,
-            logoURI:
-              // eslint-disable-next-line max-len
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4200000000000000000000000000000000000006/logo.png',
-          },
-        ],
-      },
-    },
-  },
 };
 
 const uniswapRouterURLs = {
@@ -105,57 +55,29 @@ const uniswapWidgetTheme: Theme = {
   secondary: '#666666', // secondary text color
 };
 
-const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
+const useUniswapTradeModal = ({
+  tradeConfig,
+  ethChainId,
+  rpcUrl,
+  blockExplorerUrl,
+}: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
   const [ethersProvider, setEthersProvider] = useState<
     Web3Provider | undefined
   >(undefined);
   const [uniswapTokensList, setUniswapTokensList] = useState<UniswapToken[]>();
-  const [jsonRpcUrlMap, setJsonRpcUrlMap] = useState<{
-    [chainId: number]: string[];
-  }>({});
   const [isMagicConfigured, setIsMagicConfigured] = useState(false);
-
-  // Use cached nodes - only fetch once
-  const nodes = fetchCachedNodes();
 
   // Check if user is logged in with Magic
   const userIsMagicUser = useMemo(() => checkIfMagicUser(), []);
 
-  // Process nodes to create RPC URL map
-  useEffect(() => {
-    if (nodes) {
-      const rpcMap = nodes.reduce(
-        (acc, node) => {
-          if (node.ethChainId && node.url) {
-            const urls = node.url.split(',').map((url) => url.trim());
-            acc[node.ethChainId] = urls;
-          }
-          return acc;
-        },
-        {} as { [chainId: number]: string[] },
-      );
-
-      setJsonRpcUrlMap(rpcMap);
-    }
-  }, [nodes]);
-
-  // Find base chain node
-  const baseNode = useMemo(
-    () =>
-      nodes?.find((n) => n.ethChainId === commonProtocol.ValidChains.Base) as
-        | NodeInfo
-        | undefined,
-    [nodes],
-  );
-
   // Automatically configure Magic provider for Magic users
   useEffect(() => {
-    if (userIsMagicUser && !isMagicConfigured && baseNode?.ethChainId) {
+    if (userIsMagicUser && !isMagicConfigured && ethChainId) {
       const configureMagicProvider = () => {
         try {
-          if (!baseNode?.ethChainId) return;
-          const magic = getMagicForChain(baseNode.ethChainId);
+          if (!ethChainId) return;
+          const magic = getMagicForChain(ethChainId);
           if (!magic) return;
 
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
@@ -168,7 +90,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
       void configureMagicProvider();
     }
-  }, [userIsMagicUser, baseNode, isMagicConfigured]);
+  }, [userIsMagicUser, isMagicConfigured, ethChainId]);
 
   // Initialize token list
   useRunOnceOnCondition({
@@ -176,23 +98,26 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       const handleTokensInit = () => {
         setIsLoadingInitialState(true);
 
-        if (!baseNode?.ethChainId) {
+        if (!ethChainId) {
           return;
         }
 
         // Set tokens list with custom token
         const customLists =
-          uniswapTokenListConfig.custom.chains?.[baseNode.ethChainId]?.list ||
-          [];
+          uniswapTokenListConfig.custom.chains?.[ethChainId]?.list || [];
         const tokensList = [
           ...customLists,
           {
             name: tradeConfig.token.name,
-            address: tradeConfig.token.contract_address,
+            address:
+              (tradeConfig.token as ExternalToken).contract_address ||
+              (tradeConfig.token as LaunchpadToken).token_address,
             symbol: tradeConfig.token.symbol,
-            decimals: tradeConfig.token.decimals,
-            chainId: baseNode.ethChainId,
-            logoURI: tradeConfig.token.logo || '',
+            decimals: (tradeConfig.token as ExternalToken).decimals || 18,
+            chainId: ethChainId,
+            logoURI:
+              (tradeConfig.token as ExternalToken).logo ||
+              (tradeConfig.token as LaunchpadToken).icon_url,
           },
         ];
 
@@ -202,7 +127,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
       handleTokensInit();
     },
-    shouldRun: !!baseNode?.ethChainId,
+    shouldRun: !!ethChainId,
   });
 
   // Connect wallet handler - manages Magic and regular wallet connections
@@ -215,14 +140,14 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       return true;
     }
 
-    if (!baseNode?.ethChainId) {
-      console.log('[Network Debug] No baseNode.ethChainId available');
+    if (!ethChainId) {
+      console.log('[Network Debug] No ethChainId available');
       return false;
     }
 
-    const baseChainIdHex = `0x${baseNode.ethChainId.toString(16)}`;
+    const baseChainIdHex = getChainHex(ethChainId);
     console.log(
-      `[Network Debug] Target Base chain ID: ${baseNode.ethChainId} (hex: ${baseChainIdHex})`,
+      `[Network Debug] Target Base chain ID: ${ethChainId} (hex: ${baseChainIdHex})`,
     );
 
     try {
@@ -230,7 +155,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       if (userIsMagicUser) {
         console.log('[Network Debug] Using Magic authentication flow');
         // Use the utility function to get Magic instance for the Base chain
-        const magic = getMagicForChain(baseNode.ethChainId);
+        const magic = getMagicForChain(ethChainId);
 
         if (!magic) {
           return false;
@@ -388,10 +313,8 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
                             symbol: 'ETH',
                             decimals: 18,
                           },
-                          rpcUrls: jsonRpcUrlMap[baseNode.ethChainId] || [
-                            'https://mainnet.base.org',
-                          ],
-                          blockExplorerUrls: ['https://basescan.org'],
+                          rpcUrls: [rpcUrl],
+                          blockExplorerUrls: [blockExplorerUrl],
                         },
                       ],
                     });
@@ -421,9 +344,9 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
 
           try {
             console.log(
-              `[Network Debug] Calling enable for chain ID: ${baseNode.ethChainId}`,
+              `[Network Debug] Calling enable for chain ID: ${ethChainId}`,
             );
-            await selectedWallet.enable(`${baseNode.ethChainId}`);
+            await selectedWallet.enable(`${ethChainId}`);
 
             // Create an ethers provider from the wallet's provider
             const ethersCompatibleProvider = new Web3Provider(
@@ -452,28 +375,30 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       return false;
     }
   }, [
-    baseNode,
     userIsMagicUser,
     isMagicConfigured,
     ethersProvider,
-    jsonRpcUrlMap,
+    ethChainId,
+    rpcUrl,
+    blockExplorerUrl,
   ]);
 
   // Create and return the widget config
   const widgetConfig: UniswapWidgetConfig = {
-    isReady: !isLoadingInitialState && Object.keys(jsonRpcUrlMap).length > 0,
+    isReady: !isLoadingInitialState && !!rpcUrl,
     provider: ethersProvider, // Now has the correct type
     theme: uniswapWidgetTheme,
     tokensList: uniswapTokensList,
-    jsonRpcUrlMap,
     defaultTokenAddress: {
       input: 'NATIVE',
-      output: tradeConfig.token.contract_address,
+      output:
+        (tradeConfig.token as ExternalToken).contract_address ||
+        (tradeConfig.token as LaunchpadToken).token_address,
     },
     convenienceFee: {
       percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,
       recipient: {
-        [baseNode?.ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+        [ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
       },
     },
     routerURLs: uniswapRouterURLs,

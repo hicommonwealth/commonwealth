@@ -14,6 +14,7 @@ export enum QuestActionContentIdScope {
   TwitterTweet = 'twitter_tweet',
   DiscordServer = 'discord_server',
   Chain = 'chain',
+  Group = 'group',
 }
 
 export type QuestActionSubFormErrors = {
@@ -60,6 +61,7 @@ export type QuestActionSubFormConfig = {
   requires_twitter_tweet_link: boolean;
   requires_discord_server_url: boolean;
   with_optional_chain_id: boolean;
+  requires_group_id: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

@@ -14,6 +14,7 @@ export const actionCopies = {
     ['SSOLinked']: 'Link a new social (SSO)',
     ['TweetEngagement']: 'Engage on Tweet',
     ['CommonDiscordServerJoined']: "Join Common's Discord Community",
+    ['MembershipsRefreshed']: 'Join a Group',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -29,6 +30,7 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['CommonDiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
+    ['MembershipsRefreshed']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -79,6 +81,7 @@ export const actionCopies = {
       </div>
     ),
     ['CommonDiscordServerJoined']: '',
+    ['MembershipsRefreshed']: '',
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -93,5 +96,6 @@ export const actionCopies = {
     ['UserMentioned']: '',
     ['TweetEngagement']: '',
     ['CommonDiscordServerJoined']: '',
+    ['MembershipsRefreshed']: '',
   },
 };

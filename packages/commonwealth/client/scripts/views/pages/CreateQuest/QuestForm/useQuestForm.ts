@@ -14,6 +14,7 @@ import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
+  doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
@@ -50,6 +51,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'WalletLinked',
       'SSOLinked',
       'CommonDiscordServerJoined',
+      'MembershipsRefreshed',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };
@@ -121,6 +123,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     doesActionRequireDiscordServerURL(chosenAction),
                   with_optional_chain_id:
                     allowsContentId && doesActionAllowChainId(chosenAction),
+                  requires_group_id:
+                    allowsContentId && doesActionRequireGroupId(chosenAction),
                 },
               };
             }),
@@ -222,6 +226,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             return 'discord_server_url';
           if (scope === QuestActionContentIdScope.Topic) return 'topic';
           if (scope === QuestActionContentIdScope.Chain) return 'chain';
+          if (scope === QuestActionContentIdScope.Group) return 'group';
           if (scope === QuestActionContentIdScope.Thread) {
             if (subForm.config?.with_optional_comment_id) return 'comment';
             return 'thread';
@@ -244,7 +249,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               subForm.config?.with_optional_chain_id ||
               subForm.config?.with_optional_topic_id ||
               subForm.config?.requires_twitter_tweet_link ||
-              subForm.config?.requires_discord_server_url) && {
+              subForm.config?.requires_discord_server_url ||
+              subForm.config?.requires_group_id) && {
               content_id: await buildContentIdFromIdentifier(
                 subForm.values.contentIdentifier,
                 contentIdScope,
@@ -413,6 +419,28 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 contentIdentifier: `Invalid topic link.${
                   values?.community
                     ? ' Topic must belong to selected community'
+                    : ''
+                }`,
+              };
+            }
+            setQuestActionSubForms([...tempForm]);
+          }
+          if (error.includes('group with id')) {
+            const groupId = error.match(/id "(\d+)"/)[1];
+            const tempForm = [...questActionSubForms];
+            const foundSubForm = tempForm.find(
+              (form) =>
+                form.config?.requires_group_id &&
+                form.values.contentIdScope ===
+                  QuestActionContentIdScope.Group &&
+                form.values.contentIdentifier?.includes(`${groupId}`),
+            );
+            if (foundSubForm) {
+              foundSubForm.errors = {
+                ...(foundSubForm.errors || {}),
+                contentIdentifier: `Invalid group link.${
+                  values?.community
+                    ? ' Group must belong to selected community'
                     : ''
                 }`,
               };
