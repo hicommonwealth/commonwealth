@@ -13,6 +13,7 @@ import Permissions from 'utils/Permissions';
 import ContestCard from 'views/components/ContestCard';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -92,6 +93,7 @@ export const HeaderWithFilters = ({
   });
 
   const user = useUserStore();
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const [searchParams] = useSearchParams();
   const contestAddress = searchParams.get('contest');
@@ -225,6 +227,16 @@ export const HeaderWithFilters = ({
       <div className="header-row">
         {!isOnArchivePage && views && views.length ? (
           <div className="filter-section">
+            {!user.activeAccount && (
+              <div className="join-community-header-button">
+                <CWButton
+                  label="Join Community"
+                  buttonType="primary"
+                  buttonHeight="sm"
+                  onClick={handleJoinCommunity}
+                />
+              </div>
+            )}
             <Select
               selected={selectedView || ThreadViewFilterTypes.All}
               onSelect={(item) => {
@@ -304,7 +316,7 @@ export const HeaderWithFilters = ({
           <CWText className="subheader-text">
             This section is for all archived posts. Archived posts will always
             be visible here and can be linked to new thread posts, but they
-            can’t be upvoted or receive new comments.
+            can't be upvoted or receive new comments.
           </CWText>
         )}
 
@@ -576,6 +588,7 @@ export const HeaderWithFilters = ({
         })}
       </>
 
+      {JoinCommunityModals}
       <CWModal
         size="medium"
         content={

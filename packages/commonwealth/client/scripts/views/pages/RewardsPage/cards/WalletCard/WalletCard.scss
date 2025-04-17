@@ -39,4 +39,11 @@
       border-bottom: 1px solid $neutral-50;
     }
   }
+
+  .wallet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
 }
