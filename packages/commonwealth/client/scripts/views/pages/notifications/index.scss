@@ -1,0 +1,21 @@
+@import '../../../styles/shared';
+
+// Layout class using viewport units minus nav height
+.NotificationsPageLayout {
+  min-height: calc(100vh - 80px); // Adjust 80px if nav height differs
+  overflow-y: auto; // Allow layout to scroll if content exceeds min-height
+
+  .layout-container {
+    display: flex; // Ensure children can use flex: 1
+    flex-direction: column; // Match KnockNotifications direction
+    height: 100%; // Make container fill the layout height
+  }
+}
+
+.KnockNotifications {
+  display: flex; // Needed for flex: 1 to work
+  flex-direction: column; // Assume vertical layout
+  flex: 1; // Make it fill the height-constrained layout
+  overflow: hidden; // Hide internal scroll if any
+  // Add any other necessary base styles for this container
+}
