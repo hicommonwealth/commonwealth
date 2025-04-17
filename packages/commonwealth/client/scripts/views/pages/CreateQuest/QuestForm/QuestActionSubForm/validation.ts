@@ -7,6 +7,7 @@ import {
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
   numberValidationSchema,
+  stringHasNumbersOnlyValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'zod';
@@ -36,8 +37,9 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_topic_id ||
     config?.with_optional_chain_id;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
-  const requiresDiscordServerURL = config?.requires_discord_server_url;
+  const requiresDiscordServerId = config?.requires_discord_server_id;
   const requiresGroupId = config?.requires_group_id;
+  const requiresStartLink = config?.requires_start_link;
   const requiresCreatorPoints = config?.requires_creator_points;
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
 
@@ -45,7 +47,7 @@ export const buildQuestSubFormValidationSchema = (
     requiresCreatorPoints ||
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
-    requiresDiscordServerURL ||
+    requiresDiscordServerId ||
     requiresGroupId;
 
   if (!needsExtension) return questSubFormValidationSchema;
@@ -67,6 +69,26 @@ export const buildQuestSubFormValidationSchema = (
     baseSchema = baseSchema.extend({
       contentIdentifier: linkValidationSchema.required,
     }) as unknown as typeof baseSchema;
+  }
+  if (requiresStartLink) {
+    if (requiresDiscordServerId) {
+      baseSchema = baseSchema.extend({
+        startLink: linkValidationSchema.required.refine(
+          (url) => {
+            // validate discord server URL
+            const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
+            return discordRegex.test(url);
+          },
+          {
+            message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
+          },
+        ),
+      }) as unknown as typeof baseSchema;
+    } else {
+      baseSchema = baseSchema.extend({
+        startLink: linkValidationSchema.required,
+      }) as unknown as typeof baseSchema;
+    }
   }
   if (requiresCreatorPoints) {
     baseSchema = baseSchema
@@ -153,18 +175,9 @@ export const buildQuestSubFormValidationSchema = (
         },
       ) as unknown as typeof baseSchema;
   }
-  if (requiresDiscordServerURL) {
+  if (requiresDiscordServerId) {
     baseSchema = baseSchema.extend({
-      contentIdentifier: linkValidationSchema.required.refine(
-        (url) => {
-          // validate discord server URL
-          const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
-          return discordRegex.test(url);
-        },
-        {
-          message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
-        },
-      ),
+      contentIdentifier: stringHasNumbersOnlyValidationSchema,
     }) as unknown as typeof baseSchema;
   }
 

@@ -9,6 +9,7 @@ import {
   doesActionRequireDiscordServerURL,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
+  doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -154,6 +155,7 @@ const useQuestActionMultiFormsState = ({
         doesActionRequireDiscordServerURL(chosenAction);
       const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
+      const requiresStartLink = doesActionRequireStartLink(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -166,10 +168,11 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
-        requires_discord_server_url: requiresDiscordServerURL,
+        requires_discord_server_id: requiresDiscordServerURL,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
+        requires_start_link: requiresStartLink,
       };
 
       // set fixed action repitition per certain actions
@@ -203,7 +206,7 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.TwitterTweet;
           break;
         }
-        case 'CommonDiscordServerJoined': {
+        case 'DiscordServerJoined': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.DiscordServer;
           break;

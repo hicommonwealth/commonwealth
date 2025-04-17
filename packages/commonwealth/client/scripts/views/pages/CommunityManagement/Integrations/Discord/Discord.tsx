@@ -16,6 +16,7 @@ import {
   useSetForumChannelConnectionMutation,
 } from 'state/api/discord';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
@@ -41,6 +42,8 @@ const Discord = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     community?.discord_config_id ? 'connected' : 'none',
   );
+
+  const user = useUserStore();
 
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
@@ -188,7 +191,8 @@ const Discord = () => {
         <CWText type="b1">
           <p>
             You can merge content from Discord directly into your community by
-            connecting the Commonbot.{' '}
+            connecting the Commonbot. Contact support to access this premium
+            feature.{' '}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -264,7 +268,7 @@ const Discord = () => {
             ? 'Disconnecting Discord...'
             : CTA_TEXT[connectionStatus]
         }
-        disabled={connectionStatus === 'connecting'}
+        disabled={connectionStatus === 'connecting' || !user.isSiteAdmin}
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>

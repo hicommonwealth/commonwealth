@@ -16,7 +16,7 @@ export type ContentIdType =
   | 'topic'
   | 'group'
   | 'tweet_url'
-  | 'discord_server_url'
+  | 'discord_server_id'
   | 'chain';
 
 export const inferContentIdTypeFromContentId = (
@@ -45,7 +45,7 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     case 'tweet_url':
       return QuestActionContentIdScope.TwitterTweet;
-    case 'discord_server_url':
+    case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
     case 'chain':
       return QuestActionContentIdScope.Chain;
@@ -104,7 +104,7 @@ export const buildContentIdFromIdentifier = async (
     if (foundTopic) return `${idType}:${foundTopic.id}`;
     throw new Error(`invalid topic url ${identifier}`);
   }
-  if (idType === 'tweet_url' || idType === 'discord_server_url') {
+  if (idType === 'tweet_url' || idType === 'discord_server_id') {
     return `${idType}:${identifier}`;
   }
   if (idType === 'group') {
@@ -137,7 +137,7 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'comment')
     return `${origin}/discussion/comment/${idOrURL}${params}`;
   if (idType === 'tweet_url') return `${idOrURL}${params}`;
-  if (idType === 'discord_server_url') return `${idOrURL}${params}`;
+  if (idType === 'discord_server_id') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
