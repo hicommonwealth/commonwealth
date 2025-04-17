@@ -1,5 +1,6 @@
 export * from './decodeContent';
 export * from './denormalizedCountUtils';
+export * from './discordClient';
 export * from './farcasterUtils';
 export * from './generateImage';
 export * from './generateUnsubscribeLink';
