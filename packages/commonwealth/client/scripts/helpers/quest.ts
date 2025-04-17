@@ -61,7 +61,7 @@ export const doesActionRequireTwitterTweetURL = (action: QuestActionType) => {
   return action === 'TweetEngagement';
 };
 
-export const doesActionRequireDiscordServerURL = (action: QuestActionType) => {
+export const doesActionRequireDiscordServerId = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
 };
 

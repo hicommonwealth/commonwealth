@@ -6,7 +6,7 @@ import {
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -151,8 +151,8 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionAllowChainId(chosenAction);
       const allowsTwitterTweetUrl =
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
-      const requiresDiscordServerURL =
-        doesActionRequireDiscordServerURL(chosenAction);
+      const requiresDiscordServerId =
+        doesActionRequireDiscordServerId(chosenAction);
       const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
@@ -168,7 +168,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
-        requires_discord_server_id: requiresDiscordServerURL,
+        requires_discord_server_id: requiresDiscordServerId,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
@@ -242,7 +242,7 @@ const useQuestActionMultiFormsState = ({
             !allowsTwitterTweetUrl) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
-            !requiresDiscordServerURL) ||
+            !requiresDiscordServerId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Chain &&
             !allowsChainId) ||

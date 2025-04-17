@@ -3,7 +3,7 @@ import {
   doesActionAllowChainId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
@@ -28,7 +28,7 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     if (doesActionRequireTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
-    if (doesActionRequireDiscordServerURL(action as QuestAction))
+    if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;

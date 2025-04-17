@@ -13,7 +13,7 @@ import {
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -122,7 +122,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     doesActionRequireTwitterTweetURL(chosenAction),
                   requires_discord_server_id:
                     allowsContentId &&
-                    doesActionRequireDiscordServerURL(chosenAction),
+                    doesActionRequireDiscordServerId(chosenAction),
                   with_optional_chain_id:
                     allowsContentId && doesActionAllowChainId(chosenAction),
                   requires_group_id:
