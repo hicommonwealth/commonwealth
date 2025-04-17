@@ -12,6 +12,7 @@ export type RequirementCardProps = {
 
 export type GroupCardProps = {
   isJoined?: boolean;
+  groupId: number;
   groupName: string;
   groupDescription?: string;
   requirements?: RequirementCardProps[]; // This represents erc requirements
