@@ -192,8 +192,10 @@ const Discord = () => {
         <CWText type="b1">
           <p>
             You can merge content from Discord directly into your community by
-            connecting the Commonbot. Contact support to access this premium
-            feature.{' '}
+            connecting the Commonbot.{' '}
+            {community !== undefined && !canIntegrateDiscord(community)
+              ? 'Contact support to access this premium feature.'
+              : ''}
             <a
               target="_blank"
               rel="noopener noreferrer"
