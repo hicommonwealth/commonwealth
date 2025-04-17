@@ -4,7 +4,7 @@ import { config } from '../config';
 
 const log = logger(import.meta);
 
-let client: Client;
+let client: Client | undefined;
 
 export async function getDiscordClient(): Promise<Client<true>> {
   if (client && client.isReady() && client.token) {
@@ -28,6 +28,7 @@ export async function getDiscordClient(): Promise<Client<true>> {
       client.once('error', (e) => {
         log.error('Discord client error');
         clearTimeout(timeout);
+        client = undefined;
         reject(e);
       });
     }
@@ -35,6 +36,7 @@ export async function getDiscordClient(): Promise<Client<true>> {
     log.trace('Logging in to discord');
     client.login(config.DISCORD.BOT_TOKEN).catch((e) => {
       clearTimeout(timeout);
+      client = undefined;
       reject(e);
     });
   });
