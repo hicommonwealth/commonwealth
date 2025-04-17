@@ -13,7 +13,7 @@ export const actionCopies = {
     ['WalletLinked']: 'Link a new wallet',
     ['SSOLinked']: 'Link a new social (SSO)',
     ['TweetEngagement']: 'Engage on Tweet',
-    ['DiscordServerJoined']: "Join Common's Discord Community",
+    ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
   },
   pre_reqs: {
