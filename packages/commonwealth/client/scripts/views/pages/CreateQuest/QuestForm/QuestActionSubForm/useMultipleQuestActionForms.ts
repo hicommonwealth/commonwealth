@@ -6,6 +6,7 @@ import {
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerURL,
+  doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
@@ -148,6 +149,7 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerURL =
         doesActionRequireDiscordServerURL(chosenAction);
+      const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
 
       // update config based on chosen action
@@ -162,6 +164,7 @@ const useQuestActionMultiFormsState = ({
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_url: requiresDiscordServerURL,
+        requires_group_id: requiresGroupId,
       };
 
       // set fixed action repitition per certain actions
@@ -200,6 +203,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.DiscordServer;
           break;
         }
+        case 'MembershipsRefreshed': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Group;
+          break;
+        }
         default: {
           break;
         }
@@ -221,7 +229,10 @@ const useQuestActionMultiFormsState = ({
             !allowsTwitterTweetUrl) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
-            !requiresDiscordServerURL)
+            !requiresDiscordServerURL) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Group &&
+            !requiresGroupId)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;
