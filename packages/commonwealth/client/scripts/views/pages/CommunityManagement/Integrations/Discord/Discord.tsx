@@ -269,10 +269,12 @@ const Discord = () => {
             ? 'Disconnecting Discord...'
             : CTA_TEXT[connectionStatus]
         }
-        disabled={
-          connectionStatus === 'connecting' ||
-          (community !== undefined ? !canIntegrateDiscord(community) : true)
-        }
+        disabled={(() => {
+          if (connectionStatus === 'connecting') return true;
+          if (connectionStatus === 'connected') return false;
+          if (community === undefined) return true;
+          return !canIntegrateDiscord(community);
+        })()}
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>
