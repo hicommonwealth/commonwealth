@@ -173,6 +173,14 @@ export enum CosmosGovernanceVersion {
 }
 
 export enum CommunityType {
+  Blast = 'blast',
+  Base = 'base',
+  Ethereum = 'ethereum',
+  Cosmos = 'cosmos',
+  Polygon = 'polygon',
+  Solana = 'solana',
+  Skale = 'skale',
+  Sonieum = 'sonieum',
   Launchpad = 'launchpad',
   Basic = 'basic',
 }
