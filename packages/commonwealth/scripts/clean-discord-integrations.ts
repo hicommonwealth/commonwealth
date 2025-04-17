@@ -21,6 +21,15 @@ async function deleteDiscordConfig(community_id: string) {
       },
       transaction,
     });
+    await models.Topic.update(
+      { channel_id: null },
+      {
+        where: {
+          community_id,
+        },
+        transaction,
+      },
+    );
   });
 }
 

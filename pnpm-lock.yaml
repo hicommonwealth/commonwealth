@@ -658,6 +658,9 @@ importers:
       bn.js:
         specifier: ^4.12.0
         version: 4.12.0
+      discord.js:
+        specifier: ^14.16.2
+        version: 14.16.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       graphile-worker:
         specifier: ^0.16.6
         version: 0.16.6(typescript@5.8.2)
