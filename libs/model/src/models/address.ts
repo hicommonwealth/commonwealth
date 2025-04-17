@@ -122,7 +122,6 @@ export default (
             'block_info',
             'created_at',
             'updated_at',
-            'oauth_provider',
             'oauth_email',
             'oauth_username',
             'oauth_phone_number',
