@@ -40,7 +40,6 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
-import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
@@ -133,10 +132,17 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isSystemQuest = quest.id < 0;
 
-  const handleActionStart = (
-    actionName: QuestAction,
-    actionContentId?: string,
-  ) => {
+  const handleActionStart = (action: z.infer<typeof QuestActionMeta>) => {
+    const actionName = action.event_name;
+    const actionContentId = action.content_id;
+
+    // generic cases when actions have start link (i.e discord requires start link)
+    if (action.start_link) {
+      window.open(action.start_link, '_blank');
+      return;
+    }
+
+    // specific cases when actions don't have start links
     switch (actionName) {
       case 'SignUpFlowCompleted': {
         setAuthModalConfig({
@@ -231,11 +237,8 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'DiscordServerJoined': {
-        if (actionContentId) {
-          window.open(buildURLFromContentId(actionContentId), '_blank');
-        } else {
-          notifyError(`Linked discord server url is invalid`);
-        }
+        // requires a start link
+        notifyError(`Start link is invalid for this action`);
         break;
       }
       case 'MembershipsRefreshed': {

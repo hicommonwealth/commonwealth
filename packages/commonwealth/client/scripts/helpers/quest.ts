@@ -72,6 +72,10 @@ export const doesActionRequireGroupId = (action: QuestActionType) => {
   return action === 'MembershipsRefreshed';
 };
 
+export const doesActionRequireStartLink = (action: QuestActionType) => {
+  return action === 'DiscordServerJoined';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,

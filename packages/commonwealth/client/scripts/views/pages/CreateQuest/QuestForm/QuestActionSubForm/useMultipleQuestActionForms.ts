@@ -8,6 +8,7 @@ import {
   doesActionRequireDiscordServerURL,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
+  doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -151,6 +152,7 @@ const useQuestActionMultiFormsState = ({
         doesActionRequireDiscordServerURL(chosenAction);
       const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
+      const requiresStartLink = doesActionRequireStartLink(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -165,6 +167,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_id: requiresDiscordServerURL,
         requires_group_id: requiresGroupId,
+        requires_start_link: requiresStartLink,
       };
 
       // set fixed action repitition per certain actions

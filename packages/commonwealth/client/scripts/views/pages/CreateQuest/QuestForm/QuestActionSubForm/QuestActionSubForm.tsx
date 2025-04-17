@@ -465,6 +465,21 @@ const QuestActionSubForm = ({
         </div>
       )}
 
+      {/* TODO: fix copy for discord */}
+      {config?.requires_start_link && (
+        <CWTextInput
+          label="Start Link"
+          name="startLink"
+          placeholder="https://example.com"
+          fullWidth
+          {...(defaultValues?.startLink && {
+            defaultValue: defaultValues?.startLink,
+          })}
+          onInput={(e) => onChange?.({ startLink: e?.target?.value?.trim() })}
+          customError={errors?.startLink}
+        />
+      )}
+
       {config?.with_optional_thread_id && (
         <div className="content-id-type-selector">
           <CWText type="caption">Action Scope</CWText>

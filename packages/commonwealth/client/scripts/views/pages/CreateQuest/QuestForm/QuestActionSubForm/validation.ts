@@ -37,6 +37,7 @@ export const buildQuestSubFormValidationSchema = (
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerURL = config?.requires_discord_server_id;
   const requiresGroupId = config?.requires_group_id;
+  const requiresStartLink = config?.requires_start_link;
   const requiresCreatorPoints = config?.requires_creator_points;
 
   const needsExtension =
@@ -86,6 +87,11 @@ export const buildQuestSubFormValidationSchema = (
   if (requiresGroupId) {
     baseSchema = baseSchema.extend({
       contentLink: linkValidationSchema.required,
+    }) as unknown as typeof baseSchema;
+  }
+  if (requiresStartLink) {
+    baseSchema = baseSchema.extend({
+      startLink: linkValidationSchema.required,
     }) as unknown as typeof baseSchema;
   }
   if (requiresTwitterEngagement) {
