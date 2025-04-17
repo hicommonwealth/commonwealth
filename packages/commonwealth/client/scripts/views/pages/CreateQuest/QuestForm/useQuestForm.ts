@@ -117,7 +117,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_twitter_tweet_link:
                     allowsContentId &&
                     doesActionRequireTwitterTweetURL(chosenAction),
-                  requires_discord_server_url:
+                  requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
                   requires_group_id:
@@ -220,7 +220,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           if (scope === QuestActionContentIdScope.TwitterTweet)
             return 'tweet_url';
           if (scope === QuestActionContentIdScope.DiscordServer)
-            return 'discord_server_url';
+            return 'discord_server_id';
           if (scope === QuestActionContentIdScope.Topic) return 'topic';
           if (scope === QuestActionContentIdScope.Group) return 'group';
           if (scope === QuestActionContentIdScope.Thread) {
@@ -244,7 +244,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               subForm.config?.with_optional_thread_id ||
               subForm.config?.with_optional_topic_id ||
               subForm.config?.requires_twitter_tweet_link ||
-              subForm.config?.requires_discord_server_url ||
+              subForm.config?.requires_discord_server_id ||
               subForm.config?.requires_group_id) && {
               content_id: await buildContentIdFromURL(
                 subForm.values.contentLink,
@@ -323,7 +323,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
     const subFormErrors = validateSubForms();

@@ -35,7 +35,7 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
-  const requiresDiscordServerURL = config?.requires_discord_server_url;
+  const requiresDiscordServerURL = config?.requires_discord_server_id;
   const requiresGroupId = config?.requires_group_id;
   const requiresCreatorPoints = config?.requires_creator_points;
 
@@ -146,17 +146,10 @@ export const buildQuestSubFormValidationSchema = (
       ) as unknown as typeof baseSchema;
   }
   if (requiresDiscordServerURL) {
+    // TO FIX: discord-server
+    // 735965332958871634
     baseSchema = baseSchema.extend({
-      contentLink: linkValidationSchema.required.refine(
-        (url) => {
-          // validate discord server URL
-          const discordRegex = /https:\/\/discord\.(com\/invite\/|gg\/?)\w+/;
-          return discordRegex.test(url);
-        },
-        {
-          message: VALIDATION_MESSAGES.DISCORD_SERVER_FORMAT,
-        },
-      ),
+      contentLink: z.any(),
     }) as unknown as typeof baseSchema;
   }
 

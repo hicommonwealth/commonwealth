@@ -163,7 +163,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
-        requires_discord_server_url: requiresDiscordServerURL,
+        requires_discord_server_id: requiresDiscordServerURL,
         requires_group_id: requiresGroupId,
       };
 
