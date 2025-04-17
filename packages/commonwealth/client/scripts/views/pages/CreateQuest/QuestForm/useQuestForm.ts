@@ -1,4 +1,6 @@
 import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -12,6 +14,7 @@ import {
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerURL,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
@@ -53,7 +56,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'DiscordServerJoined',
       'MembershipsRefreshed',
     ] as QuestAction[],
-    channel: ['TweetEngagement'] as QuestAction[],
+    channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
   const [availableQuestActions, setAvailableQuestActions] = useState<
     QuestAction[]
@@ -100,6 +103,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
                   }),
+                  ...(doesActionRequireChainEvent(chosenAction) && {
+                    contractAddress: subForm.contractAddress,
+                    ethChainId: subForm.ethChainId,
+                    eventSignature: subForm.eventSignature,
+                    transactionHash: subForm.transactionHash,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
@@ -122,6 +131,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerURL(chosenAction),
+                  requires_chain_event:
+                    doesActionRequireChainEvent(chosenAction),
                   requires_group_id:
                     allowsContentId && doesActionRequireGroupId(chosenAction),
                   requires_start_link: doesActionRequireStartLink(chosenAction),
@@ -266,6 +277,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
             },
           }),
+          ...(subForm.config?.requires_chain_event && {
+            chain_event: {
+              eth_chain_id: parseInt(`${subForm.values.ethChainId}`, 10),
+              contract_address: subForm.values.contractAddress! as z.infer<
+                typeof EVM_ADDRESS_STRICT
+              >,
+              event_signature: subForm.values.eventSignature! as z.infer<
+                typeof EVM_EVENT_SIGNATURE_STRICT
+              >,
+              tx_hash: subForm.values.transactionHash! as z.infer<
+                typeof EVM_EVENT_SIGNATURE_STRICT
+              >,
+            },
+          }),
           participation_limit: subForm.values.participationLimit,
           participation_period: subForm.values
             .participationPeriod as QuestParticipationPeriod,
@@ -343,7 +368,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (mode === 'create') {
           await handleCreateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate('/explore');
+          navigate('/explore?tab=quests');
         }
         if (mode === 'update') {
           await handleUpdateQuest(values);

@@ -26,7 +26,9 @@ type TextAreaFormValidationProps = {
 
 type TextAreaProps = BaseTextInputProps &
   TextAreaStyleProps &
-  TextAreaFormValidationProps;
+  TextAreaFormValidationProps & {
+    customError?: string;
+  };
 
 export const CWTextArea = (props: TextAreaProps) => {
   const validationProps = useTextInputWithValidation();
@@ -48,6 +50,7 @@ export const CWTextArea = (props: TextAreaProps) => {
     resizeWithText = false,
     hookToForm,
     instructionalMessage,
+    customError,
   } = props;
 
   const formContext = useFormContext();
@@ -97,7 +100,7 @@ export const CWTextArea = (props: TextAreaProps) => {
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
           validationStatus:
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined),
+            (formFieldErrorMessage || customError ? 'failure' : undefined),
           disabled,
           isTyping: validationProps.isTyping,
         })}
@@ -161,14 +164,19 @@ export const CWTextArea = (props: TextAreaProps) => {
           validationStatus={validationProps.validationStatus}
         />
       )}
-      {label && (
+      {(label || customError) && (
         <NewMessageRow
-          hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
-          // @ts-expect-error <StrictNullChecks/>
-          statusMessage={validationProps.statusMessage || formFieldErrorMessage}
+          hasFeedback={
+            !!inputValidationFn || !!formFieldErrorMessage || !!customError
+          }
+          statusMessage={
+            validationProps.statusMessage ||
+            formFieldErrorMessage ||
+            customError
+          }
           validationStatus={
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined)
+            (formFieldErrorMessage || customError ? 'failure' : undefined)
           }
         />
       )}

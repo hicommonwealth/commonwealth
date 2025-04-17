@@ -5,6 +5,7 @@ import {
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerURL,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
@@ -166,6 +167,7 @@ const useQuestActionMultiFormsState = ({
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_discord_server_id: requiresDiscordServerURL,
+        requires_chain_event: doesActionRequireChainEvent(chosenAction),
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
       };

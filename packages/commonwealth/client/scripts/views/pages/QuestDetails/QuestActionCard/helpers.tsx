@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import { pluralize } from 'helpers';
 import React from 'react';
 
@@ -15,6 +16,7 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: "Join Common's Discord Community",
     ['MembershipsRefreshed']: 'Join a Group',
+    ['XpChainEventCreated']: 'Engage on Blockchain',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -31,6 +33,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: () => '',
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -81,6 +84,24 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: (
+      contractAddress: string,
+      ethChainId: number | string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Any user address who&apos;s transaction emits the event on the
+            ethereum chain: {ethChainId} and contract: {contractAddress}, will
+            receive Aura.
+          </li>
+          <li>
+            ● Aura goes to the initiator of the transaction, and not the
+            receiver/target of it.
+          </li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -96,5 +117,6 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: '',
   },
 };

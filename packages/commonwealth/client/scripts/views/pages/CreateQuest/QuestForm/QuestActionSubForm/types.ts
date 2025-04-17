@@ -30,6 +30,11 @@ export type QuestActionSubFormErrors = {
   noOfLikes?: string;
   noOfRetweets?: string;
   noOfReplies?: string;
+  // specific to chain event actions
+  contractAddress?: string;
+  ethChainId?: string;
+  eventSignature?: string;
+  transactionHash?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -48,6 +53,11 @@ export type QuestActionSubFormFields = {
   noOfLikes?: string | number;
   noOfRetweets?: string | number;
   noOfReplies?: string | number;
+  // specific to chain event actions
+  contractAddress?: string;
+  ethChainId?: string | number;
+  eventSignature?: string;
+  transactionHash?: string;
 };
 
 export type QuestActionSubFormConfig = {
@@ -58,6 +68,7 @@ export type QuestActionSubFormConfig = {
   with_optional_comment_id: boolean;
   requires_twitter_tweet_link: boolean;
   requires_discord_server_id: boolean;
+  requires_chain_event: boolean;
   requires_group_id: boolean;
   requires_start_link: boolean;
 };
