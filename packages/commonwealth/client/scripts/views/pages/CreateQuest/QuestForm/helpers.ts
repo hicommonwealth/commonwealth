@@ -1,8 +1,9 @@
 import axios from 'axios';
 import {
+  doesActionAllowChainId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
@@ -15,7 +16,8 @@ export type ContentIdType =
   | 'topic'
   | 'group'
   | 'tweet_url'
-  | 'discord_server_id';
+  | 'discord_server_id'
+  | 'chain';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -26,10 +28,12 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     if (doesActionRequireTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
-    if (doesActionRequireDiscordServerURL(action as QuestAction))
+    if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
+    if (doesActionAllowChainId(action as QuestAction))
+      return QuestActionContentIdScope.Chain;
     if (doesActionRequireGroupId(action as QuestAction))
       return QuestActionContentIdScope.Group;
     return undefined;
@@ -43,6 +47,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
+    case 'chain':
+      return QuestActionContentIdScope.Chain;
     case 'group':
       return QuestActionContentIdScope.Group;
     default:
@@ -50,20 +56,20 @@ export const inferContentIdTypeFromContentId = (
   }
 };
 
-export const buildContentIdFromURL = async (
-  url: string,
+export const buildContentIdFromIdentifier = async (
+  identifier: string, // can be a url or a string containing the identifier value
   idType: ContentIdType,
 ) => {
   if (idType === 'comment') {
     return `${idType}:${parseInt(
-      url.includes('discussion/comment/')
-        ? url.split('discussion/comment/')[1] // remove comment redirector path
-        : url.split('?comment=')[1], // remove remove query string param
+      identifier.includes('discussion/comment/')
+        ? identifier.split('discussion/comment/')[1] // remove comment redirector path
+        : identifier.split('?comment=')[1], // remove remove query string param
     )}`;
   }
   if (idType === 'thread') {
     return `${idType}:${parseInt(
-      url
+      identifier
         .split('?')[0] // remove query string
         .split('discussion/')[1] // remove thread redirector path
         .split('-')[0],
@@ -71,14 +77,15 @@ export const buildContentIdFromURL = async (
   }
   if (idType === 'topic') {
     const foundId = parseInt(
-      `${url.split('?')[0]?.split('/').filter(Boolean).at(-1)}`,
+      `${identifier.split('?')[0]?.split('/').filter(Boolean).at(-1)}`,
     );
 
     if (foundId) return `${idType}:${foundId}`;
 
-    const communityId = url?.split('/')?.filter?.(Boolean)?.at?.(2) || '';
+    const communityId =
+      identifier?.split('/')?.filter?.(Boolean)?.at?.(2) || '';
     const topicName = decodeURIComponent(
-      url?.split('/')?.filter(Boolean)?.at(4)?.split('?')?.at(0) || '',
+      identifier?.split('/')?.filter(Boolean)?.at(4)?.split('?')?.at(0) || '',
     );
     // Note: This is not a good approach and is only added temporarily.
     // The core problem here is that we don't get topic ids from topic page urls, so we need to fetch the topics list
@@ -95,24 +102,27 @@ export const buildContentIdFromURL = async (
       (t) => t.name.toLowerCase().trim() === topicName.toLowerCase().trim(),
     );
     if (foundTopic) return `${idType}:${foundTopic.id}`;
-    throw new Error(`invalid topic url ${url}`);
+    throw new Error(`invalid topic url ${identifier}`);
+  }
+  if (idType === 'tweet_url' || idType === 'discord_server_id') {
+    return `${idType}:${identifier}`;
   }
   if (idType === 'group') {
     return `${idType}:${parseInt(
-      url.includes('group/')
-        ? new URL(url).pathname.split('/').at(-1) || '' // get group id from url pathname
-        : new URLSearchParams(new URL(url).search).get('groupId') || '', // get group id from url search params
+      identifier.includes('group/')
+        ? new URL(identifier).pathname.split('/').at(-1) || '' // get group id from url pathname
+        : new URLSearchParams(new URL(identifier).search).get('groupId') || '', // get group id from url search params
     )}`;
   }
-  if (idType === 'tweet_url') {
-    return `${idType}:${url}`;
-  }
-  if (idType === 'discord_server_id') {
-    return `discord_server_id:${url}`;
+  if (idType === 'chain') {
+    return `${idType}:${identifier}`;
   }
 };
 
-export const buildURLFromContentId = (contentId: string, withParams = {}) => {
+export const buildRedirectURLFromContentId = (
+  contentId: string,
+  withParams = {},
+) => {
   const [id, ...rest] = contentId.split(':');
   const idType = id as ContentIdType;
   const idOrURL = Array.isArray(rest) ? rest.join(':') : rest;
@@ -130,6 +140,9 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'discord_server_id') return `${idOrURL}${params}`;
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
+  }
+  if (idType === 'chain') {
+    return `${idOrURL}`;
   }
   if (idType === 'group') {
     return `${origin}/group/${idOrURL}${params}`;

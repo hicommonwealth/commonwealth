@@ -40,7 +40,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -163,12 +163,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/11847
+        // Update create community flow to select a specific chain via url params
         navigate(`/createCommunity`, {}, null);
         break;
       }
       case 'ThreadCreated': {
         if (actionContentId) {
-          const url = buildURLFromContentId(actionContentId, {
+          const url = buildRedirectURLFromContentId(actionContentId, {
             newThread: true,
           }).split(window.location.origin)[1];
           navigate(url, {}, null);
@@ -189,7 +191,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(actionContentId).split(
+            buildRedirectURLFromContentId(actionContentId).split(
               window.location.origin,
             )[1],
             {},
@@ -208,7 +210,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(actionContentId).split(
+              ? buildRedirectURLFromContentId(actionContentId).split(
                   window.location.origin,
                 )[1]
               : `/explore?tab=threads`,
@@ -230,7 +232,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'TweetEngagement': {
         if (actionContentId) {
-          window.open(buildURLFromContentId(actionContentId), '_blank');
+          window.open(buildRedirectURLFromContentId(actionContentId), '_blank');
         } else {
           notifyError(`Linked twitter tweet url is invalid`);
         }
@@ -244,7 +246,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'MembershipsRefreshed': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(actionContentId).split(
+            buildRedirectURLFromContentId(actionContentId).split(
               window.location.origin,
             )[1],
             {},
@@ -329,6 +331,26 @@ const QuestDetails = ({ id }: { id: number }) => {
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
 
   const isCompleted = gainedXP === totalUserXP && isStarted;
+
+  const getQuestActionBlockedReason = () => {
+    if ((isSystemQuest && user.isLoggedIn) || !isStarted || isEnded) {
+      if (isSystemQuest && user.isLoggedIn)
+        return 'Only available for new users';
+      if (!isStarted) return 'Only available when quest starts';
+      if (isEnded) return 'Unavailable, quest has ended';
+    }
+
+    return undefined;
+  };
+
+  const getXpLogsForActions = (action: QuestActionType) => {
+    return xpProgressions
+      .filter((log) => log.action_meta_id === action.id)
+      .map((log) => ({
+        id: log.action_meta_id,
+        createdAt: new Date(log.event_created_at),
+      }));
+  };
 
   return (
     <CWPageLayout>
@@ -465,31 +487,23 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
                   questAction={action as QuestActionType}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
                   isActionCompleted={isQuestActionComplete(
+                    new Date(quest.start_date),
+                    new Date(quest.end_date),
                     action as QuestActionType,
                     xpProgressions as unknown as XPLog[],
                   )}
-                  xpLogsForActions={xpProgressions
-                    .filter((log) => log.action_meta_id === action.id)
-                    .map((log) => ({
-                      id: log.action_meta_id,
-                      createdAt: new Date(log.event_created_at),
-                    }))}
+                  xpLogsForActions={getXpLogsForActions(
+                    action as QuestActionType,
+                  )}
                   canStartAction={
                     isSystemQuest
                       ? !user.isLoggedIn && isStarted && !isEnded
                       : isStarted && !isEnded
                   }
-                  {...(((isSystemQuest && user.isLoggedIn) ||
-                    !isStarted ||
-                    isEnded) && {
-                    actionStartBlockedReason:
-                      isSystemQuest && user.isLoggedIn
-                        ? `Only available for new users`
-                        : !isStarted
-                          ? 'Only available when quest starts'
-                          : 'Unavailable, quest has ended',
-                  })}
+                  actionStartBlockedReason={getQuestActionBlockedReason()}
                 />
               ))}
             </div>
@@ -513,6 +527,8 @@ const QuestDetails = ({ id }: { id: number }) => {
                       completed: (quest.action_metas || [])
                         .map((action) =>
                           isQuestActionComplete(
+                            new Date(q.start_date),
+                            new Date(q.end_date),
                             action as QuestActionType,
                             xpProgressions as unknown as XPLog[],
                           ),
