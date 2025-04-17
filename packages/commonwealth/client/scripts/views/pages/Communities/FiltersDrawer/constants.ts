@@ -4,6 +4,7 @@ import {
   BASE_ID,
   BLAST_ID,
   POLYGON_ETH_CHAIN_ID,
+  SONIEUM_ID,
 } from 'views/components/CommunityInformationForm/constants';
 import { z } from 'zod';
 import { CommunitySortDirections, CommunitySortOptions } from './types';
@@ -18,6 +19,7 @@ export const communityChains = {
   Base: parseInt(BASE_ID),
   Polygon: POLYGON_ETH_CHAIN_ID,
   Blast: parseInt(BLAST_ID),
+  Sonieum: parseInt(SONIEUM_ID),
 };
 
 export const communityTypes = Object.keys(CommunityType) as CommunityType[];

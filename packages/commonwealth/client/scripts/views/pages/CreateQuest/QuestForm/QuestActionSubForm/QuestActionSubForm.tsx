@@ -9,6 +9,7 @@ import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useEffect } from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import CWRepetitionCycleRadioButton, {
   useCWRepetitionCycleRadioButton,
 } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
@@ -63,6 +64,7 @@ const QuestActionSubForm = ({
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
       discordServerId: `0xxxxxxxxxxxxxxxx0`,
+      chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
     },
     labels: {
@@ -70,6 +72,7 @@ const QuestActionSubForm = ({
       commentId: 'Comment Link (optional)',
       topicId: 'Topic Link (optional)',
       twitterTweetUrl: 'Tweet URL',
+      chainId: 'Chain Id (optional)',
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
     },
@@ -108,6 +111,10 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.labels.discordServerId;
     }
 
+    if (config?.with_optional_chain_id) {
+      return contentIdInputConfig.labels.chainId;
+    }
+
     if (config?.requires_group_id) {
       return contentIdInputConfig.labels.groupId;
     }
@@ -139,6 +146,10 @@ const QuestActionSubForm = ({
       return contentIdInputConfig.placeholders.discordServerId;
     }
 
+    if (config?.with_optional_chain_id) {
+      return contentIdInputConfig.placeholders.chainId;
+    }
+
     if (config?.requires_group_id) {
       return contentIdInputConfig.placeholders.groupId;
     }
@@ -168,6 +179,7 @@ const QuestActionSubForm = ({
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
+    config?.with_optional_chain_id ||
     config?.requires_group_id;
 
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
@@ -226,6 +238,14 @@ const QuestActionSubForm = ({
 
     return { error: undefined };
   };
+
+  const chainNodes = fetchCachedNodes()
+    ?.filter((node) => node?.ethChainId || node?.cosmosChainId)
+    ?.map((node) => ({
+      label: `${node.name} - (Chain Id = ${node?.ethChainId || node?.cosmosChainId})`,
+      value: node.id,
+    }))
+    ?.sort((a, b) => a.label.localeCompare(b.label));
 
   const {
     error: repetitionCycleRadioError,
@@ -375,7 +395,8 @@ const QuestActionSubForm = ({
         name="action"
         options={actionOptions}
         onChange={(newValue) =>
-          newValue && onChange?.({ action: newValue.value, contentLink: '' })
+          newValue &&
+          onChange?.({ action: newValue.value, contentIdentifier: '' })
         }
         {...(defaultValues?.action && {
           value: {
@@ -519,7 +540,7 @@ const QuestActionSubForm = ({
             onChange={(e) =>
               e.target.checked &&
               onChange?.({
-                contentLink: '',
+                contentIdentifier: '',
                 contentIdScope: QuestActionContentIdScope.Topic,
               })
             }
@@ -536,7 +557,7 @@ const QuestActionSubForm = ({
             onChange={(e) =>
               e.target.checked &&
               onChange?.({
-                contentLink: '',
+                contentIdentifier: '',
                 contentIdScope: QuestActionContentIdScope.Thread,
               })
             }
@@ -545,22 +566,49 @@ const QuestActionSubForm = ({
       )}
 
       <div className={clsx('grid-row', allowsContentId ? 'cols-2' : 'cols-1')}>
-        {allowsContentId && (
-          <CWTextInput
-            key={`contentIdScope-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
-            name="contentLink"
-            label={getContentIdInputLabel()}
-            placeholder={getContentIdInputPlaceholder()}
-            fullWidth
-            {...(defaultValues?.contentLink && {
-              defaultValue: defaultValues?.contentLink,
-            })}
-            onInput={(e) =>
-              onChange?.({ contentLink: e?.target?.value?.trim() })
-            }
-            customError={errors?.contentLink}
-          />
-        )}
+        {allowsContentId &&
+          (config.with_optional_chain_id ? (
+            <CWSelectList
+              isClearable={true}
+              backspaceRemovesValue
+              key={`contentIdentifier-${defaultValues?.action}`}
+              name="contentIdentifier"
+              label="Chain Node"
+              placeholder="Select a chain node"
+              options={chainNodes}
+              onChange={(newValue) =>
+                onChange?.({ contentIdentifier: `${newValue?.value || ''}` })
+              }
+              {...(defaultValues?.contentIdentifier && {
+                value: {
+                  value: parseInt(`${defaultValues?.contentIdentifier}`),
+                  label: `${
+                    chainNodes?.find(
+                      (x) =>
+                        x.value ===
+                        parseInt(`${defaultValues?.contentIdentifier}`),
+                    )?.label
+                  }`,
+                },
+              })}
+              customError={errors?.contentIdentifier}
+            />
+          ) : (
+            <CWTextInput
+              key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
+              name="contentIdentifier"
+              label={getContentIdInputLabel()}
+              placeholder={getContentIdInputPlaceholder()}
+              fullWidth
+              {...(defaultValues?.contentIdentifier && {
+                defaultValue: defaultValues?.contentIdentifier,
+              })}
+              onInput={(e) =>
+                onChange?.({ contentIdentifier: e?.target?.value?.trim() })
+              }
+              customError={errors?.contentIdentifier}
+            />
+          ))}
 
         <CWTextInput
           label="Instructions Link (optional)"

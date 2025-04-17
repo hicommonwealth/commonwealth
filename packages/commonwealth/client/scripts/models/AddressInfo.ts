@@ -17,6 +17,7 @@ class AddressInfo extends Account {
     address,
     community,
     walletId,
+    walletSsoSource,
     ghostAddress,
     lastActive,
   }: {
@@ -36,6 +37,7 @@ class AddressInfo extends Account {
       community,
       addressId: id,
       walletId,
+      walletSsoSource,
       ghostAddress,
       profile: (() => {
         if (!ignoreProfile) return undefined;
