@@ -105,8 +105,10 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
 
-        // create on-chain namespace admin group if not already created
-        const GROUP_NAME = 'Namespace Admins';
+        // create on-chain namespace groups if not already created
+        const NAMESPACE_ADMINS_GROUP_NAME = 'Namespace Admins';
+        const COMMUNITY_NOMINATED_GROUP_NAME = 'Community Nominated';
+
         if (!log_removed) {
           // don't create group if chain event represents a log removal
           // TODO: should we remove group when log is removed?
@@ -114,12 +116,12 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
           await models.Group.findOrCreate({
             where: {
               community_id: community.id,
-              metadata: { name: GROUP_NAME },
+              metadata: { name: NAMESPACE_ADMINS_GROUP_NAME },
             },
             defaults: {
               community_id: community.id,
               metadata: {
-                name: GROUP_NAME,
+                name: NAMESPACE_ADMINS_GROUP_NAME,
                 description: 'Users with onchain namespace admin privileges',
                 required_requirements: 1,
               },
@@ -127,12 +129,43 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                 {
                   rule: 'threshold',
                   data: {
-                    threshold: '0',
+                    threshold: '0', // must have more than 0 tokens
                     source: {
                       source_type: BalanceSourceType.ERC1155,
                       evm_chain_id: community.ChainNode!.eth_chain_id!,
                       contract_address: namespace_address,
                       token_id: '0',
+                    },
+                  },
+                },
+              ],
+              is_system_managed: true,
+            },
+            transaction,
+          });
+
+          await models.Group.findOrCreate({
+            where: {
+              community_id: community.id,
+              metadata: { name: COMMUNITY_NOMINATED_GROUP_NAME },
+            },
+            defaults: {
+              community_id: community.id,
+              metadata: {
+                name: COMMUNITY_NOMINATED_GROUP_NAME,
+                description: 'Users nominated',
+                required_requirements: 1,
+              },
+              requirements: [
+                {
+                  rule: 'threshold',
+                  data: {
+                    threshold: '4', // must have 5 or more tokens
+                    source: {
+                      source_type: BalanceSourceType.ERC1155,
+                      evm_chain_id: community.ChainNode!.eth_chain_id!,
+                      contract_address: namespace_address,
+                      token_id: '3',
                     },
                   },
                 },
