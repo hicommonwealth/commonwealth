@@ -157,6 +157,7 @@ async function startDiscordListener() {
       )
       .catch((e) => {
         log.error('Failed to emit DiscordServerJoined event', e, {
+          server_id: member.guild.id,
           discord_user_id: member.id,
           discord_username: member.user.username,
           discord_server_join_date: joinedAt,
