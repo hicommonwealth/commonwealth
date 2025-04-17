@@ -1,7 +1,7 @@
 import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
-import { Community, User } from '@hicommonwealth/schemas';
+import { User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
@@ -61,7 +61,7 @@ describe('Upgrade Tiers lifecycle', () => {
   const contestAddress: string = '0x1234567890123456789012345678901234567890';
   const contestId: number = 1;
 
-  let community: z.infer<typeof Community>;
+  // let community: z.infer<typeof Community>;
   let user: z.infer<typeof User>;
 
   beforeAll(async () => {
