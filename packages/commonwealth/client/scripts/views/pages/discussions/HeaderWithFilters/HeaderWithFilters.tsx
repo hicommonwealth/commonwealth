@@ -316,7 +316,7 @@ export const HeaderWithFilters = ({
           <CWText className="subheader-text">
             This section is for all archived posts. Archived posts will always
             be visible here and can be linked to new thread posts, but they
-            can't be upvoted or receive new comments.
+            can&apos;t be upvoted or receive new comments.
           </CWText>
         )}
 
