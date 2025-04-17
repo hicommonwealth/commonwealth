@@ -62,7 +62,7 @@ const QuestActionSubForm = ({
       sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
       sampleTopicLink: `https://${PRODUCTION_DOMAIN}/common/discussions/Proposals`,
       twitterTweetUrl: `https://x.com/user/status/1904060455158428146`,
-      discordServerUrl: `0xxxxxxxxxxxxxxxx0`,
+      discordServerId: `0xxxxxxxxxxxxxxxx0`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
     },
     labels: {
@@ -70,8 +70,17 @@ const QuestActionSubForm = ({
       commentId: 'Comment Link (optional)',
       topicId: 'Topic Link (optional)',
       twitterTweetUrl: 'Tweet URL',
-      discordServerUrl: 'Discord Server Id',
+      discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
+    },
+  };
+
+  const startLinkInputConfig = {
+    placeholders: {
+      discordServerUrl: `https://discord.gg/commonwealth`,
+    },
+    labels: {
+      discordServerUrl: 'Discord Server Url',
     },
   };
 
@@ -96,7 +105,7 @@ const QuestActionSubForm = ({
     }
 
     if (config?.requires_discord_server_id) {
-      return contentIdInputConfig.labels.discordServerUrl;
+      return contentIdInputConfig.labels.discordServerId;
     }
 
     if (config?.requires_group_id) {
@@ -127,7 +136,7 @@ const QuestActionSubForm = ({
     }
 
     if (config?.requires_discord_server_id) {
-      return contentIdInputConfig.placeholders.discordServerUrl;
+      return contentIdInputConfig.placeholders.discordServerId;
     }
 
     if (config?.requires_group_id) {
@@ -135,6 +144,22 @@ const QuestActionSubForm = ({
     }
 
     return 'Content Id';
+  };
+
+  const getStartLinkInputLabel = () => {
+    if (config?.requires_discord_server_id) {
+      return startLinkInputConfig.labels.discordServerUrl;
+    }
+
+    return 'Start Link';
+  };
+
+  const getStartLinkInputPlaceholder = () => {
+    if (config?.requires_discord_server_id) {
+      return startLinkInputConfig.placeholders.discordServerUrl;
+    }
+
+    return 'https://example.com';
   };
 
   const allowsContentId =
@@ -465,12 +490,11 @@ const QuestActionSubForm = ({
         </div>
       )}
 
-      {/* TODO: fix copy for discord */}
       {config?.requires_start_link && (
         <CWTextInput
-          label="Start Link"
+          label={getStartLinkInputLabel()}
           name="startLink"
-          placeholder="https://example.com"
+          placeholder={getStartLinkInputPlaceholder()}
           fullWidth
           {...(defaultValues?.startLink && {
             defaultValue: defaultValues?.startLink,
