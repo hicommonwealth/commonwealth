@@ -1,5 +1,7 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { OpenFeature } from '@openfeature/web-sdk';
+import { useQueryClient } from '@tanstack/react-query';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
@@ -16,12 +18,13 @@ import {
   useGetCommunityByIdQuery,
   useGetMembersQuery,
 } from 'state/api/communities';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
+import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -74,6 +77,7 @@ const CommunityMembersPage = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
   const user = useUserStore();
+  const queryClient = useQueryClient();
 
   const [selectedTab, setSelectedTab] = useState<TabValues>(
     TabValues.AllMembers,
@@ -101,6 +105,67 @@ const CommunityMembersPage = () => {
     userAddress: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
   });
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [cooldownActive, setCooldownActive] = useState(false);
+  const COOLDOWN_DURATION = 10 * 60 * 1000; // 10 minutes in ms
+
+  const refreshUserMembershipsMutation =
+    trpc.community.refreshUserMemberships.useMutation({
+      onMutate: () => {
+        setIsRefreshing(true);
+      },
+      onSuccess: () => {
+        notifySuccess(
+          'Memberships refresh started',
+          'Check back in a few moments.',
+        );
+        // Invalidate relevant queries to refetch data
+        queryClient.invalidateQueries({
+          queryKey: [ApiEndpoints.GET_MEMBERSHIPS],
+        });
+        queryClient.invalidateQueries({ queryKey: [ApiEndpoints.GET_MEMBERS] });
+        queryClient.invalidateQueries({
+          queryKey: [ApiEndpoints.FETCH_GROUPS],
+        });
+        // Start cooldown
+        setCooldownActive(true);
+        setTimeout(() => {
+          setCooldownActive(false);
+        }, COOLDOWN_DURATION);
+      },
+      onError: (error) => {
+        if (error.data?.code === 'TOO_MANY_REQUESTS') {
+          notifyError(
+            'Refresh limit reached',
+            'Please wait a few minutes before trying again.',
+          );
+          // Ensure cooldown is active if rate limited
+          setCooldownActive(true);
+          // Optional: Use error.data.retryAfter if available from rate limiter
+          const retryAfter =
+            (error.data as any)?.retryAfter || COOLDOWN_DURATION;
+          setTimeout(() => {
+            setCooldownActive(false);
+          }, retryAfter);
+        } else {
+          notifyError('Failed to refresh memberships', error.message);
+        }
+      },
+      onSettled: () => {
+        setIsRefreshing(false);
+      },
+    });
+
+  const handleRefreshClick = () => {
+    if (cooldownActive || isRefreshing) return;
+    // Ensure communityId is available before mutating
+    if (!communityId) {
+      notifyError('Cannot refresh memberships', 'Community ID not found.');
+      return;
+    }
+    refreshUserMembershipsMutation.mutate({ community_id: communityId });
+  };
 
   const debouncedSearchTerm = useDebounce<string | undefined>(
     searchFilters.searchText,
@@ -353,7 +418,26 @@ const CommunityMembersPage = () => {
     <CWPageLayout>
       <section className="CommunityMembersPage">
         {/* Header */}
-        <CWText type="h2">Members ({totalResults})</CWText>
+        <div className="page-header">
+          <CWText type="h2">Members ({totalResults})</CWText>
+          {user.activeAccount && (
+            <CWButton
+              label="Refresh your memberships"
+              iconLeft="cycle"
+              buttonType="secondary"
+              onClick={handleRefreshClick}
+              isLoading={isRefreshing}
+              disabled={cooldownActive || isRefreshing}
+              tooltip={
+                cooldownActive
+                  ? 'Refresh available in a few minutes'
+                  : undefined
+              }
+              buttonHeight="sm"
+              className="refresh-button"
+            />
+          )}
+        </div>
 
         {/* Tabs section */}
         <CWTabsRow>

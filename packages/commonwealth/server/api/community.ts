@@ -146,6 +146,16 @@ export const trpcRouter = trpc.router({
     Community.RefreshCommunityMemberships,
     trpc.Tag.Community,
   ),
+  refreshUserMemberships: trpc.command(
+    Community.RefreshUserMemberships,
+    trpc.Tag.Community,
+    [
+      trpc.rateLimit(
+        (ctx, input) => `${ctx.actor.user?.id}:${input.community_id}`,
+        { max: 1, windowMs: 10 * 60 * 1000 },
+      ),
+    ],
+  ),
   selectCommunity: trpc.command(Community.SelectCommunity, trpc.Tag.Community),
   joinCommunity: trpc.command(Community.JoinCommunity, trpc.Tag.Community, [
     trpc.trackAnalytics([
