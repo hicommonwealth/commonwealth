@@ -303,7 +303,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (quest && quest.id) {
       await updateQuest({
         quest_id: quest.id,
-        action_metas: await buildActionMetasPayload(),
+        action_metas: buildActionMetasPayload(),
       });
     }
   };
@@ -328,7 +328,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || null, // send null to remove community association
-      action_metas: await buildActionMetasPayload(),
+      action_metas: buildActionMetasPayload(),
     });
   };
 
