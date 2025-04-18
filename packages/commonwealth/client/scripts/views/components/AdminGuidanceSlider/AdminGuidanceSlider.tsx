@@ -111,7 +111,7 @@ export const AdminGuidanceSlider = () => {
         content={
           <DismissModal
             label="Admin Quick Links" // Updated label
-            description={`These cards provide quick access to common admin areas. You can dismiss this slider temporarily.`} // Simplified description
+            description="These cards provide quick access to common admin areas. You can dismiss this slider temporarily." // Simplified description
             showDismissCheckbox={false} // Simplfied: Only temporary dismiss for now
             onModalClose={() => setIsModalVisible(false)}
             onDismiss={() => {
