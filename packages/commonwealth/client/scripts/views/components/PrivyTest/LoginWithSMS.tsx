@@ -26,6 +26,9 @@ export const LoginWithSMS = () => {
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
+    setStage('enter-phone-number');
+    setPhoneNumber('');
+    setCode('');
   }, [logout]);
 
   const handleSendCode = useCallback(() => {
@@ -69,7 +72,7 @@ export const LoginWithSMS = () => {
             value={code}
           />
 
-          <button onClick={handleLoginWithCode}>Send Code</button>
+          <button onClick={handleLoginWithCode}>Verify Code</button>
         </>
       )}
     </>

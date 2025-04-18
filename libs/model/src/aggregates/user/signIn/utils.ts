@@ -25,10 +25,10 @@ export function constructFindAddressBySsoQueryFilter(
     query += ` oauth_username = :oauthUsername`;
   } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
     query += `oauth_email = :oauthEmail`;
-  } else if (['phone_number'].includes(ssoInfo.provider)) {
+  } else if (['phone_number', 'SMS', 'phone'].includes(ssoInfo.provider)) {
     query += `oauth_phone_number = :oauthPhoneNumber`;
   } else {
-    throw new Error(`Unsupported OAuth provider: ${ssoInfo.provider}`);
+    throw new Error(`Unsupported OAuth provider: '${ssoInfo.provider}'`);
   }
 
   return query;

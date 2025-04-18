@@ -1,11 +1,9 @@
 import { ConnectedWallet, usePrivy, useWallets } from '@privy-io/react-auth';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
 
 export function useConnectedWallet() {
   const wallets = useWallets();
-  const walletsRef = useRef(wallets);
-  walletsRef.current = wallets;
   const privy = usePrivy();
   const createWallet = useMemoizedFunction(privy.createWallet);
 
@@ -19,9 +17,9 @@ export function useConnectedWallet() {
         return;
       }
 
-      if (walletsRef.current.ready) {
-        if (walletsRef.current.wallets.length > 0) {
-          setConnectedWallet(walletsRef.current.wallets[0]);
+      if (wallets.ready) {
+        if (wallets.wallets.length > 0 && !connectedWallet) {
+          setConnectedWallet(wallets.wallets[0]);
         } else {
           // this should NOT happen, but the SDK is incorrect in the
           // documentation and may have a bug.
@@ -32,7 +30,14 @@ export function useConnectedWallet() {
     }
 
     doAsync().catch(console.error);
-  }, [createWallet, privy.authenticated]);
+  }, [
+    connectedWallet,
+    createWallet,
+    privy.authenticated,
+    wallets.ready,
+    wallets.wallets,
+    wallets.wallets.length,
+  ]);
 
   return connectedWallet;
 }

@@ -18,13 +18,16 @@ export function usePrivySMS(props: UsePrivySMS) {
   useEffect(() => {
     async function doAsync() {
       if (wallet) {
+        console.log('Trying to login...');
         await privySignOn({
           wallet,
           onSuccess,
           onError,
           ssoOAuthToken: undefined,
-          ssoProvider: undefined,
+          ssoProvider: 'phone',
         });
+      } else {
+        console.warn('No wallet... ');
       }
     }
 

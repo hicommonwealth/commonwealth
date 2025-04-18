@@ -109,7 +109,6 @@ export async function signInPrivy({
     // TODO: existing linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
     //  this extra call to Privy
     const fullPrivyUser = await getPrivyUserById(privyUser.id);
-    if (!payload.privy.ssoOAuthToken) throw new Error('Missing OAuth token');
     if (!payload.privy.ssoProvider) throw new Error('Missing OAuth provider');
     verifiedSsoInfo = await getVerifiedUserInfo({
       privyUser: fullPrivyUser,
