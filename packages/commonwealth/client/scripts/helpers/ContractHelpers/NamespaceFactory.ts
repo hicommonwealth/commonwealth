@@ -353,6 +353,7 @@ class NamespaceFactory extends ContractBase {
     walletAddress: string,
     chainId: string,
   ): Promise<TransactionReceipt> {
+    console.log('configureVerification', namespaceName, walletAddress, chainId);
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }

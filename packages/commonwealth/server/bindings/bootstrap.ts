@@ -19,6 +19,7 @@ import {
   DiscordBotPolicy,
   FarcasterWorker,
   LaunchpadPolicy,
+  NominationsWorker,
   TwitterEngagementPolicy,
   User,
   models,
@@ -82,6 +83,10 @@ export async function bootstrapBindings(
     },
   );
   checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
+
+  const nominationsWorkerSubRes =
+    await brokerInstance.subscribe(NominationsWorker);
+  checkSubscriptionResponse(nominationsWorkerSubRes, NominationsWorker.name);
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
     Contest.Contests,
