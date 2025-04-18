@@ -47,8 +47,7 @@ class LaunchpadBondingCurve extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-    const value =
-      this.chainId === '8453' ? 4.4400042e14 : 4.4400042e14 - 0.000444e18;
+    const value = 0.000444e18 + 0.00000001e18;
     const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
@@ -58,7 +57,7 @@ class LaunchpadBondingCurve extends ContractBase {
       [],
       this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
-      connectorWeight,
+      999000,
       this.tokenCommunityManager,
       value,
     );

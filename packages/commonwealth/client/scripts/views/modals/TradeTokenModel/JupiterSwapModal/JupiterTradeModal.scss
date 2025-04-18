@@ -1,0 +1,33 @@
+@import '../../../../styles/shared.scss';
+
+.JupiterTradeModal {
+  overflow-y: scroll;
+  padding-left: 8px;
+
+  .CWModalBody {
+    max-height: 500px;
+  }
+
+  .header-content {
+    width: 100%;
+
+    .token-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 16px;
+    }
+  }
+
+  .Jupiter {
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .jupiter-terminal {
+      width: 100%;
+    }
+  }
+}
