@@ -129,6 +129,11 @@ export default (
         defaultValue: 0,
       },
       namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
+      namespace_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       namespace_address: {
         type: Sequelize.STRING,
         allowNull: true,
