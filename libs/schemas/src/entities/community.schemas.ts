@@ -64,7 +64,7 @@ export const Community = z.object({
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
   namespace_creator_address: z.string().nullish(),
-  namespace_verification_configured: z.boolean(),
+  namespace_verification_configured: z.boolean().optional(),
   namespace_nominations: z.array(z.string()).nullish(),
   namespace_verified: z.boolean().optional(),
   redirect: z.string().nullish(),
@@ -75,7 +75,7 @@ export const Community = z.object({
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
-  environment: z.string(),
+  environment: z.string().optional(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
