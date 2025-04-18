@@ -19,7 +19,7 @@ export enum ViewType {
 }
 
 export interface CommunityData {
-  ChainNode: any; // You may want to type this more specifically based on your ChainNode type
+  ChainNode;
   name: string;
   nameLower: string;
   namespace: string;
