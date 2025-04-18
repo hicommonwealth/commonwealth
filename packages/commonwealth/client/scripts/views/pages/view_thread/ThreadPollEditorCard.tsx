@@ -14,7 +14,7 @@ import './poll_cards.scss';
 type ThreadPollEditorCardProps = {
   thread?: Thread;
   threadAlreadyHasPolling: boolean;
-  setLocalPoll?: any;
+  setLocalPoll?: (params) => void;
   isCreateThreadPage?: boolean;
   aiInteractionsToggleEnabled?: boolean;
   threadContentDelta?: string;
@@ -31,7 +31,7 @@ export const ThreadPollEditorCard = ({
   threadContentDelta,
 }: ThreadPollEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [pollData, setPollData] = useState<any>();
+  const [pollData, setPollData] = useState<string>();
 
   const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(false);
 
@@ -116,7 +116,11 @@ export const ThreadPollEditorCard = ({
         content={
           <PollEditorModal
             thread={thread}
-            onModalClose={() => setIsModalOpen(false)}
+            onModalClose={() => {
+              setIsModalOpen(false);
+              setIsAIresponseCompleted(false);
+              setPollData('');
+            }}
             pollData={pollData}
             isAIresponseCompleted={isAIresponseCompleted}
             setLocalPoll={setLocalPoll}

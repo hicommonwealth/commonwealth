@@ -50,9 +50,9 @@ const customDurationOptions = [
 type PollEditorModalProps = {
   onModalClose: () => void;
   thread?: Thread;
-  pollData?: any;
+  pollData?: string;
   isAIresponseCompleted: boolean;
-  setLocalPoll?: any;
+  setLocalPoll?: (params) => void;
 };
 
 export const PollEditorModal = ({
@@ -68,10 +68,8 @@ export const PollEditorModal = ({
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
   const user = useUserStore();
-  console.log('pollData', { pollData });
   useEffect(() => {
     if (pollData && pollData !== undefined && isAIresponseCompleted) {
-      console.log('pollData', { pollData });
       const newPollData = JSON.parse(pollData);
       setPrompt(newPollData?.question);
       setOptions(newPollData?.options);
@@ -128,7 +126,7 @@ export const PollEditorModal = ({
           customDuration: customDurationEnabled ? customDuration : undefined,
           authorCommunity: user.activeAccount?.community?.id || '',
           address: user.activeAccount?.address || '',
-        });
+        }).catch(console.error);
 
         notifySuccess('Poll creation succeeded');
       } else if (setLocalPoll) {
@@ -233,7 +231,7 @@ export const PollEditorModal = ({
               label="Save changes"
               buttonType="primary"
               buttonHeight="sm"
-              onClick={handleSavePoll}
+              onClick={() => void handleSavePoll()}
             />
           </CWModalFooter>
         </>

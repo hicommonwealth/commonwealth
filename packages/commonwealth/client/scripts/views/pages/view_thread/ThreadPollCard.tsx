@@ -15,12 +15,14 @@ type ThreadPollCardProps = {
   poll: Poll;
   showDeleteButton?: boolean;
   isTopicMembershipRestricted?: boolean;
+  isCreateThreadPage?: boolean;
 };
 
 export const ThreadPollCard = ({
   poll,
   showDeleteButton,
   isTopicMembershipRestricted = false,
+  isCreateThreadPage = false,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -114,7 +116,11 @@ export const ThreadPollCard = ({
       <PollCard
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
+        disableVoteButton={
+          !user.activeAccount ||
+          isTopicMembershipRestricted ||
+          isCreateThreadPage
+        }
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(

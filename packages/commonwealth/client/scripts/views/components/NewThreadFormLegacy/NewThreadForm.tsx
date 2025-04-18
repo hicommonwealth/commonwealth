@@ -58,8 +58,9 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-// eslint-disable-next-line max-len
+
 import Poll from 'client/scripts/models/Poll';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -627,7 +628,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-  console.log('<<<<<<pollsData>>>>', { pollsData });
   const sidebarComponent = [
     {
       label: 'Links',
@@ -661,7 +661,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       poll={poll}
                       key={poll.id}
                       isTopicMembershipRestricted={isRestrictedMembership}
-                      showDeleteButton={isAdmin}
+                      showDeleteButton={false}
+                      isCreateThreadPage={true}
                     />
                   );
                 })}

@@ -52,8 +52,8 @@ IMPORTANT: Return only the comment without any introduction, explanations, or me
 const generatePollPrompt = (context: string) => {
   return `
 You are an AI assistant skilled in analyzing discussion threads to create engaging polls.
-Based on the following thread content, generate one poll suggestion in JSON format that reflects the main debate, topic, or question raised.
-
+Based on the following thread content, generate one poll suggestion in JSON format that reflects the main debate, topic,
+ or question raised.
 THREAD CONTENT:
 ${context}
 
