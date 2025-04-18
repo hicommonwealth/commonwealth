@@ -38,14 +38,10 @@ export const ThreadPollEditorCard = ({
   const { generateCompletion } = useAiCompletion();
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
-  console.log('>threadContentDelta>>>', { threadContentDelta });
   const handleGeneratePoll = () => {
     let effectiveTitle;
     let effectiveBody;
 
-    if (isCreateThreadPage && !threadContentDelta) {
-      alert('no content');
-    }
     if (isCreateThreadPage && threadContentDelta && threadTitle) {
       effectiveTitle = aiInteractionsToggleEnabled
         ? threadTitle?.trim() || DEFAULT_THREAD_TITLE
@@ -66,8 +62,6 @@ export const ThreadPollEditorCard = ({
 
     setPollData(text);
     const prompt = generatePollPrompt(context);
-
-    console.log(prompt);
 
     generateCompletion(prompt, {
       model: 'gpt-4o-mini',
@@ -96,6 +90,7 @@ export const ThreadPollEditorCard = ({
           threadAlreadyHasPolling ? 'an' : 'another'
         } offchain poll to this
         thread?`}
+        showCollapsedIcon={true}
         content={
           <div className="PollEditorCard">
             <CWButton

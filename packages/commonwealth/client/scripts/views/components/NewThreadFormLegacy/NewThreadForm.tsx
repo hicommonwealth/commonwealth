@@ -661,8 +661,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       poll={poll}
                       key={poll.id}
                       isTopicMembershipRestricted={isRestrictedMembership}
-                      showDeleteButton={false}
+                      showDeleteButton={true}
                       isCreateThreadPage={true}
+                      setLocalPoll={setPollData}
                     />
                   );
                 })}

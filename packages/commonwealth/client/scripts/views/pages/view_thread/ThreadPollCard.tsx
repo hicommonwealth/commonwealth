@@ -16,6 +16,7 @@ type ThreadPollCardProps = {
   showDeleteButton?: boolean;
   isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
+  setLocalPoll?: (params) => void;
 };
 
 export const ThreadPollCard = ({
@@ -23,6 +24,7 @@ export const ThreadPollCard = ({
   showDeleteButton,
   isTopicMembershipRestricted = false,
   isCreateThreadPage = false,
+  setLocalPoll,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -150,8 +152,12 @@ export const ThreadPollCard = ({
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
-          //@typescript-eslint/no-misused-promises
-          handleDeletePoll().catch(console.error);
+          if (isCreateThreadPage && setLocalPoll) {
+            setLocalPoll([]);
+          } else {
+            //@typescript-eslint/no-misused-promises
+            handleDeletePoll().catch(console.error);
+          }
         }}
       />
       <CWModal
