@@ -67,8 +67,8 @@ export const ThreadPollEditorCard = ({
       model: 'gpt-4o-mini',
       stream: true,
       onError: (error) => {
-        console.error('Error generating AI comment:', error);
-        notifyError('Failed to generate AI comment');
+        console.error('Error generating Poll:', error);
+        notifyError('Failed to generate  Poll');
       },
       onChunk: (chunk) => {
         text += chunk;
@@ -79,7 +79,7 @@ export const ThreadPollEditorCard = ({
         setIsAIresponseCompleted(true);
       },
     }).catch((error) => {
-      console.error('Failed to generate comment:', error);
+      console.error('Failed to generate poll:', error);
     });
   };
 
