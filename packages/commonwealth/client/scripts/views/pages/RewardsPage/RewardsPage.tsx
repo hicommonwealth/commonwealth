@@ -69,7 +69,7 @@ const RewardsPage = () => {
   }
 
   return (
-    <CWPageLayout>
+    <CWPageLayout className="RewardsPageLayout">
       <section className="RewardsPage">
         <CWText type="h2" className="header">
           Rewards
