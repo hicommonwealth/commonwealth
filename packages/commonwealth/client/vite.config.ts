@@ -111,6 +111,8 @@ export default defineConfig(({ mode }) => {
     'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
       env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
     ),
+    'process.env.LAUNCHPAD_CHAIN_ID':
+      JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
   };
 
   return {
