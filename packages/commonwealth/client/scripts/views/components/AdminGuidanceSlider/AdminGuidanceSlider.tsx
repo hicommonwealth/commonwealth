@@ -5,7 +5,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import Permissions from 'utils/Permissions';
-import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider'; // Assuming CardsSlider and related components are reusable
+import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 
 // Define card types relevant to admin guidance
@@ -111,7 +111,10 @@ export const AdminGuidanceSlider = () => {
         content={
           <DismissModal
             label="Admin Quick Links" // Updated label
-            description="These cards provide quick access to common admin areas. You can dismiss this slider temporarily." // Simplified description
+            description={
+              `These cards provide quick access to common admin areas. ` +
+              `You can dismiss this slider temporarily.`
+            }
             showDismissCheckbox={false} // Simplfied: Only temporary dismiss for now
             onModalClose={() => setIsModalVisible(false)}
             onDismiss={() => {
