@@ -234,7 +234,7 @@ const DirectoryPage = () => {
       return;
     }
 
-    const filterLogic = (comm: any) => {
+    const filterLogic = (comm) => {
       return appliedFilters.some((filter) => {
         if (filter.label === 'Admin picked') {
           return selectedCommunities.includes(comm.id);
@@ -290,28 +290,29 @@ const DirectoryPage = () => {
     setAppliedFilters([]);
   };
 
-  const handleSaveChanges = async () => {
-    try {
-      const validTags = selectedTags || [];
-      const validCommunities = selectedCommunities || [];
+  const handleSaveChanges = () => {
+    const validTags = selectedTags || [];
+    const validCommunities = selectedCommunities || [];
 
-      await updateCommunityDirectoryTags({
-        community_id: communityId,
-        tag_names: validTags,
-        selected_community_ids: validCommunities,
+    updateCommunityDirectoryTags({
+      community_id: communityId,
+      tag_names: validTags,
+      selected_community_ids: validCommunities,
+    })
+      .then(() => {
+        setIsDirectorySettingsDrawerOpen(false);
+        return refetchTagsAndCommunities();
+      })
+      .then(() => {
+        trackAnalytics({
+          event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
+          isPWA: isAddedToHomeScreen,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        notifyError('Failed to update Directory Settings');
       });
-
-      setIsDirectorySettingsDrawerOpen(false);
-      await refetchTagsAndCommunities();
-
-      trackAnalytics({
-        event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
-        isPWA: isAddedToHomeScreen,
-      });
-    } catch (error) {
-      console.log(error);
-      notifyError('Failed to update Directory Settings');
-    }
   };
 
   const displayTableData = useMemo(() => {
@@ -371,7 +372,7 @@ const DirectoryPage = () => {
             <div className="community-search">
               <CWTextInput
                 value={communitySearch}
-                onInput={(e: any) => setCommunitySearch(e.target.value)}
+                onInput={(e) => setCommunitySearch(e.target.value)}
                 fullWidth
                 placeholder="Search communities"
                 iconLeft={<MagnifyingGlass size={24} weight="regular" />}
