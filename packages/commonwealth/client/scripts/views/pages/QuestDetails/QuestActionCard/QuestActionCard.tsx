@@ -114,7 +114,6 @@ const QuestActionCard = ({
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
                       questAction?.ChainEventXpSource?.contract_address || '',
-                      // TODO: 11069 - platform - return chain node in response
                       questAction?.ChainEventXpSource?.ChainNode
                         ?.eth_chain_id || '',
                     )}
