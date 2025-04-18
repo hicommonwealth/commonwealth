@@ -153,7 +153,8 @@ const UpdateQuest = ({ id }: { id: number }) => {
                       )?.ethChainId || ''
                     }`
                   : ``,
-                eventSignature: `${action.ChainEventXpSource?.event_signature || ''}`,
+                // important to use readable signature instead of event signature here
+                eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
                 // TODO: 11069 fix type + add tx_hash in response
                 transactionHash: `${(action.ChainEventXpSource as any)?.tx_hash || ''}`,
               })),
