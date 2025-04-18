@@ -514,7 +514,6 @@ function setupRouter(
     router,
     'get',
     '/groups',
-    databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
   );
 

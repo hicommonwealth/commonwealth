@@ -4,9 +4,10 @@ import { delay } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 import z from 'zod';
+import { config as envConfig } from '../../config';
 import { RequiredTwitterBotConfig, TwitterBotConfig } from './types';
 
-const log = logger(import.meta);
+const log = logger(import.meta, undefined, envConfig.TWITTER.LOG_LEVEL);
 
 function mustHaveAuth(
   config: TwitterBotConfig,
@@ -72,7 +73,9 @@ export const generateSignature = (
     encodeURIComponent(paramString),
   ].join('&');
 
-  const signingKey = `${encodeURIComponent(credentials.consumerSecret)}&${encodeURIComponent(credentials.accessTokenSecret)}`;
+  const signingKey = `${encodeURIComponent(
+    credentials.consumerSecret,
+  )}&${encodeURIComponent(credentials.accessTokenSecret)}`;
 
   const signature = crypto
     .createHmac('sha1', signingKey)
@@ -125,11 +128,17 @@ export const generateOAuthHeader = ({
 
 export class HttpError extends Error {
   statusCode: number;
+  queryParams?: Record<string, string>;
 
-  constructor(message: string, statusCode: number) {
+  constructor(
+    message: string,
+    statusCode: number,
+    queryParams?: Record<string, string>,
+  ) {
     super(message);
     this.name = 'HttpError';
     this.statusCode = statusCode;
+    this.queryParams = queryParams;
 
     // This is necessary in TypeScript to ensure prototype chain works correctly
     Object.setPrototypeOf(this, HttpError.prototype);
@@ -141,6 +150,7 @@ export class HttpError extends Error {
         name: this.name,
         message: this.message,
         statusCode: this.statusCode,
+        queryParams: JSON.stringify(this.queryParams),
       },
     };
   }
@@ -193,6 +203,7 @@ export async function getFromTwitter({
     throw new HttpError(
       `Request failed with status ${response.status}: ${response.statusText}`,
       response.status,
+      parsedQueryParams,
     );
   }
 
@@ -275,7 +286,10 @@ export async function getFromTwitterWrapper<
       throw e;
     }
 
-    console.log('>>>>>>>>', res.jsonBody);
+    log.trace(`Twitter response from ${url}`, {
+      ...logContext,
+      response: res.jsonBody,
+    });
     const parsedRes = responseSchema.parse(res.jsonBody);
     paginationToken = parsedRes.meta?.next_token;
     requestsRemaining = res.requestsRemaining;

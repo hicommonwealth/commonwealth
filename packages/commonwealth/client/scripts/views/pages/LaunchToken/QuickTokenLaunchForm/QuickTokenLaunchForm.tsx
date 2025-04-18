@@ -206,26 +206,27 @@ export const QuickTokenLaunchForm = ({
               chainNodeId: baseNode.id,
               tokenizeCommunity: tokenizedThreadsEnabled ? true : false,
             });
-            const response = await createCommunityMutation(communityPayload)
-              .then(() => true)
-              .catch((e) => {
-                const errorMsg = e?.message?.toLowerCase() || '';
-                if (
-                  !(
-                    errorMsg.includes('name') &&
-                    errorMsg.includes('already') &&
-                    errorMsg.includes('exists')
-                  )
-                ) {
-                  // this is not a unique community name error, abort token creation
-                  return 'invalid_state';
-                }
-                return false;
-              });
 
-            if (response === 'invalid_state') return;
+            let response;
+            try {
+              response = await createCommunityMutation(communityPayload);
+            } catch (e) {
+              const errorMsg = e?.message?.toLowerCase() || '';
+              if (
+                errorMsg.includes('name') &&
+                errorMsg.includes('already') &&
+                errorMsg.includes('exists')
+              ) {
+                // this is not a unique community name error, abort token creation
+                response = 'invalid_state';
+              }
+            }
+            if (response === 'invalid_state') {
+              notifyError('Community name already taken.');
+              return;
+            }
 
-            if (response === true) {
+            if (response) {
               // store community id for this submitted token info, incase user submits
               // the form again we won't create another community for the same token info
               setCreatedCommunityIdsToTokenInfoMap((prev) => ({

@@ -102,6 +102,7 @@ export async function __searchComments(
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
+      "Comments".marked_as_spam_at IS NULL AND
       query @@ "Comments".search
     ${paginationSort}
   `;
@@ -116,6 +117,7 @@ export async function __searchComments(
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
+      "Comments".marked_as_spam_at IS NULL AND
       query @@ "Comments".search
   `;
 

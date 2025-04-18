@@ -18,6 +18,7 @@ export enum CommunityType {
   Polygon = 'polygon',
   Solana = 'solana',
   Skale = 'skale',
+  Sonieum = 'sonieum',
 }
 
 export type SelectedCommunity = {

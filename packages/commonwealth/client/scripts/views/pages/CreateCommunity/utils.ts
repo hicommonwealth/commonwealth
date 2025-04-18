@@ -4,13 +4,13 @@ import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWF
 export enum CreateCommunityStep {
   CommunityTypeSelection = 'CommunityTypeSelection',
   CommunityInformation = 'CommunityInformation',
-  CommunityStake = 'CommunityStake',
+  OnchainTransactions = 'OnchainTransactions',
   Success = 'Success',
 }
 
 export const getFormSteps = (
   createCommunityStep: CreateCommunityStep,
-  showCommunityStakeStep: boolean,
+  showOnchainTransactionsStep: boolean,
 ): CWFormStepsProps['steps'] => {
   return [
     {
@@ -29,14 +29,15 @@ export const getFormSteps = (
             ? 'active'
             : 'completed',
     },
-    ...((showCommunityStakeStep
+    ...((showOnchainTransactionsStep
       ? [
           {
-            label: 'Namespace',
+            label: 'Onchain Transactions',
             state:
-              createCommunityStep < CreateCommunityStep.CommunityStake
+              createCommunityStep < CreateCommunityStep.OnchainTransactions
                 ? 'inactive'
-                : createCommunityStep === CreateCommunityStep.CommunityStake
+                : createCommunityStep ===
+                    CreateCommunityStep.OnchainTransactions
                   ? 'active'
                   : 'completed',
           },
@@ -51,7 +52,7 @@ export const handleChangeStep = (
   setCreateCommunityStep: React.Dispatch<
     React.SetStateAction<CreateCommunityStep>
   >,
-  showCommunityStakeStep: boolean,
+  showOnchainTransactionsStep: boolean,
 ) => {
   switch (createCommunityStep) {
     case CreateCommunityStep.CommunityTypeSelection:
@@ -60,13 +61,13 @@ export const handleChangeStep = (
     case CreateCommunityStep.CommunityInformation:
       setCreateCommunityStep(
         forward
-          ? showCommunityStakeStep
-            ? CreateCommunityStep.CommunityStake
+          ? showOnchainTransactionsStep
+            ? CreateCommunityStep.OnchainTransactions
             : CreateCommunityStep.Success
           : CreateCommunityStep.CommunityTypeSelection,
       );
       return;
-    case CreateCommunityStep.CommunityStake:
+    case CreateCommunityStep.OnchainTransactions:
       setCreateCommunityStep(
         forward
           ? CreateCommunityStep.Success
