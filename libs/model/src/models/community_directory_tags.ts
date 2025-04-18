@@ -15,14 +15,13 @@ export type CommunityDirectoryTagsInstance =
 export type CommunityDirectoryTagsModelStatic =
   Sequelize.ModelStatic<CommunityDirectoryTagsInstance>;
 
-export default (sequelize: Sequelize.Sequelize) =>
-  <CommunityDirectoryTagsModelStatic>(
+export default (sequelize: Sequelize.Sequelize) => {
+  const CommunityDirectoryTags = <CommunityDirectoryTagsModelStatic>(
     sequelize.define<CommunityDirectoryTagsInstance>(
       'CommunityDirectoryTags',
       {
         community_id: {
           type: Sequelize.STRING,
-          primaryKey: true,
           allowNull: false,
           references: {
             model: 'Communities',
@@ -62,6 +61,17 @@ export default (sequelize: Sequelize.Sequelize) =>
             exclude: ['created_at', 'updated_at'],
           },
         },
+        indexes: [
+          {
+            unique: true,
+            fields: ['community_id', 'tag_id', 'selected_community_id'],
+          },
+        ],
       },
     )
   );
+
+  CommunityDirectoryTags.removeAttribute('id');
+
+  return CommunityDirectoryTags;
+};
