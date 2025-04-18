@@ -150,7 +150,6 @@ const DirectoryPage = () => {
     if (isLoadingTagsAndCommunities) {
       return;
     }
-
     if (tagsAndCommunitiesError) {
       console.error(
         'Error loading tags and communities:',
