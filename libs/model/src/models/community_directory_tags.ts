@@ -61,6 +61,13 @@ export default (sequelize: Sequelize.Sequelize) => {
             exclude: ['created_at', 'updated_at'],
           },
         },
+        indexes: [
+          {
+            unique: true,
+            fields: ['community_id', 'tag_id', 'selected_community_id'],
+            name: 'unique_community_tag_selected',
+          },
+        ],
       },
     )
   );
