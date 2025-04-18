@@ -169,7 +169,7 @@ export const AdminOnboardingSlider = () => {
           description={CARD_TYPES['create-topic'].description}
           iconURL={CARD_TYPES['create-topic'].iconURL}
           iconAlt="create-topic-icon"
-          isActionCompleted={topics.length > 1} // we have a default 'General' topic which is not counted here
+          isActionCompleted={topics.length > 1}
           onCTAClick={() => redirectToPage('create-topic')}
         />
         <ActionCard
