@@ -22,6 +22,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       {
         community_id: {
           type: Sequelize.STRING,
+          primaryKey: true,
           allowNull: false,
           references: {
             model: 'Communities',
