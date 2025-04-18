@@ -20,9 +20,11 @@ export function usePrivySignOn() {
   const signMessage = useSignMessageMemo();
   const identityTokenRef = useIdentityTokenRef();
 
+  // TODO: we should consider only signing on when there is no user store.
+
   return useCallback(
     async (props: UsePrivySignOnProps) => {
-      const { wallet, ssoOAuthToken, ssoProvider, onSuccess, onError } = props;
+      const { wallet, ssoOAuthToken, ssoProvider, onSuccess } = props;
 
       const ethereumProvider = async () => await wallet.getEthereumProvider();
       const signMessageProvider = async (message: string): Promise<string> => {
