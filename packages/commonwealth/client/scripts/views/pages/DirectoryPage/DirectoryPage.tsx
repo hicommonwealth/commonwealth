@@ -23,6 +23,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import DirectoryPageContent from 'views/pages/DirectoryPage/DirectoryPageContent';
 import useDirectoryPageData, {
+  CommunityData,
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
@@ -45,8 +46,12 @@ const DirectoryPage = () => {
     useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCommunities, setSelectedCommunities] = useState<string[]>([]);
-  const [filteredCommunities, setFilteredCommunities] = useState<any[]>([]);
-  const [filteredTableData, setFilteredTableData] = useState<any[]>([]);
+  const [filteredCommunities, setFilteredCommunities] = useState<
+    CommunityData[]
+  >([]);
+  const [filteredTableData, setFilteredTableData] = useState<CommunityData[]>(
+    [],
+  );
   const [appliedFilters, setAppliedFilters] = useState<
     Array<{ label: string; value: string }>
   >([]);

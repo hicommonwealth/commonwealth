@@ -9,6 +9,7 @@ import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsR
 import './DirectorySettingsDrawer.scss';
 import ManualSelection from './ManualSelection';
 import TagSelection from './TagSelection';
+import { CommunityData } from './useDirectoryPageData';
 
 enum DirectoryDrawerTabsType {
   TagSelectionType = 'TagSelection',
@@ -18,7 +19,7 @@ enum DirectoryDrawerTabsType {
 type DirectorySettingsDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
-  filteredRelatedCommunitiesData: any;
+  filteredRelatedCommunitiesData: CommunityData[];
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
   selectedCommunities: string[];
@@ -36,8 +37,9 @@ const DirectorySettingsDrawer = ({
   setSelectedCommunities,
   handleSaveChanges,
 }: DirectorySettingsDrawerProps) => {
-  const [activeDirectoryDrawerTab, setActiveDirectoryDrawerTab] =
-    useState('TagSelection');
+  const [activeDirectoryDrawerTab, setActiveDirectoryDrawerTab] = useState(
+    DirectoryDrawerTabsType.TagSelectionType,
+  );
 
   return (
     <div className="DirectorySettingsDrawer">

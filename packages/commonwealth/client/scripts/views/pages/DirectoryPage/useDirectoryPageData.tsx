@@ -17,6 +17,20 @@ export enum ViewType {
   Rows = 'Rows',
   Tiles = 'Tiles',
 }
+
+export interface CommunityData {
+  ChainNode: any; // You may want to type this more specifically based on your ChainNode type
+  name: string;
+  nameLower: string;
+  namespace: string;
+  description: string;
+  members: string;
+  threads: string;
+  iconUrl: string;
+  id: string;
+  tag_ids: string[];
+}
+
 interface UseDirectoryPageDataProps {
   chainNodeId?: number;
   searchTerm: string;
@@ -58,7 +72,7 @@ const useDirectoryPageData = ({
     [navigate, trackAnalytics, isAddedToHomeScreen],
   );
 
-  const relatedCommunitiesData = useMemo(
+  const relatedCommunitiesData = useMemo<CommunityData[]>(
     () =>
       relatedCommunities.map((c) => ({
         ChainNode: getNodeById(c.chain_node_id, nodes),
@@ -75,7 +89,7 @@ const useDirectoryPageData = ({
     [nodes, relatedCommunities],
   );
 
-  const filteredRelatedCommunitiesData = useMemo(
+  const filteredRelatedCommunitiesData = useMemo<CommunityData[]>(
     () =>
       relatedCommunitiesData.filter((c) => c.nameLower.includes(searchTerm)),
     [searchTerm, relatedCommunitiesData],

@@ -6,7 +6,7 @@ import DirectorySelectorItem from './DirectorySelectorItem';
 import './TagsAndManualSelection.scss';
 
 type ManualSelectionProps = {
-  filteredRelatedCommunitiesData: any;
+  filteredRelatedCommunitiesData;
   selectedCommunities: string[];
   setSelectedCommunities: (communities: string[]) => void;
 };
@@ -38,7 +38,7 @@ const ManualSelection = ({
   };
 
   const handleCommunityClick = useCallback(
-    (community: any) => {
+    (community) => {
       const newCommunities = localSelectedCommunities.includes(community.id)
         ? localSelectedCommunities.filter((c) => c !== community.id)
         : [...localSelectedCommunities, community.id];
@@ -49,7 +49,7 @@ const ManualSelection = ({
   );
 
   const renderItem = useCallback(
-    (i: number, community: any) => {
+    (i: number, community) => {
       const isSelected = localSelectedCommunities.includes(community.id);
 
       return (

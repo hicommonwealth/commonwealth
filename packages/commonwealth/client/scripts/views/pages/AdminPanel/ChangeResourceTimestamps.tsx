@@ -92,7 +92,7 @@ const ChangeResourceTimestamps = () => {
     label: x,
     value: x,
   }));
-  console.log('resourceNames', resourceNames);
+
   const dateFieldNames = [
     'created_at',
     'updated_at',
