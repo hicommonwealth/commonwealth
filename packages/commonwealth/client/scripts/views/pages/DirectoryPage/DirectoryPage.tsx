@@ -24,6 +24,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import DirectoryPageContent from 'views/pages/DirectoryPage/DirectoryPageContent';
 import useDirectoryPageData, {
   CommunityData,
+  RowType,
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
@@ -49,9 +50,7 @@ const DirectoryPage = () => {
   const [filteredCommunities, setFilteredCommunities] = useState<
     CommunityData[]
   >([]);
-  const [filteredTableData, setFilteredTableData] = useState<CommunityData[]>(
-    [],
-  );
+  const [filteredTableData, setFilteredTableData] = useState<RowType[]>([]);
   const [appliedFilters, setAppliedFilters] = useState<
     Array<{ label: string; value: string }>
   >([]);
@@ -121,7 +120,11 @@ const DirectoryPage = () => {
   });
 
   const getFilteredCommunities = useCallback(
-    (communities: any[], tags: string[], manualSelections: string[]) => {
+    <T extends CommunityData>(
+      communities: T[],
+      tags: string[],
+      manualSelections: string[],
+    ): T[] => {
       if (!communities) {
         return [];
       }

@@ -31,6 +31,20 @@ export interface CommunityData {
   tag_ids: string[];
 }
 
+export interface RowType {
+  ChainNode;
+  name: string;
+  nameLower: string;
+  namespace: string;
+  description: string;
+  members: string;
+  threads: string;
+  iconUrl: string;
+  id: string;
+  tag_ids: string[];
+  community: JSX.Element;
+}
+
 interface UseDirectoryPageDataProps {
   chainNodeId?: number;
   searchTerm: string;
@@ -95,7 +109,7 @@ const useDirectoryPageData = ({
     [searchTerm, relatedCommunitiesData],
   );
 
-  const tableData = useMemo(() => {
+  const tableData = useMemo<RowType[]>(() => {
     if (selectedViewType !== ViewType.Rows) {
       return [];
     }
