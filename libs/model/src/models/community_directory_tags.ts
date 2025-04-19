@@ -22,14 +22,12 @@ export default (sequelize: Sequelize.Sequelize) => {
       {
         community_id: {
           type: Sequelize.STRING,
-          primaryKey: true,
           allowNull: false,
           references: {
             model: 'Communities',
             key: 'id',
           },
           onDelete: 'CASCADE',
-          unique: 'unique_community_tag_selected',
         },
         tag_id: {
           type: Sequelize.INTEGER,
@@ -39,7 +37,6 @@ export default (sequelize: Sequelize.Sequelize) => {
             key: 'id',
           },
           onDelete: 'CASCADE',
-          unique: 'unique_community_tag_selected',
         },
         selected_community_id: {
           type: Sequelize.STRING,
@@ -49,7 +46,6 @@ export default (sequelize: Sequelize.Sequelize) => {
             key: 'id',
           },
           onDelete: 'CASCADE',
-          unique: 'unique_community_tag_selected',
         },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -65,6 +61,13 @@ export default (sequelize: Sequelize.Sequelize) => {
             exclude: ['created_at', 'updated_at'],
           },
         },
+        indexes: [
+          {
+            unique: true,
+            fields: ['community_id', 'tag_id', 'selected_community_id'],
+            name: 'unique_community_tag_selected',
+          },
+        ],
       },
     )
   );
