@@ -71,6 +71,7 @@ export default (sequelize: Sequelize.Sequelize) => {
       },
     )
   );
+  CommunityDirectoryTags.removeAttribute('id');
 
   return CommunityDirectoryTags;
 };
