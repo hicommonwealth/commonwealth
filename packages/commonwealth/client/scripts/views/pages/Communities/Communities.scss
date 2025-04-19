@@ -9,6 +9,14 @@
   height: 100%;
   overflow-y: auto;
 
+  /* Hide scrollbar but maintain scroll functionality for all browsers */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+
+  &::-webkit-scrollbar {
+    display: none; /* WebKit browsers (Chrome, Safari) */
+  }
+
   .layout-container {
     height: 100%;
     margin-top: 10px;
@@ -21,10 +29,22 @@
   flex-direction: column;
   overflow: hidden;
 
+  /* Hide all inner scrollbars throughout the page */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+      width: 0;
+      height: 0;
+    }
+  }
+
   .header-section {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -66,6 +86,133 @@
       }
     }
 
+    .search-filter-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 0;
+
+      .search-filter-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+
+        .search-container {
+          max-width: 520px;
+          width: 100%;
+          min-width: 180px;
+          flex: 1;
+
+          .input-and-icon-container {
+            .text-input-left-icon > svg {
+              left: 16px;
+              color: $neutral-400;
+            }
+
+            input.hasLeftIcon {
+              padding-left: 48px;
+            }
+          }
+        }
+
+        .inline-filters {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+          flex-wrap: nowrap;
+
+          .inline-filter-select {
+            min-width: 180px;
+            max-width: 220px;
+
+            @include extraSmall {
+              min-width: 150px;
+            }
+          }
+        }
+
+        .actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-shrink: 0;
+
+          .view-toggle {
+            display: flex;
+            gap: 8px;
+            cursor: pointer;
+
+            .icon-container {
+              width: 32px;
+              height: 32px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              &.selected {
+                background-color: $neutral-50;
+                border-radius: 6px;
+              }
+
+              svg {
+                color: $black;
+              }
+            }
+          }
+        }
+
+        @include mediumSmall {
+          flex-wrap: nowrap;
+
+          .search-container {
+            min-width: 120px;
+            max-width: none;
+            flex: 1;
+          }
+
+          .inline-filters {
+            flex: 0 1 auto;
+            min-width: 120px;
+
+            .inline-filter-select {
+              min-width: 120px;
+            }
+          }
+        }
+
+        @include extraSmall {
+          .inline-filters {
+            min-width: 110px;
+
+            .inline-filter-select {
+              min-width: 110px;
+            }
+          }
+        }
+      }
+
+      .applied-filters-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+
+        .applied-filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          /* Style for filter tags */
+          .Tag {
+            .Text {
+              text-transform: capitalize;
+            }
+          }
+        }
+      }
+    }
+
     .filters {
       display: flex;
       align-items: center;
@@ -101,10 +248,13 @@
     }
 
     .explore-tabs-row {
-      margin: 8px 0 16px;
+      margin: 8px 0 0px;
       width: 100%;
       border-bottom: 1px solid $neutral-200;
       overflow-x: auto;
+
+      /* Extra styles to ensure horizontal scrolling works without scrollbar */
+      -webkit-overflow-scrolling: touch;
 
       @include extraSmall {
         padding-bottom: 4px;
@@ -155,6 +305,7 @@
     .Feed {
       width: 100%;
       min-height: 400px;
+      overflow: hidden; /* Hide any scrollbars in Feed */
 
       .no-feed-message {
         text-align: center;
@@ -171,13 +322,81 @@
       margin-top: 16px;
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
 
-      .XPEarningsTable {
+      .XPTable {
         width: 100%;
         max-width: 100%;
 
         @include extraSmall {
           font-size: 14px;
+        }
+      }
+
+      // Add card view styling
+      &.cards-view {
+        .CWTable {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 20px;
+
+          .table-head {
+            display: none;
+          }
+
+          .table-row {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            background-color: $white;
+            position: relative;
+
+            td {
+              padding: 8px 0;
+              border-bottom: none;
+
+              &:first-child {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: $primary-50;
+                color: $primary-600;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                padding: 0;
+              }
+
+              &:nth-child(2) {
+                padding-top: 0;
+
+                .table-cell {
+                  .user-info {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+
+                    .Avatar {
+                      width: 64px;
+                      height: 64px;
+                    }
+
+                    p {
+                      text-align: center;
+                      font-size: 16px;
+                      font-weight: 500;
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -186,6 +405,7 @@
   .communities-list {
     width: 100%;
     min-height: 500px;
+    overflow: hidden;
 
     > div {
       div[data-testid='virtuoso-item-list'] {
@@ -252,6 +472,7 @@
   }
 
   .heading-container {
+    margin-top: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -284,6 +505,7 @@
     overflow-y: hidden;
     white-space: nowrap;
     padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
 
     // Apply to children of QuestList and ExploreContestList
     & > div {

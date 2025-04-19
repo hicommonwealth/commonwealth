@@ -3,6 +3,29 @@
 .ExploreContestList {
   margin: 16px 0;
 
+  .contest-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+
+    .stage-filter {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .community-filter {
+      min-width: 240px;
+      max-width: 400px;
+
+      @include extraSmall {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  }
+
   .content {
     display: grid;
     grid-gap: 28px;
@@ -40,6 +63,10 @@
 
 // Special style for when this component is inside a horizontal-scroll-container
 .horizontal-scroll-container .ExploreContestList {
+  .contest-filters {
+    margin-left: 180px;
+  }
+
   .content {
     display: flex !important;
     flex-wrap: nowrap !important;

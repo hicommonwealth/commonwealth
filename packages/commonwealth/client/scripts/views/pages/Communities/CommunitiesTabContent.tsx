@@ -1,4 +1,4 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { Community } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, MutableRefObject } from 'react';
@@ -12,19 +12,17 @@ import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/
 import { CWRelatedCommunityCard } from '../../components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CommunityFilters } from './FiltersDrawer';
 
-type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
-type ExtendedCommunitySliceType = [
-  ExtendedCommunityType,
-  ExtendedCommunityType,
-];
+// Define local types (assuming Community is imported or available)
+type CommunityItem = z.infer<typeof Community>; // Need to ensure Community is imported/available
+type CommunityPair = [CommunityItem, CommunityItem | undefined];
 
 interface CommunitiesTabContentProps {
   isLoading: boolean;
   isInitialCommunitiesLoading: boolean;
-  communitiesList: ExtendedCommunitySliceType[];
+  communitiesList: CommunityPair[];
   containerRef: MutableRefObject<HTMLElement | undefined>;
   filters: CommunityFilters;
-  historicalPrices:
+  historicalPrices?:
     | { community_id: string; old_price?: string | null }[]
     | undefined;
   ethUsdRate: number;
@@ -33,7 +31,7 @@ interface CommunitiesTabContentProps {
   fetchMoreCommunities?: () => Promise<void>;
 }
 
-const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
+const CommunitiesTabContent = ({
   isLoading,
   isInitialCommunitiesLoading,
   communitiesList,
@@ -44,7 +42,7 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
   setSelectedCommunityId,
   hasNextPage,
   fetchMoreCommunities,
-}) => {
+}: CommunitiesTabContentProps) => {
   const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
 
@@ -62,51 +60,63 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
           data={isInitialCommunitiesLoading ? [] : communitiesList}
           customScrollParent={containerRef.current}
           itemContent={(listIndex, slicedCommunities) => {
-            return slicedCommunities.map((community, sliceIndex) => {
-              const canBuyStake = !!user.addresses.find?.(
-                (address) => address?.community?.base === community?.base,
-              );
+            return slicedCommunities
+              .map((community, sliceIndex) => {
+                if (!community) {
+                  return null;
+                }
 
-              const historicalPriceMap: Map<string, string | undefined> =
-                new Map(
-                  Object.entries(
-                    (historicalPrices || [])?.reduce(
-                      (
-                        acc: Record<string, string | undefined>,
-                        { community_id, old_price },
-                      ) => {
-                        acc[community_id] = old_price || undefined;
-                        return acc;
-                      },
-                      {},
+                // Map historical prices using the original approach
+                const historicalPriceMap: Map<string, string | undefined> =
+                  new Map(
+                    Object.entries(
+                      (historicalPrices || [])?.reduce(
+                        (
+                          acc: Record<string, string | undefined>,
+                          { community_id, old_price },
+                        ) => {
+                          acc[community_id] = old_price || undefined;
+                          return acc;
+                        },
+                        {},
+                      ),
                     ),
-                  ),
+                  );
+
+                // Use the original canBuyStake logic
+                const canBuyStake = !!user.addresses.find?.(
+                  (address) => address?.community?.base === community?.base,
                 );
 
-              return (
-                <Fragment key={community.id}>
-                  <CWRelatedCommunityCard
-                    community={community}
-                    memberCount={community.profile_count || 0}
-                    threadCount={community.lifetime_thread_count || 0}
-                    canBuyStake={canBuyStake}
-                    onStakeBtnClick={() =>
-                      setSelectedCommunityId(community?.id || '')
-                    }
-                    ethUsdRate={ethUsdRate.toString()}
-                    {...(historicalPriceMap &&
-                      community.id && {
-                        historicalPrice: historicalPriceMap?.get(community.id),
-                      })}
-                    onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
-                  />
-                  {listIndex === communitiesList.length - 1 &&
-                    sliceIndex === slicedCommunities.length - 1 && (
-                      <NewCommunityCard />
-                    )}
-                </Fragment>
-              );
-            });
+                return (
+                  <Fragment
+                    key={community.id || `community-${listIndex}-${sliceIndex}`}
+                  >
+                    <CWRelatedCommunityCard
+                      community={community}
+                      memberCount={community.profile_count || 0}
+                      threadCount={community.lifetime_thread_count || 0}
+                      canBuyStake={canBuyStake}
+                      onStakeBtnClick={() =>
+                        setSelectedCommunityId(community?.id || '')
+                      }
+                      ethUsdRate={ethUsdRate.toString()}
+                      {...(historicalPriceMap &&
+                        community.id && {
+                          historicalPrice: historicalPriceMap?.get(
+                            community.id,
+                          ),
+                        })}
+                      onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
+                    />
+                    {listIndex === communitiesList.length - 1 &&
+                      sliceIndex === slicedCommunities.length - 1 && (
+                        <NewCommunityCard />
+                      )}
+                  </Fragment>
+                );
+              })
+              .filter(Boolean);
           }}
           endReached={() => {
             hasNextPage && fetchMoreCommunities?.().catch(console.error);
@@ -125,7 +135,8 @@ const CommunitiesTabContent: React.FC<CommunitiesTabContentProps> = ({
                   {filters.withCommunityEcosystem ||
                   filters.withNetwork ||
                   filters.withStakeEnabled ||
-                  filters.withTagsIds
+                  (filters.withTagsIds && filters.withTagsIds.length > 0) ||
+                  filters.withCommunityType
                     ? ` for the applied filters.`
                     : '.'}
                   <br />
