@@ -717,6 +717,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
     <StickCommentProvider>
       <MetaTags

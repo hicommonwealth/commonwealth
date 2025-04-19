@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import _ from 'underscore';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -20,6 +20,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
+import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './poll_editor_modal.scss';
 
 const getPollDurationCopy = (
@@ -48,12 +49,18 @@ const customDurationOptions = [
 
 type PollEditorModalProps = {
   onModalClose: () => void;
-  thread: Thread;
+  thread?: Thread;
+  pollData?: string;
+  isAIresponseCompleted: boolean;
+  setLocalPoll?: (params) => void;
 };
 
 export const PollEditorModal = ({
   onModalClose,
   thread,
+  pollData,
+  isAIresponseCompleted,
+  setLocalPoll,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
@@ -61,6 +68,13 @@ export const PollEditorModal = ({
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
   const user = useUserStore();
+  useEffect(() => {
+    if (pollData && pollData !== undefined && isAIresponseCompleted) {
+      const newPollData = JSON.parse(pollData);
+      setPrompt(newPollData?.question);
+      setOptions(newPollData?.options);
+    }
+  }, [pollData, isAIresponseCompleted]);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
@@ -104,16 +118,31 @@ export const PollEditorModal = ({
     }
 
     try {
-      await createPoll({
-        threadId: thread.id,
-        prompt,
-        options,
-        customDuration: customDurationEnabled ? customDuration : undefined,
-        authorCommunity: user.activeAccount?.community?.id || '',
-        address: user.activeAccount?.address || '',
-      });
+      if (thread) {
+        await createPoll({
+          threadId: thread?.id,
+          prompt,
+          options,
+          customDuration: customDurationEnabled ? customDuration : undefined,
+          authorCommunity: user.activeAccount?.community?.id || '',
+          address: user.activeAccount?.address || '',
+        }).catch(console.error);
 
-      notifySuccess('Poll creation succeeded');
+        notifySuccess('Poll creation succeeded');
+      } else if (setLocalPoll) {
+        setLocalPoll([
+          {
+            options: options,
+            prompt: prompt,
+            communityId: user.activeAccount?.community?.id,
+            customDuration: customDurationEnabled ? customDuration : undefined,
+            address: user.activeAccount?.address || '',
+            createdAt: moment(),
+            endsAt: moment('2025-04-20T19:04:53.661Z'),
+            votes: [],
+          },
+        ]);
+      }
     } catch (err) {
       notifyError('Poll creation failed');
       console.error(err);
@@ -125,82 +154,88 @@ export const PollEditorModal = ({
   return (
     <div className="PollEditorModal" ref={modalContainerRef}>
       <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
-      <CWModalBody>
-        <CWTextInput
-          label="Question"
-          placeholder="Do you support this proposal?"
-          value={prompt}
-          onInput={(e) => {
-            setPrompt(e.target.value);
-          }}
-        />
-        <div className="options-and-label-container">
-          <CWLabel label="Options" />
-          <div className="options-container">
-            {options.map((choice, index) => (
-              <CWTextInput
-                key={index}
-                placeholder={`${index + 1}.`}
-                value={choice}
-                onInput={(e) => handleInputChange(e.target.value, index)}
-              />
-            ))}
-          </div>
-          <div className="buttons-row">
+      {!isAIresponseCompleted ? (
+        <CWCircleMultiplySpinner />
+      ) : (
+        <>
+          <CWModalBody>
+            <CWTextInput
+              label="Question"
+              placeholder="Do you support this proposal?"
+              value={prompt}
+              onInput={(e) => {
+                setPrompt(e.target.value);
+              }}
+            />
+            <div className="options-and-label-container">
+              <CWLabel label="Options" />
+              <div className="options-container">
+                {options?.map((choice, index) => (
+                  <CWTextInput
+                    key={index}
+                    placeholder={`${index + 1}.`}
+                    value={choice}
+                    onInput={(e) => handleInputChange(e.target.value, index)}
+                  />
+                ))}
+              </div>
+              <div className="buttons-row">
+                <CWButton
+                  label="Remove choice"
+                  buttonType="destructive"
+                  buttonHeight="sm"
+                  disabled={options?.length <= 2}
+                  onClick={handleRemoveLastChoice}
+                />
+                <CWButton
+                  label="Add choice"
+                  buttonType="primary"
+                  buttonHeight="sm"
+                  disabled={options?.length >= 6}
+                  onClick={handleAddChoice}
+                />
+              </div>
+            </div>
+            <div className="duration-row">
+              <CWText type="caption" className="poll-duration-text">
+                {getPollDurationCopy(customDuration, customDurationEnabled)}
+              </CWText>
+              <div className="duration-row-actions">
+                <CWCheckbox
+                  label="Custom duration"
+                  checked={customDurationEnabled}
+                  onChange={handleCustomDurationChange}
+                  value=""
+                />
+                {customDurationEnabled && (
+                  <SelectList
+                    menuPortalTarget={modalContainerRef?.current}
+                    isSearchable={false}
+                    options={customDurationOptions}
+                    defaultValue={customDurationOptions[0]}
+                    // @ts-expect-error <StrictNullChecks/>
+                    onChange={({ value }) => setCustomDuration(value)}
+                  />
+                )}
+              </div>
+            </div>
+          </CWModalBody>
+          <CWModalFooter>
             <CWButton
-              label="Remove choice"
-              buttonType="destructive"
+              label="Cancel"
+              buttonType="secondary"
               buttonHeight="sm"
-              disabled={options.length <= 2}
-              onClick={handleRemoveLastChoice}
+              onClick={onModalClose}
             />
             <CWButton
-              label="Add choice"
+              label="Save changes"
               buttonType="primary"
               buttonHeight="sm"
-              disabled={options.length >= 6}
-              onClick={handleAddChoice}
+              onClick={() => void handleSavePoll()}
             />
-          </div>
-        </div>
-        <div className="duration-row">
-          <CWText type="caption" className="poll-duration-text">
-            {getPollDurationCopy(customDuration, customDurationEnabled)}
-          </CWText>
-          <div className="duration-row-actions">
-            <CWCheckbox
-              label="Custom duration"
-              checked={customDurationEnabled}
-              onChange={handleCustomDurationChange}
-              value=""
-            />
-            {customDurationEnabled && (
-              <SelectList
-                menuPortalTarget={modalContainerRef?.current}
-                isSearchable={false}
-                options={customDurationOptions}
-                defaultValue={customDurationOptions[0]}
-                // @ts-expect-error <StrictNullChecks/>
-                onChange={({ value }) => setCustomDuration(value)}
-              />
-            )}
-          </div>
-        </div>
-      </CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label="Cancel"
-          buttonType="secondary"
-          buttonHeight="sm"
-          onClick={onModalClose}
-        />
-        <CWButton
-          label="Save changes"
-          buttonType="primary"
-          buttonHeight="sm"
-          onClick={handleSavePoll}
-        />
-      </CWModalFooter>
+          </CWModalFooter>
+        </>
+      )}
     </div>
   );
 };

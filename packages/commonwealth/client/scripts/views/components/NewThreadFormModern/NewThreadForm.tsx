@@ -41,8 +41,12 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
+import Poll from 'client/scripts/models/Poll';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
+import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
+import { ExtendedPoll } from '../NewThreadFormLegacy/NewThreadForm';
 import DetailCard from '../proposals/DetailCard';
 import TimeLineCard from '../proposals/TimeLineCard';
 import VotingResultView from '../proposals/VotingResultView';
@@ -68,6 +72,8 @@ export const NewThreadForm = () => {
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+
+  const [pollsData, setPollData] = useState<ExtendedPoll[]>();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
@@ -102,6 +108,7 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
     canShowTopicPermissionBanner,
     setCanShowTopicPermissionBanner,
+    editorText,
   } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest =
@@ -351,6 +358,44 @@ export const NewThreadForm = () => {
         </div>
       ),
     },
+    ...((pollsData && pollsData?.length > 0) ||
+    !app.chain?.meta?.admin_only_polling ||
+    isAdmin
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(
+                    pollsData?.map((poll) => [poll?.id, poll]),
+                  ).values(),
+                ].map((poll: Poll) => {
+                  return (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      isTopicMembershipRestricted={isRestrictedMembership}
+                      showDeleteButton={true}
+                      isCreateThreadPage={true}
+                      setLocalPoll={setPollData}
+                    />
+                  );
+                })}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
+                  <ThreadPollEditorCard
+                    threadAlreadyHasPolling={!pollsData?.length}
+                    setLocalPoll={setPollData}
+                    isCreateThreadPage={true}
+                    threadTitle={threadTitle}
+                    threadContentDelta={editorText}
+                  />
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const proposalDetailSidebar = [

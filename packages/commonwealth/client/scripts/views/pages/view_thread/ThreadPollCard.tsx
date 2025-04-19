@@ -15,12 +15,16 @@ type ThreadPollCardProps = {
   poll: Poll;
   showDeleteButton?: boolean;
   isTopicMembershipRestricted?: boolean;
+  isCreateThreadPage?: boolean;
+  setLocalPoll?: (params) => void;
 };
 
 export const ThreadPollCard = ({
   poll,
   showDeleteButton,
   isTopicMembershipRestricted = false,
+  isCreateThreadPage = false,
+  setLocalPoll,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -104,7 +108,7 @@ export const ThreadPollCard = ({
     });
   };
 
-  const userVote = poll.getUserVote(
+  const userVote = poll?.getUserVote?.(
     user.activeAccount?.community?.id || '',
     user.activeAccount?.address || '',
   );
@@ -114,12 +118,16 @@ export const ThreadPollCard = ({
       <PollCard
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
+        disableVoteButton={
+          !user.activeAccount ||
+          isTopicMembershipRestricted ||
+          isCreateThreadPage
+        }
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+          poll?.endsAt && poll?.endsAt?.isBefore(moment().utc()),
         )}
         totalVoteCount={poll.votes?.length}
         voteInformation={poll.options.map((option) => {
@@ -144,8 +152,12 @@ export const ThreadPollCard = ({
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
-          //@typescript-eslint/no-misused-promises
-          handleDeletePoll().catch(console.error);
+          if (isCreateThreadPage && setLocalPoll) {
+            setLocalPoll([]);
+          } else {
+            //@typescript-eslint/no-misused-promises
+            handleDeletePoll().catch(console.error);
+          }
         }}
       />
       <CWModal
