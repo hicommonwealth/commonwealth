@@ -63,6 +63,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
       env.FLAG_PARTNERSHIP_WALLET,
     ),
+    'process.env.FLAG_USER_TRUST_LEVEL': JSON.stringify(
+      env.FLAG_USER_TRUST_LEVEL,
+    ),
   };
 
   const config = {
