@@ -26,12 +26,17 @@ abstract class ContractBase {
   async initialize(
     withWallet: boolean = false,
     chainId?: string,
+    providerInstance?: any,
   ): Promise<void> {
-    if (!this.initialized || withWallet) {
+    if (!this.initialized || withWallet || providerInstance) {
       try {
         this.chainId = chainId || '1';
         let provider = this.rpc;
-        if (withWallet) {
+
+        if (providerInstance) {
+          provider = providerInstance;
+          this.walletEnabled = true;
+        } else if (withWallet) {
           this.wallet = WebWalletController.Instance.availableWallets(
             ChainBase.Ethereum,
           )[0];
@@ -39,7 +44,6 @@ abstract class ContractBase {
           if (!this.wallet.api) {
             await this.wallet.enable(chainId);
           }
-          // @ts-expect-error StrictNullChecks
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;

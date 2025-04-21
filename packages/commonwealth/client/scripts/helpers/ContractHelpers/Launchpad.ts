@@ -29,8 +29,9 @@ class LaunchpadBondingCurve extends ContractBase {
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    providerInstance?: any,
   ): Promise<void> {
-    await super.initialize(withWallet, chainId);
+    await super.initialize(withWallet, chainId, providerInstance);
     this.launchpadFactory = new this.web3.eth.Contract(
       LaunchpadAbi,
       this.launchpadFactoryAddress,
@@ -65,9 +66,7 @@ class LaunchpadBondingCurve extends ContractBase {
   }
 
   async buyToken(amountEth: number, walletAddress: string, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
-    }
+    this.isInitialized();
 
     const txReceipt = await cp.buyToken(
       this.contract,
@@ -79,9 +78,8 @@ class LaunchpadBondingCurve extends ContractBase {
   }
 
   async sellToken(amountSell: number, walletAddress: string, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
-    }
+    this.isInitialized();
+
     const tokenContract = new this.web3.eth.Contract(
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
@@ -110,8 +108,8 @@ class LaunchpadBondingCurve extends ContractBase {
   }
 
   async getAmountOut(amountIn: number, buy: boolean, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+    if (!this.initialized) {
+      await this.initialize(false, chainId);
     }
 
     const amountOut = await cp.getPrice(
