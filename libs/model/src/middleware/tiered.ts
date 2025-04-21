@@ -4,7 +4,6 @@ import {
   Context,
   InvalidActor,
 } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
 import {
   hasTierRateLimits,
   USER_TIERS,
@@ -13,6 +12,7 @@ import {
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
+import { config } from '../config';
 import { models } from '../database';
 
 function builtKey(user_id: number, counter: 'creates' | 'upvotes') {

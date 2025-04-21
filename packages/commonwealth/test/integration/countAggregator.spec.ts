@@ -1,6 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, dispose } from '@hicommonwealth/core';
-import { tester, type DB } from '@hicommonwealth/model';
+import { type DB, tester } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -78,10 +78,11 @@ describe('Count Aggregator Tests', () => {
         '1',
         'true',
       );
-      await cache().setKey(
-        CacheNamespaces.Thread_View_Count,
+      await cache().incrementHashKey(
+        CacheNamespaces.CountAggregator,
+        'thread_view_counts',
         thread!.id!.toString(),
-        '5',
+        5,
       );
       await countAggregator(); // calling count aggregtor here
       const community = await models.Community.findOne({
