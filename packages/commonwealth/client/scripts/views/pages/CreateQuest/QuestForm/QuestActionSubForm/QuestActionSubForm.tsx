@@ -519,7 +519,7 @@ const QuestActionSubForm = ({
               key={`eventSignature-${defaultValues?.action}`}
               name="eventSignature"
               label="Event Signature"
-              placeholder="0xd2b4b1d70d7f76d55b524ea788ab85e9ab2d01d99ebbeedfb0b69ab0735bc5c9"
+              placeholder="event Transfer(address indexed from, address indexed to, uint256 value)"
               {...(defaultValues?.eventSignature && {
                 value: defaultValues?.eventSignature,
               })}
