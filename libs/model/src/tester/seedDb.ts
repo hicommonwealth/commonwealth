@@ -144,6 +144,7 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: testnetNode.id!,
+          namespace_verified: false,
         },
         {
           id: 'yearn',
@@ -157,6 +158,7 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
+          namespace_verified: false,
         },
         {
           id: 'sushi',
@@ -171,6 +173,7 @@ export const seedDb = async () => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
+          namespace_verified: false,
         },
         {
           id: 'edgeware',
@@ -185,6 +188,7 @@ export const seedDb = async () => {
           base: ChainBase.Substrate,
           ss58_prefix: 7,
           chain_node_id: edgewareNode.id!,
+          namespace_verified: false,
         },
         {
           id: 'ethereum',
@@ -199,6 +203,7 @@ export const seedDb = async () => {
           type: ChainType.Chain,
           base: ChainBase.Ethereum,
           chain_node_id: mainnetNode.id!,
+          namespace_verified: false,
         },
         {
           id: 'osmosis',
@@ -213,6 +218,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: osmosisNode.id!,
           bech32_prefix: 'osmo',
+          namespace_verified: false,
         },
         {
           id: 'csdk-beta',
@@ -227,6 +233,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkBetaNode.id!,
           bech32_prefix: 'cosmos',
+          namespace_verified: false,
         },
         {
           id: 'csdk',
@@ -241,6 +248,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkV1Node.id!,
           bech32_prefix: 'cosmos',
+          namespace_verified: false,
         },
         {
           id: 'common-protocol',
@@ -257,6 +265,7 @@ export const seedDb = async () => {
           chain_node_id: 1263,
           namespace: 'IanSpace',
           namespace_address: ZERO_ADDRESS,
+          namespace_verified: false,
         },
         {
           id: 'csdk-beta-local',
@@ -271,6 +280,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkBetaLocalNode.id!,
           bech32_prefix: 'cosmos',
+          namespace_verified: false,
         },
         {
           id: 'csdk-v1-local',
@@ -285,6 +295,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: csdkV1LocalNode.id!,
           bech32_prefix: 'cosmos',
+          namespace_verified: false,
         },
         {
           id: 'evmos-dev-local',
@@ -299,6 +310,7 @@ export const seedDb = async () => {
           base: ChainBase.CosmosSDK,
           chain_node_id: ethermintLocalNode.id!,
           bech32_prefix: 'cosmos',
+          namespace_verified: false,
         },
       ].map((x) => ({
         ...x,
@@ -310,6 +322,7 @@ export const seedDb = async () => {
         has_homepage: 'false' as any,
         collapsed_on_homepage: false,
         directory_page_enabled: false,
+        namespace_verified: false,
       })),
     );
 

@@ -7,8 +7,10 @@ import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
+  getTotalRepititionCountsForQuestAction,
 } from 'helpers/quest';
 import React from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -17,13 +19,12 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
-import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
 import './QuestActionCard.scss';
 import { actionCopies } from './helpers';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
+  onActionStart: (action: z.infer<typeof QuestActionMeta>) => void;
   actionNumber: number;
   questAction: z.infer<typeof QuestActionMeta>;
   isActionInEligible?: boolean;
@@ -31,6 +32,8 @@ type QuestActionCardProps = {
   inEligibilityReason?: string;
   canStartAction?: boolean;
   actionStartBlockedReason?: string;
+  questStartDate: Date;
+  questEndDate: Date;
 };
 
 const QuestActionCard = ({
@@ -43,7 +46,10 @@ const QuestActionCard = ({
   canStartAction,
   inEligibilityReason,
   questAction,
+  questStartDate,
+  questEndDate,
 }: QuestActionCardProps) => {
+  console.log('questAction => ', questAction);
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
       questAction.creator_reward_weight * 100,
@@ -62,8 +68,12 @@ const QuestActionCard = ({
   const questRepeatitionCycle = questAction?.participation_period;
   const questParticipationLimitPerCycle =
     questAction?.participation_times_per_period || 0;
-  const attemptsLeft =
-    questParticipationLimitPerCycle - (xpLogsForActions || []).length;
+  const totalActionRepititions = getTotalRepititionCountsForQuestAction(
+    questStartDate,
+    questEndDate,
+    questAction,
+  ).totalRepititions;
+  const attemptsLeft = totalActionRepititions - (xpLogsForActions || []).length;
 
   return (
     <div className="QuestActionCard">
@@ -94,13 +104,23 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
-            {(questAction.event_name === 'TweetEngagement' ||
-              questAction.event_name === 'CommonDiscordServerJoined') && (
+            {[
+              'TweetEngagement',
+              'DiscordServerJoined',
+              'CommunityCreated',
+            ].includes(questAction.event_name) && (
               <>
-                <CWDivider />
-                <CWText type="caption" fontWeight="semiBold">
-                  {actionCopies.pre_reqs[questAction.event_name]()}
-                </CWText>
+                {questAction.event_name === 'CommunityCreated' &&
+                !questAction.content_id ? (
+                  <></>
+                ) : (
+                  <CWDivider />
+                )}
+                {actionCopies.pre_reqs[questAction.event_name]() && (
+                  <CWText type="caption" fontWeight="semiBold">
+                    {actionCopies.pre_reqs[questAction.event_name]()}
+                  </CWText>
+                )}
                 {questAction.event_name === 'TweetEngagement' && (
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
@@ -110,6 +130,18 @@ const QuestActionCard = ({
                     )}
                   </CWText>
                 )}
+                {questAction.event_name === 'CommunityCreated' &&
+                  questAction.content_id && (
+                    <CWText type="caption">
+                      {actionCopies.explainer[questAction.event_name](
+                        fetchCachedNodes()?.find?.(
+                          (node) =>
+                            `${questAction.content_id?.split(`:`)?.at(-1)}` ===
+                            `${node.id}`,
+                        )?.name,
+                      )}
+                    </CWText>
+                  )}
               </>
             )}
             {!hideShareSplit &&
@@ -133,7 +165,7 @@ const QuestActionCard = ({
               />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
-                attemptsLeft !== questParticipationLimitPerCycle && (
+                attemptsLeft !== totalActionRepititions && (
                   <CWTag
                     type="group"
                     label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
@@ -174,12 +206,7 @@ const QuestActionCard = ({
                   buttonHeight="sm"
                   buttonWidth="narrow"
                   iconRight="arrowRightPhosphor"
-                  onClick={() =>
-                    onActionStart(
-                      questAction.event_name,
-                      questAction?.content_id || undefined,
-                    )
-                  }
+                  onClick={() => onActionStart(questAction)}
                   disabled={!canStartAction}
                 />,
                 actionStartBlockedReason || '',

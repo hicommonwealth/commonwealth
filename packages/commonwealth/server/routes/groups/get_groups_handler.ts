@@ -1,6 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
 import z from 'zod';
-import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
+import {
+  GetGroupsOptions,
+  GetGroupsResult,
+} from '../../controllers/server_groups_methods/get_groups';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
@@ -14,10 +17,11 @@ export const getGroupsHandler = async (
   req: TypedRequestQuery<GetGroupsQueryQuery>,
   res: TypedResponse<GetGroupsResponse>,
 ) => {
-  const { community } = req;
-
   const schema = z.object({
     query: z.object({
+      // either group/community id is required
+      community_id: z.string().optional(),
+      group_id: z.coerce.number().optional(),
       address_id: z.coerce.number().optional(),
       include_members: z.coerce.boolean().optional(),
       include_topics: z.coerce.boolean().optional(),
@@ -28,14 +32,17 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { include_members, include_topics },
+    query: { include_members, include_topics, group_id, community_id },
   } = validationResult.data;
+  if (!group_id && !community_id) {
+    throw new AppError(JSON.stringify(validationResult.error));
+  }
 
   const result = await controllers.groups.getGroups({
-    // @ts-expect-error StrictNullChecks
-    communityId: community.id,
+    communityId: community_id,
+    groupId: group_id,
     includeMembers: include_members,
     includeTopics: include_topics,
-  });
+  } as GetGroupsOptions);
   return success(res, result);
 };

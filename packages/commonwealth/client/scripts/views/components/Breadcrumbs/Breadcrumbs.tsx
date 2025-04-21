@@ -46,6 +46,7 @@ export const Breadcrumbs = () => {
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
   const communityId = app.activeChainId() || '';
+
   const { data: linkedThreads } = useGetThreadsByIdQuery({
     community_id: communityId,
     thread_ids: getThreadId ? [Number(getThreadId[1])] : [],
@@ -58,8 +59,12 @@ export const Breadcrumbs = () => {
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title || '',
     currentTopic: linkedThreads?.[0]?.topic?.name || '',
-    topicURL:
-      `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
+    topicURL: communityId
+      ? `/${communityId}/discussions/${encodeURI(
+          linkedThreads?.[0]?.topic?.name || '',
+        )}`
+      : `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` ||
+        '',
   };
 
   let standalone = false;
@@ -84,6 +89,7 @@ export const Breadcrumbs = () => {
   }
 
   const user = userData.addresses?.[0];
+
   const pathnames = generateBreadcrumbs(
     location.pathname,
     navigate,

@@ -1,4 +1,3 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
@@ -12,7 +11,7 @@ import { UseCommonTradeTokenFormProps } from './types';
 import useBuyTrade from './useBuyTrade';
 import useSellTrade from './useSellTrade';
 
-const COMMON_PLATFORM_FEE_PERCENTAGE = 5; // make configurable when needed
+const COMMON_PLATFORM_FEE_PERCENTAGE = 1; // make configurable when needed
 
 const useCommonTradeTokenForm = ({
   tradeConfig,
@@ -39,8 +38,8 @@ const useCommonTradeTokenForm = ({
   // base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
-  ) as NodeInfo; // this is expected to exist
+    (n) => n.ethChainId === parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
+  ) as NodeInfo;
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({

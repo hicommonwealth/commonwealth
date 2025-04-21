@@ -7,6 +7,7 @@ import {
   CreateUnverifiedUser,
   DiscordBotPolicy,
   FarcasterWorker,
+  LaunchpadPolicy,
   NotificationsPolicy,
   TwitterEngagementPolicy,
   User,
@@ -22,6 +23,7 @@ export const rascalConsumerMap = [
   CreateUnverifiedUser,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
+  LaunchpadPolicy,
   {
     consumer: ContestWorker,
     overrides: {

@@ -19,18 +19,23 @@ export const CreateQuest = {
   context: AuthContext,
 };
 
-export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true }).extend({
-  tweet_engagement_caps: z
-    .object({
-      likes: z.number().gte(0).max(100),
-      retweets: z.number().gte(0).max(100),
-      replies: z.number().gte(0).max(100),
-    })
-    .optional()
-    .refine(
-      (data) => !(data && !data.likes && !data.retweets && !data.replies),
-    ),
-});
+export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true })
+  .extend({
+    tweet_engagement_caps: z
+      .object({
+        likes: z.number().gte(0).max(100),
+        retweets: z.number().gte(0).max(100),
+        replies: z.number().gte(0).max(100),
+      })
+      .optional()
+      .refine(
+        (data) => !(data && !data.likes && !data.retweets && !data.replies),
+      ),
+  })
+  .refine(
+    (data) =>
+      !(data.content_id?.includes('discord_server_id') && !data.start_link),
+  );
 
 export const UpdateQuest = {
   input: z.object({

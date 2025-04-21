@@ -220,7 +220,8 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  CommonDiscordServerJoined: z.object({
+  DiscordServerJoined: z.object({
+    server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
     joined_date: z.coerce.date(),
@@ -542,6 +543,13 @@ export const events = {
         rejected: z.boolean().optional(),
       })
       .array(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityDirectoryTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
     created_at: z.coerce.date(),
   }),
 } as const;

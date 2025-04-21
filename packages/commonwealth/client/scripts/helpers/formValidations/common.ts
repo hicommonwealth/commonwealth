@@ -111,3 +111,11 @@ export const numberNonDecimalGTZeroValidationSchema =
     },
     { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
   );
+
+export const stringHasNumbersOnlyValidationSchema = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => /^\d+$/.test(`${value}`), // checks for digits only
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
+  );
