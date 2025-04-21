@@ -42,7 +42,7 @@ const TreandingToken = ({
         <div className="token-data">
           <img src={iconURL} className="image" alt={name} />
           <div className="info">
-            <CWText fontWeight="semiBold">{smartTrim(name, 17)}</CWText>
+            <CWText fontWeight="semiBold">{smartTrim(name, 12)}</CWText>
             <div className="detail">
               <CWText className="creator" type="caption">
                 by
