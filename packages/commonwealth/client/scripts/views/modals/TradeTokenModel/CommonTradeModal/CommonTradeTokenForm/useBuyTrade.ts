@@ -134,6 +134,24 @@ const useBuyTrade = ({
         transaction_hash: txReceipt.transactionHash,
       });
 
+      try {
+        // @ts-expect-error StrictNullChecks
+        await (window as any).ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: tradeConfig.token.token_address,
+              symbol: tradeConfig.token.symbol?.substring(0, 11),
+              decimals: 18,
+              image: tradeConfig.token.icon_url || '',
+            },
+          },
+        });
+      } catch (error) {
+        console.log('Failed to watch asset in MM, watch manually', error);
+      }
+
       // join user's selected address to community
       const isMemberOfCommunity = user.addresses.find(
         (x) => x.community.id === tokenCommunity.id,
