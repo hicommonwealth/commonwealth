@@ -10,6 +10,7 @@ import {
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
+import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -33,6 +34,8 @@ import {
   typeToIcon,
 } from './utils';
 
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+
 const RewardsPage = () => {
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
@@ -54,25 +57,22 @@ const RewardsPage = () => {
     distributedTokenAddress: ZERO_ADDRESS,
   });
 
-  // Fetch launchpad trades data using infinite query
-  const {
-    data: launchpadTradesData,
-    isLoading: isLaunchpadTradesLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useGetLaunchpadTradesQuery(
-    { token_address: ZERO_ADDRESS },
-    {
-      enabled: tableTab === TableType.TokenTXHistory, // Only fetch when tab is active
-    },
-  );
+  // Fetch launchpad trades data using the original query hook
+  const { data: launchpadTradesData, isLoading: isLaunchpadTradesLoading } =
+    useGetLaunchpadTradesQuery(
+      { token_address: ZERO_ADDRESS },
+      {
+        enabled: tableTab === TableType.TokenTXHistory,
+      },
+    );
 
-  // Flatten pages into a single list of trades
-  const launchpadTrades = useMemo(() => {
-    // useQuery returns the data directly, or undefined while loading.
-    // Default to an empty array if data is not yet available.
-    return launchpadTradesData ?? [];
+  // Handle hook return type (can be {}, undefined, or actual data)
+  const launchpadTrades: GetLaunchpadTradesOutput | undefined = useMemo(() => {
+    // Check if data is an array before returning
+    if (Array.isArray(launchpadTradesData)) {
+      return launchpadTradesData;
+    }
+    return undefined; // Return undefined if data is {}, null, or undefined
   }, [launchpadTradesData]);
 
   const trendValue = calculateReferralTrend(referralFees || []);
@@ -157,9 +157,6 @@ const RewardsPage = () => {
           <TokenTXHistoryTable
             trades={launchpadTrades}
             isLoading={isLaunchpadTradesLoading}
-            isFetchingNextPage={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            fetchNextPage={fetchNextPage}
           />
         )}
         {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}

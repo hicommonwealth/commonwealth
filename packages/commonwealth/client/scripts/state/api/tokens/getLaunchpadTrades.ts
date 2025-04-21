@@ -20,4 +20,3 @@ export type GetLaunchpadTradesInput =
   typeof schemas.GetLaunchpadTrades.input._type;
 // Note: The output type was already defined and imported from 'types/api' in other files.
 // We might need to reconcile this later if 'types/api' is not the canonical source.
-// export type GetLaunchpadTradesOutput = typeof schemas.GetLaunchpadTrades.output._type;
