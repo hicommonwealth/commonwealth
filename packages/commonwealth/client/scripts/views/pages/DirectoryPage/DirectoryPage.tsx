@@ -303,7 +303,7 @@ const DirectoryPage = () => {
         return refetchTagsAndCommunities();
       })
       .then(() => {
-        notifySuccess('Directory Settings updated successfully');
+        notifySuccess('Directory Settings updated successfully!');
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
           isPWA: isAddedToHomeScreen,
