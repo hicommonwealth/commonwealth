@@ -29,8 +29,8 @@ const TOKEN_AI_PROMPTS_CONFIG = {
       or emojis. Restrict your answer to between 3 and 6 characters.`,
   description: `
       Provide a description for the token. Make it funny and keep it in the vein of ironic, sardonic, twitter personae.
-      There are no emoji restrictions. Keep the description to 2 sentences. DO NOT BE OVERLY POSITIVE about global 
-      phenomenon, only the asset itself. Restrict your answer to between 1 or 2 sentences and less than 180 characters.
+      There are no emoji restrictions. You don't have to say 'introducing' or 'new token'. Keep the description to 1 sentence. DO NOT BE OVERLY POSITIVE about global 
+      phenomenon, only the asset itself. Restrict your answer to between 1 sentences and less than 180 characters.
     `,
   image: (name: string, symbol: string) => `
       Please create an image for a web3 token called "${name}" with symbol "${symbol}". 
