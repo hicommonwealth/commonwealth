@@ -4,12 +4,10 @@ import { z } from 'zod';
 export const calculateTokenPricing = (
   token: z.infer<typeof TokenView>,
   ethToUsdRate: number,
-  tokensPerWei?: number,
+  ethPerToken?: number,
 ) => {
   let currentRate = (token.latest_price || 0) * ethToUsdRate;
-  if (tokensPerWei && currentRate !== 0) {
-    const weiPerToken = 1 / (tokensPerWei || 1);
-    const ethPerToken = Number(weiPerToken) / 1e18;
+  if (ethPerToken && currentRate !== 0) {
     currentRate = ethPerToken * ethToUsdRate;
   }
   const price24HrAgo = (token.old_price || 0) * ethToUsdRate;

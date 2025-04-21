@@ -44,7 +44,9 @@ export const resetBalancesCache = async (
     predicate: (query) => {
       const [key] = query.queryKey;
       return (
-        typeof key === 'string' && key.startsWith('TOKEN_ETH_EXCHANGE_RATE')
+        typeof key === 'string' &&
+        (key.startsWith('TOKEN_ETH_EXCHANGE_RATE') ||
+          key.startsWith('ETH_PER_TOKEN'))
       );
     },
   });

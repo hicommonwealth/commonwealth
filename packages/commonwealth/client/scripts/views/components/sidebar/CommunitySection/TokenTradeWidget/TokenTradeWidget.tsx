@@ -8,7 +8,7 @@ import NodeInfo from 'models/NodeInfo';
 import React, { useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
-import { useTokenEthExchangeRateQuery } from 'state/api/launchPad';
+import { useEthPerTokenQuery } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -55,11 +55,9 @@ export const TokenTradeWidget = ({
     (n) => n.id === tokenCommunity?.chain_node_id,
   ) as NodeInfo;
 
-  const { data: tokensPerWei = 0 } = useTokenEthExchangeRateQuery({
-    chainRpc: communityNode?.url,
+  const { data: ethPerToken = 0 } = useEthPerTokenQuery({
     ethChainId: communityNode?.ethChainId || 1,
-    mode: 'buy',
-    tokenAmount: 1,
+    chainRpc: communityNode?.url,
     tokenAddress: (communityToken as LaunchpadToken)?.token_address,
     enabled:
       !!tokenCommunity && !!(communityToken as LaunchpadToken)?.token_address,
@@ -85,7 +83,7 @@ export const TokenTradeWidget = ({
       ? calculateTokenPricing(
           communityToken as z.infer<typeof TokenView>,
           ethToUsdRate,
-          tokensPerWei,
+          ethPerToken,
         )
       : null;
 
