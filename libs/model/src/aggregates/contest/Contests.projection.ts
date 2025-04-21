@@ -16,6 +16,7 @@ import {
   buildContestLeaderboardUrl,
   buildFarcasterContestFrameUrl,
   getBaseUrl,
+  getDefaultContestImage,
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
@@ -78,11 +79,24 @@ async function createInitialContest(
     true,
   );
 
-  const { startTime, endTime } = await getContestStatus(
-    { rpc: url, eth_chain_id: ethChainId },
-    contest_address,
-    isOneOff,
-  );
+  const { startTime, endTime, prizeShare, voterShare, contestToken } =
+    await getContestStatus(
+      { rpc: url, eth_chain_id: ethChainId },
+      contest_address,
+      isOneOff,
+    );
+
+  // get general topic
+  const topic = await models.Topic.findOne({
+    where: {
+      community_id: community!.id,
+      name: 'General',
+    },
+  });
+  if (!topic) {
+    log.warn(`General topic not found for community ${community!.id}`);
+    return;
+  }
 
   await models.sequelize.transaction(async (transaction) => {
     if (isTokenGraduation) {
@@ -94,8 +108,14 @@ async function createInitialContest(
           decimals,
           community_id: community!.id,
           created_at: new Date(),
-          name: 'Token Graduation',
-          payout_structure: [100],
+          name: 'Top Posts of the Week',
+          description:
+            'Top content of the week gets rewarded by community owned pool',
+          image_url: getDefaultContestImage(),
+          prize_percentage: prizeShare,
+          payout_structure: [50, 30, 20], // TODO: get payout structure from contract?
+          topic_id: topic.id,
+          funding_token_address: contestToken,
           is_farcaster_contest: false,
           environment: config.APP_ENV,
         },
