@@ -34,6 +34,19 @@ describe('Count Aggregator Tests', () => {
 
   afterAll(async () => {
     await dispose()();
+    await cache().deleteNamespaceKeys(
+      CacheNamespaces.Community_Thread_Count_Changed,
+    );
+    await cache().deleteNamespaceKeys(
+      CacheNamespaces.Community_Profile_Count_Changed,
+    );
+    await cache().deleteNamespaceKeys(
+      CacheNamespaces.Thread_Reaction_Count_Changed,
+    );
+    await cache().deleteKey(
+      CacheNamespaces.CountAggregator,
+      'thread_view_counts',
+    );
   });
 
   describe('Tests the count aggregator', () => {

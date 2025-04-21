@@ -271,6 +271,8 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       decrementKey: () => Promise.resolve(0),
       getKeyTTL: () => Promise.resolve(0),
       setKeyTTL: () => Promise.resolve(false),
+      incrementHashKey: () => Promise.resolve(0),
+      getHash: () => Promise.resolve({}),
     }
   );
 });

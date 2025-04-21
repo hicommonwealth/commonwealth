@@ -456,6 +456,41 @@ export class RedisCache implements Cache {
     }
   }
 
+  public async incrementHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    increment: number = 1,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HINCRBY(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        increment,
+      );
+    } catch (e) {
+      this._log.error(
+        'An error occurred while incrementing hash key',
+        e as Error,
+      );
+    }
+    return 0;
+  }
+
+  public async getHash(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<Record<string, string>> {
+    if (!this.isReady()) return {};
+    try {
+      return this._client.HGETALL(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return {};
+  }
+
   public async flushAll(): Promise<void> {
     if (!this.isReady()) return;
     try {

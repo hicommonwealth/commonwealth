@@ -82,6 +82,7 @@ export enum CacheNamespaces {
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
+  CountAggregator = 'count_aggregator',
   Thread_View_Count = 'thread_view_count',
   Community_Thread_Count_Changed = 'community_thread_count_changed',
   Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
@@ -159,6 +160,18 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+
+  // Hash methods
+  incrementHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    increment?: number,
+  ): Promise<number>;
+  getHash(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<Record<string, string>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

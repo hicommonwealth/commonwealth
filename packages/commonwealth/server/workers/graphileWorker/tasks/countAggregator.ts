@@ -87,14 +87,14 @@ async function processLifetimeThreadCounts() {
 
   await models.sequelize.query(
     `
-        WITH lifetime_thread_count AS (SELECT community_id, COUNT(*) AS count
-            FROM "Threads"
-            WHERE "community_id" IN (:communityIds)
-            GROUP BY "community_id"
-        )
-        UPDATE "Communities"
-        SET lifetime_thread_count = lifetime_thread_count.count FROM lifetime_thread_count
-        WHERE "Communities".id = lifetime_thread_count.community_id;
+      WITH lifetime_thread_count AS (SELECT community_id, COUNT(*) AS count
+                                     FROM "Threads"
+                                     WHERE "community_id" IN (:communityIds)
+                                     GROUP BY "community_id")
+      UPDATE "Communities"
+      SET lifetime_thread_count = lifetime_thread_count.count
+      FROM lifetime_thread_count
+      WHERE "Communities".id = lifetime_thread_count.community_id;
     `,
     {
       replacements: { communityIds },
@@ -118,15 +118,15 @@ async function processProfileCounts() {
 
   await models.sequelize.query(
     `
-    UPDATE "Communities" C
-    SET profile_count = sub.count
-        FROM (
-            SELECT community_id, COUNT(*) AS count
+      UPDATE "Communities" C
+      SET profile_count = sub.count
+      FROM (SELECT community_id, COUNT(*) AS count
             FROM "Addresses"
-            WHERE user_id IS NOT NULL AND verified IS NOT NULL
-            GROUP BY community_id
-        ) AS sub
-    WHERE C.id = sub.community_id AND C.id IN (:communityIds);
+            WHERE user_id IS NOT NULL
+              AND verified IS NOT NULL
+            GROUP BY community_id) AS sub
+      WHERE C.id = sub.community_id
+        AND C.id IN (:communityIds);
     `,
     {
       replacements: { communityIds },
@@ -150,14 +150,14 @@ async function processReactionCounts() {
 
   await models.sequelize.query(
     `
-        WITH reaction_count AS (SELECT thread_id, COUNT(*) AS count
-            FROM "Reactions"
-            WHERE "thread_id" IN (:threadIds)
-            GROUP BY "thread_id"
-        )
-        UPDATE "Threads"
-        SET reaction_count = reaction_count.count FROM reaction_count
-        WHERE "Threads".id = reaction_count.thread_id;
+      WITH reaction_count AS (SELECT thread_id, COUNT(*) AS count
+                              FROM "Reactions"
+                              WHERE "thread_id" IN (:threadIds)
+                              GROUP BY "thread_id")
+      UPDATE "Threads"
+      SET reaction_count = reaction_count.count
+      FROM reaction_count
+      WHERE "Threads".id = reaction_count.thread_id;
     `,
     {
       replacements: { communityIds: threadIds },
@@ -174,49 +174,16 @@ async function processReactionCounts() {
 // 2. Updates DB
 // 3. Clears thread view count namespace
 async function processViewCounts() {
-  let cursor = 0;
-  const allKeys: string[] = [];
+  const threadIdHash = await cache().getHash(
+    CacheNamespaces.CountAggregator,
+    'thread_view_counts',
+  );
+  const threadIds = Object.keys(threadIdHash).join(', ');
 
-  do {
-    const result = (await cache().scan(
-      CacheNamespaces.Thread_View_Count,
-      cursor,
-      10000,
-    )) as {
-      cursor: number;
-      keys: string[];
-    };
-
-    if (!result) {
-      return;
-    }
-
-    cursor = result.cursor;
-    allKeys.push(...result.keys);
-  } while (cursor !== 0);
-
-  const namespaceLength = CacheNamespaces.Thread_View_Count.length;
-  const ids = allKeys?.map((key) => {
-    return key.substring(namespaceLength + 1);
-  });
-  if (!ids?.length) {
-    return;
-  }
-
-  const values = await cache().getKeys(CacheNamespaces.Thread_View_Count, ids);
-  const idToCount = Object.entries(values).map(([key, value]) => [
-    key.substring(namespaceLength + 1),
-    parseInt(value, 10),
-  ]);
-
-  // convert idToCount into a bulk update sql statement
-  if (idToCount.length > 0) {
-    const cases = idToCount
-      .map(([threadId, count]) => `WHEN ${threadId} THEN view_count + ${count}`)
+  if (threadIds.length > 0) {
+    const cases = Object.entries(threadIdHash)
+      .map(([threadId, count]) => `WHEN ${threadId} THEN ${count}`)
       .join(' ');
-
-    const threadIds = idToCount.map(([threadId]) => threadId).join(', ');
-
     const query = `
         UPDATE "Threads"
         SET view_count = CASE id
@@ -224,9 +191,10 @@ async function processViewCounts() {
         END
         WHERE id IN (${threadIds});
       `;
-
     await models.sequelize.query(query);
-
-    await cache().deleteNamespaceKeys(CacheNamespaces.Thread_View_Count);
+    await cache().deleteKey(
+      CacheNamespaces.CountAggregator,
+      'thread_view_counts',
+    );
   }
 }

@@ -121,8 +121,9 @@ export const trpcRouter = trpc.router({
         const ids = input.thread_ids.split(',').map((x) => parseInt(x, 10));
         await Promise.all(
           ids.map((t) =>
-            cache().incrementKey(
-              CacheNamespaces.Thread_View_Count,
+            cache().incrementHashKey(
+              CacheNamespaces.CountAggregator,
+              'thread_view_count',
               t.toString(),
             ),
           ),
