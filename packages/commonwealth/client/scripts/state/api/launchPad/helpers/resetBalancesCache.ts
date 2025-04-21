@@ -40,6 +40,14 @@ export const resetBalancesCache = async (
       tokenAmount: 1 * 1e18, // amount per unit
     }),
   });
+  await queryClient.invalidateQueries({
+    predicate: (query) => {
+      const [key] = query.queryKey;
+      return (
+        typeof key === 'string' && key.startsWith('TOKEN_ETH_EXCHANGE_RATE')
+      );
+    },
+  });
   void queryClient.invalidateQueries({
     predicate: (query) => {
       const [path] = query.queryKey;
