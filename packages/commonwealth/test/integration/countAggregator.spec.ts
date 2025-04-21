@@ -1,6 +1,11 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, dispose } from '@hicommonwealth/core';
-import { type DB, tester } from '@hicommonwealth/model';
+import {
+  CommunityInstance,
+  type DB,
+  tester,
+  ThreadInstance,
+} from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -10,13 +15,17 @@ chai.use(chaiHttp);
 
 describe('Count Aggregator Tests', () => {
   let models: DB;
+  let community: CommunityInstance;
+  let originalThreadCount: number;
+  let originalProfileCount: number;
+  let thread: ThreadInstance;
 
   beforeAll(async () => {
     cache({
       adapter: new RedisCache('redis://localhost:6379'),
     });
     models = await tester.seedDb();
-    await models.Thread.create({
+    thread = await models.Thread.create({
       community_id: 'ethereum',
       title: '',
       body: '',
@@ -26,52 +35,48 @@ describe('Count Aggregator Tests', () => {
       address_id: 1,
       view_count: 0,
     });
-    await cache().ready();
-    await cache().deleteNamespaceKeys(
-      CacheNamespaces.Community_Thread_Count_Changed,
+    community = (await models.Community.findOne({
+      where: {
+        id: 'ethereum',
+      },
+    }))!;
+    console.log(
+      `Start counts: thread = ${community.lifetime_thread_count}, profile = ${community.profile_count}`,
     );
+    originalThreadCount = community.lifetime_thread_count!;
+    originalProfileCount = community.profile_count!;
+    await cache().ready();
+    await cache().flushAll();
   });
 
   afterAll(async () => {
     await dispose()();
-    await cache().deleteNamespaceKeys(
-      CacheNamespaces.Community_Thread_Count_Changed,
-    );
-    await cache().deleteNamespaceKeys(
-      CacheNamespaces.Community_Profile_Count_Changed,
-    );
-    await cache().deleteNamespaceKeys(
-      CacheNamespaces.Thread_Reaction_Count_Changed,
-    );
-    await cache().deleteKey(
-      CacheNamespaces.CountAggregator,
-      'thread_view_counts',
-    );
+    await cache().flushAll();
   });
 
   describe('Tests the count aggregator', () => {
     test('it shouldnt do anything when redis is empty', async () => {
       await countAggregator();
-      const thread = await models.Thread.findOne({
-        where: { id: 1 },
-      });
-      expect(thread?.view_count).to.equal(0);
-      expect(thread?.reaction_count).to.equal(0);
+      expect(thread.view_count).to.equal(0);
+      expect(thread.reaction_count).to.equal(0);
     });
 
     test('it updates counts when redis updates', async () => {
-      let thread = await models.Thread.findOne({
-        where: { id: 1 },
+      const [user] = await tester.seed('User', {});
+      await tester.seed('Address', {
+        user_id: user!.id,
+        verified: new Date(),
+        community_id: 'ethereum',
       });
-      await cache().setKey(
-        CacheNamespaces.Community_Thread_Count_Changed,
+      await cache().addToSet(
+        CacheNamespaces.CountAggregator,
+        'community_thread_count_changed',
         'ethereum',
-        'true',
       );
-      await cache().setKey(
-        CacheNamespaces.Community_Profile_Count_Changed,
+      await cache().addToSet(
+        CacheNamespaces.CountAggregator,
+        'community_profile_count_changed',
         'ethereum',
-        'true',
       );
       await cache().setKey(
         CacheNamespaces.Thread_Reaction_Count_Changed,
@@ -84,20 +89,40 @@ describe('Count Aggregator Tests', () => {
         thread!.id!.toString(),
         5,
       );
-      await countAggregator(); // calling count aggregtor here
-      const community = await models.Community.findOne({
-        where: { id: 'ethereum' },
-      });
-
+      await cache().incrementHashKey(
+        CacheNamespaces.CountAggregator,
+        'thread_view_counts',
+        thread!.id!.toString(),
+        10,
+      );
+      await countAggregator();
+      await community.reload();
       await createReaction(models);
 
-      expect(community?.lifetime_thread_count).to.equal(1);
-      expect(community?.profile_count).to.equal(2); // these 2 come from seedDB
-      thread = await models.Thread.findOne({
-        where: { community_id: 'ethereum' },
-      });
-      expect(thread!.view_count).to.equal(5);
+      expect(community.lifetime_thread_count).to.equal(originalThreadCount + 1);
+      expect(community.profile_count).to.equal(originalProfileCount + 1);
+
+      await thread.reload();
+      expect(thread!.view_count).to.equal(15);
       expect(thread!.reaction_count).to.equal(1);
+
+      const profileChangedSet = await cache().getSet(
+        CacheNamespaces.CountAggregator,
+        'community_profile_count_changed',
+      );
+      expect(profileChangedSet.length).to.equal(0);
+
+      const threadChangedSet = await cache().getSet(
+        CacheNamespaces.CountAggregator,
+        'community_thread_count_changed',
+      );
+      expect(threadChangedSet.length).to.equal(0);
+
+      const viewCountsHash = await cache().getHash(
+        CacheNamespaces.CountAggregator,
+        'thread_view_counts',
+      );
+      expect(Object.keys(viewCountsHash).length).to.equal(0);
     });
   });
 });

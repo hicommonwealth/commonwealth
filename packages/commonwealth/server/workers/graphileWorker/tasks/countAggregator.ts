@@ -52,36 +52,13 @@ export async function countAggregator() {
   }
 }
 
-async function getUpdateSignal(namespace: CacheNamespaces) {
-  let cursor = 0;
-  const allKeys: string[] = [];
-  const namespaceLength = namespace.length;
-
-  do {
-    const result = (await cache().scan(namespace, cursor, 10000)) as {
-      cursor: number;
-      keys: string[];
-    };
-
-    if (!result) {
-      return;
-    }
-
-    cursor = result.cursor;
-    allKeys.push(...result.keys);
-  } while (cursor !== 0);
-
-  const ids = allKeys.map((key) => key.substring(namespaceLength + 1));
-
-  return ids;
-}
-
 async function processLifetimeThreadCounts() {
-  const communityIds = await getUpdateSignal(
-    CacheNamespaces.Community_Thread_Count_Changed,
+  const communityIds = await cache().getSet(
+    CacheNamespaces.CountAggregator,
+    'community_thread_count_changed',
   );
 
-  if (!communityIds?.length) {
+  if (!communityIds.length) {
     return;
   }
 
@@ -102,14 +79,16 @@ async function processLifetimeThreadCounts() {
     },
   );
 
-  await cache().deleteNamespaceKeys(
-    CacheNamespaces.Community_Thread_Count_Changed,
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    'community_thread_count_changed',
   );
 }
 
 async function processProfileCounts() {
-  const communityIds = await getUpdateSignal(
-    CacheNamespaces.Community_Profile_Count_Changed,
+  const communityIds = await cache().getSet(
+    CacheNamespaces.CountAggregator,
+    'community_profile_count_changed',
   );
 
   if (!communityIds?.length) {
@@ -134,14 +113,16 @@ async function processProfileCounts() {
     },
   );
 
-  await cache().deleteNamespaceKeys(
-    CacheNamespaces.Community_Profile_Count_Changed,
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    'community_profile_count_changed',
   );
 }
 
 async function processReactionCounts() {
-  const threadIds = await getUpdateSignal(
-    CacheNamespaces.Thread_Reaction_Count_Changed,
+  const threadIds = await cache().getSet(
+    CacheNamespaces.CountAggregator,
+    'thread_reaction_count_changed',
   );
 
   if (!threadIds?.length) {
@@ -170,9 +151,6 @@ async function processReactionCounts() {
   );
 }
 
-// 1. Creates mapping of thread_id -> redis count
-// 2. Updates DB
-// 3. Clears thread view count namespace
 async function processViewCounts() {
   const threadIdHash = await cache().getHash(
     CacheNamespaces.CountAggregator,
@@ -182,15 +160,15 @@ async function processViewCounts() {
 
   if (threadIds.length > 0) {
     const cases = Object.entries(threadIdHash)
-      .map(([threadId, count]) => `WHEN ${threadId} THEN ${count}`)
+      .map(([threadId, count]) => `WHEN ${threadId} THEN view_count + ${count}`)
       .join(' ');
     const query = `
-        UPDATE "Threads"
-        SET view_count = CASE id
-          ${cases}
+      UPDATE "Threads"
+      SET view_count = CASE id
+        ${cases}
         END
-        WHERE id IN (${threadIds});
-      `;
+      WHERE id IN (${threadIds});
+    `;
     await models.sequelize.query(query);
     await cache().deleteKey(
       CacheNamespaces.CountAggregator,

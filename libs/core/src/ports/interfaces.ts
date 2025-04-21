@@ -83,8 +83,6 @@ export enum CacheNamespaces {
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
   CountAggregator = 'count_aggregator',
-  Thread_View_Count = 'thread_view_count',
-  Community_Thread_Count_Changed = 'community_thread_count_changed',
   Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
   Community_Profile_Count_Changed = 'community_profile_count_changed',
   Tiered_Counter = 'tiered_counter',
@@ -172,6 +170,20 @@ export interface Cache extends Disposable {
     namespace: CacheNamespaces,
     key: string,
   ): Promise<Record<string, string>>;
+  setHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    value: string,
+  ): Promise<number>;
+
+  // Set methods
+  addToSet(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+  ): Promise<number>;
+  getSet(namespace: CacheNamespaces, key: string): Promise<string[]>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

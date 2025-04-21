@@ -491,6 +491,55 @@ export class RedisCache implements Cache {
     return {};
   }
 
+  public async setHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HSET(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return 0;
+  }
+
+  public async addToSet(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.SADD(
+        RedisCache.getNamespaceKey(namespace, key),
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while adding item to set', e as Error);
+    }
+    return 0;
+  }
+
+  public async getSet(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      return this._client.SMEMBERS(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting set', e as Error);
+    }
+    return [];
+  }
+
   public async flushAll(): Promise<void> {
     if (!this.isReady()) return;
     try {

@@ -3,7 +3,12 @@ import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
-import { updateRankOnThreadIneligibility } from './ranking';
+import {
+  createThreadRank,
+  decrementThreadRank,
+  incrementThreadRank,
+  updateRankOnThreadIneligibility,
+} from './ranking';
 
 const log = logger(import.meta);
 
@@ -16,7 +21,7 @@ export const trpcRouter = trpc.router({
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
     trpc.fireAndForget(async (_, output) => {
-      await middleware.createThreadRank(output);
+      await createThreadRank(output);
     }),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
@@ -57,14 +62,11 @@ export const trpcRouter = trpc.router({
       }),
       trpc.fireAndForget(
         async (_, { community_id, thread_id, user_tier_at_creation }) => {
-          await middleware.incrementThreadRank(
-            config.HEURISTIC_WEIGHTS.LIKE_WEIGHT,
-            {
-              community_id,
-              thread_id,
-              user_tier_at_creation: user_tier_at_creation || 1,
-            },
-          );
+          await incrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
+            community_id,
+            thread_id,
+            user_tier_at_creation: user_tier_at_creation || 1,
+          });
         },
       ),
       trpc.trackAnalytics([
@@ -84,7 +86,7 @@ export const trpcRouter = trpc.router({
       );
     }),
     trpc.fireAndForget(async (_, output) => {
-      await middleware.updateRankOnThreadIneligibility(output);
+      await updateRankOnThreadIneligibility(output);
     }),
   ]),
   deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [
@@ -98,14 +100,11 @@ export const trpcRouter = trpc.router({
           where: { id: thread_id },
         });
         if (thread) {
-          await middleware.decrementThreadRank(
-            config.HEURISTIC_WEIGHTS.LIKE_WEIGHT,
-            {
-              thread_id,
-              community_id: thread.community_id,
-              user_tier_at_creation: user_tier_at_creation || 1,
-            },
-          );
+          await decrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
+            thread_id,
+            community_id: thread.community_id,
+            user_tier_at_creation: user_tier_at_creation || 1,
+          });
         }
       }
     }),

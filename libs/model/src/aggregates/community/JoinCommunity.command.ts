@@ -114,10 +114,10 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await cache().setKey(
-            CacheNamespaces.Community_Profile_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            'community_profile_count_changed',
             community_id,
-            'true',
           );
 
           await emitEvent(

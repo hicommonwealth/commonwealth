@@ -139,10 +139,10 @@ export default (
         ) => {
           const { Outbox, Address } = sequelize.models;
 
-          await cache().setKey(
-            CacheNamespaces.Community_Thread_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            'community_thread_count_changed',
             thread.community_id,
-            'true',
           );
 
           const { topic_id, community_id } = thread.get({
@@ -172,10 +172,10 @@ export default (
           );
         },
         afterDestroy: async (thread: ThreadInstance) => {
-          await cache().setKey(
-            CacheNamespaces.Community_Thread_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            'community_thread_count_changed',
             thread.community_id,
-            'true',
           );
         },
       },

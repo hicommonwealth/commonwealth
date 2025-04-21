@@ -271,8 +271,15 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       decrementKey: () => Promise.resolve(0),
       getKeyTTL: () => Promise.resolve(0),
       setKeyTTL: () => Promise.resolve(false),
+
+      // hash
       incrementHashKey: () => Promise.resolve(0),
       getHash: () => Promise.resolve({}),
+      setHashKey: () => Promise.resolve(0),
+
+      // set
+      addToSet: () => Promise.resolve(0),
+      getSet: () => Promise.resolve([]),
     }
   );
 });
