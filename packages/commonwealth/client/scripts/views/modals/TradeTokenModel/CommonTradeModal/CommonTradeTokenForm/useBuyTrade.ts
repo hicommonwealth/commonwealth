@@ -134,7 +134,9 @@ const useBuyTrade = ({
         transaction_hash: txReceipt.transactionHash,
       });
 
+      // Restore local wallet_watchAsset logic
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (window as any).ethereum.request({
           method: 'wallet_watchAsset',
           params: {
