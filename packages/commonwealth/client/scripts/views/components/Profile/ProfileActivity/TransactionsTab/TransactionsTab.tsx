@@ -166,9 +166,6 @@ const TransactionsTab = ({
     );
   }, [transformedPrefetchedData, filterOptions.searchText]);
 
-  const isLoading =
-    isPrefetchedLoading || (tokenAddresses.length > 0 && isLoadingMetadata);
-
   const dataToDisplay = locallyFilteredData || hookData;
 
   return (
