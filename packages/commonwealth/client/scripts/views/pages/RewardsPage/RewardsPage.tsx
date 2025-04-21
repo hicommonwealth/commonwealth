@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
+import { useGetLaunchpadTradesQuery } from 'state/api/tokens';
 import {
   useGetUserReferralFeesQuery,
   useGetUserReferralsQuery,
@@ -52,6 +53,27 @@ const RewardsPage = () => {
     apiCallEnabled: !!user?.id,
     distributedTokenAddress: ZERO_ADDRESS,
   });
+
+  // Fetch launchpad trades data using infinite query
+  const {
+    data: launchpadTradesData,
+    isLoading: isLaunchpadTradesLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetLaunchpadTradesQuery(
+    { token_address: ZERO_ADDRESS },
+    {
+      enabled: tableTab === TableType.TokenTXHistory, // Only fetch when tab is active
+    },
+  );
+
+  // Flatten pages into a single list of trades
+  const launchpadTrades = useMemo(() => {
+    // useQuery returns the data directly, or undefined while loading.
+    // Default to an empty array if data is not yet available.
+    return launchpadTradesData ?? [];
+  }, [launchpadTradesData]);
 
   const trendValue = calculateReferralTrend(referralFees || []);
   const totalEarnings = calculateTotalEarnings(referralFees || []);
@@ -131,7 +153,15 @@ const RewardsPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {tableTab === TableType.TokenTXHistory && <TokenTXHistoryTable />}
+        {tableTab === TableType.TokenTXHistory && (
+          <TokenTXHistoryTable
+            trades={launchpadTrades}
+            isLoading={isLaunchpadTradesLoading}
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+          />
+        )}
         {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
     </CWPageLayout>

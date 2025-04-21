@@ -135,7 +135,6 @@ const useBuyTrade = ({
       });
 
       try {
-        // @ts-expect-error StrictNullChecks
         await (window as any).ethereum.request({
           method: 'wallet_watchAsset',
           params: {

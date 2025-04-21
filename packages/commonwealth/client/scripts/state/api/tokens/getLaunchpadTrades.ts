@@ -7,10 +7,12 @@ export const useGetLaunchpadTradesQuery = (
   // Input type from the Zod schema
   input: typeof schemas.GetLaunchpadTrades.input._type,
   // Options like `enabled`, `staleTime`, etc., passed to react-query
-  options?: Parameters<typeof trpc.token.getLaunchpadTrades.useQuery>[1],
+  options?: Parameters<
+    typeof trpc.launchpadToken.getLaunchpadTrades.useQuery
+  >[1],
 ) => {
   // Call the TRPC hook
-  return trpc.token.getLaunchpadTrades.useQuery(input, options);
+  return trpc.launchpadToken.getLaunchpadTrades.useQuery(input, options);
 };
 
 // Export the inferred input/output types for convenience elsewhere
