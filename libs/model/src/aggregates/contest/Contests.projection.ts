@@ -6,10 +6,13 @@ import {
   getContestScore,
   getContestStatus,
   getTokenAttributes,
+  getTransaction,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
+  LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
+  LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
   buildContestLeaderboardUrl,
   buildFarcasterContestFrameUrl,
   getBaseUrl,
@@ -46,6 +49,7 @@ async function createInitialContest(
   interval: number,
   isOneOff: boolean,
   blockNumber: number,
+  isTokenGraduation: boolean = false,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -81,6 +85,24 @@ async function createInitialContest(
   );
 
   await models.sequelize.transaction(async (transaction) => {
+    if (isTokenGraduation) {
+      await models.ContestManager.create(
+        {
+          contest_address,
+          interval,
+          ticker,
+          decimals,
+          community_id: community!.id,
+          created_at: new Date(),
+          name: 'Token Graduation',
+          payout_structure: [100],
+          is_farcaster_contest: false,
+          environment: config.APP_ENV,
+        },
+        { transaction },
+      );
+    }
+
     const [contestManager] = await models.ContestManager.update(
       {
         interval,
@@ -218,6 +240,47 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
         );
         if (!contestManager) {
+          // check if the contest was created via token graduation
+          const chain = await models.ChainNode.scope('withPrivateData').findOne(
+            {
+              where: {
+                eth_chain_id: payload.eth_chain_id,
+              },
+            },
+          );
+          if (!chain) {
+            log.warn(
+              `ChainNode (${payload.eth_chain_id}) not found for contest ${payload.contest_address}`,
+            );
+            return;
+          }
+          const rpc = chain.private_url || chain.url;
+          if (rpc) {
+            const {
+              tx: { from: deployerAddress },
+            } = await getTransaction({
+              rpc,
+              txHash: payload.transaction_hash,
+            });
+            if (
+              [
+                LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
+                LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
+              ].includes(deployerAddress)
+            ) {
+              await createInitialContest(
+                payload.namespace,
+                payload.contest_address,
+                payload.interval,
+                false,
+                payload.block_number,
+                true,
+              );
+              return;
+            }
+          }
+
+          // contest manager not found and not created via token graduation
           log.warn(
             `ContestManager not found for contest ${payload.contest_address}`,
           );
