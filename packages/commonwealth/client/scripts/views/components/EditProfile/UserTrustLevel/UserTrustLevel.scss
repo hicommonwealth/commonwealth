@@ -13,19 +13,19 @@
   border: 1.5px solid transparent;
 
   &.level-green {
-    border-color: #c8e6c9;
+    border-color: $green-200;
   }
 
   &.level-yellow {
-    border-color: #ffecb3;
+    border-color: $yellow-200;
   }
 
   &.level-gray {
-    border-color: #e0e0e0;
+    border-color: $neutral-200;
   }
 
   &.disabled {
-    border-color: #e0e0e0;
+    border-color: $neutral-200;
     opacity: 0.5;
   }
 
@@ -39,7 +39,7 @@
 
   .level-description {
     font-size: 14px;
-    color: #666;
+    color: $neutral-500;
     margin-bottom: 12px;
   }
 
@@ -53,7 +53,7 @@
       align-items: center;
       padding: 8px 12px;
       border-radius: 8px;
-      border: 1px solid #ddd;
+      border: 1px solid $neutral-200;
       gap: 8px;
 
       .item-label {
