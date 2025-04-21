@@ -177,7 +177,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.like_count;
         tweetUpdates.num_likes.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.like_cap_reached = true;
         log.trace(`Updating num_likes to ${newValue}`);
@@ -193,7 +193,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.reply_count;
         tweetUpdates.num_replies.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.reply_cap_reached = true;
         log.trace(`Updating num_replies to ${newValue}`);
@@ -209,7 +209,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.retweet_count;
         tweetUpdates.num_retweets.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.retweet_cap_reached = true;
         log.trace(`Updating num_retweets to ${newValue}`);

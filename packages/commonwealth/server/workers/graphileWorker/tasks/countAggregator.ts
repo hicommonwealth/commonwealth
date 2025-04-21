@@ -1,6 +1,12 @@
 import { cache, CacheNamespaces, dispose, logger } from '@hicommonwealth/core';
-import { GraphileTask, models, TaskPayloads } from '@hicommonwealth/model';
+import {
+  GraphileTask,
+  models,
+  pgMultiRowUpdate,
+  TaskPayloads,
+} from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../../config';
 
 const log = logger(import.meta);
 
@@ -158,21 +164,50 @@ async function processViewCounts() {
   );
   const threadIds = Object.keys(threadIdHash).join(', ');
 
-  if (threadIds.length > 0) {
-    const cases = Object.entries(threadIdHash)
-      .map(([threadId, count]) => `WHEN ${threadId} THEN view_count + ${count}`)
-      .join(' ');
-    const query = `
-      UPDATE "Threads"
-      SET view_count = CASE id
-        ${cases}
-        END
-      WHERE id IN (${threadIds});
-    `;
-    await models.sequelize.query(query);
-    await cache().deleteKey(
-      CacheNamespaces.CountAggregator,
-      'thread_view_counts',
-    );
+  if (threadIds.length === 0) return;
+
+  const rankUpdates: { newValue: string; whenCaseValue: string }[] = [];
+  const viewCountUpdates: { newValue: string; whenCaseValue: string }[] = [];
+
+  for (const [threadId, count] of <[string, string][]>(
+    Object.entries(threadIdHash)
+  )) {
+    const threadRankIncrease =
+      config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count);
+    rankUpdates.push({
+      newValue: `rank + ${threadRankIncrease}`,
+      whenCaseValue: threadId,
+    });
+    viewCountUpdates.push({
+      newValue: `view_count + ${count}`,
+      whenCaseValue: threadId,
+    });
   }
+
+  // Not in a txn to avoid locking many threads during rank updates
+  // Neither of these updates are critical and occasional data loss is tolerable
+  await pgMultiRowUpdate(
+    'Threads',
+    [
+      {
+        setColumn: 'view_count',
+        rows: viewCountUpdates,
+      },
+    ],
+    'id',
+  );
+  await pgMultiRowUpdate(
+    'ThreadRanks',
+    [
+      {
+        setColumn: 'rank',
+        rows: rankUpdates,
+      },
+    ],
+    'thread_id',
+  );
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    'thread_view_counts',
+  );
 }
