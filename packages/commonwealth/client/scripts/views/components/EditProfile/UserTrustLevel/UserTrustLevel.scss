@@ -1,0 +1,64 @@
+@import '../../../../styles/shared';
+
+.verification-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.level-box {
+  border-radius: 8px;
+  padding: 16px;
+  border: 1.5px solid transparent;
+
+  &.level-green {
+    border-color: #c8e6c9;
+  }
+
+  &.level-yellow {
+    border-color: #ffecb3;
+  }
+
+  &.level-gray {
+    border-color: #e0e0e0;
+  }
+
+  &.disabled {
+    border-color: #e0e0e0;
+    opacity: 0.5;
+  }
+
+  .level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+
+  .level-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+  }
+
+  .level-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .level-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      gap: 8px;
+
+      .item-label {
+        font-size: 14px;
+      }
+    }
+  }
+}

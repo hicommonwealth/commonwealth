@@ -32,6 +32,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
 import ProfileSection from './Section';
+import UserTrustLevel from './UserTrustLevel/UserTrustLevel';
 import { editProfileValidation } from './validation';
 
 export type Image = {
@@ -346,6 +347,17 @@ const EditProfile = () => {
                 onLinkRemovedAtIndex={onLinkRemovedAtIndex}
                 canAddLinks={links.length <= 5}
               />
+            </ProfileSection>
+            <ProfileSection
+              title="User Verification"
+              description="Verification helps build a trusted
+              ecosystem where members can interact with confidence.
+              As you progress throught verification levels,
+              you'll gain increased capabilities and recognition
+              within the community.
+              "
+            >
+              <UserTrustLevel />
             </ProfileSection>
             <ProfileSection
               title="Personalize Your Profile"
