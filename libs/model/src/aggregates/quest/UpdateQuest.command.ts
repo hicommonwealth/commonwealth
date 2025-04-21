@@ -221,6 +221,7 @@ async function updateChannelQuest(
           chain_node_id: chainNode.id!,
           contract_address: chainEvent.contract_address,
           event_signature: toEventHash(chainEvent.event_signature),
+          transaction_hash: chainEvent.tx_hash,
           readable_signature: chainEvent.event_signature,
           quest_action_meta_id: actionMetaInstance.id!,
           active: true,

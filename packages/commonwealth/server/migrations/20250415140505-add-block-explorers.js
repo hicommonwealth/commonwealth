@@ -29,6 +29,9 @@ module.exports = {
 
       ALTER TABLE "ChainEventXpSources"
       ADD COLUMN "readable_signature" VARCHAR(255) NOT NULL;
+
+      ALTER TABLE "ChainEventXpSources"
+      ADD COLUMN "transaction_hash" VARCHAR(255) NOT NULL;
     `,
         { transaction: t },
       );
