@@ -289,8 +289,8 @@ export const QuickTokenLaunchForm = ({
           default_page: DefaultPage.Homepage,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
-        onCommunityCreated(communityId);
         setCreatedCommunityId(communityId);
+        onCommunityCreated(communityId);
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
