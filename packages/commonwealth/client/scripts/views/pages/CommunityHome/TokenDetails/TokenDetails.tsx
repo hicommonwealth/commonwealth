@@ -46,12 +46,6 @@ const TokenDetails = ({
       : (communityToken as LaunchpadToken).icon_url
     : undefined;
 
-  const marketCap = communityToken
-    ? isPinnedToken
-      ? 'N/A'
-      : (communityToken as LaunchpadToken).eth_market_cap_target
-    : undefined;
-
   return (
     <div className="token-details">
       <div className="token-info">
