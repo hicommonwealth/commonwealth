@@ -51,6 +51,7 @@ class LaunchpadBondingCurve extends ContractBase {
     const connectorWeight = parseInt(
       process.env.LAUNCHPAD_CONNECTOR_WEIGHT || '830000',
     );
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
@@ -63,6 +64,7 @@ class LaunchpadBondingCurve extends ContractBase {
       connectorWeight,
       this.tokenCommunityManager,
       initialBuyValue,
+      maxFeePerGas!,
     );
     return txReceipt;
   }
@@ -71,12 +73,13 @@ class LaunchpadBondingCurve extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
       amountEth,
+      maxFeePerGas!,
     );
     return txReceipt;
   }
@@ -89,12 +92,14 @@ class LaunchpadBondingCurve extends ContractBase {
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
     );
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
       walletAddress,
       tokenContract,
+      maxFeePerGas!,
     );
     return txReceipt;
   }
