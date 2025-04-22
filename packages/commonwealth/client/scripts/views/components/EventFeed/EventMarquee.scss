@@ -18,14 +18,11 @@
   }
 
   .event-marquee-content {
-    position: relative;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    height: 100%;
     white-space: nowrap;
     animation: scrollLeft 30s linear infinite;
     padding: 0 16px;
-    width: 100%;
     will-change: transform;
     transform: translateZ(0);
 
