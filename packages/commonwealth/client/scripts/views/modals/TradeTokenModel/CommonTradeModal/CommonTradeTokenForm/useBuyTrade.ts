@@ -119,7 +119,7 @@ const useBuyTrade = ({
       }
     };
 
-    fetchTokenGainAmount();
+    void fetchTokenGainAmount();
   }, [
     launchPad,
     baseCurrencyBuyAmountDecimals,
