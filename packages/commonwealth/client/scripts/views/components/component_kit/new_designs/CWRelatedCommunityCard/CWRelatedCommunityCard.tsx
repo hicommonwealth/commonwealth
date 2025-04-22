@@ -23,6 +23,13 @@ import { CWTooltip } from '../CWTooltip';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
+const tierIcons = {
+  1: 'globe',
+  2: 'pins',
+  3: 'whiteCheck',
+  4: 'starGolden',
+} as const;
+
 type CWRelatedCommunityCardProps = {
   community: z.infer<typeof ExtendedCommunity>;
   memberCount: string | number;
@@ -141,6 +148,12 @@ export const CWRelatedCommunityCard = ({
                 <CWText type="h5" title={community?.name} fontWeight="medium">
                   {community?.name}
                 </CWText>
+                {community?.tier && tierIcons[community.tier] && (
+                  <CWIcon
+                    iconName={tierIcons[community.tier]}
+                    iconSize="small"
+                  />
+                )}
               </div>
 
               {!!stakeValue && (
