@@ -51,6 +51,42 @@ async function incrementCachedRank(
   }
 }
 
+/**
+ * Objects should be ordered by rank DESCENDING i.e. high rank at index 0.
+ */
+export async function batchedIncrementCachedRank(
+  data: {
+    community_id: string;
+    ranks: { thread_id: number; rank: string }[];
+  }[],
+) {
+  for (const { community_id, ranks } of data) {
+    const communityKey = `${CacheNamespaces.CommunityThreadRanks}_${community_id}`;
+
+    // get the lowest score item + number of elements in the set
+    const [lowestScoreItem, setLength] = await Promise.all([
+      client.zRangeWithScores(communityKey, 0, 0),
+      client.zCard(communityKey),
+    ]);
+
+    const numAdded = await client.zAdd(
+      communityKey,
+      ranks
+        .filter(({ rank }) => parseInt(rank) > lowestScoreItem[0].score)
+        .map(({ thread_id, rank }) => ({
+          score: parseInt(rank),
+          value: thread_id.toString(),
+        })),
+    );
+    if (setLength + numAdded > APPROXIMATE_MAX_SET_SIZE) {
+      await client.zPopMinCount(
+        communityKey,
+        setLength + numAdded - APPROXIMATE_MAX_SET_SIZE,
+      );
+    }
+  }
+}
+
 async function decrementCachedRank(
   communityId: string,
   threadId: number,

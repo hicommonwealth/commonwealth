@@ -166,10 +166,12 @@ export interface Cache extends Disposable {
     field: string,
     increment?: number,
   ): Promise<number>;
+
   getHash(
     namespace: CacheNamespaces,
     key: string,
   ): Promise<Record<string, string>>;
+
   setHashKey(
     namespace: CacheNamespaces,
     key: string,
@@ -183,7 +185,22 @@ export interface Cache extends Disposable {
     key: string,
     value: string,
   ): Promise<number>;
+
   getSet(namespace: CacheNamespaces, key: string): Promise<string[]>;
+
+  // Sorted set methods
+  sliceSortedSetWithScores(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number,
+    end: number,
+  ): Promise<
+    {
+      value: string;
+      score: number;
+    }[]
+  >;
+  getSortedSetSize(namespace: CacheNamespaces, key: string): Promise<number>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

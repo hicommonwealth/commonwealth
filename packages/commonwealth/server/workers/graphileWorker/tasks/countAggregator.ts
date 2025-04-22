@@ -6,6 +6,7 @@ import {
   TaskPayloads,
 } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { batchedIncrementCachedRank } from '../../../api/ranking';
 import { config } from '../../../config';
 
 const log = logger(import.meta);
@@ -160,7 +161,7 @@ async function processReactionCounts() {
 async function processViewCounts() {
   const threadIdHash = await cache().getHash(
     CacheNamespaces.CountAggregator,
-    'thread_view_counts',
+    'thread_view_count',
   );
   const threadIds = Object.keys(threadIdHash).join(', ');
 
@@ -174,10 +175,12 @@ async function processViewCounts() {
   )) {
     const threadRankIncrease =
       config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count);
-    rankUpdates.push({
-      newValue: `rank + ${threadRankIncrease}`,
-      whenCaseValue: threadId,
-    });
+    if (threadRankIncrease > 0) {
+      rankUpdates.push({
+        newValue: `rank + ${threadRankIncrease}`,
+        whenCaseValue: threadId,
+      });
+    }
     viewCountUpdates.push({
       newValue: `view_count + ${count}`,
       whenCaseValue: threadId,
@@ -205,9 +208,23 @@ async function processViewCounts() {
       },
     ],
     'thread_id',
+    undefined,
+    true,
   );
-  await cache().deleteKey(
-    CacheNamespaces.CountAggregator,
-    'thread_view_counts',
+  await cache().deleteKey(CacheNamespaces.CountAggregator, 'thread_view_count');
+
+  const ranks = await models.sequelize.query<{
+    community_id: string;
+    ranks: { thread_id: number; rank: string }[];
+  }>(
+    `
+      SELECT T.community_id, ARRAY_AGG(ROW_TO_JSON(TR) ORDER BY TR.rank DESC) AS ranks
+      FROM "ThreadRanks" TR
+             JOIN "Threads" T ON TR.thread_id = T.id
+      WHERE TR.thread_id IN (:threadIds)
+      GROUP BY T.community_id;
+    `,
+    { replacements: { threadIds }, type: QueryTypes.SELECT },
   );
+  await batchedIncrementCachedRank(ranks);
 }

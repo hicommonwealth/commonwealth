@@ -14,6 +14,7 @@ export async function pgMultiRowUpdate(
   columns: [Column, ...Column[]],
   caseColumn: string,
   transaction?: Transaction,
+  updatedAtColumn?: boolean,
 ) {
   if (columns.length === 0) return false;
 
@@ -43,7 +44,7 @@ export async function pgMultiRowUpdate(
   );
   const query = `
     UPDATE "${tableName}"
-    SET ${updates}
+    SET ${updates} ${updatedAtColumn ? `, updated_at = NOW()` : ''}
     WHERE ${caseColumn} IN (${Array.from(caseValues).join(', ')});
   `;
 

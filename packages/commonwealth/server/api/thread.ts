@@ -117,15 +117,16 @@ export const trpcRouter = trpc.router({
     [
       trpc.fireAndForget(async (input) => {
         log.trace('incrementing thread view count', { ids: input.thread_ids });
-        const ids = input.thread_ids.split(',').map((x) => parseInt(x, 10));
         await Promise.all(
-          ids.map((t) =>
-            cache().incrementHashKey(
-              CacheNamespaces.CountAggregator,
-              'thread_view_count',
-              t.toString(),
+          input.thread_ids
+            .split(',')
+            .map((threadId) =>
+              cache().incrementHashKey(
+                CacheNamespaces.CountAggregator,
+                'thread_view_count',
+                threadId,
+              ),
             ),
-          ),
         );
       }),
     ],

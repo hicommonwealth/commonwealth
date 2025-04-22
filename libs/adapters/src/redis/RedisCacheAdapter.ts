@@ -540,6 +540,28 @@ export class RedisCache implements Cache {
     return [];
   }
 
+  public async getSortedSetSize(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zCard(RedisCache.getNamespaceKey(namespace, key));
+  }
+
+  public async sliceSortedSetWithScores(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRangeWithScores(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+    );
+  }
+
   public async flushAll(): Promise<void> {
     if (!this.isReady()) return;
     try {

@@ -280,6 +280,10 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       // set
       addToSet: () => Promise.resolve(0),
       getSet: () => Promise.resolve([]),
+
+      // Sorted Set
+      sliceSortedSetWithScores: () => Promise.resolve([]),
+      getSortedSetSize: () => Promise.resolve(0),
     }
   );
 });
