@@ -45,7 +45,7 @@ const CreateCommunityButton = ({
       <CWButton
         label="Create Community"
         buttonHeight={buttonHeight}
-        buttonWidth="full"
+        buttonWidth="auto"
         {...(withIcon && { iconLeft: 'peopleNew' })}
         onClick={handleCreateCommunity}
       />
