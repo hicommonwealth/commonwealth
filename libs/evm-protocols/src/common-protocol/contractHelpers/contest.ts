@@ -157,10 +157,6 @@ export const getContestStatus = async (
     }),
   ]);
 
-  console.log('prizeShare', prizeShare);
-  console.log('voterShare', voterShare);
-  console.log('contestToken', contestToken);
-
   return {
     startTime: Number(startTime),
     endTime: Number(endTime),
