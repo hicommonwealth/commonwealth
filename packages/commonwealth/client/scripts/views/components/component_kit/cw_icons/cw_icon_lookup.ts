@@ -332,6 +332,10 @@ export const iconLookup = {
   ethChain: CustomIcons.CWEth,
   cosmosChain: CustomIcons.CWCosmos,
   polkadotChain: CustomIcons.CWPolkadot,
+  globe: Icons.CWGlobe,
+  whiteCheck: Icons.CWWhiteCheck,
+  pins: Icons.CWPin,
+  starGolden: Icons.CWStarGolden,
 };
 
 export const customIconLookup = {
