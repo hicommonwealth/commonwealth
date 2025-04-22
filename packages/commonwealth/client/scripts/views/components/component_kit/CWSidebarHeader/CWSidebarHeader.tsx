@@ -11,6 +11,14 @@ import { Skeleton } from '../../Skeleton';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { CWIcon } from '../cw_icons/cw_icon';
+
+const tierIcons = {
+  1: 'globe',
+  2: 'pins',
+  3: 'whiteCheck',
+  4: 'starGolden',
+} as const;
 
 const SidebarHeader = ({
   isInsideCommunity,
@@ -50,26 +58,34 @@ const SidebarHeader = ({
             }
             placement="top"
             renderTrigger={(handleInteraction, isTooltipOpen) => (
-              <CWText
-                className="header"
-                type="h5"
-                onClick={() =>
-                  app.chain.id &&
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: app.chain.id,
-                  })
-                }
-                onMouseEnter={(e) => {
-                  handleMouseEnter({ e, isTooltipOpen, handleInteraction });
-                }}
-                onMouseLeave={(e) => {
-                  handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-                }}
-              >
-                {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
-              </CWText>
+              <div className="header-container">
+                <CWText
+                  className="header"
+                  type="h5"
+                  onClick={() =>
+                    app.chain.id &&
+                    navigateToCommunity({
+                      navigate,
+                      path: '',
+                      chain: app.chain.id,
+                    })
+                  }
+                  onMouseEnter={(e) => {
+                    handleMouseEnter({ e, isTooltipOpen, handleInteraction });
+                  }}
+                  onMouseLeave={(e) => {
+                    handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+                  }}
+                >
+                  {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
+                </CWText>
+                {community?.tier && tierIcons[community.tier] && (
+                  <CWIcon
+                    iconName={tierIcons[community.tier]}
+                    iconSize="small"
+                  />
+                )}
+              </div>
             )}
           />
         </>
