@@ -9,25 +9,16 @@ import { AddressBalanceProps } from '../types';
 import './AddressBalance.scss';
 
 const AddressBalance = ({ trading, addresses }: AddressBalanceProps) => {
-  console.log('[AddressBalance] Props:', { trading, addresses });
-
   const isBuyMode = trading.mode.value === TradingMode.Buy;
   const isETH = isBuyMode;
 
   const balanceKey = isBuyMode ? 'eth' : 'selectedToken';
   const balanceInfo = addresses.selected?.balances?.[balanceKey];
 
-  console.log(`[AddressBalance] Using balanceKey: ${balanceKey}`);
-  console.log(
-    '[AddressBalance] Derived balanceInfo from addresses:',
-    balanceInfo,
-  );
-
   const tokenSymbol = isETH ? 'ETH' : trading.token?.symbol || '...'; // Add safe access for symbol
 
   const renderBalance = () => {
     const isLoading = balanceInfo?.isLoading;
-    console.log('[AddressBalance] isLoading:', isLoading);
 
     // Show skeleton only if data structure exists and isLoading is true
     if (isLoading) {
@@ -37,7 +28,6 @@ const AddressBalance = ({ trading, addresses }: AddressBalanceProps) => {
     // Ensure balanceData and value exist before rendering FormattedDisplayNumber
     // If balanceData is undefined or isLoading is false, try to display value or N/A
     const valueToDisplay = balanceInfo?.value;
-    console.log('[AddressBalance] valueToDisplay:', valueToDisplay);
 
     return (
       <>
