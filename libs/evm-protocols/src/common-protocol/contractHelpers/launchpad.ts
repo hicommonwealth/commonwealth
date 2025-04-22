@@ -144,6 +144,7 @@ export const transferLiquidity = async (
   contract: any,
   tokenAddress: string,
   walletAddress: string,
+  maxFeePerGas?: bigint,
 ) => {
   const remainingTokens = await contract.methods
     ._poolLiquidity(tokenAddress)
@@ -155,9 +156,18 @@ export const transferLiquidity = async (
     830000,
   );
 
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   const txReceipt = await contract.methods
     .transferLiquidity(tokenAddress, remainingTokens)
-    .send({ value: amountIn, from: walletAddress });
+    .send({
+      value: amountIn,
+      from: walletAddress,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+    });
   return txReceipt;
 };
 
@@ -305,9 +315,22 @@ export async function transferLaunchpadLiquidityToUniswap({
     LPBondingCurveAbi,
     lpBondingCurveAddress,
   );
-  await commonProtocol.transferLiquidity(
+
+  // Estimate gas
+  const latestBlock = await web3.eth.getBlock('latest');
+  let maxFeePerGas: bigint | undefined;
+
+  if (latestBlock.baseFeePerGas) {
+    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
+    maxFeePerGas =
+      latestBlock.baseFeePerGas * BigInt(2) +
+      BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
+  }
+
+  return await commonProtocol.transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
+    maxFeePerGas,
   );
 }
