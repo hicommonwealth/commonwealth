@@ -174,7 +174,7 @@ const useBuyTrade = ({
         amountEth: baseCurrencyBuyAmountDecimals * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
-        tokenUrl: tradeConfig.token.icon_url,
+        tokenUrl: tradeConfig.token.icon_url!,
       };
       const txReceipt = await buyToken(payload);
 
