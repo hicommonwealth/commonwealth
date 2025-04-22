@@ -1,0 +1,457 @@
+@import '../../../styles/shared';
+
+.search-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 0;
+  width: 100%;
+
+  /* Hide all scrollbars within the filter container */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .search-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .search-container {
+      flex: 0 0 auto;
+      width: 350px;
+      min-width: 200px;
+      max-width: 350px;
+
+      .input-and-icon-container {
+        .text-input-left-icon > svg {
+          left: 16px;
+          color: var(--neutral-400);
+        }
+
+        input.hasLeftIcon {
+          padding-left: 48px;
+        }
+      }
+    }
+
+    .right-side-controls {
+      display: flex;
+      gap: 24px;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      align-items: center;
+      margin-left: auto;
+
+      .inline-filters {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        width: auto;
+
+        // When there are multiple filters, apply special styling
+        &:has(> .inline-filter-select + .inline-filter-select),
+        &:has(> .inline-filter-select + .inline-filter-toggle),
+        &:has(> .inline-filter-toggle + .inline-filter-select),
+        &.multiple-filters {
+          @include medium {
+            // Hide labels when there are multiple filters on medium screens
+            .filter-label {
+              display: none;
+            }
+          }
+        }
+
+        .inline-filter-select {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          min-width: 120px;
+          max-width: 200px;
+          flex: 0 0 auto;
+
+          // Special styling for community filter
+          &.community-filter {
+            min-width: 160px;
+            max-width: 240px;
+          }
+
+          .filter-label {
+            white-space: nowrap;
+            color: $neutral-500;
+            font-weight: 500;
+            font-size: 14px;
+          }
+
+          // Style the select dropdown
+          .select__control {
+            min-height: 40px;
+            border-color: $neutral-200;
+            min-width: 120px;
+            width: 100%;
+
+            &:hover {
+              border-color: $neutral-300;
+            }
+
+            &.select__control--is-focused {
+              border-color: $primary-500;
+              box-shadow: 0 0 0 1px $primary-500;
+            }
+
+            .select__value-container {
+              padding: 2px 8px;
+            }
+
+            .select__single-value {
+              max-width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .select__menu {
+              /* Ensure dropdown menus still scroll, just without visible scrollbars */
+              overflow-y: auto;
+              -webkit-overflow-scrolling: touch;
+            }
+          }
+        }
+
+        .inline-filter-toggle {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          flex: 0 0 auto;
+        }
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        margin-left: 8px;
+
+        .view-toggle {
+          display: flex;
+          border-radius: 6px;
+          overflow: hidden;
+          background-color: $neutral-100;
+
+          .icon-container {
+            padding: 6px;
+            cursor: pointer;
+            color: $neutral-500;
+
+            &.selected {
+              background-color: $neutral-200;
+              color: $neutral-800;
+            }
+          }
+        }
+      }
+    }
+
+    // Medium screens
+    @include medium {
+      .search-container {
+        width: 300px;
+        min-width: 180px;
+        max-width: 300px;
+      }
+
+      .right-side-controls {
+        .inline-filters {
+          gap: 16px;
+          white-space: nowrap;
+
+          .inline-filter-select {
+            min-width: 100px;
+            max-width: 160px;
+
+            &.community-filter {
+              min-width: 140px;
+              max-width: 180px;
+            }
+
+            .filter-label {
+              font-size: 13px;
+            }
+
+            .select__control {
+              min-width: 100px;
+            }
+          }
+        }
+      }
+    }
+
+    // Medium-small breakpoint (905-1239px)
+    @media screen and (max-width: $breakpoint-medium-small-max-px) and (min-width: $breakpoint-medium-small-min-px) {
+      flex-wrap: nowrap;
+
+      .search-container {
+        width: 280px;
+        min-width: 180px;
+        max-width: 280px;
+      }
+
+      .right-side-controls {
+        gap: 16px;
+
+        .inline-filters {
+          gap: 12px;
+
+          .inline-filter-select {
+            min-width: 90px;
+            max-width: 140px;
+
+            &.community-filter {
+              min-width: 110px;
+              max-width: 150px;
+            }
+
+            .filter-label {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+    // Small screens
+    @include small {
+      flex-wrap: nowrap;
+
+      .search-container {
+        width: 200px;
+        min-width: 150px;
+        max-width: 200px;
+      }
+
+      .right-side-controls {
+        width: auto;
+        margin-left: auto;
+        margin-top: 0;
+        flex-wrap: nowrap;
+        gap: 12px;
+
+        .inline-filters {
+          flex-wrap: nowrap;
+          justify-content: flex-end;
+          gap: 8px;
+          width: auto;
+          overflow: visible;
+
+          .inline-filter-select {
+            min-width: 80px;
+            width: auto;
+            flex: 0 0 auto;
+
+            &.community-filter {
+              min-width: 80px;
+              flex: 0 0 auto;
+            }
+
+            .filter-label {
+              font-size: 12px;
+              display: none; /* Hide all labels on small screens */
+            }
+
+            .select__control {
+              min-width: 80px;
+              padding: 0 8px;
+              width: 100%;
+
+              .select__value-container {
+                padding: 2px 6px;
+              }
+            }
+
+            // Fix dropdown menu width for small screens
+            .select__menu {
+              min-width: 120px;
+              width: max-content;
+            }
+          }
+        }
+
+        .actions {
+          margin-left: 4px;
+        }
+      }
+    }
+
+    // Extra small screens - keep filters in single row
+    @include extraSmall {
+      .search-filter-row {
+        overflow: visible;
+      }
+
+      .search-container {
+        width: 140px;
+        min-width: 120px;
+        max-width: 140px;
+      }
+
+      .right-side-controls {
+        margin-left: auto;
+        justify-content: flex-end;
+        gap: 4px; /* Even smaller gap */
+        flex-wrap: nowrap; /* Keep in a single row */
+        overflow: visible;
+
+        .inline-filters {
+          gap: 6px;
+          flex-wrap: nowrap;
+          width: auto;
+          overflow-x: auto;
+          overflow-y: visible;
+          overflow: visible;
+
+          .inline-filter-select {
+            min-width: 75px;
+            max-width: 110px;
+            overflow: visible;
+
+            &.community-filter {
+              min-width: 75px;
+              max-width: 110px;
+            }
+
+            .filter-label {
+              display: none; /* Hide labels on extra small screens */
+            }
+
+            .select__control {
+              min-width: 75px;
+              padding: 0 4px;
+              width: 100%;
+
+              .select__value-container {
+                padding: 2px 4px;
+              }
+
+              .select__indicators {
+                padding: 0 4px;
+
+                .select__indicator {
+                  padding: 4px;
+                }
+              }
+            }
+
+            // Fix dropdown menu width for extra small screens
+            .select__menu {
+              min-width: 120px;
+              width: max-content;
+            }
+          }
+
+          .inline-filter-toggle {
+            gap: 2px;
+
+            button {
+              padding: 4px 8px;
+              font-size: 12px;
+            }
+          }
+        }
+
+        .actions {
+          margin-left: 2px;
+        }
+      }
+    }
+  }
+
+  .applied-filters-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 0;
+
+    .applied-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
+}
+
+// Thread search results styles
+.search-results-container {
+  padding: 16px 0;
+
+  .thread-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .thread-result {
+      border: 1px solid $neutral-200;
+      border-radius: 8px;
+      padding: 16px;
+      background-color: white;
+      transition: box-shadow 0.15s ease-in-out;
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+        color: $neutral-900;
+      }
+
+      p {
+        margin: 0;
+        color: $neutral-600;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .loading-threads,
+  .error-threads,
+  .no-results {
+    padding: 32px;
+    text-align: center;
+    color: $neutral-600;
+    font-size: 16px;
+  }
+
+  .load-more-button {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background-color: $primary-500;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: center;
+
+    &:hover {
+      background-color: darken($primary-500, 5%);
+    }
+  }
+}

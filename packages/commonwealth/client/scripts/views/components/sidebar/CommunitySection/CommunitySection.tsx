@@ -175,8 +175,9 @@ export const CommunitySection = ({
 
         <CWDivider />
         <DiscussionSection
-          // @ts-expect-error <StrictNullChecks/>
-          topicIdsIncludedInContest={topicIdsIncludedInContest}
+          topicIdsIncludedInContest={topicIdsIncludedInContest.filter(
+            (id): id is number => id !== undefined,
+          )}
         />
         <CWDivider />
         {isAdmin && (
@@ -212,12 +213,10 @@ export const CommunitySection = ({
         content={
           <ManageCommunityStakeModal
             mode={modeOfManageCommunityStakeModal}
-            // @ts-expect-error <StrictNullChecks/>
             onModalClose={() => setModeOfManageCommunityStakeModal(null)}
             denomination={findDenominationString(activeChainId) || 'ETH'}
           />
         }
-        // @ts-expect-error <StrictNullChecks/>
         onClose={() => setModeOfManageCommunityStakeModal(null)}
         open={!!modeOfManageCommunityStakeModal}
       />

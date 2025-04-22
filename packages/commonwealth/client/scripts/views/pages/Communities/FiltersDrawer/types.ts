@@ -1,16 +1,16 @@
 import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 
 export enum CommunitySortOptions {
-  MostRecent = 'Most Recent',
+  MostRecent = 'Newest',
   MarketCap = 'Market Cap',
   Price = 'Price',
-  MemberCount = 'Number of Members',
-  ThreadCount = 'Number of Threads',
+  MemberCount = '# of 👥',
+  ThreadCount = '# of ✏️',
 }
 
 export enum CommunitySortDirections {
-  Ascending = 'Ascending',
-  Descending = 'Descending',
+  Ascending = 'High',
+  Descending = 'Low',
 }
 
 export type CommunityFilters = {
@@ -22,6 +22,7 @@ export type CommunityFilters = {
   withCommunityType?: CommunityType;
   withCommunitySortBy?: CommunitySortOptions;
   withCommunitySortOrder?: CommunitySortDirections;
+  sortBy?: string;
 };
 
 export type FiltersDrawerProps = {
