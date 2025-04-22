@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
@@ -286,10 +286,11 @@ export const QuickTokenLaunchForm = ({
           ...(sanitizedTokenInfo.imageURL && {
             icon_url: sanitizedTokenInfo.imageURL,
           }),
+          default_page: DefaultPage.Homepage,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
-        setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
+        setCreatedCommunityId(communityId);
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
