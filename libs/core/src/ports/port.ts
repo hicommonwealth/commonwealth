@@ -284,6 +284,10 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       // Sorted Set
       sliceSortedSetWithScores: () => Promise.resolve([]),
       getSortedSetSize: () => Promise.resolve(0),
+      delSortedSetItemsByRank: () => Promise.resolve(0),
+      addToSortedSet: () => Promise.resolve(0),
+      sortedSetPopMin: () => Promise.resolve([]),
+      delSortedSetItemsByValue: () => Promise.resolve(0),
     }
   );
 });

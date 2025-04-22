@@ -191,15 +191,44 @@ export interface Cache extends Disposable {
   sliceSortedSetWithScores(
     namespace: CacheNamespaces,
     key: string,
-    start: number,
-    end: number,
+    start?: number,
+    end?: number,
   ): Promise<
     {
       value: string;
       score: number;
     }[]
   >;
+
   getSortedSetSize(namespace: CacheNamespaces, key: string): Promise<number>;
+
+  delSortedSetItemsByRank(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number,
+    end: number,
+  ): Promise<number>;
+
+  addToSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    items:
+      | { value: string; score: number }[]
+      | { value: string; score: number },
+    options?: { updateOnly?: boolean },
+  ): Promise<number>;
+
+  sortedSetPopMin(
+    namespace: CacheNamespaces,
+    key: string,
+    numToPop?: number,
+  ): Promise<{ value: string; score: number }[]>;
+
+  delSortedSetItemsByValue(
+    namespace: CacheNamespaces,
+    key: string,
+    values: string[] | string,
+  ): Promise<number>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

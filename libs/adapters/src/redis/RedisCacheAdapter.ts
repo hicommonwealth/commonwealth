@@ -562,6 +562,64 @@ export class RedisCache implements Cache {
     );
   }
 
+  public async delSortedSetItemsByRank(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRemRangeByRank(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+    );
+  }
+
+  public async addToSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    items:
+      | { value: string; score: number }[]
+      | { value: string; score: number },
+    options?: {
+      updateOnly?: boolean;
+    },
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zAdd(
+      RedisCache.getNamespaceKey(namespace, key),
+      items,
+      {
+        ...(options?.updateOnly ? { XX: true } : {}),
+      },
+    );
+  }
+
+  public async sortedSetPopMin(
+    namespace: CacheNamespaces,
+    key: string,
+    numToPop = 1,
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zPopMinCount(
+      RedisCache.getNamespaceKey(namespace, key),
+      numToPop,
+    );
+  }
+
+  public async delSortedSetItemsByValue(
+    namespace: CacheNamespaces,
+    key: string,
+    values: string[] | string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRem(
+      RedisCache.getNamespaceKey(namespace, key),
+      values,
+    );
+  }
+
   public async flushAll(): Promise<void> {
     if (!this.isReady()) return;
     try {
