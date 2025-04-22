@@ -71,14 +71,26 @@ export function formatDisplayNumber(
   // Handle small fractional numbers using existing logic
   if (Math.abs(num) < 1 && Math.abs(num) > 0) {
     const fractionalResult = formatSmallFractionalValue(num);
-    // formatSmallFractionalValue returns either a string (for >= 0.01) or the object
+
+    // formatSmallFractionalValue returns either a string or an object { decimal0Count, valueAfterDecimal0s }
     if (typeof fractionalResult === 'string') {
-      // Ensure currency symbol is prepended if it's a string result
+      // This handles cases like 0.123 -> "0.12", 0.00123 -> "0.001" based on helper logic
       return `${currencySymbol}${fractionalResult}`;
     }
-    // If we need to return the object for FractionalValue component
-    // Currency symbol is not added here as FractionalValue handles the display
-    return fractionalResult;
+    if (typeof fractionalResult === 'object' && fractionalResult !== null) {
+      // Check the user's desired threshold for using FractionalValue
+      if (fractionalResult.decimal0Count >= 4) {
+        // Return the object to trigger FractionalValue render for subscript
+        return fractionalResult;
+      } else {
+        // For decimal0Count 0, 1, 2, 3 (based on helper logic), format as string
+        // Use the decimals option passed, or a default like 6 for precision
+        const precision = options.decimals === undefined ? 6 : options.decimals;
+        return `${currencySymbol}${num.toFixed(precision)}`;
+      }
+    }
+    // Fallback if fractionalResult is null or unexpected type
+    return `${currencySymbol}${num.toFixed(6)}`; // Default to 6 decimals
   }
 
   // Handle numbers >= 1

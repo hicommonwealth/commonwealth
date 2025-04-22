@@ -21,20 +21,17 @@ const FormattedDisplayNumber = ({
   const formattedResult = formatDisplayNumber(value, options);
 
   const renderContent = () => {
-    if (typeof formattedResult === 'object') {
-      // Use the FractionalValue component when the result is an object
+    if (typeof formattedResult === 'object' && formattedResult !== null) {
       const num = typeof value === 'string' ? parseFloat(value) : (value ?? 0);
-      // Pass original value to FractionalValue as it expects a number
       return (
         <FractionalValue
           value={num}
-          className={className} // Pass className to FractionalValue
-          {...textStyleProps} // Pass textStyleProps to FractionalValue
+          className={className}
+          {...textStyleProps}
         />
       );
     }
 
-    // Render as standard text if formattedResult is a string
     return (
       <CWText
         className={clsx('FormattedDisplayNumber', className)}
@@ -49,7 +46,7 @@ const FormattedDisplayNumber = ({
     return (
       <CWTooltip
         placement="bottom"
-        content={tooltipContent.toString()} // Ensure content is string
+        content={tooltipContent.toString()}
         renderTrigger={(handleInteraction) => (
           <span
             onMouseEnter={handleInteraction}

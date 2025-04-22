@@ -33,7 +33,7 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
             value={invest.baseCurrency.unitEthExchangeRate}
             options={{ decimals: 6, currencySymbol: '$' }}
           />
-          {isRightSymbolCurrency ? baseCurrencySymbol : ''} = 1 ETH
+          {isRightSymbolCurrency ? baseCurrencySymbol : ''} &nbsp;=&nbsp; 1 ETH
         </CWText>
       </div>
       <div className="entry">

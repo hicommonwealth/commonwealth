@@ -16,7 +16,7 @@ const SellReceipt = ({ trading }: ReceiptDetailsProps) => {
       <div className="entry">
         <CWText type="caption">Exchange Rate ({baseTokenSymbol}/ETH)</CWText>
         <CWText type="caption">
-          1 {baseTokenSymbol} ={' '}
+          1 {baseTokenSymbol} &nbsp;=&nbsp;
           <FormattedDisplayNumber
             type="caption"
             value={invest.baseToken.unitEthExchangeRate}
