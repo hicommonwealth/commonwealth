@@ -101,9 +101,9 @@ export const getAmountIn = async (
     contract.methods.liquidity(tokenAddress).call(),
   ]);
   const delta =
-    ((BigInt(amountOut) + BigInt(data[0])) / BigInt(data[0])) **
-    (BigInt(1000000) / BigInt(cw));
-  return BigInt(data[1]) * delta - BigInt(data[1]);
+    ((Number(amountOut) + Number(data[0])) / Number(data[0])) **
+    (Number(1000000) / Number(cw));
+  return Number(data[1]) * delta - Number(data[1]);
 };
 
 export const transferLiquidity = async (

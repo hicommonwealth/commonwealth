@@ -6,6 +6,7 @@ import {
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { AuthContext } from '../context';
 import {
   Community,
   CommunityMember,
@@ -248,4 +249,50 @@ export const GetPinnedTokens = {
     with_price: z.boolean().optional(),
   }),
   output: PinnedTokenWithPrices.array(),
+};
+
+export const GetCommunitySelectedTagsAndCommunities = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z
+    .object({
+      id: z.string(),
+      icon_url: z.string().nullish(),
+      community: z.string().nullish(),
+      description: z.string().nullish(),
+      lifetime_thread_count: PG_INT.nullish(),
+      profile_count: PG_INT.nullish(),
+      namespace: z.string().nullish(),
+      chain_node_id: PG_INT.nullish(),
+      tag_names: z
+        .array(z.string())
+        .nullish()
+        .transform((val) => val || []),
+      selected_community_ids: z
+        .array(z.string())
+        .nullish()
+        .transform((val) => val || []),
+    })
+    .array()
+    .nullish()
+    .transform((val) => val || []),
+};
+
+export const UpdateCommunityDirectoryTags = {
+  input: z.object({
+    community_id: z.string(),
+    tag_names: z
+      .array(z.string())
+      .nullish()
+      .transform((val) => val || []),
+    selected_community_ids: z
+      .array(z.string())
+      .nullish()
+      .transform((val) => val || []),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+  context: AuthContext,
 };
