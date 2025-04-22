@@ -15,44 +15,105 @@ const client = redis.client;
 //  the loss of precision is negligible -> set minimum weights i.e. minimum rank
 
 const APPROXIMATE_MAX_SET_SIZE = 500;
+const globalThreadRanksKey = 'global_thread_ranks';
 
+function safetySetTrim(
+  key: string,
+  setLength: number,
+): Promise<number | undefined> {
+  if (setLength > APPROXIMATE_MAX_SET_SIZE + 10) {
+    log.error(
+      'Redis sorted set size is too large, removing lowest ranking items',
+      undefined,
+      {
+        setLength,
+        redis_key: key,
+      },
+    );
+    return client.zRemRangeByRank(key, 0, setLength - APPROXIMATE_MAX_SET_SIZE);
+  }
+  return Promise.resolve(undefined);
+}
+
+function addOrUpdateSortedSetRank(
+  key: string,
+  setLength: number,
+  rank: number,
+  threadId: number,
+  lowestRankedItem:
+    | {
+        value: string;
+        score: number;
+      }
+    | undefined,
+): (
+  | Promise<number>
+  | Promise<{ score: number; value: string }[]>
+  | Promise<undefined>
+)[] {
+  if (setLength < APPROXIMATE_MAX_SET_SIZE) {
+    return [client.zAdd(key, { score: rank, value: threadId.toString() })];
+  } else if (lowestRankedItem && lowestRankedItem.score < rank) {
+    return [
+      client.zAdd(key, { score: rank, value: threadId.toString() }),
+      client.zPopMinCount(key, 1),
+    ];
+  }
+  return [Promise.resolve(undefined)];
+}
+
+/**
+ * Increments the rank of threads in community sorted sets as well as in the
+ * global sorted set only if the new rank is higher than the lowest rank in
+ * the set.
+ */
 async function incrementCachedRank(
   communityId: string,
   threadId: number,
   rank: number,
 ) {
-  const strThreadId = threadId.toString();
   const communityKey = `${CacheNamespaces.CommunityThreadRanks}_${communityId}`;
 
   // get the lowest score item + number of elements in the set
-  const [lowestScoreItem, setLength] = await Promise.all([
+  const [
+    lowestCommunityItem,
+    communitySetLength,
+    lowestGlobalItem,
+    globalSetLength,
+  ] = await Promise.all([
     client.zRangeWithScores(communityKey, 0, 0),
     client.zCard(communityKey),
+    client.zRangeWithScores(globalThreadRanksKey, 0, 0),
+    client.zCard(globalThreadRanksKey),
   ]);
 
   // theoretically won't happen but added in-case to prevent Redis set infinitely growing
-  if (setLength > APPROXIMATE_MAX_SET_SIZE + 10) {
-    // logging as error so it is reported to Rollbar and we get a notification
-    log.error('Redis set size is too large, removing oldest items');
-    await client.zRemRangeByRank(
-      communityKey,
-      0,
-      setLength - APPROXIMATE_MAX_SET_SIZE,
-    );
-  }
+  await Promise.allSettled([
+    safetySetTrim(communityKey, communitySetLength),
+    safetySetTrim(globalThreadRanksKey, globalSetLength),
+  ]);
 
-  if (setLength < APPROXIMATE_MAX_SET_SIZE) {
-    await client.zAdd(communityKey, { score: rank, value: strThreadId });
-  } else if (lowestScoreItem[0].score < rank) {
-    await Promise.all([
-      client.zAdd(communityKey, { score: rank, value: strThreadId }),
-      client.zPopMinCount(communityKey, 1),
-    ]);
-  }
+  await Promise.allSettled([
+    ...addOrUpdateSortedSetRank(
+      communityKey,
+      communitySetLength,
+      rank,
+      threadId,
+      lowestCommunityItem[0],
+    ),
+    ...addOrUpdateSortedSetRank(
+      globalThreadRanksKey,
+      globalSetLength,
+      rank,
+      threadId,
+      lowestGlobalItem[0],
+    ),
+  ]);
 }
 
 /**
- * Objects should be ordered by rank DESCENDING i.e. high rank at index 0.
+ * Increments the rank of a batch of threads from multiple communities. This is
+ * primarily used for ViewCount related rank updates.
  */
 export async function batchedIncrementCachedRank(
   data: {
@@ -60,33 +121,135 @@ export async function batchedIncrementCachedRank(
     ranks: { thread_id: number; rank: string }[];
   }[],
 ) {
+  const [globalLowestRankedItem, globalSetLength] = await Promise.all([
+    client.zRangeWithScores(globalThreadRanksKey, 0, 0),
+    client.zCard(globalThreadRanksKey),
+  ]);
+  const globalNumAddedPromises: Promise<number | undefined>[] = [];
+
+  const communityData: Record<
+    string,
+    { setLength: number; promiseIndex: number }
+  > = {};
+  const communityNumAddedPromises: Promise<number | undefined>[] = [];
+  let index = 0;
   for (const { community_id, ranks } of data) {
+    const globalRanksToAdd = ranks.filter(
+      ({ rank }) => parseInt(rank) > (globalLowestRankedItem[0]?.score || 0),
+    );
+    if (globalRanksToAdd.length > 0) {
+      globalNumAddedPromises.push(
+        client.zAdd(
+          globalThreadRanksKey,
+          globalRanksToAdd.map(({ thread_id, rank }) => ({
+            score: parseInt(rank),
+            value: thread_id.toString(),
+          })),
+        ),
+      );
+    }
+
+    const communityKey = `${CacheNamespaces.CommunityThreadRanks}_${community_id}`;
+    let lowestRankedItem: { value: string; score: number }[];
+    let setLength: number;
+    try {
+      // get the lowest score item + number of elements in the set
+      [lowestRankedItem, setLength] = await Promise.all([
+        client.zRangeWithScores(communityKey, 0, 0),
+        client.zCard(communityKey),
+      ]);
+    } catch (e) {
+      log.error(
+        'Failed to get lowest ranked item and set length from community sorted set (batched)',
+        undefined,
+        {
+          communityKey,
+        },
+      );
+      continue;
+    }
+
+    const communityRanksToAdd = ranks.filter(
+      ({ rank }) => parseInt(rank) > (lowestRankedItem[0]?.score || 0),
+    );
+    if (communityRanksToAdd.length > 0) {
+      communityNumAddedPromises.push(
+        client.zAdd(
+          communityKey,
+          communityRanksToAdd.map(({ thread_id, rank }) => ({
+            score: parseInt(rank),
+            value: thread_id.toString(),
+          })),
+        ),
+      );
+      communityData[community_id] = {
+        setLength,
+        promiseIndex: index,
+      };
+      index++;
+    }
+  }
+
+  const numAddedRes = await Promise.allSettled(communityNumAddedPromises);
+
+  const popPromises: Promise<{ value: string; score: number }[]>[] = [];
+  for (const [community_id, { setLength, promiseIndex }] of Object.entries(
+    communityData,
+  )) {
     const communityKey = `${CacheNamespaces.CommunityThreadRanks}_${community_id}`;
 
-    // get the lowest score item + number of elements in the set
-    const [lowestScoreItem, setLength] = await Promise.all([
-      client.zRangeWithScores(communityKey, 0, 0),
-      client.zCard(communityKey),
-    ]);
+    const numAdded = numAddedRes[promiseIndex];
+    if (numAdded.status === 'rejected') {
+      log.error(
+        'Failed to add batched rank to community sorted set',
+        undefined,
+        {
+          key: communityKey,
+          reason: numAdded.reason,
+        },
+      );
+      continue;
+    }
 
-    const numAdded = await client.zAdd(
-      communityKey,
-      ranks
-        .filter(({ rank }) => parseInt(rank) > lowestScoreItem[0].score)
-        .map(({ thread_id, rank }) => ({
-          score: parseInt(rank),
-          value: thread_id.toString(),
-        })),
-    );
-    if (setLength + numAdded > APPROXIMATE_MAX_SET_SIZE) {
-      await client.zPopMinCount(
-        communityKey,
-        setLength + numAdded - APPROXIMATE_MAX_SET_SIZE,
+    if (
+      numAdded.value &&
+      setLength + numAdded.value > APPROXIMATE_MAX_SET_SIZE
+    ) {
+      popPromises.push(
+        client.zPopMinCount(
+          communityKey,
+          setLength + numAdded.value - APPROXIMATE_MAX_SET_SIZE,
+        ),
       );
     }
   }
+
+  await Promise.allSettled(popPromises);
+
+  const globalPromiseRes = await Promise.allSettled(globalNumAddedPromises);
+  let globalNumAdded = 0;
+  for (const promise of globalPromiseRes) {
+    if (promise.status === 'rejected') {
+      log.error('Failed to add batched rank to global sorted set', undefined, {
+        key: globalThreadRanksKey,
+        reason: promise.reason,
+      });
+      continue;
+    }
+    globalNumAdded += promise.value || 0;
+  }
+  if (globalSetLength + globalNumAdded > APPROXIMATE_MAX_SET_SIZE) {
+    await client.zPopMinCount(
+      globalThreadRanksKey,
+      globalSetLength + globalNumAdded - APPROXIMATE_MAX_SET_SIZE,
+    );
+  }
 }
 
+/**
+ * Decrements the rank of a thread in the relevant community sorted set and the
+ * global sorted set.
+ */
 async function decrementCachedRank(
   communityId: string,
   threadId: number,
@@ -138,6 +301,11 @@ export async function createThreadRank(thread: z.infer<typeof Thread>) {
   await incrementCachedRank(thread.community_id!, thread.id!, rank);
 }
 
+/**
+ * Removes a thread from all sorted sets when it becomes ineligible for ranking.
+ * Ineligibility includes but is not limited to deleting a thread or marking a
+ * thread as spam.
+ */
 export async function updateRankOnThreadIneligibility({
   thread_id,
   community_id,

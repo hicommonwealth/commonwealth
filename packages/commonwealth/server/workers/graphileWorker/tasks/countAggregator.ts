@@ -218,7 +218,7 @@ async function processViewCounts() {
     ranks: { thread_id: number; rank: string }[];
   }>(
     `
-      SELECT T.community_id, ARRAY_AGG(ROW_TO_JSON(TR) ORDER BY TR.rank DESC) AS ranks
+      SELECT T.community_id, ARRAY_AGG(ROW_TO_JSON(TR)) AS ranks
       FROM "ThreadRanks" TR
              JOIN "Threads" T ON TR.thread_id = T.id
       WHERE TR.thread_id IN (:threadIds)

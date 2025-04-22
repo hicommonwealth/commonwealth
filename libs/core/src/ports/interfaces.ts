@@ -84,7 +84,6 @@ export enum CacheNamespaces {
   Query_Response = 'query_response',
   CountAggregator = 'count_aggregator',
   Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
-  Community_Profile_Count_Changed = 'community_profile_count_changed',
   Tiered_Counter = 'tiered_counter',
   External_Api_Usage_Counter = 'api_key_counter',
   CommunityThreadRanks = 'community_thread_ranks',
