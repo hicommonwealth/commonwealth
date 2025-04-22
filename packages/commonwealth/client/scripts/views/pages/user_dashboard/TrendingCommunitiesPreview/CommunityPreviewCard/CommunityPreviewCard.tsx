@@ -14,6 +14,14 @@ import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
+
+const tierIcons = {
+  1: 'globe',
+  2: 'pins',
+  3: 'whiteCheck',
+  4: 'starGolden',
+} as const;
+
 type CommunityPreviewCardProps = {
   monthlyThreadCount?: number;
   isCommunityMember?: boolean;
@@ -33,6 +41,7 @@ type CommunityPreviewCardProps = {
         icon_url: string;
         id: string;
         base: ChainBase;
+        tier?: number;
       }>;
     }
 );
@@ -92,8 +101,11 @@ const CommunityPreviewCard = ({
             <div className="community-name">
               {community?.name && (
                 <CWText type="h4" fontWeight="medium">
-                  {smartTrim(community?.name, 10)}
+                  {smartTrim(community?.name, 8)}
                 </CWText>
+              )}
+              {community?.tier && tierIcons[community.tier] && (
+                <CWIcon iconName={tierIcons[community.tier]} iconSize="small" />
               )}
 
               <div className="thread-counts">
