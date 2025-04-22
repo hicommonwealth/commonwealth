@@ -1,7 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { calculateTokenPricing } from 'helpers/launchpad';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -16,6 +15,7 @@ import TradeTokenModal, {
   TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
@@ -124,31 +124,10 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
       ) : (
         <div className="list">
           {(tokens || []).map((token) => {
-            const pricing = calculateTokenPricing(
-              token as z.infer<typeof TokenView>,
-              ethToUsdRate,
-            );
-
             return (
               <TokenCard
                 key={token.name}
-                name={token.name}
-                symbol={token.symbol}
-                price={pricing.currentPrice}
-                pricePercentage24HourChange={
-                  pricing.pricePercentage24HourChange
-                }
-                marketCap={{
-                  current: pricing.marketCapCurrent,
-                  goal: pricing.marketCapGoal,
-                  isCapped: pricing.isMarketCapGoalReached,
-                }}
-                mode={
-                  pricing.isMarketCapGoalReached
-                    ? TradingMode.Swap
-                    : TradingMode.Buy
-                }
-                iconURL={token.icon_url || ''}
+                token={token as LaunchpadToken}
                 onCTAClick={(mode) => {
                   handleCTAClick(
                     mode,
