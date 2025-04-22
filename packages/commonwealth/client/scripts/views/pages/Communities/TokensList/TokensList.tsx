@@ -5,7 +5,6 @@ import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -74,14 +73,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
-
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -107,7 +98,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      {isInitialLoading || isLoadingETHToCurrencyRate ? (
+      {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
