@@ -24,7 +24,7 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
     ethChainId: communityNode?.ethChainId || 1,
     chainRpc: communityNode?.url,
     tokenAddress: (token as LaunchpadToken)?.token_address,
-    enabled: !!tokenCommunity && !!token?.token_address,
+    enabled: !!tokenCommunity,
   });
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
