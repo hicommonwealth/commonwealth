@@ -118,48 +118,57 @@ export const getContestStatus = async (
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
   };
 
-  const promise = await client.multicall({
-    contracts: [
-      {
-        ...contract,
-        functionName: 'startTime',
-      },
-      {
-        ...contract,
-        functionName: 'endTime',
-      },
-      {
-        ...contract,
-        functionName: 'currentContentId',
-      },
-      {
-        ...contract,
-        functionName: oneOff ? 'contestLength' : 'contestInterval',
-      },
-      {
-        ...contract,
-        functionName: 'prizeShare',
-      },
-      {
-        ...contract,
-        functionName: 'voterShare',
-      },
-      {
-        ...contract,
-        functionName: 'contestToken',
-      },
-    ],
-    allowFailure: false,
-  });
+  const [
+    startTime,
+    endTime,
+    currentContentId,
+    contestInterval,
+    prizeShare,
+    voterShare,
+    contestToken,
+  ] = await Promise.all([
+    client.readContract({
+      ...contract,
+      functionName: 'startTime',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: 'endTime',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: 'currentContentId',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: oneOff ? 'contestLength' : 'contestInterval',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: 'prizeShare',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: 'voterShare',
+    }),
+    client.readContract({
+      ...contract,
+      functionName: 'contestToken',
+    }),
+  ]);
+
+  console.log('prizeShare', prizeShare);
+  console.log('voterShare', voterShare);
+  console.log('contestToken', contestToken);
 
   return {
-    startTime: Number(promise[0]),
-    endTime: Number(promise[1]),
-    contestInterval: Number(promise[2]),
-    lastContentId: String(promise[3]),
-    prizeShare: Number(promise[4]),
-    voterShare: Number(promise[5]),
-    contestToken: promise[6] as `0x${string}`,
+    startTime: Number(startTime),
+    endTime: Number(endTime),
+    contestInterval: Number(contestInterval),
+    lastContentId: String(currentContentId),
+    prizeShare: Number(prizeShare),
+    voterShare: Number(voterShare),
+    contestToken: contestToken as `0x${string}`,
   };
 };
 

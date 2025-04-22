@@ -11,6 +11,7 @@ import {
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
+  LP_CONTEST_MANAGER_ADDRESS_ANVIL,
   LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
   LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
   buildContestLeaderboardUrl,
@@ -117,6 +118,8 @@ async function createInitialContest(
           topic_id: topic.id,
           funding_token_address: contestToken,
           is_farcaster_contest: false,
+          cancelled: false,
+          ended: false,
           environment: config.APP_ENV,
         },
         { transaction },
@@ -286,6 +289,7 @@ export function Contests(): Projection<typeof inputs> {
               [
                 LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
                 LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
+                LP_CONTEST_MANAGER_ADDRESS_ANVIL,
               ].includes(deployerAddress)
             ) {
               await createInitialContest(
