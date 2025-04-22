@@ -117,6 +117,7 @@ async function createInitialContest(
           payout_structure: [50, 35, 15],
           topic_id: topic.id,
           funding_token_address: contestToken,
+          vote_weight_multiplier: 100,
           is_farcaster_contest: false,
           cancelled: false,
           ended: false,
