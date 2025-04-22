@@ -144,14 +144,18 @@ export const getTargetMarketCap = (
   initialReserve: number = 4.167e8,
   initialSupply: number = 1e18,
   currentSupply: number = 4.3e26,
-  connectorWeight: number = 0.83,
+  connectorWeight: number = 830000,
   totalSupply: number = 1e9,
 ) => {
-  initialReserve = parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000');
-  connectorWeight =
-    parseInt(process.env.LAUNCHPAD_CONNECTOR_WEIGHT || '830000') / 1000000;
-  const x = initialReserve / (initialSupply * connectorWeight);
-  const y = (currentSupply / initialSupply) ** (1 / connectorWeight - 1);
+  const initialReserveVar = parseInt(
+    process.env.LAUNCHPAD_INITIAL_PRICE || initialReserve.toString(),
+  );
+  const connectorWeightVar =
+    parseInt(
+      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || connectorWeight.toString(),
+    ) / 1000000;
+  const x = initialReserveVar / (initialSupply * connectorWeightVar);
+  const y = (currentSupply / initialSupply) ** (1 / connectorWeightVar - 1);
   const price = x * y;
   return price * totalSupply;
 };
