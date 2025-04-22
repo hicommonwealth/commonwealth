@@ -103,11 +103,7 @@ const getCreateContentMenuItems = (
       type: 'element',
       element: (
         <div onClick={resetSidebarState} key="create-community-wrapper">
-          <CreateCommunityButton
-            withIcon
-            buttonHeight="sm"
-            buttonWidth="auto"
-          />
+          <CreateCommunityButton withIcon buttonHeight="sm" />
         </div>
       ),
     } as PopoverMenuItem,

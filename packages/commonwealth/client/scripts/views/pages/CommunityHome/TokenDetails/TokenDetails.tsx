@@ -1,8 +1,4 @@
-import { TokenView } from '@hicommonwealth/schemas';
-import BigNumber from 'bignumber.js';
 import { formatAddressShort } from 'client/scripts/helpers';
-import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
-import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
@@ -11,11 +7,10 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import numeral from 'numeral';
 import React from 'react';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
-import { z } from 'zod';
 import FormattedDisplayNumber from '../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import SocialLinks from './SocialLinks/SocialLinks';
 import './TokenDetails.scss';
@@ -34,22 +29,11 @@ const TokenDetails = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
-    tokenSymbol: 'ETH',
+  const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
   });
 
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
-
-  if (isLoadingToken) return;
-
-  const tokenPricing = communityToken
-    ? calculateTokenPricing(
-        communityToken as z.infer<typeof TokenView>,
-        ethToUsdRate,
-      )
-    : null;
+  if (isLoadingToken || pricingLoading) return;
 
   const address = communityToken
     ? isPinnedToken
@@ -63,34 +47,10 @@ const TokenDetails = ({
       : (communityToken as LaunchpadToken).icon_url
     : undefined;
 
-  const formattedMarketCap =
-    communityToken &&
-    tokenPricing &&
-    typeof tokenPricing.marketCapCurrent === 'number'
-      ? `${currencyNameToSymbolMap[SupportedCurrencies.USD]}${numeral(tokenPricing.marketCapCurrent).format('0.00a')}`
-      : 'N/A';
-
-  // Set Total Supply to 1B for community tokens, null otherwise
   const totalSupply = !isPinnedToken ? '1000000000' : null;
   const formattedTotalSupply = totalSupply
     ? numeral(totalSupply).format('0.0a')
     : 'N/A';
-
-  // Re-added Sanity Check Log
-  if (
-    tokenPricing &&
-    totalSupply &&
-    typeof tokenPricing.currentPrice === 'number'
-  ) {
-    const calculatedMarketCap = new BigNumber(tokenPricing.currentPrice).times(
-      new BigNumber(totalSupply),
-    );
-    console.log('>>> TokenDetails Sanity Check:');
-    console.log('   Price:', tokenPricing.currentPrice);
-    console.log('   Supply:', totalSupply);
-    console.log('   Calculated MCAP:', calculatedMarketCap.toString());
-    console.log('   Reported MCAP:', tokenPricing.marketCapCurrent);
-  }
 
   return (
     <div className="token-details">
@@ -186,24 +146,26 @@ const TokenDetails = ({
           <CWText type="b1" className="faded">
             Market Cap
           </CWText>
-          <CWText type="b1" fontWeight="medium">
-            {formattedMarketCap}
-          </CWText>
+          {communityToken ? (
+            <CWText>
+              ${numeral(tokenPricing.marketCapCurrent).format('0.00a')}
+            </CWText>
+          ) : (
+            <CWText>N/A</CWText>
+          )}
         </div>
         <div className="stat-item">
           <CWText type="b1" className="faded">
             Price
           </CWText>
           {/* Use FormattedDisplayNumber for price */}
-          {communityToken &&
-          tokenPricing &&
-          typeof tokenPricing.currentPrice === 'number' ? (
+          {communityToken && tokenPricing?.currentPrice !== undefined ? ( // More robust check
             <FormattedDisplayNumber
               value={tokenPricing.currentPrice}
               options={{
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: 4,
+                // Use correct options based on FormatNumberOptions type
+                decimals: 4,
+                currencySymbol: '$',
               }}
               type="b1"
               fontWeight="medium"

@@ -42,12 +42,15 @@ class LaunchpadBondingCurve extends ContractBase {
     symbol: string,
     walletAddress: string,
     chainId: string,
-    connectorWeight: number = 830000,
   ) {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-    const initialBuyValue = 4.4400042e14;
+    const initialBuyValue =
+      4.44e14 + parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000');
+    const connectorWeight = parseInt(
+      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || '830000',
+    );
     const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
