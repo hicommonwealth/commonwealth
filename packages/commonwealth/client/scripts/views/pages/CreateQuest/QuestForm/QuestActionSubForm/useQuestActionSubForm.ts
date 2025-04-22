@@ -36,11 +36,7 @@ const useQuestActionSubForm = ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
     }))
-    .filter(
-      (action) =>
-        !(hiddenActions || []).includes(action.value) &&
-        action.value !== 'UserMentioned',
-    );
+    .filter((action) => !(hiddenActions || []).includes(action.value));
 
   const inputConfigs = {
     contentId: {
