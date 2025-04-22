@@ -3,10 +3,14 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import FormattedDisplayNumber from '../../../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import { SellAmountSelectionProps } from '../types';
 import './AmountSelections.scss';
 
 const SellAmountSelection = ({ trading }: SellAmountSelectionProps) => {
+  const ethGain = trading.amounts.sell.gain.eth || 0;
+  const decimalOptions = ethGain >= 1 ? { decimals: 4 } : { decimals: 6 };
+
   return (
     <div className="AmountSelections">
       <div className="amount-input-with-currency-symbol">
@@ -24,7 +28,7 @@ const SellAmountSelection = ({ trading }: SellAmountSelectionProps) => {
       <CWText type="caption" className="invest-to-gain-amounts">
         =
         <CWIcon iconName="ethereum" iconSize="small" />{' '}
-        {trading.amounts.sell.gain.eth.toFixed(18)} ETH
+        <FormattedDisplayNumber value={ethGain} options={decimalOptions} /> ETH
       </CWText>
 
       {trading.amounts.sell.invest.baseToken.presetAmounts && (
@@ -34,7 +38,7 @@ const SellAmountSelection = ({ trading }: SellAmountSelectionProps) => {
               <CWTag
                 key={presetAmount}
                 type="amount"
-                label={`${presetAmount} ${trading.token.symbol}`}
+                label={`${presetAmount}`}
                 onClick={() =>
                   trading.amounts.sell.invest.baseToken.onAmountChange(
                     presetAmount,

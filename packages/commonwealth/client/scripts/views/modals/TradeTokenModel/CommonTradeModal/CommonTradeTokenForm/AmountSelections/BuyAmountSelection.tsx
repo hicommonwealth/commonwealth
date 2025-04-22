@@ -4,6 +4,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import FormattedDisplayNumber from '../../../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import TokenIcon from '../../../TokenIcon';
 import { BuyAmountSelectionProps } from '../types';
 import './AmountSelections.scss';
@@ -29,7 +30,11 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
 
       <CWText type="caption" className="invest-to-gain-amounts">
         = {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
-        {trading.amounts.buy.gain.token} {trading.token.symbol}
+        <FormattedDisplayNumber
+          value={trading.amounts.buy.gain.token}
+          options={{ decimals: 4 }}
+        />{' '}
+        {trading.token.symbol}
       </CWText>
 
       {trading.amounts.buy.invest.baseCurrency.presetAmounts && (
