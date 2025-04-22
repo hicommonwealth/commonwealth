@@ -231,16 +231,44 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'TweetEngagement': {
-        if (actionContentId) {
-          window.open(buildRedirectURLFromContentId(actionContentId), '_blank');
+        // Check if user has Twitter linked
+        const hasTwitterLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'twitter',
+        );
+
+        if (hasTwitterLinked) {
+          if (actionContentId) {
+            window.open(
+              buildRedirectURLFromContentId(actionContentId),
+              '_blank',
+            );
+          } else {
+            notifyError(`Linked twitter tweet url is invalid`);
+          }
         } else {
-          notifyError(`Linked twitter tweet url is invalid`);
+          // Open Twitter SSO modal if Twitter isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+          });
         }
         break;
       }
       case 'DiscordServerJoined': {
-        // requires a start link
-        notifyError(`Start link is invalid for this action`);
+        // Check if user has Discord linked and if there's a start link
+        const hasDiscordLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'discord',
+        );
+
+        if (hasDiscordLinked && action.start_link) {
+          window.open(action.start_link, '_blank');
+        } else {
+          // Open Discord SSO modal if Discord isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+          });
+        }
         break;
       }
       case 'MembershipsRefreshed': {

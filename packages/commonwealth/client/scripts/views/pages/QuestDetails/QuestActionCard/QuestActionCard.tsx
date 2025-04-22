@@ -49,7 +49,6 @@ const QuestActionCard = ({
   questStartDate,
   questEndDate,
 }: QuestActionCardProps) => {
-  console.log('questAction => ', questAction);
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
       questAction.creator_reward_weight * 100,
@@ -62,6 +61,27 @@ const QuestActionCard = ({
   const isUserReferred = !!user.referredByAddress;
   const hideShareSplit =
     doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
+
+  // Function to determine the button label based on quest action type
+  const getButtonLabel = () => {
+    const hasDiscordLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'discord',
+    );
+
+    const hasTwitterLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'twitter',
+    );
+
+    if (questAction.event_name === 'DiscordServerJoined' && !hasDiscordLinked) {
+      return 'Connect Discord';
+    }
+
+    if (questAction.event_name === 'TweetEngagement' && !hasTwitterLinked) {
+      return 'Connect Twitter';
+    }
+
+    return 'Start';
+  };
 
   const isRepeatableQuest =
     questAction?.participation_limit === QuestParticipationLimit.OncePerPeriod;
@@ -202,7 +222,7 @@ const QuestActionCard = ({
                 <CWButton
                   buttonType="secondary"
                   buttonAlt="green"
-                  label="Start"
+                  label={getButtonLabel()}
                   buttonHeight="sm"
                   buttonWidth="narrow"
                   iconRight="arrowRightPhosphor"
