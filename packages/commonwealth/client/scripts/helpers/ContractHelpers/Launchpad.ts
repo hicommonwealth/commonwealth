@@ -65,8 +65,15 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async buyToken(amountEth: number, walletAddress: string, chainId: string) {
-    this.isInitialized();
+  async buyToken(
+    amountEth: number,
+    walletAddress: string,
+    chainId: string,
+    providerInstance?: any,
+  ) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
 
     const txReceipt = await cp.buyToken(
       this.contract,
@@ -77,8 +84,15 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async sellToken(amountSell: number, walletAddress: string, chainId: string) {
-    this.isInitialized();
+  async sellToken(
+    amountSell: number,
+    walletAddress: string,
+    chainId: string,
+    providerInstance?: any,
+  ) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
 
     const tokenContract = new this.web3.eth.Contract(
       erc20Abi as unknown as AbiItem[],

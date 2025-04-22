@@ -47,14 +47,12 @@ const buyToken = async ({
     chainRpc,
   );
 
-  // Always initialize before use. Pass magicProvider if it exists.
-  await launchPad.initialize(
-    true, // Always initialize with wallet context for transactions
+  return await launchPad.buyToken(
+    amountEth,
+    walletAddress,
     `${ethChainId}`,
-    magicProvider, // Pass provider if available, otherwise ContractBase uses default
+    magicProvider,
   );
-
-  return await launchPad.buyToken(amountEth, walletAddress, `${ethChainId}`);
 };
 
 const useBuyTokenMutation = () => {
