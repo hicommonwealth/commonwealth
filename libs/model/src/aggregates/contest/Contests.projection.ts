@@ -79,7 +79,7 @@ async function createInitialContest(
     true,
   );
 
-  const { startTime, endTime, prizeShare, voterShare, contestToken } =
+  const { startTime, endTime, prizeShare, contestToken } =
     await getContestStatus(
       { rpc: url, eth_chain_id: ethChainId },
       contest_address,
@@ -113,7 +113,7 @@ async function createInitialContest(
             'Top content of the week gets rewarded by community owned pool',
           image_url: getDefaultContestImage(),
           prize_percentage: prizeShare,
-          payout_structure: [50, 30, 20], // TODO: get payout structure from contract?
+          payout_structure: [50, 35, 15],
           topic_id: topic.id,
           funding_token_address: contestToken,
           is_farcaster_contest: false,
