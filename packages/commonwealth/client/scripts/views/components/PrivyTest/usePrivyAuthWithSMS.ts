@@ -1,15 +1,11 @@
 import { useLoginWithSms } from '@privy-io/react-auth';
 
 import { useEffect, useMemo } from 'react';
+import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
 import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
 import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
 
-type UsePrivySMS = {
-  onSuccess: (address: string, isNewlyCreated: boolean) => void;
-  onError: (err: Error) => void;
-};
-
-export function usePrivyAuthWithSMS(props: UsePrivySMS) {
+export function usePrivyAuthWithSMS(props: PrivyCallbacks) {
   const { onSuccess, onError } = props;
   const { sendCode, loginWithCode } = useLoginWithSms();
   const privySignOn = usePrivySignOn();
