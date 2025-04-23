@@ -9,6 +9,7 @@ export interface BuyTokenProps {
   tokenAddress: string;
   amountEth: number;
   walletAddress: string;
+  tokenUrl?: string;
 }
 
 const buyToken = async ({
@@ -17,6 +18,7 @@ const buyToken = async ({
   tokenAddress,
   amountEth,
   walletAddress,
+  tokenUrl,
 }: BuyTokenProps) => {
   const launchPad = new LaunchpadBondingCurve(
     commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
@@ -26,7 +28,12 @@ const buyToken = async ({
     chainRpc,
   );
 
-  return await launchPad.buyToken(amountEth, walletAddress, `${ethChainId}`);
+  return await launchPad.buyToken(
+    amountEth,
+    walletAddress,
+    `${ethChainId}`,
+    tokenUrl,
+  );
 };
 
 const useBuyTokenMutation = () => {
