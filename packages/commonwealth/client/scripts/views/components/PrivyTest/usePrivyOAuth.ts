@@ -9,21 +9,12 @@ import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/pri
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSignIn } from 'state/api/user';
+import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
 import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
 import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
 import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
 
-type OnSuccess = {
-  address: string;
-  isNewlyCreated: boolean;
-};
-
-type UsePrivyOAuthProps = {
-  onSuccess: (success: OnSuccess) => void;
-  onError: (err: Error) => void;
-};
-
-export function usePrivyOAuth(props: UsePrivyOAuthProps) {
+export function usePrivyOAuth(props: PrivyCallbacks) {
   const { onSuccess, onError } = props;
 
   const [oAuthAccessToken, setOAuthAccessToken] = useState<string | undefined>(
@@ -108,7 +99,7 @@ export function usePrivyOAuth(props: UsePrivyOAuthProps) {
         },
       });
 
-      onSuccess({ address: wallet.address, isNewlyCreated: newlyCreated });
+      onSuccess(wallet.address, newlyCreated);
     }
 
     doAsync().catch((err) => {
