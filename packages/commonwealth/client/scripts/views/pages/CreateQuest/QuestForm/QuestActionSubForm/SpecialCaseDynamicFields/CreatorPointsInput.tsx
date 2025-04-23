@@ -10,6 +10,7 @@ const CreatorPointsInput = ({
   onChange,
   config,
 }: SpecialCaseDynamicFieldsProps) => {
+  // only render if config allows
   if (!config?.requires_creator_points) return <></>;
 
   const hasReferrerShare = doesActionRewardShareForReferrer(
