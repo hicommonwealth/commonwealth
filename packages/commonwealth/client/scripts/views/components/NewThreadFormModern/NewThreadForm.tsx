@@ -72,6 +72,7 @@ export const NewThreadForm = () => {
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+  const [selectedActionCard, setSelectedActionCard] = useState<string[]>([]);
 
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
 
@@ -344,20 +345,24 @@ export const NewThreadForm = () => {
   };
 
   const sidebarComponent = [
-    {
-      label: 'Links',
-      item: (
-        <div className="cards-column">
-          <LinkedProposalsCard
-            thread={null}
-            showAddProposalButton={true}
-            setLinkedProposals={setLinkedProposals}
-            linkedProposals={linkedProposals}
-            communityId={communityId}
-          />
-        </div>
-      ),
-    },
+    ...(selectedActionCard.includes('Snapshot')
+      ? [
+          {
+            label: 'Links',
+            item: (
+              <div className="cards-column">
+                <LinkedProposalsCard
+                  thread={null}
+                  showAddProposalButton={true}
+                  setLinkedProposals={setLinkedProposals}
+                  linkedProposals={linkedProposals}
+                  communityId={communityId}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...((pollsData && pollsData?.length > 0) ||
     !app.chain?.meta?.admin_only_polling ||
     isAdmin
@@ -382,15 +387,16 @@ export const NewThreadForm = () => {
                     />
                   );
                 })}
-                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
-                  <ThreadPollEditorCard
-                    threadAlreadyHasPolling={!pollsData?.length}
-                    setLocalPoll={setPollData}
-                    isCreateThreadPage={true}
-                    threadTitle={threadTitle}
-                    threadContentDelta={editorText}
-                  />
-                )}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) &&
+                  selectedActionCard.includes('Poll') && (
+                    <ThreadPollEditorCard
+                      threadAlreadyHasPolling={!pollsData?.length}
+                      setLocalPoll={setPollData}
+                      isCreateThreadPage={true}
+                      threadTitle={threadTitle}
+                      threadContentDelta={editorText}
+                    />
+                  )}
               </div>
             ),
           },
@@ -579,6 +585,8 @@ export const NewThreadForm = () => {
                       onClick={handleNewThreadCreation}
                     />
                   )}
+                  setSelectedActionCard={setSelectedActionCard}
+                  selectedActionCard={selectedActionCard}
                 />
 
                 {contestThreadBannerVisible && <ContestThreadBanner />}
