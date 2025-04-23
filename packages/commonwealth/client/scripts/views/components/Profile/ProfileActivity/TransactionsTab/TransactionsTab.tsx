@@ -2,6 +2,7 @@ import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { formatUnits } from 'ethers/lib/utils';
 import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useGetLaunchpadTradesQuery } from 'state/api/launchPad';
 import { useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
@@ -79,15 +80,15 @@ const transformLaunchpadTradeData = (
         trade.eth_chain_id,
       ),
       community: {
-        id: trade.token_address,
-        name: meta.name || 'Launchpad Community',
-        default_symbol: meta.symbol || 'LPAD',
-        icon_url: meta.icon_url || '',
+        id: trade.community_id,
+        name: trade.name,
+        default_symbol: trade.symbol,
+        icon_url: trade.community_icon_url,
         chain_node_id: trade.eth_chain_id,
       },
       transaction_category: 'launchpad',
       transaction_type: trade.is_buy ? 'buy' : 'sell',
-      totalPrice: `${formatUnits(trade.price?.toString() || '0', 18)} ETH`,
+      totalPrice: `${formatUnits((trade.price * 1e18)?.toString() || '0', 18)} ETH`,
       price: trade.price,
       transaction_hash: trade.transaction_hash,
       community_id: trade.token_address,
@@ -114,6 +115,11 @@ const TransactionsTab = ({
   }, [searchText]);
 
   const user = useUserStore();
+
+  const { data: launchpadData } = useGetLaunchpadTradesQuery({
+    trader_addresses: user.addresses.map((u) => u.address),
+  });
+
   const hasMagic = user.hasMagicWallet;
 
   const ADDRESS_FILTERS = [
@@ -169,17 +175,20 @@ const TransactionsTab = ({
     addressFilter,
   });
 
-  const transformedPrefetchedData = useMemo(() => {
-    if (!prefetchedData || isLoadingMetadata) return undefined;
-    return transformLaunchpadTradeData(prefetchedData, metadataMap);
-  }, [prefetchedData, metadataMap, isLoadingMetadata]);
+  const transformedPrefetchedData = transformLaunchpadTradeData(
+    launchpadData,
+    metadataMap,
+  );
 
   const locallyFilteredData = useMemo(() => {
     if (!transformedPrefetchedData) return undefined;
     if (!filterOptions.searchText) return transformedPrefetchedData;
 
     return transformedPrefetchedData.filter((tx) =>
-      (tx.community.default_symbol + tx.community.name)
+      (tx.transaction_category === 'launchpad'
+        ? `${tx.community.name} (${tx.community.default_symbol})`
+        : `${tx.community.default_symbol} ${tx.community.name}`
+      )
         .toLowerCase()
         .includes((filterOptions.searchText || '').toLowerCase()),
     );
