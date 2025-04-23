@@ -1,6 +1,6 @@
 import {
   TokenBondingCurveABI,
-  TokenLaunchpadABI,
+  TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
@@ -9,7 +9,7 @@ import ContractBase from './ContractBase';
 class TokenLaunchpad extends ContractBase {
   private paymentTokenContract: any;
   launchpadFactoryAddress: string;
-  launchpadFactory: Contract<typeof TokenLaunchpadABI>;
+  launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
 
   constructor(
     launchpadFactoryAddress: string, // use chainConfig.postTokenLaunchpad
@@ -19,7 +19,7 @@ class TokenLaunchpad extends ContractBase {
   ) {
     super(bondingCurveAddress, TokenBondingCurveABI, rpc);
     this.launchpadFactory = new this.web3.eth.Contract(
-      TokenLaunchpadABI,
+      TokenLaunchpadAbi,
       launchpadFactoryAddress,
     );
     this.launchpadFactoryAddress = launchpadFactoryAddress;
@@ -33,10 +33,12 @@ class TokenLaunchpad extends ContractBase {
     name: string,
     symbol: string,
     walletAddress: string,
-    tokenCommunityManager: string,
     threadId: number,
     exchangeToken: string,
     chainId: string,
+    initPurchaseAmount: number,
+    authorAddress: string,
+    communityTreasuryAddress: string,
   ) {
     try {
       if (!this.initialized || !this.walletEnabled) {
@@ -47,14 +49,15 @@ class TokenLaunchpad extends ContractBase {
         this.launchpadFactory,
         name,
         symbol,
-        [],
-        [],
+        [8250, 1550, 100, 100],
+        [authorAddress, communityTreasuryAddress],
         this.web3.utils.toWei('1e9', 'ether'), // Default 1B tokens
         walletAddress,
         830000,
-        tokenCommunityManager,
         threadId,
         exchangeToken,
+        initPurchaseAmount,
+        this.paymentTokenContract,
       );
     } catch (error) {
       console.error('Error launching token with liquidity:', error);

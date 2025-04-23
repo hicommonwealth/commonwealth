@@ -31,14 +31,21 @@ export const launchPostToken = async (
   totalSupply: string, // Default 1B tokens in Wei
   walletAddress: string,
   connectorWeight: number,
-  tokenCommunityManager: string,
   threadId: number,
   exchangeToken: string,
+  initPurchaseAmount: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tokenContract: any,
   curveId: number = 1,
   scalar: number = 0,
-  lphook: string = '0x0000000000000000000000000000000000000000',
 ) => {
   try {
+    await approveTokenTransfer(
+      tokenContract,
+      contract.options.address,
+      initPurchaseAmount.toString(),
+      walletAddress,
+    );
     const txReceipt = await contract.methods
       .launchTokenWithLiquidity(
         name,
@@ -48,13 +55,14 @@ export const launchPostToken = async (
         totalSupply,
         curveId,
         scalar,
-        lphook,
-        tokenCommunityManager,
+        0x0000000000000000000000000000000000000000, // No LP hook
+        0x0000000000000000000000000000000000000000, // No TCM
         connectorWeight,
         threadId,
         exchangeToken,
+        initPurchaseAmount,
       )
-      .send({ from: walletAddress, value: 0 });
+      .send({ from: walletAddress, value: 4.44e14 });
     return txReceipt;
   } catch (error) {
     console.error('Error launching token:', error);
@@ -80,10 +88,12 @@ export const buyPostToken = async (
       amountIn,
       walletAddress,
     );
-
+    const feeAmount = await contract.methods
+      .getETHFeeAmount(tokenAddress, amountIn, true)
+      .call();
     const txReceipt = await contract.methods
       .buyToken(tokenAddress, recipient, amountIn, minAmountOut)
-      .send({ from: walletAddress, value: 0 });
+      .send({ from: walletAddress, value: feeAmount });
     return txReceipt;
   } catch (error) {
     console.error('Error buying token:', error);
@@ -108,10 +118,12 @@ export const sellPostToken = async (
       amount,
       walletAddress,
     );
-
+    const feeAmount = await contract.methods
+      .getETHFeeAmount(tokenAddress, amount, false)
+      .call();
     const txReceipt = await contract.methods
       .sellToken(tokenAddress, amount, minAmountOut)
-      .send({ from: walletAddress, value: 0 });
+      .send({ from: walletAddress, value: feeAmount });
     return txReceipt;
   } catch (error) {
     console.error('Error selling token:', error);
