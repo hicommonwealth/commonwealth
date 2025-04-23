@@ -11,6 +11,7 @@ import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { openConfirmation } from '../../../modals/confirmation_modal';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import ProfileSection from '../Section';
@@ -123,19 +124,36 @@ const ManageApiKey = () => {
           </CWText>
         )}
       </div>
-      <CWButton
-        label="Create an API Key"
-        type="button"
-        buttonType="primary"
-        buttonWidth="narrow"
-        onClick={handleCreateAPIKey}
-        disabled={tier < UserTierMap.SocialVerified}
-        tooltip={
-          tier < UserTierMap.SocialVerified
-            ? 'You need to be Tier 4 (Social Verified) or higher to create an API key'
-            : undefined
-        }
-      />
+      {tier < UserTierMap.SocialVerified ? (
+        <CWTooltip
+          content="You need to be Tier 4 (Social Verified) or higher to create an API key"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <div
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWButton
+                label="Create an API Key"
+                type="button"
+                buttonType="primary"
+                buttonWidth="narrow"
+                onClick={handleCreateAPIKey}
+                disabled={true}
+              />
+            </div>
+          )}
+        />
+      ) : (
+        <CWButton
+          label="Create an API Key"
+          type="button"
+          buttonType="primary"
+          buttonWidth="narrow"
+          onClick={handleCreateAPIKey}
+          disabled={false}
+        />
+      )}
     </section>
   );
 
