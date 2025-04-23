@@ -35,7 +35,7 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
-import { AuthOptionTypes } from 'views/modals/AuthModal/types';
+import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
@@ -64,9 +64,11 @@ const QuestDetails = ({ id }: { id: number }) => {
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
+    specificAuthOption?: AuthOptions;
   }>({
     type: undefined,
     options: undefined,
+    specificAuthOption: undefined,
   });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
@@ -250,6 +252,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           setAuthModalConfig({
             type: AuthModalType.SignIn,
             options: ['sso'],
+            specificAuthOption: 'x', // only show twitter option
           });
         }
         break;
@@ -267,6 +270,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           setAuthModalConfig({
             type: AuthModalType.SignIn,
             options: ['sso'],
+            specificAuthOption: 'discord', // only show discord option
           });
         }
         break;
@@ -584,6 +588,9 @@ const QuestDetails = ({ id }: { id: number }) => {
         showWalletsFor={
           (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
         }
+        {...(authModalConfig.specificAuthOption && {
+          showAuthOptionFor: authModalConfig.specificAuthOption,
+        })}
         showAuthOptionTypesFor={authModalConfig.options}
         isOpen={!!(authModalConfig.type && authModalConfig.options)}
       />
