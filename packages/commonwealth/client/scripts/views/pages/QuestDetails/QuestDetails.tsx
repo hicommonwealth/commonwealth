@@ -266,6 +266,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (!action.start_link) {
           // requires a start link
           notifyError(`Start link is invalid for this action`);
+          return;
         }
 
         if (hasDiscordLinked && action.start_link) {
