@@ -254,7 +254,7 @@ export const config = configure(
         ? parseFloat(COMMUNITY_TIER_WEIGHT)
         : 1,
     },
-    DISABLE_TIER_RATE_LIMITS: ['local', 'CI'].includes(target.APP_ENV)
+    DISABLE_TIER_RATE_LIMITS: ['local'].includes(target.APP_ENV)
       ? true
       : DISABLE_TIER_RATE_LIMITS === 'true',
   },
