@@ -1,14 +1,14 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
-import { usePrivyAuthWithSMS } from 'views/components/PrivyTest/usePrivyAuthWithSMS';
+import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
 
-export const LoginWithSMS = () => {
+export const LoginWithEmail = () => {
   const { authenticated, logout } = usePrivy();
-  const [stage, setStage] = useState<'enter-phone-number' | 'wait-for-code'>(
-    'enter-phone-number',
+  const [stage, setStage] = useState<'enter-email' | 'wait-for-code'>(
+    'enter-email',
   );
 
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
 
   const handleSuccess = useCallback(() => {
@@ -19,25 +19,25 @@ export const LoginWithSMS = () => {
     console.log('error: ', err);
   }, []);
 
-  const { sendCode, loginWithCode } = usePrivyAuthWithSMS({
+  const { sendCode, loginWithCode } = usePrivyAuthWithEmail({
     onSuccess: handleSuccess,
     onError: handleError,
   });
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
-    setStage('enter-phone-number');
-    setPhoneNumber('');
+    setStage('enter-email');
+    setEmail('');
     setCode('');
   }, [logout]);
 
   const handleSendCode = useCallback(() => {
     async function doAsync() {
-      await sendCode({ phoneNumber });
+      await sendCode({ email });
       setStage('wait-for-code');
     }
     doAsync().catch(handleError);
-  }, [handleError, sendCode, phoneNumber]);
+  }, [handleError, sendCode, email]);
 
   const handleLoginWithCode = useCallback(() => {
     async function doAsync() {
@@ -56,14 +56,14 @@ export const LoginWithSMS = () => {
 
   return (
     <>
-      {stage === 'enter-phone-number' && (
+      {stage === 'enter-email' && (
         <>
           <input
-            placeholder="Enter phone number"
+            placeholder="Enter email"
             type="tel"
             required
-            onChange={(e) => setPhoneNumber(e.currentTarget.value)}
-            value={phoneNumber}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            value={email}
           />
           <button onClick={handleSendCode}>Send Code</button>
         </>

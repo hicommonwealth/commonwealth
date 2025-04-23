@@ -12,7 +12,7 @@ type UsePrivySignOnProps = {
   onError: (err: Error) => void;
   wallet: ConnectedWallet;
   ssoOAuthToken: string | undefined;
-  ssoProvider: 'google_oauth' | 'phone';
+  ssoProvider: 'google_oauth' | 'phone' | 'email';
 };
 
 export function usePrivySignOn() {

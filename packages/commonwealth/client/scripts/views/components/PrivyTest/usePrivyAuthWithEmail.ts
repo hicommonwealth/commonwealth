@@ -24,7 +24,7 @@ export function usePrivyAuthWithEmail(props: UsePrivySMS) {
           onSuccess,
           onError,
           ssoOAuthToken: undefined,
-          ssoProvider: 'phone',
+          ssoProvider: 'email',
         });
       } else {
         console.warn('No wallet... ');
