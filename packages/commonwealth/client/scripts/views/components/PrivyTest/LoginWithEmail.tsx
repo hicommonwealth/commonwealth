@@ -1,5 +1,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
+import { useDefaultAuthCallbacks } from 'views/components/PrivyTest/useDefaultAuthCallbacks';
 import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
 
 export const LoginWithEmail = () => {
@@ -11,20 +12,9 @@ export const LoginWithEmail = () => {
   const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
 
-  const handleSuccess = useCallback(() => {
-    console.log('success!');
-    const landingURL = new URL('/', window.location.href).toString();
-    document.location.href = landingURL;
-  }, []);
+  const callbacks = useDefaultAuthCallbacks();
 
-  const handleError = useCallback((err: Error) => {
-    console.log('error: ', err);
-  }, []);
-
-  const { sendCode, loginWithCode } = usePrivyAuthWithEmail({
-    onSuccess: handleSuccess,
-    onError: handleError,
-  });
+  const { sendCode, loginWithCode } = usePrivyAuthWithEmail(callbacks);
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
@@ -38,15 +28,15 @@ export const LoginWithEmail = () => {
       await sendCode({ email });
       setStage('wait-for-code');
     }
-    doAsync().catch(handleError);
-  }, [handleError, sendCode, email]);
+    doAsync().catch(callbacks.onError);
+  }, [callbacks.onError, sendCode, email]);
 
   const handleLoginWithCode = useCallback(() => {
     async function doAsync() {
       await loginWithCode({ code });
     }
-    doAsync().catch(handleError);
-  }, [handleError, loginWithCode, code]);
+    doAsync().catch(callbacks.onError);
+  }, [callbacks.onError, loginWithCode, code]);
 
   if (authenticated) {
     return (
