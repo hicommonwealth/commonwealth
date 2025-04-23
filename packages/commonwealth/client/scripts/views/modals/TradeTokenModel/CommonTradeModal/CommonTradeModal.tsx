@@ -28,7 +28,7 @@ const CommonTradeModal = ({
         ...tradeConfig,
         ethBuyCurrency: TRADING_CURRENCY,
         buyTokenPresetAmounts: [100, 300, 1000],
-        sellTokenPresetAmounts: ['Max'],
+        sellTokenPresetAmounts: ['25%', '50%', '75%', 'Max'],
       },
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
