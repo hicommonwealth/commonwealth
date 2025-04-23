@@ -2,33 +2,15 @@ import { useLoginWithSms } from '@privy-io/react-auth';
 
 import { useEffect, useMemo } from 'react';
 import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
-import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
-import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
+import { usePrivyAuthEffect } from 'views/components/PrivyTest/usePrivyAuthEffect';
 
 export function usePrivyAuthWithSMS(props: PrivyCallbacks) {
-  const { onSuccess, onError } = props;
   const { sendCode, loginWithCode } = useLoginWithSms();
-  const privySignOn = usePrivySignOn();
-  const wallet = useConnectedWallet();
+  const privyAuthEffect = usePrivyAuthEffect(props);
 
   useEffect(() => {
-    async function doAsync() {
-      if (wallet) {
-        console.log('Trying to login...');
-        await privySignOn({
-          wallet,
-          onSuccess,
-          onError,
-          ssoOAuthToken: undefined,
-          ssoProvider: 'phone',
-        });
-      } else {
-        console.warn('No wallet... ');
-      }
-    }
-
-    doAsync().catch(onError);
-  }, [onError, onSuccess, privySignOn, wallet]);
+    privyAuthEffect('phone', undefined);
+  }, [privyAuthEffect]);
 
   return useMemo(() => {
     return {

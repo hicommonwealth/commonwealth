@@ -17,7 +17,7 @@ export function usePrivyAuthEffect(props: PrivyCallbacks) {
   const userStore = useUserStore();
 
   return useCallback(
-    (ssoProvider: 'email', ssoOAuthToken: string | undefined) => {
+    (ssoProvider: 'email' | 'phone', ssoOAuthToken: string | undefined) => {
       async function doAsync() {
         if (userStore.isLoggedIn) {
           console.log('userStore isLoggedIn');
