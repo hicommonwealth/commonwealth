@@ -81,6 +81,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
+  // FIXME change this to isAuthLoading ...
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   // @ts-expect-error <StrictNullChecks>
   const [signerAccount, setSignerAccount] = useState<Account>(null);

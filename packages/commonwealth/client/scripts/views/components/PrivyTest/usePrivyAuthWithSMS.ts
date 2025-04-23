@@ -9,7 +9,7 @@ type UsePrivySMS = {
   onError: (err: Error) => void;
 };
 
-export function usePrivySMS(props: UsePrivySMS) {
+export function usePrivyAuthWithSMS(props: UsePrivySMS) {
   const { onSuccess, onError } = props;
   const { sendCode, loginWithCode } = useLoginWithSms();
   const privySignOn = usePrivySignOn();

@@ -1,6 +1,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
-import { usePrivySMS } from 'views/components/PrivyTest/usePrivySMS';
+import { usePrivyAuthWithSMS } from 'views/components/PrivyTest/usePrivyAuthWithSMS';
 
 export const LoginWithSMS = () => {
   const { authenticated, logout } = usePrivy();
@@ -19,7 +19,7 @@ export const LoginWithSMS = () => {
     console.log('error: ', err);
   }, []);
 
-  const { sendCode, loginWithCode } = usePrivySMS({
+  const { sendCode, loginWithCode } = usePrivyAuthWithSMS({
     onSuccess: handleSuccess,
     onError: handleError,
   });
