@@ -113,6 +113,8 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.LAUNCHPAD_CHAIN_ID':
       JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
+    'proces.env.ENABLED_TRPC_BATCHING':
+      JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
   };
 
   return {
