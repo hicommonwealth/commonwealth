@@ -283,6 +283,7 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
 
       // Sorted Set
       sliceSortedSetWithScores: () => Promise.resolve([]),
+      sliceSortedSet: () => Promise.resolve([]),
       getSortedSetSize: () => Promise.resolve(0),
       delSortedSetItemsByRank: () => Promise.resolve(0),
       addToSortedSet: () => Promise.resolve(0),

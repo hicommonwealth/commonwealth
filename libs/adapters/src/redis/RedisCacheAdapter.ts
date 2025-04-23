@@ -566,6 +566,24 @@ export class RedisCache implements Cache {
     );
   }
 
+  public async sliceSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<string[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRange(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
+    );
+  }
+
   public async delSortedSetItemsByRank(
     namespace: CacheNamespaces,
     key: string,

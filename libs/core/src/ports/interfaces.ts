@@ -201,6 +201,14 @@ export interface Cache extends Disposable {
     }[]
   >;
 
+  sliceSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    end?: number,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<string[]>;
+
   getSortedSetSize(namespace: CacheNamespaces, key: string): Promise<number>;
 
   delSortedSetItemsByRank(

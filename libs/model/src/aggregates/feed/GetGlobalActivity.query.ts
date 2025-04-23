@@ -13,13 +13,15 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
     body: async ({ payload }) => {
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
 
-      const rankedThreadIds = await cache().sliceSortedSetWithScores(
+      console.log(`?????????????? cursor=${cursor}, limit=${limit}`);
+      const rankedThreadIds = await cache().sliceSortedSet(
         CacheNamespaces.GlobalThreadRanks,
-        '',
+        'all',
         (cursor - 1) * limit,
         cursor * limit - 1,
         { order: 'ASC' },
       );
+      console.log('\n>>>>>>>>>>>>>>>>', rankedThreadIds);
 
       // TODO: if we run out of ranked threads should we return something else
       if (!rankedThreadIds.length)
@@ -38,21 +40,21 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         WHERE T.id IN (:threadIds)
       )
         ${baseActivityQuery}
-        ORDER BY ARRAY_POSITION(:threadIds, T.id);
+        ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
       `;
 
       const threads = await models.sequelize.query<
-        z.infer<typeof schemas.ActivityThread>
+        z.infer<typeof schemas.ActivityThreadWrapper>
       >(query, {
         type: QueryTypes.SELECT,
         replacements: {
           comment_limit,
-          threadIds: rankedThreadIds,
+          threadIds: rankedThreadIds.map((t) => parseInt(t)),
         },
       });
 
       return {
-        results: threads,
+        results: threads.map((t) => t.thread),
         page: cursor,
         limit,
       };
