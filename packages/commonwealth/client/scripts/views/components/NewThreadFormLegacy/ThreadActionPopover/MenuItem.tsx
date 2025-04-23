@@ -1,8 +1,21 @@
 import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import {
+  CustomIconName,
+  IconName,
+} from '../../component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './MenuItem.scss';
+
+type MenuItemProps = {
+  icon: IconName | CustomIconName;
+  title: string;
+  subtext: string;
+  buttonText: string;
+  isAdded: boolean;
+  onAdd: () => void;
+};
 
 const MenuItem = ({
   icon,
@@ -11,7 +24,7 @@ const MenuItem = ({
   buttonText,
   isAdded,
   onAdd,
-}: any) => {
+}: MenuItemProps) => {
   return (
     <div className="menu-item">
       <div className="menu-item__header">
@@ -30,6 +43,7 @@ const MenuItem = ({
             iconSize="small"
             className="caret-icon"
             weight="light"
+            onClick={onAdd}
           />
         ) : (
           <>

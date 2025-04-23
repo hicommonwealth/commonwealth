@@ -5,6 +5,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { IconName } from '../../component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../component_kit/cw_text';
 import MenuItem from './MenuItem';
 import './ThreadActionPopover.scss';
@@ -13,7 +14,26 @@ type SharePopoverProps = {
   setSelectedActionCard?: React.Dispatch<React.SetStateAction<string[]>>;
   selectedActionCard?: string[];
 } & Partial<PopoverTriggerProps>;
-
+const items = [
+  {
+    icon: 'sparkle',
+    title: 'Poll',
+    subtext: 'Generate a poll from thread contents for members to vote',
+    buttonText: 'Add',
+  },
+  {
+    icon: 'lightning',
+    title: 'Snapshot',
+    subtext: 'Add existing proposal from Snapshot space.',
+    buttonText: 'Add',
+  },
+  {
+    icon: 'cardholder',
+    title: 'Funding',
+    subtext: 'Request funds from the community wallet.',
+    buttonText: 'Add',
+  },
+];
 export const ThreadActionPopover = ({
   setSelectedActionCard,
   selectedActionCard,
@@ -26,29 +46,16 @@ export const ThreadActionPopover = ({
     },
     [popoverProps],
   );
-  const items = [
-    {
-      icon: 'sparkle',
-      title: 'Poll',
-      subtext: 'Generate a poll from thread contents for memebers to vote',
-      buttonText: 'Add',
-    },
-    {
-      icon: 'lightning',
-      title: 'Snapshot',
-      subtext: 'Add existing proposal from Snapshot space.',
-      buttonText: 'Add',
-    },
-    {
-      icon: 'cardholder',
-      title: 'Funding',
-      subtext: 'Request funds from the community wallet.',
-      buttonText: 'Add',
-    },
-  ];
 
-  const handleAddItem = (title: string) => {
-    setSelectedActionCard && setSelectedActionCard((prev) => [...prev, title]);
+  const handleToggleItem = (title) => {
+    setSelectedActionCard &&
+      setSelectedActionCard((prev) => {
+        if (prev.includes(title)) {
+          return prev.filter((item) => item !== title);
+        } else {
+          return [...prev, title];
+        }
+      });
   };
 
   return (
@@ -66,9 +73,7 @@ export const ThreadActionPopover = ({
             fill="#656167"
             color="#656167"
           />
-          <CWText fontWeight="regular" className="action">
-            Actions
-          </CWText>
+          <CWText type="b2">Actions</CWText>
         </div>
 
         <CWPopover
@@ -78,12 +83,12 @@ export const ThreadActionPopover = ({
               {items.map((item) => (
                 <MenuItem
                   key={item.title}
-                  icon={item.icon}
+                  icon={item.icon as IconName}
                   title={item.title}
                   subtext={item.subtext}
                   buttonText={item.buttonText}
-                  isAdded={selectedActionCard?.includes(item?.title)}
-                  onAdd={() => handleAddItem(item?.title)}
+                  isAdded={selectedActionCard?.includes(item?.title) || false}
+                  onAdd={() => handleToggleItem(item?.title)}
                 />
               ))}
             </>
