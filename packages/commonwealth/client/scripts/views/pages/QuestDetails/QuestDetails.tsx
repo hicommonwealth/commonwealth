@@ -263,6 +263,11 @@ const QuestDetails = ({ id }: { id: number }) => {
           (address) => address.walletSsoSource === 'discord',
         );
 
+        if (!action.start_link) {
+          // requires a start link
+          notifyError(`Start link is invalid for this action`);
+        }
+
         if (hasDiscordLinked && action.start_link) {
           window.open(action.start_link, '_blank');
         } else {
