@@ -39,14 +39,14 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  // aggregate transaction per community per address
   const stakes = (() => {
-    const accumulatedStakes: Record<string, any> = {};
+    const accumulatedStakes = {};
 
-    for (const transaction of transactions) {
+    transactions.map((transaction) => {
       const key = (
         transaction.community.id + transaction.address
       ).toLowerCase();
-
       const action =
         transaction.transaction_type === 'mint' ||
         transaction.transaction_type === 'buy'
@@ -72,14 +72,17 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
               ? `${updatedAmount} stakes`
               : `${updatedAmount || 0} tokens`,
             price: `${updatedAvgPrice} ETH`,
+            sortValue: updatedAmount,
           },
         },
-        sortValue: updatedAmount,
       };
-    }
+    });
 
-    return Object.values(accumulatedStakes).filter(
-      (tx) => tx.amount && tx.amount > 0,
+    return (
+      Object.values(accumulatedStakes)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((transaction: any) => ({ ...transaction }))
+        .filter((transaction) => transaction.amount > 0)
     );
   })();
 
@@ -130,4 +133,5 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
     </section>
   );
 };
+
 export { MyTokens };
