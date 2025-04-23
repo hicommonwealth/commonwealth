@@ -1,0 +1,19 @@
+.ThreadActionPopover {
+  .left-container {
+    display: flex;
+    align-items: center;
+  }
+  .left-container svg {
+    color: #656167;
+    height: 16px;
+    width: 16px;
+  }
+
+  .left-container .Text {
+    color: #656167;
+  }
+}
+.ThreadActionPopoverPopover {
+  width: 248px;
+  padding: 0px !important;
+}

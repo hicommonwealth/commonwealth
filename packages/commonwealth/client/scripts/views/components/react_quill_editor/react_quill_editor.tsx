@@ -56,6 +56,8 @@ type ReactQuillEditorProps = {
   cancelEditing?: () => void;
   fromManageTopic?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  setSelectedActionCard?: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedActionCard?: string[];
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -79,6 +81,8 @@ const ReactQuillEditor = ({
   name,
   fromManageTopic = false,
   onKeyDown,
+  setSelectedActionCard,
+  selectedActionCard,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -419,6 +423,8 @@ const ReactQuillEditor = ({
               <CustomQuillFooter
                 // @ts-expect-error <StrictNullChecks/>
                 handleImageUploader={handleImageUploader}
+                setSelectedActionCard={setSelectedActionCard}
+                selectedActionCard={selectedActionCard}
               />
             </div>
           </div>

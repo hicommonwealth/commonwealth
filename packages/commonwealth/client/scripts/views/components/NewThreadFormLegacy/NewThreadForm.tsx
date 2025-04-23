@@ -110,6 +110,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [linkedProposals, setLinkedProposals] =
     useState<ProposalState | null>();
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+  const [selectedActionCard, setSelectedActionCard] = useState<string[]>([]);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
@@ -667,15 +668,16 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     />
                   );
                 })}
-                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
-                  <ThreadPollEditorCard
-                    threadAlreadyHasPolling={!pollsData?.length}
-                    setLocalPoll={setPollData}
-                    isCreateThreadPage={true}
-                    threadTitle={threadTitle}
-                    threadContentDelta={threadContentDelta}
-                  />
-                )}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) &&
+                  selectedActionCard.includes('Poll') && (
+                    <ThreadPollEditorCard
+                      threadAlreadyHasPolling={!pollsData?.length}
+                      setLocalPoll={setPollData}
+                      isCreateThreadPage={true}
+                      threadTitle={threadTitle}
+                      threadContentDelta={threadContentDelta}
+                    />
+                  )}
               </div>
             ),
           },
@@ -912,6 +914,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                         : disabledActionsTooltipText,
                   })}
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                  setSelectedActionCard={setSelectedActionCard}
+                  selectedActionCard={selectedActionCard}
                 />
 
                 <MessageRow

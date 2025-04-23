@@ -56,6 +56,7 @@ import {
   ImageSquare,
   Kanban,
   Lightbulb,
+  Lightning,
   Link,
   LinkBreak,
   ListChecks,
@@ -332,6 +333,7 @@ export const iconLookup = {
   ethChain: CustomIcons.CWEth,
   cosmosChain: CustomIcons.CWCosmos,
   polkadotChain: CustomIcons.CWPolkadot,
+  lightning: withPhosphorIcon(Lightning),
 };
 
 export const customIconLookup = {
