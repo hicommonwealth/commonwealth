@@ -9,11 +9,28 @@ export const calculateTokenPricing = (
   ethPerToken: number,
 ) => {
   const currentRate = ethPerToken * ethToUsdRate || 0;
-  const price24HrAgo =
-    (token?.old_price ||
-      parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000') / 1e18) *
-    ethToUsdRate;
-  const priceChange = (currentRate - price24HrAgo) / price24HrAgo;
+
+  // Check if token was created within the last 24 hours
+  const isCreatedWithin24Hours = token?.created_at
+    ? Date.now() - new Date(token.created_at).getTime() < 24 * 60 * 60 * 1000
+    : false;
+
+  // Calculate price change based on old_price which is now the first trade just outside the 24 hour window
+  let priceChange = 0;
+
+  if (token?.old_price) {
+    // old_price is now the price of the first trade just outside the 24h window
+    const price24HrAgo = token.old_price * ethToUsdRate;
+    priceChange = (currentRate - price24HrAgo) / price24HrAgo;
+  } else if (isCreatedWithin24Hours) {
+    // For tokens created within 24h without a trade outside 24h window,
+    // use the initial launch price
+    const initialPrice =
+      (parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000') / 1e18) *
+      ethToUsdRate;
+    priceChange = (currentRate - initialPrice) / initialPrice;
+  }
+  // Otherwise price change remains 0 (if no trade outside 24h window and not created within 24h)
   const pricePercentage24HourChange = parseFloat(
     (
       (priceChange === Number.POSITIVE_INFINITY ||
