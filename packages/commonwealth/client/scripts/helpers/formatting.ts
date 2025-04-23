@@ -108,7 +108,8 @@ export function formatDisplayNumber(
     });
   }
 
-  // Ensure currency symbol is prepended correctly, handling the case where formatBigNumberShort returns a string without it.
+  // Ensure currency symbol is prepended correctly, handling the case where
+  // formatBigNumberShort returns a string without it.
   if (useShortSuffixes && Math.abs(num) >= 1000) {
     // formatBigNumberShort already includes the suffix (k, m, b, t)
     return `${currencySymbol}${formattedNumber}`;

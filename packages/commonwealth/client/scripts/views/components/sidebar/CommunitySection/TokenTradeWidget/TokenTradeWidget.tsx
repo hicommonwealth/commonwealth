@@ -37,11 +37,8 @@ export const TokenTradeWidget = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const {
-    pricing: tokenPricing,
-    ethToUsdRate,
-    isLoading: isLoadingETHToCurrencyRate,
-  } = useTokenPricing({ token: communityToken as LaunchpadToken });
+  const { pricing: tokenPricing, isLoading: isLoadingETHToCurrencyRate } =
+    useTokenPricing({ token: communityToken as LaunchpadToken });
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{

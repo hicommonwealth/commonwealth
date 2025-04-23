@@ -29,11 +29,7 @@ const TokenDetails = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const {
-    pricing: tokenPricing,
-    ethToUsdRate,
-    isLoading: pricingLoading,
-  } = useTokenPricing({
+  const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
     token: communityToken as LaunchpadToken,
   });
 
