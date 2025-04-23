@@ -26,6 +26,7 @@ abstract class ContractBase {
   async initialize(
     withWallet: boolean = false,
     chainId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<void> {
     if (!this.initialized || withWallet || providerInstance) {

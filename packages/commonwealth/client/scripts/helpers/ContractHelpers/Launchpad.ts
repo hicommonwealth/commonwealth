@@ -29,6 +29,7 @@ class LaunchpadBondingCurve extends ContractBase {
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<void> {
     await super.initialize(withWallet, chainId, providerInstance);
@@ -69,6 +70,7 @@ class LaunchpadBondingCurve extends ContractBase {
     amountEth: number,
     walletAddress: string,
     chainId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ) {
     if (!this.initialized || !this.walletEnabled) {
@@ -88,6 +90,7 @@ class LaunchpadBondingCurve extends ContractBase {
     amountSell: number,
     walletAddress: string,
     chainId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ) {
     if (!this.initialized || !this.walletEnabled) {

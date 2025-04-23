@@ -27,7 +27,7 @@ const sellToken = async ({
       addr.address.toLowerCase() === walletAddress.toLowerCase() &&
       addr.walletId?.toLowerCase().includes('magic'),
   );
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let magicProvider: any = null;
   if (isMagicAddress) {
     const magic = getMagicForChain(ethChainId);
