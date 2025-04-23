@@ -1,6 +1,5 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
-import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import React from 'react';
 import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
@@ -12,11 +11,12 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
-import {
-  QuestAction,
-  QuestActionContentIdScope,
-  QuestActionSubFormProps,
-} from './types';
+import ActionContentIdScopeSelector from './SpecialCaseDynamicFields/ActionContentIdScopeSelector';
+import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
+import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
+import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
+import TwitterFields from './SpecialCaseDynamicFields/TwitterFields';
+import { QuestAction, QuestActionSubFormProps } from './types';
 import useQuestActionSubForm from './useQuestActionSubForm';
 
 const QuestActionSubForm = (props: QuestActionSubFormProps) => {
@@ -33,9 +33,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
     doesActionPreventRepetition,
     repetitionCycleRadio,
     actionOptions,
-    inputConfigs,
     hasContentIdField,
-    communityChainNodeSelectInputOptions,
   } = useQuestActionSubForm(props);
 
   return (
@@ -136,185 +134,44 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         }
       />
 
-      {config?.requires_creator_points && (
-        <CWTextInput
-          label={`${
-            doesActionRewardShareForReferrer(
-              defaultValues?.action as QuestAction,
-            )
-              ? 'Referrer'
-              : 'Creater'
-          } Reward Share`}
-          placeholder="Points Earned"
-          containerClassName="span-3"
-          fullWidth
-          {...(defaultValues?.creatorRewardAmount && {
-            defaultValue: defaultValues?.creatorRewardAmount,
-          })}
-          onInput={(e) =>
-            onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
-          }
-          name="creatorRewardAmount"
-          customError={errors?.creatorRewardAmount}
-          // eslint-disable-next-line max-len
-          instructionalMessage={`Deducted from total reward points. ${
-            doesActionRewardShareForReferrer(
-              defaultValues?.action as QuestAction,
-            )
-              ? 'Only applied for referred user.'
-              : ''
-          }`}
-        />
-      )}
-
-      {config?.requires_twitter_tweet_link && (
+      {
         <>
-          <CWTextInput
-            key={`noOfLikes-${defaultValues?.action}`}
-            name="noOfLikes"
-            label="Likes Count"
-            placeholder="0"
-            fullWidth
-            {...(defaultValues?.noOfLikes !== 'undefiend' && {
-              defaultValue: defaultValues?.noOfLikes,
-            })}
-            onInput={(e) => onChange?.({ noOfLikes: e?.target?.value?.trim() })}
-            customError={errors?.noOfLikes}
-            containerClassName="span-2"
+          {/* Dynamic fields below:
+            1. Each field/group is rendered independently if current config allows
+            2. Rendering logic is validated by their internal state
+          */}
+          <CreatorPointsInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
           />
-          <CWTextInput
-            key={`noOfRetweets-${defaultValues?.action}`}
-            name="noOfRetweets"
-            label="Retweets Count"
-            placeholder="0"
-            fullWidth
-            {...(defaultValues?.noOfRetweets !== 'undefiend' && {
-              defaultValue: defaultValues?.noOfRetweets,
-            })}
-            onInput={(e) =>
-              onChange?.({ noOfRetweets: e?.target?.value?.trim() })
-            }
-            customError={errors?.noOfRetweets}
-            containerClassName="span-2"
+          <TwitterFields
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
           />
-          <CWTextInput
-            key={`noOfReplies-${defaultValues?.action}`}
-            name="noOfReplies"
-            label="Replies Count"
-            placeholder="0"
-            fullWidth
-            {...(defaultValues?.noOfReplies !== 'undefiend' && {
-              defaultValue: defaultValues?.noOfReplies,
-            })}
-            onInput={(e) =>
-              onChange?.({ noOfReplies: e?.target?.value?.trim() })
-            }
-            customError={errors?.noOfReplies}
-            containerClassName="span-2"
+          <StartLinkInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ActionContentIdScopeSelector
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ContentIdInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
           />
         </>
-      )}
-
-      {config?.requires_start_link && (
-        <CWTextInput
-          label={inputConfigs.startLink.label}
-          name="startLink"
-          containerClassName="span-6"
-          placeholder={inputConfigs.startLink.placeholder}
-          fullWidth
-          {...(defaultValues?.startLink && {
-            defaultValue: defaultValues?.startLink,
-          })}
-          onInput={(e) => onChange?.({ startLink: e?.target?.value?.trim() })}
-          customError={errors?.startLink}
-        />
-      )}
-
-      {config?.with_optional_thread_id && (
-        <div className="content-id-type-selector span-6">
-          <CWText type="caption">Action Scope</CWText>
-          <CWRadioButton
-            className="radio-btn mt-8"
-            value={QuestActionContentIdScope.Topic}
-            label="Linked Topic"
-            groupName={`contentIdScope-${defaultValues?.action}`}
-            {...(defaultValues?.contentIdScope ===
-              QuestActionContentIdScope.Topic && {
-              checked: true,
-            })}
-            onChange={(e) =>
-              e.target.checked &&
-              onChange?.({
-                contentIdentifier: '',
-                contentIdScope: QuestActionContentIdScope.Topic,
-              })
-            }
-          />
-          <CWRadioButton
-            className="radio-btn"
-            value={QuestActionContentIdScope.Thread}
-            label="Linked Thread"
-            groupName={`contentIdScope-${defaultValues?.action}`}
-            {...(defaultValues?.contentIdScope ===
-              QuestActionContentIdScope.Thread && {
-              checked: true,
-            })}
-            onChange={(e) =>
-              e.target.checked &&
-              onChange?.({
-                contentIdentifier: '',
-                contentIdScope: QuestActionContentIdScope.Thread,
-              })
-            }
-          />
-        </div>
-      )}
-
-      {hasContentIdField &&
-        (config?.with_optional_chain_id ? (
-          <CWSelectList
-            isClearable={true}
-            backspaceRemovesValue
-            key={`contentIdentifier-${defaultValues?.action}`}
-            name="contentIdentifier"
-            label="Chain Node"
-            placeholder="Select a chain node"
-            containerClassname="span-3"
-            options={communityChainNodeSelectInputOptions}
-            onChange={(newValue) =>
-              onChange?.({ contentIdentifier: `${newValue?.value || ''}` })
-            }
-            {...(defaultValues?.contentIdentifier && {
-              value: {
-                value: parseInt(`${defaultValues?.contentIdentifier}`),
-                label: `${
-                  communityChainNodeSelectInputOptions?.find(
-                    (x) =>
-                      x.value ===
-                      parseInt(`${defaultValues?.contentIdentifier}`),
-                  )?.label
-                }`,
-              },
-            })}
-            customError={errors?.contentIdentifier}
-          />
-        ) : (
-          <CWTextInput
-            key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
-            name="contentIdentifier"
-            label={inputConfigs.contentId.label}
-            placeholder={inputConfigs.contentId.placeholder}
-            containerClassName="span-3"
-            fullWidth
-            {...(defaultValues?.contentIdentifier && {
-              defaultValue: defaultValues?.contentIdentifier,
-            })}
-            onInput={(e) =>
-              onChange?.({ contentIdentifier: e?.target?.value?.trim() })
-            }
-            customError={errors?.contentIdentifier}
-          />
-        ))}
+      }
 
       <CWTextInput
         label="Instructions Link (optional)"

@@ -7,7 +7,11 @@ import {
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+  QuestActionSubFormConfig,
+} from './QuestActionSubForm';
 
 export type ContentIdType =
   | 'comment'
@@ -132,4 +136,18 @@ export const buildRedirectURLFromContentId = (
   }
 
   return '';
+};
+
+export const doesConfigAllowContentIdField = (
+  config: QuestActionSubFormConfig,
+) => {
+  return (
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id ||
+    config?.requires_twitter_tweet_link ||
+    config?.requires_discord_server_id ||
+    config?.with_optional_chain_id ||
+    config?.requires_group_id
+  );
 };
