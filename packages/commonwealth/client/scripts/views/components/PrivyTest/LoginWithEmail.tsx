@@ -13,6 +13,8 @@ export const LoginWithEmail = () => {
 
   const handleSuccess = useCallback(() => {
     console.log('success!');
+    const landingURL = new URL('/', window.location.href).toString();
+    document.location.href = landingURL;
   }, []);
 
   const handleError = useCallback((err: Error) => {

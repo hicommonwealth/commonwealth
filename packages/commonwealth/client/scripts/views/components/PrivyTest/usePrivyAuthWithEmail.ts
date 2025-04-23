@@ -1,6 +1,7 @@
 import { useLoginWithEmail } from '@privy-io/react-auth';
 
 import { useEffect, useMemo } from 'react';
+import useUserStore from 'state/ui/user';
 import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
 import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
 
@@ -14,9 +15,16 @@ export function usePrivyAuthWithEmail(props: UsePrivySMS) {
   const { sendCode, loginWithCode } = useLoginWithEmail();
   const privySignOn = usePrivySignOn();
   const wallet = useConnectedWallet();
+  const userStore = useUserStore();
+  console.log('userStore isLoggedIn', userStore.isLoggedIn);
 
   useEffect(() => {
     async function doAsync() {
+      if (userStore.isLoggedIn) {
+        console.log('userStore isLoggedIn');
+        return;
+      }
+
       if (wallet) {
         console.log('Trying to login...');
         await privySignOn({
@@ -32,7 +40,7 @@ export function usePrivyAuthWithEmail(props: UsePrivySMS) {
     }
 
     doAsync().catch(onError);
-  }, [onError, onSuccess, privySignOn, wallet]);
+  }, [onError, onSuccess, privySignOn, wallet, userStore.isLoggedIn]);
 
   return useMemo(() => {
     return {

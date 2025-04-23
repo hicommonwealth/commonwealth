@@ -57,6 +57,8 @@ export function usePrivySignOn() {
         },
       });
 
+      console.log('FIXME IN THEORY... calling onSuccess');
+
       onSuccess(wallet.address, newlyCreated);
     },
     [identityTokenRef, signIn, signMessage],
