@@ -125,7 +125,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      community: showTag ? communityId : 'all_communities',
+      communityScope: showTag ? communityId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();

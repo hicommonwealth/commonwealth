@@ -54,6 +54,17 @@ describe('CacheDecorator', () => {
       decrementKey: vi.fn(),
       getKeyTTL: vi.fn(),
       setKeyTTL: vi.fn(),
+      incrementHashKey: vi.fn(),
+      getHash: vi.fn(),
+      setHashKey: vi.fn(),
+      addToSet: vi.fn(),
+      getSet: vi.fn(),
+      sliceSortedSetWithScores: vi.fn(),
+      getSortedSetSize: vi.fn(),
+      delSortedSetItemsByRank: vi.fn(),
+      addToSortedSet: vi.fn(),
+      sortedSetPopMin: vi.fn(),
+      delSortedSetItemsByValue: vi.fn(),
     };
     cache({
       key: 'mocked.cache.key',
