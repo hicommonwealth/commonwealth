@@ -19,20 +19,29 @@ export const launchToken = async (
   tokenCommunityManager: string,
   value: number = 4.4400042e14,
 ) => {
-  const txReceipt = await contract.methods
-    .launchTokenWithLiquidity(
-      name,
-      symbol,
-      shares,
-      holders,
-      totalSupply,
-      1,
-      0,
-      '0x0000000000000000000000000000000000000000',
-      tokenCommunityManager,
-      connectorWeight,
-    )
-    .send({ from: walletAddress, value });
+  const contractCall = await contract.methods.launchTokenWithLiquidity(
+    name,
+    symbol,
+    shares,
+    holders,
+    totalSupply,
+    1,
+    0,
+    '0x0000000000000000000000000000000000000000',
+    tokenCommunityManager,
+    connectorWeight,
+  );
+  const gasResult = await contractCall.estimateGas({
+    from: walletAddress,
+    value: value.toFixed(0),
+  });
+
+  const txReceipt = contractCall.send({
+    from: walletAddress,
+    value,
+    type: '0x2',
+    gas: gasResult.toString(),
+  });
   return txReceipt;
 };
 
@@ -101,9 +110,9 @@ export const getAmountIn = async (
     contract.methods.liquidity(tokenAddress).call(),
   ]);
   const delta =
-    ((BigInt(amountOut) + BigInt(data[0])) / BigInt(data[0])) **
-    (BigInt(1000000) / BigInt(cw));
-  return BigInt(data[1]) * delta - BigInt(data[1]);
+    ((Number(amountOut) + Number(data[0])) / Number(data[0])) **
+    (Number(1000000) / Number(cw));
+  return Number(data[1]) * delta - Number(data[1]);
 };
 
 export const transferLiquidity = async (
@@ -135,11 +144,18 @@ export const getTargetMarketCap = (
   initialReserve: number = 4.167e8,
   initialSupply: number = 1e18,
   currentSupply: number = 4.3e26,
-  connectorWeight: number = 0.83,
+  connectorWeight: number = 830000,
   totalSupply: number = 1e9,
 ) => {
-  const x = initialReserve / (initialSupply * connectorWeight);
-  const y = (currentSupply / initialSupply) ** (1 / connectorWeight - 1);
+  const initialReserveVar = parseInt(
+    process.env.LAUNCHPAD_INITIAL_PRICE || initialReserve.toString(),
+  );
+  const connectorWeightVar =
+    parseInt(
+      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || connectorWeight.toString(),
+    ) / 1000000;
+  const x = initialReserveVar / (initialSupply * connectorWeightVar);
+  const y = (currentSupply / initialSupply) ** (1 / connectorWeightVar - 1);
   const price = x * y;
   return price * totalSupply;
 };

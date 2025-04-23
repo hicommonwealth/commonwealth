@@ -1,6 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -303,6 +303,7 @@ const DirectoryPage = () => {
         return refetchTagsAndCommunities();
       })
       .then(() => {
+        notifySuccess('Directory Settings updated successfully!');
         trackAnalytics({
           event: MixpanelCommunityInteractionEvent.DIRECTORY_SETTINGS_CHANGED,
           isPWA: isAddedToHomeScreen,

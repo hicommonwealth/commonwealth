@@ -10,6 +10,7 @@ import { AddressList } from '../CommunitySection/AddressList';
 import { CommunitySectionSkeleton } from '../CommunitySection/CommunitySectionSkeleton';
 import ProfileCard from '../CommunitySection/ProfileCard';
 import CreateCommunityButton from '../CreateCommunityButton';
+import TokenLaunchButton from '../TokenLaunchButton';
 import './SidebarProfileSection.scss';
 
 interface SidebarProfileSectionProps {
@@ -98,6 +99,7 @@ export const SidebarProfileSection = ({
         )}
 
         <CWDivider />
+        <TokenLaunchButton buttonHeight="sm" />
         <CreateCommunityButton />
         <CWDivider />
       </div>
