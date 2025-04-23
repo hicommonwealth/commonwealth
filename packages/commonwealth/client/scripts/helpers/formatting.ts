@@ -37,6 +37,7 @@ export type FormatNumberOptions = {
 export type FractionalValueResult = {
   valueAfterDecimal0s: number;
   decimal0Count: number;
+  currencySymbol?: string;
 };
 
 /**
@@ -81,7 +82,7 @@ export function formatDisplayNumber(
       // Check the user's desired threshold for using FractionalValue
       if (fractionalResult.decimal0Count >= 4) {
         // Return the object to trigger FractionalValue render for subscript
-        return fractionalResult;
+        return { ...fractionalResult, currencySymbol };
       } else {
         // For decimal0Count 0, 1, 2, 3 (based on helper logic), format as string
         // Use the decimals option passed, or a default like 6 for precision

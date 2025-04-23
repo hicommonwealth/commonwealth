@@ -26,6 +26,7 @@ const FormattedDisplayNumber = ({
       return (
         <FractionalValue
           value={num}
+          currencySymbol={formattedResult.currencySymbol}
           className={className}
           {...textStyleProps}
         />

@@ -29,7 +29,11 @@ const TokenDetails = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
+  const {
+    pricing: tokenPricing,
+    ethToUsdRate,
+    isLoading: pricingLoading,
+  } = useTokenPricing({
     token: communityToken as LaunchpadToken,
   });
 
@@ -49,8 +53,12 @@ const TokenDetails = ({
 
   const totalSupply = !isPinnedToken ? '1000000000' : null;
   const formattedTotalSupply = totalSupply
-    ? numeral(totalSupply).format('0.0a')
+    ? numeral(totalSupply).format('0.00a')
     : 'N/A';
+
+  // Use values directly from hook (market cap fallback is handled inside hook)
+  const finalMarketCap = tokenPricing?.marketCapCurrent;
+  const displayPrice = tokenPricing?.currentPrice; // Use price directly from hook
 
   return (
     <div className="token-details">
@@ -142,50 +150,50 @@ const TokenDetails = ({
             )}
           </CWText>
         </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Market Cap
-          </CWText>
-          {communityToken ? (
-            <CWText>
-              ${numeral(tokenPricing.marketCapCurrent).format('0.00a')}
-            </CWText>
-          ) : (
-            <CWText>N/A</CWText>
-          )}
-        </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Price
-          </CWText>
-          {/* Use FormattedDisplayNumber for price */}
-          {communityToken && tokenPricing?.currentPrice !== undefined ? ( // More robust check
-            <FormattedDisplayNumber
-              value={tokenPricing.currentPrice}
-              options={{
-                // Use correct options based on FormatNumberOptions type
-                decimals: 4,
-                currencySymbol: '$',
-              }}
-              type="b1"
-              fontWeight="medium"
-            />
-          ) : (
-            <CWText type="b1" fontWeight="medium">
-              N/A
-            </CWText>
-          )}
-        </div>
-        {/* Conditionally render Total Supply Stat Item only for Launchpad Tokens */}
-        {!isPinnedToken && (
-          <div className="stat-item">
-            <CWText type="b1" className="faded">
-              Total Supply
-            </CWText>
-            <CWText type="b1" fontWeight="medium">
-              {formattedTotalSupply}
-            </CWText>
-          </div>
+        {communityToken && (
+          <>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Market Cap
+              </CWText>
+              <CWText className="stat-value">
+                {finalMarketCap !== null && finalMarketCap !== undefined
+                  ? `$${numeral(finalMarketCap).format('0.00a')}`
+                  : 'N/A'}
+              </CWText>
+            </div>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Price
+              </CWText>
+              {displayPrice !== null && displayPrice !== undefined ? (
+                <FormattedDisplayNumber
+                  value={displayPrice}
+                  options={{
+                    decimals: 8,
+                    currencySymbol: '$',
+                  }}
+                  type="b1"
+                  fontWeight="medium"
+                  className="stat-value"
+                />
+              ) : (
+                <CWText type="b1" fontWeight="medium" className="stat-value">
+                  N/A
+                </CWText>
+              )}
+            </div>
+            {!isPinnedToken && (
+              <div className="stat-item">
+                <CWText type="b1" className="faded">
+                  Total Supply
+                </CWText>
+                <CWText type="b1" fontWeight="medium">
+                  {formattedTotalSupply}
+                </CWText>
+              </div>
+            )}
+          </>
         )}
         <div className="token-footer">
           <CWText type="b1" className="faded">

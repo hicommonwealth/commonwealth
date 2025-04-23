@@ -37,8 +37,11 @@ export const TokenTradeWidget = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const { pricing: tokenPricing, isLoading: isLoadingETHToCurrencyRate } =
-    useTokenPricing({ token: communityToken as LaunchpadToken });
+  const {
+    pricing: tokenPricing,
+    ethToUsdRate,
+    isLoading: isLoadingETHToCurrencyRate,
+  } = useTokenPricing({ token: communityToken as LaunchpadToken });
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -74,6 +77,9 @@ export const TokenTradeWidget = ({
     (communityToken as ExternalToken)?.logo;
 
   const isLaunched = (communityToken as LaunchpadToken).liquidity_transferred;
+
+  const finalMarketCap = tokenPricing?.marketCapCurrent ?? 0;
+
   return (
     <section className="TokenTradeWidget">
       <div className="pad-8 header">
@@ -153,7 +159,7 @@ export const TokenTradeWidget = ({
               />
               <MarketCapProgress
                 marketCap={{
-                  current: tokenPricing.marketCapCurrent,
+                  current: finalMarketCap,
                   goal: tokenPricing.marketCapGoal,
                   isCapped: tokenPricing.isMarketCapGoalReached,
                 }}

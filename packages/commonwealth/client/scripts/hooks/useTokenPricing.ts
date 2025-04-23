@@ -41,5 +41,5 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
     ethPerToken,
   );
 
-  return { pricing, isLoading: isLoadingETHToCurrencyRate };
+  return { pricing, ethToUsdRate, isLoading: isLoadingETHToCurrencyRate };
 };
