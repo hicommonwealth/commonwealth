@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PrivyAuthMethod } from 'views/components/PrivyTest/AuthMethod';
 import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
-import { LoginWithSMS } from 'views/components/PrivyTest/LoginWithSMS';
+import { LoginWithPhone } from 'views/components/PrivyTest/LoginWithPhone';
 import { LoginWithEmail } from './LoginWithEmail';
 
 /**
@@ -29,7 +29,7 @@ export const LoginWithPrivy = () => {
     case 'email':
       return <LoginWithEmail />;
     case 'phone':
-      return <LoginWithSMS />;
+      return <LoginWithPhone />;
     case 'google':
       return <LoginWithGoogle />;
   }

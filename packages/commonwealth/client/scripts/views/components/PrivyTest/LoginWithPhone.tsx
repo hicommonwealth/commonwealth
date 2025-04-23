@@ -1,8 +1,8 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
-import { usePrivyAuthWithSMS } from 'views/components/PrivyTest/usePrivyAuthWithSMS';
+import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
 
-export const LoginWithSMS = () => {
+export const LoginWithPhone = () => {
   const { authenticated, logout } = usePrivy();
   const [stage, setStage] = useState<'enter-phone-number' | 'wait-for-code'>(
     'enter-phone-number',
@@ -21,7 +21,7 @@ export const LoginWithSMS = () => {
     console.log('error: ', err);
   }, []);
 
-  const { sendCode, loginWithCode } = usePrivyAuthWithSMS({
+  const { sendCode, loginWithCode } = usePrivyAuthWithPhone({
     onSuccess: handleSuccess,
     onError: handleError,
   });
