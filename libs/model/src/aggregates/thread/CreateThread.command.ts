@@ -213,6 +213,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       return {
         ...thread!.toJSON(),
         topic: topic!.toJSON(),
+        community_tier: community.tier,
       };
     },
   };

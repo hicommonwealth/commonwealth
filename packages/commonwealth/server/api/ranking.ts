@@ -1,9 +1,8 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { Thread } from '@hicommonwealth/schemas';
+import { CommunityTierMap, UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
 import { config } from '../config';
 
 const log = logger(import.meta);
@@ -86,7 +85,8 @@ function addOrUpdateSortedSetRank(
 async function incrementCachedRank(
   communityId: string,
   threadId: number,
-  rank: number,
+  communityRank: number,
+  globalRank: number,
 ) {
   // get the lowest score item + number of elements in the set
   const [
@@ -129,7 +129,7 @@ async function incrementCachedRank(
       CacheNamespaces.CommunityThreadRanks,
       communityId,
       communitySetLength,
-      rank,
+      communityRank,
       threadId,
       lowestCommunityItem[0],
     ),
@@ -137,7 +137,7 @@ async function incrementCachedRank(
       CacheNamespaces.GlobalThreadRanks,
       globalThreadRanksKey,
       globalSetLength,
-      rank,
+      globalRank,
       threadId,
       lowestGlobalItem[0],
     ),
@@ -151,7 +151,7 @@ async function incrementCachedRank(
 export async function batchedIncrementCachedRank(
   data: {
     community_id: string;
-    ranks: { thread_id: number; rank: string }[];
+    ranks: { thread_id: number; community_rank: string; global_rank: string }[];
   }[],
 ) {
   const [globalLowestRankedItem, globalSetLength] = await Promise.all([
@@ -174,15 +174,16 @@ export async function batchedIncrementCachedRank(
   let index = 0;
   for (const { community_id, ranks } of data) {
     const globalRanksToAdd = ranks.filter(
-      ({ rank }) => parseInt(rank) > (globalLowestRankedItem[0]?.score || 0),
+      ({ global_rank }) =>
+        parseInt(global_rank) > (globalLowestRankedItem[0]?.score || 0),
     );
     if (globalRanksToAdd.length > 0) {
       globalNumAddedPromises.push(
         cache().addToSortedSet(
           CacheNamespaces.GlobalThreadRanks,
           globalThreadRanksKey,
-          globalRanksToAdd.map(({ thread_id, rank }) => ({
-            score: parseInt(rank),
+          globalRanksToAdd.map(({ thread_id, global_rank }) => ({
+            score: parseInt(global_rank),
             value: thread_id.toString(),
           })),
         ),
@@ -218,15 +219,16 @@ export async function batchedIncrementCachedRank(
     }
 
     const communityRanksToAdd = ranks.filter(
-      ({ rank }) => parseInt(rank) > (lowestRankedItem[0]?.score || 0),
+      ({ community_rank }) =>
+        parseInt(community_rank) > (lowestRankedItem[0]?.score || 0),
     );
     if (communityRanksToAdd.length > 0) {
       communityNumAddedPromises.push(
         cache().addToSortedSet(
           CacheNamespaces.CommunityThreadRanks,
           community_id,
-          communityRanksToAdd.map(({ thread_id, rank }) => ({
-            score: parseInt(rank),
+          communityRanksToAdd.map(({ thread_id, community_rank }) => ({
+            score: parseInt(community_rank),
             value: thread_id.toString(),
           })),
         ),
@@ -304,7 +306,8 @@ export async function batchedIncrementCachedRank(
 async function decrementCachedRank(
   communityId: string,
   threadId: number,
-  rank: number,
+  communityRank: number,
+  globalRank: number,
 ) {
   // update the score if it exists (and do nothing if it doesn't)
   await Promise.allSettled([
@@ -312,7 +315,7 @@ async function decrementCachedRank(
       CacheNamespaces.CommunityThreadRanks,
       communityId,
       {
-        score: rank,
+        score: communityRank,
         value: threadId.toString(),
       },
       { updateOnly: true },
@@ -321,7 +324,7 @@ async function decrementCachedRank(
       CacheNamespaces.GlobalThreadRanks,
       globalThreadRanksKey,
       {
-        score: rank,
+        score: globalRank,
         value: threadId.toString(),
       },
       { updateOnly: true },
@@ -348,30 +351,48 @@ async function updatePostgresRank(threadId: number, rankIncrease: number) {
   const rank = (await models.sequelize.query(
     `
       UPDATE "ThreadRanks"
-      SET rank       = rank + :rankIncrease,
-          updated_at = NOW()
+      SET community_rank = community_rank + :rankIncrease,
+          global_rank    = global_rank + :rankIncrease,
+          updated_at     = NOW()
       WHERE thread_id = :threadId
-      RETURNING rank;
+      RETURNING community_rank, global_rank;
     `,
     {
       type: QueryTypes.UPDATE,
       replacements: { rankIncrease: Math.round(rankIncrease), threadId },
     },
-  )) as unknown as [{ rank: number }[], number];
+  )) as unknown as [{ community_rank: number; global_rank: number }[], number];
   return rank[0];
 }
 
-export async function createThreadRank(thread: z.infer<typeof Thread>) {
-  const rank =
+export async function createThreadRank(
+  thread: {
+    id: number;
+    created_at: Date;
+    user_tier_at_creation: UserTierMap;
+  },
+  community: { id: string; tier: CommunityTierMap },
+) {
+  const communityRank =
     Math.floor((thread.created_at?.getTime() || Date.now()) / 1000) *
       config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT +
     (thread.user_tier_at_creation || 1) *
       config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT;
+  const globalRank =
+    Math.round(communityRank) +
+    config.HEURISTIC_WEIGHTS.COMMUNITY_TIER_WEIGHT * community.tier;
+
   await models.ThreadRank.create({
     thread_id: thread.id!,
-    rank: BigInt(Math.round(rank)),
+    community_rank: BigInt(Math.round(communityRank)),
+    global_rank: BigInt(globalRank),
   });
-  await incrementCachedRank(thread.community_id!, thread.id!, rank);
+  await incrementCachedRank(
+    community.id,
+    thread.id!,
+    communityRank,
+    globalRank,
+  );
 }
 
 /**
@@ -408,7 +429,12 @@ export async function incrementThreadRank(
     log.trace(`No thread rank found for thread ${thread_id}`);
     return;
   }
-  await incrementCachedRank(community_id!, thread_id!, Number(rank[0].rank));
+  await incrementCachedRank(
+    community_id!,
+    thread_id!,
+    Number(rank[0].community_rank),
+    Number(rank[0].global_rank),
+  );
 }
 
 export async function decrementThreadRank(
@@ -425,5 +451,10 @@ export async function decrementThreadRank(
   // since we don't replace a decreased rank with the next highest rank from Postgres. This is because:
   // 1. We avoid an index on rank in "ThreadsRank" table
   // 2. Comment deletion/spam is rare
-  await decrementCachedRank(community_id!, thread_id!, Number(rank[0].rank));
+  await decrementCachedRank(
+    community_id!,
+    thread_id!,
+    Number(rank[0].community_rank),
+    Number(rank[0].global_rank),
+  );
 }

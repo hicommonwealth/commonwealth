@@ -74,6 +74,7 @@ const {
   LIKE_WEIGHT,
   CREATED_DATE_WEIGHT,
   CREATOR_USER_TIER_WEIGHT,
+  COMMUNITY_TIER_WEIGHT,
   DISABLE_TIER_RATE_LIMITS,
 } = process.env;
 
@@ -248,6 +249,9 @@ export const config = configure(
         : 1,
       CREATOR_USER_TIER_WEIGHT: CREATOR_USER_TIER_WEIGHT
         ? parseFloat(CREATOR_USER_TIER_WEIGHT)
+        : 1,
+      COMMUNITY_TIER_WEIGHT: COMMUNITY_TIER_WEIGHT
+        ? parseFloat(COMMUNITY_TIER_WEIGHT)
         : 1,
     },
     DISABLE_TIER_RATE_LIMITS: ['local', 'CI'].includes(target.APP_ENV)
@@ -529,6 +533,7 @@ export const config = configure(
       LIKE_WEIGHT: z.number(),
       CREATED_DATE_WEIGHT: z.number(),
       CREATOR_USER_TIER_WEIGHT: z.number(),
+      COMMUNITY_TIER_WEIGHT: z.number(),
     }),
     DISABLE_TIER_RATE_LIMITS: z
       .boolean()

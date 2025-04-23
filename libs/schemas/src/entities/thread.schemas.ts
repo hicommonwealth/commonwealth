@@ -74,7 +74,8 @@ export const Thread = z.object({
 
 export const ThreadRank = z.object({
   thread_id: PG_INT,
-  rank: z.bigint(),
+  community_rank: z.bigint(),
+  global_rank: z.bigint(),
   updated_at: z.coerce.date().optional(),
 
   // associations

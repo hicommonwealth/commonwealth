@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ReactionContext, ThreadContext, TopicContext } from '../context';
-import { Reaction, Thread } from '../entities';
+import { COMMUNITY_TIER, Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -25,7 +25,7 @@ export const CreateThread = {
     is_linking_token: z.boolean().optional(),
     turnstile_token: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ community_tier: COMMUNITY_TIER }),
   context: TopicContext,
 };
 

@@ -20,9 +20,19 @@ export const trpcRouter = trpc.router({
     trpc.fireAndForget(async (_, __, ctx) => {
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
-    trpc.fireAndForget(async (_, output) => {
-      await createThreadRank(output);
-    }),
+    trpc.fireAndForget(
+      async (
+        _,
+        { id, created_at, user_tier_at_creation, community_id, community_tier },
+      ) => {
+        if (user_tier_at_creation) {
+          await createThreadRank(
+            { id: id!, created_at: created_at!, user_tier_at_creation },
+            { id: community_id, tier: community_tier },
+          );
+        }
+      },
+    ),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
       ({ community_id }) => ({ community: community_id }),

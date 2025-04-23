@@ -215,7 +215,7 @@ async function processViewCounts() {
 
   const ranks = await models.sequelize.query<{
     community_id: string;
-    ranks: { thread_id: number; rank: string }[];
+    ranks: { thread_id: number; community_rank: string; global_rank: string }[];
   }>(
     `
       SELECT T.community_id, ARRAY_AGG(ROW_TO_JSON(TR)) AS ranks

@@ -17,11 +17,19 @@ export default (
         primaryKey: true,
         allowNull: false,
       },
-      rank: {
+      community_rank: {
         type: Sequelize.BIGINT,
         allowNull: false,
         get() {
-          const rank = this.getDataValue('rank') as unknown as string;
+          const rank = this.getDataValue('community_rank') as unknown as string;
+          return BigInt(rank);
+        },
+      },
+      global_rank: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        get() {
+          const rank = this.getDataValue('global_rank') as unknown as string;
           return BigInt(rank);
         },
       },
