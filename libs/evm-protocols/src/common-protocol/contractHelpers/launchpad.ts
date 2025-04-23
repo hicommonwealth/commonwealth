@@ -18,6 +18,7 @@ export const launchToken = async (
   connectorWeight: number,
   tokenCommunityManager: string,
   value: number = 4.4400042e14,
+  maxFeePerGas?: bigint,
 ) => {
   const contractCall = await contract.methods.launchTokenWithLiquidity(
     name,
@@ -36,11 +37,16 @@ export const launchToken = async (
     value: value.toFixed(0),
   });
 
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   const txReceipt = contractCall.send({
     from: walletAddress,
     value,
     type: '0x2',
     gas: gasResult.toString(),
+    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+    maxPriorityFeePerGas,
   });
   return txReceipt;
 };
@@ -51,6 +57,7 @@ export const buyToken = async (
   tokenAddress: string,
   walletAddress: string,
   value: number,
+  maxFeePerGas?: bigint,
 ) => {
   const contractCall = contract.methods.buyToken(tokenAddress, 0);
   const gasResult = await contractCall.estimateGas({
@@ -58,11 +65,16 @@ export const buyToken = async (
     value: value.toFixed(0),
   });
 
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   const txReceipt = await contractCall.send({
     from: walletAddress,
     value: value.toFixed(0),
-    gas: gasResult.toString(),
+    gas: gasResult ? gasResult.toString() : undefined,
     type: '0x2',
+    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+    maxPriorityFeePerGas,
   });
   return txReceipt;
 };
@@ -75,15 +87,27 @@ export const sellToken = async (
   walletAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
+  maxFeePerGas?: bigint,
 ) => {
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   await tokenContract.methods
     .approve(contract.options.address, BigInt(amount))
     .send({
       from: walletAddress,
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+      type: '0x2',
     });
   const txReceipt = await contract.methods
     .sellToken(tokenAddress, BigInt(amount), 0)
-    .send({ from: walletAddress });
+    .send({
+      from: walletAddress,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+    });
   return txReceipt;
 };
 
@@ -120,6 +144,7 @@ export const transferLiquidity = async (
   contract: any,
   tokenAddress: string,
   walletAddress: string,
+  maxFeePerGas?: bigint,
 ) => {
   const remainingTokens = await contract.methods
     ._poolLiquidity(tokenAddress)
@@ -131,9 +156,18 @@ export const transferLiquidity = async (
     830000,
   );
 
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   const txReceipt = await contract.methods
     .transferLiquidity(tokenAddress, remainingTokens)
-    .send({ value: amountIn, from: walletAddress });
+    .send({
+      value: amountIn,
+      from: walletAddress,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+    });
   return txReceipt;
 };
 
@@ -281,9 +315,22 @@ export async function transferLaunchpadLiquidityToUniswap({
     LPBondingCurveAbi,
     lpBondingCurveAddress,
   );
-  await commonProtocol.transferLiquidity(
+
+  // Estimate gas
+  const latestBlock = await web3.eth.getBlock('latest');
+  let maxFeePerGas: bigint | undefined;
+
+  if (latestBlock.baseFeePerGas) {
+    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
+    maxFeePerGas =
+      latestBlock.baseFeePerGas * BigInt(2) +
+      BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
+  }
+
+  return await commonProtocol.transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
+    maxFeePerGas,
   );
 }
