@@ -46,7 +46,7 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
 
     transactions.map((transaction) => {
       const key = (
-        transaction.community.id + transaction.address
+        transaction.community.id + transaction.transaction_hash
       ).toLowerCase();
       const action = transaction.transaction_type === 'mint' ? 1 : -1;
 
