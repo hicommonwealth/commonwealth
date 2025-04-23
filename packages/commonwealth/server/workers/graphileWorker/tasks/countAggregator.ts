@@ -5,6 +5,7 @@ import {
   pgMultiRowUpdate,
   TaskPayloads,
 } from '@hicommonwealth/model';
+import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { batchedIncrementCachedRank } from '../../../api/ranking';
 import { config } from '../../../config';
@@ -62,7 +63,7 @@ export async function countAggregator() {
 async function processLifetimeThreadCounts() {
   const communityIds = await cache().getSet(
     CacheNamespaces.CountAggregator,
-    'community_thread_count_changed',
+    CountAggregatorKeys.CommunityThreadCount,
   );
 
   if (!communityIds.length) {
@@ -88,14 +89,14 @@ async function processLifetimeThreadCounts() {
 
   await cache().deleteKey(
     CacheNamespaces.CountAggregator,
-    'community_thread_count_changed',
+    CountAggregatorKeys.CommunityThreadCount,
   );
 }
 
 async function processProfileCounts() {
   const communityIds = await cache().getSet(
     CacheNamespaces.CountAggregator,
-    'community_profile_count_changed',
+    CountAggregatorKeys.CommunityProfileCount,
   );
 
   if (!communityIds?.length) {
@@ -122,7 +123,7 @@ async function processProfileCounts() {
 
   await cache().deleteKey(
     CacheNamespaces.CountAggregator,
-    'community_profile_count_changed',
+    CountAggregatorKeys.CommunityProfileCount,
   );
 }
 
@@ -161,7 +162,7 @@ async function processReactionCounts() {
 async function processViewCounts() {
   const threadIdHash = await cache().getHash(
     CacheNamespaces.CountAggregator,
-    'thread_view_count',
+    CountAggregatorKeys.ThreadViewCount,
   );
   const threadIds = Object.keys(threadIdHash).join(', ');
 
@@ -221,7 +222,10 @@ async function processViewCounts() {
     undefined,
     true,
   );
-  await cache().deleteKey(CacheNamespaces.CountAggregator, 'thread_view_count');
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    CountAggregatorKeys.ThreadViewCount,
+  );
 
   const ranks = await models.sequelize.query<{
     community_id: string;

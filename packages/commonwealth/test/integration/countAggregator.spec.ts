@@ -6,6 +6,7 @@ import {
   tester,
   ThreadInstance,
 } from '@hicommonwealth/model';
+import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -70,12 +71,12 @@ describe('Count Aggregator Tests', () => {
       });
       await cache().addToSet(
         CacheNamespaces.CountAggregator,
-        'community_thread_count_changed',
+        CountAggregatorKeys.CommunityThreadCount,
         'ethereum',
       );
       await cache().addToSet(
         CacheNamespaces.CountAggregator,
-        'community_profile_count_changed',
+        CountAggregatorKeys.CommunityProfileCount,
         'ethereum',
       );
       await cache().setKey(
@@ -85,13 +86,13 @@ describe('Count Aggregator Tests', () => {
       );
       await cache().incrementHashKey(
         CacheNamespaces.CountAggregator,
-        'thread_view_counts',
+        CountAggregatorKeys.ThreadViewCount,
         thread!.id!.toString(),
         5,
       );
       await cache().incrementHashKey(
         CacheNamespaces.CountAggregator,
-        'thread_view_counts',
+        CountAggregatorKeys.ThreadViewCount,
         thread!.id!.toString(),
         10,
       );
@@ -108,19 +109,19 @@ describe('Count Aggregator Tests', () => {
 
       const profileChangedSet = await cache().getSet(
         CacheNamespaces.CountAggregator,
-        'community_profile_count_changed',
+        CountAggregatorKeys.CommunityProfileCount,
       );
       expect(profileChangedSet.length).to.equal(0);
 
       const threadChangedSet = await cache().getSet(
         CacheNamespaces.CountAggregator,
-        'community_thread_count_changed',
+        CountAggregatorKeys.CommunityThreadCount,
       );
       expect(threadChangedSet.length).to.equal(0);
 
       const viewCountsHash = await cache().getHash(
         CacheNamespaces.CountAggregator,
-        'thread_view_counts',
+        CountAggregatorKeys.ThreadViewCount,
       );
       expect(Object.keys(viewCountsHash).length).to.equal(0);
     });

@@ -6,7 +6,11 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  CountAggregatorKeys,
+  addressSwapper,
+} from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -116,7 +120,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
 
           await cache().addToSet(
             CacheNamespaces.CountAggregator,
-            'community_profile_count_changed',
+            CountAggregatorKeys.CommunityProfileCount,
             community_id,
           );
 

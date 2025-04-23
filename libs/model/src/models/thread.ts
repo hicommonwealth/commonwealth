@@ -1,6 +1,7 @@
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import {
+  CountAggregatorKeys,
   MAX_TRUNCATED_CONTENT_LENGTH,
   getDecodedString,
 } from '@hicommonwealth/shared';
@@ -141,7 +142,7 @@ export default (
 
           await cache().addToSet(
             CacheNamespaces.CountAggregator,
-            'community_thread_count_changed',
+            CountAggregatorKeys.CommunityThreadCount,
             thread.community_id,
           );
 
@@ -174,7 +175,7 @@ export default (
         afterDestroy: async (thread: ThreadInstance) => {
           await cache().addToSet(
             CacheNamespaces.CountAggregator,
-            'community_thread_count_changed',
+            CountAggregatorKeys.CommunityThreadCount,
             thread.community_id,
           );
         },

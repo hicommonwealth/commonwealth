@@ -1,6 +1,7 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
+import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
 import {
@@ -133,7 +134,7 @@ export const trpcRouter = trpc.router({
             .map((threadId) =>
               cache().incrementHashKey(
                 CacheNamespaces.CountAggregator,
-                'thread_view_count',
+                CountAggregatorKeys.ThreadViewCount,
                 threadId,
               ),
             ),
