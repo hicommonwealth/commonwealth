@@ -553,12 +553,16 @@ export class RedisCache implements Cache {
     key: string,
     start = 0,
     stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
   ): Promise<{ value: string; score: number }[]> {
     if (!this.isReady()) throw new Error('Redis is not ready');
     return this._client.zRangeWithScores(
       RedisCache.getNamespaceKey(namespace, key),
       start,
       stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
     );
   }
 

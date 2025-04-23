@@ -193,6 +193,7 @@ export interface Cache extends Disposable {
     key: string,
     start?: number,
     end?: number,
+    options?: { order?: 'ASC' | 'DESC' },
   ): Promise<
     {
       value: string;

@@ -167,7 +167,9 @@ async function processViewCounts() {
 
   if (threadIds.length === 0) return;
 
-  const rankUpdates: { newValue: string; whenCaseValue: string }[] = [];
+  const communityRankUpdates: { newValue: string; whenCaseValue: string }[] =
+    [];
+  const globalRankUpdates: { newValue: string; whenCaseValue: string }[] = [];
   const viewCountUpdates: { newValue: string; whenCaseValue: string }[] = [];
 
   for (const [threadId, count] of <[string, string][]>(
@@ -176,8 +178,12 @@ async function processViewCounts() {
     const threadRankIncrease =
       config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count);
     if (threadRankIncrease > 0) {
-      rankUpdates.push({
-        newValue: `rank + ${threadRankIncrease}`,
+      communityRankUpdates.push({
+        newValue: `community_rank + ${threadRankIncrease}`,
+        whenCaseValue: threadId,
+      });
+      globalRankUpdates.push({
+        newValue: `global_rank + ${threadRankIncrease}`,
         whenCaseValue: threadId,
       });
     }
@@ -203,8 +209,12 @@ async function processViewCounts() {
     'ThreadRanks',
     [
       {
-        setColumn: 'rank',
-        rows: rankUpdates,
+        setColumn: 'community_rank',
+        rows: communityRankUpdates,
+      },
+      {
+        setColumn: 'global_rank',
+        rows: globalRankUpdates,
       },
     ],
     'thread_id',
