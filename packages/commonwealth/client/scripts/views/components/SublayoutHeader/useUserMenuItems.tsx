@@ -249,17 +249,18 @@ const useUserMenuItems = ({
               label: 'Addresses',
             },
             ...addresses,
-            {
-              type: 'default',
-              label: 'Connect a new address',
-              onClick: () => {
-                onAuthModalOpen();
-                onAddressItemClick?.();
-              },
-            },
             { type: 'divider' },
           ] as PopoverMenuItem[])
         : []),
+      {
+        type: 'default',
+        label: 'Connect a new address',
+        onClick: () => {
+          onAuthModalOpen();
+          onAddressItemClick?.();
+        },
+      },
+      { type: 'divider' },
       {
         type: 'header',
         label: 'Settings',
