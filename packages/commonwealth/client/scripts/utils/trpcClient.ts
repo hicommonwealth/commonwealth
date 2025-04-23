@@ -13,7 +13,7 @@ export const trpcClient = trpc.createClient({
     process.env.ENABLE_TRPC_BATCHING === 'true'
       ? httpBatchLink({
           url: BASE_API_PATH,
-          async headers() {
+          headers() {
             const user = userStore.getState();
             return {
               authorization: user.jwt || '',
@@ -27,7 +27,7 @@ export const trpcClient = trpc.createClient({
         })
       : httpLink({
           url: BASE_API_PATH,
-          async headers() {
+          headers() {
             const user = userStore.getState();
             return {
               authorization: user.jwt || '',

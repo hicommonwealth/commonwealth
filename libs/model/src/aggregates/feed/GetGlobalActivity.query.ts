@@ -13,7 +13,6 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
     body: async ({ payload }) => {
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
 
-      console.log(`?????????????? cursor=${cursor}, limit=${limit}`);
       const rankedThreadIds = await cache().sliceSortedSet(
         CacheNamespaces.GlobalThreadRanks,
         'all',
@@ -21,7 +20,6 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         cursor * limit - 1,
         { order: 'ASC' },
       );
-      console.log('\n>>>>>>>>>>>>>>>>', rankedThreadIds);
 
       // TODO: if we run out of ranked threads should we return something else
       if (!rankedThreadIds.length)
