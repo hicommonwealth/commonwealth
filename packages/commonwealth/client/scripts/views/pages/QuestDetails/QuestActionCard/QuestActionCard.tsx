@@ -73,11 +73,11 @@ const QuestActionCard = ({
     );
 
     if (questAction.event_name === 'DiscordServerJoined' && !hasDiscordLinked) {
-      return 'Connect Discord';
+      return 'Connect Discord & Start';
     }
 
     if (questAction.event_name === 'TweetEngagement' && !hasTwitterLinked) {
-      return 'Connect Twitter';
+      return 'Connect Twitter & Start';
     }
 
     return 'Start';
