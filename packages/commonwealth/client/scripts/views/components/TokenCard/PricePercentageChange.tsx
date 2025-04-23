@@ -38,7 +38,7 @@ const PricePercentageChange = ({
           { positive: pricePercentage24HourChange >= 0 },
         )}
         {...(tokenCard
-          ? { fontWeight: 'semiBold', type: 'h3' }
+          ? { fontWeight: 'semiBold', type: 'h4' }
           : { type: 'caption' })}
       >
         {useIcon ? (
