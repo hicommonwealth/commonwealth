@@ -60,6 +60,7 @@ describe('CacheDecorator', () => {
       addToSet: vi.fn(),
       getSet: vi.fn(),
       sliceSortedSetWithScores: vi.fn(),
+      sliceSortedSet: vi.fn(),
       getSortedSetSize: vi.fn(),
       delSortedSetItemsByRank: vi.fn(),
       addToSortedSet: vi.fn(),
