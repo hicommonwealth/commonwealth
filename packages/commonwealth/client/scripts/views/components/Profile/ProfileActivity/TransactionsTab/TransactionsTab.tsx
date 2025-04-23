@@ -151,11 +151,10 @@ const TransactionsTab = ({
     return [...new Set(filteredAddresses)];
   }, [prefetchedData]);
 
-  const { data: tokensMetadata, isLoading: isLoadingMetadata } =
-    useTokensMetadataQuery({
-      tokenIds: tokenAddresses,
-      nodeEthChainId: prefetchedData?.[0]?.eth_chain_id ?? 0,
-    });
+  const { data: tokensMetadata } = useTokensMetadataQuery({
+    tokenIds: tokenAddresses,
+    nodeEthChainId: prefetchedData?.[0]?.eth_chain_id ?? 0,
+  });
 
   const metadataMap = useMemo(() => {
     if (!tokensMetadata) return {};
