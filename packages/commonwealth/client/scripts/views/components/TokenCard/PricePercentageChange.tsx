@@ -43,9 +43,9 @@ const PricePercentageChange = ({
       >
         {useIcon ? (
           pricePercentage24HourChange >= 0 ? (
-            <CWIcon iconName="arrowUpHalfGreen" />
+            <CWIcon iconName="arrowUpHalfGreen" iconSize="small" />
           ) : (
-            <CWIcon iconName="arrowDownHalfOrange" />
+            <CWIcon iconName="arrowDownHalfOrange" iconSize="small" />
           )
         ) : pricePercentage24HourChange >= 0 ? (
           '+'
