@@ -14,6 +14,9 @@ import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityToken
 import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
 import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
 
+/**
+ * @deprecated
+ */
 export function usePrivyOAuth(props: PrivyCallbacks) {
   const { onSuccess, onError } = props;
 

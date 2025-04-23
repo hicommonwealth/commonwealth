@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { PrivyAuthMethod } from 'views/components/PrivyTest/AuthMethod';
 import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
 import { LoginWithPhone } from 'views/components/PrivyTest/LoginWithPhone';
+import { PrivyAuthMethod } from 'views/components/PrivyTest/PrivyAuthMethod';
 import { LoginWithEmail } from './LoginWithEmail';
 
 /**
@@ -19,7 +19,9 @@ export const LoginWithPrivy = () => {
         <div>
           <button onClick={() => setPrivyAuthMethod('email')}>Email</button>
           <button onClick={() => setPrivyAuthMethod('phone')}>Phone</button>
-          <button onClick={() => setPrivyAuthMethod('google')}>Google</button>
+          <button onClick={() => setPrivyAuthMethod('google_oauth')}>
+            Google
+          </button>
         </div>
       </>
     );
@@ -30,7 +32,7 @@ export const LoginWithPrivy = () => {
       return <LoginWithEmail />;
     case 'phone':
       return <LoginWithPhone />;
-    case 'google':
+    case 'google_oauth':
       return <LoginWithGoogle />;
   }
 };

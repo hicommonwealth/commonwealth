@@ -1,5 +1,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
+import { useDefaultAuthCallbacks } from 'views/components/PrivyTest/useDefaultAuthCallbacks';
 import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
 
 export const LoginWithPhone = () => {
@@ -11,20 +12,9 @@ export const LoginWithPhone = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [code, setCode] = useState<string>('');
 
-  const handleSuccess = useCallback(() => {
-    console.log('success!');
-    const landingURL = new URL('/', window.location.href).toString();
-    document.location.href = landingURL;
-  }, []);
+  const callbacks = useDefaultAuthCallbacks();
 
-  const handleError = useCallback((err: Error) => {
-    console.log('error: ', err);
-  }, []);
-
-  const { sendCode, loginWithCode } = usePrivyAuthWithPhone({
-    onSuccess: handleSuccess,
-    onError: handleError,
-  });
+  const { sendCode, loginWithCode } = usePrivyAuthWithPhone(callbacks);
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
@@ -38,15 +28,15 @@ export const LoginWithPhone = () => {
       await sendCode({ phoneNumber });
       setStage('wait-for-code');
     }
-    doAsync().catch(handleError);
-  }, [handleError, sendCode, phoneNumber]);
+    doAsync().catch(callbacks.onError);
+  }, [callbacks.onError, sendCode, phoneNumber]);
 
   const handleLoginWithCode = useCallback(() => {
     async function doAsync() {
       await loginWithCode({ code });
     }
-    doAsync().catch(handleError);
-  }, [handleError, loginWithCode, code]);
+    doAsync().catch(callbacks.onError);
+  }, [callbacks.onError, loginWithCode, code]);
 
   if (authenticated) {
     return (

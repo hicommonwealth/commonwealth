@@ -1,19 +1,14 @@
 import React, { useCallback } from 'react';
-import { usePrivyOAuth } from 'views/components/PrivyTest/usePrivyOAuth';
+import { useDefaultAuthCallbacks } from 'views/components/PrivyTest/useDefaultAuthCallbacks';
+import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
 
 export const LoginWithGoogle = () => {
-  const handleSuccess = useCallback(() => {
-    console.log('success!');
-  }, []);
+  const callbacks = useDefaultAuthCallbacks();
 
-  const handleError = useCallback((err: Error) => {
-    console.log('error: ', err);
-  }, []);
-
-  const { onPrivyOAuth, authenticated, loading, logout } = usePrivyOAuth({
-    onSuccess: handleSuccess,
-    onError: handleError,
-  });
+  const { onInitOAuth, authenticated, loading, logout } = usePrivyAuthWithOAuth(
+    'google_oauth',
+    callbacks,
+  );
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
@@ -30,7 +25,7 @@ export const LoginWithGoogle = () => {
   }
 
   return (
-    <button onClick={onPrivyOAuth} disabled={loading}>
+    <button onClick={onInitOAuth} disabled={loading}>
       {loading ? 'Logging in...' : 'Log in with Google'}
     </button>
   );
