@@ -1,0 +1,123 @@
+import {
+  CacheDecorator,
+  lookupKeyDurationInReq,
+} from '@hicommonwealth/adapters';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import axios from 'axios';
+import type { Router } from 'express';
+import { registerRoute } from '../middleware/methodNotAllowed';
+
+const defaultCacheDuration = 60; // 1 minute
+
+function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
+  // Handle OPTIONS preflight requests
+  router.options('/uniswapProxy', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.sendStatus(200);
+  });
+
+  registerRoute(
+    router,
+    'get',
+    '/uniswapProxy',
+    calcUniswapCacheKeyDuration,
+    cacheDecorator.cacheMiddleware(
+      defaultCacheDuration,
+      lookupKeyDurationInReq,
+    ),
+    async function (req, res) {
+      try {
+        // Get the original URL parameters from the request
+        const queryParams = new URLSearchParams();
+        Object.keys(req.query).forEach(key => {
+          if (key !== 'endpoint' && key !== 'path') {
+            queryParams.append(key, req.query[key] as string);
+          }
+        });
+        
+        // Get the endpoint and path from the query params
+        const endpoint = req.query.endpoint as string || '';
+        const path = req.query.path as string || 'quote';
+        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+        
+        // Make the request to Uniswap API
+        const response = await axios.get(
+          `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}${queryString}`,
+          {
+            headers: {
+              origin: `https://${PRODUCTION_DOMAIN}`,
+              'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+          },
+        );
+        
+        // Set appropriate CORS headers
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        
+        // Return the response data
+        return res.send(response.data);
+      } catch (err) {
+        console.error('Uniswap proxy error:', err);
+        res.status(err.response?.status || 500).json({ 
+          message: err.message,
+          details: err.response?.data
+        });
+      }
+    },
+  );
+
+  // Add POST method handler
+  registerRoute(
+    router,
+    'post',
+    '/uniswapProxy',
+    async function (req, res) {
+      try {
+        // Get the endpoint and path from the query params
+        const endpoint = req.query.endpoint as string || '';
+        const path = req.query.path as string || 'quote';
+        
+        // Make the request to Uniswap API
+        const response = await axios.post(
+          `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}`,
+          req.body,
+          {
+            headers: {
+              origin: `https://${PRODUCTION_DOMAIN}`,
+              'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+          },
+        );
+        
+        // Set appropriate CORS headers
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        
+        // Return the response data
+        return res.send(response.data);
+      } catch (err) {
+        console.error('Uniswap proxy error:', err);
+        res.status(err.response?.status || 500).json({ 
+          message: err.message,
+          details: err.response?.data
+        });
+      }
+    },
+  );
+}
+
+function calcUniswapCacheKeyDuration(req, res, next) {
+  req.cacheDuration = 60; // cache for 1 minute
+  const queryString = new URLSearchParams(req.query as Record<string, string>).toString();
+  req.cacheKey = `/api/uniswapProxy_${queryString}`;
+  return next();
+}
+
+export default setupUniswapProxy; 
