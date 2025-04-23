@@ -44,11 +44,11 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         <CWIconButton
           iconName="close"
           onClick={onRemove}
-          className="ml-auto cursor-pointer remove-btn"
+          className="ml-auto cursor-pointer remove-btn span-6"
         />
       )}
 
-      <div className="repeatition-selector">
+      <div className="repeatition-selector span-6">
         <CWText type="caption" fontWeight="semiBold">
           Action Schedule
         </CWText>
@@ -98,6 +98,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         label="Action"
         placeholder="Select an action"
         name="action"
+        containerClassname="span-6"
         options={actionOptions}
         onChange={(newValue) =>
           newValue &&
@@ -120,59 +121,54 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         }
       />
 
-      <div
-        className={clsx(
-          'grid-row',
-          config?.requires_creator_points ? 'cols-2' : 'cols-1',
-        )}
-      >
+      <CWTextInput
+        label="Total Reward Points"
+        placeholder="Points Earned"
+        fullWidth
+        {...(defaultValues?.rewardAmount && {
+          defaultValue: defaultValues?.rewardAmount,
+        })}
+        onInput={(e) => onChange?.({ rewardAmount: e?.target?.value?.trim() })}
+        name="rewardAmount"
+        customError={errors?.rewardAmount}
+        containerClassName={
+          config?.requires_creator_points ? 'span-3' : 'span-6'
+        }
+      />
+
+      {config?.requires_creator_points && (
         <CWTextInput
-          label="Total Reward Points"
+          label={`${
+            doesActionRewardShareForReferrer(
+              defaultValues?.action as QuestAction,
+            )
+              ? 'Referrer'
+              : 'Creater'
+          } Reward Share`}
           placeholder="Points Earned"
+          containerClassName="span-3"
           fullWidth
-          {...(defaultValues?.rewardAmount && {
-            defaultValue: defaultValues?.rewardAmount,
+          {...(defaultValues?.creatorRewardAmount && {
+            defaultValue: defaultValues?.creatorRewardAmount,
           })}
           onInput={(e) =>
-            onChange?.({ rewardAmount: e?.target?.value?.trim() })
+            onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
           }
-          name="rewardAmount"
-          customError={errors?.rewardAmount}
+          name="creatorRewardAmount"
+          customError={errors?.creatorRewardAmount}
+          // eslint-disable-next-line max-len
+          instructionalMessage={`Deducted from total reward points. ${
+            doesActionRewardShareForReferrer(
+              defaultValues?.action as QuestAction,
+            )
+              ? 'Only applied for referred user.'
+              : ''
+          }`}
         />
-
-        {config?.requires_creator_points && (
-          <CWTextInput
-            label={`${
-              doesActionRewardShareForReferrer(
-                defaultValues?.action as QuestAction,
-              )
-                ? 'Referrer'
-                : 'Creater'
-            } Reward Share`}
-            placeholder="Points Earned"
-            fullWidth
-            {...(defaultValues?.creatorRewardAmount && {
-              defaultValue: defaultValues?.creatorRewardAmount,
-            })}
-            onInput={(e) =>
-              onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
-            }
-            name="creatorRewardAmount"
-            customError={errors?.creatorRewardAmount}
-            // eslint-disable-next-line max-len
-            instructionalMessage={`Deducted from total reward points. ${
-              doesActionRewardShareForReferrer(
-                defaultValues?.action as QuestAction,
-              )
-                ? 'Only applied for referred user.'
-                : ''
-            }`}
-          />
-        )}
-      </div>
+      )}
 
       {config?.requires_twitter_tweet_link && (
-        <div className="grid-row cols-3">
+        <>
           <CWTextInput
             key={`noOfLikes-${defaultValues?.action}`}
             name="noOfLikes"
@@ -184,6 +180,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
             })}
             onInput={(e) => onChange?.({ noOfLikes: e?.target?.value?.trim() })}
             customError={errors?.noOfLikes}
+            containerClassName="span-2"
           />
           <CWTextInput
             key={`noOfRetweets-${defaultValues?.action}`}
@@ -198,6 +195,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
               onChange?.({ noOfRetweets: e?.target?.value?.trim() })
             }
             customError={errors?.noOfRetweets}
+            containerClassName="span-2"
           />
           <CWTextInput
             key={`noOfReplies-${defaultValues?.action}`}
@@ -212,14 +210,16 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
               onChange?.({ noOfReplies: e?.target?.value?.trim() })
             }
             customError={errors?.noOfReplies}
+            containerClassName="span-2"
           />
-        </div>
+        </>
       )}
 
       {config?.requires_start_link && (
         <CWTextInput
           label={inputConfigs.startLink.label}
           name="startLink"
+          containerClassName="span-6"
           placeholder={inputConfigs.startLink.placeholder}
           fullWidth
           {...(defaultValues?.startLink && {
@@ -231,7 +231,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
       )}
 
       {config?.with_optional_thread_id && (
-        <div className="content-id-type-selector">
+        <div className="content-id-type-selector span-6">
           <CWText type="caption">Action Scope</CWText>
           <CWRadioButton
             className="radio-btn mt-8"
@@ -270,67 +270,66 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         </div>
       )}
 
-      <div
-        className={clsx('grid-row', hasContentIdField ? 'cols-2' : 'cols-1')}
-      >
-        {hasContentIdField &&
-          (config?.with_optional_chain_id ? (
-            <CWSelectList
-              isClearable={true}
-              backspaceRemovesValue
-              key={`contentIdentifier-${defaultValues?.action}`}
-              name="contentIdentifier"
-              label="Chain Node"
-              placeholder="Select a chain node"
-              options={communityChainNodeSelectInputOptions}
-              onChange={(newValue) =>
-                onChange?.({ contentIdentifier: `${newValue?.value || ''}` })
-              }
-              {...(defaultValues?.contentIdentifier && {
-                value: {
-                  value: parseInt(`${defaultValues?.contentIdentifier}`),
-                  label: `${
-                    communityChainNodeSelectInputOptions?.find(
-                      (x) =>
-                        x.value ===
-                        parseInt(`${defaultValues?.contentIdentifier}`),
-                    )?.label
-                  }`,
-                },
-              })}
-              customError={errors?.contentIdentifier}
-            />
-          ) : (
-            <CWTextInput
-              key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
-              name="contentIdentifier"
-              label={inputConfigs.contentId.label}
-              placeholder={inputConfigs.contentId.placeholder}
-              fullWidth
-              {...(defaultValues?.contentIdentifier && {
-                defaultValue: defaultValues?.contentIdentifier,
-              })}
-              onInput={(e) =>
-                onChange?.({ contentIdentifier: e?.target?.value?.trim() })
-              }
-              customError={errors?.contentIdentifier}
-            />
-          ))}
+      {hasContentIdField &&
+        (config?.with_optional_chain_id ? (
+          <CWSelectList
+            isClearable={true}
+            backspaceRemovesValue
+            key={`contentIdentifier-${defaultValues?.action}`}
+            name="contentIdentifier"
+            label="Chain Node"
+            placeholder="Select a chain node"
+            containerClassname="span-3"
+            options={communityChainNodeSelectInputOptions}
+            onChange={(newValue) =>
+              onChange?.({ contentIdentifier: `${newValue?.value || ''}` })
+            }
+            {...(defaultValues?.contentIdentifier && {
+              value: {
+                value: parseInt(`${defaultValues?.contentIdentifier}`),
+                label: `${
+                  communityChainNodeSelectInputOptions?.find(
+                    (x) =>
+                      x.value ===
+                      parseInt(`${defaultValues?.contentIdentifier}`),
+                  )?.label
+                }`,
+              },
+            })}
+            customError={errors?.contentIdentifier}
+          />
+        ) : (
+          <CWTextInput
+            key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
+            name="contentIdentifier"
+            label={inputConfigs.contentId.label}
+            placeholder={inputConfigs.contentId.placeholder}
+            containerClassName="span-3"
+            fullWidth
+            {...(defaultValues?.contentIdentifier && {
+              defaultValue: defaultValues?.contentIdentifier,
+            })}
+            onInput={(e) =>
+              onChange?.({ contentIdentifier: e?.target?.value?.trim() })
+            }
+            customError={errors?.contentIdentifier}
+          />
+        ))}
 
-        <CWTextInput
-          label="Instructions Link (optional)"
-          name="instructionsLink"
-          placeholder="https://example.com"
-          fullWidth
-          {...(defaultValues?.instructionsLink && {
-            defaultValue: defaultValues?.instructionsLink,
-          })}
-          onInput={(e) =>
-            onChange?.({ instructionsLink: e?.target?.value?.trim() })
-          }
-          customError={errors?.instructionsLink}
-        />
-      </div>
+      <CWTextInput
+        label="Instructions Link (optional)"
+        name="instructionsLink"
+        placeholder="https://example.com"
+        containerClassName={hasContentIdField ? 'span-3' : 'span-6'}
+        fullWidth
+        {...(defaultValues?.instructionsLink && {
+          defaultValue: defaultValues?.instructionsLink,
+        })}
+        onInput={(e) =>
+          onChange?.({ instructionsLink: e?.target?.value?.trim() })
+        }
+        customError={errors?.instructionsLink}
+      />
     </div>
   );
 };
