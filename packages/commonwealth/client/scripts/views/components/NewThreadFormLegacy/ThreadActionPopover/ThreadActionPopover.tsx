@@ -60,7 +60,7 @@ export const ThreadActionPopover = ({
 
   return (
     <ClickAwayListener
-      onClickAway={async () => {
+      onClickAway={() => {
         popoverProps.setAnchorEl(null);
       }}
     >
