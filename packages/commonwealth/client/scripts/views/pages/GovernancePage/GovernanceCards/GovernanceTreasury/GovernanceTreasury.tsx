@@ -1,5 +1,3 @@
-import { TokenView } from '@hicommonwealth/schemas';
-import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
@@ -11,16 +9,19 @@ import { CWIdentificationTag } from 'client/scripts/views/components/component_k
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { formatAddressShort } from 'shared/utils';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
-import { z } from 'zod';
 import './GovernanceTresury.scss';
 
 const GovernanceTresury = () => {
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
+  const { pricing: tokenPricing } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
+  });
   const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: 'ETH',
   });
@@ -34,13 +35,6 @@ const GovernanceTresury = () => {
   const handleRequestFunds = () => {
     // TODO : It should open up to a modal that allows users to "create a proposal"
   };
-
-  const tokenPricing = communityToken
-    ? calculateTokenPricing(
-        communityToken as z.infer<typeof TokenView>,
-        ethToUsdRate,
-      )
-    : null;
 
   const address = communityToken
     ? isPinnedToken

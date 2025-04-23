@@ -1,24 +1,20 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TradingMode } from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import FractionalValue from '../FractionalValue';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
 
 export interface TokenCardProps {
-  name: string;
-  symbol: string;
-  iconURL: string;
+  token: LaunchpadToken;
   currency?: SupportedCurrencies;
-  marketCap: { current: number; goal: number; isCapped: boolean };
-  price: number;
-  pricePercentage24HourChange: number;
-  mode: TradingMode.Buy | TradingMode.Swap;
   className?: string;
   onCTAClick?: (mode: TradingMode) => void;
   onCardBodyClick?: () => void;
@@ -27,18 +23,16 @@ export interface TokenCardProps {
 const MAX_CHARS_FOR_LABELS = 9;
 
 const TokenCard = ({
-  name,
-  symbol,
-  iconURL,
+  token,
   currency = SupportedCurrencies.USD,
-  marketCap,
-  price,
-  pricePercentage24HourChange,
-  mode,
   className,
   onCardBodyClick,
   onCTAClick,
 }: TokenCardProps) => {
+  const { name, symbol, icon_url } = token;
+
+  const { pricing } = useTokenPricing({ token });
+
   const currencySymbol = currencyNameToSymbolMap[currency];
 
   const handleBodyClick = (e: React.MouseEvent) =>
@@ -53,6 +47,10 @@ const TokenCard = ({
     ? symbol.slice(0, MAX_CHARS_FOR_LABELS) + '...'
     : symbol;
 
+  const mode = pricing.isMarketCapGoalReached
+    ? TradingMode.Swap
+    : TradingMode.Buy;
+
   return (
     <div
       role="button"
@@ -60,7 +58,7 @@ const TokenCard = ({
       className={clsx('TokenCard', className)}
       onClick={handleBodyClick}
     >
-      <img src={iconURL} className="image" onClick={handleBodyClick} />
+      <img src={icon_url || ''} className="image" onClick={handleBodyClick} />
       {/* name and price row */}
       <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
@@ -81,7 +79,7 @@ const TokenCard = ({
           <CWText className="text-dark ml-auto" type="h4" fontWeight="regular">
             {currencySymbol}
             <FractionalValue
-              value={price}
+              value={pricing.currentPrice}
               type="h4"
               fontWeight="regular"
               className="text-dark"
@@ -89,14 +87,18 @@ const TokenCard = ({
           </CWText>
           <CWText className="ml-auto text-light" type="caption">
             <PricePercentageChange
-              pricePercentage24HourChange={pricePercentage24HourChange}
+              pricePercentage24HourChange={pricing.pricePercentage24HourChange}
             />
           </CWText>
         </div>
       </div>
       {/* market cap row */}
       <MarketCapProgress
-        marketCap={marketCap}
+        marketCap={{
+          current: pricing.marketCapCurrent,
+          goal: pricing.marketCapGoal,
+          isCapped: pricing.isMarketCapGoalReached,
+        }}
         currency={currency}
         onBodyClick={handleBodyClick}
       />

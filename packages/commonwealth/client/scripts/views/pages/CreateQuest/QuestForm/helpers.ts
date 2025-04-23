@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import {
   doesActionAllowChainId,
   doesActionAllowThreadId,
@@ -7,7 +7,6 @@ import {
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import { SERVER_URL } from 'state/api/config';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 
 export type ContentIdType =
@@ -56,7 +55,7 @@ export const inferContentIdTypeFromContentId = (
   }
 };
 
-export const buildContentIdFromIdentifier = async (
+export const buildContentIdFromIdentifier = (
   identifier: string, // can be a url or a string containing the identifier value
   idType: ContentIdType,
 ) => {
@@ -76,32 +75,16 @@ export const buildContentIdFromIdentifier = async (
     )}`;
   }
   if (idType === 'topic') {
-    const foundId = parseInt(
-      `${identifier.split('?')[0]?.split('/').filter(Boolean).at(-1)}`,
-    );
+    // check if url is in a redirect format
+    const urlObj = new URL(identifier);
+    if (identifier.includes(`${urlObj.origin}/discussion/topic/`)) {
+      const topicId = parseInt(identifier.split('/').at(-1) || '');
+      if (topicId) return `${idType}:${topicId}`;
+    }
 
-    if (foundId) return `${idType}:${foundId}`;
-
-    const communityId =
-      identifier?.split('/')?.filter?.(Boolean)?.at?.(2) || '';
-    const topicName = decodeURIComponent(
-      identifier?.split('/')?.filter(Boolean)?.at(4)?.split('?')?.at(0) || '',
-    );
-    // Note: This is not a good approach and is only added temporarily.
-    // The core problem here is that we don't get topic ids from topic page urls, so we need to fetch the topics list
-    // for the community and then find a topic which matches the topic name from url, and then extract its id for api
-    // storage. The solution is to update topic urls to store topic ids, and should be done in a followup
-    // https://github.com/hicommonwealth/commonwealth/issues/11546
-    const communityTopics = (
-      await axios.get(
-        // eslint-disable-next-line max-len
-        `${SERVER_URL}/internal/trpc/community.getTopics?batch=1&input=%7B%220%22%3A%7B%22community_id%22%3A%22${communityId}%22%7D%7D`,
-      )
-    ).data?.[0]?.result?.data;
-    const foundTopic = communityTopics?.find(
-      (t) => t.name.toLowerCase().trim() === topicName.toLowerCase().trim(),
-    );
-    if (foundTopic) return `${idType}:${foundTopic.id}`;
+    // check if url is in a resolved format
+    const topicIdentifier = generateTopicIdentifiersFromUrl(identifier);
+    if (topicIdentifier?.topicId) return `${idType}:${topicIdentifier.topicId}`;
     throw new Error(`invalid topic url ${identifier}`);
   }
   if (idType === 'tweet_url' || idType === 'discord_server_id') {

@@ -22,6 +22,8 @@ type CustomCWSelectListProps = {
   ) => Promise<void>;
   showCopyIcon?: boolean;
   instructionalMessage?: string;
+  onClick?: (value: OptionProps) => void;
+  placeholder?: string;
 };
 
 type OptionProps = {
@@ -51,6 +53,7 @@ export const CWSelectList = <
     showCopyIcon,
     saveToClipboard,
     instructionalMessage,
+    placeholder,
   } = props;
   const formContext = useFormContext();
   const isHookedToForm = hookToForm && name;
@@ -100,6 +103,7 @@ export const CWSelectList = <
         {...(defaultFormContextValue && { value: defaultFormContextValue })}
         isDisabled={isDisabled}
         required={props?.required || formFieldContext?.required}
+        placeholder={placeholder || 'Select...'}
         onBlur={(e) => {
           props?.onBlur?.(e);
           formFieldContext?.onBlur?.(e);
@@ -114,6 +118,7 @@ export const CWSelectList = <
               // @ts-expect-error <StrictNullChecks/>
               formContext.setError(name, null);
           }
+          props?.onClick?.(newValue);
         }}
         styles={{
           control: (baseStyles) => ({

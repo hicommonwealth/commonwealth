@@ -11,6 +11,7 @@ export interface BuyTokenProps {
   tokenAddress: string;
   amountEth: number;
   walletAddress: string;
+  tokenUrl?: string;
 }
 
 const buyToken = async ({
@@ -19,6 +20,7 @@ const buyToken = async ({
   tokenAddress,
   amountEth,
   walletAddress,
+  tokenUrl,
 }: BuyTokenProps) => {
   // Check if the selected address belongs to a Magic user
   const userAddresses = userStore.getState().addresses;
@@ -51,6 +53,7 @@ const buyToken = async ({
     amountEth,
     walletAddress,
     `${ethChainId}`,
+    tokenUrl,
     magicProvider,
   );
 };
