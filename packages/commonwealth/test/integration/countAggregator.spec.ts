@@ -14,6 +14,21 @@ import { countAggregator } from '../../server/workers/graphileWorker/tasks/count
 
 chai.use(chaiHttp);
 
+async function clearCountAggregatorCache() {
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    CountAggregatorKeys.ThreadViewCount,
+  );
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    CountAggregatorKeys.CommunityThreadCount,
+  );
+  await cache().deleteKey(
+    CacheNamespaces.CountAggregator,
+    CountAggregatorKeys.CommunityProfileCount,
+  );
+}
+
 describe('Count Aggregator Tests', () => {
   let models: DB;
   let community: CommunityInstance;
@@ -47,12 +62,12 @@ describe('Count Aggregator Tests', () => {
     originalThreadCount = community.lifetime_thread_count!;
     originalProfileCount = community.profile_count!;
     await cache().ready();
-    await cache().flushAll();
+    await clearCountAggregatorCache();
   });
 
   afterAll(async () => {
     await dispose()();
-    await cache().flushAll();
+    await clearCountAggregatorCache();
   });
 
   describe('Tests the count aggregator', () => {
@@ -78,11 +93,6 @@ describe('Count Aggregator Tests', () => {
         CacheNamespaces.CountAggregator,
         CountAggregatorKeys.CommunityProfileCount,
         'ethereum',
-      );
-      await cache().setKey(
-        CacheNamespaces.Thread_Reaction_Count_Changed,
-        '1',
-        'true',
       );
       await cache().incrementHashKey(
         CacheNamespaces.CountAggregator,
