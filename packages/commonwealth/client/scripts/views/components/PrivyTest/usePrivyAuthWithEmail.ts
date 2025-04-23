@@ -1,41 +1,16 @@
 import { useLoginWithEmail } from '@privy-io/react-auth';
 
 import { useEffect, useMemo } from 'react';
-import useUserStore from 'state/ui/user';
 import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
-import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
-import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
+import { usePrivyAuthEffect } from 'views/components/PrivyTest/usePrivyAuthEffect';
 
 export function usePrivyAuthWithEmail(props: PrivyCallbacks) {
-  const { onSuccess, onError } = props;
   const { sendCode, loginWithCode } = useLoginWithEmail();
-  const privySignOn = usePrivySignOn();
-  const wallet = useConnectedWallet();
-  const userStore = useUserStore();
+  const privyAuthEffect = usePrivyAuthEffect(props);
 
   useEffect(() => {
-    async function doAsync() {
-      if (userStore.isLoggedIn) {
-        console.log('userStore isLoggedIn');
-        return;
-      }
-
-      if (wallet) {
-        console.log('Trying to login...');
-        await privySignOn({
-          wallet,
-          onSuccess,
-          onError,
-          ssoOAuthToken: undefined,
-          ssoProvider: 'email',
-        });
-      } else {
-        console.warn('No wallet... ');
-      }
-    }
-
-    doAsync().catch(onError);
-  }, [onError, onSuccess, privySignOn, wallet, userStore.isLoggedIn]);
+    privyAuthEffect('email', undefined);
+  }, [privyAuthEffect]);
 
   return useMemo(() => {
     return {

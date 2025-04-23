@@ -6,6 +6,9 @@ import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
 
 /**
  * Provide JUST the logic we need in the useEffect.
+ *
+ * You then just wrap this with useEffect so when the dependencies change, it
+ * automatically gets called.
  */
 export function usePrivyAuthEffect(props: PrivyCallbacks) {
   const { onSuccess, onError } = props;
@@ -13,27 +16,30 @@ export function usePrivyAuthEffect(props: PrivyCallbacks) {
   const wallet = useConnectedWallet();
   const userStore = useUserStore();
 
-  return useCallback(() => {
-    async function doAsync() {
-      if (userStore.isLoggedIn) {
-        console.log('userStore isLoggedIn');
-        return;
+  return useCallback(
+    (ssoProvider: 'email', ssoOAuthToken: string | undefined) => {
+      async function doAsync() {
+        if (userStore.isLoggedIn) {
+          console.log('userStore isLoggedIn');
+          return;
+        }
+
+        if (wallet) {
+          console.log('Trying to login...');
+          await privySignOn({
+            wallet,
+            onSuccess,
+            onError,
+            ssoOAuthToken,
+            ssoProvider,
+          });
+        } else {
+          console.warn('No wallet... ');
+        }
       }
 
-      if (wallet) {
-        console.log('Trying to login...');
-        await privySignOn({
-          wallet,
-          onSuccess,
-          onError,
-          ssoOAuthToken: undefined,
-          ssoProvider: 'email',
-        });
-      } else {
-        console.warn('No wallet... ');
-      }
-    }
-
-    doAsync().catch(onError);
-  }, [onError, onSuccess, privySignOn, wallet, userStore.isLoggedIn]);
+      doAsync().catch(onError);
+    },
+    [onError, onSuccess, privySignOn, wallet, userStore.isLoggedIn],
+  );
 }
