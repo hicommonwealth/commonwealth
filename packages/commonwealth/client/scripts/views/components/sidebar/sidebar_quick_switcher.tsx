@@ -1,3 +1,4 @@
+import { Feed, FeedItem, GenericData } from '@knocklabs/react';
 import useFetchNotifications from 'client/scripts/state/api/notifications/useFetchNotifications';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -13,19 +14,6 @@ import { SideBarNotificationIcon } from './SidebarNotificationIcon';
 import { calculateUnreadCount } from './helpers';
 import './sidebar_quick_switcher.scss';
 
-interface NotificationItem {
-  seen_at?: string;
-  read_at?: string;
-  data?: {
-    community_name?: string;
-  };
-}
-
-interface FeedClient {
-  markAsRead: (notifications: NotificationItem[]) => Promise<any>;
-  markAsSeen: (notifications: NotificationItem[]) => Promise<any>;
-}
-
 export const SidebarQuickSwitcher = ({
   isInsideCommunity,
   onMobile,
@@ -38,8 +26,8 @@ export const SidebarQuickSwitcher = ({
   const user = useUserStore();
 
   // Safely access notification data
-  let items: NotificationItem[] = [];
-  let feedClient: FeedClient | null = null;
+  let items: FeedItem<GenericData>[] = [];
+  let feedClient: Feed | null = null;
   try {
     const notificationsData = useFetchNotifications();
     items = notificationsData.items || [];
