@@ -78,49 +78,43 @@ function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
     },
   );
 
-  // Add POST method handler
-  registerRoute(
-    router,
-    'post',
-    '/uniswapProxy',
-    async function (req, res) {
-      try {
-        // Get the endpoint and path from the query params
-        const endpoint = (req.query.endpoint as string) || '';
-        const path = (req.query.path as string) || 'quote';
+  registerRoute(router, 'post', '/uniswapProxy', async function (req, res) {
+    try {
+      // Get the endpoint and path from the query params
+      const endpoint = (req.query.endpoint as string) || '';
+      const path = (req.query.path as string) || 'quote';
 
-        // Make the request to Uniswap API
-        const response = await axios.post(
-          `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}`,
-          req.body,
-          {
-            headers: {
-              origin: process.env.SERVER_URL || 'https://commonwealth.im',
-              'Content-Type': 'application/json',
-            },
-            timeout: 10000,
+      // Make the request to Uniswap API
+      const response = await axios.post(
+        `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}`,
+        req.body,
+        {
+          headers: {
+            origin: process.env.SERVER_URL || 'https://commonwealth.im',
+            'Content-Type': 'application/json',
           },
-        );
+          timeout: 10000,
+        },
+      );
 
-        // Set appropriate CORS headers
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-        res.setHeader(
-          'Access-Control-Allow-Headers',
-          'Content-Type, Authorization',
-        );
+      // Set appropriate CORS headers
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization',
+      );
 
-        // Return the response data
-        return res.send(response.data);
-      } catch (err) {
-        console.error('Uniswap proxy error:', err);
-        res.status(err.response?.status || 500).json({
-          message: err.message,
-          details: err.response?.data,
-        });
-      }
-    },
-  );
+      // Return the response data
+      return res.send(response.data);
+    } catch (err) {
+      console.error('Uniswap proxy error:', err);
+      res.status(err.response?.status || 500).json({
+        message: err.message,
+        details: err.response?.data,
+      });
+    }
+  });
 }
 
 function calcUniswapCacheKeyDuration(req, res, next) {
