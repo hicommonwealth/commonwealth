@@ -420,7 +420,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         );
         return;
       }
-
       if (err?.message?.includes('limit')) {
         console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
