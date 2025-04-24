@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
@@ -109,14 +109,28 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         const NAMESPACE_ADMINS_GROUP_NAME = 'Namespace Admins';
         const COMMUNITY_NOMINATED_GROUP_NAME = 'Community Nominated';
 
-        if (!log_removed) {
-          // don't create group if chain event represents a log removal
-          // TODO: should we remove group when log is removed?
-          // TODO: should we add any default users to this group?
+        if (log_removed) {
+          await models.Group.destroy({
+            where: {
+              community_id: community.id,
+              metadata: {
+                name: {
+                  [Op.in]: [
+                    NAMESPACE_ADMINS_GROUP_NAME,
+                    COMMUNITY_NOMINATED_GROUP_NAME,
+                  ],
+                },
+              },
+              is_system_managed: true,
+            },
+            transaction,
+          });
+        } else {
           await models.Group.findOrCreate({
             where: {
               community_id: community.id,
               metadata: { name: NAMESPACE_ADMINS_GROUP_NAME },
+              is_system_managed: true,
             },
             defaults: {
               community_id: community.id,
@@ -148,6 +162,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             where: {
               community_id: community.id,
               metadata: { name: COMMUNITY_NOMINATED_GROUP_NAME },
+              is_system_managed: true,
             },
             defaults: {
               community_id: community.id,

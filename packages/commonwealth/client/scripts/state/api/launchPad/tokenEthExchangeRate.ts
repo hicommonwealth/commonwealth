@@ -37,6 +37,7 @@ const tokenEthExchangeRate = async ({
 export const getTokenEthExchangeRateQueryKey = (
   params: TokenEthExchangeRateProps,
 ) => [
+  'TOKEN_ETH_EXCHANGE_RATE',
   params.ethChainId,
   params.chainRpc,
   params.tokenAddress,

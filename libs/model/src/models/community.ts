@@ -137,6 +137,11 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      namespace_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
       redirect: { type: Sequelize.TEXT, allowNull: true },

@@ -308,9 +308,11 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
 
-  // Contests
+  // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
+
+  // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
     recurringContestStartedMapper,
   [EvmEventSignatures.Contests.SingleContestStarted]:
