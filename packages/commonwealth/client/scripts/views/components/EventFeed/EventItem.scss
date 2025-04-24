@@ -1,0 +1,79 @@
+.EventItem {
+  display: flex;
+  align-items: flex-start;
+  background-color: var(--Neutral-Colors-Neutral-100, #fff);
+  border: 1px solid var(--Neutral-Colors-Neutral-300, #e0e0e0);
+  border-radius: 7px;
+  padding: 4px 8px;
+  gap: 4px;
+  cursor: pointer;
+  height: auto;
+  text-decoration: none;
+  color: var(--Text-Colors-Text-Body, #1a1a1a);
+  transition: all 0.2s ease;
+  margin-right: 16px; // Keep margin for spacing within marquee for now
+
+  &:hover {
+    background: var(--Neutral-Colors-Neutral-200, #f5f5f5);
+    border-color: var(--Neutral-Colors-Neutral-400, #bdbdbd);
+  }
+
+  .event-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; // Prevent icon from shrinking
+
+    .custom-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .event-left-content {
+    display: flex;
+    flex-direction: column; // Stack primary/secondary lines
+    flex-grow: 1; // Allow this section to grow
+    overflow: hidden; // Prevent text overflow issues
+    gap: 0px; // Adjust gap between primary/secondary lines if needed
+
+    // Apply base font size to all text parts within left content
+    span,
+    strong {
+      font-size: 0.625rem; // 10px
+      line-height: 1.2; // Keep tight line height
+    }
+
+    .event-primary-line,
+    .event-secondary-line {
+      white-space: nowrap; // Prevent text wrapping
+      overflow: hidden; // Hide overflow
+      text-overflow: ellipsis; // Add ellipsis (...) for overflow
+      display: flex; // Use flex to handle potential inline elements within lines
+      align-items: baseline;
+      gap: 4px; // Add horizontal gap between text parts
+    }
+
+    .event-primary-line {
+      span,
+      strong {
+        font-weight: 700; // Ensure primary is bold
+      }
+    }
+
+    .event-secondary-line {
+      // Example: Set text color to match Figma 'by BeerMeWorld'
+      span,
+      strong {
+        color: var(--Primary-Blue-500, #007bff); // Example blue color
+        font-weight: normal; // Ensure secondary is not bold by default
+      }
+      // Allow specific secondary parts to be bold if needed
+      strong {
+        font-weight: 700;
+      }
+    }
+  }
+}
