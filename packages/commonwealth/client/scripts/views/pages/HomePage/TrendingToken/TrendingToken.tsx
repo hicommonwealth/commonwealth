@@ -27,6 +27,19 @@ const TrendingToken = ({
   const handleBodyClick = (e: React.MouseEvent) =>
     e.target === e.currentTarget && onCardBodyClick?.();
 
+  // Get the raw percentage
+  const rawPercentage = pricing.pricePercentage24HourChange;
+  // Format the percentage value based on magnitude
+  let percentageToDisplay: number = rawPercentage ?? 0;
+  if (rawPercentage != null) {
+    const formattedString =
+      Math.abs(rawPercentage) >= 1000
+        ? rawPercentage.toFixed(0) // >= 1000, show 0 decimals
+        : rawPercentage.toFixed(2); // < 1000, show 2 decimals
+    // Convert formatted string back to number
+    percentageToDisplay = parseFloat(formattedString);
+  }
+
   const mode = pricing.isMarketCapGoalReached
     ? TradingMode.Swap
     : TradingMode.Buy;
@@ -54,7 +67,8 @@ const TrendingToken = ({
           </div>
         </div>
         <PricePercentageChange
-          pricePercentage24HourChange={pricing.pricePercentage24HourChange}
+          // Pass the formatted number
+          pricePercentage24HourChange={percentageToDisplay}
           show24Hour={false}
           useIcon
           tokenCard
