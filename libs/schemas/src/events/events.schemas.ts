@@ -552,4 +552,11 @@ export const events = {
     selected_community_ids: z.array(z.string()),
     created_at: z.coerce.date(),
   }),
+
+  KyoFinanceSwapQuestVerified: z.object({
+    quest_action_meta_id: PG_INT,
+  }),
+  KyoFinanceLpQuestVerified: z.object({
+    quest_action_meta_id: PG_INT,
+  }),
 } as const;

@@ -19,6 +19,18 @@ export const AllChannelQuestActionNames = [
   ...ChannelBatchActions,
 ] as const;
 
+export const ExternalApiQuests = {
+  KyoFinanceSwapQuestVerified: events.KyoFinanceSwapQuestVerified,
+  KyoFinanceLpQuestVerified: events.KyoFinanceLpQuestVerified,
+} as const;
+
+export const ExternalApiQuestNames = [
+  ...(Object.keys(ExternalApiQuests) as [
+    keyof typeof ExternalApiQuests,
+    ...Array<keyof typeof ExternalApiQuests>,
+  ]),
+];
+
 export const QuestEvents = {
   SignUpFlowCompleted: events.SignUpFlowCompleted,
   CommunityCreated: events.CommunityCreated,
@@ -38,6 +50,7 @@ export const QuestEvents = {
   NamespaceLinked: events.NamespaceLinked,
   CommunityGoalReached: events.CommunityGoalReached,
   MembershipsRefreshed: events.MembershipsRefreshed,
+  ...ExternalApiQuests,
   ...ChannelQuestEvents,
 } as const;
 

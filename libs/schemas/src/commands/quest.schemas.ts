@@ -31,6 +31,36 @@ export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true })
       .refine(
         (data) => !(data && !data.likes && !data.retweets && !data.replies),
       ),
+    external_api_verification: z
+      .object({
+        kyo_finance_swap: z
+          .object({
+            outputToken: z
+              .string()
+              .optional()
+              .describe('Address of token swapped from'),
+            inputToken: z
+              .string()
+              .optional()
+              .describe('Address of token to swap to'),
+            minOutputAmount: z
+              .string()
+              .optional()
+              .describe('Minimum amount of output token swapped'),
+            minTimestamp: z
+              .string()
+              .optional()
+              .describe('Minimum timestamp of swap'),
+            minVolumeUSD: z
+              .string()
+              .optional()
+              .describe('Minimum volume of swap'),
+          })
+          .describe(
+            'https://docs.kyo.finance/technical-docs/swap-lp-quest-verification-api#id-1.-swap-quest',
+          ),
+      })
+      .optional(),
   })
   .refine(
     (data) =>
@@ -61,6 +91,14 @@ export const DeleteQuest = {
 
 export const CancelQuest = {
   input: z.object({ quest_id: z.number() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const VerifyQuestAction = {
+  input: z.object({
+    quest_action_meta_id: z.number(),
+  }),
   output: z.boolean(),
   context: AuthContext,
 };
