@@ -3,7 +3,7 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -17,7 +17,12 @@ import CommunityTransactions from './CommunityTransactions/CommunityTransactions
 import TokenDetails from './TokenDetails/TokenDetails';
 import TokenPerformance from './TokenPerformance/TokenPerformance';
 
+let communityHomeInstanceCounter = 0;
+
 const CommunityHome = () => {
+  const instanceId = useState(() => ++communityHomeInstanceCounter)[0];
+  console.log(`[CommunityHome-${instanceId}] Component initializing`);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
@@ -34,6 +39,17 @@ const CommunityHome = () => {
   } = useManageCommunityStakeModalStore();
 
   const [selectedCommunityId] = useState<string>();
+
+  // Component lifecycle tracking
+  useEffect(() => {
+    console.log(`[CommunityHome-${instanceId}] Component mounted`);
+
+    return () => {
+      console.log(`[CommunityHome-${instanceId}] Component unmounted`);
+    };
+  }, [instanceId]);
+
+  console.log(`[CommunityHome-${instanceId}] Rendering component`);
 
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">

@@ -7,15 +7,24 @@ import {
 } from 'client/scripts/views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
-import React, { useEffect, useState } from 'react';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import CommonTrade from './CommonTrade/CommonTrade';
 import './TokenPerformance.scss';
+import TopHolders from './TopHolders/TopHolders';
 import UniswapTrade from './UniswapTrade/UniswapTrade';
 
+let performanceInstanceCounter = 0;
+
 const TokenPerformance = () => {
+  const componentId = useMemo(() => ++performanceInstanceCounter, []);
+  console.log(`[TokenPerformance-${componentId}] Component initializing`);
+
+  const mountRef = useRef(true);
+
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     tradeConfig?: TradingConfig;
   }>({ tradeConfig: undefined });
@@ -23,25 +32,99 @@ const TokenPerformance = () => {
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  useEffect(() => {
-    if (!communityToken) return;
+  const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
+  });
 
-    setTokenLaunchModalConfig({
+  // Component lifecycle logging
+  useEffect(() => {
+    console.log(`[TokenPerformance-${componentId}] Component mounted`);
+    mountRef.current = true;
+
+    return () => {
+      console.log(`[TokenPerformance-${componentId}] Component unmounting`);
+      mountRef.current = false;
+    };
+  }, [componentId]);
+
+  // Use useEffect with proper cleanup
+  useEffect(() => {
+    if (!communityToken) {
+      console.log(
+        `[TokenPerformance-${componentId}] No community token, skipping config update`,
+      );
+      return;
+    }
+
+    console.log(
+      `[TokenPerformance-${componentId}] Setting token launch modal config`,
+      { isPinnedToken },
+    );
+
+    const newConfig = {
       tradeConfig: {
         mode: isPinnedToken ? TradingMode.Swap : TradingMode.Buy,
         token: communityToken,
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
-    });
-  }, [communityToken, isPinnedToken]);
+    };
 
-  if (isLoadingToken || !communityToken) return;
+    setTokenLaunchModalConfig(newConfig);
 
-  const chain = isPinnedToken ? 'base' : 'base-sepolia';
-  const address = isPinnedToken
-    ? (communityToken as ExternalToken).contract_address
-    : (communityToken as LaunchpadToken).token_address;
+    return () => {
+      console.log(
+        `[TokenPerformance-${componentId}] Cleaning up token launch effect`,
+      );
+    };
+  }, [communityToken, isPinnedToken, componentId]);
 
+  console.log(`[TokenPerformance-${componentId}] Rendering - Loading state:`, {
+    isLoadingToken,
+    pricingLoading,
+    hasToken: !!communityToken,
+  });
+
+  if (isLoadingToken || !communityToken || pricingLoading) {
+    console.log(
+      `[TokenPerformance-${componentId}] Exiting early due to loading state`,
+    );
+    return null;
+  }
+
+  // Memoize these values to prevent unnecessary recalculations
+  const chain = useMemo(() => {
+    const result = isPinnedToken ? 'base' : 'base-sepolia';
+    console.log(`[TokenPerformance-${componentId}] Calculated chain:`, result);
+    return result;
+  }, [isPinnedToken, componentId]);
+
+  const address = useMemo(() => {
+    const result = isPinnedToken
+      ? (communityToken as ExternalToken).contract_address
+      : (communityToken as LaunchpadToken).token_address;
+    console.log(
+      `[TokenPerformance-${componentId}] Calculated address:`,
+      result,
+    );
+    return result;
+  }, [communityToken, isPinnedToken, componentId]);
+
+  // Check if it's a launchpad token and if it has reached its goal
+  const isLaunchpadToken = !isPinnedToken;
+  const hasReachedGoal = useMemo(() => {
+    const result = isLaunchpadToken
+      ? tokenPricing?.isMarketCapGoalReached
+      : true;
+    console.log(
+      `[TokenPerformance-${componentId}] Calculated hasReachedGoal:`,
+      result,
+    );
+    return result;
+  }, [isLaunchpadToken, tokenPricing, componentId]);
+
+  console.log(
+    `[TokenPerformance-${componentId}] About to render full component`,
+  );
   return (
     <div className="TokenPerformance">
       <div className="heading-container">
@@ -53,14 +136,18 @@ const TokenPerformance = () => {
           </div>
         </Link>
       </div>
-      <div className="performance-content">
-        <GeckoTerminalChart
-          className="GekoChart"
-          chain={chain}
-          poolAddress={address}
-          info={false}
-          swaps={false}
-        />
+      <div
+        className={`performance-content ${!hasReachedGoal ? 'no-chart' : ''}`}
+      >
+        {hasReachedGoal && (
+          <GeckoTerminalChart
+            className="GeckoChart"
+            chain={chain}
+            poolAddress={address}
+            info={false}
+            swaps={false}
+          />
+        )}
         {isPinnedToken
           ? tokenLaunchModalConfig.tradeConfig && (
               <UniswapTrade
@@ -74,6 +161,7 @@ const TokenPerformance = () => {
                 tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
               />
             )}
+        {!hasReachedGoal && <TopHolders />}
       </div>
     </div>
   );
