@@ -67,7 +67,7 @@ const transformLaunchpadTradeData = (
     const meta = metadataMap[trade.token_address?.toLowerCase()] || {};
     const decimals = meta.decimals ?? 18;
     const formattedAmount = formatUnits(
-      Math.round(parseFloat(trade.community_token_amount)) || '0',
+      trade.community_token_amount || '0',
       decimals,
     );
 
