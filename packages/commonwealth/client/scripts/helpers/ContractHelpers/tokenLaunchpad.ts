@@ -1,5 +1,5 @@
 import {
-  TokenBondingCurveABI,
+  TokenBondingCurveAbi,
   TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
@@ -17,7 +17,7 @@ class TokenLaunchpad extends ContractBase {
     paymentTokenAddress: string, // communities payment token
     rpc: string,
   ) {
-    super(bondingCurveAddress, TokenBondingCurveABI, rpc);
+    super(bondingCurveAddress, TokenBondingCurveAbi, rpc);
     this.launchpadFactory = new this.web3.eth.Contract(
       TokenLaunchpadAbi,
       launchpadFactoryAddress,
