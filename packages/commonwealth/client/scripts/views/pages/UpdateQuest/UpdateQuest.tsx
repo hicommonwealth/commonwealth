@@ -134,6 +134,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
                 rewardAmount: `${action.reward_amount}`,
                 instructionsLink: action.instructions_link || '',
+                amountMultipler: `${action.amount_multiplier || 0}`,
                 contentIdScope: inferContentIdTypeFromContentId(
                   action.event_name as QuestAction,
                   action.content_id || undefined,

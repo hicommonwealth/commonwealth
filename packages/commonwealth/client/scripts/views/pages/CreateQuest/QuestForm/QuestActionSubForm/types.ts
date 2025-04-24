@@ -15,6 +15,7 @@ export enum QuestActionContentIdScope {
   DiscordServer = 'discord_server',
   Chain = 'chain',
   Group = 'group',
+  TokenTradeThreshold = 'threshold',
 }
 
 export type QuestActionSubFormErrors = {
@@ -31,6 +32,8 @@ export type QuestActionSubFormErrors = {
   noOfLikes?: string;
   noOfRetweets?: string;
   noOfReplies?: string;
+  // specific to launchpad token actions
+  amountMultipler?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -52,6 +55,8 @@ export type QuestActionSubFormFields = {
   noOfLikes?: string | number;
   noOfRetweets?: string | number;
   noOfReplies?: string | number;
+  // specific to launchpad token actions
+  amountMultipler?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
@@ -65,6 +70,8 @@ export type QuestActionSubFormConfig = {
   with_optional_chain_id: boolean;
   requires_group_id: boolean;
   requires_start_link: boolean;
+  requires_amount_multipler: boolean;
+  with_optional_token_trade_threshold: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

@@ -4,6 +4,7 @@ import {
 } from '@hicommonwealth/schemas';
 import {
   linkValidationSchema,
+  numberDecimalValidationSchema,
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
   numberValidationSchema,
@@ -35,20 +36,27 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_comment_id ||
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
-    config?.with_optional_chain_id;
+    config?.with_optional_chain_id ||
+    config?.with_optional_token_trade_threshold;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerId = config?.requires_discord_server_id;
   const requiresGroupId = config?.requires_group_id;
   const requiresStartLink = config?.requires_start_link;
+  const requiresAmountMultipler = config?.requires_amount_multipler;
   const requiresCreatorPoints = config?.requires_creator_points;
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
+  const allowsTokenThresholdAmountAsContentId =
+    config?.with_optional_token_trade_threshold;
 
   const needsExtension =
     requiresCreatorPoints ||
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
     requiresDiscordServerId ||
-    requiresGroupId;
+    requiresGroupId ||
+    requiresStartLink ||
+    allowsChainIdAsContentId ||
+    allowsTokenThresholdAmountAsContentId;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -58,6 +66,10 @@ export const buildQuestSubFormValidationSchema = (
     if (allowsChainIdAsContentId) {
       baseSchema = baseSchema.extend({
         contentIdentifier: numberValidationSchema.optional,
+      }) as unknown as typeof baseSchema;
+    } else if (allowsTokenThresholdAmountAsContentId) {
+      baseSchema = baseSchema.extend({
+        contentIdentifier: numberDecimalValidationSchema.optional,
       }) as unknown as typeof baseSchema;
     } else {
       baseSchema = baseSchema.extend({
@@ -89,6 +101,11 @@ export const buildQuestSubFormValidationSchema = (
         startLink: linkValidationSchema.required,
       }) as unknown as typeof baseSchema;
     }
+  }
+  if (requiresAmountMultipler) {
+    baseSchema = baseSchema.extend({
+      amountMultipler: numberNonDecimalGTZeroValidationSchema,
+    }) as unknown as typeof baseSchema;
   }
   if (requiresCreatorPoints) {
     baseSchema = baseSchema

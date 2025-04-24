@@ -28,6 +28,7 @@ const ContentIdInput = ({
       discordServerId: `0xxxxxxxxxxxxxxxx0`,
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
+      tokenThresholdAmount: '0.00001',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -37,6 +38,7 @@ const ContentIdInput = ({
       chainId: 'Chain Id (optional)',
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
+      tokenThresholdAmount: 'Min Trade Amount (optional)',
     },
   };
 
@@ -90,6 +92,13 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.groupId,
         placeholder: inputConfig.placeholders.groupId,
+      };
+    }
+
+    if (config?.with_optional_token_trade_threshold) {
+      return {
+        label: inputConfig.labels.tokenThresholdAmount,
+        placeholder: inputConfig.placeholders.tokenThresholdAmount,
       };
     }
 

@@ -37,7 +37,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'TweetEngagement' ||
     action === 'CommunityCreated' ||
     action === 'DiscordServerJoined' ||
-    action === 'MembershipsRefreshed'
+    action === 'MembershipsRefreshed' ||
+    action === 'LaunchpadTokenTraded'
   );
 };
 
@@ -79,6 +80,14 @@ export const doesActionRequireGroupId = (action: QuestActionType) => {
 
 export const doesActionRequireStartLink = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
+};
+
+export const doesActionAllowTokenTradeThreshold = (action: QuestActionType) => {
+  return action === 'LaunchpadTokenTraded';
+};
+
+export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
+  return action === 'LaunchpadTokenTraded';
 };
 
 const convertTimeRemainingToLabel = ({
