@@ -80,7 +80,8 @@ FROM
   JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
   websearch_to_tsquery('english', $searchTerm) as tsquery
 WHERE
-  "Threads".deleted_at IS NULL
+  "Threads".deleted_at IS NULL AND
+  "Threads".marked_as_spam_at IS NULL
   ${bind.community ? 'AND "Threads".community_id = $community' : ''} 
   AND ("Threads".title ILIKE '%' || $searchTerm || '%' 
   ${!threadTitleOnly ? 'OR tsquery @@ "Threads".search' : ''})

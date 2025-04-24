@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import type AddressInfo from '../models/AddressInfo';
 import { CustomIconName } from '../views/components/component_kit/cw_icons/cw_icon_lookup';
 
@@ -55,4 +55,33 @@ export const getChainIcon = (
   }
 
   return 'eth'; // default fallback
+};
+
+// Helper function to map WalletSsoSource to CustomIconName
+export const getSsoIconName = (
+  source?: WalletSsoSource,
+): CustomIconName | undefined => {
+  if (!source) return undefined;
+
+  switch (source) {
+    case WalletSsoSource.Google:
+      return 'google';
+    case WalletSsoSource.Github:
+      return 'github';
+    case WalletSsoSource.Discord:
+      return 'discordIcon';
+    case WalletSsoSource.Twitter:
+      return 'twitterIcon';
+    case WalletSsoSource.Apple:
+      return 'apple';
+    case WalletSsoSource.Email:
+      return 'email';
+    case WalletSsoSource.Farcaster:
+      return 'farcaster';
+    case WalletSsoSource.SMS:
+      return 'SMS';
+    case WalletSsoSource.Unknown:
+    default:
+      return undefined;
+  }
 };

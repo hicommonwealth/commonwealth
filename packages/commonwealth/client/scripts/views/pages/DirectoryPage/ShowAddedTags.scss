@@ -1,0 +1,13 @@
+.ShowAddedTags {
+  .added-tags-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .tag-button {
+    height: 30px;
+  }
+}

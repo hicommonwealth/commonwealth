@@ -337,6 +337,8 @@ export const iconLookup = {
 export const customIconLookup = {
   base: CustomIcons.CWBase,
   blast: CustomIcons.CWBlast,
+  google: Icons.CWGoogle,
+  github: Icons.CWGithub,
   email: CustomIcons.CWEmail,
   solana: CustomIcons.CWSolana,
   nearIcon: CustomIcons.CWNearIcon,
@@ -344,11 +346,8 @@ export const customIconLookup = {
   cosmos: CustomIcons.CWCosmos,
   polkadot: CustomIcons.CWPolkadot,
   discordIcon: CustomIcons.CWDiscord,
-  githubIcon: CustomIcons.CWGithub,
-  twitterIcon: CustomIcons.CWTwitter,
-  envelope: CustomIcons.CWEnvelop,
-  'keplr-ethereum': CustomIcons.CWKeplr,
-  'cosm-metamask': CustomIcons.CWMetaMask,
+  octocat: Icons.CWOctocat,
+  hamburger: Icons.CWHamburger,
   keplr: CustomIcons.CWKeplr,
   leap: CustomIcons.CWLeap,
   magic: CustomIcons.CWMagic,
@@ -368,6 +367,10 @@ export const customIconLookup = {
   SMS: withPhosphorIcon(ChatText),
   privy: CustomIcons.CWPrivy,
   okx: CustomIcons.CWOKX,
+  twitterIcon: CustomIcons.CWTwitter,
+  envelope: CustomIcons.CWEnvelop,
+  'keplr-ethereum': CustomIcons.CWKeplr,
+  'cosm-metamask': CustomIcons.CWMetaMask,
 };
 
 export type IconName = keyof typeof iconLookup;

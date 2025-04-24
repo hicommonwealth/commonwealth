@@ -1,6 +1,11 @@
+import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
+import { formatUnits } from 'ethers/lib/utils';
 import { formatAddressShort } from 'helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useGetLaunchpadTradesQuery } from 'state/api/launchPad';
+import { useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
@@ -14,6 +19,28 @@ import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
 import useTransactionHistory from './useTransactionHistory';
 
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+
+type TransactionHistoryItem = {
+  address: string;
+  timestamp: number;
+  amount: number;
+  etherscanLink: string;
+  community: {
+    id: string;
+    name: string;
+    default_symbol: string;
+    icon_url: string;
+    chain_node_id: number;
+  };
+  transaction_category: 'launchpad' | 'stake';
+  transaction_type: 'buy' | 'sell';
+  totalPrice: string;
+  price: number;
+  transaction_hash: string;
+  community_id: string;
+};
+
 const BASE_ADDRESS_FILTER = {
   label: 'All addresses',
   value: '',
@@ -23,12 +50,57 @@ type TransactionsTabProps = {
   transactionsType: 'tokens' | 'history';
   showFilterOptions?: boolean;
   searchText?: string;
+  prefetchedData?: GetLaunchpadTradesOutput;
+};
+
+const transformLaunchpadTradeData = (
+  trades: GetLaunchpadTradesOutput | null | undefined,
+  metadataMap: Record<
+    string,
+    | { decimals?: number; name?: string; symbol?: string; icon_url?: string }
+    | undefined
+  >,
+): TransactionHistoryItem[] => {
+  if (!trades) return [];
+
+  return trades.map((trade) => {
+    const meta = metadataMap[trade.token_address?.toLowerCase()] || {};
+    const decimals = meta.decimals ?? 18;
+    const formattedAmount = formatUnits(
+      trade.community_token_amount || '0',
+      decimals,
+    );
+
+    return {
+      address: trade.trader_address,
+      timestamp: trade.timestamp * 1000,
+      amount: parseFloat(formattedAmount),
+      etherscanLink: buildEtherscanLink(
+        trade.transaction_hash,
+        trade.eth_chain_id,
+      ),
+      community: {
+        id: trade.community_id,
+        name: trade.name,
+        default_symbol: trade.symbol,
+        icon_url: trade.community_icon_url,
+        chain_node_id: trade.eth_chain_id,
+      },
+      transaction_category: 'launchpad',
+      transaction_type: trade.is_buy ? 'buy' : 'sell',
+      totalPrice: `${formatUnits((trade.price * 1e18)?.toString() || '0', 18)} ETH`,
+      price: trade.price,
+      transaction_hash: trade.transaction_hash,
+      community_id: trade.token_address,
+    };
+  });
 };
 
 const TransactionsTab = ({
   transactionsType,
   showFilterOptions = true,
   searchText = '',
+  prefetchedData,
 }: TransactionsTabProps) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchText,
@@ -43,6 +115,11 @@ const TransactionsTab = ({
   }, [searchText]);
 
   const user = useUserStore();
+
+  const { data: launchpadData } = useGetLaunchpadTradesQuery({
+    trader_addresses: user.addresses.map((u) => u.address),
+  });
+
   const hasMagic = user.hasMagicWallet;
 
   const ADDRESS_FILTERS = [
@@ -57,19 +134,66 @@ const TransactionsTab = ({
     (a) => a.value,
   );
 
-  // @ts-expect-error <StrictNullChecks/>
-  let addressFilter = [filterOptions.selectedAddress.value];
-  // @ts-expect-error <StrictNullChecks/>
-  if (filterOptions.selectedAddress.value === '') {
+  let addressFilter = [filterOptions.selectedAddress?.value].filter(
+    (v): v is string => typeof v === 'string',
+  );
+  if (filterOptions.selectedAddress?.value === '') {
     addressFilter = possibleAddresses;
   }
 
   const { openMagicWallet } = useAuthentication({});
 
-  const data = useTransactionHistory({
+  const tokenAddresses = useMemo((): string[] => {
+    if (!prefetchedData) return [];
+    const filteredAddresses: string[] = prefetchedData
+      .map((t) => t.token_address?.toLowerCase())
+      .filter((a): a is string => !!a);
+    return [...new Set(filteredAddresses)];
+  }, [prefetchedData]);
+
+  const { data: tokensMetadata } = useTokensMetadataQuery({
+    tokenIds: tokenAddresses,
+    nodeEthChainId: prefetchedData?.[0]?.eth_chain_id ?? 0,
+  });
+
+  const metadataMap = useMemo(() => {
+    if (!tokensMetadata) return {};
+    return tokensMetadata.reduce(
+      (acc, meta) => {
+        if (meta?.tokenId) {
+          acc[meta.tokenId.toLowerCase()] = meta;
+        }
+        return acc;
+      },
+      {} as Record<string, (typeof tokensMetadata)[number]>,
+    );
+  }, [tokensMetadata]);
+
+  const hookData = useTransactionHistory({
     filterOptions,
     addressFilter,
   });
+
+  const transformedPrefetchedData = transformLaunchpadTradeData(
+    launchpadData,
+    metadataMap,
+  );
+
+  const locallyFilteredData = useMemo(() => {
+    if (!transformedPrefetchedData) return undefined;
+    if (!filterOptions.searchText) return transformedPrefetchedData;
+
+    return transformedPrefetchedData.filter((tx) =>
+      (tx.transaction_category === 'launchpad'
+        ? `${tx.community.name} (${tx.community.default_symbol})`
+        : `${tx.community.default_symbol} ${tx.community.name}`
+      )
+        .toLowerCase()
+        .includes((filterOptions.searchText || '').toLowerCase()),
+    );
+  }, [transformedPrefetchedData, filterOptions.searchText]);
+
+  const dataToDisplay = locallyFilteredData || hookData;
 
   return (
     <section className="TransactionsTab">
@@ -107,10 +231,9 @@ const TransactionsTab = ({
               options={ADDRESS_FILTERS}
               value={filterOptions.selectedAddress}
               onChange={(option) =>
-                // @ts-expect-error <StrictNullChecks/>
                 setFilterOptions((filters) => ({
                   ...filters,
-                  selectedAddress: option,
+                  selectedAddress: option ?? undefined,
                 }))
               }
             />
@@ -118,17 +241,17 @@ const TransactionsTab = ({
         </section>
       )}
 
-      {!(data?.length > 0) ? (
+      {!(dataToDisplay?.length > 0) ? (
         <NoTransactionHistory
           withSelectedAddress={!!filterOptions?.selectedAddress?.value}
         />
       ) : (
         <>
           {transactionsType === 'tokens' && (
-            <MyTokens transactions={data || []} />
+            <MyTokens transactions={dataToDisplay || []} />
           )}
           {transactionsType === 'history' && (
-            <TransactionsHistory transactions={data || []} />
+            <TransactionsHistory transactions={dataToDisplay || []} />
           )}
         </>
       )}

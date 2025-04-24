@@ -42,13 +42,16 @@ class LaunchpadBondingCurve extends ContractBase {
     symbol: string,
     walletAddress: string,
     chainId: string,
-    connectorWeight: number = 830000,
   ) {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-    const value =
-      this.chainId === '8453' ? 4.4400042e14 : 4.4400042e14 - 0.000444e18;
+    const initialBuyValue =
+      4.44e14 + parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000');
+    const connectorWeight = parseInt(
+      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || '830000',
+    );
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
@@ -60,22 +63,58 @@ class LaunchpadBondingCurve extends ContractBase {
       walletAddress,
       connectorWeight,
       this.tokenCommunityManager,
-      value,
+      initialBuyValue,
+      maxFeePerGas!,
     );
     return txReceipt;
   }
 
-  async buyToken(amountEth: number, walletAddress: string, chainId: string) {
+  async buyToken(
+    amountEth: number,
+    walletAddress: string,
+    chainId: string,
+    imgUrl?: string,
+  ) {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
       amountEth,
+      maxFeePerGas!,
     );
+
+    // Add token to user's wallet after successful purchase
+    try {
+      const tokenContract = new this.web3.eth.Contract(
+        erc20Abi as unknown as AbiItem[],
+        this.tokenAddress,
+      );
+
+      // Get token details for wallet_watchAsset
+      const tokenSymbol = await tokenContract.methods.symbol().call();
+
+      // @ts-expect-error StrictNullChecks
+      await this.web3.currentProvider.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: this.tokenAddress,
+            symbol: tokenSymbol,
+            decimals: 18,
+            image: imgUrl,
+          },
+        },
+      });
+    } catch (error) {
+      console.log('Failed to add token to wallet:', error);
+      // Continue as this is an enhancement, not a critical functionality
+    }
+
     return txReceipt;
   }
 
@@ -87,12 +126,14 @@ class LaunchpadBondingCurve extends ContractBase {
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
     );
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
       walletAddress,
       tokenContract,
+      maxFeePerGas!,
     );
     return txReceipt;
   }

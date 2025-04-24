@@ -1,8 +1,17 @@
-import { Op } from 'sequelize';
+import { FindOptions, Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
 
-export async function findActiveContestManager(contest_address: string) {
+export async function findActiveContestManager(
+  contest_address: string,
+  {
+    include,
+  }: {
+    include?: FindOptions<typeof models.ContestManager>['include'];
+  } = {
+    include: [],
+  },
+) {
   return await models.ContestManager.findOne({
     where: {
       contest_address,
@@ -14,5 +23,6 @@ export async function findActiveContestManager(contest_address: string) {
         [Op.not]: true,
       },
     },
+    include,
   });
 }

@@ -154,6 +154,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             stages_enabled: true,
             allow_tokenized_threads,
             thread_purchase_token,
+            namespace_verified: false,
           },
           { transaction },
         );
