@@ -4,11 +4,36 @@
   background-color: $neutral-50;
   padding: 16px;
   border-radius: 6px;
-  display: flex;
-  flex-direction: column;
   gap: 24px;
   width: 100%;
   position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 equal-width columns */
+  align-items: flex-start;
+
+  .span-1 {
+    grid-column: span 1;
+  }
+
+  .span-2 {
+    grid-column: span 2;
+  }
+
+  .span-3 {
+    grid-column: span 3;
+  }
+
+  .span-6 {
+    grid-column: span 6;
+  }
+
+  .span-1,
+  .span-2,
+  .span-3 {
+    @include mediumSmallInclusive {
+      grid-column: span 6;
+    }
+  }
 
   &.isRemoveable {
     padding-top: 28px !important;
@@ -42,33 +67,6 @@
     .mt-8 {
       margin-top: 8px;
     }
-  }
-
-  .grid-row {
-    display: grid;
-
-    &.cols-1 {
-      grid-template-columns: 1fr;
-    }
-
-    &.cols-2 {
-      @include mediumSmallInclusive {
-        grid-template-columns: 1fr;
-      }
-
-      grid-template-columns: 1fr 1fr;
-    }
-
-    &.cols-3 {
-      @include mediumSmallInclusive {
-        grid-template-columns: 1fr;
-      }
-
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    gap: 24px;
-    align-items: flex-start;
   }
 
   .MessageRow {

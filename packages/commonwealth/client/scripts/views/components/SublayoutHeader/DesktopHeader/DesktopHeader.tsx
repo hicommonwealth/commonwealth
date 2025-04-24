@@ -24,12 +24,12 @@ import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWText } from '../../component_kit/cw_text';
 import XPProgressIndicator from '../XPProgressIndicator';
 
 import DownloadMobileApp from 'views/components/DownloadMobileApp';
+import FormattedDisplayNumber from '../../FormattedDisplayNumber/FormattedDisplayNumber';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -174,12 +174,15 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                           weight="fill"
                           iconButtonTheme="black"
                         />
-                        <CWText
-                          className="earnings"
-                          fontWeight="medium"
+                        <FormattedDisplayNumber
+                          value={balance}
+                          options={{ decimals: 3, useShortSuffixes: false }}
+                          className="mr-1"
                           type="caption"
-                        >
-                          {capDecimals(balance || '0')} ETH
+                          fontWeight="medium"
+                        />
+                        <CWText type="caption" className="ml-1">
+                          ETH
                         </CWText>
                         <CWCustomIcon iconName="base" iconSize="xs" />
                       </div>

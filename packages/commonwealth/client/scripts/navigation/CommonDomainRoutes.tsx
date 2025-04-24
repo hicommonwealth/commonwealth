@@ -49,7 +49,6 @@ const NotificationSettings = lazy(
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
@@ -60,6 +59,9 @@ const ViewThreadPage = lazy(
 );
 const TopicRedirectPage = lazy(() => import('views/pages/topic_redirect'));
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const GroupRedirectPage = lazy(
+  () => import('views/pages/Redirects/GroupRedirect'),
+);
 const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -356,9 +358,13 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/proposal/:type/:identifier"
     path="/:scope/proposal/:type/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
 
   <Route
@@ -451,6 +457,13 @@ const CommonDomainRoutes = () => [
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
+    key="/group/:id"
+    path="/group/:id"
+    element={withLayout(GroupRedirectPage, {
       scoped: false,
     })}
   />,

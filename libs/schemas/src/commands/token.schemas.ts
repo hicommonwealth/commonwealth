@@ -30,14 +30,17 @@ export const CreateLaunchpadTrade = {
 
 export const GetLaunchpadTrades = {
   input: z.object({
-    token_address: z.string(),
+    token_address: z.string().optional(),
+    trader_addresses: z.string().optional(),
   }),
   output: LaunchpadTrade.extend({
     community_token_amount: z.string(),
     floating_supply: z.string(),
-  })
-    .array()
-    .nullish(),
+    name: z.string(),
+    symbol: z.string(),
+    community_id: z.string(),
+    community_icon_url: z.string(),
+  }).array(),
 };
 
 export const GetTokenizedThreadsAllowed = {

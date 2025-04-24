@@ -10,6 +10,7 @@ export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
 export const SKALE_ID = '974399131';
+export const SONIEUM_ID = '1868';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
