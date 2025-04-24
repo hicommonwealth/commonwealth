@@ -1,9 +1,15 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  COMMUNITY_TIERS,
+  CommunityTierMap,
+  Tier,
+} from '@hicommonwealth/shared';
 import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
+import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
@@ -15,13 +21,6 @@ import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
-
-const tierIcons = {
-  1: 'globe',
-  2: 'pins',
-  3: 'whiteCheck',
-  4: 'starGolden',
-} as const;
 
 type CommunityPreviewCardProps = {
   monthlyThreadCount?: number;
@@ -46,6 +45,12 @@ type CommunityPreviewCardProps = {
       }>;
     }
 );
+
+const hasClientInfo = (
+  tier: Tier,
+): tier is Tier & { clientInfo: { componentIcon: IconName } } => {
+  return 'clientInfo' in tier && tier.clientInfo?.componentIcon !== undefined;
+};
 
 const CommunityPreviewCard = ({
   community,
@@ -109,12 +114,18 @@ const CommunityPreviewCard = ({
               )}
               {trustLevelEnabled &&
                 community?.tier &&
-                tierIcons[community.tier] && (
-                  <CWIcon
-                    iconName={tierIcons[community.tier]}
-                    iconSize="small"
-                  />
-                )}
+                (() => {
+                  const tier =
+                    COMMUNITY_TIERS[community.tier as CommunityTierMap];
+                  return (
+                    hasClientInfo(tier) && (
+                      <CWIcon
+                        iconName={tier.clientInfo.componentIcon}
+                        iconSize="small"
+                      />
+                    )
+                  );
+                })()}
 
               <div className="thread-counts">
                 <CWIcon iconName="notepad" weight="light" />

@@ -1,6 +1,14 @@
 type TierClientInfo = {
   trustLevel: 1 | 2 | 3 | 4 | 5;
   icon: string;
+  componentIcon:
+    | 'stopSymbol'
+    | 'socialVerified'
+    | 'sandClock'
+    | 'globe'
+    | 'pins'
+    | 'whiteCheck'
+    | 'starGolden';
 };
 
 type TierRateLimits = {
@@ -65,6 +73,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 1,
       icon: '🐣',
+      componentIcon: 'socialVerified',
     },
     hourlyRateLimits: {
       create: 1,
@@ -81,6 +90,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 2,
       icon: '⌛',
+      componentIcon: 'sandClock',
     },
     hourlyRateLimits: {
       create: 2,
@@ -97,6 +107,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 3,
       icon: '🌐',
+      componentIcon: 'globe',
     },
     hourlyRateLimits: {
       create: 5,
@@ -113,6 +124,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 4,
       icon: '🔗',
+      componentIcon: 'pins',
     },
   },
   [UserTierMap.ManuallyVerified]: {
@@ -121,6 +133,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 5,
       icon: '⭐',
+      componentIcon: 'starGolden',
     },
   },
 } as const satisfies Record<UserTierMap, UserTier>;
@@ -145,6 +158,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 1,
       icon: '🚫',
+      componentIcon: 'stopSymbol',
     },
   },
   [CommunityTierMap.SocialVerified]: {
@@ -153,6 +167,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 2,
       icon: '🌐',
+      componentIcon: 'globe',
     },
   },
   [CommunityTierMap.CommunityVerified]: {
@@ -161,6 +176,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 3,
       icon: '🔗',
+      componentIcon: 'pins',
     },
   },
   [CommunityTierMap.ManuallyVerified]: {
@@ -169,6 +185,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 4,
       icon: '✅',
+      componentIcon: 'whiteCheck',
     },
   },
   [CommunityTierMap.PremiumVerification]: {
@@ -177,6 +194,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 5,
       icon: '⭐',
+      componentIcon: 'starGolden',
     },
   },
 } as const satisfies Record<CommunityTierMap, Tier>;

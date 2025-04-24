@@ -336,6 +336,9 @@ export const iconLookup = {
   whiteCheck: Icons.CWWhiteCheck,
   pins: Icons.CWPin,
   starGolden: Icons.CWStarGolden,
+  socialVerified: Icons.CWSocialVerified,
+  sandClock: Icons.CWSandClock,
+  stopSymbol: Icons.CWStopSymbol,
 };
 
 export const customIconLookup = {
