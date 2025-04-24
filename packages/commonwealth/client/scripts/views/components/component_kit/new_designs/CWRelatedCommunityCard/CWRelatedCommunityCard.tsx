@@ -1,5 +1,11 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import {
+  COMMUNITY_TIERS,
+  CommunityTierMap,
+  Tier,
+} from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
@@ -24,12 +30,11 @@ import { CWTooltip } from '../CWTooltip';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
-const tierIcons = {
-  1: 'globe',
-  2: 'pins',
-  3: 'whiteCheck',
-  4: 'starGolden',
-} as const;
+const hasClientInfo = (
+  tier: Tier,
+): tier is Tier & { clientInfo: { componentIcon: IconName } } => {
+  return 'clientInfo' in tier && tier.clientInfo?.componentIcon !== undefined;
+};
 
 type CWRelatedCommunityCardProps = {
   community: z.infer<typeof ExtendedCommunity>;
@@ -153,12 +158,18 @@ export const CWRelatedCommunityCard = ({
                 </CWText>
                 {trustLevelEnabled &&
                   community?.tier &&
-                  tierIcons[community.tier] && (
-                    <CWIcon
-                      iconName={tierIcons[community.tier]}
-                      iconSize="small"
-                    />
-                  )}
+                  (() => {
+                    const tier =
+                      COMMUNITY_TIERS[community.tier as CommunityTierMap];
+                    return (
+                      hasClientInfo(tier) && (
+                        <CWIcon
+                          iconName={tier.clientInfo.componentIcon}
+                          iconSize="small"
+                        />
+                      )
+                    );
+                  })()}
               </div>
 
               {!!stakeValue && (
