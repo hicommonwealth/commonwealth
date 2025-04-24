@@ -295,6 +295,10 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'LaunchpadTokenCreated': {
+        navigate(`/createTokenCommunity`, {}, null);
+        break;
+      }
       default:
         return;
     }

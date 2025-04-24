@@ -7,7 +7,11 @@ import {
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+  QuestActionSubFormConfig,
+} from './QuestActionSubForm';
 
 export type ContentIdType =
   | 'comment'
@@ -59,24 +63,33 @@ export const buildContentIdFromIdentifier = (
   identifier: string, // can be a url or a string containing the identifier value
   idType: ContentIdType,
 ) => {
+  if (idType === 'tweet_url' || idType === 'discord_server_id') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'chain') {
+    return `${idType}:${identifier}`;
+  }
+
+  // this is used by all the remaining idType's below
+  const urlObj = new URL(identifier);
+  const searchParams = new URLSearchParams(urlObj.search);
+
   if (idType === 'comment') {
     return `${idType}:${parseInt(
       identifier.includes('discussion/comment/')
-        ? identifier.split('discussion/comment/')[1] // remove comment redirector path
-        : identifier.split('?comment=')[1], // remove remove query string param
+        ? urlObj.pathname.split('/').at(-1) || '' // get comment id from url pathname
+        : searchParams.get('comment') || '', // get comment id from url search params
     )}`;
   }
   if (idType === 'thread') {
     return `${idType}:${parseInt(
-      identifier
-        .split('?')[0] // remove query string
+      urlObj.pathname
         .split('discussion/')[1] // remove thread redirector path
         .split('-')[0],
     )}`;
   }
   if (idType === 'topic') {
     // check if url is in a redirect format
-    const urlObj = new URL(identifier);
     if (identifier.includes(`${urlObj.origin}/discussion/topic/`)) {
       const topicId = parseInt(identifier.split('/').at(-1) || '');
       if (topicId) return `${idType}:${topicId}`;
@@ -87,18 +100,12 @@ export const buildContentIdFromIdentifier = (
     if (topicIdentifier?.topicId) return `${idType}:${topicIdentifier.topicId}`;
     throw new Error(`invalid topic url ${identifier}`);
   }
-  if (idType === 'tweet_url' || idType === 'discord_server_id') {
-    return `${idType}:${identifier}`;
-  }
   if (idType === 'group') {
     return `${idType}:${parseInt(
       identifier.includes('group/')
-        ? new URL(identifier).pathname.split('/').at(-1) || '' // get group id from url pathname
-        : new URLSearchParams(new URL(identifier).search).get('groupId') || '', // get group id from url search params
+        ? urlObj.pathname.split('/').at(-1) || '' // get group id from url pathname
+        : searchParams.get('groupId') || '', // get group id from url search params
     )}`;
-  }
-  if (idType === 'chain') {
-    return `${idType}:${identifier}`;
   }
 };
 
@@ -132,4 +139,18 @@ export const buildRedirectURLFromContentId = (
   }
 
   return '';
+};
+
+export const doesConfigAllowContentIdField = (
+  config: QuestActionSubFormConfig,
+) => {
+  return (
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id ||
+    config?.requires_twitter_tweet_link ||
+    config?.requires_discord_server_id ||
+    config?.with_optional_chain_id ||
+    config?.requires_group_id
+  );
 };

@@ -24,6 +24,7 @@ type CustomCWSelectListProps = {
   instructionalMessage?: string;
   onClick?: (value: OptionProps) => void;
   placeholder?: string;
+  containerClassname?: string;
 };
 
 type OptionProps = {
@@ -54,6 +55,7 @@ export const CWSelectList = <
     saveToClipboard,
     instructionalMessage,
     placeholder,
+    containerClassname,
   } = props;
   const formContext = useFormContext();
   const isHookedToForm = hookToForm && name;
@@ -89,9 +91,13 @@ export const CWSelectList = <
 
   return (
     <div
-      className={getClasses<{ disabled?: boolean }>(
+      className={getClasses<{
+        disabled?: boolean;
+        containerClassname?: string;
+      }>(
         {
           disabled: isDisabled,
+          containerClassname,
         },
         'CWSelectList',
       )}
