@@ -20,6 +20,7 @@ export type AuthSSOs =
 export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom' | 'backpack' | 'solflare';
+export type SuiWallets = 'sui-wallet';
 export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase' | 'okx';
 export type CommunitySpecificWallets =
   | 'terrastation'
@@ -31,6 +32,7 @@ export type AuthWallets =
   | SolanaWallets
   | SubstrateWallets
   | EVMWallets
+  | SuiWallets
   | CommunitySpecificWallets
   | 'NO_WALLETS_FOUND';
 export type AuthTypes = AuthWallets | AuthSSOs;

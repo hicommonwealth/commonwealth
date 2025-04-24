@@ -78,6 +78,17 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
+  'sui-wallet': {
+    icon: {
+      name: 'sui-wallet',
+      isCustom: true,
+    },
+    label: 'Sui Wallet',
+    description: {
+      text: 'Sui Communities',
+      hasBackground: false,
+    },
+  },
   okx: {
     icon: {
       name: 'okx',

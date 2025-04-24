@@ -1147,6 +1147,24 @@ export const CWPrivy = () => {
   return <svg></svg>;
 };
 
+export const CWSuiWallet = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      {...otherProps}
+    >
+      <rect width="16" height="16" rx="2" fill="#6FBCF0" />
+      <path d="M4 4.5L8 3L12 4.5V8L8 13L4 8V4.5Z" fill="white" />
+    </svg>
+  );
+};
+
 export const CWSolana = (props: CustomIconProps) => {
   const { componentType, iconSize, ...otherProps } = props;
   return (

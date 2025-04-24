@@ -367,6 +367,7 @@ export const customIconLookup = {
   SMS: withPhosphorIcon(ChatText),
   privy: CustomIcons.CWPrivy,
   okx: CustomIcons.CWOKX,
+  'sui-wallet': CustomIcons.CWSuiWallet,
   twitterIcon: CustomIcons.CWTwitter,
   envelope: CustomIcons.CWEnvelop,
   'keplr-ethereum': CustomIcons.CWKeplr,
