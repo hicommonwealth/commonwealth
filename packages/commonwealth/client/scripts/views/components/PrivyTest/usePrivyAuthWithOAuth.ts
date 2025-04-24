@@ -25,12 +25,14 @@ export function usePrivyAuthWithOAuth(
 
   useOAuthTokens({
     onOAuthTokenGrant: (params) => {
+      console.log('FIXME: onOAuthTokenGrant', params);
       setOAuthAccessToken(params.oAuthTokens.accessToken);
     },
   });
 
   useEffect(() => {
     if (!oAuthAccessToken) {
+      console.log('FIXME: No oAuthAccessToken');
       return;
     }
 
@@ -39,6 +41,7 @@ export function usePrivyAuthWithOAuth(
 
   const onInitOAuth = useCallback(() => {
     async function doAsync() {
+      console.log("FIXME: onInitOAuth: 'google_oauth'");
       await initOAuth({ provider: 'google' });
     }
 

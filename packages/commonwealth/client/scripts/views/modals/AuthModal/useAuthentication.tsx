@@ -35,7 +35,7 @@ import {
 } from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
@@ -43,6 +43,7 @@ import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profil
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -109,6 +110,29 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
   const { signIn } = useSignIn();
+
+  const handlePrivySuccess = useCallback(() => {
+    console.log('FIXME: privy success!');
+    // const landingURL = new URL('/', window.location.href).toString();
+    // document.location.href = landingURL;
+  }, []);
+
+  const handlePrivyError = useCallback((err: Error) => {
+    console.log('privy error: ', err);
+  }, []);
+
+  const privyCallbacks = useMemo(() => {
+    return {
+      onSuccess: handlePrivySuccess,
+      onError: handlePrivyError,
+    };
+  }, [handlePrivyError, handlePrivySuccess]);
+
+  console.log('FIXME loading privy... ');
+  const { onInitOAuth, authenticated, loading, logout } = usePrivyAuthWithOAuth(
+    'google_oauth',
+    privyCallbacks,
+  );
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
@@ -235,7 +259,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // New callback for handling social login
-  const onSocialLogin = async (provider: WalletSsoSource) => {
+  const onSocialLoginMagic = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
@@ -258,6 +282,17 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
+    setIsMagicLoading(true);
+
+    console.log('onSocialLoginPrivy: ' + provider);
+
+    await onInitOAuth();
+  };
+
+  // determine which login system to use...
+  const onSocialLogin = onSocialLoginPrivy;
 
   // Performs Login on the client
   const onLogInWithAccount = async (
