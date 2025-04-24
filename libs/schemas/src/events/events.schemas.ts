@@ -554,9 +554,13 @@ export const events = {
   }),
 
   KyoFinanceSwapQuestVerified: z.object({
+    verified_at: z.coerce.date(),
+    user_id: PG_INT,
     quest_action_meta_id: PG_INT,
   }),
   KyoFinanceLpQuestVerified: z.object({
+    verified_at: z.coerce.date(),
+    user_id: PG_INT,
     quest_action_meta_id: PG_INT,
   }),
 } as const;

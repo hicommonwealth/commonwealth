@@ -9,6 +9,7 @@ import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
+import { XpLogInstance } from '../../models/xp_log';
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -118,6 +119,7 @@ async function recordXpsForQuest(
 ) {
   const shared_with_address =
     shared_with?.creator_address || shared_with?.referrer_address;
+  const xpLogs: XpLogInstance[] = [];
   await sequelize.transaction(async (transaction) => {
     const shared_with_user_id = shared_with_address
       ? await getUserByAddress(shared_with_address)
@@ -186,7 +188,7 @@ async function recordXpsForQuest(
         : undefined;
       const xp_points = reward_amount - (shared_xp_points ?? 0);
 
-      const [, created] = await models.XpLog.findOrCreate({
+      const [xpLog, created] = await models.XpLog.findOrCreate({
         where: {
           user_id,
           action_meta_id: action_meta.id,
@@ -203,6 +205,7 @@ async function recordXpsForQuest(
         },
         transaction,
       });
+      xpLogs.push(xpLog);
 
       if (created)
         await accumulatePoints(
@@ -216,11 +219,15 @@ async function recordXpsForQuest(
         );
     }
   });
+  return xpLogs;
 }
 
-export function Xp(): Projection<typeof schemas.QuestEvents> {
+const output = z.union([z.array(schemas.XpLog), z.undefined()]);
+
+export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
   return {
     inputs: schemas.QuestEvents,
+    output,
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
         const referee_address = await models.User.findOne({
@@ -612,6 +619,28 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
               );
             }),
         );
+      },
+      KyoFinanceSwapQuestVerified: async ({ payload }) => {
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        return await recordXpsForQuest(payload.user_id, payload.verified_at, [
+          action_meta,
+        ]);
+      },
+      KyoFinanceLpQuestVerified: async ({ payload }) => {
+        const action_meta = await models.QuestActionMeta.findOne({
+          where: {
+            id: payload.quest_action_meta_id,
+          },
+        });
+        if (!action_meta) return;
+        return await recordXpsForQuest(payload.user_id, payload.verified_at, [
+          action_meta,
+        ]);
       },
     },
   };

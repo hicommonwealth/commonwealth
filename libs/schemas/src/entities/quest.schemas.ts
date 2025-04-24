@@ -92,38 +92,105 @@ export const QuestTweet = z
   })
   .describe('A tweet associated to a quest from which XP can be earned');
 
-export const QuestActionMeta = z
-  .object({
-    id: z.number().nullish(),
-    quest_id: z.number(),
-    //event names instead of enums for flexibility when adding new events
-    event_name: z.enum([
-      ...(Object.keys(QuestEvents) as [
-        keyof typeof QuestEvents,
-        ...Array<keyof typeof QuestEvents>,
-      ]),
-      ...ChannelBatchActions,
-    ]),
-    reward_amount: z.number(),
-    creator_reward_weight: z.number().min(0).max(1).default(0),
-    amount_multiplier: z.number().min(0).nullish(),
-    participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
-    participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
-    instructions_link: z.string().url().optional().nullish(),
-    participation_times_per_period: z.number().nullish(),
-    content_id: z
-      .string()
-      .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
-      )
-      .nullish(),
-    start_link: z.string().url().nullish(),
-    created_at: z.coerce.date().optional(),
-    updated_at: z.coerce.date().optional(),
+const KyoFinanceChainIds = z.union([
+  z.literal(1868).describe('Soneium Mainnet'),
+  z.literal(1946).describe('Soneium Testnet'),
+]);
 
-    // associations
-    QuestTweet: QuestTweet.nullish(),
+export const KyoFinanceSwapQuestRequestParams = z
+  .object({
+    chainId: KyoFinanceChainIds,
+    outputToken: z
+      .string()
+      .optional()
+      .describe('Address of token swapped from'),
+    inputToken: z.string().optional().describe('Address of token to swap to'),
+    minOutputAmount: z
+      .string()
+      .optional()
+      .describe('Minimum amount of output token swapped'),
+    minTimestamp: z.string().optional().describe('Minimum timestamp of swap'),
+    minVolumeUSD: z.string().optional().describe('Minimum volume of swap'),
   })
+  .describe(
+    'https://docs.kyo.finance/technical-docs/swap-lp-quest-verification-api#id-1.-swap-quest',
+  );
+
+export const KyoFinanceLpQuestRequestParams = z
+  .object({
+    chainId: KyoFinanceChainIds,
+    poolAddresses: z
+      .array(z.string())
+      .describe('Addresses of the token liquidity pools'),
+    minUSDValues: z
+      .array(z.string())
+      .optional()
+      .describe('Minimum USD value deposited in a pool'),
+  })
+  .refine((data) => {
+    if (data.minUSDValues) {
+      return data.minUSDValues.length === data.poolAddresses.length;
+    }
+    return true;
+  })
+  .describe(
+    'https://docs.kyo.finance/technical-docs/swap-lp-quest-verification-api#id-2.-lp-quest',
+  );
+
+const sharedQuestActionMeta = z.object({
+  id: z.number().nullish(),
+  quest_id: z.number(),
+  //event names instead of enums for flexibility when adding new events
+  event_name: z.enum([
+    ...(Object.keys(QuestEvents) as [
+      keyof typeof QuestEvents,
+      ...Array<keyof typeof QuestEvents>,
+    ]),
+    ...ChannelBatchActions,
+  ]),
+  reward_amount: z.number(),
+  creator_reward_weight: z.number().min(0).max(1).default(0),
+  amount_multiplier: z.number().min(0).nullish(),
+  participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
+  participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
+  instructions_link: z.string().url().optional().nullish(),
+  participation_times_per_period: z.number().nullish(),
+  content_id: z
+    .string()
+    .regex(
+      /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
+    )
+    .nullish(),
+  start_link: z.string().url().nullish(),
+  metadata: z.null().nullish(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+
+  // associations
+  QuestTweet: QuestTweet.nullish(),
+});
+
+export const KyoFinanceSwapQuestAction = sharedQuestActionMeta.extend({
+  event_name: z.literal('KyoFinanceSwapQuestVerified'),
+  metadata: KyoFinanceSwapQuestRequestParams,
+});
+
+const x = {} as unknown as z.infer<typeof KyoFinanceSwapQuestAction>;
+console.log(x.metadata.inputToken);
+
+export const KyoFinanceLpQuestAction = sharedQuestActionMeta.extend({
+  event_name: z.literal('KyoFinanceLpQuestVerified'),
+  metadata: KyoFinanceLpQuestRequestParams,
+});
+
+export const GeneralQuestAction = sharedQuestActionMeta.extend({});
+
+export const QuestActionMeta = z
+  .discriminatedUnion('event_name', [
+    KyoFinanceSwapQuestAction,
+    KyoFinanceLpQuestAction,
+    GeneralQuestAction,
+  ])
   .describe('Quest action metadata associated to a quest instance');
 
 export const QuestScore = z

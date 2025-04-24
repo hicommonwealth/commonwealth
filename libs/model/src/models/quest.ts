@@ -85,6 +85,9 @@ export const QuestActionMeta = (
       instructions_link: { type: Sequelize.STRING, allowNull: true },
       content_id: { type: Sequelize.STRING, allowNull: true },
       start_link: { type: Sequelize.STRING, allowNull: true },
+      // MUST NOT be JSONB because JSONB affects ordering of properties/values
+      // and ordering must be maintained
+      metadata: { type: Sequelize.JSON, allowNull: true },
     },
     {
       timestamps: true,
