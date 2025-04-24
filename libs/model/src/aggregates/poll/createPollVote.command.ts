@@ -33,17 +33,24 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
 
-      const [vote] = await models.Vote.findOrCreate({
+      // findOrCreate doesn't work because `poll_id` and `option` not
+      // optional in the Vote schema
+      let vote = await models.Vote.findOne({
         where: {
           poll_id: payload.poll_id,
           address: address.address,
         },
-        defaults: {
+      });
+      if (!vote) {
+        vote = await models.Vote.create({
+          poll_id: payload.poll_id,
+          address: address.address,
           author_community_id: address.community_id,
           community_id: poll.community_id,
           option: payload.option,
-        } as any,
-      });
+        });
+      }
+
       return vote.toJSON();
     },
   };
