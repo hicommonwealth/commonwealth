@@ -44,7 +44,7 @@ const EditProfile = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const userTrustLevelEnabled = useFlag('userTrustLevel');
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState<string>();
@@ -350,7 +350,7 @@ const EditProfile = () => {
                 canAddLinks={links.length <= 5}
               />
             </ProfileSection>
-            {userTrustLevelEnabled && (
+            {trustLevelEnabled && (
               <ProfileSection
                 title="User Verification"
                 description="Verification helps build a trusted
