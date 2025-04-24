@@ -2,7 +2,7 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { SERVER_URL } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Router } from 'express';
 import { registerRoute } from '../middleware/methodNotAllowed';
@@ -47,7 +47,7 @@ function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
           `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}${queryString}`,
           {
             headers: {
-              origin: `https://${PRODUCTION_DOMAIN}`,
+              origin: SERVER_URL,
               'Content-Type': 'application/json',
             },
             timeout: 10000,
@@ -88,7 +88,7 @@ function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
           req.body,
           {
             headers: {
-              origin: `https://${PRODUCTION_DOMAIN}`,
+              origin: SERVER_URL,
               'Content-Type': 'application/json',
             },
             timeout: 10000,
