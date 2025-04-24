@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+// import clsx from 'clsx'; // Revert clsx usage
 import useStickyHeader from '../../../hooks/useStickyHeader';
 import { useFetchEventStreamQuery } from '../../../state/api/feeds/eventStream';
 import EventItem from './EventItem';
@@ -10,11 +11,11 @@ interface EventMarqueeProps {
   elementId?: string;
 }
 
-const EventMarquee: React.FC<EventMarqueeProps> = ({
+const EventMarquee = ({
   isSticky = false,
   zIndex = 50,
   elementId = 'event-marquee',
-}) => {
+}: EventMarqueeProps) => {
   const { data, fetchNextPage, hasNextPage } = useFetchEventStreamQuery();
 
   useEffect(() => {
@@ -94,7 +95,7 @@ const EventMarquee: React.FC<EventMarqueeProps> = ({
   return (
     <div
       id={elementId}
-      className={`event-marquee ${isSticky ? 'sticky' : ''}`}
+      className={`EventMarquee ${isSticky ? 'sticky' : ''}`}
       style={{ zIndex }}
     >
       <div className="event-marquee-content">

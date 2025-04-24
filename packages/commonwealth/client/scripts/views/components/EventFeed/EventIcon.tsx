@@ -13,7 +13,7 @@ interface EventIconProps {
   imageUrl?: string;
 }
 
-const EventIcon: React.FC<EventIconProps> = ({ type, imageUrl }) => {
+const EventIcon = ({ type, imageUrl }: EventIconProps) => {
   if (imageUrl) {
     return <img src={imageUrl} className="custom-icon" alt={type} />;
   }
