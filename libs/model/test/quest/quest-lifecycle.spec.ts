@@ -125,26 +125,25 @@ describe('Quest lifecycle', () => {
           quest_type: 'common',
         },
       });
-      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
-        [
-          {
-            event_name: 'CommentCreated',
-            reward_amount: 100,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Daily,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0,
-          },
-          {
-            event_name: 'CommentUpvoted',
-            reward_amount: 200,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Monthly,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0.1,
-            content_id: `thread:${thread_id}`,
-          },
-        ];
+      const action_metas = [
+        {
+          event_name: 'CommentCreated' as const,
+          reward_amount: 100,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: QuestParticipationPeriod.Daily,
+          participation_times_per_period: 3,
+          creator_reward_weight: 0,
+        },
+        {
+          event_name: 'CommentUpvoted' as const,
+          reward_amount: 200,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: QuestParticipationPeriod.Monthly,
+          participation_times_per_period: 3,
+          creator_reward_weight: 0.1,
+          content_id: `thread:${thread_id}`,
+        },
+      ] satisfies Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[];
       const patch = {
         description: 'updated description',
         end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 8),
@@ -293,26 +292,25 @@ describe('Quest lifecycle', () => {
 
     it('should return multiple quests with action metas', async () => {
       // add some quests to the community
-      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
-        [
-          {
-            event_name: 'CommentCreated',
-            reward_amount: 100,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Daily,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0,
-          },
-          {
-            event_name: 'CommentUpvoted',
-            reward_amount: 200,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Monthly,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0.1,
-            content_id: `thread:${thread_id}`,
-          },
-        ];
+      const action_metas = [
+        {
+          event_name: 'CommentCreated' as const,
+          reward_amount: 100,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: QuestParticipationPeriod.Daily,
+          participation_times_per_period: 3,
+          creator_reward_weight: 0,
+        },
+        {
+          event_name: 'CommentUpvoted' as const,
+          reward_amount: 200,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: QuestParticipationPeriod.Monthly,
+          participation_times_per_period: 3,
+          creator_reward_weight: 0.1,
+          content_id: `thread:${thread_id}`,
+        },
+      ] satisfies Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[];
       const quests = await Promise.all(
         [...Array(3)].map(() =>
           command(CreateQuest(), {
@@ -419,17 +417,16 @@ describe('Quest lifecycle', () => {
           quest_type: 'common',
         },
       });
-      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
-        [
-          {
-            event_name: 'CommentCreated',
-            reward_amount: 100,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Daily,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0,
-          },
-        ];
+      const action_metas = [
+        {
+          event_name: 'CommentCreated' as const,
+          reward_amount: 100,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: QuestParticipationPeriod.Daily,
+          participation_times_per_period: 3,
+          creator_reward_weight: 0,
+        },
+      ] satisfies Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[];
       const updated = await command(UpdateQuest(), {
         actor: superadmin,
         payload: {

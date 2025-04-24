@@ -1,6 +1,6 @@
 import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
-import { z } from 'zod';
+import { z, ZodSchema } from 'zod';
 import {
   EventContext,
   EventSchemas,
@@ -233,7 +233,7 @@ export interface Broker extends Disposable {
   publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    consumer: () => EventsHandlerMetadata<Inputs>,
+    consumer: () => EventsHandlerMetadata<Inputs, ZodSchema>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

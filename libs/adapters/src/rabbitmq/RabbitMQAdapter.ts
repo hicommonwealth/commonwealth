@@ -15,6 +15,7 @@ import {
 import { Events } from '@hicommonwealth/schemas';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
+import { ZodSchema } from 'zod';
 
 /**
  * Build a retry strategy function based on custom retry strategies map.
@@ -189,7 +190,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async subscribe(
-    consumer: () => EventsHandlerMetadata<EventSchemas>,
+    consumer: () => EventsHandlerMetadata<EventSchemas, ZodSchema>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

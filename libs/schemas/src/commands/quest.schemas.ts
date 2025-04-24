@@ -43,10 +43,10 @@ export const ActionMetaInput = z.union([
       (data) =>
         !(data.content_id?.includes('discord_server_id') && !data.start_link),
     ),
-  KyoFinanceSwapQuestAction.refine(
+  KyoFinanceSwapQuestAction.omit({ quest_id: true }).refine(
     (data) => data.participation_limit === QuestParticipationLimit.OncePerQuest,
   ),
-  KyoFinanceLpQuestAction.refine(
+  KyoFinanceLpQuestAction.omit({ quest_id: true }).refine(
     (data) => data.participation_limit === QuestParticipationLimit.OncePerQuest,
   ),
 ]);
