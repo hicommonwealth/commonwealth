@@ -8,6 +8,9 @@ export enum BalanceSourceType {
   CW721 = 'cw721',
   SPL = 'spl',
   SOLNFT = 'metaplex',
+  SuiNative = 'sui_native',
+  SuiCoin = 'sui_coin',
+  SuiObject = 'sui_object',
 }
 
 export enum BalanceType {
@@ -17,6 +20,7 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+  Sui = 'sui',
 }
 
 export type ContractSource = {
@@ -52,6 +56,16 @@ export type CosmosContractSource = {
   contract_address: string;
 };
 
+export type SuiSource = {
+  source_type:
+    | BalanceSourceType.SuiNative
+    | BalanceSourceType.SuiCoin
+    | BalanceSourceType.SuiObject;
+  sui_network: string;
+  type?: string;
+  object_id?: string;
+};
+
 export type ThresholdData = {
   threshold: string;
   source:
@@ -59,7 +73,8 @@ export type ThresholdData = {
     | NativeSource
     | CosmosSource
     | CosmosContractSource
-    | SolanaSource;
+    | SolanaSource
+    | SuiSource;
 };
 
 export type AbiType = Record<string, unknown>[];
@@ -86,6 +101,7 @@ export enum WalletId {
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
   OKX = 'okx',
+  SuiWallet = 'sui-wallet',
 }
 
 // Passed directly to Magic login.
@@ -112,6 +128,7 @@ export enum ChainBase {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Solana = 'solana',
+  Sui = 'sui',
 }
 
 export enum ChainType {
@@ -158,6 +175,7 @@ export enum ChainNetwork {
   BSC = 'bsc',
   Avalanche = 'avalanche',
   Arthera = 'arthera',
+  Sui = 'sui',
 }
 
 /**

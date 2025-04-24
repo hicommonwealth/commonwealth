@@ -54,3 +54,6 @@ export const WEI_PER_ETHER = 1000000000000000000;
 
 export const NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID = 3;
 export const NAMESPACE_MIN_NOMINATION_BALANCE = 5;
+
+// Sui Chain Constants
+export const SUI_MAINNET_CHAIN_ID = 'sui:mainnet'; // Identifier for Sui Mainnet
