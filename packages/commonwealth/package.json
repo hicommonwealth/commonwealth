@@ -131,6 +131,8 @@
     "@metamask/detect-provider": "^2.0.0",
     "@metamask/eth-sig-util": "^4.0.0",
     "@mui/base": "5.0.0-beta.5",
+    "@mysten/sui.js": "^0.54.1",
+    "@mysten/wallet-standard": "^0.14.7",
     "@neynar/nodejs-sdk": "^1.55.0",
     "@noble/hashes": "^1.4.0",
     "@openfeature/core": "^1.1.0",
