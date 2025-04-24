@@ -257,6 +257,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
+      case 'LaunchpadTokenTraded': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=tokens`);
+        break;
+      }
       default:
         return;
     }
@@ -472,7 +480,7 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Create action to earn aura
+                Complete action to earn aura
               </CWText>
               <CWTag
                 label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
