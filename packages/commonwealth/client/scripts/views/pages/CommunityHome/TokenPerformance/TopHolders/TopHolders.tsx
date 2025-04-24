@@ -1,5 +1,5 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -77,6 +77,7 @@ let instanceCounter = 0;
 const TopHolders = () => {
   const componentId = useState(() => ++instanceCounter)[0];
   console.log(`[TopHolders-${componentId}] Component initializing`);
+  const navigate = useCommonNavigate();
 
   // Hardcode isWindowSmallInclusive to false for now to prevent resize issues
   const isWindowSmallInclusive = false;
@@ -165,12 +166,15 @@ const TopHolders = () => {
     <div className="TopHolders">
       <div className="heading-container">
         <CWText type="h2">Top Holders</CWText>
-        <Link to="/explore?tab=tokens" className="see-all-link">
+        <div
+          className="see-all-link"
+          onClick={() => navigate('/members?tab=all-members')}
+        >
           <div className="link-right">
             <CWText className="link">See all top holders</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
-        </Link>
+        </div>
       </div>
       <div className="holders-table">
         <CWTable columnInfo={columnInfo} rowData={rowData} />
