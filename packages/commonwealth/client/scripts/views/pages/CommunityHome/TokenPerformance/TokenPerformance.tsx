@@ -1,5 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import GeckoTerminalChart from 'client/scripts/views/components/GekoTerminalChart/GekoTerminalChart';
+import GeckoTerminalChart from 'client/scripts/views/components/GeckoTerminalChart/GeckoTerminalChart';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import {
   TradingConfig,
