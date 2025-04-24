@@ -67,7 +67,7 @@ const transformLaunchpadTradeData = (
     const meta = metadataMap[trade.token_address?.toLowerCase()] || {};
     const decimals = meta.decimals ?? 18;
     const formattedAmount = formatUnits(
-      trade.community_token_amount || '0',
+      Math.round(parseFloat(trade.community_token_amount)) || '0',
       decimals,
     );
 
@@ -88,7 +88,7 @@ const transformLaunchpadTradeData = (
       },
       transaction_category: 'launchpad',
       transaction_type: trade.is_buy ? 'buy' : 'sell',
-      totalPrice: `${formatUnits((trade.price * 1e18)?.toString() || '0', 18)} ETH`,
+      totalPrice: `${formatUnits(Math.round(trade.price * 1e18) || '0', 18)} ETH`,
       price: trade.price,
       transaction_hash: trade.transaction_hash,
       community_id: trade.token_address,
