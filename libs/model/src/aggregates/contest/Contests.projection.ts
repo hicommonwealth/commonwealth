@@ -78,6 +78,7 @@ async function createInitialContest(
     contest_address,
     url,
     true,
+    isOneOff,
   );
 
   const { startTime, endTime, prizeShare, contestToken } =
@@ -117,7 +118,6 @@ async function createInitialContest(
           payout_structure: [50, 35, 15],
           topic_id: topic.id,
           funding_token_address: contestToken,
-          vote_weight_multiplier: 100,
           is_farcaster_contest: false,
           cancelled: false,
           ended: false,
@@ -255,6 +255,41 @@ export async function updateScore(contest_address: string, contest_id: number) {
   }
 }
 
+async function isGraduatedContest(
+  payload: z.infer<typeof inputs.RecurringContestManagerDeployed>,
+): Promise<boolean> {
+  const chain = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      eth_chain_id: payload.eth_chain_id,
+    },
+  });
+  if (!chain) {
+    log.warn(
+      `ChainNode (${payload.eth_chain_id}) not found for contest ${payload.contest_address}`,
+    );
+    return false;
+  }
+  const rpc = chain.private_url || chain.url;
+  if (!rpc) {
+    log.warn(`Chain node url not found on contest ${payload.contest_address}`);
+    return false;
+  }
+  const {
+    tx: { from: deployerAddress },
+  } = await getTransaction({
+    rpc,
+    txHash: payload.transaction_hash,
+  });
+  const validDeployers =
+    config.APP_ENV === 'production'
+      ? [LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET]
+      : [
+          LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
+          LP_CONTEST_MANAGER_ADDRESS_ANVIL,
+        ];
+  return validDeployers.includes(deployerAddress);
+}
+
 export function Contests(): Projection<typeof inputs> {
   return {
     inputs,
@@ -264,48 +299,22 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
         );
         if (!contestManager) {
-          // check if the contest was created via token graduation
-          const chain = await models.ChainNode.scope('withPrivateData').findOne(
-            {
-              where: {
-                eth_chain_id: payload.eth_chain_id,
-              },
-            },
-          );
-          if (!chain) {
-            log.warn(
-              `ChainNode (${payload.eth_chain_id}) not found for contest ${payload.contest_address}`,
+          const isGraduated = await isGraduatedContest(payload);
+          if (isGraduated) {
+            // onchain contest was created via token graduation
+            await createInitialContest(
+              payload.namespace,
+              payload.contest_address,
+              payload.interval,
+              false,
+              payload.block_number,
+              true,
             );
             return;
           }
-          const rpc = chain.private_url || chain.url;
-          if (rpc) {
-            const {
-              tx: { from: deployerAddress },
-            } = await getTransaction({
-              rpc,
-              txHash: payload.transaction_hash,
-            });
-            if (
-              [
-                LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
-                LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
-                LP_CONTEST_MANAGER_ADDRESS_ANVIL,
-              ].includes(deployerAddress)
-            ) {
-              await createInitialContest(
-                payload.namespace,
-                payload.contest_address,
-                payload.interval,
-                false,
-                payload.block_number,
-                true,
-              );
-              return;
-            }
-          }
 
-          // contest manager not found and not created via token graduation
+          // Contest manager should have been created by user, but was not found in this DB.
+          // This is usually happens if the contest was created in another environment, e.g. QA/prod.
           log.warn(
             `ContestManager not found for contest ${payload.contest_address}`,
           );

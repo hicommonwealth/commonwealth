@@ -47,9 +47,9 @@ export async function handleCapReached(
         lpBondingCurveAddress,
         privateKey: config.WEB3.PRIVATE_KEY,
       });
+      token.liquidity_transferred = true;
     }
 
-    token.liquidity_transferred = true;
     await token.save();
   }
 }
