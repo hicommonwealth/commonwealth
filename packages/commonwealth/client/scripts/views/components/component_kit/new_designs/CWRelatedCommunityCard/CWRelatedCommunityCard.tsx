@@ -1,4 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
@@ -54,6 +55,8 @@ export const CWRelatedCommunityCard = ({
   const navigate = useCommonNavigate();
   const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const { stakeEnabled, stakeValue, stakeChange } = useCommunityCardPrice({
     community,
@@ -148,12 +151,14 @@ export const CWRelatedCommunityCard = ({
                 <CWText type="h5" title={community?.name} fontWeight="medium">
                   {community?.name}
                 </CWText>
-                {community?.tier && tierIcons[community.tier] && (
-                  <CWIcon
-                    iconName={tierIcons[community.tier]}
-                    iconSize="small"
-                  />
-                )}
+                {trustLevelEnabled &&
+                  community?.tier &&
+                  tierIcons[community.tier] && (
+                    <CWIcon
+                      iconName={tierIcons[community.tier]}
+                      iconSize="small"
+                    />
+                  )}
               </div>
 
               {!!stakeValue && (

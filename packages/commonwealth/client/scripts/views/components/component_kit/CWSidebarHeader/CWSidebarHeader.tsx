@@ -1,6 +1,7 @@
 import React from 'react';
 import './CWSidebarHeader.scss';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -28,6 +29,8 @@ const SidebarHeader = ({
   onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -79,12 +82,14 @@ const SidebarHeader = ({
                 >
                   {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
                 </CWText>
-                {community?.tier && tierIcons[community.tier] && (
-                  <CWIcon
-                    iconName={tierIcons[community.tier]}
-                    iconSize="small"
-                  />
-                )}
+                {trustLevelEnabled &&
+                  community?.tier &&
+                  tierIcons[community.tier] && (
+                    <CWIcon
+                      iconName={tierIcons[community.tier]}
+                      iconSize="small"
+                    />
+                  )}
               </div>
             )}
           />
