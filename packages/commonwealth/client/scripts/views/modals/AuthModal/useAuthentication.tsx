@@ -113,8 +113,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const handlePrivySuccess = useCallback(() => {
     console.log('FIXME: privy success!');
-    // const landingURL = new URL('/', window.location.href).toString();
-    // document.location.href = landingURL;
+    // FIXME: this needs to work properly.
+    const landingURL = new URL('/', window.location.href).toString();
+    document.location.href = landingURL;
   }, []);
 
   const handlePrivyError = useCallback((err: Error) => {
@@ -288,7 +289,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     console.log('onSocialLoginPrivy: ' + provider);
 
-    await onInitOAuth();
+    onInitOAuth();
   };
 
   // determine which login system to use...
