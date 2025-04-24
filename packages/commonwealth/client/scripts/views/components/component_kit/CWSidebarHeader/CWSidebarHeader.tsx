@@ -4,10 +4,9 @@ import './CWSidebarHeader.scss';
 import {
   COMMUNITY_TIERS,
   CommunityTierMap,
-  Tier,
+  hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -19,12 +18,6 @@ import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWIcon } from '../cw_icons/cw_icon';
-
-const hasClientInfo = (
-  tier: Tier,
-): tier is Tier & { clientInfo: { componentIcon: IconName } } => {
-  return 'clientInfo' in tier && tier.clientInfo?.componentIcon !== undefined;
-};
 
 const SidebarHeader = ({
   isInsideCommunity,
@@ -90,12 +83,13 @@ const SidebarHeader = ({
                 {trustLevelEnabled &&
                   community?.tier &&
                   (() => {
-                    const tier =
-                      COMMUNITY_TIERS[community.tier as CommunityTierMap];
+                    const tier = community.tier as CommunityTierMap;
                     return (
-                      hasClientInfo(tier) && (
+                      hasCommunityTierClientInfo(tier) && (
                         <CWIcon
-                          iconName={tier.clientInfo.componentIcon}
+                          iconName={
+                            COMMUNITY_TIERS[tier].clientInfo.componentIcon
+                          }
                           iconSize="small"
                         />
                       )

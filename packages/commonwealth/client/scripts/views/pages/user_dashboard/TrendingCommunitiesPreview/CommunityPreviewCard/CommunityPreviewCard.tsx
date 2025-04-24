@@ -2,14 +2,13 @@ import {
   ChainBase,
   COMMUNITY_TIERS,
   CommunityTierMap,
-  Tier,
+  hasCommunityTierClientInfo,
 } from '@hicommonwealth/shared';
 import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
-import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
@@ -45,12 +44,6 @@ type CommunityPreviewCardProps = {
       }>;
     }
 );
-
-const hasClientInfo = (
-  tier: Tier,
-): tier is Tier & { clientInfo: { componentIcon: IconName } } => {
-  return 'clientInfo' in tier && tier.clientInfo?.componentIcon !== undefined;
-};
 
 const CommunityPreviewCard = ({
   community,
@@ -115,12 +108,13 @@ const CommunityPreviewCard = ({
               {trustLevelEnabled &&
                 community?.tier &&
                 (() => {
-                  const tier =
-                    COMMUNITY_TIERS[community.tier as CommunityTierMap];
+                  const tier = community.tier as CommunityTierMap;
                   return (
-                    hasClientInfo(tier) && (
+                    hasCommunityTierClientInfo(tier) && (
                       <CWIcon
-                        iconName={tier.clientInfo.componentIcon}
+                        iconName={
+                          COMMUNITY_TIERS[tier].clientInfo.componentIcon
+                        }
                         iconSize="small"
                       />
                     )

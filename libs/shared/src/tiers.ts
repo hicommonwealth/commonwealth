@@ -238,3 +238,18 @@ export function hasTierClientInfo(
 export function canIntegrateDiscord({ tier }: { tier: CommunityTierMap }) {
   return tier >= CommunityTierMap.ManuallyVerified;
 }
+
+export type CommunityTierWithClientInfo = CommunityTierLevels &
+  {
+    [K in CommunityTierLevels]: (typeof COMMUNITY_TIERS)[K] extends {
+      clientInfo: TierClientInfo;
+    }
+      ? K
+      : never;
+  }[CommunityTierLevels];
+
+export function hasCommunityTierClientInfo(
+  tier: CommunityTierLevels,
+): tier is CommunityTierWithClientInfo {
+  return 'clientInfo' in COMMUNITY_TIERS[tier];
+}
