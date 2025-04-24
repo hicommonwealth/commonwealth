@@ -78,6 +78,17 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
+  okx: {
+    icon: {
+      name: 'okx',
+      isCustom: true,
+    },
+    label: 'OKX Wallet',
+    description: {
+      text: '+10 Aura w/ OKX Signup',
+      hasBackground: true,
+    },
+  },
   polkadot: {
     icon: {
       name: 'polkadot',

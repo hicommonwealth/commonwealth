@@ -91,7 +91,7 @@ export const CreateComment = ({
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (turnstileToken?: string | null) => {
     if (!user.activeAccount) {
       throw new Error('No active account');
     }
@@ -110,6 +110,7 @@ export const CreateComment = ({
         parentCommentId: parentCommentId ?? null,
         parentCommentMsgId: parentCommentMsgId ?? null,
         existingNumberOfComments: rootThread.numberOfComments || 0,
+        turnstileToken,
       });
 
       const newComment = await createComment(input);

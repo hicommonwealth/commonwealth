@@ -19,7 +19,7 @@ import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
 } from 'state/api/quests';
-import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
+import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
@@ -35,16 +35,12 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
-import { AuthOptionTypes } from 'views/modals/AuthModal/types';
+import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import QuestCard from '../Communities/QuestList/QuestCard';
-import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  buildURLFromContentId,
-  ContentIdType,
-} from '../CreateQuest/QuestForm/helpers';
+import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
@@ -65,20 +61,14 @@ const QuestDetails = ({ id }: { id: number }) => {
     enabled: user.isLoggedIn && xpEnabled,
   });
 
-  const { data: randomResourceIds, isLoading: isLoadingRandomResourceIds } =
-    useGetRandomResourceIds({
-      limit: 1,
-      cursor: 1,
-      enabled: true,
-    });
-  const randomResourceId = randomResourceIds?.results?.[0];
-
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
+    specificAuthOption?: AuthOptions;
   }>({
     type: undefined,
     options: undefined,
+    specificAuthOption: undefined,
   });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
@@ -109,7 +99,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     shouldRun: !!quest,
   });
 
-  const { pendingWeeklyQuests } = useXPProgress();
+  const { pendingWeeklyQuests } = useXPProgress({ includeSystemQuests: true }); // show system quests in quest details
 
   const popoverProps = usePopover();
 
@@ -117,7 +107,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (isLoading) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -142,11 +132,27 @@ const QuestDetails = ({ id }: { id: number }) => {
       (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
   });
 
-  const handleActionStart = (
-    actionName: QuestAction,
-    actionContentId?: string,
-  ) => {
+  const isSystemQuest = quest.id < 0;
+
+  const handleActionStart = (action: z.infer<typeof QuestActionMeta>) => {
+    const actionName = action.event_name;
+    const actionContentId = action.content_id;
+
+    // generic cases when actions have start link (i.e discord requires start link)
+    if (action.start_link) {
+      window.open(action.start_link, '_blank');
+      return;
+    }
+
+    // specific cases when actions don't have start links
     switch (actionName) {
+      case 'SignUpFlowCompleted': {
+        setAuthModalConfig({
+          type: AuthModalType.CreateAccount,
+          options: ['wallets', 'sso'],
+        });
+        break;
+      }
       case 'WalletLinked': {
         setAuthModalConfig({
           type: AuthModalType.SignIn,
@@ -159,16 +165,16 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'CommunityCreated': {
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/11847
+        // Update create community flow to select a specific chain via url params
         navigate(`/createCommunity`, {}, null);
         break;
       }
       case 'ThreadCreated': {
         if (actionContentId) {
-          const url = buildURLFromContentId(
-            actionContentId?.split?.(':')?.[1],
-            actionContentId?.split?.(':')?.[0] as ContentIdType,
-            { newThread: true },
-          ).split(window.location.origin)[1];
+          const url = buildRedirectURLFromContentId(actionContentId, {
+            newThread: true,
+          }).split(window.location.origin)[1];
           navigate(url, {}, null);
           return;
         }
@@ -187,10 +193,9 @@ const QuestDetails = ({ id }: { id: number }) => {
       case 'CommentCreated': {
         if (actionContentId) {
           navigate(
-            buildURLFromContentId(
-              actionContentId.split(':')[1],
-              actionContentId.split(':')[0] as ContentIdType,
-            ).split(window.location.origin)[1],
+            buildRedirectURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
             {},
             null,
           );
@@ -207,13 +212,10 @@ const QuestDetails = ({ id }: { id: number }) => {
         if (actionContentId) {
           navigate(
             actionContentId
-              ? buildURLFromContentId(
-                  actionContentId.split(':')[1],
-                  actionContentId.split(':')[0] as ContentIdType,
-                ).split(window.location.origin)[1]
-              : `/discussion/${
-                  randomResourceId?.thread_id
-                }?comment=${randomResourceId?.comment_id}`,
+              ? buildRedirectURLFromContentId(actionContentId).split(
+                  window.location.origin,
+                )[1]
+              : `/explore?tab=threads`,
             {},
             null,
           );
@@ -228,6 +230,73 @@ const QuestDetails = ({ id }: { id: number }) => {
       }
       case 'UserMentioned': {
         // TODO: user mention is not implemented in app
+        break;
+      }
+      case 'TweetEngagement': {
+        // Check if user has Twitter linked
+        const hasTwitterLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'twitter',
+        );
+
+        if (hasTwitterLinked) {
+          if (actionContentId) {
+            window.open(
+              buildRedirectURLFromContentId(actionContentId),
+              '_blank',
+            );
+          } else {
+            notifyError(`Linked twitter tweet url is invalid`);
+          }
+        } else {
+          // Open Twitter SSO modal if Twitter isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+            specificAuthOption: 'x', // only show twitter option
+          });
+        }
+        break;
+      }
+      case 'DiscordServerJoined': {
+        // Check if user has Discord linked and if there's a start link
+        const hasDiscordLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'discord',
+        );
+
+        if (!action.start_link) {
+          // requires a start link
+          notifyError(`Start link is invalid for this action`);
+          return;
+        }
+
+        if (hasDiscordLinked && action.start_link) {
+          window.open(action.start_link, '_blank');
+        } else {
+          // Open Discord SSO modal if Discord isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+            specificAuthOption: 'discord', // only show discord option
+          });
+        }
+        break;
+      }
+      case 'MembershipsRefreshed': {
+        if (actionContentId) {
+          navigate(
+            buildRedirectURLFromContentId(actionContentId).split(
+              window.location.origin,
+            )[1],
+            {},
+            null,
+          );
+        } else {
+          notifyError(`Linked group url is invalid`);
+        }
+        break;
+      }
+      case 'LaunchpadTokenCreated': {
+        navigate(`/createTokenCommunity`, {}, null);
         break;
       }
       default:
@@ -304,6 +373,26 @@ const QuestDetails = ({ id }: { id: number }) => {
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
 
   const isCompleted = gainedXP === totalUserXP && isStarted;
+
+  const getQuestActionBlockedReason = () => {
+    if ((isSystemQuest && user.isLoggedIn) || !isStarted || isEnded) {
+      if (isSystemQuest && user.isLoggedIn)
+        return 'Only available for new users';
+      if (!isStarted) return 'Only available when quest starts';
+      if (isEnded) return 'Unavailable, quest has ended';
+    }
+
+    return undefined;
+  };
+
+  const getXpLogsForActions = (action: QuestActionType) => {
+    return xpProgressions
+      .filter((log) => log.action_meta_id === action.id)
+      .map((log) => ({
+        id: log.action_meta_id,
+        createdAt: new Date(log.event_created_at),
+      }));
+  };
 
   return (
     <CWPageLayout>
@@ -440,22 +529,23 @@ const QuestDetails = ({ id }: { id: number }) => {
                   actionNumber={index + 1}
                   onActionStart={handleActionStart}
                   questAction={action as QuestActionType}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
                   isActionCompleted={isQuestActionComplete(
+                    new Date(quest.start_date),
+                    new Date(quest.end_date),
                     action as QuestActionType,
                     xpProgressions as unknown as XPLog[],
                   )}
-                  xpLogsForActions={xpProgressions
-                    .filter((log) => log.action_meta_id === action.id)
-                    .map((log) => ({
-                      id: log.action_meta_id,
-                      createdAt: new Date(log.event_created_at),
-                    }))}
-                  canStartAction={isStarted && !isEnded}
-                  {...((!isStarted || isEnded) && {
-                    actionStartBlockedReason: !isStarted
-                      ? 'Only available when quest starts'
-                      : 'Unavailable, quest has ended',
-                  })}
+                  xpLogsForActions={getXpLogsForActions(
+                    action as QuestActionType,
+                  )}
+                  canStartAction={
+                    isSystemQuest
+                      ? !user.isLoggedIn && isStarted && !isEnded
+                      : isStarted && !isEnded
+                  }
+                  actionStartBlockedReason={getQuestActionBlockedReason()}
                 />
               ))}
             </div>
@@ -479,6 +569,8 @@ const QuestDetails = ({ id }: { id: number }) => {
                       completed: (quest.action_metas || [])
                         .map((action) =>
                           isQuestActionComplete(
+                            new Date(q.start_date),
+                            new Date(q.end_date),
                             action as QuestActionType,
                             xpProgressions as unknown as XPLog[],
                           ),
@@ -506,6 +598,9 @@ const QuestDetails = ({ id }: { id: number }) => {
         showWalletsFor={
           (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
         }
+        {...(authModalConfig.specificAuthOption && {
+          showAuthOptionFor: authModalConfig.specificAuthOption,
+        })}
         showAuthOptionTypesFor={authModalConfig.options}
         isOpen={!!(authModalConfig.type && authModalConfig.options)}
       />

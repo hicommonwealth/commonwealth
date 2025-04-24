@@ -1,3 +1,4 @@
+import { AppError } from '@hicommonwealth/core';
 import {
   GroupAttributes,
   GroupInstance,
@@ -9,9 +10,22 @@ import { Op, WhereOptions } from 'sequelize';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
-  communityId: string;
   includeMembers?: boolean;
   includeTopics?: boolean;
+} & (
+  | {
+      communityId: string;
+      groupId?: never;
+    }
+  | {
+      communityId?: never;
+      groupId: number;
+    }
+);
+
+const Errors = {
+  InvalidGroup: 'Invalid group',
+  InvalidCommunity: 'Invalid community',
 };
 
 export type TopicAttributesWithPermission = TopicAttributes & {
@@ -33,11 +47,25 @@ export type GroupInstanceWithTopicPermissions = GroupInstance & {
 
 export async function __getGroups(
   this: ServerGroupsController,
-  { communityId, includeMembers, includeTopics }: GetGroupsOptions,
+  { communityId, groupId, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
+  if (communityId) {
+    const foundCommunity = await this.models.Community.findOne({
+      where: { id: communityId },
+    });
+    if (!foundCommunity) throw new AppError(Errors.InvalidCommunity);
+  }
+  if (groupId) {
+    const foundGroup = await this.models.Group.findOne({
+      where: { id: groupId },
+    });
+    if (!foundGroup) throw new AppError(Errors.InvalidGroup);
+  }
+
   const groups = await this.models.Group.findAll({
     where: {
-      community_id: communityId,
+      ...(communityId && { community_id: communityId }),
+      ...(groupId && { id: groupId }),
     },
     include: [
       {
@@ -81,7 +109,7 @@ export async function __getGroups(
   if (includeTopics) {
     const topics = await this.models.Topic.findAll({
       where: {
-        community_id: communityId,
+        ...(communityId && { community_id: communityId }),
         group_ids: {
           [Op.overlap]: groupsResult.map(({ id }) => id!),
         },

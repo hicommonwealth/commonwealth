@@ -20,6 +20,7 @@ import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -33,10 +34,13 @@ import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
+import { smartTrim } from 'shared/utils';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
+
+const MAX_CHARS_FOR_TITLE = 28;
 
 const noFundsProps = {
   title: 'There are no funds for this contest',
@@ -239,6 +243,28 @@ const ContestCard = ({
     return null;
   }
 
+  const isTitleTrimmed = name.length > MAX_CHARS_FOR_TITLE;
+  const trimmedTitle = smartTrim(name, MAX_CHARS_FOR_TITLE);
+
+  const renderTitleWithTooltip = (title: string, isTrimmed: boolean) => {
+    if (!isTrimmed) return <CWText type="h4">{title}</CWText>;
+
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={name}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            <CWText type="h4">{trimmedTitle}</CWText>
+          </span>
+        )}
+      />
+    );
+  };
+
   return (
     <CWCard
       className={clsx('ContestCard', {
@@ -273,7 +299,7 @@ const ContestCard = ({
                 iconUrl: community?.iconUrl || '',
               }}
             />
-            <CWText type="h3">{name}</CWText>
+            {renderTitleWithTooltip(trimmedTitle, isTitleTrimmed)}
           </div>
           {finishDate ? (
             <CWCountDownTimer

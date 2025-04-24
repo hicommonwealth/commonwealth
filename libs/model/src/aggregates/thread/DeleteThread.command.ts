@@ -26,7 +26,16 @@ export function DeleteThread(): Command<typeof schemas.DeleteThread> {
           where: { thread_id: thread.id! },
           transaction,
         });
-        await thread.destroy({ transaction });
+
+        await models.sequelize.query(
+          `
+          UPDATE "Threads"
+          SET search     = null,
+              deleted_at = NOW()
+          WHERE id = :threadId
+        `,
+          { transaction, replacements: { threadId: thread.id } },
+        );
       });
 
       return {

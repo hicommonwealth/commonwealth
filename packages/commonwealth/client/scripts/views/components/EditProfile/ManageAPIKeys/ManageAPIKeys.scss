@@ -5,5 +5,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .api-key-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .tier-message {
+        color: $rorange-500;
+      }
+    }
   }
 }

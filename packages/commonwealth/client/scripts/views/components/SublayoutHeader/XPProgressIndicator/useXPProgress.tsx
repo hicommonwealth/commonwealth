@@ -8,15 +8,21 @@ import './XPProgressIndicator.scss';
 
 const WEEKLY_XP_GOAL = 100; // Hardcoded in client per product spec.
 
-const useXPProgress = () => {
+type UseXPProgress = {
+  includeSystemQuests?: boolean;
+};
+
+const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
+  const currentWeekStart = moment().startOf('week');
+  const currentWeekEnd = moment().endOf('week');
 
   const { data: xpProgressions = [], isLoading: isLoadingXPProgression } =
     useGetXPs({
       user_id: user.id,
-      from: moment().startOf('week').toDate(),
-      to: moment().endOf('week').toDate(),
+      from: currentWeekStart.toDate(),
+      to: currentWeekEnd.toDate(),
       enabled: user.isLoggedIn && xpEnabled,
     });
 
@@ -24,18 +30,33 @@ const useXPProgress = () => {
     useFetchQuestsQuery({
       cursor: 1,
       limit: 40,
-      end_after: moment().startOf('week').toDate(),
-      start_before: moment().endOf('week').toDate(),
-      include_system_quests: false, // dont show system quests in xp progression bar
+      end_after: currentWeekStart.toDate(),
+      start_before: currentWeekEnd.toDate(),
+      include_system_quests: includeSystemQuests,
       enabled: user.isLoggedIn && xpEnabled,
     });
 
   const allWeeklyQuests = (questsList?.pages || [])
     .flatMap((page) => page.results)
     .map((quest) => {
+      // Filter XP logs for this quest
+      const questXpLogs = xpProgressions.filter((p) => p.quest_id === quest.id);
+
+      // For system quests (negative IDs), only include XP earned in current week
+      const isSystemQuest = quest.id < 0;
+      const validXpLogs = isSystemQuest
+        ? questXpLogs.filter((xpLog) => {
+            // Check if the XP was earned in the current week
+            const xpEarnedDate = moment(xpLog.created_at);
+            return (
+              xpEarnedDate.isSameOrAfter(currentWeekStart) &&
+              xpEarnedDate.isSameOrBefore(currentWeekEnd)
+            );
+          })
+        : questXpLogs;
+
       const gainedXP =
-        xpProgressions
-          .filter((p) => p.quest_id === quest.id)
+        validXpLogs
           .map((p) => p.xp_points)
           .reduce(
             (accumulator, currentValue) => accumulator + currentValue,

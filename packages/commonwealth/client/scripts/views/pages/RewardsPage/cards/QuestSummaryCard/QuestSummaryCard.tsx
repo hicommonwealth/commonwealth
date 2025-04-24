@@ -35,7 +35,7 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_after: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
@@ -47,7 +47,7 @@ const QuestSummaryCard = () => {
     limit: 2,
     end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
-    include_system_quests: !user.isLoggedIn,
+    include_system_quests: true,
     enabled: xpEnabled,
   });
 
@@ -55,7 +55,7 @@ const QuestSummaryCard = () => {
     navigate('/explore?tab=quests');
   };
 
-  const handleCTAClick = (questId: number, communityId?: string) => {
+  const handleCTAClick = (questId: number, communityId?: string | null) => {
     navigate(`/quests/${questId}`, {}, communityId);
   };
 
@@ -78,7 +78,7 @@ const QuestSummaryCard = () => {
       <div className="QuestSummaryCard">
         <div className="xp-body">
           <CWText fontWeight="bold" type="h4">
-            {user.xpPoints} XP&nbsp;
+            {user.xpPoints} Aura&nbsp;
             <CWText type="caption">earned from quests</CWText>
           </CWText>
         </div>
@@ -106,7 +106,7 @@ const QuestSummaryCard = () => {
                   isActive={isShowingActiveQuests}
                   name={quest.name}
                   onCTAClick={() =>
-                    handleCTAClick(quest.id, quest.community_id || '')
+                    handleCTAClick(quest.id, quest.community_id)
                   }
                 />
               );

@@ -47,7 +47,7 @@ const QuestList = ({
     limit: minQuests,
     end_after: moment().startOf('week').toDate(),
     // dont show system quests in quest lists for communities
-    include_system_quests: questsForCommunityId ? false : !user.isLoggedIn,
+    include_system_quests: questsForCommunityId ? false : true,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -114,6 +114,8 @@ const QuestList = ({
                   completed: (quest.action_metas || [])
                     .map((action) =>
                       isQuestActionComplete(
+                        new Date(quest.start_date),
+                        new Date(quest.end_date),
                         action as QuestAction,
                         xpProgressions as unknown as XPLog[],
                       ),

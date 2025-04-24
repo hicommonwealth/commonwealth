@@ -1,4 +1,9 @@
-import { configure, config as target } from '@hicommonwealth/core';
+import {
+  configure,
+  LogLevel,
+  LogLevels,
+  config as target,
+} from '@hicommonwealth/core';
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
@@ -46,14 +51,24 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  TWITTER_LOG_LEVEL,
   TWITTER_APP_BEARER_TOKEN,
   TWITTER_CONSUMER_KEY,
   TWITTER_CONSUMER_SECRET,
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_TOKEN_SECRET,
   SKALE_PRIVATE_KEY,
+  PRIVY_FLAG,
+  PRIVY_APP_ID,
+  PRIVY_APP_SECRET,
   FLAG_USE_RUNWARE,
   RUNWARE_API_KEY,
+  CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+  CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY,
+  CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+  CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
+  CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+  CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -66,6 +81,7 @@ const DEFAULTS = {
   DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
+  TWITTER_LOG_LEVEL: 'info' as const,
 };
 
 export const config = configure(
@@ -173,6 +189,7 @@ export const config = configure(
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
     TWITTER: {
+      LOG_LEVEL: (TWITTER_LOG_LEVEL as LogLevel) || target.LOGGING.LOG_LEVEL,
       APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
       CONSUMER_KEY: TWITTER_CONSUMER_KEY,
       CONSUMER_SECRET: TWITTER_CONSUMER_SECRET,
@@ -182,9 +199,39 @@ export const config = configure(
     SKALE: {
       PRIVATE_KEY: SKALE_PRIVATE_KEY || '',
     },
+    PRIVY: {
+      FLAG_ENABLED: PRIVY_FLAG === 'true',
+      APP_ID: PRIVY_APP_ID,
+      APP_SECRET: PRIVY_APP_SECRET,
+    },
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
+    },
+    CLOUDFLARE: {
+      TURNSTILE: {
+        ...(CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY &&
+          CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY && {
+            CREATE_COMMUNITY: {
+              SITE_KEY: CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_COMMUNITY_SECRET_KEY,
+            },
+          }),
+        ...(CF_TURNSTILE_CREATE_THREAD_SITE_KEY &&
+          CF_TURNSTILE_CREATE_THREAD_SECRET_KEY && {
+            CREATE_THREAD: {
+              SITE_KEY: CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
+            },
+          }),
+        ...(CF_TURNSTILE_CREATE_COMMENT_SITE_KEY &&
+          CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY && {
+            CREATE_COMMENT: {
+              SITE_KEY: CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+              SECRET_KEY: CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
+            },
+          }),
+      },
     },
   },
   z.object({
@@ -391,6 +438,7 @@ export const config = configure(
         ),
     }),
     TWITTER: z.object({
+      LOG_LEVEL: z.enum(LogLevels),
       APP_BEARER_TOKEN: z.string().optional(),
       CONSUMER_KEY: z.string().optional(),
       CONSUMER_SECRET: z.string().optional(),
@@ -406,11 +454,54 @@ export const config = configure(
           'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
+    PRIVY: z
+      .object({
+        FLAG_ENABLED: z.boolean(),
+        APP_ID: z.string().optional(),
+        APP_SECRET: z.string().optional(),
+      })
+      .refine(
+        (data) => !(data.FLAG_ENABLED && (!data.APP_ID || !data.APP_SECRET)),
+      ),
     IMAGE_GENERATION: z
       .object({
         FLAG_USE_RUNWARE: z.boolean().optional(),
         RUNWARE_API_KEY: z.string().optional(),
       })
       .refine((data) => !(data.FLAG_USE_RUNWARE && !data.RUNWARE_API_KEY)),
+    CLOUDFLARE: z.object({
+      TURNSTILE: z.object({
+        CREATE_COMMUNITY: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create community widget keys are required in production',
+          ),
+        CREATE_THREAD: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create thread widget keys are required in production',
+          ),
+        CREATE_COMMENT: z
+          .object({
+            SITE_KEY: z.string(),
+            SECRET_KEY: z.string(),
+          })
+          .optional()
+          .refine(
+            (data) => !(['production'].includes(target.APP_ENV) && !data),
+            'Turnstile create comment widget keys are required in production',
+          ),
+      }),
+    }),
   }),
 );

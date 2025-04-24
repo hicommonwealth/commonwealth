@@ -1,5 +1,6 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { generateUsername } from 'unique-username-generator';
 import { ZodUndefined } from 'zod';
@@ -41,7 +42,7 @@ export function CreateUnverifiedUser(): Policy<typeof inputs, ZodUndefined> {
                 name: generateUsername('', 2),
                 avatar_url: null, // TODO: random avatar
               },
-              tier: 0,
+              tier: UserTierMap.IncompleteUser,
             },
             { transaction },
           );

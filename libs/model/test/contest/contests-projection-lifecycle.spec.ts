@@ -207,6 +207,9 @@ describe('Contests projection lifecycle', () => {
       endTime: 100,
       contestInterval: 50,
       lastContentId: '1',
+      // prizeShare: 10,
+      // voterShare: 20,
+      // contestToken: '0x000',
     });
 
     await handleEvent(Contests(), {

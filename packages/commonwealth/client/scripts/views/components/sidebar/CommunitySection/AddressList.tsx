@@ -68,7 +68,7 @@ export const AddressList = ({
               Addresses
             </CWText>
           </div>
-          {user.isLoggedIn && isInsideCommunity && (
+          {user.isLoggedIn && (
             <div className="address-right">
               <AddressCreate onAuthModalOpen={() => onAuthModalOpen()} />
             </div>

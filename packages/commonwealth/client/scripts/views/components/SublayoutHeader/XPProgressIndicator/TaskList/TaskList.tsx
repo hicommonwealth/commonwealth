@@ -19,7 +19,7 @@ const TaskList = ({ className }: TaskListProps) => {
     isLoadingQuestsList,
     isLoadingXPProgression,
     pendingWeeklyQuests,
-  } = useXPProgress();
+  } = useXPProgress({ includeSystemQuests: true }); // dont show system quests in xp progression bar
 
   if (isLoadingXPProgression) return;
 

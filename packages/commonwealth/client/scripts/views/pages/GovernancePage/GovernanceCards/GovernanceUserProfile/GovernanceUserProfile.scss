@@ -1,0 +1,40 @@
+@import '../../../../../styles/shared.scss';
+
+.GovernanceProfileCard {
+  width: 250px;
+  padding: 24px;
+  background-color: $white;
+  border: 1px solid $neutral-100;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+
+      .profile-address {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    }
+  }
+
+  .profile-body {
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+}

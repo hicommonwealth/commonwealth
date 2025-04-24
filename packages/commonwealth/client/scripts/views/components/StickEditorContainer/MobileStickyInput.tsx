@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import useSidebarStore from 'state/ui/sidebar/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
@@ -9,7 +15,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { MobileInput } from './MobileInput';
 import './MobileStickyInput.scss';
+import StickyInput from './StickyInput';
 import { StickCommentContext } from './context/StickCommentProvider';
+
+// because it is just a UI for now, this is not real flag yet
+const newStickyInput = false;
 
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
@@ -18,9 +28,9 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const menuVisible = useSidebarStore((state) => state.menuVisible);
+  const stickyInputRef = useRef<HTMLDivElement>(null);
 
   const handleCancel = useCallback(() => {
-    console.log('MobileStickyInput: handleCancel triggered');
     setFocused(false);
   }, []);
 
@@ -60,6 +70,21 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const handleFocused = useCallback(() => {
     setFocused(true);
   }, []);
+
+  useEffect(() => {
+    const node = stickyInputRef.current;
+    if (!node) return;
+
+    const preventScroll = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+
+    node.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      node.removeEventListener('touchmove', preventScroll);
+    };
+  }, [focused]);
 
   const parent = document.getElementById('MobileNavigationHead');
 
@@ -102,8 +127,12 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     );
   }
 
+  if (newStickyInput) {
+    return createPortal(<StickyInput />, parent);
+  }
+
   return createPortal(
-    <div className="MobileStickyInput">
+    <div className="MobileStickyInput" ref={stickyInputRef}>
       <MobileInput
         {...props}
         onFocus={handleFocused}

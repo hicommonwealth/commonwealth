@@ -76,6 +76,7 @@ export const UserView = z.object({
   updated_at: z.date().or(z.string()).nullish(),
   ProfileTags: z.array(ProfileTagsView).optional(),
   unsubscribe_uuid: z.string().uuid().nullish().optional(),
+  tier: z.number().nullish().optional(),
 });
 type UserView = z.infer<typeof UserView>;
 
@@ -168,7 +169,7 @@ export const ThreadView = Thread.extend({
   topic: TopicView.optional(),
   topic_id: PG_INT.optional(),
   is_linking_token: z.boolean().optional(),
-  launchpad_token_address: z.string().optional(),
+  launchpad_token_address: z.string().nullable().optional(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
@@ -263,7 +264,6 @@ export const GetThreads = {
   output: z.object({
     page: z.number(),
     limit: z.number(),
-    numVotingThreads: z.number(),
     threads: z.array(ThreadView),
     threadCount: z.number().optional(),
   }),

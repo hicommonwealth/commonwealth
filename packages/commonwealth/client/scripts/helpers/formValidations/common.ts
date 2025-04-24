@@ -61,31 +61,61 @@ export const quillValidationSchema = z.object({
   ___isMarkdown: z.boolean(),
 });
 
-export const numberValidationSchema = z
-  .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
-  .refine(
-    (value) => {
-      const intVal = parseInt(value, 10);
-      return !isNaN(intVal) && intVal.toString() === value.trim();
-    },
-    { message: VALIDATION_MESSAGES.INVALID_INPUT },
-  );
+export const numberValidationSchema = {
+  required: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+    .refine(
+      (value) => {
+        const intVal = parseInt(value, 10);
+        return !isNaN(intVal) && intVal.toString() === value.trim();
+      },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
+    ),
+  optional: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .optional()
+    .refine(
+      (value) => {
+        if (!value || value.toString().trim() === '') return true;
+        const intVal = parseInt(value, 10);
+        return !isNaN(intVal) && intVal.toString() === value.trim();
+      },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
+    ),
+};
 
 // non decimal number
-export const numberNonDecimalValidationSchema = numberValidationSchema.refine(
-  (value) => {
-    return !Number.isInteger(value);
-  },
-  { message: VALIDATION_MESSAGES.MUST_BE_TYPE('integer') },
-);
+export const numberNonDecimalValidationSchema = {
+  required: numberValidationSchema.required.refine(
+    (value) => {
+      return !Number.isInteger(value);
+    },
+    { message: VALIDATION_MESSAGES.MUST_BE_TYPE('integer') },
+  ),
+  optional: numberValidationSchema.optional.refine(
+    (value) => {
+      if (!value || value?.trim() === '') return true;
+      return !Number.isInteger(value);
+    },
+    { message: VALIDATION_MESSAGES.MUST_BE_TYPE('integer') },
+  ),
+};
 
 // non decimal number greater than 0
 export const numberNonDecimalGTZeroValidationSchema =
-  numberNonDecimalValidationSchema.refine(
+  numberNonDecimalValidationSchema.required.refine(
     (value) => {
       const intVal = parseInt(value, 10);
       return intVal > 0;
     },
     { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+  );
+
+export const stringHasNumbersOnlyValidationSchema = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => /^\d+$/.test(`${value}`), // checks for digits only
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );
