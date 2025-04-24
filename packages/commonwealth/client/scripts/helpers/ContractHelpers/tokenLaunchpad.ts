@@ -7,6 +7,7 @@ import { Contract } from 'web3';
 import ContractBase from './ContractBase';
 
 class TokenLaunchpad extends ContractBase {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private paymentTokenContract: any;
   launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
