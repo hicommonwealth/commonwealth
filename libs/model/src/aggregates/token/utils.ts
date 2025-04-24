@@ -5,7 +5,7 @@ import {
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
 import { config, models } from '@hicommonwealth/model';
-import { mustExist } from 'model/src/middleware';
+import { mustExist } from '../../middleware';
 
 export async function handleCapReached(
   token_address: string,
