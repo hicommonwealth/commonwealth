@@ -20,6 +20,7 @@ import {
   getDefaultContestImage,
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { privateKeyToAccount } from 'viem/accounts';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';
@@ -274,19 +275,28 @@ async function isGraduatedContest(
     log.warn(`Chain node url not found on contest ${payload.contest_address}`);
     return false;
   }
+
+  mustExist('env LAUNCHPAD_PRIVATE_KEY', !!config.WEB3.LAUNCHPAD_PRIVATE_KEY);
+
   const {
     tx: { from: deployerAddress },
   } = await getTransaction({
     rpc,
     txHash: payload.transaction_hash,
   });
-  const validDeployers =
+
+  const account = privateKeyToAccount(
+    config.WEB3.LAUNCHPAD_PRIVATE_KEY! as `0x${string}`,
+  );
+
+  const lpContestManagerAddresses =
     config.APP_ENV === 'production'
       ? [LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET]
       : [
           LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
           LP_CONTEST_MANAGER_ADDRESS_ANVIL,
         ];
+  const validDeployers = [...lpContestManagerAddresses, account.address];
   return validDeployers.includes(deployerAddress);
 }
 

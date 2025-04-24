@@ -5,6 +5,7 @@ import {
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
 import { config, models } from '@hicommonwealth/model';
+import { mustExist } from 'model/src/middleware';
 
 export async function handleCapReached(
   token_address: string,
@@ -40,12 +41,14 @@ export async function handleCapReached(
       lpBondingCurveAddress,
     });
 
+    mustExist('env LAUNCHPAD_PRIVATE_KEY', !!config.WEB3.LAUNCHPAD_PRIVATE_KEY);
+
     if (!onChainTokenData.funded) {
       await transferLaunchpadLiquidityToUniswap({
         rpc: url,
         tokenAddress: token_address,
         lpBondingCurveAddress,
-        privateKey: config.WEB3.PRIVATE_KEY,
+        privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
       token.liquidity_transferred = true;
     }
