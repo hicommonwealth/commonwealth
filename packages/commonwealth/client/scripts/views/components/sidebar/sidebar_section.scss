@@ -22,6 +22,10 @@
     .Icon {
       margin-right: 4px;
     }
+
+    .sidebar-section-new-tag {
+      margin-left: 4px;
+    }
   }
 
   .sections-container {
@@ -141,4 +145,14 @@
   svg {
     fill: transparent;
   }
+}
+
+// Specific styles for the 'New' tag variant in the sidebar
+.cw-tag--sidebar-new {
+  padding-left: 4px; // Reduce horizontal padding
+  padding-right: 4px;
+  gap: 0; // Remove gap between icon and text
+  // Optionally, adjust height/font-size if needed
+  // height: 20px;
+  // font-size: 11px;
 }

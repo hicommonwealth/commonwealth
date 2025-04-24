@@ -12,12 +12,17 @@ export type BaseSidebarAttrs = {
 
 export type SubSectionAttrs = {
   rowIcon?: boolean;
+  isVisible: boolean;
+  leftIcon?: React.ReactNode;
+  isNew?: boolean;
 } & BaseSidebarAttrs;
 
 export type SectionGroupAttrs = {
   containsChildren: boolean;
   displayData: SubSectionAttrs[] | null;
   hasDefaultToggle: boolean;
+  leftIcon?: React.ReactNode;
+  isNew?: boolean;
 } & BaseSidebarAttrs;
 
 export type SidebarSectionAttrs = {
@@ -25,6 +30,7 @@ export type SidebarSectionAttrs = {
   displayData?: SectionGroupAttrs[];
   extraComponents?: React.ReactNode;
   toggleDisabled?: boolean;
+  isNew?: boolean;
 } & BaseSidebarAttrs;
 
 export type ToggleTree = {
