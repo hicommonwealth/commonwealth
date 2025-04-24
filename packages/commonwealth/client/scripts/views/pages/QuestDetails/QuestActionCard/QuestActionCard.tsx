@@ -108,6 +108,7 @@ const QuestActionCard = ({
               'TweetEngagement',
               'DiscordServerJoined',
               'CommunityCreated',
+              'LaunchpadTokenTraded',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -142,6 +143,14 @@ const QuestActionCard = ({
                       )}
                     </CWText>
                   )}
+                {questAction.event_name === 'LaunchpadTokenTraded' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.amount_multiplier || 0,
+                      `${questAction?.content_id?.split(':').at(-1) || ''}`,
+                    )}
+                  </CWText>
+                )}
               </>
             )}
             {!hideShareSplit &&
