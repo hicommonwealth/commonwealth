@@ -364,7 +364,7 @@ const DirectoryPage = () => {
         </CWText>
         <CWDivider />
         <CWText type="h4" className="subtitle">
-          {baseChain?.name} ecosystem
+          {community?.name} ecosystem
         </CWText>
         <div className="search-row-and-filter">
           <div className="search-row">
