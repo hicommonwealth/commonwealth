@@ -137,15 +137,21 @@ export const KyoFinanceLpQuestRequestParams = z
     'https://docs.kyo.finance/technical-docs/swap-lp-quest-verification-api#id-2.-lp-quest',
   );
 
+type GeneralQuestNames = Exclude<
+  keyof typeof QuestEvents,
+  keyof typeof ExternalApiQuests
+>;
+
 const sharedQuestActionMeta = z.object({
   id: z.number().nullish(),
   quest_id: z.number(),
   //event names instead of enums for flexibility when adding new events
   event_name: z.enum([
-    ...(Object.keys(QuestEvents) as [
-      keyof typeof QuestEvents,
-      ...Array<keyof typeof QuestEvents>,
-    ]),
+    ...(Object.keys(QuestEvents).filter(
+      (e) =>
+        e !== 'KyoFinanceLpQuestVerified' &&
+        e !== 'KyoFinanceSwapQuestVerified',
+    ) as [GeneralQuestNames, ...Array<GeneralQuestNames>]),
     ...ChannelBatchActions,
   ]),
   reward_amount: z.number(),
