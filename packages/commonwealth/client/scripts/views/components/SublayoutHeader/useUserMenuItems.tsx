@@ -78,7 +78,7 @@ const useUserMenuItems = ({
   const xpEnabled = useFlag('xp');
   const privyEnabled = useFlag('privy');
 
-  const { ready, authenticated, logout } = usePrivy();
+  const { authenticated, logout } = usePrivy();
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
