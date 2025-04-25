@@ -29,8 +29,10 @@ class LaunchpadBondingCurve extends ContractBase {
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<void> {
-    await super.initialize(withWallet, chainId);
+    await super.initialize(withWallet, chainId, providerInstance);
     this.launchpadFactory = new this.web3.eth.Contract(
       LaunchpadAbi,
       this.launchpadFactoryAddress,
@@ -71,12 +73,16 @@ class LaunchpadBondingCurve extends ContractBase {
 
   async buyToken(
     amountEth: number,
+
     walletAddress: string,
+
     chainId: string,
     imgUrl?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+      await this.initialize(true, chainId, providerInstance);
     }
     const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.buyToken(
@@ -118,10 +124,17 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async sellToken(amountSell: number, walletAddress: string, chainId: string) {
+  async sellToken(
+    amountSell: number,
+    walletAddress: string,
+    chainId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
+  ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+      await this.initialize(true, chainId, providerInstance);
     }
+
     const tokenContract = new this.web3.eth.Contract(
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
@@ -152,8 +165,8 @@ class LaunchpadBondingCurve extends ContractBase {
   }
 
   async getAmountOut(amountIn: number, buy: boolean, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+    if (!this.initialized) {
+      await this.initialize(false, chainId);
     }
 
     const amountOut = await cp.getPrice(
