@@ -44,6 +44,7 @@ import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profil
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
 import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
 import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
 import useSMSDialogStore from 'views/components/PrivyTest/usePrivySMSDialogStore';
@@ -138,6 +139,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
   const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
+  const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
@@ -250,8 +252,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     });
     await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
   };
-  //const onSMSLogin = onSMSLoginMagic;
-  const onSMSLogin = onSMSLoginPrivy;
+
+  const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
 
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
@@ -313,14 +315,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
-
     console.log('onSocialLoginPrivy: ' + provider);
-
     privyAuthWithOAuth.onInitOAuth(provider);
   };
 
-  // determine which login system to use...
-  const onSocialLogin = onSocialLoginPrivy;
+  const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;
 
   // Performs Login on the client
   const onLogInWithAccount = async (
