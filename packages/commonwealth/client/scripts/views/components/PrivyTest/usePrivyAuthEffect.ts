@@ -24,12 +24,10 @@ export function usePrivyAuthEffect(props: PrivyCallbacks) {
     ) => {
       async function doAsync() {
         if (userStore.isLoggedIn) {
-          console.log('userStore isLoggedIn');
           return;
         }
 
         if (wallet) {
-          console.log('Trying to login...');
           await privySignOn({
             wallet,
             onSuccess,

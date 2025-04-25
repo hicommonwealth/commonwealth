@@ -22,9 +22,16 @@ export function useConnectedWallet() {
           setConnectedWallet(wallets.wallets[0]);
         } else {
           // this should NOT happen, but the SDK is incorrect in the
-          // documentation and may have a bug.
-          console.warn('No wallets ... manually creating one.');
-          await createWallet();
+          // documentation and will return with empty wallets sometimes, even
+          // though they should automatically be created.
+          try {
+            await createWallet();
+          } catch (e) {
+            // we have to ignore this because if the wallets don't exist, we
+            // have to try to create one but the hook doesn't behave properly,
+            // so this will just throw an error. We should probably try to
+            // fix this in the future.
+          }
         }
       }
     }
