@@ -201,7 +201,7 @@ export const ReactionButton = ({
       <InsufficientBalanceModal
         isOpen={isInsufficientBalanceModalOpen}
         onClose={() => setIsInsufficientBalanceModalOpen(false)}
-        tokenSymbol={thread.topic?.token_symbol}
+        tokenSymbol={thread.topic?.token_symbol ?? undefined}
         isCommunityStake={!thread.topic?.weighted_voting}
         communityId={communityId}
       />
