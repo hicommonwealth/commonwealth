@@ -16,11 +16,7 @@ import CommonTrade from './CommonTrade/CommonTrade';
 import './TokenPerformance.scss';
 import UniswapTrade from './UniswapTrade/UniswapTrade';
 
-let performanceInstanceCounter = 0;
-
 const TokenPerformance = () => {
-  const componentId = useMemo(() => ++performanceInstanceCounter, []);
-
   const mountRef = useRef(true);
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -33,16 +29,6 @@ const TokenPerformance = () => {
   const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
     token: communityToken as LaunchpadToken,
   });
-
-  // Component lifecycle logging
-  useEffect(() => {
-    mountRef.current = true;
-
-    return () => {
-      mountRef.current = false;
-    };
-  }, [componentId]);
-
   // Use useEffect with proper cleanup
   useEffect(() => {
     if (!communityToken) {
@@ -62,10 +48,6 @@ const TokenPerformance = () => {
     return () => {};
   }, [communityToken, isPinnedToken, componentId]);
 
-  if (isLoadingToken || !communityToken || pricingLoading) {
-    return null;
-  }
-
   // Memoize these values to prevent unnecessary recalculations
   const chain = useMemo(() => {
     const result = isPinnedToken ? 'base' : 'base-sepolia';
@@ -73,9 +55,19 @@ const TokenPerformance = () => {
   }, [isPinnedToken, componentId]);
 
   const address = useMemo(() => {
+    if (!communityToken) {
+      return undefined;
+    }
     const result = isPinnedToken
       ? (communityToken as ExternalToken).contract_address
       : (communityToken as LaunchpadToken).token_address;
+    if (!result) {
+      console.warn(
+        'Token address/contract_address not found on communityToken',
+        communityToken,
+      );
+      return undefined;
+    }
     return result;
   }, [communityToken, isPinnedToken, componentId]);
 
@@ -87,6 +79,11 @@ const TokenPerformance = () => {
       : true;
     return result;
   }, [isLaunchpadToken, tokenPricing, componentId]);
+
+  // Moved conditional return after all hook calls
+  if (isLoadingToken || !communityToken || pricingLoading) {
+    return null;
+  }
 
   return (
     <div className="TokenPerformance">
@@ -102,7 +99,7 @@ const TokenPerformance = () => {
       <div
         className={`performance-content ${!hasReachedGoal ? 'no-chart' : ''}`}
       >
-        {hasReachedGoal && (
+        {hasReachedGoal && address && (
           <GeckoTerminalChart
             className="GeckoChart"
             chain={chain}

@@ -72,8 +72,6 @@ const mockTopHolders = [
   },
 ];
 
-let instanceCounter = 0;
-
 const TopHolders = () => {
   const navigate = useCommonNavigate();
 
