@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
   getLaunchpadToken,
@@ -6,6 +7,8 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config, models } from '@hicommonwealth/model';
 import { mustExist } from '../../middleware';
+
+const log = logger(import.meta);
 
 export async function handleCapReached(
   token_address: string,
@@ -51,6 +54,7 @@ export async function handleCapReached(
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
       token.liquidity_transferred = true;
+      log.debug(`Liquidity transferred to ${token_address}`);
     }
 
     await token.save();
