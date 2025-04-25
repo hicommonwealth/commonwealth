@@ -18,7 +18,6 @@ const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  rewardAmount: numberNonDecimalGTZeroValidationSchema,
   instructionsLink: linkValidationSchema.optional,
   participationLimit: z.nativeEnum(QuestParticipationLimit, {
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
@@ -43,6 +42,7 @@ export const buildQuestSubFormValidationSchema = (
   const requiresGroupId = config?.requires_group_id;
   const requiresStartLink = config?.requires_start_link;
   const requiresAmountMultipler = config?.requires_amount_multipler;
+  const requiresBasicRewardPoints = config?.requires_basic_points;
   const requiresCreatorPoints = config?.requires_creator_points;
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
   const allowsTokenThresholdAmountAsContentId =
@@ -107,33 +107,42 @@ export const buildQuestSubFormValidationSchema = (
       amountMultipler: numberNonDecimalGTZeroValidationSchema,
     }) as unknown as typeof baseSchema;
   }
-  if (requiresCreatorPoints) {
-    baseSchema = baseSchema
-      .extend({
-        creatorRewardAmount: numberNonDecimalValidationSchema.required,
-      })
-      .refine(
-        (data) => {
-          try {
-            const creatorRewardAmount = numberValidationSchema.required.parse(
-              data.creatorRewardAmount,
-            );
-            const rewardAmount = numberValidationSchema.required.parse(
-              data.rewardAmount,
-            );
-            // verify creatorRewardAmount is less or equal to rewardAmount
-            return (
-              parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
-            );
-          } catch {
-            return false;
-          }
-        },
-        {
-          message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
-          path: ['creatorRewardAmount'],
-        },
-      ) as unknown as typeof baseSchema;
+  if (requiresBasicRewardPoints) {
+    if (!requiresCreatorPoints) {
+      baseSchema = baseSchema.extend({
+        rewardAmount: numberNonDecimalGTZeroValidationSchema,
+      }) as unknown as typeof baseSchema;
+    }
+
+    if (requiresCreatorPoints) {
+      baseSchema = baseSchema
+        .extend({
+          rewardAmount: numberNonDecimalGTZeroValidationSchema,
+          creatorRewardAmount: numberNonDecimalValidationSchema.required,
+        })
+        .refine(
+          (data) => {
+            try {
+              const creatorRewardAmount = numberValidationSchema.required.parse(
+                data.creatorRewardAmount,
+              );
+              const rewardAmount = numberValidationSchema.required.parse(
+                data.rewardAmount,
+              );
+              // verify creatorRewardAmount is less or equal to rewardAmount
+              return (
+                parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
+              );
+            } catch {
+              return false;
+            }
+          },
+          {
+            message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
+            path: ['creatorRewardAmount'],
+          },
+        ) as unknown as typeof baseSchema;
+    }
   }
   if (requiresTwitterEngagement) {
     baseSchema = baseSchema

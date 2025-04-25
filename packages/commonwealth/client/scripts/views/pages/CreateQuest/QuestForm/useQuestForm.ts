@@ -15,6 +15,7 @@ import {
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
   doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
@@ -117,6 +118,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 },
                 errors: {},
                 config: {
+                  requires_basic_points:
+                    doesActionRequireBasicRewardAmount(chosenAction),
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
                   is_action_repeatable: doesActionAllowRepetition(chosenAction),
@@ -255,7 +258,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
       return {
         event_name: subForm.values.action as QuestAction,
-        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
             parseInt(`${subForm.values.rewardAmount}`, 10),

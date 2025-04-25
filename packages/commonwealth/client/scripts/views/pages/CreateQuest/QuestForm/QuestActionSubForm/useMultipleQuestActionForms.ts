@@ -8,6 +8,7 @@ import {
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
   doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
@@ -145,6 +146,8 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
+      const requiresBasicPoints =
+        doesActionRequireBasicRewardAmount(chosenAction);
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
@@ -164,6 +167,7 @@ const useQuestActionMultiFormsState = ({
 
       // update config based on chosen action
       updatedSubForms[index].config = {
+        requires_basic_points: requiresBasicPoints,
         requires_creator_points: requiresCreatorPoints,
         is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,

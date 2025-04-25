@@ -13,6 +13,7 @@ import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
 import ActionContentIdScopeSelector from './SpecialCaseDynamicFields/ActionContentIdScopeSelector';
 import AmountMultipler from './SpecialCaseDynamicFields/AmountMultipler';
+import BasicPointsInput from './SpecialCaseDynamicFields/BasicPointsInput';
 import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
 import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
 import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
@@ -126,27 +127,18 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         }
       />
 
-      <CWTextInput
-        label="Total Reward Points"
-        placeholder="Points Earned"
-        fullWidth
-        {...(defaultValues?.rewardAmount && {
-          defaultValue: defaultValues?.rewardAmount,
-        })}
-        onInput={(e) => onChange?.({ rewardAmount: e?.target?.value?.trim() })}
-        name="rewardAmount"
-        customError={errors?.rewardAmount}
-        containerClassName={
-          config?.requires_creator_points ? 'span-3' : 'span-6'
-        }
-      />
-
       {
         <>
           {/* Dynamic fields below:
             1. Each field/group is rendered independently if current config allows
             2. Rendering logic is validated by their internal state
           */}
+          <BasicPointsInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
           <CreatorPointsInput
             defaultValues={defaultValues}
             errors={errors}

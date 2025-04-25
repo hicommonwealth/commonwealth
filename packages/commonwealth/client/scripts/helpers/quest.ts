@@ -90,6 +90,24 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
   return action === 'LaunchpadTokenTraded';
 };
 
+export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
+  const commonQuests: QuestActionType[] = [
+    'CommunityCreated',
+    'CommunityJoined',
+    'ThreadCreated',
+    'ThreadUpvoted',
+    'CommentCreated',
+    'CommentUpvoted',
+    'WalletLinked',
+    'SSOLinked',
+    'DiscordServerJoined',
+    'MembershipsRefreshed',
+  ];
+  const channelQuest: QuestActionType[] = ['TweetEngagement'];
+
+  return [...commonQuests, ...channelQuest].includes(action);
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,

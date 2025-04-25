@@ -60,6 +60,7 @@ export type QuestActionSubFormFields = {
 };
 
 export type QuestActionSubFormConfig = {
+  requires_basic_points: boolean;
   requires_creator_points: boolean;
   is_action_repeatable: boolean;
   with_optional_topic_id: boolean;

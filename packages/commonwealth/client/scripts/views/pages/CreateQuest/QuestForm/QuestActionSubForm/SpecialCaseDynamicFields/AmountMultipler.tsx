@@ -22,7 +22,7 @@ const AmountMultipler = ({
       })}
       onInput={(e) => onChange?.({ amountMultipler: e?.target?.value?.trim() })}
       customError={errors?.amountMultipler}
-      instructionalMessage='Users will receive "reward amount multipler * reward points" aura'
+      instructionalMessage='Users will receive "reward amount multipler * user eth trade amount" aura'
     />
   );
 };

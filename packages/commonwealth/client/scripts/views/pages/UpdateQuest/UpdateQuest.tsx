@@ -132,7 +132,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 action: action.event_name as QuestAction,
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
-                rewardAmount: `${action.reward_amount}`,
+                rewardAmount: `${action.reward_amount || 0}`,
                 instructionsLink: action.instructions_link || '',
                 amountMultipler: `${action.amount_multiplier || 0}`,
                 contentIdScope: inferContentIdTypeFromContentId(
