@@ -121,11 +121,11 @@ const CommunityHome = () => {
       } else {
         throw new Error('Thread creation response missing ID.');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating thread:', error);
-      notifyError(
-        `Failed to create thread: ${error.message || 'Unknown error'}`,
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      notifyError(`Failed to create thread: ${errorMessage}`);
       return -1; // Return -1 on error
     }
   };
