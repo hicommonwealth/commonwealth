@@ -128,6 +128,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const handlePrivyError = useCallback((err: Error) => {
     console.log('privy error: ', err);
+    setIsMagicLoading(false);
   }, []);
 
   const privyCallbacks = useMemo(() => {
