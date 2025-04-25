@@ -484,6 +484,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
           amount: Number(payload.eth_amount),
+          threshold: Number(payload.eth_amount),
         });
       },
       WalletLinked: async ({ payload }) => {
