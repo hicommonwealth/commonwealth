@@ -468,13 +468,23 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user_id = await getUserByAddress(payload.trader_address);
         if (!user_id) return;
 
+        const token = await models.LaunchpadToken.findOne({
+          where: { token_address: payload.token_address },
+        });
+        if (!token) return;
+
+        const community = await models.Community.findOne({
+          where: { namespace_address: token.namespace },
+        });
+
         const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
-          { created_at },
+          { community_id: community?.id, created_at },
           'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
           amount: Number(payload.eth_amount),
+          threshold: Number(payload.eth_amount),
         });
       },
       WalletLinked: async ({ payload }) => {
