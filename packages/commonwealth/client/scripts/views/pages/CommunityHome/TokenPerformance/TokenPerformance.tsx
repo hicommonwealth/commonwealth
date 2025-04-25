@@ -8,7 +8,7 @@ import {
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { useTokenPricing } from 'hooks/useTokenPricing';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
@@ -17,8 +17,6 @@ import './TokenPerformance.scss';
 import UniswapTrade from './UniswapTrade/UniswapTrade';
 
 const TokenPerformance = () => {
-  const mountRef = useRef(true);
-
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     tradeConfig?: TradingConfig;
   }>({ tradeConfig: undefined });
@@ -46,13 +44,13 @@ const TokenPerformance = () => {
     setTokenLaunchModalConfig(newConfig);
 
     return () => {};
-  }, [communityToken, isPinnedToken, componentId]);
+  }, [communityToken, isPinnedToken]);
 
   // Memoize these values to prevent unnecessary recalculations
   const chain = useMemo(() => {
     const result = isPinnedToken ? 'base' : 'base-sepolia';
     return result;
-  }, [isPinnedToken, componentId]);
+  }, [isPinnedToken]);
 
   const address = useMemo(() => {
     if (!communityToken) {
@@ -69,7 +67,7 @@ const TokenPerformance = () => {
       return undefined;
     }
     return result;
-  }, [communityToken, isPinnedToken, componentId]);
+  }, [communityToken, isPinnedToken]);
 
   // Check if it's a launchpad token and if it has reached its goal
   const isLaunchpadToken = !isPinnedToken;
@@ -78,7 +76,7 @@ const TokenPerformance = () => {
       ? tokenPricing?.isMarketCapGoalReached
       : true;
     return result;
-  }, [isLaunchpadToken, tokenPricing, componentId]);
+  }, [isLaunchpadToken, tokenPricing]);
 
   // Moved conditional return after all hook calls
   if (isLoadingToken || !communityToken || pricingLoading) {

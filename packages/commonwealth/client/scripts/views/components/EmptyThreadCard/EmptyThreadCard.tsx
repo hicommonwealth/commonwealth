@@ -1,6 +1,5 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
-import app from 'state';
 import useUserStore from 'state/ui/user';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -11,7 +10,6 @@ import './EmptyThreadCard.scss';
 
 export const EmptyThreadCard = () => {
   const navigate = useCommonNavigate();
-  const communityId = app.activeChainId();
   const user = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
