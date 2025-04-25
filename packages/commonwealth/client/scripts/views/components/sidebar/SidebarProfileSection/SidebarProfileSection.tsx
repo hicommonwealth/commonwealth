@@ -10,6 +10,7 @@ import { AddressList } from '../CommunitySection/AddressList';
 import { CommunitySectionSkeleton } from '../CommunitySection/CommunitySectionSkeleton';
 import ProfileCard from '../CommunitySection/ProfileCard';
 import CreateCommunityButton from '../CreateCommunityButton';
+import TokenLaunchButton from '../TokenLaunchButton';
 import './SidebarProfileSection.scss';
 
 interface SidebarProfileSectionProps {
@@ -58,6 +59,7 @@ export const SidebarProfileSection = ({
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       return;
@@ -97,6 +99,7 @@ export const SidebarProfileSection = ({
         )}
 
         <CWDivider />
+        <TokenLaunchButton buttonHeight="sm" />
         <CreateCommunityButton />
         <CWDivider />
       </div>

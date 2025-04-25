@@ -14,6 +14,7 @@ export type CommunityInformationFormSubmitValues = {
     value: string;
   };
   links?: string[];
+  tokenizeCommunity: boolean;
 };
 
 export type CommunityInformationFormProps = {

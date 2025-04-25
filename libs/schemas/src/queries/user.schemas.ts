@@ -102,6 +102,7 @@ export const GetUserAddresses = {
       address: z.string(),
       lastActive: z.date().or(z.string()),
       avatarUrl: z.string().nullish(),
+      tier: z.number().nullish(),
     }),
   ),
 };
@@ -174,6 +175,25 @@ export const GetXps = {
     event_name: z.string().optional().describe('Filters events by event name'),
   }),
   output: z.array(XpLogView),
+};
+
+export const XpRankedUser = z.object({
+  user_id: PG_INT,
+  xp_points: z.number(),
+  tier: z.number(),
+  user_name: z.string().nullish(),
+  avatar_url: z.string().nullish(),
+});
+
+export const GetXpsRanked = {
+  input: z.object({
+    top: z.number(),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
+  }),
+  output: z.array(XpRankedUser),
 };
 
 export const RandomResourceIdsView = z.object({

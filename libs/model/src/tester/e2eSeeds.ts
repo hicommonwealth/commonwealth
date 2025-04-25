@@ -3,6 +3,7 @@ import {
   ChainNetwork,
   ChainType,
   CommunityTierMap,
+  DisabledCommunitySpamTier,
   UserTierMap,
 } from '@hicommonwealth/shared';
 import type {
@@ -102,7 +103,7 @@ export const e2eTestEntities = async function (
           {
             id: 'cmntest',
             tier: CommunityTierMap.Unverified,
-            spam_tier_level: 0,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 9999,
             name: 'cmntest',
             network: ChainNetwork.Ethereum,
@@ -118,7 +119,7 @@ export const e2eTestEntities = async function (
           {
             id: 'cmntest2',
             tier: CommunityTierMap.Unverified,
-            spam_tier_level: 0,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 99999,
             name: 'cmntest2',
             network: ChainNetwork.Ethereum,
@@ -141,6 +142,7 @@ export const e2eTestEntities = async function (
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
           directory_page_enabled: false,
+          namespace_verified: false,
         })),
       )),
     );

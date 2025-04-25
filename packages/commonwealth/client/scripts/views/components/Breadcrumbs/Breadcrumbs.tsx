@@ -1,11 +1,13 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
+import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
@@ -16,10 +18,35 @@ export const Breadcrumbs = () => {
   const navigate = useCommonNavigate();
   const userData = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
+  const [searchParams] = useSearchParams();
+  const getProposalPath = location.pathname.match(/\/proposal-details\/(.+)$/);
+  const identifier = getProposalPath ? getProposalPath[1] : null;
+  const queryType = searchParams.get('type');
+  const querySnapshotId = searchParams.get('snapshotId');
+
+  const proposalId = identifier
+    ? queryType === 'cosmos'
+      ? identifier.split('-')[0]
+      : identifier
+    : null;
+
+  const { proposal: snapshotProposal } = useSnapshotProposal({
+    identifier: proposalId || '',
+    snapshotId: querySnapshotId || '',
+    enabled: !!(queryType === 'snapshot' && querySnapshotId),
+  });
+
+  const { title: proposalTitle } = useCosmosProposal({
+    proposalId: proposalId || '',
+    enabled: !!(proposalId && queryType === 'cosmos'),
+  });
+
+  const currentProposalTitle = snapshotProposal?.title || proposalTitle;
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
 
   const communityId = app.activeChainId() || '';
+
   const { data: linkedThreads } = useGetThreadsByIdQuery({
     community_id: communityId,
     thread_ids: getThreadId ? [Number(getThreadId[1])] : [],
@@ -32,8 +59,12 @@ export const Breadcrumbs = () => {
   const currentDiscussion = {
     currentThreadName: linkedThreads?.[0]?.title || '',
     currentTopic: linkedThreads?.[0]?.topic?.name || '',
-    topicURL:
-      `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` || '',
+    topicURL: communityId
+      ? `/${communityId}/discussions/${encodeURI(
+          linkedThreads?.[0]?.topic?.name || '',
+        )}`
+      : `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` ||
+        '',
   };
 
   let standalone = false;
@@ -58,12 +89,14 @@ export const Breadcrumbs = () => {
   }
 
   const user = userData.addresses?.[0];
+
   const pathnames = generateBreadcrumbs(
     location.pathname,
     navigate,
     domain?.isCustomDomain ? communityId : '',
     currentDiscussion,
     user?.userId,
+    currentProposalTitle,
   );
 
   //Gets the tooltip copy based on the current page.

@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
@@ -7,14 +8,18 @@ import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
 import './Integrations.scss';
+import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
 import SpamLevel from './SpamLevel';
 import Stake from './Stake';
 import Token from './Token';
+import Tokenization from './Tokenization';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
-  const showSnapshotIntegration = app.chain.meta.base === ChainBase.Ethereum;
+  const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
+
+  const isJudgementEnabled = useFlag('judgeContest');
 
   return (
     <CommunityManagementLayout
@@ -32,8 +37,10 @@ const Integrations = () => {
         <Directory />
         <SpamLevel />
         <Token />
+        {isEthereum && isJudgementEnabled && <OnchainVerification />}
         <Stake />
-        {showSnapshotIntegration && <Snapshots />}
+        {isEthereum && <Snapshots />}
+        <Tokenization />
         <Discord />
         <Webhooks />
         <CustomTOS />

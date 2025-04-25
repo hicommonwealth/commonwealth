@@ -26,6 +26,7 @@ import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  CommunityTierMap,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
   UserTierMap,
@@ -105,7 +106,8 @@ describe('Thread lifecycle', () => {
           : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
-      spam_tier_level: 1,
+      tier: CommunityTierMap.CommunityVerified,
+      spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
       active: true,

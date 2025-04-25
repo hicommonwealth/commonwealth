@@ -86,4 +86,15 @@
   .ContestCard {
     margin-bottom: 16px;
   }
+
+  // Added styles for the new button wrapper
+  .join-community-header-button {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+
+    @include medium {
+      display: none;
+    }
+  }
 }

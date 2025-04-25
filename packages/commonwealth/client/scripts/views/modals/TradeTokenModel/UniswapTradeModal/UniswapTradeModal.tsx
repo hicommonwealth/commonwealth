@@ -1,9 +1,12 @@
+import { getChainName } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SwapWidget } from '@uniswap/widgets';
+import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import React, { useEffect, useState } from 'react';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -16,9 +19,11 @@ import {
 } from 'views/components/component_kit/new_designs/CWModal';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal } from 'views/modals/AuthModal';
+import { formatJsonRpcMap } from 'views/modals/TradeTokenModel/UniswapTradeModal/useJsonRpcUrlMap';
+import { LaunchpadToken } from '../CommonTradeModal/types';
 import TokenIcon from '../TokenIcon';
 import './UniswapTradeModal.scss';
-import { UniswapTradeTokenModalProps } from './types';
+import { ExternalToken, UniswapTradeTokenModalProps } from './types';
 import useUniswapTradeModal from './useUniswapTradeModal';
 
 const UniswapTradeModal = ({
@@ -26,13 +31,25 @@ const UniswapTradeModal = ({
   onModalClose,
   tradeConfig,
 }: UniswapTradeTokenModalProps) => {
-  const { uniswapWidget, isMagicUser, isMagicConfigured } =
-    useUniswapTradeModal({ tradeConfig });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const { data: tokenCommunity } = useGetCommunityByIdQuery({
+    id: tradeConfig.token.community_id,
+    enabled: !!tradeConfig.token.community_id,
+    includeNodeInfo: true,
+  });
+  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
+  const networkName = tokenCommunity?.ChainNode?.name;
+  const rpcUrl = tokenCommunity?.ChainNode?.url;
+  const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
+
+  const { uniswapWidget, isMagicUser, isMagicConfigured } =
+    useUniswapTradeModal({ tradeConfig, ethChainId, rpcUrl, blockExplorerUrl });
 
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
     useNetworkSwitching({
-      jsonRpcUrlMap: uniswapWidget.jsonRpcUrlMap,
+      ethChainId,
+      rpcUrl,
       provider: uniswapWidget.provider,
     });
 
@@ -95,6 +112,59 @@ const UniswapTradeModal = ({
     uniswapWidget.connectWallet,
   ]);
 
+  useEffect(() => {
+    if (isOpen && isWrongNetwork) {
+      void promptNetworkSwitch();
+    }
+  }, [isOpen, isWrongNetwork, promptNetworkSwitch]);
+
+  const nodes = fetchCachedNodes();
+  const jsonRpcUrlMap = formatJsonRpcMap(nodes);
+
+  const logo =
+    (tradeConfig.token as ExternalToken).logo ||
+    (tradeConfig.token as LaunchpadToken).icon_url;
+
+  const supportedChainIds = Object.values(SupportedChainId).filter(
+    (value) => typeof value === 'number',
+  ) as number[];
+
+  if (!supportedChainIds.includes(ethChainId!)) {
+    return (
+      <CWModal
+        open={isOpen}
+        onClose={() => {
+          onModalClose?.();
+        }}
+        size="medium"
+        className="UnsupportedChainModal"
+        content={
+          <>
+            <CWModalHeader
+              label={<CWText type="h4">Unsupported Network</CWText>}
+              onModalClose={onModalClose || (() => {})}
+            />
+            <CWModalBody>
+              <CWText>
+                The community connected network:{' '}
+                {getChainName({ id: ethChainId! })} is not supported on Uniswap.
+                Please switch to a supported network such as Base or Mainnet.
+              </CWText>
+            </CWModalBody>
+            <CWModalFooter>
+              <CWButton
+                label="Close"
+                buttonType="primary"
+                onClick={() => {
+                  onModalClose?.();
+                }}
+              />
+            </CWModalFooter>
+          </>
+        }
+      />
+    );
+  }
   return (
     <>
       <CWModal
@@ -111,9 +181,7 @@ const UniswapTradeModal = ({
                 <div className="header-content">
                   <CWText type="h4" className="token-info">
                     Swap Token - {tradeConfig.token.symbol}{' '}
-                    {tradeConfig.token.logo && (
-                      <TokenIcon size="large" url={tradeConfig.token.logo} />
-                    )}
+                    {logo && <TokenIcon size="large" url={logo} />}
                   </CWText>
 
                   {/* Network indicator moved to header */}
@@ -141,7 +209,7 @@ const UniswapTradeModal = ({
                               true,
                             )}
                             <CWButton
-                              label="Switch to Base"
+                              label={`Switch to ${networkName}`}
                               buttonHeight="sm"
                               buttonType="secondary"
                               onClick={() => void promptNetworkSwitch()}
@@ -168,7 +236,7 @@ const UniswapTradeModal = ({
                     className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
                     tokenList={uniswapWidget.tokensList}
                     routerUrl={uniswapWidget.routerURLs.default}
-                    jsonRpcUrlMap={uniswapWidget.jsonRpcUrlMap}
+                    jsonRpcUrlMap={jsonRpcUrlMap}
                     theme={uniswapWidget.theme}
                     defaultInputTokenAddress={
                       uniswapWidget.defaultTokenAddress.input

@@ -1,6 +1,7 @@
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { resetXPCacheForUser } from 'helpers/quest';
 import { initAppState } from 'state';
+import { trpc } from 'utils/trpcClient';
 import useUserStore from '../../ui/user';
 
 interface CreateCommunityProps {
@@ -13,6 +14,7 @@ interface CreateCommunityProps {
   socialLinks: string[];
   tokenName?: string;
   turnstileToken?: string;
+  tokenizeCommunity: boolean;
 }
 
 export const buildCreateCommunityInput = ({
@@ -22,6 +24,7 @@ export const buildCreateCommunityInput = ({
   description,
   iconUrl,
   socialLinks,
+  tokenizeCommunity,
   tokenName,
   chainNodeId,
   turnstileToken,
@@ -39,6 +42,7 @@ export const buildCreateCommunityInput = ({
     token_name: tokenName,
     chain_node_id: chainNodeId,
     turnstile_token: turnstileToken,
+    allow_tokenized_threads: tokenizeCommunity,
   };
 };
 
@@ -49,9 +53,7 @@ const useCreateCommunityMutation = () => {
     onSuccess: async () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
 
-      // reset xp cache
-      utils.quest.getQuests.invalidate().catch(console.error);
-      utils.user.getXps.invalidate().catch(console.error);
+      resetXPCacheForUser(utils);
 
       await initAppState(false);
     },

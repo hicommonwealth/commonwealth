@@ -522,6 +522,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
           new Date(currentUserAddress.lastActive),
+          0,
         );
       }
     } catch (e) {

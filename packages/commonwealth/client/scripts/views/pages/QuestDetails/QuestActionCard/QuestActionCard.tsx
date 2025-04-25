@@ -7,44 +7,24 @@ import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
+  getTotalRepititionCountsForQuestAction,
 } from 'helpers/quest';
 import React from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { z } from 'zod';
-import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
 import './QuestActionCard.scss';
-
-const actionCopies = {
-  title: {
-    ['SignUpFlowCompleted']: 'Sign in to Common',
-    ['CommunityCreated']: 'Create a community',
-    ['CommunityJoined']: 'Join a community',
-    ['ThreadCreated']: 'Create a thread',
-    ['ThreadUpvoted']: 'Upvote a thread',
-    ['CommentCreated']: 'Create a comment',
-    ['CommentUpvoted']: 'Upvote a comment',
-    ['WalletLinked']: 'Link a new wallet',
-    ['SSOLinked']: 'Link a new social (SSO)',
-  },
-  shares: {
-    ['CommunityCreated']: 'referrer',
-    ['CommunityJoined']: 'referrer',
-    ['ThreadCreated']: '',
-    ['ThreadUpvoted']: '',
-    ['CommentCreated']: '',
-    ['CommentUpvoted']: 'comment creator',
-    ['UserMentioned']: '',
-  },
-};
+import { actionCopies } from './helpers';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
+  onActionStart: (action: z.infer<typeof QuestActionMeta>) => void;
   actionNumber: number;
   questAction: z.infer<typeof QuestActionMeta>;
   isActionInEligible?: boolean;
@@ -52,6 +32,8 @@ type QuestActionCardProps = {
   inEligibilityReason?: string;
   canStartAction?: boolean;
   actionStartBlockedReason?: string;
+  questStartDate: Date;
+  questEndDate: Date;
 };
 
 const QuestActionCard = ({
@@ -64,6 +46,8 @@ const QuestActionCard = ({
   canStartAction,
   inEligibilityReason,
   questAction,
+  questStartDate,
+  questEndDate,
 }: QuestActionCardProps) => {
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
@@ -78,13 +62,38 @@ const QuestActionCard = ({
   const hideShareSplit =
     doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
 
+  // Function to determine the button label based on quest action type
+  const getButtonLabel = () => {
+    const hasDiscordLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'discord',
+    );
+
+    const hasTwitterLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'twitter',
+    );
+
+    if (questAction.event_name === 'DiscordServerJoined' && !hasDiscordLinked) {
+      return 'Connect Discord & Start';
+    }
+
+    if (questAction.event_name === 'TweetEngagement' && !hasTwitterLinked) {
+      return 'Connect Twitter & Start';
+    }
+
+    return 'Start';
+  };
+
   const isRepeatableQuest =
     questAction?.participation_limit === QuestParticipationLimit.OncePerPeriod;
   const questRepeatitionCycle = questAction?.participation_period;
   const questParticipationLimitPerCycle =
     questAction?.participation_times_per_period || 0;
-  const attemptsLeft =
-    questParticipationLimitPerCycle - (xpLogsForActions || []).length;
+  const totalActionRepititions = getTotalRepititionCountsForQuestAction(
+    questStartDate,
+    questEndDate,
+    questAction,
+  ).totalRepititions;
+  const attemptsLeft = totalActionRepititions - (xpLogsForActions || []).length;
 
   return (
     <div className="QuestActionCard">
@@ -115,6 +124,46 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
+            {[
+              'TweetEngagement',
+              'DiscordServerJoined',
+              'CommunityCreated',
+            ].includes(questAction.event_name) && (
+              <>
+                {questAction.event_name === 'CommunityCreated' &&
+                !questAction.content_id ? (
+                  <></>
+                ) : (
+                  <CWDivider />
+                )}
+                {actionCopies.pre_reqs[questAction.event_name]() && (
+                  <CWText type="caption" fontWeight="semiBold">
+                    {actionCopies.pre_reqs[questAction.event_name]()}
+                  </CWText>
+                )}
+                {questAction.event_name === 'TweetEngagement' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.QuestTweet?.like_cap || 0,
+                      questAction?.QuestTweet?.retweet_cap || 0,
+                      questAction?.QuestTweet?.replies_cap || 0,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'CommunityCreated' &&
+                  questAction.content_id && (
+                    <CWText type="caption">
+                      {actionCopies.explainer[questAction.event_name](
+                        fetchCachedNodes()?.find?.(
+                          (node) =>
+                            `${questAction.content_id?.split(`:`)?.at(-1)}` ===
+                            `${node.id}`,
+                        )?.name,
+                      )}
+                    </CWText>
+                  )}
+              </>
+            )}
             {!hideShareSplit &&
               doesActionRequireRewardShare(questAction.event_name) &&
               creatorXP.percentage > 0 && (
@@ -136,7 +185,7 @@ const QuestActionCard = ({
               />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
-                attemptsLeft !== questParticipationLimitPerCycle && (
+                attemptsLeft !== totalActionRepititions && (
                   <CWTag
                     type="group"
                     label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
@@ -173,16 +222,11 @@ const QuestActionCard = ({
                 <CWButton
                   buttonType="secondary"
                   buttonAlt="green"
-                  label="Start"
+                  label={getButtonLabel()}
                   buttonHeight="sm"
                   buttonWidth="narrow"
                   iconRight="arrowRightPhosphor"
-                  onClick={() =>
-                    onActionStart(
-                      questAction.event_name,
-                      questAction?.content_id || undefined,
-                    )
-                  }
+                  onClick={() => onActionStart(questAction)}
                   disabled={!canStartAction}
                 />,
                 actionStartBlockedReason || '',

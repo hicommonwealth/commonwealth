@@ -67,10 +67,10 @@ export const chainTypes =
           ? 'solana'
           : 'cosmos',
       value:
-        chain.ethChainId ||
-        chain.cosmosChainId ||
         chain.balanceType === 'solana'
           ? chain.name
-          : 0,
+          : chain.ethChainId || chain.cosmosChainId
+            ? chain.ethChainId || chain.cosmosChainId
+            : 0,
       label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
     })) || [];

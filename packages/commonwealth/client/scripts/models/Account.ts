@@ -1,7 +1,9 @@
 import {
   DEFAULT_NAME,
+  UserTierMap,
   type ChainBase,
   type WalletId,
+  type WalletSsoSource,
 } from '@hicommonwealth/shared';
 import type momentType from 'moment';
 import moment from 'moment';
@@ -28,6 +30,7 @@ class Account {
 
   private _addressId?: number;
   private _walletId?: WalletId;
+  private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
 
@@ -52,6 +55,7 @@ class Account {
     signedInProfile,
     ignoreProfile = true,
     lastActive,
+    walletSsoSource,
   }: {
     // required args
     community: AccountCommunity;
@@ -65,6 +69,7 @@ class Account {
     validationBlockInfo?: string;
     profile?: MinimumProfile;
     lastActive?: string | momentType.Moment;
+    walletSsoSource?: WalletSsoSource;
     signedInProfile?: {
       userId: number;
       name?: string;
@@ -82,6 +87,7 @@ class Account {
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
+    this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
     // @ts-expect-error StrictNullChecks
     this._sessionPublicAddress = sessionPublicAddress;
@@ -100,6 +106,7 @@ class Account {
         signedInProfile.avatarUrl ?? '',
         updatedProfile.chain,
         signedInProfile.lastActive ?? null,
+        UserTierMap.IncompleteUser,
       );
       // manually trigger an update signal when data is fetched
       NewProfilesController.Instance.isFetched.emit('redraw');
@@ -121,6 +128,10 @@ class Account {
 
   public setWalletId(walletId: WalletId) {
     this._walletId = walletId;
+  }
+
+  get walletSsoSource() {
+    return this._walletSsoSource;
   }
 
   get validationToken() {

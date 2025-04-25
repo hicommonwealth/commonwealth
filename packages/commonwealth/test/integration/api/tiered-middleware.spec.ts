@@ -1,6 +1,10 @@
 import { Actor, dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
-import { ChainBase, UserTierMap } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  CommunityTierMap,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
@@ -106,6 +110,7 @@ describe('Tiered middleware', () => {
     });
     const [community] = await tester.seed('Community', {
       chain_node_id: server.e2eTestEntities.testChainNodes[0].id,
+      tier: CommunityTierMap.ManuallyVerified,
       base: ChainBase.Ethereum,
       active: true,
       lifetime_thread_count: 0,

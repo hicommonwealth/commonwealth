@@ -21,6 +21,7 @@ const CWRepetitionCycleRadioButton = ({
       className={clsx('repetition-cycle-label', {
         hasInputError: repetitionCycleInputProps?.hasError,
         hasSelectError: repetitionCycleSelectListProps.hasError,
+        disabled: radioButtonProps.disabled,
       })}
     >
       <CWText type="b2">Repeatable</CWText>
@@ -30,7 +31,9 @@ const CWRepetitionCycleRadioButton = ({
         size="small"
         value={repetitionCycleInputProps?.value}
         placeholder={repetitionCycleInputProps?.placeholder}
-        disabled={repetitionCycleInputProps?.isDisabled}
+        disabled={
+          repetitionCycleInputProps?.isDisabled || radioButtonProps.disabled
+        }
         onFocus={stopPropogation}
         onClick={stopPropogation}
         onKeyDown={stopPropogation}
@@ -49,7 +52,10 @@ const CWRepetitionCycleRadioButton = ({
           //  Note: can be hooked to form validation, but errors need to be displayed seperately (unhandled)
           isSearchable={false}
           isClearable={false}
-          isDisabled={repetitionCycleSelectListProps.isDisabled}
+          isDisabled={
+            repetitionCycleSelectListProps.isDisabled ||
+            radioButtonProps.disabled
+          }
           options={repetitionCycleSelectListProps.options}
           value={repetitionCycleSelectListProps.selected}
           placeholder={repetitionCycleSelectListProps.placeholder}
@@ -69,6 +75,7 @@ const CWRepetitionCycleRadioButton = ({
         className={clsx(
           'CWRepetitionCycleRadioButton',
           radioButtonProps.className,
+          { disabled: radioButtonProps.disabled },
         )}
         label={RepetitionCycleLabel}
       />

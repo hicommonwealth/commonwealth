@@ -57,4 +57,10 @@
       text-transform: capitalize;
     }
   }
+
+  .PricePercentageChange {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
