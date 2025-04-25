@@ -24,11 +24,11 @@ async function updateReferralCount(
     (await referrer.update(
       {
         referral_count: models.sequelize.literal(`
-        SELECT COUNT(DISTINCT referee_address)
+        (SELECT COUNT(DISTINCT referee_address)
         FROM "Referrals"
         WHERE referrer_address IN (
           SELECT address from "Addresses" WHERE user_id = ${referrer.id!}
-        )
+        ))
       `),
       },
       { transaction },
