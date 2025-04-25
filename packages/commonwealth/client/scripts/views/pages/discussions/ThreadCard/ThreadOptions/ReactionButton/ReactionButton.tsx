@@ -20,6 +20,7 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
+import { InsufficientBalanceModal } from 'views/modals/InsufficientBalanceModal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
@@ -40,6 +41,8 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isInsufficientBalanceModalOpen, setIsInsufficientBalanceModalOpen] =
+    useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -125,9 +128,7 @@ export const ReactionButton = ({
           return;
         }
         if ((e.message as string)?.includes('Insufficient token balance')) {
-          notifyError(
-            'You must have the requisite tokens to upvote in this topic',
-          );
+          setIsInsufficientBalanceModalOpen(true);
         } else {
           notifyError('Failed to upvote');
         }
@@ -196,6 +197,13 @@ export const ReactionButton = ({
       <AuthModal
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
+      />
+      <InsufficientBalanceModal
+        isOpen={isInsufficientBalanceModalOpen}
+        onClose={() => setIsInsufficientBalanceModalOpen(false)}
+        tokenSymbol={thread.topic?.token_symbol}
+        isCommunityStake={!thread.topic?.weighted_voting}
+        communityId={communityId}
       />
     </>
   );
