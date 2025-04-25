@@ -4,24 +4,20 @@ import { createStore } from 'zustand/vanilla';
 
 type OnCancel = () => void;
 
-interface SMSDialogStore {
-  phoneNumber: string | undefined;
-  loading: boolean;
+type InternalState = {
+  active: boolean;
   onCancel: OnCancel | undefined;
-  setState: (
-    phoneNumber: string | undefined,
-    loading: boolean,
-    onCancel: OnCancel | undefined,
-  ) => void;
-}
+};
+
+type SMSDialogStore = InternalState & {
+  setState: (state: InternalState) => void;
+};
 
 export const smsDialogStore = createStore<SMSDialogStore>()(
   devtools((set) => ({
-    phoneNumber: undefined,
-    loading: false,
+    active: false,
     onCancel: () => {},
-    setState: (phoneNumber, loading, onCancel) =>
-      set({ phoneNumber, loading, onCancel }),
+    setState: (newState: InternalState) => set(newState),
   })),
 );
 

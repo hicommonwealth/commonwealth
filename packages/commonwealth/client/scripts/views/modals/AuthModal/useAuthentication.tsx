@@ -84,7 +84,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
-  // FIXME change this to isAuthLoading ...
   const [isMagicLoading, setIsMagicLoading] = useState<boolean>();
   // @ts-expect-error <StrictNullChecks>
   const [signerAccount, setSignerAccount] = useState<Account>(null);
@@ -245,9 +244,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setSMS(tempSMSToUse);
     // this will bring the SMS dialog up so that the user can enter the code we
     // are about to send
-    setSMSDialogState(tempSMSToUse, true, () => {
-      setSMS(undefined);
-      setIsMagicLoading(false);
+    setSMSDialogState({
+      active: true,
+      onCancel: () => {
+        setSMS(undefined);
+        setIsMagicLoading(false);
+      },
     });
     await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
   };
