@@ -120,8 +120,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // TODO: deinit the API, if necessary
     // ...
     if (this._api) {
-      if ((this.api.currentProvider as any)?.connection.connected) {
-        await (this._api.currentProvider as any).connection.close();
+      try {
+        // Add more robust checks before accessing properties
+        const provider = this._api.currentProvider as any;
+        if (provider?.connection?.connected) {
+          await provider.connection.close();
+          console.log('Ethereum provider connection closed.');
+        }
+      } catch (error) {
+        console.error('Error closing Ethereum provider connection:', error);
       }
       // @ts-expect-error StrictNullChecks
       this._api = null;
