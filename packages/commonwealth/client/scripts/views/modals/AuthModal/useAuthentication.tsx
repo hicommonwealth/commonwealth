@@ -8,6 +8,7 @@ import {
   verifySession,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -90,6 +91,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+  const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
   const { setState: setSMSDialogState } = useSMSDialogStore();
@@ -134,12 +136,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     };
   }, [handlePrivyError, handlePrivySuccess]);
 
-  console.log('FIXME loading privy... ');
-  const { onInitOAuth, authenticated, loading, logout } = usePrivyAuthWithOAuth(
-    'google_oauth',
-    privyCallbacks,
-  );
-
+  const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
   const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
@@ -319,7 +316,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     console.log('onSocialLoginPrivy: ' + provider);
 
-    onInitOAuth();
+    privyAuthWithOAuth.onInitOAuth(provider);
   };
 
   // determine which login system to use...

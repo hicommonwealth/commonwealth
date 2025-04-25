@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
 import { LoginWithPhone } from 'views/components/PrivyTest/LoginWithPhone';
-import { PrivyAuthMethod } from 'views/components/PrivyTest/PrivyAuthMethod';
+import { PrivySignInSSOProvider } from 'views/components/PrivyTest/types';
 import { LoginWithEmail } from './LoginWithEmail';
 
 /**
@@ -10,7 +10,7 @@ import { LoginWithEmail } from './LoginWithEmail';
  */
 export const LoginWithPrivy = () => {
   const [privyAuthMethod, setPrivyAuthMethod] = useState<
-    PrivyAuthMethod | undefined
+    PrivySignInSSOProvider | undefined
   >(undefined);
 
   if (!privyAuthMethod) {

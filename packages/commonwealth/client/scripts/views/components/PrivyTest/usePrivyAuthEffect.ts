@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import useUserStore from 'state/ui/user';
-import { PrivyAuthMethod } from 'views/components/PrivyTest/PrivyAuthMethod';
 import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
+import { PrivySignInSSOProvider } from 'views/components/PrivyTest/types';
 import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
 import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
 
@@ -18,7 +18,10 @@ export function usePrivyAuthEffect(props: PrivyCallbacks) {
   const userStore = useUserStore();
 
   return useCallback(
-    (ssoProvider: PrivyAuthMethod, ssoOAuthToken: string | undefined) => {
+    (
+      ssoProvider: PrivySignInSSOProvider,
+      ssoOAuthToken: string | undefined,
+    ) => {
       async function doAsync() {
         if (userStore.isLoggedIn) {
           console.log('userStore isLoggedIn');

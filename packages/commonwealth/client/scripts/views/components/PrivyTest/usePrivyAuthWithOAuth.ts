@@ -1,19 +1,18 @@
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   useLoginWithOAuth,
   useOAuthTokens,
   usePrivy,
 } from '@privy-io/react-auth';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
 import { usePrivyAuthEffect } from 'views/components/PrivyTest/usePrivyAuthEffect';
+import { OAuthProvider, toSignInProvider } from './types';
 
 /**
  * Use privy auth with OAuth providers. Like google.
  */
-export function usePrivyAuthWithOAuth(
-  provider: 'google_oauth',
-  props: PrivyCallbacks,
-) {
+export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   const { onError } = props;
 
   const [oAuthAccessToken, setOAuthAccessToken] = useState<string | undefined>(
@@ -22,6 +21,7 @@ export function usePrivyAuthWithOAuth(
   const privyAuthEffect = usePrivyAuthEffect(props);
   const { authenticated, logout } = usePrivy();
   const { loading, initOAuth } = useLoginWithOAuth();
+  const providerRef = useRef<OAuthProvider | undefined>(undefined);
 
   useOAuthTokens({
     onOAuthTokenGrant: (params) => {
@@ -32,26 +32,52 @@ export function usePrivyAuthWithOAuth(
 
   useEffect(() => {
     if (!oAuthAccessToken) {
-      console.log('FIXME: No oAuthAccessToken');
       return;
     }
 
-    privyAuthEffect(provider, oAuthAccessToken);
-  }, [oAuthAccessToken, privyAuthEffect, provider]);
-
-  const onInitOAuth = useCallback(() => {
-    async function doAsync() {
-      console.log("FIXME: onInitOAuth: 'google_oauth'");
-      await initOAuth({ provider: 'google' });
+    if (!providerRef.current) {
+      console.warn('No provider.');
+      return;
     }
 
-    doAsync().catch((err) => {
-      console.error(err);
-      onError(err);
-    });
-  }, [initOAuth, onError]);
+    privyAuthEffect(toSignInProvider(providerRef.current), oAuthAccessToken);
+  }, [oAuthAccessToken, privyAuthEffect]);
+
+  const onInitOAuth = useCallback(
+    (provider: OAuthProvider | WalletSsoSource) => {
+      async function doAsync() {
+        if (isOauthProvider(provider)) {
+          providerRef.current = provider;
+          await initOAuth({ provider });
+        } else {
+          throw new Error('Not supported: ' + provider);
+        }
+      }
+
+      doAsync().catch((err) => {
+        console.error(err);
+        onError(err);
+      });
+    },
+    [initOAuth, onError],
+  );
 
   return useMemo(() => {
     return { onInitOAuth, authenticated, logout, loading };
   }, [authenticated, logout, onInitOAuth, loading]);
+}
+
+function isOauthProvider(
+  value: WalletSsoSource | OAuthProvider,
+): value is OAuthProvider {
+  switch (value) {
+    case 'google':
+    case 'github':
+    case 'discord':
+    case 'twitter':
+    case 'apple':
+      return true;
+    default:
+      return false;
+  }
 }
