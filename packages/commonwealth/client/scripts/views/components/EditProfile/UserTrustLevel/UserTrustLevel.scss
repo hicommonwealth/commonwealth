@@ -9,8 +9,23 @@
 
 .level-box {
   border-radius: 8px;
+  display: flex;
   padding: 16px;
   border: 1.5px solid transparent;
+  justify-content: start;
+  gap: 16px;
+
+  .tier-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .level-box-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 
   &.level-green {
     border-color: $green-200;
