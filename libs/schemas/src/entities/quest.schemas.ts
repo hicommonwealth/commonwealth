@@ -175,9 +175,6 @@ export const KyoFinanceSwapQuestAction = sharedQuestActionMeta.extend({
   metadata: KyoFinanceSwapQuestRequestParams,
 });
 
-const x = {} as unknown as z.infer<typeof KyoFinanceSwapQuestAction>;
-console.log(x.metadata.inputToken);
-
 export const KyoFinanceLpQuestAction = sharedQuestActionMeta.extend({
   event_name: z.literal('KyoFinanceLpQuestVerified'),
   metadata: KyoFinanceLpQuestRequestParams,
