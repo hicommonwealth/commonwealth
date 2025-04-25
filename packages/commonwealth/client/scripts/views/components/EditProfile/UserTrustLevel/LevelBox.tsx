@@ -4,6 +4,15 @@ import { CWText } from '../../component_kit/cw_text';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
 import { Status } from './types';
 
+type ComponentIcon =
+  | 'stopSymbol'
+  | 'socialVerified'
+  | 'sandClock'
+  | 'globe'
+  | 'pins'
+  | 'whiteCheck'
+  | 'starGolden';
+
 interface LevelBoxProps {
   level: number;
   title: string;
@@ -11,14 +20,7 @@ interface LevelBoxProps {
   color: string;
   status: Status;
   isLocked: boolean;
-  icon?:
-    | 'stopSymbol'
-    | 'socialVerified'
-    | 'sandClock'
-    | 'globe'
-    | 'pins'
-    | 'whiteCheck'
-    | 'starGolden';
+  icon?: ComponentIcon;
   items?: Array<{ label: string }>;
 }
 
