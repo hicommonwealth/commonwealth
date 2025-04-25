@@ -646,6 +646,9 @@ importers:
       '@solana/web3.js':
         specifier: ^1.91.6
         version: 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      alchemy-sdk:
+        specifier: ^3.5.7
+        version: 3.5.7(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       async-mutex:
         specifier: ^0.5.0
         version: 0.5.0
@@ -9418,6 +9421,9 @@ packages:
 
   alchemy-sdk@3.4.1:
     resolution: {integrity: sha512-GeL8J6VIiE7tIgXevkcm0VqdZnhO0EpOXQQCzUMsoMrj92hBKj9ZmUjyPxXF8tUdsHYixQApng2eJXoRWmv5lw==}
+
+  alchemy-sdk@3.5.7:
+    resolution: {integrity: sha512-/3EXnmSbMsIoWzkl50VF64eTfNfqc6kSP+MdnJHBtzHiIJWpksG5KupYdok0yRlft3P5nt7vK7CwP/aPXmG4Xg==}
 
   alge@0.8.1:
     resolution: {integrity: sha512-kiV9nTt+XIauAXsowVygDxMZLplZxDWt0W8plE/nB32/V2ziM/P/TxDbSVK7FYIUt2Xo16h3/htDh199LNPCKQ==}
@@ -26751,7 +26757,7 @@ snapshots:
   '@metaplex-foundation/beet-solana@0.3.1(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
-      '@solana/web3.js': 1.95.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       bs58: 5.0.0
       debug: 4.3.7(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -26763,7 +26769,7 @@ snapshots:
   '@metaplex-foundation/beet-solana@0.4.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
-      '@solana/web3.js': 1.95.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       bs58: 5.0.0
       debug: 4.3.7(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -26775,7 +26781,7 @@ snapshots:
   '@metaplex-foundation/beet-solana@0.4.1(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
-      '@solana/web3.js': 1.95.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       bs58: 5.0.0
       debug: 4.3.7(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -30484,7 +30490,7 @@ snapshots:
   '@solana/spl-token@0.1.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@babel/runtime': 7.26.0
-      '@solana/web3.js': 1.95.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       buffer: 6.0.3
       buffer-layout: 1.2.2
@@ -34064,6 +34070,30 @@ snapshots:
       - supports-color
       - utf-8-validate
     optional: true
+
+  alchemy-sdk@3.5.7(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10):
+    dependencies:
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/abstract-provider': 5.7.0
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/contracts': 5.7.0
+      '@ethersproject/hash': 5.7.0
+      '@ethersproject/networks': 5.7.1
+      '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ethersproject/units': 5.7.0
+      '@ethersproject/wallet': 5.7.0
+      '@ethersproject/web': 5.7.1
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      axios: 1.7.7(debug@4.3.7)
+      sturdy-websocket: 0.2.1
+      websocket: 1.0.35
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - supports-color
+      - utf-8-validate
 
   alge@0.8.1:
     dependencies:
@@ -44867,8 +44897,7 @@ snapshots:
 
   structured-headers@0.4.1: {}
 
-  sturdy-websocket@0.2.1:
-    optional: true
+  sturdy-websocket@0.2.1: {}
 
   style-mod@4.1.2: {}
 

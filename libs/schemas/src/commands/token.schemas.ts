@@ -53,3 +53,20 @@ export const GetTokenizedThreadsAllowed = {
     thread_purchase_token: z.string().nullish(),
   }),
 };
+
+export const GetTokenInfoAlchemy = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    token_address: z.string(),
+  }),
+  output: z.object({
+    symbol: z.string(),
+    currency: z.string(),
+    data: z.object({
+      value: z.string(),
+      timestamp: z.string(),
+      marketCap: z.string(),
+      totalVolume: z.string(),
+    }),
+  }),
+};
