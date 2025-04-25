@@ -23,7 +23,7 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
 with top as (
 	select
 		user_id,
-		sum(xp_points)::int + sum(xp_referrer_points)::int as xp_points
+		sum(xp_points)::int + sum(coalesce(xp_referrer_points, 0))::int as xp_points
 	from "XpLogs" l
 		join "QuestActionMetas" m on l.action_meta_id = m.id
 		join "Quests" q on m.quest_id = q.id
@@ -44,7 +44,7 @@ from
         : `
 select
  	id as user_id,
- 	xp_points + xp_referrer_points as xp_points,
+ 	xp_points + coalesce(xp_referrer_points, 0) as xp_points,
  	tier,
  	profile->>'name' as user_name,
  	profile->>'avatar_url' as avatar_url
