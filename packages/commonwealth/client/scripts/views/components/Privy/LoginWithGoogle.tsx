@@ -5,14 +5,16 @@ import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOA
 export const LoginWithGoogle = () => {
   const callbacks = useDefaultAuthCallbacks();
 
-  const { onInitOAuth, authenticated, loading, logout } = usePrivyAuthWithOAuth(
-    'google_oauth',
-    callbacks,
-  );
+  const { onInitOAuth, authenticated, loading, logout } =
+    usePrivyAuthWithOAuth(callbacks);
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
   }, [logout]);
+
+  const handleLogin = useCallback(() => {
+    onInitOAuth('google');
+  }, [onInitOAuth]);
 
   if (authenticated) {
     return (
@@ -25,7 +27,7 @@ export const LoginWithGoogle = () => {
   }
 
   return (
-    <button onClick={onInitOAuth} disabled={loading}>
+    <button onClick={handleLogin} disabled={loading}>
       {loading ? 'Logging in...' : 'Log in with Google'}
     </button>
   );
