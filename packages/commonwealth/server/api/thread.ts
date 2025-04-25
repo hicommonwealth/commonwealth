@@ -24,11 +24,22 @@ export const trpcRouter = trpc.router({
     trpc.fireAndForget(
       async (
         _,
-        { id, created_at, user_tier_at_creation, community_id, community_tier },
+        {
+          id,
+          created_at,
+          user_tier_at_creation,
+          community_id,
+          community_tier,
+          marked_as_spam_at,
+        },
       ) => {
-        if (user_tier_at_creation) {
+        if (!marked_as_spam_at) {
           await createThreadRank(
-            { id: id!, created_at: created_at!, user_tier_at_creation },
+            {
+              id: id!,
+              created_at: created_at!,
+              user_tier_at_creation: user_tier_at_creation!,
+            },
             { id: community_id, tier: community_tier },
           );
         }
@@ -51,12 +62,39 @@ export const trpcRouter = trpc.router({
       ),
     ),
     trpc.fireAndForget(
-      async ({ spam }, { id, community_id, marked_as_spam_at }) => {
+      async (
+        { spam },
+        {
+          id,
+          community_id,
+          marked_as_spam_at,
+          created_at,
+          user_tier_at_creation,
+          spam_toggled,
+        },
+      ) => {
+        if (!user_tier_at_creation || !spam_toggled) return;
+
         if (spam === true && marked_as_spam_at !== null) {
           await updateRankOnThreadIneligibility({
             thread_id: id!,
             community_id,
           });
+        } else if (spam === false && marked_as_spam_at === null) {
+          const community = await models.Community.findOne({
+            attributes: ['tier'],
+            where: {
+              id: community_id,
+            },
+          });
+          if (!community) return;
+          await createThreadRank(
+            { id: id!, created_at: created_at!, user_tier_at_creation },
+            {
+              id: community_id,
+              tier: community.tier,
+            },
+          );
         }
       },
     ),
@@ -76,7 +114,7 @@ export const trpcRouter = trpc.router({
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             community_id,
             thread_id,
-            user_tier_at_creation: user_tier_at_creation || 1,
+            user_tier_at_creation: user_tier_at_creation!,
           });
         },
       ),
@@ -105,6 +143,7 @@ export const trpcRouter = trpc.router({
     //   await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
     // }),
     trpc.fireAndForget(async (_, { thread_id, user_tier_at_creation }) => {
+      if (!user_tier_at_creation) return;
       if (thread_id) {
         const thread = await models.Thread.findOne({
           attributes: ['community_id'],
@@ -114,7 +153,7 @@ export const trpcRouter = trpc.router({
           await decrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             thread_id,
             community_id: thread.community_id,
-            user_tier_at_creation: user_tier_at_creation || 1,
+            user_tier_at_creation: user_tier_at_creation,
           });
         }
       }

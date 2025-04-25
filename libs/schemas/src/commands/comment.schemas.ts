@@ -67,6 +67,9 @@ export const ToggleCommentSpam = {
     comment_id: PG_INT,
     spam: z.boolean(),
   }),
-  output: Comment.extend({ community_id: z.string() }),
+  output: Comment.extend({
+    community_id: z.string(),
+    spam_toggled: z.boolean(),
+  }),
   context: CommentContext,
 };

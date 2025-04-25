@@ -52,7 +52,7 @@ export const UpdateThread = {
     is_linking_token: z.boolean().optional(),
     launchpad_token_address: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ spam_toggled: z.boolean() }),
   context: ThreadContext,
 };
 

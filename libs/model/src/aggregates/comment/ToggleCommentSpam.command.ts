@@ -12,11 +12,13 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
     ],
     body: async ({ actor, payload, context }) => {
       const { comment, community_id } = mustBeAuthorizedComment(actor, context);
+      let spamToggled = false;
 
       if (payload.spam && !comment.marked_as_spam_at) {
         comment.marked_as_spam_at = new Date();
         comment.search = null;
         await comment.save();
+        spamToggled = true;
       } else if (!payload.spam && comment.marked_as_spam_at) {
         // Update search index when unmarking as spam
         let body = comment.body;
@@ -27,6 +29,7 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
         comment.search = getCommentSearchVector(body);
         comment.marked_as_spam_at = null;
         await comment.save();
+        spamToggled = true;
       }
 
       const address = await models.Address.findOne({
@@ -43,7 +46,7 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
       const formattedComment = comment.get({ plain: true });
       if (address) formattedComment.Address = address.get({ plain: true });
 
-      return { ...formattedComment, community_id };
+      return { ...formattedComment, community_id, spam_toggled: spamToggled };
     },
   };
 }

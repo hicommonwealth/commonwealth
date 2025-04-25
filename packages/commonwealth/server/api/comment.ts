@@ -17,7 +17,7 @@ export const trpcRouter = trpc.router({
         await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
           community_id,
           thread_id,
-          user_tier_at_creation: user_tier_at_creation || 1,
+          user_tier_at_creation: user_tier_at_creation!,
         });
       },
     ),
@@ -52,22 +52,46 @@ export const trpcRouter = trpc.router({
   deleteComment: trpc.command(Comment.DeleteComment, trpc.Tag.Comment, [
     trpc.fireAndForget(
       async (_, { thread_id, community_id, user_tier_at_creation }) => {
+        if (!user_tier_at_creation) return;
         await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
           thread_id,
           community_id,
-          user_tier_at_creation: user_tier_at_creation || 1,
+          user_tier_at_creation: user_tier_at_creation,
         });
       },
     ),
   ]),
   toggleCommentSpam: trpc.command(Comment.ToggleCommentSpam, trpc.Tag.Comment, [
     trpc.fireAndForget(
-      async (_, { thread_id, community_id, user_tier_at_creation }) => {
-        await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
+      async (
+        { spam },
+        {
           thread_id,
           community_id,
-          user_tier_at_creation: user_tier_at_creation || 1,
-        });
+          user_tier_at_creation,
+          marked_as_spam_at,
+          spam_toggled,
+        },
+      ) => {
+        if (!user_tier_at_creation) return;
+
+        if (spam === true && marked_as_spam_at !== null && spam_toggled) {
+          await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
+            thread_id,
+            community_id,
+            user_tier_at_creation: user_tier_at_creation,
+          });
+        } else if (
+          spam === false &&
+          marked_as_spam_at === null &&
+          spam_toggled
+        ) {
+          await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
+            community_id,
+            thread_id,
+            user_tier_at_creation,
+          });
+        }
       },
     ),
   ]),
