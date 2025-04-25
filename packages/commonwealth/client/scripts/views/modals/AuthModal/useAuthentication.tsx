@@ -44,6 +44,7 @@ import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
 import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
+import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -114,7 +115,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const handlePrivySuccess = useCallback(() => {
     console.log('FIXME: privy success!');
     // FIXME: this needs to work properly.
-    const landingURL = new URL('/', window.location.href).toString();
+    const landingURL = new URL(
+      '/dashboard/for-you',
+      window.location.href,
+    ).toString();
     document.location.href = landingURL;
   }, []);
 
@@ -134,6 +138,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     'google_oauth',
     privyCallbacks,
   );
+
+  const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
@@ -193,7 +199,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
-  const onSMSLogin = async (phoneNumber = '') => {
+  const onSMSLoginMagic = async (phoneNumber = '') => {
+    console.log('FIXME: onSMSLogin: ' + phoneNumber + '');
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
 
@@ -225,6 +232,19 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  const onSMSLoginPrivy = async (phoneNumber) => {
+    console.log('FIXME: onSMSLogin: ' + phoneNumber);
+
+    setIsMagicLoading(true);
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+
+    //privy
+  };
+  const onSMSLogin = onSMSLoginMagic;
+
+  //const onSMSLogin = onSMSLoginPrivy;
 
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;

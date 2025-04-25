@@ -8,6 +8,8 @@ export function usePrivyAuthWithPhone(props: PrivyCallbacks) {
   const { sendCode, loginWithCode } = useLoginWithSms();
   const privyAuthEffect = usePrivyAuthEffect(props);
 
+  // FIXME: DO NOT export loginWithCode I think... do this in our own dialog
+  // we're working on
   useEffect(() => {
     privyAuthEffect('phone', undefined);
   }, [privyAuthEffect]);
