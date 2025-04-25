@@ -65,6 +65,11 @@ async function queryExternalApi<
   let jsonRes: any;
   try {
     const res = await fetch(urlObj.toString());
+    if (!res.ok)
+      throw new Error(
+        `Fetching external quest data failed with status code ${res.status}`,
+      );
+
     jsonRes = await res.json();
   } catch (e) {
     log.error(
