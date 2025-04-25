@@ -1,18 +1,19 @@
-import { useLoginWithSms } from '@privy-io/react-auth';
+import { useLoginWithSms, usePrivy } from '@privy-io/react-auth';
 
 import { useEffect, useMemo } from 'react';
 import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
 import { usePrivyAuthEffect } from 'views/components/PrivyTest/usePrivyAuthEffect';
 
 export function usePrivyAuthWithPhone(props: PrivyCallbacks) {
+  const { authenticated } = usePrivy();
   const { sendCode, loginWithCode } = useLoginWithSms();
   const privyAuthEffect = usePrivyAuthEffect(props);
 
-  // FIXME: DO NOT export loginWithCode I think... do this in our own dialog
-  // we're working on
   useEffect(() => {
-    privyAuthEffect('phone', undefined);
-  }, [privyAuthEffect]);
+    if (authenticated) {
+      privyAuthEffect('phone', undefined);
+    }
+  }, [privyAuthEffect, authenticated]);
 
   return useMemo(() => {
     return {

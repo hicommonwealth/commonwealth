@@ -5,6 +5,7 @@ import {
   getSessionSigners,
   WalletId,
 } from '@hicommonwealth/shared';
+import { usePrivy } from '@privy-io/react-auth';
 import axios from 'axios';
 import {
   LocalStorageKeys,
@@ -50,24 +51,6 @@ const resetWalletConnectSession = async () => {
   await walletConnectWallet.reset();
 };
 
-export const handleLogout = async () => {
-  try {
-    await axios.get(`${SERVER_URL}/logout`);
-    await initAppState();
-    await resetWalletConnectSession();
-    for (const signer of getSessionSigners()) {
-      signer.target.clear();
-    }
-    notifySuccess('Signed out');
-    darkModeStore.getState().setDarkMode(false);
-    setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
-    setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
-  } catch (err) {
-    notifyError('Something went wrong during logging out.');
-    window.location.reload();
-  }
-};
-
 interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
   isMenuOpen: boolean;
@@ -93,6 +76,9 @@ const useUserMenuItems = ({
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
   const xpEnabled = useFlag('xp');
+  const privyEnabled = useFlag('privy');
+
+  const { ready, authenticated, logout } = usePrivy();
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -118,6 +104,27 @@ const useUserMenuItems = ({
     app.activeChainId() &&
     !userData?.activeAccount &&
     uniqueChainAddresses?.length > 0;
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await axios.get(`${SERVER_URL}/logout`);
+      await initAppState();
+      await resetWalletConnectSession();
+      for (const signer of getSessionSigners()) {
+        signer.target.clear();
+      }
+      if (privyEnabled && authenticated) {
+        await logout();
+      }
+      notifySuccess('Signed out');
+      darkModeStore.getState().setDarkMode(false);
+      setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
+      setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
+    } catch (err) {
+      notifyError('Something went wrong during logging out.');
+      window.location.reload();
+    }
+  }, [authenticated, logout, privyEnabled]);
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
