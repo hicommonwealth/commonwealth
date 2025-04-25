@@ -2,15 +2,26 @@ import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 
+type OnCancel = () => void;
+
 interface SMSDialogStore {
   phoneNumber: string | undefined;
-  setPhoneNumber: (phoneNumber: string | undefined) => void;
+  loading: boolean;
+  onCancel: OnCancel | undefined;
+  setState: (
+    phoneNumber: string | undefined,
+    loading: boolean,
+    onCancel: OnCancel | undefined,
+  ) => void;
 }
 
 export const smsDialogStore = createStore<SMSDialogStore>()(
   devtools((set) => ({
     phoneNumber: undefined,
-    setPhoneNumber: (phoneNumber) => set({ phoneNumber }),
+    loading: false,
+    onCancel: () => {},
+    setState: (phoneNumber, loading, onCancel) =>
+      set({ phoneNumber, loading, onCancel }),
   })),
 );
 

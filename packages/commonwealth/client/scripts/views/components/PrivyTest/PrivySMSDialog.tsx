@@ -6,7 +6,11 @@ import useSMSDialogStore from 'views/components/PrivyTest/usePrivySMSDialogStore
  * Background dialog that we run along with the store so that we can finish auth.
  */
 export const PrivySMSDialog = () => {
-  const { phoneNumber, setPhoneNumber } = useSMSDialogStore();
+  const {
+    phoneNumber,
+    setState: setSMSDialogStore,
+    onCancel,
+  } = useSMSDialogStore();
   const [code, setCode] = useState<string>('');
   const { loginWithCode } = useLoginWithSms();
 
@@ -14,9 +18,13 @@ export const PrivySMSDialog = () => {
     async function doAsync() {
       await loginWithCode({ code });
     }
-    // FIXME: how should we share callbacks?
     doAsync().catch(console.error);
   }, [loginWithCode, code]);
+
+  const handleCancel = useCallback(() => {
+    onCancel?.();
+    setSMSDialogStore(undefined, false, undefined);
+  }, [onCancel, setSMSDialogStore]);
 
   if (!phoneNumber) return null;
 
@@ -38,7 +46,7 @@ export const PrivySMSDialog = () => {
 
       <button onClick={handleLoginWithCode}>Verify Code</button>
 
-      <button onClick={() => setPhoneNumber(undefined)}>cancel</button>
+      <button onClick={handleCancel}>cancel</button>
     </div>
   );
 };

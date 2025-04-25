@@ -93,7 +93,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
-  const { setPhoneNumber } = useSMSDialogStore();
+  const { setState: setSMSDialogStoreState } = useSMSDialogStore();
 
   const user = useUserStore();
 
@@ -238,14 +238,20 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onSMSLoginPrivy = async (phoneNumber) => {
     console.log('FIXME: onSMSLogin: ' + phoneNumber);
 
+    // TODO: make sure cancel resets the loading...
+
     setIsMagicLoading(true);
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
-    setPhoneNumber(tempSMSToUse);
+    // this will bring the SMS dialog up so that the user can enter the code we
+    // are about to send
+    setSMSDialogStoreState(tempSMSToUse, true, () => {
+      setSMS(undefined);
+      setIsMagicLoading(false);
+    });
     await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
   };
   //const onSMSLogin = onSMSLoginMagic;
-
   const onSMSLogin = onSMSLoginPrivy;
 
   const onEmailLogin = async (emailToUse = '') => {
