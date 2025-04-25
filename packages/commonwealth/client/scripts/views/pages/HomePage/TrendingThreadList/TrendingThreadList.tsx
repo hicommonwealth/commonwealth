@@ -22,6 +22,7 @@ import { useFetchThreadsQuery } from 'client/scripts/state/api/threads';
 import useUserStore from 'client/scripts/state/ui/user';
 import { VirtuosoGrid } from 'react-virtuoso';
 import Permissions from 'utils/Permissions';
+import { EmptyThreadCard } from 'views/components/EmptyThreadCard/EmptyThreadCard';
 import { z } from 'zod';
 import { PageNotFound } from '../../404';
 import { ThreadCard } from '../../discussions/ThreadCard';
@@ -275,11 +276,7 @@ const TrendingThreadList = ({
             </div>
           </div>
         )}
-        <>
-          <CWText type="h2" className="empty-thread">
-            No threads found
-          </CWText>
-        </>
+        <EmptyThreadCard />
       </div>
     );
   }
@@ -295,38 +292,31 @@ const TrendingThreadList = ({
           </div>
         </div>
       )}
-      <>
-        {!isLoading && !feed && (
-          <CWText type="h2" className="empty-thread">
-            No threads found
-          </CWText>
-        )}
-        {isLoading ? (
-          <div className="content">
-            <>
-              <Skeleton height="300px" />
-              <Skeleton height="300px" />
-            </>
-          </div>
-        ) : (
-          <div className="content">
-            <VirtuosoGrid
-              overscan={50}
-              customScrollParent={customScrollParent}
-              totalCount={allThreads?.length || DEFAULT_COUNT}
-              data={allThreads || []}
-              style={{ width: '100%', height: '100%' }}
-              itemContent={(i, thread) => (
-                <FeedThread
-                  key={i}
-                  thread={communityIdFilter ? thread : mapThread(thread)}
-                  onClick={() => {}}
-                />
-              )}
-            />
-          </div>
-        )}
-      </>
+      {isLoading ? (
+        <div className="content">
+          <>
+            <Skeleton height="300px" />
+            <Skeleton height="300px" />
+          </>
+        </div>
+      ) : (
+        <div className="content">
+          <VirtuosoGrid
+            overscan={50}
+            customScrollParent={customScrollParent}
+            totalCount={allThreads?.length || DEFAULT_COUNT}
+            data={allThreads || []}
+            style={{ width: '100%', height: '100%' }}
+            itemContent={(i, thread) => (
+              <FeedThread
+                key={i}
+                thread={communityIdFilter ? thread : mapThread(thread)}
+                onClick={() => {}}
+              />
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };

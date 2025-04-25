@@ -1,0 +1,39 @@
+.EmptyThreadCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px; // Keep sufficient padding for empty state content
+  min-height: 250px; // Maintain minimum height similar to other cards
+  width: 325px; // Set fixed width to match ThreadCard
+  height: 280px; // Set fixed height to match ThreadCard
+  box-sizing: border-box; // Include padding and border in the element's total width and height
+  margin: 10px 0; // Add similar margin as .content might have provided
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px; // Spacing between elements
+
+    .icon {
+      color: var(--grey-600); // Or appropriate color from theme
+      margin-bottom: 8px; // Extra space below icon
+    }
+
+    .title {
+      color: var(--grey-900);
+    }
+
+    .subtitle {
+      color: var(--grey-700);
+      max-width: 300px; // Prevent text from getting too wide
+    }
+
+    .start-thread-button {
+      margin-top: 16px; // Extra space above button
+      min-width: 200px; // Ensure button has a decent width
+    }
+  }
+}
