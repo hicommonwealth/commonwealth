@@ -234,10 +234,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onSMSLoginPrivy = async (phoneNumber) => {
-    console.log('FIXME: onSMSLogin: ' + phoneNumber);
-
-    // TODO: make sure cancel resets the loading...
-
     setIsMagicLoading(true);
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
@@ -310,9 +306,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       });
       await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
 
-      // FIXME: I need to handle these now...
+      // TODO: I need to handle these now...
       // setIsMagicLoading(false);
-      // FIXME: trackLoginEvent('email', true);
+      // TODO: trackLoginEvent('email', true);
     } catch (e) {
       notifyError(`Error authenticating with email`);
       console.error(`Error authenticating with email: ${e}`);

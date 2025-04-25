@@ -26,10 +26,12 @@ export function usePrivySignOn() {
     async (props: UsePrivySignOnProps) => {
       const { wallet, ssoOAuthToken, ssoProvider, onSuccess } = props;
 
-      const ethereumProvider = async () => await wallet.getEthereumProvider();
+      const ethereumProvider = async () => {
+        return await wallet.getEthereumProvider();
+      };
       const signMessageProvider = async (message: string): Promise<string> => {
         const uiOptions = {
-          title: 'Authenticate',
+          title: 'Authenticate with Common',
         };
 
         const { signature } = await signMessage({ message }, { uiOptions });
