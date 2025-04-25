@@ -1,5 +1,5 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -75,20 +75,10 @@ const mockTopHolders = [
 let instanceCounter = 0;
 
 const TopHolders = () => {
-  const componentId = useState(() => ++instanceCounter)[0];
-  console.log(`[TopHolders-${componentId}] Component initializing`);
   const navigate = useCommonNavigate();
 
   // Hardcode isWindowSmallInclusive to false for now to prevent resize issues
   const isWindowSmallInclusive = false;
-
-  // Simple component lifecycle logging
-  useEffect(() => {
-    console.log(`[TopHolders-${componentId}] Component mounted`);
-    return () => {
-      console.log(`[TopHolders-${componentId}] Component unmounted`);
-    };
-  }, [componentId]);
 
   const columnInfo: CWTableColumnInfo[] = [
     {
@@ -161,7 +151,6 @@ const TopHolders = () => {
     };
   });
 
-  console.log(`[TopHolders-${componentId}] Rendering component`);
   return (
     <div className="TopHolders">
       <div className="heading-container">
