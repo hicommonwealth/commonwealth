@@ -1,7 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { PrivyTest } from 'views/components/PrivyTest/PrivyTest';
+import { PrivyTest } from 'views/components/Privy/PrivyTest';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';

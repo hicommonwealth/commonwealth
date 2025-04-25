@@ -1,35 +1,35 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { useCallback, useState } from 'react';
-import { useDefaultAuthCallbacks } from 'views/components/PrivyTest/useDefaultAuthCallbacks';
-import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
+import { useDefaultAuthCallbacks } from 'views/components/Privy/useDefaultAuthCallbacks';
+import { usePrivyAuthWithPhone } from 'views/components/Privy/usePrivyAuthWithPhone';
 
-export const LoginWithEmail = () => {
+export const LoginWithPhone = () => {
   const { authenticated, logout } = usePrivy();
-  const [stage, setStage] = useState<'enter-email' | 'wait-for-code'>(
-    'enter-email',
+  const [stage, setStage] = useState<'enter-phone-number' | 'wait-for-code'>(
+    'enter-phone-number',
   );
 
-  const [email, setEmail] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [code, setCode] = useState<string>('');
 
   const callbacks = useDefaultAuthCallbacks();
 
-  const { sendCode, loginWithCode } = usePrivyAuthWithEmail(callbacks);
+  const { sendCode, loginWithCode } = usePrivyAuthWithPhone(callbacks);
 
   const handleLogout = useCallback(() => {
     logout().catch(console.error);
-    setStage('enter-email');
-    setEmail('');
+    setStage('enter-phone-number');
+    setPhoneNumber('');
     setCode('');
   }, [logout]);
 
   const handleSendCode = useCallback(() => {
     async function doAsync() {
-      await sendCode({ email });
+      await sendCode({ phoneNumber });
       setStage('wait-for-code');
     }
     doAsync().catch(callbacks.onError);
-  }, [callbacks.onError, sendCode, email]);
+  }, [callbacks.onError, sendCode, phoneNumber]);
 
   const handleLoginWithCode = useCallback(() => {
     async function doAsync() {
@@ -48,14 +48,14 @@ export const LoginWithEmail = () => {
 
   return (
     <>
-      {stage === 'enter-email' && (
+      {stage === 'enter-phone-number' && (
         <>
           <input
-            placeholder="Enter email"
+            placeholder="Enter phone number"
             type="tel"
             required
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            value={email}
+            onChange={(e) => setPhoneNumber(e.currentTarget.value)}
+            value={phoneNumber}
           />
           <button onClick={handleSendCode}>Send Code</button>
         </>

@@ -4,8 +4,8 @@ import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/pri
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback } from 'react';
 import { useSignIn } from 'state/api/user';
-import { useIdentityTokenRef } from 'views/components/PrivyTest/useIdentityTokenRef';
-import { useSignMessageMemo } from 'views/components/PrivyTest/useSignMessageMemo';
+import { useIdentityTokenRef } from 'views/components/Privy/useIdentityTokenRef';
+import { useSignMessageMemo } from 'views/components/Privy/useSignMessageMemo';
 
 type UsePrivySignOnProps = {
   onSuccess: (address: string, isNewlyCreated: boolean) => void;

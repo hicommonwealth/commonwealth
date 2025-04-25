@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import useUserStore from 'state/ui/user';
-import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
-import { PrivySignInSSOProvider } from 'views/components/PrivyTest/types';
-import { useConnectedWallet } from 'views/components/PrivyTest/useConnectedWallet';
-import { usePrivySignOn } from 'views/components/PrivyTest/usePrivySignOn';
+import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
+import { PrivySignInSSOProvider } from 'views/components/Privy/types';
+import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
+import { usePrivySignOn } from 'views/components/Privy/usePrivySignOn';
 
 /**
  * Provide JUST the logic we need in the useEffect.

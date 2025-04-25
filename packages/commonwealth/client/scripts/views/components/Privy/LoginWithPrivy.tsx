@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { LoginWithGoogle } from 'views/components/PrivyTest/LoginWithGoogle';
-import { LoginWithPhone } from 'views/components/PrivyTest/LoginWithPhone';
-import { PrivySignInSSOProvider } from 'views/components/PrivyTest/types';
+import { LoginWithGoogle } from 'views/components/Privy/LoginWithGoogle';
+import { LoginWithPhone } from 'views/components/Privy/LoginWithPhone';
+import { PrivySignInSSOProvider } from 'views/components/Privy/types';
 import { LoginWithEmail } from './LoginWithEmail';
 
 /**

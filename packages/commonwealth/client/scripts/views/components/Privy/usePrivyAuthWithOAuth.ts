@@ -5,8 +5,8 @@ import {
   usePrivy,
 } from '@privy-io/react-auth';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PrivyCallbacks } from 'views/components/PrivyTest/PrivyCallbacks';
-import { usePrivyAuthEffect } from 'views/components/PrivyTest/usePrivyAuthEffect';
+import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
+import { usePrivyAuthEffect } from 'views/components/Privy/usePrivyAuthEffect';
 import { OAuthProvider, toSignInProvider } from './types';
 
 /**

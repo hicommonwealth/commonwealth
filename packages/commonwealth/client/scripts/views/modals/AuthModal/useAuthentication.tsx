@@ -44,11 +44,11 @@ import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profil
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
-import usePrivyEmailDialogStore from 'views/components/PrivyTest/stores/usePrivyEmailDialogStore';
-import usePrivySMSDialogStore from 'views/components/PrivyTest/stores/usePrivySMSDialogStore';
-import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
-import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
-import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
+import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import { usePrivyAuthWithEmail } from 'views/components/Privy/usePrivyAuthWithEmail';
+import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
+import { usePrivyAuthWithPhone } from 'views/components/Privy/usePrivyAuthWithPhone';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -119,7 +119,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { signIn } = useSignIn();
 
   const handlePrivySuccess = useCallback(() => {
-    // FIXME: this needs to work properly.
     const landingURL = new URL(
       '/dashboard/for-you',
       window.location.href,

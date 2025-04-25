@@ -1,6 +1,6 @@
 import { ConnectedWallet, usePrivy, useWallets } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
-import { useMemoizedFunction } from 'views/components/PrivyTest/useMemoizedFunction';
+import { useMemoizedFunction } from 'views/components/Privy/useMemoizedFunction';
 
 export function useConnectedWallet() {
   const wallets = useWallets();

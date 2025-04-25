@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { useDefaultAuthCallbacks } from 'views/components/PrivyTest/useDefaultAuthCallbacks';
-import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
+import { useDefaultAuthCallbacks } from 'views/components/Privy/useDefaultAuthCallbacks';
+import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
 
 export const LoginWithGoogle = () => {
   const callbacks = useDefaultAuthCallbacks();

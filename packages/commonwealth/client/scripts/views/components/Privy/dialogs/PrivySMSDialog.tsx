@@ -1,23 +1,23 @@
-import { useLoginWithEmail } from '@privy-io/react-auth';
+import { useLoginWithSms } from '@privy-io/react-auth';
 import React, { useCallback } from 'react';
-import { CodeDialog } from 'views/components/PrivyTest/dialogs/CodeDialog';
-import usePrivyEmailDialogStore from 'views/components/PrivyTest/stores/usePrivyEmailDialogStore';
+import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import { CodeDialog } from './CodeDialog';
 
 /**
  * Background dialog that we run along with the store so that we can finish auth.
  */
-export const PrivyEmailDialog = () => {
+export const PrivySMSDialog = () => {
   const {
     active,
-    setState: setEmailDialogStore,
+    setState: setSMSDialogStore,
     onCancel,
-  } = usePrivyEmailDialogStore();
-  const { loginWithCode } = useLoginWithEmail();
+  } = usePrivySMSDialogStore();
+  const { loginWithCode } = useLoginWithSms();
 
   const handleLoginWithCode = useCallback(
     (code: string) => {
       async function doAsync() {
-        setEmailDialogStore({
+        setSMSDialogStore({
           active: false,
           onCancel: undefined,
         });
@@ -26,16 +26,16 @@ export const PrivyEmailDialog = () => {
       }
       doAsync().catch(console.error);
     },
-    [setEmailDialogStore, loginWithCode],
+    [setSMSDialogStore, loginWithCode],
   );
 
   const handleCancel = useCallback(() => {
     onCancel?.();
-    setEmailDialogStore({
+    setSMSDialogStore({
       active: false,
       onCancel: undefined,
     });
-  }, [onCancel, setEmailDialogStore]);
+  }, [onCancel, setSMSDialogStore]);
 
   if (!active) return null;
 
