@@ -21,7 +21,6 @@ let communityHomeInstanceCounter = 0;
 
 const CommunityHome = () => {
   const instanceId = useState(() => ++communityHomeInstanceCounter)[0];
-  console.log(`[CommunityHome-${instanceId}] Component initializing`);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const xpEnabled = useFlag('xp');
@@ -42,14 +41,8 @@ const CommunityHome = () => {
 
   // Component lifecycle tracking
   useEffect(() => {
-    console.log(`[CommunityHome-${instanceId}] Component mounted`);
-
-    return () => {
-      console.log(`[CommunityHome-${instanceId}] Component unmounted`);
-    };
+    return () => {};
   }, [instanceId]);
-
-  console.log(`[CommunityHome-${instanceId}] Rendering component`);
 
   return (
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">

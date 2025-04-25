@@ -21,7 +21,6 @@ let performanceInstanceCounter = 0;
 
 const TokenPerformance = () => {
   const componentId = useMemo(() => ++performanceInstanceCounter, []);
-  console.log(`[TokenPerformance-${componentId}] Component initializing`);
 
   const mountRef = useRef(true);
 
@@ -38,11 +37,9 @@ const TokenPerformance = () => {
 
   // Component lifecycle logging
   useEffect(() => {
-    console.log(`[TokenPerformance-${componentId}] Component mounted`);
     mountRef.current = true;
 
     return () => {
-      console.log(`[TokenPerformance-${componentId}] Component unmounting`);
       mountRef.current = false;
     };
   }, [componentId]);
@@ -50,16 +47,8 @@ const TokenPerformance = () => {
   // Use useEffect with proper cleanup
   useEffect(() => {
     if (!communityToken) {
-      console.log(
-        `[TokenPerformance-${componentId}] No community token, skipping config update`,
-      );
       return;
     }
-
-    console.log(
-      `[TokenPerformance-${componentId}] Setting token launch modal config`,
-      { isPinnedToken },
-    );
 
     const newConfig = {
       tradeConfig: {
@@ -71,30 +60,16 @@ const TokenPerformance = () => {
 
     setTokenLaunchModalConfig(newConfig);
 
-    return () => {
-      console.log(
-        `[TokenPerformance-${componentId}] Cleaning up token launch effect`,
-      );
-    };
+    return () => {};
   }, [communityToken, isPinnedToken, componentId]);
 
-  console.log(`[TokenPerformance-${componentId}] Rendering - Loading state:`, {
-    isLoadingToken,
-    pricingLoading,
-    hasToken: !!communityToken,
-  });
-
   if (isLoadingToken || !communityToken || pricingLoading) {
-    console.log(
-      `[TokenPerformance-${componentId}] Exiting early due to loading state`,
-    );
     return null;
   }
 
   // Memoize these values to prevent unnecessary recalculations
   const chain = useMemo(() => {
     const result = isPinnedToken ? 'base' : 'base-sepolia';
-    console.log(`[TokenPerformance-${componentId}] Calculated chain:`, result);
     return result;
   }, [isPinnedToken, componentId]);
 
@@ -102,10 +77,6 @@ const TokenPerformance = () => {
     const result = isPinnedToken
       ? (communityToken as ExternalToken).contract_address
       : (communityToken as LaunchpadToken).token_address;
-    console.log(
-      `[TokenPerformance-${componentId}] Calculated address:`,
-      result,
-    );
     return result;
   }, [communityToken, isPinnedToken, componentId]);
 
@@ -115,16 +86,9 @@ const TokenPerformance = () => {
     const result = isLaunchpadToken
       ? tokenPricing?.isMarketCapGoalReached
       : true;
-    console.log(
-      `[TokenPerformance-${componentId}] Calculated hasReachedGoal:`,
-      result,
-    );
     return result;
   }, [isLaunchpadToken, tokenPricing, componentId]);
 
-  console.log(
-    `[TokenPerformance-${componentId}] About to render full component`,
-  );
   return (
     <div className="TokenPerformance">
       <div className="heading-container">
