@@ -93,7 +93,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
-  const { setState: setSMSDialogStoreState } = useSMSDialogStore();
+  const { setState: setSMSDialogState } = useSMSDialogStore();
 
   const user = useUserStore();
 
@@ -245,7 +245,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setSMS(tempSMSToUse);
     // this will bring the SMS dialog up so that the user can enter the code we
     // are about to send
-    setSMSDialogStoreState(tempSMSToUse, true, () => {
+    setSMSDialogState(tempSMSToUse, true, () => {
       setSMS(undefined);
       setIsMagicLoading(false);
     });
