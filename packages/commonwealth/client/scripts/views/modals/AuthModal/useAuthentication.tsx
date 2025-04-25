@@ -119,7 +119,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { signIn } = useSignIn();
 
   const handlePrivySuccess = useCallback(() => {
-    console.log('FIXME: privy success!');
     // FIXME: this needs to work properly.
     const landingURL = new URL(
       '/dashboard/for-you',
@@ -202,7 +201,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   // Handles Magic Link Login
   const onSMSLoginMagic = async (phoneNumber = '') => {
-    console.log('FIXME: onSMSLogin: ' + phoneNumber + '');
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
 
@@ -291,8 +289,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   const onEmailLoginPrivy = async (emailToUse = '') => {
-    console.log('FIXME: onEmailLoginPrivy: ' + emailToUse);
-
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
 
@@ -312,7 +308,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           setIsMagicLoading(false);
         },
       });
-      console.log('FIXME sendCode: ' + tempEmailToUse);
       await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
 
       // FIXME: I need to handle these now...

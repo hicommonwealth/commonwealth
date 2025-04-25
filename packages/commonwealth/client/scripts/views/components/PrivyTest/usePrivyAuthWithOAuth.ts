@@ -25,7 +25,6 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
 
   useOAuthTokens({
     onOAuthTokenGrant: (params) => {
-      console.log('FIXME: onOAuthTokenGrant', params);
       setOAuthAccessToken(params.oAuthTokens.accessToken);
     },
   });
