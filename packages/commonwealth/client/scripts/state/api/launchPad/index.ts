@@ -1,5 +1,6 @@
 import useBuyTokenMutation from './buyToken';
 import useEthPerTokenQuery from './ethPerToken';
+import useGetLaunchpadTradesQuery from './getLaunchpadTrades';
 import useLaunchTokenMutation from './launchToken';
 import useSellTokenMutation from './sellToken';
 import useTokenEthExchangeRateQuery from './tokenEthExchangeRate';
@@ -7,6 +8,7 @@ import useTokenEthExchangeRateQuery from './tokenEthExchangeRate';
 export {
   useBuyTokenMutation,
   useEthPerTokenQuery,
+  useGetLaunchpadTradesQuery,
   useLaunchTokenMutation,
   useSellTokenMutation,
   useTokenEthExchangeRateQuery,

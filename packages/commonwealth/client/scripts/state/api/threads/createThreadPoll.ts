@@ -6,7 +6,7 @@ import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import { userStore } from 'state/ui/user';
 
 interface CreateThreadPollProps {
-  threadId: number;
+  threadId?: number;
   prompt: string;
   options: string[];
   customDuration?: string;
@@ -22,17 +22,22 @@ const createThreadPoll = async ({
   authorCommunity,
   address,
 }: CreateThreadPollProps) => {
-  const response = await axios.post(`${SERVER_URL}/threads/${threadId}/polls`, {
-    community_id: app.activeChainId(),
-    author_chain: authorCommunity,
-    address,
-    jwt: userStore.getState().jwt,
-    prompt,
-    options,
-    custom_duration: customDuration?.split(' ')[0],
-  });
+  if (threadId) {
+    const response = await axios.post(
+      `${SERVER_URL}/threads/${threadId}/polls`,
+      {
+        community_id: app.activeChainId(),
+        author_chain: authorCommunity,
+        address,
+        jwt: userStore.getState().jwt,
+        prompt,
+        options,
+        custom_duration: customDuration?.split(' ')[0],
+      },
+    );
 
-  return response.data.result;
+    return response.data.result;
+  }
 };
 
 const useCreateThreadPollMutation = () => {

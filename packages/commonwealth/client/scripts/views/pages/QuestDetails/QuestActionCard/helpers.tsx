@@ -15,6 +15,7 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
+    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
   },
   pre_reqs: {
@@ -31,7 +32,8 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
-    ['MembershipsRefreshed']: '',
+    ['MembershipsRefreshed']: () => '',
+    ['LaunchpadTokenCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
   },
   explainer: {
@@ -84,6 +86,7 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['LaunchpadTokenCreated']: '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -116,6 +119,7 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['LaunchpadTokenCreated']: '',
     ['LaunchpadTokenTraded']: '',
   },
 };

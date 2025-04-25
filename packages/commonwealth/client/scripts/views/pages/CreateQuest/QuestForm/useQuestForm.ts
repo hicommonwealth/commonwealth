@@ -59,6 +59,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'SSOLinked',
       'DiscordServerJoined',
       'MembershipsRefreshed',
+      'LaunchpadTokenCreated',
       'LaunchpadTokenTraded',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
