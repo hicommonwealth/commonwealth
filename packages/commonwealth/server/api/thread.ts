@@ -75,7 +75,7 @@ export const trpcRouter = trpc.router({
       ) => {
         if (!user_tier_at_creation || !spam_toggled) return;
 
-        if (spam === true && marked_as_spam_at !== null) {
+        if (spam === true && marked_as_spam_at) {
           await updateRankOnThreadIneligibility({
             thread_id: id!,
             community_id,

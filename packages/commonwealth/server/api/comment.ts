@@ -73,19 +73,15 @@ export const trpcRouter = trpc.router({
           spam_toggled,
         },
       ) => {
-        if (!user_tier_at_creation) return;
+        if (!user_tier_at_creation || !spam_toggled) return;
 
-        if (spam === true && marked_as_spam_at !== null && spam_toggled) {
+        if (spam === true && marked_as_spam_at !== null) {
           await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
             thread_id,
             community_id,
             user_tier_at_creation: user_tier_at_creation,
           });
-        } else if (
-          spam === false &&
-          marked_as_spam_at === null &&
-          spam_toggled
-        ) {
+        } else if (spam === false && marked_as_spam_at === null) {
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
             community_id,
             thread_id,

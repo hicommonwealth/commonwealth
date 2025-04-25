@@ -376,7 +376,7 @@ export async function createThreadRank(
   const communityRank =
     Math.floor((thread.created_at?.getTime() || Date.now()) / 1000) *
       config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT +
-    (thread.user_tier_at_creation || 1) *
+    thread.user_tier_at_creation *
       config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT;
   const globalRank =
     Math.round(communityRank) +
