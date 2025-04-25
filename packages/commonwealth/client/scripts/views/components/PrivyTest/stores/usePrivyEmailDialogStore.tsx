@@ -21,6 +21,6 @@ export const smsDialogStore = createStore<SMSDialogStore>()(
   })),
 );
 
-const useSMSDialogStore = createBoundedUseStore(smsDialogStore);
+const usePrivySMSDialogStore = createBoundedUseStore(smsDialogStore);
 
-export default useSMSDialogStore;
+export default usePrivySMSDialogStore;

@@ -44,10 +44,10 @@ import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profil
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import usePrivySMSDialogStore from 'views/components/PrivyTest/stores/usePrivySMSDialogStore';
 import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
 import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
 import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
-import useSMSDialogStore from 'views/components/PrivyTest/usePrivySMSDialogStore';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -95,7 +95,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
-  const { setState: setSMSDialogState } = useSMSDialogStore();
+  const { setState: setSMSDialogState } = usePrivySMSDialogStore();
 
   const user = useUserStore();
 

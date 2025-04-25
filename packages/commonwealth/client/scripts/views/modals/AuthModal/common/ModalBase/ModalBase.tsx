@@ -14,7 +14,8 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
-import { PrivySMSDialog } from 'views/components/PrivyTest/PrivySMSDialog';
+import { PrivyEmailDialog } from 'views/components/PrivyTest/dialogs/PrivyEmailDialog';
+import { PrivySMSDialog } from 'views/components/PrivyTest/dialogs/PrivySMSDialog';
 import {
   CWTab,
   CWTabsRow,
@@ -329,6 +330,7 @@ const ModalBase = ({
   return (
     <>
       <PrivySMSDialog />
+      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
