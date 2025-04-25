@@ -45,6 +45,7 @@ import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
 import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
 import { usePrivyAuthWithPhone } from 'views/components/PrivyTest/usePrivyAuthWithPhone';
+import useSMSDialogStore from 'views/components/PrivyTest/usePrivySMSDialogStore';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -92,6 +93,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     useState(false);
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { setPhoneNumber } = useSMSDialogStore();
 
   const user = useUserStore();
 
@@ -239,12 +241,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setIsMagicLoading(true);
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
-
-    //privy
+    setPhoneNumber(tempSMSToUse);
+    await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
   };
-  const onSMSLogin = onSMSLoginMagic;
+  //const onSMSLogin = onSMSLoginMagic;
 
-  //const onSMSLogin = onSMSLoginPrivy;
+  const onSMSLogin = onSMSLoginPrivy;
 
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;

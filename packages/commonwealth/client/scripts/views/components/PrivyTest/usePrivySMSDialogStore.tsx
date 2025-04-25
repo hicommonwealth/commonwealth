@@ -4,6 +4,7 @@ import { createStore } from 'zustand/vanilla';
 
 interface SMSDialogStore {
   phoneNumber: string | undefined;
+  setPhoneNumber: (phoneNumber: string | undefined) => void;
 }
 
 export const smsDialogStore = createStore<SMSDialogStore>()(
