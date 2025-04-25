@@ -29,6 +29,12 @@ const columns: CWTableColumnInfo[] = [
     numeric: false,
     sortable: true,
   },
+  {
+    key: 'xp',
+    header: `Aura`,
+    numeric: true,
+    sortable: true,
+  },
 ];
 
 const XPTable = () => {
