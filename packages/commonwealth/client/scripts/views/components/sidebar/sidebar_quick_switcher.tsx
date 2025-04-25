@@ -1,4 +1,5 @@
-import { Feed, FeedItem, GenericData } from '@knocklabs/client';
+import { Feed, FeedItem } from '@knocklabs/client';
+import type { GenericData } from '@knocklabs/types';
 import useFetchNotifications from 'client/scripts/state/api/notifications/useFetchNotifications';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
