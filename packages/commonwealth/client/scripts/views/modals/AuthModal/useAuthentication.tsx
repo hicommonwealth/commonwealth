@@ -44,6 +44,7 @@ import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profil
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import usePrivyEmailDialogStore from 'views/components/PrivyTest/stores/usePrivyEmailDialogStore';
 import usePrivySMSDialogStore from 'views/components/PrivyTest/stores/usePrivySMSDialogStore';
 import { usePrivyAuthWithEmail } from 'views/components/PrivyTest/usePrivyAuthWithEmail';
 import { usePrivyAuthWithOAuth } from 'views/components/PrivyTest/usePrivyAuthWithOAuth';
@@ -96,6 +97,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
   const { setState: setSMSDialogState } = usePrivySMSDialogStore();
+  const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
 
   const user = useUserStore();
 
@@ -255,7 +257,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
 
-  const onEmailLogin = async (emailToUse = '') => {
+  const onEmailLoginMagic = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
 
@@ -287,6 +289,43 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  const onEmailLoginPrivy = async (emailToUse = '') => {
+    console.log('FIXME: onEmailLoginPrivy: ' + emailToUse);
+
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
+    setIsMagicLoading(true);
+
+    if (!tempEmailToUse) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      setEmailDialogState({
+        active: true,
+        onCancel: () => {
+          setEmail(undefined);
+          setIsMagicLoading(false);
+        },
+      });
+      console.log('FIXME sendCode: ' + tempEmailToUse);
+      await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
+
+      // FIXME: I need to handle these now...
+      // setIsMagicLoading(false);
+      // FIXME: trackLoginEvent('email', true);
+    } catch (e) {
+      notifyError(`Error authenticating with email`);
+      console.error(`Error authenticating with email: ${e}`);
+      setIsMagicLoading(false);
+    }
+  };
+
+  const onEmailLogin = privyEnabled ? onEmailLoginPrivy : onEmailLoginMagic;
 
   // New callback for handling social login
   const onSocialLoginMagic = async (provider: WalletSsoSource) => {

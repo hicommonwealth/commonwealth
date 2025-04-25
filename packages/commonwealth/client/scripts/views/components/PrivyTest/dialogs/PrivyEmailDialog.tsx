@@ -1,7 +1,7 @@
 import { useLoginWithEmail } from '@privy-io/react-auth';
 import React, { useCallback } from 'react';
 import { CodeDialog } from 'views/components/PrivyTest/dialogs/CodeDialog';
-import usePrivySMSDialogStore from 'views/components/PrivyTest/stores/usePrivySMSDialogStore';
+import usePrivyEmailDialogStore from 'views/components/PrivyTest/stores/usePrivyEmailDialogStore';
 
 /**
  * Background dialog that we run along with the store so that we can finish auth.
@@ -11,7 +11,7 @@ export const PrivyEmailDialog = () => {
     active,
     setState: setEmailDialogStore,
     onCancel,
-  } = usePrivySMSDialogStore();
+  } = usePrivyEmailDialogStore();
   const { loginWithCode } = useLoginWithEmail();
 
   const handleLoginWithCode = useCallback(
