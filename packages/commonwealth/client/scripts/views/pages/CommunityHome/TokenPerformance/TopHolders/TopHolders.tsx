@@ -154,7 +154,7 @@ const TopHolders = () => {
   return (
     <div className="TopHolders">
       <div className="heading-container">
-        <CWText type="h2">Top Holders</CWText>
+        <CWText type="h3">Top Holders</CWText>
         <div
           className="see-all-link"
           onClick={() => navigate('/members?tab=all-members')}
