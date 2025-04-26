@@ -122,6 +122,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     if (this._api) {
       try {
         // Add more robust checks before accessing properties
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const provider = this._api.currentProvider as any;
         if (provider?.connection?.connected) {
           await provider.connection.close();
