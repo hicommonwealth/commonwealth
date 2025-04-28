@@ -1209,3 +1209,26 @@ export const CWOKX = (props: CustomIconProps) => {
     </svg>
   );
 };
+
+export const CWSui = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      {...otherProps}
+    >
+      <rect width="32" height="32" rx="6.4" fill="#6FBCF0" />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M18.4 9.6H13.6C11.3909 9.6 9.6 11.3909 9.6 13.6V18.4C9.6 20.6091 11.3909 22.4 13.6 22.4H18.4C20.6091 22.4 22.4 20.6091 22.4 18.4V13.6C22.4 11.3909 20.6091 9.6 18.4 9.6ZM13.6 6.4C9.6235 6.4 6.4 9.6235 6.4 13.6V18.4C6.4 22.3765 9.6235 25.6 13.6 25.6H18.4C22.3765 25.6 25.6 22.3765 25.6 18.4V13.6C25.6 9.6235 22.3765 6.4 18.4 6.4H13.6Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
