@@ -143,7 +143,7 @@
     "@polkadot/util": "12.6.2",
     "@polkadot/util-crypto": "12.6.2",
     "@popperjs/core": "^2.0.6",
-    "@privy-io/react-auth": "^2.9.1",
+    "@privy-io/react-auth": "^2.12.0",
     "@privy-io/server-auth": "^1.19.0",
     "@sendgrid/mail": "^6.5.0",
     "@snapshot-labs/snapshot.js": "^0.4.35",
