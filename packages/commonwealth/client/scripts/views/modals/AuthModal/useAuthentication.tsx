@@ -343,6 +343,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
     console.log('onSocialLoginPrivy: ' + provider);
