@@ -63,11 +63,6 @@ const LevelBox = ({
           <CWText type="b2" className="level-description">
             {description}
           </CWText>
-          {showArrow && !items?.length && (
-            <div className="level-arrow">
-              <CWIcon iconName="arrowRightPhosphor" iconSize="small" />
-            </div>
-          )}
         </div>
         {items && items.length > 0 && (
           <div className={`level-items ${isLocked ? 'locked' : ''}`}>
