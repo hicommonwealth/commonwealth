@@ -1,10 +1,13 @@
 import React from 'react';
-import { LoginWithGoogle } from 'views/components/Privy/LoginWithGoogle';
+import { CodeDialog } from './dialogs/CodeDialog';
 
 export const PrivyTest = () => {
   return (
     <div>
-      <LoginWithGoogle />
+      <CodeDialog
+        onComplete={(code: string) => console.log('verify: code: ' + code)}
+        onCancel={() => {}}
+      />
     </div>
   );
 };
