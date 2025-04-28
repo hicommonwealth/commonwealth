@@ -1,9 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
-import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
   getTotalRepititionCountsForQuestAction,
   QuestAction,
 } from 'helpers/quest';
@@ -18,6 +15,7 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { actionCopies } from './helpers';
 import './QuestActionCard.scss';
+import QuestActionXpShares from './QuestActionXPShares';
 import TotalQuestActionXPTag from './TotalQuestActionXPTag';
 
 type QuestActionCardProps = {
@@ -47,19 +45,7 @@ const QuestActionCard = ({
   questStartDate,
   questEndDate,
 }: QuestActionCardProps) => {
-  const rewardAmount = questAction.reward_amount;
-  const creatorXP = {
-    percentage: roundDecimalsOrReturnWhole(
-      questAction.creator_reward_weight * 100,
-      2,
-    ),
-    value: questAction.creator_reward_weight * rewardAmount,
-  };
-
   const user = useUserStore();
-  const isUserReferred = !!user.referredByAddress;
-  const hideShareSplit =
-    doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
 
   // Function to determine the button label based on quest action type
   const getButtonLabel = () => {
@@ -172,20 +158,7 @@ const QuestActionCard = ({
                 )}
               </>
             )}
-            {!hideShareSplit &&
-              doesActionRequireRewardShare(questAction.event_name) &&
-              creatorXP.percentage > 0 && (
-                <CWText type="caption" className="xp-shares">
-                  <span className="creator-share">
-                    {creatorXP.percentage}% (
-                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} Aura)
-                  </span>
-                  &nbsp; shared with{' '}
-                  {actionCopies.shares[questAction.event_name]}. Your share ={' '}
-                  {Math.abs(rewardAmount - creatorXP.value)} Aura
-                  {isRepeatableQuest ? ` / attempt` : ''}
-                </CWText>
-              )}
+            <QuestActionXpShares questAction={questAction} />
             <div className="points-row">
               <TotalQuestActionXPTag questAction={questAction} />
               {isRepeatableQuest &&
