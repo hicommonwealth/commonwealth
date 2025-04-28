@@ -62,6 +62,7 @@ const UserTrustLevel = () => {
             isLocked={isLocked}
             icon={icon}
             items={level.items}
+            showArrow={level.redirect}
           />
         );
       })}

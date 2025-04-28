@@ -8,6 +8,7 @@ export const levels: VerificationLevel[] = [
     status: 'Not Started',
     color: 'green',
     items: [],
+    redirect: false,
   },
   {
     level: 2,
@@ -15,6 +16,7 @@ export const levels: VerificationLevel[] = [
     description: 'Verified wallet older than 1 week',
     status: 'Not Started',
     color: 'yellow',
+    redirect: false,
   },
   {
     level: 3,
@@ -23,6 +25,7 @@ export const levels: VerificationLevel[] = [
     status: 'Not Started',
     color: 'gray',
     items: [],
+    redirect: true,
   },
   {
     level: 4,
@@ -30,7 +33,11 @@ export const levels: VerificationLevel[] = [
     description: 'Creator of a namespace, contest or launchpad token.',
     status: 'Not Started',
     color: 'gray',
-    items: [],
+    items: [
+      { label: 'Verify Community', status: 'Not Started' },
+      { label: 'Verify Domain Ownership', status: 'Not Started' },
+    ],
+    redirect: true,
   },
   {
     level: 5,
@@ -39,5 +46,6 @@ export const levels: VerificationLevel[] = [
     status: 'Not Started',
     color: 'gray',
     items: [],
+    redirect: false,
   },
 ];

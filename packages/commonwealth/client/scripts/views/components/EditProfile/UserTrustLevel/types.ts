@@ -10,6 +10,7 @@ export interface VerificationLevel {
   title: string;
   description: string;
   status: Status;
-  color: 'green' | 'yellow' | 'gray';
+  color: string;
   items?: VerificationItem[];
+  redirect?: boolean;
 }

@@ -22,6 +22,7 @@ interface LevelBoxProps {
   isLocked: boolean;
   icon?: ComponentIcon;
   items?: Array<{ label: string }>;
+  showArrow?: boolean;
 }
 
 const getTagType = (status: Status): 'passed' | 'proposal' => {
@@ -37,11 +38,12 @@ const LevelBox: React.FC<LevelBoxProps> = ({
   isLocked,
   icon,
   items,
+  showArrow = false,
 }) => {
   return (
     <div className={`level-box level-${color} ${isLocked ? 'disabled' : ''}`}>
       <div className="tier-icon">
-        {icon && <CWIcon iconName={icon} iconSize="large" />}
+        {icon && <CWIcon iconName={icon} iconSize="xl" />}
       </div>
       <div className="level-box-content">
         <div className="level-header">
@@ -52,17 +54,31 @@ const LevelBox: React.FC<LevelBoxProps> = ({
           </div>
           <CWTag type={getTagType(status)} label={status} />
         </div>
-        <CWText type="b2" className="level-description">
-          {description}
-        </CWText>
-        {!isLocked && items && items.length > 0 && (
-          <div className="level-items">
+        <div className="description-container">
+          <CWText type="b2" className="level-description">
+            {description}
+          </CWText>
+          {showArrow && !items?.length && (
+            <div className="level-arrow">
+              <CWIcon iconName="arrowRightPhosphor" iconSize="small" />
+            </div>
+          )}
+        </div>
+        {items && items.length > 0 && (
+          <div className={`level-items ${isLocked ? 'locked' : ''}`}>
             {items.map((item, idx) => (
               <div key={idx} className="level-item">
-                <CWTag type={getTagType(status)} label={status} />
-                <CWText type="b2" className="item-label">
-                  {item.label}
-                </CWText>
+                <div className="level-item-content">
+                  <CWTag type={getTagType(status)} label={status} />
+                  <CWText type="b2" className="item-label">
+                    {item.label}
+                  </CWText>
+                </div>
+                {showArrow && (
+                  <div className="level-arrow">
+                    <CWIcon iconName="arrowRightPhosphor" iconSize="small" />
+                  </div>
+                )}
               </div>
             ))}
           </div>
