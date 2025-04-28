@@ -20,7 +20,7 @@ async function getUserByAddressId(address_id: number) {
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address },
+    where: { address, user_id: { [Op.not]: null } },
     attributes: ['user_id'],
   });
   return addr?.user_id ?? undefined;
@@ -456,7 +456,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
       },
       LaunchpadTokenCreated: async ({ payload }) => {
-        const created_at = new Date(Number(payload.block_timestamp));
+        const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
           { created_at },
           'LaunchpadTokenCreated',
@@ -469,22 +469,26 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
-          where: { token_address: payload.token_address },
+          where: { token_address: payload.token_address.toLowerCase() },
         });
         if (!token) return;
 
         const community = await models.Community.findOne({
-          where: { namespace_address: token.namespace },
+          where: { namespace: token.namespace },
         });
 
-        const created_at = new Date(Number(payload.block_timestamp));
+        const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
           { community_id: community?.id, created_at },
           'LaunchpadTokenTraded',
         );
+
+        // payload eth_amount is in wei, a little misleading
+        const eth_amount = Number(payload.eth_amount) / 1e18;
+        //console.log({ payload, action_metas, eth_amount });
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
-          amount: Number(payload.eth_amount),
-          threshold: Number(payload.eth_amount),
+          amount: eth_amount,
+          threshold: eth_amount,
         });
       },
       WalletLinked: async ({ payload }) => {
