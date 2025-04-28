@@ -11,6 +11,7 @@ export const PrivySMSDialog = () => {
     active,
     setState: setSMSDialogStore,
     onCancel,
+    onError,
   } = usePrivySMSDialogStore();
   const { loginWithCode } = useLoginWithSms();
 
@@ -20,13 +21,14 @@ export const PrivySMSDialog = () => {
         setSMSDialogStore({
           active: false,
           onCancel: undefined,
+          onError: undefined,
         });
 
         await loginWithCode({ code });
       }
-      doAsync().catch(console.error);
+      doAsync().catch(onError);
     },
-    [setSMSDialogStore, loginWithCode],
+    [onError, setSMSDialogStore, loginWithCode],
   );
 
   const handleCancel = useCallback(() => {
@@ -34,10 +36,17 @@ export const PrivySMSDialog = () => {
     setSMSDialogStore({
       active: false,
       onCancel: undefined,
+      onError: undefined,
     });
   }, [onCancel, setSMSDialogStore]);
 
   if (!active) return null;
 
-  return <CodeDialog onVerify={handleLoginWithCode} onCancel={handleCancel} />;
+  return (
+    <CodeDialog
+      onComplete={handleLoginWithCode}
+      onCancel={handleCancel}
+      headerText="Enter the code we sent to your phone"
+    />
+  );
 };

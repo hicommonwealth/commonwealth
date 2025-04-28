@@ -4,9 +4,12 @@ import { createStore } from 'zustand/vanilla';
 
 type OnCancel = () => void;
 
+type OnError = (err: Error) => void;
+
 type InternalState = {
   active: boolean;
   onCancel: OnCancel | undefined;
+  onError: OnError | undefined;
 };
 
 type SMSDialogStore = InternalState & {
@@ -16,7 +19,8 @@ type SMSDialogStore = InternalState & {
 export const smsDialogStore = createStore<SMSDialogStore>()(
   devtools((set) => ({
     active: false,
-    onCancel: () => {},
+    onCancel: undefined,
+    onError: undefined,
     setState: (newState: InternalState) => set(newState),
   })),
 );

@@ -11,6 +11,7 @@ export const PrivyEmailDialog = () => {
     active,
     setState: setEmailDialogStore,
     onCancel,
+    onError,
   } = usePrivyEmailDialogStore();
   const { loginWithCode } = useLoginWithEmail();
 
@@ -20,13 +21,14 @@ export const PrivyEmailDialog = () => {
         setEmailDialogStore({
           active: false,
           onCancel: undefined,
+          onError: undefined,
         });
 
         await loginWithCode({ code });
       }
-      doAsync().catch(console.error);
+      doAsync().catch(onError);
     },
-    [setEmailDialogStore, loginWithCode],
+    [onError, setEmailDialogStore, loginWithCode],
   );
 
   const handleCancel = useCallback(() => {
@@ -34,10 +36,17 @@ export const PrivyEmailDialog = () => {
     setEmailDialogStore({
       active: false,
       onCancel: undefined,
+      onError,
     });
-  }, [onCancel, setEmailDialogStore]);
+  }, [onCancel, onError, setEmailDialogStore]);
 
   if (!active) return null;
 
-  return <CodeDialog onVerify={handleLoginWithCode} onCancel={handleCancel} />;
+  return (
+    <CodeDialog
+      onComplete={handleLoginWithCode}
+      onCancel={handleCancel}
+      headerText="Enter the code we sent to your email"
+    />
+  );
 };
