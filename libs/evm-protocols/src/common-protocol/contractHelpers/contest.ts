@@ -39,7 +39,8 @@ export const getTotalContestBalance = async (
   });
 
   let feeManagerAddressPromise: Promise<`0x${string}`> | undefined;
-  if (!oneOff) {
+  const useFeeManager = await contestContract.read.useFeeManager();
+  if (!oneOff && useFeeManager) {
     feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
   }
 
@@ -49,7 +50,7 @@ export const getTotalContestBalance = async (
   ]);
 
   let beneficiaryBalancePromise: Promise<bigint> | undefined;
-  if (!oneOff && feeManagerAddress) {
+  if (!oneOff && feeManagerAddress && useFeeManager) {
     beneficiaryBalancePromise = client.readContract({
       address: feeManagerAddress,
       abi: FeeManagerAbi,

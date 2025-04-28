@@ -238,7 +238,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
       contest_address,
       details.prize_percentage,
       details.payout_structure,
-      undefined,
+      contest_id,
       details.interval === 0,
     );
     await models.Contest.update(
