@@ -48,7 +48,7 @@ const UserTrustLevel = () => {
     <div className="verification-container">
       {levels.map((level) => {
         const status = getLevelStatus(level.level);
-        const isLocked = level.level > currentTier;
+        const isLocked = level.level > currentTier + 1;
         const icon = getTierIcon(level.level);
 
         return (
