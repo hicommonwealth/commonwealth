@@ -3,7 +3,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
-  calculateTotalXPForQuestActions,
   isQuestActionComplete,
   isQuestComplete,
   QuestAction as QuestActionType,
@@ -116,24 +115,6 @@ const QuestDetails = ({ id }: { id: number }) => {
   if (!quest) {
     return <PageNotFound />;
   }
-
-  const gainedXP =
-    xpProgressions
-      .filter((p) => p.quest_id === quest.id)
-      .map((p) => p.xp_points)
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
-    0;
-
-  const isUserReferred = !!user.referredByAddress;
-  // this only includes end user xp gain, creator/referrer xp is not included in this
-  const { totalXpFixed, launchpadTokenTradedMultiplerAura } =
-    calculateTotalXPForQuestActions({
-      isUserReferred,
-      questStartDate: new Date(quest.start_date),
-      questEndDate: new Date(quest.end_date),
-      questActions:
-        (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
-    });
 
   const isSystemQuest = quest.id < 0;
 
@@ -385,9 +366,10 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const isCompleted = isQuestComplete({
     questStartDate: new Date(quest.start_date),
-    totalXpFixed: totalXpFixed,
-    totalXPGained: gainedXP,
-    launchpadTokenTradedMultiplerAura,
+    questEndDate: new Date(quest.end_date),
+    questActions:
+      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+    xpLogs: xpProgressions as unknown as XPLog[],
   });
 
   const getQuestActionBlockedReason = () => {

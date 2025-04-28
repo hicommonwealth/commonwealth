@@ -253,45 +253,47 @@ export const getTotalRepititionCountsForQuestAction = (
   };
 };
 
-export const isQuestComplete = ({
-  questStartDate,
-  totalXPGained,
-  totalXpFixed,
-  launchpadTokenTradedMultiplerAura,
-}: {
-  questStartDate: Date;
-  totalXpFixed: number;
-  totalXPGained: number;
-  launchpadTokenTradedMultiplerAura?: number;
-}) => {
-  const isStarted = moment().isSameOrAfter(moment(questStartDate));
-  const isAllFixedXPGained = totalXPGained === totalXpFixed;
-  // TODO: 11884, test this
-  const hasGainedSomeDynamicXpIfQuestHasIt = launchpadTokenTradedMultiplerAura
-    ? totalXPGained > totalXpFixed
-    : true;
-  const isCompleted =
-    isAllFixedXPGained && hasGainedSomeDynamicXpIfQuestHasIt && isStarted;
-  return isCompleted;
-};
-
 export const isQuestActionComplete = (
   questStartDate: Date,
   questEndDate: Date,
   questAction: QuestAction,
   xpLogs: XPLog[],
 ) => {
-  // TODO: 11884, update this
   // if action repeats, then its only labeled as completed if all the repeatitions are complete
-  return questAction.participation_limit ===
-    QuestParticipationLimit.OncePerQuest
-    ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
-    : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
-        getTotalRepititionCountsForQuestAction(
-          questStartDate,
-          questEndDate,
-          questAction,
-        ).totalRepititions;
+  if (questAction.participation_limit === QuestParticipationLimit.OncePerQuest)
+    return !!xpLogs.find((p) => p.action_meta_id === questAction.id);
+
+  return (
+    xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
+    getTotalRepititionCountsForQuestAction(
+      questStartDate,
+      questEndDate,
+      questAction,
+    ).totalRepititions
+  );
+};
+
+export const isQuestComplete = ({
+  questStartDate,
+  questEndDate,
+  questActions,
+  xpLogs,
+}: {
+  questStartDate: Date;
+  questEndDate: Date;
+  questActions: QuestAction[];
+  xpLogs: XPLog[];
+}) => {
+  const isStarted = moment().isSameOrAfter(moment(questStartDate));
+  const completedActionsCount = questActions
+    .map((action) =>
+      isQuestActionComplete(questStartDate, questEndDate, action, xpLogs),
+    )
+    .filter(Boolean).length;
+  const isCompleted = completedActionsCount === questActions.length;
+  isStarted;
+
+  return isCompleted;
 };
 
 export const resetXPCacheForUser = (

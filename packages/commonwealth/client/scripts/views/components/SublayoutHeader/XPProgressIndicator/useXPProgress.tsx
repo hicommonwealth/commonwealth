@@ -1,13 +1,11 @@
-import {
-  calculateTotalXPForQuestActions,
-  isQuestComplete,
-  QuestAction,
-} from 'helpers/quest';
+import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { isQuestComplete, XPLog } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { z } from 'zod';
 import './XPProgressIndicator.scss';
 
 const WEEKLY_XP_GOAL = 100; // Hardcoded in client per product spec.
@@ -67,22 +65,15 @@ const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
             0,
           ) || 0;
 
-      const { totalXpFixed, launchpadTokenTradedMultiplerAura } =
-        calculateTotalXPForQuestActions({
-          questActions: (quest.action_metas as QuestAction[]) || [],
-          isUserReferred: !!user.referredByAddress,
-          questStartDate: new Date(quest.start_date),
-          questEndDate: new Date(quest.end_date),
-        });
-
       return {
         ...quest,
         gainedXP,
         isCompleted: isQuestComplete({
           questStartDate: new Date(quest.start_date),
-          totalXpFixed: totalXpFixed,
-          totalXPGained: gainedXP,
-          launchpadTokenTradedMultiplerAura,
+          questEndDate: new Date(quest.end_date),
+          questActions:
+            (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+          xpLogs: xpProgressions as unknown as XPLog[],
         }),
       };
     });
