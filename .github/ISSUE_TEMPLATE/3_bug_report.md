@@ -1,7 +1,7 @@
 ---
 name: Bug Report
 about: Use this template for reporting bugs.
-labels: bug, needs estimate
+labels: bug, needs estimate, tow
 ---
 
 ## Describe the bug
