@@ -177,7 +177,7 @@ export const calculateTotalXPForQuestActions = ({
   questEndDate: Date;
   questActions: QuestAction[];
 }) => {
-  return (
+  const totalXpFixed =
     questActions
       ?.map((action) => {
         // calc reward per attempt with option creator share
@@ -202,8 +202,13 @@ export const calculateTotalXPForQuestActions = ({
         // calc final reward for action
         return finalRewardPerAttempt * totalAttemptsPerSession * totalSessions;
       })
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) || 0
-  );
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
+    0;
+  const launchpadTokenTradedMultiplerAura =
+    questActions?.find((action) => (action?.amount_multiplier || 0) > 0)
+      ?.amount_multiplier || 0;
+
+  return { totalXpFixed, launchpadTokenTradedMultiplerAura };
 };
 
 export const getTotalRepititionCountsForQuestAction = (
@@ -248,12 +253,35 @@ export const getTotalRepititionCountsForQuestAction = (
   };
 };
 
+export const isQuestComplete = ({
+  questStartDate,
+  totalXPGained,
+  totalXpFixed,
+  launchpadTokenTradedMultiplerAura,
+}: {
+  questStartDate: Date;
+  totalXpFixed: number;
+  totalXPGained: number;
+  launchpadTokenTradedMultiplerAura?: number;
+}) => {
+  const isStarted = moment().isSameOrAfter(moment(questStartDate));
+  const isAllFixedXPGained = totalXPGained === totalXpFixed;
+  // TODO: 11884, test this
+  const hasGainedSomeDynamicXpIfQuestHasIt = launchpadTokenTradedMultiplerAura
+    ? totalXPGained > totalXpFixed
+    : true;
+  const isCompleted =
+    isAllFixedXPGained && hasGainedSomeDynamicXpIfQuestHasIt && isStarted;
+  return isCompleted;
+};
+
 export const isQuestActionComplete = (
   questStartDate: Date,
   questEndDate: Date,
   questAction: QuestAction,
   xpLogs: XPLog[],
 ) => {
+  // TODO: 11884, update this
   // if action repeats, then its only labeled as completed if all the repeatitions are complete
   return questAction.participation_limit ===
     QuestParticipationLimit.OncePerQuest

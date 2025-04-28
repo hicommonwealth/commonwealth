@@ -1,4 +1,8 @@
-import { calculateTotalXPForQuestActions, QuestAction } from 'helpers/quest';
+import {
+  calculateTotalXPForQuestActions,
+  isQuestComplete,
+  QuestAction,
+} from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
@@ -63,17 +67,23 @@ const useXPProgress = ({ includeSystemQuests }: UseXPProgress) => {
             0,
           ) || 0;
 
-      const totalUserXP = calculateTotalXPForQuestActions({
-        questActions: (quest.action_metas as QuestAction[]) || [],
-        isUserReferred: !!user.referredByAddress,
-        questStartDate: new Date(quest.start_date),
-        questEndDate: new Date(quest.end_date),
-      });
+      const { totalXpFixed, launchpadTokenTradedMultiplerAura } =
+        calculateTotalXPForQuestActions({
+          questActions: (quest.action_metas as QuestAction[]) || [],
+          isUserReferred: !!user.referredByAddress,
+          questStartDate: new Date(quest.start_date),
+          questEndDate: new Date(quest.end_date),
+        });
+
       return {
         ...quest,
         gainedXP,
-        totalUserXP,
-        isCompleted: gainedXP === totalUserXP,
+        isCompleted: isQuestComplete({
+          questStartDate: new Date(quest.start_date),
+          totalXpFixed: totalXpFixed,
+          totalXPGained: gainedXP,
+          launchpadTokenTradedMultiplerAura,
+        }),
       };
     });
   const upcomingWeeklyQuests = allWeeklyQuests.filter((q) =>

@@ -193,7 +193,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           formMethodsRef?.current?.getValues('end_date') || new Date(),
         questStartDate:
           formMethodsRef?.current?.getValues('start_date') || new Date(),
-      }),
+      })?.totalXpFixed, // Note: dynamic xp calculation is not needed here
     );
   }, [questActionSubForms]);
 
