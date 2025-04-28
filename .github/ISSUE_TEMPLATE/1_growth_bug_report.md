@@ -1,7 +1,9 @@
 ---
-name: Bug Report
+name: Growth Bug Report
 about: Use this template for reporting bugs.
-labels: bug, needs estimate
+labels: bug, needs estimate, tow
+type: Bug
+projects: ["hicommonwealth/47"]
 ---
 
 ## Describe the bug
@@ -9,18 +11,17 @@ labels: bug, needs estimate
 
 ### Initial conditions
 <!-- What was the state of the system before the bug was encountered? -->
-**Environment:** 
+**Environment:**
 <!-- e.g. staging, production, etc -->
-**Branch/Release version:** 
+**Branch/Release version:**
 <!-- e.g. master, develop, etc -->
-**Browser:** 
+**Browser:**
 <!-- e.g. Chrome, Firefox, etc -->
-**Wallet:** 
+**Wallet:**
 <!-- e.g. MetaMask, Coinbase, etc -->
 
 ## Reproduction steps
 <!-- Steps to reproduce, or note if cannot be reproduced -->
-
 
 ## Actual behavior
 <!-- A clear and concise description of what is expect to happen. -->
@@ -30,9 +31,10 @@ labels: bug, needs estimate
 
 ## Screenshots / Video
 <!-- Omit if not applicable -->
+<!-- If on a browser include a screenshot of the console -->
 
 ## Reporter
-<!-- e.g. external client, engineering team, growth team -->
+Growth Team
 
 ## Additional context
 <!-- Any other context about the problem -->
