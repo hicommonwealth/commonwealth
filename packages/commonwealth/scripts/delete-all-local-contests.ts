@@ -18,6 +18,8 @@ async function deleteAllLocalContests() {
   await models.ContestAction.destroy({ truncate: true, cascade: true });
   await models.Contest.destroy({ truncate: true, cascade: true });
   await models.ContestManager.destroy({ truncate: true, cascade: true });
+  await models.LaunchpadToken.destroy({ truncate: true, cascade: true });
+  await models.Outbox.destroy({ truncate: true, cascade: true });
   log.debug('Deleted all local contests');
 }
 
