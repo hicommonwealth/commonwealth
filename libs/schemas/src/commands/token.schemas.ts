@@ -60,13 +60,16 @@ export const GetTokenInfoAlchemy = {
     token_address: z.string(),
   }),
   output: z.object({
-    symbol: z.string(),
+    network: z.string(),
+    address: z.string(),
     currency: z.string(),
-    data: z.object({
-      value: z.string(),
-      timestamp: z.string(),
-      marketCap: z.string(),
-      totalVolume: z.string(),
-    }),
+    data: z
+      .object({
+        value: z.string(),
+        timestamp: z.string(),
+        marketCap: z.string(),
+        totalVolume: z.string(),
+      })
+      .array(),
   }),
 };
