@@ -78,6 +78,7 @@ const UserTrustLevel = () => {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        showAuthOptionTypesFor={['sso']}
       />
     </div>
   );
