@@ -7,7 +7,7 @@ on:
 jobs:
   apply-label:
     runs-on: ubuntu-latest
-    # Only run this job when the 'tow' label is applied
+    # Only run this job when the 'external' label is applied
     if: contains(github.event.issue.labels.*.name, 'external')
     permissions:
       issues: write
