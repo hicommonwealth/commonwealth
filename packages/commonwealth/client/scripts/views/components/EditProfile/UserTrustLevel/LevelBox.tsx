@@ -29,7 +29,7 @@ const getTagType = (status: Status): 'passed' | 'proposal' => {
   return status === 'Done' ? 'passed' : 'proposal';
 };
 
-const LevelBox: React.FC<LevelBoxProps> = ({
+const LevelBox = ({
   level,
   title,
   description,
@@ -39,7 +39,7 @@ const LevelBox: React.FC<LevelBoxProps> = ({
   icon,
   items,
   showArrow = false,
-}) => {
+}: LevelBoxProps) => {
   return (
     <div className={`level-box level-${color} ${isLocked ? 'disabled' : ''}`}>
       <div className="tier-icon">
