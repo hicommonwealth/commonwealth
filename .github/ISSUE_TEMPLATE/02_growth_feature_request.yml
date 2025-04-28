@@ -1,6 +1,6 @@
 name: "Growth Feature Request"
 description: "For growth team to request a new feature."
-labels: ["needs estimate", "request"]
+labels: ["needs estimate", "request", "external"]
 type: "Feature"
 projects: ["hicommonwealth/47"]
 body:

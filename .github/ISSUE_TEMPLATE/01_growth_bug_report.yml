@@ -1,7 +1,7 @@
 name: Growth Bug Report
 description: Use this template for reporting bugs.
 title: "[Bug]: "
-labels: ["bug", "needs estimate", "tow"]
+labels: ["bug", "needs estimate", "tow", "external"]
 projects: ["hicommonwealth/47"]
 assignees: []
 body:
