@@ -7,6 +7,7 @@ export const PrivyTest = () => {
       <CodeDialog
         onComplete={(code: string) => console.log('verify: code: ' + code)}
         onCancel={() => {}}
+        headerText="Verify your identity"
       />
     </div>
   );
