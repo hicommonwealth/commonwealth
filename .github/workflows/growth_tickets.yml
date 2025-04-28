@@ -1,0 +1,46 @@
+name: Growth Issue Label Automation
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  apply-label:
+    runs-on: ubuntu-latest
+    # Only run this job when the 'tow' label is applied
+    if: contains(github.event.issue.labels.*.name, 'tow')
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            
+            // Get the issue body as an object (for issue forms)
+            let issueBody;
+            try {
+              issueBody = JSON.parse(issue.body);
+            } catch (e) {
+              console.log('Not a JSON formatted issue body');
+              return;
+            }
+            
+            // Check if the issue has the dropdown field and get its value
+            if (issueBody && issueBody.priority) {
+              const priority = issueBody.priority;
+              console.log(`Priority selected: ${priority}`);
+            
+              if (!['P0', 'P1', 'P2', 'P3', 'P4'].includes(priority)) {
+                console.error(`Unknown priority: ${priority}`);
+                return;
+              }
+              
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: [priority]
+              });
+            }
