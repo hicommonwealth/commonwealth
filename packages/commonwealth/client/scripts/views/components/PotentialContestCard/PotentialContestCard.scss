@@ -1,0 +1,148 @@
+@import '../../../styles/shared';
+
+// Keyframes for subtle pulse animation (box-shadow for prize)
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($yellow-400, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba($yellow-400, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($yellow-400, 0);
+  }
+}
+
+// Keyframes for progress bar shimmer animation
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0; // Start off-screen left
+  }
+  100% {
+    background-position: 200% 0; // End off-screen right
+  }
+}
+
+.PotentialContestCard {
+  width: 335px; // Match ContestCard width in ActiveContestList
+  padding: 0;
+  display: flex; // Ensure flex properties work correctly
+  flex-direction: column; // Stack content vertically
+  position: relative; // Needed for potential absolute positioned elements if added later
+
+  // Skeleton specific styles
+  &.PotentialContestCard--Skeleton {
+    .Skeleton {
+      border-radius: $border-radius-md; // Match card border radius
+    }
+  }
+
+  .contest-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // Spacing between elements
+    height: 100%; // Allow body to fill card height
+    flex-grow: 1; // Allow body to grow
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .header-trophy-icon {
+        color: $yellow-500;
+      }
+    }
+
+    // Styles for the prize breakdown section
+    .prizes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      // Add animation to the container
+      // animation: pulse 2s infinite;
+      // border-radius: $border-radius-sm; // Match prize row radius for animation bounds
+
+      &.prizes--projected {
+        // Specific styles for projected prizes if needed
+      }
+
+      // Individual prize row styling - mirroring ContestCard
+      .prize-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 8px 4px;
+        border-radius: $border-radius-md;
+        border: 1px solid transparent; // Base border
+
+        .label {
+          color: $neutral-600;
+          font-family: $font-family-silka;
+          font-weight: 600;
+        }
+
+        .bold {
+          font-family: $font-family-monospace;
+        }
+      }
+
+      // Background colors mirroring ContestCard prize places
+      .prize-row-1 {
+        background-color: $yellow-300;
+        border-color: $yellow-400;
+        // Apply animation directly to 1st prize for focus
+        animation: pulse 2s infinite;
+      }
+
+      .prize-row-2 {
+        background-color: $neutral-200;
+        border-color: $neutral-300;
+      }
+
+      .prize-row-3 {
+        background-color: $rorange-200; // Assuming rorange is defined in shared
+        border-color: $rorange-300; // Assuming rorange is defined in shared
+      }
+    }
+
+    .prize-explanation,
+    .progress-explanation {
+      color: $neutral-600;
+    }
+
+    .divider {
+      margin: 12px 0;
+    }
+
+    .MarketCapProgress {
+      // Target the fill element for the shimmer animation
+      // Assuming a class like .MarketCapProgress__fill or similar internal structure
+      // Might need adjustment based on the actual component's markup
+      &__fill, // Common BEM pattern
+      .progress-fill, // Alternative common pattern
+      > div > div {
+        // Less specific, targets nested divs if structure is simple
+        background-size: 200% 100%;
+        background-image: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.5) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 2.5s linear infinite;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      margin-top: auto; // Push actions to the bottom
+
+      .action-button {
+        flex-grow: 1; // Make buttons share space
+      }
+    }
+  }
+}
