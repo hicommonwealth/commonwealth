@@ -1,12 +1,14 @@
 import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import { UserTierMap } from '@hicommonwealth/shared';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../../config';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
+import { tokenBalanceCache } from '../../../services';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { emitSignInEvents } from './emitSignInEvents';
 
@@ -95,6 +97,48 @@ export async function findUserBySso(
   return users[0];
 }
 
+/*
+ Check minimum balance requirement for new or existing users
+ signing in with native wallets that are below SocialVerified tier
+*/
+async function checkNativeWalletBalance(
+  address: string,
+  foundUser: UserAttributes | null,
+  ethChainId?: number,
+  transaction?: Transaction,
+): Promise<UserTierMap> {
+  if (
+    (foundUser?.tier || UserTierMap.IncompleteUser) < UserTierMap.SocialVerified
+  ) {
+    const balances = ethChainId
+      ? await tokenBalanceCache.getBalances({
+          addresses: [address],
+          balanceSourceType: BalanceSourceType.ETHNative,
+          sourceOptions: { evmChainId: ethChainId },
+        })
+      : { [address]: '0' };
+    const balance = BigInt(balances[address] || '0');
+    const minBalance = BigInt(config.CONTESTS.MIN_USER_ETH * 1e18);
+    if (balance >= minBalance) {
+      // update tier of found user
+      if (foundUser) {
+        await models.User.update(
+          { tier: UserTierMap.SocialVerified },
+          {
+            where: {
+              id: foundUser.id,
+              tier: { [Op.lt]: UserTierMap.SocialVerified },
+            },
+            transaction,
+          },
+        );
+      }
+      return UserTierMap.SocialVerified;
+    }
+  }
+  return UserTierMap.NewlyVerifiedWallet;
+}
+
 export async function findOrCreateUser({
   address,
   transaction,
@@ -103,6 +147,7 @@ export async function findOrCreateUser({
   privyUserId,
   hex,
   signedInUser,
+  ethChainId,
 }: {
   address: string;
   transaction: Transaction;
@@ -111,6 +156,7 @@ export async function findOrCreateUser({
   privyUserId?: string;
   hex?: string;
   signedInUser?: UserAttributes | null;
+  ethChainId?: number;
 }): Promise<{
   newUser: boolean;
   user: UserAttributes;
@@ -135,6 +181,15 @@ export async function findOrCreateUser({
     await updatePrivyId(signedInUser.id!);
   if (privyUserId && foundUser && !signedInUser && !foundUser.privy_id)
     await updatePrivyId(foundUser.id!);
+
+  const tier = privyUserId
+    ? UserTierMap.SocialVerified
+    : await checkNativeWalletBalance(
+        address,
+        foundUser,
+        ethChainId,
+        transaction,
+      );
 
   // Signed-in user signing in with another users address (address transfer) OR
   // Signed-out user signing in with an address they own
@@ -168,9 +223,7 @@ export async function findOrCreateUser({
       profile: {},
       referred_by_address: referrer_address ?? null,
       privy_id: privyUserId ?? null,
-      tier: privyUserId
-        ? UserTierMap.SocialVerified
-        : UserTierMap.NewlyVerifiedWallet,
+      tier,
     },
     { transaction },
   );
@@ -270,6 +323,7 @@ export async function signInUser({
       hex: payload.hex,
       transaction,
       signedInUser,
+      ethChainId,
     });
     foundOrCreatedUser = userRes.user;
     newUser = userRes.newUser;
