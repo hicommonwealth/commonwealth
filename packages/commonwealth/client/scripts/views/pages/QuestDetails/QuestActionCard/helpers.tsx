@@ -94,11 +94,18 @@ export const actionCopies = {
     ) => (
       <div>
         <ul>
-          <li>● This action has an aura multipler of {amountMultipler}</li>
+          <li>
+            ● This action rewards aura based on your trade volume ex: You trade
+            1 ETH tokens worth, you get 1 Aura.
+          </li>
+          <li>
+            ● This action has an aura multipler of {amountMultipler}x. You trade
+            1 ETH tokens worth, you get {amountMultipler} Aura.
+          </li>
           {ethAmount && (
             <li>
-              ● Aura is only awarded after {ethAmount} ETH worth of launchpad
-              token is traded
+              ● Aura is only awarded after a miminum {ethAmount} ETH worth of
+              launchpad token is traded.
             </li>
           )}
         </ul>
