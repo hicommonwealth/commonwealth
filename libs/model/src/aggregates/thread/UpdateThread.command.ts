@@ -2,6 +2,7 @@ import {
   Actor,
   InvalidActor,
   InvalidInput,
+  InvalidState,
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
@@ -326,83 +327,87 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
       });
       // == end of transaction boundary ==
 
+      const result = await models.Thread.findOne({
+        where: { id: thread_id },
+        include: [
+          {
+            model: models.Address,
+            as: 'Address',
+            include: [
+              {
+                model: models.User,
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          {
+            model: models.Address,
+            as: 'collaborators',
+            include: [
+              {
+                model: models.User,
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          { model: models.Topic, as: 'topic' },
+          {
+            model: models.Reaction,
+            as: 'reactions',
+            include: [
+              {
+                model: models.Address,
+                required: true,
+                include: [
+                  {
+                    model: models.User,
+                    required: true,
+                    attributes: ['id', 'profile', 'tier'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: models.Comment,
+            limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
+            order: [['created_at', 'DESC']],
+            attributes: [
+              'id',
+              'address_id',
+              'body',
+              'created_at',
+              'updated_at',
+              'deleted_at',
+              'marked_as_spam_at',
+              'discord_meta',
+            ],
+            include: [
+              {
+                model: models.Address,
+                attributes: ['address'],
+                include: [
+                  {
+                    model: models.User,
+                    attributes: ['profile', 'tier'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: models.ThreadVersionHistory,
+          },
+        ],
+      });
+
+      if (!result) throw new InvalidState(UpdateThreadErrors.ThreadNotFound);
+
       // TODO: should we make a query out of this, or do we have one already?
       return {
-        ...(await models.Thread.findOne({
-          where: { id: thread_id },
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-              include: [
-                {
-                  model: models.User,
-                  required: true,
-                  attributes: ['id', 'profile', 'tier'],
-                },
-              ],
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-              include: [
-                {
-                  model: models.User,
-                  required: true,
-                  attributes: ['id', 'profile', 'tier'],
-                },
-              ],
-            },
-            { model: models.Topic, as: 'topic' },
-            {
-              model: models.Reaction,
-              as: 'reactions',
-              include: [
-                {
-                  model: models.Address,
-                  required: true,
-                  include: [
-                    {
-                      model: models.User,
-                      required: true,
-                      attributes: ['id', 'profile', 'tier'],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              model: models.Comment,
-              limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
-              order: [['created_at', 'DESC']],
-              attributes: [
-                'id',
-                'address_id',
-                'body',
-                'created_at',
-                'updated_at',
-                'deleted_at',
-                'marked_as_spam_at',
-                'discord_meta',
-              ],
-              include: [
-                {
-                  model: models.Address,
-                  attributes: ['address'],
-                  include: [
-                    {
-                      model: models.User,
-                      attributes: ['profile', 'tier'],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              model: models.ThreadVersionHistory,
-            },
-          ],
-        }))!.toJSON(),
+        ...result.toJSON(),
         spam_toggled: spamToggled,
       };
     },
