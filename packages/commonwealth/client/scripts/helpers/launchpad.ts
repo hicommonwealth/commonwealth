@@ -1,4 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
+import BigNumber from 'bignumber.js';
+import { weiToTokens } from 'helpers';
 import { z } from 'zod';
 
 export const calculateTokenPricing = (
@@ -21,12 +23,31 @@ export const calculateTokenPricing = (
     ).toFixed(2),
   );
   const marketCapGoal = (token?.eth_market_cap_target || 0) * ethToUsdRate;
-  const marketCapCurrent = !token?.latest_price
-    ? 0 // Latest price doesn't exist, it is 0
+
+  let marketCapCurrent = !token?.latest_price
+    ? 0
     : token?.liquidity_transferred
-      ? marketCapGoal // liquidity transferred marketCap is reached
-      : // Otherwise display calculated cap
-        currentRate * (token?.initial_supply || 0);
+      ? marketCapGoal
+      : currentRate * (token?.initial_supply || 0);
+
+  const marketCapIsMissing =
+    marketCapCurrent === null ||
+    marketCapCurrent === undefined ||
+    marketCapCurrent === 0;
+  if (marketCapIsMissing && ethToUsdRate) {
+    const initialPriceEtherStr = weiToTokens(
+      process.env.LAUNCHPAD_INITIAL_PRICE || '0',
+      18,
+    );
+    const initialPriceEther = new BigNumber(initialPriceEtherStr);
+    const ethPrice = new BigNumber(ethToUsdRate);
+    const initialPriceUsd = initialPriceEther.multipliedBy(ethPrice);
+    const defaultTotalSupply = new BigNumber(1000000000);
+    marketCapCurrent = initialPriceUsd
+      .multipliedBy(defaultTotalSupply)
+      .toNumber();
+  }
+
   const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal;
 
   return {

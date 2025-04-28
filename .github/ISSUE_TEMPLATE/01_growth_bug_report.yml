@@ -1,0 +1,151 @@
+name: Growth Bug Report
+description: Use this template for reporting bugs.
+title: "[Bug]: "
+labels: ["bug", "needs estimate", "tow", "external"]
+projects: ["hicommonwealth/47"]
+assignees: []
+body:
+- type: dropdown
+  id: priority
+  attributes:
+    label: Priority
+    description: Priority of the bug. P0 is the highest priority.
+    options:
+      - P0
+      - P1
+      - P2
+      - P3
+      - P4
+  validations:
+    required: true
+
+- type: textarea
+  id: description
+  attributes:
+    label: Description
+    description: A clear and concise description of what the bug is.
+  validations:
+    required: true
+
+- type: input
+  id: jam-link
+  attributes:
+    label: Jam Link
+    description: A link to the jam browser capture.
+  validations:
+    required: false
+
+- type: markdown
+  attributes:
+    value: |
+      ### Initial conditions
+      What was the state of the system before the bug was encountered?
+
+- type: dropdown
+  id: environment
+  attributes:
+    label: Environment
+    description: In which environment was the bug encountered?
+    options:
+      - production (common.xyz)
+      - beta (qa.commonwealth.im)
+      - demo (demo.commonwealth.im)
+    default: 0
+  validations:
+    required: true
+
+- type: dropdown
+  id: browser
+  attributes:
+    label: Browser
+    description: Which browser were you using?
+    options:
+      - Chrome
+      - Firefox
+      - Safari
+      - Edge
+      - Brave
+      - Opera
+      - Other
+  validations:
+    required: true
+
+- type: dropdown
+  id: sign-in-method
+  attributes:
+    label: Sign In Method
+    description: Which sign in method were you using?
+    options:
+      - Apple
+      - Backpack
+      - Coinbase
+      - Discord
+      - Email
+      - Farcaster
+      - GitHub
+      - Google
+      - Keplr
+      - Leap
+      - MetaMask
+      - Okx
+      - Phantom
+      - Polkadot
+      - SMS
+      - Solflare
+      - Terra Station
+      - Twitter
+      - WalletConnect
+      - Other
+  validations:
+    required: false
+
+- type: input
+  id: address
+  attributes:
+    label: Wallet Address
+    description: What is your wallet address? This is used to determine if the issue is specific to your account.
+  validations:
+    required: false
+
+- type: textarea
+  id: reproduction-steps
+  attributes:
+    label: Reproduction steps
+    description: Steps to reproduce, or note if cannot be reproduced
+    placeholder: |
+      1. Go to '...'
+      2. Click on '....'
+      3. Scroll down to '....'
+      4. See error
+  validations:
+    required: true
+
+- type: textarea
+  id: expected-behavior
+  attributes:
+    label: Expected behavior
+    description: A clear and concise description of what you expected to happen.
+  validations:
+    required: true
+
+- type: textarea
+  id: screenshots
+  attributes:
+    label: Screenshots / Video
+    description: If applicable, add screenshots or video to help explain your problem. If on a browser include a screenshot of the console.
+  validations:
+    required: false
+
+- type: markdown
+  attributes:
+    value: |
+      ## Reporter
+      Growth Team
+
+- type: textarea
+  id: additional-context
+  attributes:
+    label: Additional context
+    description: Any other context about the problem.
+  validations:
+    required: false

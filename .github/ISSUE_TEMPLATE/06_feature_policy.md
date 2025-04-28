@@ -3,6 +3,7 @@ name: Policy Feature Request
 about: Use this template for requesting a policy within a user story.
 labels: policy, enhancement, needs estimate
 title: 🟪 <Policy Name>
+type: Feature
 ---
 
 ## Description

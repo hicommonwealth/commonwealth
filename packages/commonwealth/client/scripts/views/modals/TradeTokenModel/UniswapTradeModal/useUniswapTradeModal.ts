@@ -38,7 +38,7 @@ tempWindow.Browser = {
 const uniswapRouterURLs = {
   // UNISWAP_WIDGET_HACK: the widget doesn't call any pricing endpoints if this router url isn't enforced
   // see: https://github.com/Uniswap/widgets/issues/637#issuecomment-2253135676 for more context
-  default: 'https://api.uniswap.org/v1/',
+  default: '/api/uniswapProxy?path=',
 };
 
 // custom theme to make the widget match common's style

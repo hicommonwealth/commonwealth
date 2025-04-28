@@ -11,6 +11,7 @@ import { useTokenPricing } from 'hooks/useTokenPricing';
 import numeral from 'numeral';
 import React from 'react';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
+import FormattedDisplayNumber from '../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import SocialLinks from './SocialLinks/SocialLinks';
 import './TokenDetails.scss';
 
@@ -45,6 +46,15 @@ const TokenDetails = ({
       ? (communityToken as ExternalToken).logo
       : (communityToken as LaunchpadToken).icon_url
     : undefined;
+
+  const totalSupply = !isPinnedToken ? '1000000000' : null;
+  const formattedTotalSupply = totalSupply
+    ? numeral(totalSupply).format('0.00a')
+    : 'N/A';
+
+  // Use values directly from hook (market cap fallback is handled inside hook)
+  const finalMarketCap = tokenPricing?.marketCapCurrent;
+  const displayPrice = tokenPricing?.currentPrice; // Use price directly from hook
 
   return (
     <div className="token-details">
@@ -136,18 +146,51 @@ const TokenDetails = ({
             )}
           </CWText>
         </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Market Cap
-          </CWText>
-          {communityToken ? (
-            <CWText>
-              ${numeral(tokenPricing.marketCapCurrent).format('0.00a')}
-            </CWText>
-          ) : (
-            <CWText>N/A</CWText>
-          )}
-        </div>
+        {communityToken && (
+          <>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Market Cap
+              </CWText>
+              <CWText className="stat-value">
+                {finalMarketCap !== null && finalMarketCap !== undefined
+                  ? `$${numeral(finalMarketCap).format('0.00a')}`
+                  : 'N/A'}
+              </CWText>
+            </div>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Price
+              </CWText>
+              {displayPrice !== null && displayPrice !== undefined ? (
+                <FormattedDisplayNumber
+                  value={displayPrice}
+                  options={{
+                    decimals: 8,
+                    currencySymbol: '$',
+                  }}
+                  type="b1"
+                  fontWeight="medium"
+                  className="stat-value"
+                />
+              ) : (
+                <CWText type="b1" fontWeight="medium" className="stat-value">
+                  N/A
+                </CWText>
+              )}
+            </div>
+            {!isPinnedToken && (
+              <div className="stat-item">
+                <CWText type="b1" className="faded">
+                  Total Supply
+                </CWText>
+                <CWText type="b1" fontWeight="medium">
+                  {formattedTotalSupply}
+                </CWText>
+              </div>
+            )}
+          </>
+        )}
         <div className="token-footer">
           <CWText type="b1" className="faded">
             <CWIcon iconName="users" iconSize="small" className="footer-icon" />{' '}
