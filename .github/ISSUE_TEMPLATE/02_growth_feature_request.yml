@@ -1,0 +1,33 @@
+name: "Growth Feature Request"
+description: "For growth team to request a new feature."
+labels: ["needs estimate", "request"]
+type: "Feature"
+projects: ["hicommonwealth/47"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the requested feature at a high level.
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Priority of the request feature. P0 is the highest priority.
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+        - P4
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any additional information that may be related to the feature.
+    validations:
+      required: false
