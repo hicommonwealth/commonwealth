@@ -205,8 +205,11 @@ export const calculateTotalXPForQuestActions = ({
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
   const launchpadTokenTradedMultiplerAura =
-    questActions?.find((action) => (action?.amount_multiplier || 0) > 0)
-      ?.amount_multiplier || 0;
+    questActions?.find(
+      (action) =>
+        (action?.amount_multiplier || 0) > 0 &&
+        action.event_name === 'LaunchpadTokenTraded',
+    )?.amount_multiplier || 0;
 
   return { totalXpFixed, launchpadTokenTradedMultiplerAura };
 };
