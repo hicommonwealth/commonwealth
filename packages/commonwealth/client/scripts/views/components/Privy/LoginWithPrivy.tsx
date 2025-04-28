@@ -6,7 +6,6 @@ import { LoginWithEmail } from './LoginWithEmail';
 
 /**
  * Selector that allows to pick an auth method.
- * @constructor
  */
 export const LoginWithPrivy = () => {
   const [privyAuthMethod, setPrivyAuthMethod] = useState<

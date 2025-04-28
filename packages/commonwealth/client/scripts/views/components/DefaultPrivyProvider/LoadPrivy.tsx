@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { PrivyProvider } from '@privy-io/react-auth';
 import React, { memo } from 'react';
 import { useDarkMode } from 'state/ui/darkMode/darkMode';
@@ -21,7 +22,7 @@ export const LoadPrivy = memo(function LoadPrivy(props: DefaultPrivyProvider) {
         loginMethods: ['email', 'wallet', 'sms', 'google'],
         appearance: {
           theme: darkMode ? 'dark' : 'light',
-          logo: 'https://common.xyz/brand_assets/common.png',
+          logo: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
         },
         embeddedWallets: {
           ethereum: {
