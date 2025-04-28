@@ -15,6 +15,15 @@
   justify-content: start;
   gap: 16px;
 
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
   .tier-icon {
     display: flex;
     align-items: start;

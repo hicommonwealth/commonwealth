@@ -6,7 +6,8 @@ import {
 } from '@hicommonwealth/shared';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useUserStore from 'client/scripts/state/ui/user';
-import React from 'react';
+import React, { useState } from 'react';
+import { AuthModal } from 'views/modals/AuthModal';
 import { levels } from './constants/levels';
 import LevelBox from './LevelBox';
 import { Status } from './types';
@@ -14,6 +15,7 @@ import './UserTrustLevel.scss';
 
 const UserTrustLevel = () => {
   const userData = useUserStore();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
@@ -44,6 +46,12 @@ const UserTrustLevel = () => {
       : undefined;
   };
 
+  const handleLevelClick = (level: number) => {
+    if (level === 3) {
+      setIsAuthModalOpen(true);
+    }
+  };
+
   return (
     <div className="verification-container">
       {levels.map((level) => {
@@ -63,9 +71,14 @@ const UserTrustLevel = () => {
             icon={icon}
             items={level.items}
             showArrow={level.redirect}
+            onClick={() => handleLevelClick(level.level)}
           />
         );
       })}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 };

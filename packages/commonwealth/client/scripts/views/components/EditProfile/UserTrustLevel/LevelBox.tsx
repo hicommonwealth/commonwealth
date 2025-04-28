@@ -23,6 +23,7 @@ interface LevelBoxProps {
   icon?: ComponentIcon;
   items?: Array<{ label: string }>;
   showArrow?: boolean;
+  onClick?: () => void;
 }
 
 const getTagType = (status: Status): 'passed' | 'proposal' => {
@@ -39,9 +40,13 @@ const LevelBox = ({
   icon,
   items,
   showArrow = false,
+  onClick,
 }: LevelBoxProps) => {
   return (
-    <div className={`level-box level-${color} ${isLocked ? 'disabled' : ''}`}>
+    <div
+      className={`level-box level-${color} ${isLocked ? 'disabled' : ''} ${onClick ? 'clickable' : ''}`}
+      onClick={!isLocked ? onClick : undefined}
+    >
       <div className="tier-icon">
         {icon && <CWIcon iconName={icon} iconSize="xl" />}
       </div>
