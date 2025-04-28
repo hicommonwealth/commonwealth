@@ -1,4 +1,4 @@
-import { VerificationLevel } from '../types';
+import { VerificationItemType, VerificationLevel } from '../types';
 
 export const levels: VerificationLevel[] = [
   {
@@ -34,8 +34,16 @@ export const levels: VerificationLevel[] = [
     status: 'Not Started',
     color: 'gray',
     items: [
-      { label: 'Verify Community', status: 'Not Started' },
-      { label: 'Verify Domain Ownership', status: 'Not Started' },
+      {
+        label: 'Verify Community',
+        type: VerificationItemType.VERIFY_COMMUNITY,
+        status: 'Not Started',
+      },
+      {
+        label: 'Verify Domain Ownership',
+        type: VerificationItemType.VERIFY_DOMAIN,
+        status: 'Not Started',
+      },
     ],
     redirect: true,
   },

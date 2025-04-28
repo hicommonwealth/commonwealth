@@ -1,7 +1,13 @@
 export type Status = 'Done' | 'Not Started';
 
+export enum VerificationItemType {
+  VERIFY_COMMUNITY = 'VERIFY_COMMUNITY',
+  VERIFY_DOMAIN = 'VERIFY_DOMAIN',
+}
+
 export interface VerificationItem {
   label: string;
+  type: VerificationItemType;
   status: Status;
 }
 

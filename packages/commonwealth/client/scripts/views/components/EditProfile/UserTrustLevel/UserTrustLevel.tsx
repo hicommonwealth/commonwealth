@@ -7,15 +7,17 @@ import {
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useUserStore from 'client/scripts/state/ui/user';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthModal } from 'views/modals/AuthModal';
 import { levels } from './constants/levels';
 import LevelBox from './LevelBox';
-import { Status } from './types';
+import { Status, VerificationItem, VerificationItemType } from './types';
 import './UserTrustLevel.scss';
 
 const UserTrustLevel = () => {
   const userData = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
@@ -52,6 +54,19 @@ const UserTrustLevel = () => {
     }
   };
 
+  const handleItemClick = (item: VerificationItem) => {
+    switch (item.type) {
+      case VerificationItemType.VERIFY_COMMUNITY:
+        navigate('/createCommunity');
+        break;
+      case VerificationItemType.VERIFY_DOMAIN:
+        navigate('/createCommunity');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="verification-container">
       {levels.map((level) => {
@@ -72,6 +87,7 @@ const UserTrustLevel = () => {
             items={level.items}
             showArrow={level.redirect}
             onClick={() => handleLevelClick(level.level)}
+            onItemClick={handleItemClick}
           />
         );
       })}

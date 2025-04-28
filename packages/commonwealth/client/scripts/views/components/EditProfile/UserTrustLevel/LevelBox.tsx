@@ -24,6 +24,7 @@ interface LevelBoxProps {
   items?: Array<{ label: string }>;
   showArrow?: boolean;
   onClick?: () => void;
+  onItemClick?: (item: { label: string }) => void;
 }
 
 const getTagType = (status: Status): 'passed' | 'proposal' => {
@@ -41,6 +42,7 @@ const LevelBox = ({
   items,
   showArrow = false,
   onClick,
+  onItemClick,
 }: LevelBoxProps) => {
   return (
     <div
@@ -67,7 +69,16 @@ const LevelBox = ({
         {items && items.length > 0 && (
           <div className={`level-items ${isLocked ? 'locked' : ''}`}>
             {items.map((item, idx) => (
-              <div key={idx} className="level-item">
+              <div
+                key={idx}
+                className="level-item"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isLocked && onItemClick) {
+                    onItemClick(item);
+                  }
+                }}
+              >
                 <div className="level-item-content">
                   <CWTag type={getTagType(status)} label={status} />
                   <CWText type="b2" className="item-label">
