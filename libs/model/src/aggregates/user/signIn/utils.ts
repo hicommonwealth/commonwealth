@@ -2,7 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
-import { Op, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../../config';
 import { models } from '../../../database';
@@ -105,7 +105,6 @@ async function checkNativeWalletBalance(
   address: string,
   foundUser: UserAttributes | null,
   ethChainId?: number,
-  transaction?: Transaction,
 ): Promise<UserTierMap> {
   if (
     (foundUser?.tier || UserTierMap.IncompleteUser) < UserTierMap.SocialVerified
@@ -119,22 +118,7 @@ async function checkNativeWalletBalance(
       : { [address]: '0' };
     const balance = BigInt(balances[address] || '0');
     const minBalance = BigInt(config.CONTESTS.MIN_USER_ETH * 1e18);
-    if (balance >= minBalance) {
-      // update tier of found user
-      if (foundUser) {
-        await models.User.update(
-          { tier: UserTierMap.SocialVerified },
-          {
-            where: {
-              id: foundUser.id,
-              tier: { [Op.lt]: UserTierMap.SocialVerified },
-            },
-            transaction,
-          },
-        );
-      }
-      return UserTierMap.SocialVerified;
-    }
+    if (balance >= minBalance) return UserTierMap.SocialVerified;
   }
   return UserTierMap.NewlyVerifiedWallet;
 }
@@ -165,31 +149,27 @@ export async function findOrCreateUser({
     ? await findUserBySso(ssoInfo, transaction)
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
-  const updatePrivyId = async (userId: number) => {
-    await models.User.update(
-      { privy_id: privyUserId },
-      {
-        where: {
-          id: userId,
-        },
-        transaction,
-      },
-    );
+  const tier =
+    privyUserId && ssoInfo
+      ? UserTierMap.SocialVerified
+      : await checkNativeWalletBalance(address, foundUser, ethChainId);
+
+  const updateUser = async (id: number, values: Partial<UserAttributes>) => {
+    if (Object.keys(values).length)
+      await models.User.update(values, { where: { id }, transaction });
   };
 
-  if (privyUserId && signedInUser && !signedInUser.privy_id)
-    await updatePrivyId(signedInUser.id!);
-  if (privyUserId && foundUser && !signedInUser && !foundUser.privy_id)
-    await updatePrivyId(foundUser.id!);
-
-  const tier = privyUserId
-    ? UserTierMap.SocialVerified
-    : await checkNativeWalletBalance(
-        address,
-        foundUser,
-        ethChainId,
-        transaction,
-      );
+  if (signedInUser?.id) {
+    const values: Partial<UserAttributes> = {};
+    if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
+    if (signedInUser.tier < tier) values.tier = tier;
+    await updateUser(signedInUser.id, values);
+  } else if (foundUser?.id) {
+    const values: Partial<UserAttributes> = {};
+    if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
+    if (foundUser.tier < tier) values.tier = tier;
+    await updateUser(foundUser.id, values);
+  }
 
   // Signed-in user signing in with another users address (address transfer) OR
   // Signed-out user signing in with an address they own
