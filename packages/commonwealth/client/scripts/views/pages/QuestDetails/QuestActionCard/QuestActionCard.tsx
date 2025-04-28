@@ -1,13 +1,11 @@
-import {
-  QuestActionMeta,
-  QuestParticipationLimit,
-} from '@hicommonwealth/schemas';
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
   getTotalRepititionCountsForQuestAction,
+  QuestAction,
 } from 'helpers/quest';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
@@ -18,15 +16,15 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { z } from 'zod';
-import './QuestActionCard.scss';
 import { actionCopies } from './helpers';
+import './QuestActionCard.scss';
+import TotalQuestActionXPTag from './TotalQuestActionXPTag';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (action: z.infer<typeof QuestActionMeta>) => void;
+  onActionStart: (action: QuestAction) => void;
   actionNumber: number;
-  questAction: z.infer<typeof QuestActionMeta>;
+  questAction: QuestAction;
   isActionInEligible?: boolean;
   xpLogsForActions?: { id: number; createdAt: Date }[];
   inEligibilityReason?: string;
@@ -49,12 +47,13 @@ const QuestActionCard = ({
   questStartDate,
   questEndDate,
 }: QuestActionCardProps) => {
+  const rewardAmount = questAction.reward_amount;
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
       questAction.creator_reward_weight * 100,
       2,
     ),
-    value: questAction.creator_reward_weight * questAction.reward_amount,
+    value: questAction.creator_reward_weight * rewardAmount,
   };
 
   const user = useUserStore();
@@ -183,15 +182,12 @@ const QuestActionCard = ({
                   </span>
                   &nbsp; shared with{' '}
                   {actionCopies.shares[questAction.event_name]}. Your share ={' '}
-                  {Math.abs(questAction.reward_amount - creatorXP.value)} Aura
+                  {Math.abs(rewardAmount - creatorXP.value)} Aura
                   {isRepeatableQuest ? ` / attempt` : ''}
                 </CWText>
               )}
             <div className="points-row">
-              <CWTag
-                label={`${questAction.reward_amount} Aura${isRepeatableQuest ? ` / attempt` : ''}`}
-                type="proposal"
-              />
+              <TotalQuestActionXPTag questAction={questAction} />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
                 attemptsLeft !== totalActionRepititions && (
