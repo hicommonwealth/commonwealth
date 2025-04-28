@@ -70,7 +70,9 @@ export const CodeDialog = (props: Props) => {
           {digits.map((d, idx) => (
             <input
               key={idx}
-              ref={(el) => (inputs.current[idx] = el)}
+              ref={(el) => {
+                inputs.current[idx] = el;
+              }}
               type="text"
               inputMode="numeric"
               maxLength={1}

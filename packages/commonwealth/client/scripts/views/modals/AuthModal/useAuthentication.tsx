@@ -245,6 +245,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setSMS(undefined);
         setIsMagicLoading(false);
       },
+      onError: privyCallbacks.onError,
     });
     await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
   };
@@ -303,6 +304,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           setEmail(undefined);
           setIsMagicLoading(false);
         },
+        onError: privyCallbacks.onError,
       });
       await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
 
