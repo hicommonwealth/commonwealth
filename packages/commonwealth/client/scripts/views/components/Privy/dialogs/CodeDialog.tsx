@@ -70,6 +70,7 @@ export const CodeDialog = (props: Props) => {
           {digits.map((d, idx) => (
             <input
               key={idx}
+              autoFocus={idx === 0}
               ref={(el) => {
                 inputs.current[idx] = el;
               }}
