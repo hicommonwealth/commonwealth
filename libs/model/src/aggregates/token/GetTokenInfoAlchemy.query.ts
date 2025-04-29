@@ -40,6 +40,8 @@ export function GetTokenInfoAlchemy(): Query<
       mustExist('network not supported by alchemy', network);
 
       const today = new Date();
+      // Need two days ago because we need
+      // today's price + yesterday's price for 24 hour change
       const twoDaysAgo = new Date();
       twoDaysAgo.setHours(today.getHours() - 2 * 24);
 
