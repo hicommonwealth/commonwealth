@@ -17,14 +17,3 @@ export type PrivyOAuthProvider =
   | 'tiktok'
   | 'linkedin'
   | 'apple';
-
-export function toSignInProvider(
-  provider: OAuthProvider,
-): PrivySignInSSOProvider {
-  switch (provider) {
-    case 'google':
-      return 'google_oauth';
-    default:
-      throw new Error('Not supported: ' + provider);
-  }
-}

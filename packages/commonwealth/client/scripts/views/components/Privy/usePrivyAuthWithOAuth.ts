@@ -5,9 +5,10 @@ import {
   usePrivy,
 } from '@privy-io/react-auth';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toSignInProvider } from 'views/components/Privy/helpers';
 import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
 import { usePrivyAuthEffect } from 'views/components/Privy/usePrivyAuthEffect';
-import { OAuthProvider, toSignInProvider } from './types';
+import { OAuthProvider } from './types';
 
 /**
  * Use privy auth with OAuth providers. Like google.
