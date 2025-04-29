@@ -9,7 +9,7 @@ type OnError = (err: Error) => void;
 type InternalState = {
   active: boolean;
   onCancel: OnCancel | undefined;
-  onError: OnError | undefined;
+  onError: OnError;
 };
 
 type SMSDialogStore = InternalState & {
@@ -20,7 +20,7 @@ export const smsDialogStore = createStore<SMSDialogStore>()(
   devtools((set) => ({
     active: false,
     onCancel: undefined,
-    onError: undefined,
+    onError: () => {},
     setState: (newState: InternalState) => set(newState),
   })),
 );

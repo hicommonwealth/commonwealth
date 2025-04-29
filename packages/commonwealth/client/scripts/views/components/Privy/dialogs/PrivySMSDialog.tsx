@@ -21,12 +21,12 @@ export const PrivySMSDialog = () => {
         setSMSDialogStore({
           active: false,
           onCancel: undefined,
-          onError: undefined,
+          onError: () => {},
         });
 
         await loginWithCode({ code });
       }
-      doAsync().catch(onError);
+      doAsync().catch((err) => onError(err));
     },
     [onError, setSMSDialogStore, loginWithCode],
   );
@@ -36,7 +36,7 @@ export const PrivySMSDialog = () => {
     setSMSDialogStore({
       active: false,
       onCancel: undefined,
-      onError: undefined,
+      onError: () => {},
     });
   }, [onCancel, setSMSDialogStore]);
 

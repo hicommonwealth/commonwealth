@@ -21,12 +21,12 @@ export const PrivyEmailDialog = () => {
         setEmailDialogStore({
           active: false,
           onCancel: undefined,
-          onError: undefined,
+          onError: () => {},
         });
 
         await loginWithCode({ code });
       }
-      doAsync().catch(onError);
+      doAsync().catch((err) => onError(err));
     },
     [onError, setEmailDialogStore, loginWithCode],
   );
