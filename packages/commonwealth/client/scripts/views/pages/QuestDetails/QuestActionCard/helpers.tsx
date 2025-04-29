@@ -87,7 +87,17 @@ export const actionCopies = {
     ['DiscordServerJoined']: () => '',
     ['MembershipsRefreshed']: () => '',
     ['LaunchpadTokenCreated']: () => '',
-    ['OneOffContestManagerDeployed']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['OneOffContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Create a one-time contest in your community</li>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
