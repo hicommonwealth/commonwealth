@@ -71,6 +71,7 @@ export const CodeDialog = (props: Props) => {
             <input
               key={idx}
               autoFocus={idx === 0}
+              autoComplete="off"
               ref={(el) => {
                 inputs.current[idx] = el;
               }}
