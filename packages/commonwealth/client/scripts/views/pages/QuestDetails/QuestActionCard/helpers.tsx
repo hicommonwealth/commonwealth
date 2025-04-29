@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import { pluralize } from 'helpers';
 import React from 'react';
 
@@ -87,6 +86,7 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    // eslint-disable-next-line react/no-multi-comp
     ['XpChainEventCreated']: (
       contractAddress: string,
       ethChainId: number | string,
