@@ -90,20 +90,19 @@ async function createInitialContest(
       isOneOff,
     );
 
-  // get general topic
-  const topic = await models.Topic.findOne({
-    where: {
-      community_id: community!.id,
-      name: 'General',
-    },
-  });
-  if (!topic) {
-    log.warn(`General topic not found for community ${community!.id}`);
-    return;
-  }
-
   await models.sequelize.transaction(async (transaction) => {
     if (isTokenGraduation) {
+      // get general topic
+      const topic = await models.Topic.findOne({
+        where: {
+          community_id: community!.id,
+          name: 'General',
+        },
+      });
+      if (!topic) {
+        log.warn(`General topic not found for community ${community!.id}`);
+        return;
+      }
       await models.ContestManager.create(
         {
           contest_address,
