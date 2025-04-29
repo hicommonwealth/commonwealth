@@ -83,7 +83,10 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
-      const { contentUrl } = await uploadIfLarge('comments', body);
+      const { truncatedBody, contentUrl } = await uploadIfLarge(
+        'comments',
+        body,
+      );
 
       // == mutation transaction boundary ==
       const new_comment_id = await models.sequelize.transaction(
@@ -93,7 +96,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               ...rest,
               thread_id,
               parent_id,
-              body,
+              body: truncatedBody || body,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: '0',
@@ -119,7 +122,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
           await models.CommentVersionHistory.create(
             {
               comment_id: comment.id!,
-              body: comment.body,
+              body: truncatedBody || comment.body,
               timestamp: comment.created_at!,
               content_url: contentUrl,
             },

@@ -214,9 +214,11 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
       }
 
       let contentUrl: string | null = thread.content_url ?? null;
+      let truncatedBody: string | null = null;
       if (content.body) {
         const result = await uploadIfLarge('threads', content.body);
         contentUrl = result.contentUrl;
+        truncatedBody = result.truncatedBody;
       }
 
       let newBody = content.body || thread.body || '';
@@ -245,8 +247,10 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
         };
         await thread.update(
           {
-            // TODO: body should be set to truncatedBody once client renders content_url
             ...content,
+            ...('body' in content
+              ? { body: truncatedBody || content.body }
+              : {}),
             ...adminPatch,
             ...ownerPatch,
             last_edited: new Date(),
@@ -293,8 +297,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
               {
                 thread_id,
                 address: address.address,
-                // TODO: body should be set to truncatedBody once client renders content_url
-                body: content.body,
+                body: truncatedBody || content.body,
                 timestamp: new Date(),
                 content_url: contentUrl,
               },
