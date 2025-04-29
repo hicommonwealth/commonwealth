@@ -3,21 +3,38 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Get the ID of the Sui chain node that was added in the previous migration
+    // First clear any existing records that might conflict
+    await queryInterface.sequelize.query(
+      `DELETE FROM "ChainNodes" WHERE LOWER(name) LIKE '%sui%'`,
+    );
+    await queryInterface.bulkDelete('Topics', { community_id: 'sui' });
+    await queryInterface.bulkDelete('Communities', { id: 'sui' });
+
+    // Create the Sui chain node
+    const suiChainNode = {
+      name: 'Sui',
+      url: 'https://fullnode.mainnet.sui.io',
+      balance_type: 'sui',
+      block_explorer: 'https://suiscan.com/',
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    await queryInterface.bulkInsert('ChainNodes', [suiChainNode]);
+
+    // Get the ID of the newly created Sui chain node
     const [suiChainNodes] = await queryInterface.sequelize.query(
       `SELECT id FROM "ChainNodes" WHERE name = 'Sui' AND url = 'https://fullnode.mainnet.sui.io'`,
     );
 
     if (suiChainNodes.length === 0) {
-      throw new Error(
-        'Sui chain node not found. Make sure 20250425000001-add-sui-chain-node.js migration was run.',
-      );
+      throw new Error('Failed to create Sui chain node');
     }
 
     const suiChainNodeId = suiChainNodes[0].id;
     const now = new Date();
 
-    // Create the base Sui community
+    // Create the base Sui community using the chain node ID
     const suiCommunity = {
       id: 'sui',
       tier: 0, // Default tier
@@ -55,10 +72,16 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Delete the topics first due to foreign key constraints
+    // Delete in reverse order due to foreign key constraints
+    // Delete the topics first
     await queryInterface.bulkDelete('Topics', { community_id: 'sui' });
 
     // Delete the Sui community
     await queryInterface.bulkDelete('Communities', { id: 'sui' });
+
+    // Delete any ChainNodes with "sui" in the name (case-insensitive)
+    await queryInterface.sequelize.query(
+      `DELETE FROM "ChainNodes" WHERE LOWER(name) LIKE '%sui%'`,
+    );
   },
 };
