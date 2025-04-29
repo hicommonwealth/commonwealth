@@ -21,20 +21,16 @@ export const trpcClient = trpc.createClient({
             user.addresses?.at(0)?.address,
         };
       };
-      // return ['production', 'beta'].includes(process.env.APP_ENV || 'local') ||
-      //   process.env.ENABLE_TRPC_BATCHING === 'true'
-      //   ? httpBatchLink({
-      //       url: BASE_API_PATH,
-      //       headers: getHeaders,
-      //     })
-      //   : httpLink({
-      //       url: BASE_API_PATH,
-      //       headers: getHeaders,
-      //     });
-      return httpBatchLink({
-        url: BASE_API_PATH,
-        headers: getHeaders,
-      });
+      return ['production', 'beta'].includes(process.env.APP_ENV || 'local') ||
+        process.env.ENABLE_TRPC_BATCHING === 'true'
+        ? httpBatchLink({
+            url: BASE_API_PATH,
+            headers: getHeaders,
+          })
+        : httpLink({
+            url: BASE_API_PATH,
+            headers: getHeaders,
+          });
     })(),
   ],
   transformer: undefined,
