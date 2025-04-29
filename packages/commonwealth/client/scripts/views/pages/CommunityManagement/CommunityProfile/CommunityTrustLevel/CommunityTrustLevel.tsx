@@ -11,7 +11,6 @@ import { ButtonType } from 'views/components/component_kit/new_designs/CWButton/
 import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTrustLevel.scss';
 import LevelBox from './LevelBox';
-import { levels } from './constants/levels';
 import { Status } from './types';
 
 const CommunityTrustLevel = () => {
@@ -24,9 +23,11 @@ const CommunityTrustLevel = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const currentTier = community?.tier || 0;
+
   const getLevelStatus = (level: number): Status => {
     return level <= currentTier ? 'Done' : 'Not Started';
   };
+
   const getTierIcon = (level: number) => {
     const tierEntry = Object.entries(COMMUNITY_TIERS).find(([key]) => {
       const tier = COMMUNITY_TIERS[
@@ -79,9 +80,40 @@ const CommunityTrustLevel = () => {
     }
   };
 
+  const getLevels = () => {
+    return Object.entries(COMMUNITY_TIERS)
+      .filter(([key]) => {
+        const tier = COMMUNITY_TIERS[
+          parseInt(key) as CommunityTierMap
+        ] as Tier & {
+          clientInfo?: { trustLevel: number };
+        };
+        return (
+          hasCommunityTierClientInfo(parseInt(key) as CommunityTierMap) &&
+          tier.clientInfo?.trustLevel
+        );
+      })
+      .map(([key]) => {
+        const tier = COMMUNITY_TIERS[
+          parseInt(key) as CommunityTierMap
+        ] as Tier & {
+          clientInfo: { trustLevel: number; componentIcon: string };
+        };
+        return {
+          level: tier.clientInfo.trustLevel,
+          title: tier.name,
+          description: tier.description,
+          color: 'gray',
+          items: [],
+          redirect: false,
+        };
+      })
+      .sort((a, b) => a.level - b.level);
+  };
+
   return (
     <div className="CommunityTrustLevel">
-      {levels.map((level) => {
+      {getLevels().map((level) => {
         const status = getLevelStatus(level.level);
         const icon = getTierIcon(level.level);
         const { showButton, buttonLabel, buttonType } = getButtonConfig(
