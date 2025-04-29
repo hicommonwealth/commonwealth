@@ -1,4 +1,4 @@
-import { httpBatchLink } from '@trpc/client';
+import { httpBatchLink, httpLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import type { API } from '../../../server/api/internal-router';
 import { userStore } from '../state/ui/user';
