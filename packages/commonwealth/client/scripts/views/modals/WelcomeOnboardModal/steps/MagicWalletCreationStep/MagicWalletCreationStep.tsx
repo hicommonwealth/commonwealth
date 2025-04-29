@@ -2,14 +2,23 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import magicWalletModalImage from '../../../../../../assets/img/magic-wallet-modal-image.svg';
+import { WalletFundsModal } from '../../../WalletFundsModal';
+
 import './MagicWalletCreationStep.scss';
+
+const newWalletFunding = false;
 
 type MagicWalletCreationStepProps = {
   onComplete: () => void;
 };
+
 const MagicWalletCreationStep = ({
   onComplete,
 }: MagicWalletCreationStepProps) => {
+  if (newWalletFunding) {
+    return <WalletFundsModal />;
+  }
+
   return (
     <section className="MagicWalletCreationStep">
       <CWText type="h4" fontWeight="semiBold">
