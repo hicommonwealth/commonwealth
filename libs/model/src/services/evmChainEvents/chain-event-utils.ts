@@ -274,8 +274,8 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   event: EvmEvent,
 ) => {
   if (
-    !('quest_action_meta_id' in event.meta) ||
-    !event.meta.quest_action_meta_id
+    !('quest_action_meta_ids' in event.meta) ||
+    !event.meta.quest_action_meta_ids
   ) {
     throw new Error('Custom XP chain event is missing quest action meta id');
   }
@@ -284,7 +284,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
     event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
-      quest_action_meta_id: event.meta.quest_action_meta_id,
+      quest_action_meta_ids: event.meta.quest_action_meta_ids,
       transaction_hash: event.rawLog.transactionHash,
       created_at: new Date(Number(event.block.timestamp) * 1_000),
     },
