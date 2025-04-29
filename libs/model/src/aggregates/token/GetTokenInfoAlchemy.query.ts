@@ -4,11 +4,9 @@ import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Network } from 'alchemy-sdk';
 import z from 'zod';
-import { mustExist } from '../../middleware';
 
 const ethChainIdToAlchemy: Record<number, Network> = {
   [ValidChains.Base]: Network.BASE_MAINNET,
-  [ValidChains.SepoliaBase]: Network.BASE_SEPOLIA,
 };
 
 const errorObject = {
@@ -36,8 +34,6 @@ export function GetTokenInfoAlchemy(): Query<
         );
         return errorObject;
       }
-
-      mustExist('network not supported by alchemy', network);
 
       const today = new Date();
       // Need two days ago because we need
