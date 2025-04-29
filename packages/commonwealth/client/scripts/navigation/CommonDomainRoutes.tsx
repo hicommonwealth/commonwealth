@@ -1,7 +1,6 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { PrivyTest } from 'views/components/Privy/PrivyTest';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
@@ -150,12 +149,6 @@ const CommonDomainRoutes = () => [
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
     element={<MobileAppRedirect />}
-  />,
-
-  <Route
-    key="privy-test"
-    path="/_internal/privy-test"
-    element={<PrivyTest />}
   />,
 
   <Route
