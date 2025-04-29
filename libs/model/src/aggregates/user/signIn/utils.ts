@@ -117,7 +117,7 @@ async function checkNativeWalletBalance(
         })
       : { [address]: '0' };
     const balance = BigInt(balances[address] || '0');
-    const minBalance = BigInt(config.CONTESTS.MIN_USER_ETH * 1e18);
+    const minBalance = BigInt(config.TIER.SOCIAL_VERIFIED_MIN_ETH * 1e18);
     if (balance >= minBalance) return UserTierMap.SocialVerified;
   }
   return UserTierMap.NewlyVerifiedWallet;

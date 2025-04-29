@@ -69,6 +69,7 @@ const {
   CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
+  TIER_SOCIAL_VERIFIED_MIN_ETH,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -82,6 +83,7 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   TWITTER_LOG_LEVEL: 'info' as const,
+  TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
 };
 
 export const config = configure(
@@ -232,6 +234,11 @@ export const config = configure(
             },
           }),
       },
+    },
+    TIER: {
+      SOCIAL_VERIFIED_MIN_ETH: parseFloat(
+        TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
+      ),
     },
   },
   z.object({
@@ -502,6 +509,9 @@ export const config = configure(
             'Turnstile create comment widget keys are required in production',
           ),
       }),
+    }),
+    TIER: z.object({
+      SOCIAL_VERIFIED_MIN_ETH: z.number(),
     }),
   }),
 );
