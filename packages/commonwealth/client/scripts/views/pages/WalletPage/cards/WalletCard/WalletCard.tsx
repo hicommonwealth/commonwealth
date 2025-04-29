@@ -70,7 +70,9 @@ const WalletCard = () => {
         <div style={{ marginLeft: 'auto' }}>
           <CWIconButton
             iconName="arrowClockwise"
-            onClick={handleRefresh}
+            onClick={() => {
+              handleRefresh().catch(console.error);
+            }}
             disabled={isLoadingTokensInfo}
           />
         </div>
