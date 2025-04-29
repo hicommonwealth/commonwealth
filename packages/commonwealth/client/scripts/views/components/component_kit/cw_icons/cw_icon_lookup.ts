@@ -364,6 +364,7 @@ export const customIconLookup = {
   backpack: CustomIcons.CWBackpack,
   solflare: CustomIcons.CWSolflare,
   sui: CustomIcons.CWSui,
+  'sui-wallet': CustomIcons.CWSui,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,

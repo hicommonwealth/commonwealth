@@ -148,7 +148,7 @@ class SuiWebWalletController implements IWebWallet<string> {
    * Not part of the IWebWallet interface but can be useful for applications
    */
   public async signPersonalMessage(
-    message: Uint8Array,
+    message: Uint8Array | string,
   ): Promise<{ signature: Uint8Array }> {
     if (!this._wallet || !this._wallet.accounts.length) {
       throw new Error('Wallet not connected');
@@ -159,10 +159,23 @@ class SuiWebWalletController implements IWebWallet<string> {
     }
 
     const signMessageFeature = this._wallet.features['sui:signPersonalMessage'];
-    return await signMessageFeature.signPersonalMessage({
-      message,
-      account: this._wallet.accounts[0],
-    });
+
+    // Convert string message to Uint8Array if needed
+    const messageBytes =
+      typeof message === 'string' ? new TextEncoder().encode(message) : message;
+
+    // Sign the message with the first connected account
+    try {
+      return await signMessageFeature.signPersonalMessage({
+        message: messageBytes,
+        account: this._wallet.accounts[0],
+      });
+    } catch (error) {
+      console.error('Error signing personal message with Sui Wallet:', error);
+      throw new Error(
+        `Failed to sign message with Sui Wallet: ${error.message || 'Unknown error'}`,
+      );
+    }
   }
 
   // ACTIONS
