@@ -148,7 +148,10 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.ThreadVersionHistory);
+    .withMany(db.ThreadVersionHistory)
+    .withOne(db.ThreadRank, {
+      onDelete: 'CASCADE',
+    });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
