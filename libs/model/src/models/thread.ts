@@ -155,20 +155,22 @@ export default (
             thread.address_id,
           )) as AddressAttributes | null;
 
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: 'ThreadCreated',
-                event_payload: {
-                  ...thread.get({ plain: true }),
-                  address: address!.address,
-                  contestManagers,
+          if (!thread.marked_as_spam_at) {
+            await emitEvent(
+              Outbox,
+              [
+                {
+                  event_name: 'ThreadCreated',
+                  event_payload: {
+                    ...thread.get({ plain: true }),
+                    address: address!.address,
+                    contestManagers,
+                  },
                 },
-              },
-            ],
-            options.transaction,
-          );
+              ],
+              options.transaction,
+            );
+          }
         },
         afterDestroy: async (thread: ThreadInstance) => {
           await cache().setKey(
