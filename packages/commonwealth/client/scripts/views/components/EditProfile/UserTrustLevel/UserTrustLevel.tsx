@@ -9,6 +9,7 @@ import useUserStore from 'client/scripts/state/ui/user';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from 'views/modals/AuthModal';
+import CommunitySelectionModal from './CommunitySelectionModal';
 import { levels } from './constants/levels';
 import LevelBox from './LevelBox';
 import { Status, VerificationItem, VerificationItemType } from './types';
@@ -17,6 +18,7 @@ import './UserTrustLevel.scss';
 const UserTrustLevel = () => {
   const userData = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const { data } = useFetchProfileByIdQuery({
@@ -57,7 +59,11 @@ const UserTrustLevel = () => {
   const handleItemClick = (item: VerificationItem) => {
     switch (item.type) {
       case VerificationItemType.VERIFY_COMMUNITY:
-        navigate('/createCommunity');
+        if (userData.communities.length > 0) {
+          setIsCommunityModalOpen(true);
+        } else {
+          navigate('/createCommunity');
+        }
         break;
       case VerificationItemType.VERIFY_DOMAIN:
         navigate('/createCommunity');
@@ -95,6 +101,11 @@ const UserTrustLevel = () => {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         showAuthOptionTypesFor={['sso']}
+      />
+      <CommunitySelectionModal
+        isOpen={isCommunityModalOpen}
+        onClose={() => setIsCommunityModalOpen(false)}
+        communities={userData.communities}
       />
     </div>
   );
