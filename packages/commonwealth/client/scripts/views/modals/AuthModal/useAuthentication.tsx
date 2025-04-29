@@ -335,8 +335,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
 
       await handleSuccess(magicAddress, isNewlyCreated);
+      // FIXME: do we call this in our onClose?
       props?.onModalClose?.();
 
+      // FIXME: do we call this in our onClose?
       trackLoginEvent(provider, true);
     } catch (e) {
       notifyError(`Error authenticating with sso account`);
@@ -347,9 +349,24 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
-    setIsMagicLoading(true);
-    console.log('onSocialLoginPrivy: ' + provider);
-    privyAuthWithOAuth.onInitOAuth(provider);
+    // FIXME:
+    // const bearer = await magic.farcaster.login();
+    //
+    // const { address } = await handleSocialLoginCallback({
+    //   bearer,
+    //   walletSsoSource: WalletSsoSource.Farcaster,
+    //   referrer_address,
+    // });
+    //
+    // return { bearer, address };
+
+    if (provider === WalletSsoSource.Farcaster) {
+      console.warn("Farcaster isn't supported yet.");
+    } else {
+      setIsMagicLoading(true);
+      console.log('onSocialLoginPrivy: ' + provider);
+      privyAuthWithOAuth.onInitOAuth(provider);
+    }
   };
 
   const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;
