@@ -43,7 +43,7 @@
     "passport": "^0.7.0",
     "pg": "^8.11.3",
     "rascal": "^20.1.1",
-    "redis": "4.2.0",
+    "redis": "4.7.0",
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
     "swagger-ui-express": "^5.0.0",

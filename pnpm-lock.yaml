@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@commonxyz/common-protocol-abis':
-        specifier: 1.4.10
-        version: 1.4.10
+        specifier: 1.4.11
+        version: 1.4.11
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -164,7 +164,7 @@ importers:
         version: 3.7.0(@swc/helpers@0.5.12)(vite@5.4.11(@types/node@20.12.10)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))
       '@vitest/coverage-istanbul':
         specifier: ^1.6.0
-        version: 1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))
+        version: 1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))
       chai:
         specifier: ^4.3.6
         version: 4.4.1
@@ -302,7 +302,7 @@ importers:
         version: 4.3.2(typescript@5.8.2)(vite@5.4.11(@types/node@20.12.10)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))
       vitest:
         specifier: ^1.6.1
-        version: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0)
+        version: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0)
       wait-on:
         specifier: ^7.2.0
         version: 7.2.0
@@ -370,8 +370,8 @@ importers:
         specifier: ^20.1.1
         version: 20.1.1(amqplib@0.10.4)
       redis:
-        specifier: 4.2.0
-        version: 4.2.0
+        specifier: 4.7.0
+        version: 4.7.0
       rollbar:
         specifier: ^2.6.1
         version: 2.26.4
@@ -3135,8 +3135,8 @@ packages:
   '@coinbase/wallet-sdk@4.3.0':
     resolution: {integrity: sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw==}
 
-  '@commonxyz/common-protocol-abis@1.4.10':
-    resolution: {integrity: sha512-EM5MBGjOSOukfEUlZa2PkWZ1pCbWmHVMXlOIei5KUwxunHr0Qi/Rd1IGZfaxYGeeMdEH3/CObAu2l8qOqyKQfw==}
+  '@commonxyz/common-protocol-abis@1.4.11':
+    resolution: {integrity: sha512-MJWrj6NLma4+t7VtyPk3fsk92ozUD1YyNBJGgOKxdirQKKIkYXwR1+JIVmQXGrnE2MOp4S2cJhWpyMCc17Vv/Q==}
 
   '@confio/ics23@0.6.8':
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
@@ -7219,32 +7219,32 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@redis/bloom@1.0.2':
-    resolution: {integrity: sha512-EBw7Ag1hPgFzdznK2PBblc1kdlj5B5Cw3XwI9/oG7tSn85/HKy3X9xHy/8tm/eNXJYHLXHJL/pkwBpFMVVefkw==}
+  '@redis/bloom@1.2.0':
+    resolution: {integrity: sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==}
     peerDependencies:
       '@redis/client': ^1.0.0
 
-  '@redis/client@1.2.0':
-    resolution: {integrity: sha512-a8Nlw5fv2EIAFJxTDSSDVUT7yfBGpZO96ybZXzQpgkyLg/dxtQ1uiwTc0EGfzg1mrPjZokeBSEGTbGXekqTNOg==}
+  '@redis/client@1.6.0':
+    resolution: {integrity: sha512-aR0uffYI700OEEH4gYnitAnv3vzVGXCFvYfdpu/CJKvk4pHfLPEy/JSZyrpQ+15WhXe1yJRXLtfQ84s4mEXnPg==}
     engines: {node: '>=14'}
 
-  '@redis/graph@1.0.1':
-    resolution: {integrity: sha512-oDE4myMCJOCVKYMygEMWuriBgqlS5FqdWerikMoJxzmmTUErnTRRgmIDa2VcgytACZMFqpAOWDzops4DOlnkfQ==}
+  '@redis/graph@1.1.1':
+    resolution: {integrity: sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==}
     peerDependencies:
       '@redis/client': ^1.0.0
 
-  '@redis/json@1.0.3':
-    resolution: {integrity: sha512-4X0Qv0BzD9Zlb0edkUoau5c1bInWSICqXAGrpwEltkncUwcxJIGEcVryZhLgb0p/3PkKaLIWkjhHRtLe9yiA7Q==}
+  '@redis/json@1.0.7':
+    resolution: {integrity: sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==}
     peerDependencies:
       '@redis/client': ^1.0.0
 
-  '@redis/search@1.0.6':
-    resolution: {integrity: sha512-pP+ZQRis5P21SD6fjyCeLcQdps+LuTzp2wdUbzxEmNhleighDDTD5ck8+cYof+WLec4csZX7ks+BuoMw0RaZrA==}
+  '@redis/search@1.2.0':
+    resolution: {integrity: sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==}
     peerDependencies:
       '@redis/client': ^1.0.0
 
-  '@redis/time-series@1.0.3':
-    resolution: {integrity: sha512-OFp0q4SGrTH0Mruf6oFsHGea58u8vS/iI5+NpYdicaM+7BgqBZH8FFvNZ8rYYLrUO/QRqMq72NpXmxLVNcdmjA==}
+  '@redis/time-series@1.1.0':
+    resolution: {integrity: sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==}
     peerDependencies:
       '@redis/client': ^1.0.0
 
@@ -10455,8 +10455,8 @@ packages:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
 
-  cluster-key-slot@1.1.0:
-    resolution: {integrity: sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==}
+  cluster-key-slot@1.1.2:
+    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
     engines: {node: '>=0.10.0'}
 
   cm6-theme-basic-light@0.2.0:
@@ -12406,10 +12406,6 @@ packages:
 
   generate-object-property@1.2.0:
     resolution: {integrity: sha512-TuOwZWgJ2VAMEGJvAyPWvpqxSANF0LDpmyHauMjFYzaACvn+QTT/AZomvPCzVBV7yDN3OmwHQ5OvHaeLKre3JQ==}
-
-  generic-pool@3.8.2:
-    resolution: {integrity: sha512-nGToKy6p3PAbYQ7p1UlWl6vSPwfwU6TMSWK7TTu+WUY4ZjyZQGniGGt2oNVvyNSpyZYSB43zMXVLcBm08MTMkg==}
-    engines: {node: '>= 4'}
 
   generic-pool@3.9.0:
     resolution: {integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==}
@@ -16769,8 +16765,8 @@ packages:
     resolution: {integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==}
     engines: {node: '>=8'}
 
-  redis@4.2.0:
-    resolution: {integrity: sha512-bCR0gKVhIXFg8zCQjXEANzgI01DDixtPZgIUZHBCmwqixnu+MK3Tb2yqGjh+HCLASQVVgApiwhNkv+FoedZOGQ==}
+  redis@4.7.0:
+    resolution: {integrity: sha512-zvmkHEAdGMn+hMRXuMBtu4Vo5P6rHQjLoHftu+lBqq8ZTA3RCVC/WzD790bkKKiNFp7d5/9PcSD19fJyyRvOdQ==}
 
   redux-thunk@2.4.2:
     resolution: {integrity: sha512-+P3TjtnP0k/FEjcBL5FZpoovtvrTNT/UXd4/sluaSyrURlSlhLSzEdfsTBW7WsKB6yPvgd7q/iZPICFjW4o57Q==}
@@ -19813,10 +19809,10 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
       '@aws-sdk/middleware-expect-continue': 3.577.0
       '@aws-sdk/middleware-flexible-checksums': 3.577.0
@@ -19871,13 +19867,13 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso-oidc@3.577.0':
+  '@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -19914,6 +19910,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
+      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso@3.577.0':
@@ -19959,13 +19956,13 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sts@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/client-sts@3.577.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -20002,7 +19999,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
-      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/core@3.576.0':
@@ -20034,12 +20030,12 @@ snapshots:
       '@smithy/util-stream': 3.0.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
-      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/credential-provider-web-identity': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.0.0
@@ -20051,13 +20047,13 @@ snapshots:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
-  '@aws-sdk/credential-provider-node@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/credential-provider-node@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-http': 3.577.0
-      '@aws-sdk/credential-provider-ini': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-ini': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/credential-provider-process': 3.577.0
-      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/credential-provider-web-identity': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.0.0
@@ -20078,10 +20074,10 @@ snapshots:
       '@smithy/types': 3.0.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/credential-provider-sso@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))':
     dependencies:
       '@aws-sdk/client-sso': 3.577.0
-      '@aws-sdk/token-providers': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/token-providers': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -20093,7 +20089,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/types': 3.0.0
@@ -20229,9 +20225,9 @@ snapshots:
       '@smithy/types': 3.0.0
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -23288,7 +23284,7 @@ snapshots:
       eventemitter3: 5.0.1
       preact: 10.24.3
 
-  '@commonxyz/common-protocol-abis@1.4.10': {}
+  '@commonxyz/common-protocol-abis@1.4.11': {}
 
   '@confio/ics23@0.6.8':
     dependencies:
@@ -29684,31 +29680,31 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@redis/bloom@1.0.2(@redis/client@1.2.0)':
+  '@redis/bloom@1.2.0(@redis/client@1.6.0)':
     dependencies:
-      '@redis/client': 1.2.0
+      '@redis/client': 1.6.0
 
-  '@redis/client@1.2.0':
+  '@redis/client@1.6.0':
     dependencies:
-      cluster-key-slot: 1.1.0
-      generic-pool: 3.8.2
+      cluster-key-slot: 1.1.2
+      generic-pool: 3.9.0
       yallist: 4.0.0
 
-  '@redis/graph@1.0.1(@redis/client@1.2.0)':
+  '@redis/graph@1.1.1(@redis/client@1.6.0)':
     dependencies:
-      '@redis/client': 1.2.0
+      '@redis/client': 1.6.0
 
-  '@redis/json@1.0.3(@redis/client@1.2.0)':
+  '@redis/json@1.0.7(@redis/client@1.6.0)':
     dependencies:
-      '@redis/client': 1.2.0
+      '@redis/client': 1.6.0
 
-  '@redis/search@1.0.6(@redis/client@1.2.0)':
+  '@redis/search@1.2.0(@redis/client@1.6.0)':
     dependencies:
-      '@redis/client': 1.2.0
+      '@redis/client': 1.6.0
 
-  '@redis/time-series@1.0.3(@redis/client@1.2.0)':
+  '@redis/time-series@1.1.0(@redis/client@1.6.0)':
     dependencies:
-      '@redis/client': 1.2.0
+      '@redis/client': 1.6.0
 
   '@reduxjs/toolkit@1.9.7(react-redux@9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@4.2.1))(react@18.3.1)':
     dependencies:
@@ -32206,7 +32202,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitest/coverage-istanbul@1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))':
+  '@vitest/coverage-istanbul@1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0))':
     dependencies:
       debug: 4.3.4
       istanbul-lib-coverage: 3.2.2
@@ -32217,7 +32213,7 @@ snapshots:
       magicast: 0.3.4
       picocolors: 1.0.0
       test-exclude: 6.0.0
-      vitest: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0)
+      vitest: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -35370,7 +35366,7 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  cluster-key-slot@1.1.0: {}
+  cluster-key-slot@1.1.2: {}
 
   cm6-theme-basic-light@0.2.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)(@lezer/highlight@1.2.1):
     dependencies:
@@ -38140,8 +38136,6 @@ snapshots:
     dependencies:
       is-property: 1.0.2
 
-  generic-pool@3.8.2: {}
-
   generic-pool@3.9.0: {}
 
   gensync@1.0.0-beta.2: {}
@@ -39669,35 +39663,6 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
-
-  jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3):
-    dependencies:
-      cssstyle: 4.1.0
-      data-urls: 5.0.0
-      decimal.js: 10.4.3
-      form-data: 4.0.1
-      html-encoding-sniffer: 4.0.0
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5
-      is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.13
-      parse5: 7.2.1
-      rrweb-cssom: 0.6.0
-      saxes: 6.0.0
-      symbol-tree: 3.2.4
-      tough-cookie: 4.1.4
-      w3c-xmlserializer: 5.0.0
-      webidl-conversions: 7.0.0
-      whatwg-encoding: 3.1.1
-      whatwg-mimetype: 4.0.0
-      whatwg-url: 14.0.0
-      ws: 8.18.1(bufferutil@4.0.8)(utf-8-validate@6.0.3)
-      xml-name-validator: 5.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    optional: true
 
   jsesc@0.5.0: {}
 
@@ -43728,14 +43693,14 @@ snapshots:
       indent-string: 4.0.0
       strip-indent: 3.0.0
 
-  redis@4.2.0:
+  redis@4.7.0:
     dependencies:
-      '@redis/bloom': 1.0.2(@redis/client@1.2.0)
-      '@redis/client': 1.2.0
-      '@redis/graph': 1.0.1(@redis/client@1.2.0)
-      '@redis/json': 1.0.3(@redis/client@1.2.0)
-      '@redis/search': 1.0.6(@redis/client@1.2.0)
-      '@redis/time-series': 1.0.3(@redis/client@1.2.0)
+      '@redis/bloom': 1.2.0(@redis/client@1.6.0)
+      '@redis/client': 1.6.0
+      '@redis/graph': 1.1.1(@redis/client@1.6.0)
+      '@redis/json': 1.0.7(@redis/client@1.6.0)
+      '@redis/search': 1.2.0(@redis/client@1.6.0)
+      '@redis/time-series': 1.1.0(@redis/client@1.6.0)
 
   redux-thunk@2.4.2(redux@4.2.1):
     dependencies:
@@ -46238,7 +46203,7 @@ snapshots:
       sass: 1.77.0
       terser: 5.36.0
 
-  vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0):
+  vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.36.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -46262,7 +46227,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.10
-      jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - less
       - lightningcss
