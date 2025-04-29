@@ -21,6 +21,7 @@ import {
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
+import { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';
