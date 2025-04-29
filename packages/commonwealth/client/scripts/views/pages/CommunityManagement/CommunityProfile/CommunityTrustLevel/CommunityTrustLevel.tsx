@@ -7,7 +7,6 @@ import {
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ButtonType } from 'views/components/component_kit/new_designs/CWButton/CWButton';
 import { AuthModal } from 'views/modals/AuthModal';
 import './CommunityTrustLevel.scss';
@@ -23,7 +22,6 @@ const CommunityTrustLevel = () => {
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   const currentTier = community?.tier || 0;
   const getLevelStatus = (level: number): Status => {
