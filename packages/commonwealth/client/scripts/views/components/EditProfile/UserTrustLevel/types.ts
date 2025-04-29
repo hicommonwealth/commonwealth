@@ -2,7 +2,8 @@ export type Status = 'Done' | 'Not Started';
 
 export enum VerificationItemType {
   VERIFY_COMMUNITY = 'VERIFY_COMMUNITY',
-  VERIFY_DOMAIN = 'VERIFY_DOMAIN',
+  LAUNCH_COIN = 'LAUNCH_COIN',
+  COMPLETE_CONTEST = 'COMPLETE_CONTEST',
 }
 
 export interface VerificationItem {
@@ -18,5 +19,5 @@ export interface VerificationLevel {
   status: Status;
   color: string;
   items?: VerificationItem[];
-  redirect?: boolean;
+  redirect: boolean;
 }

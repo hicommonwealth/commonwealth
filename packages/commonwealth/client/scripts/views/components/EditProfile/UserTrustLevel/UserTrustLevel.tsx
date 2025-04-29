@@ -19,6 +19,8 @@ const UserTrustLevel = () => {
   const userData = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
+  const [selectedAction, setSelectedAction] =
+    useState<VerificationItemType | null>(null);
   const navigate = useNavigate();
 
   const { data } = useFetchProfileByIdQuery({
@@ -57,20 +59,36 @@ const UserTrustLevel = () => {
   };
 
   const handleItemClick = (item: VerificationItem) => {
-    switch (item.type) {
-      case VerificationItemType.VERIFY_COMMUNITY:
-        if (userData.communities.length > 0) {
-          setIsCommunityModalOpen(true);
-        } else {
+    setSelectedAction(item.type);
+    setIsCommunityModalOpen(true);
+  };
+
+  const handleCommunitySelect = (communityId: string | null) => {
+    if (!communityId) {
+      switch (selectedAction) {
+        case VerificationItemType.LAUNCH_COIN:
+          navigate('/createTokenCommunity');
+          break;
+        case VerificationItemType.VERIFY_COMMUNITY:
+        case VerificationItemType.COMPLETE_CONTEST:
           navigate('/createCommunity');
-        }
-        break;
-      case VerificationItemType.VERIFY_DOMAIN:
-        navigate('/createCommunity');
-        break;
-      default:
-        break;
+          break;
+      }
+    } else {
+      switch (selectedAction) {
+        case VerificationItemType.LAUNCH_COIN:
+          navigate(`/${communityId}/manage/integrations/token`);
+          break;
+        case VerificationItemType.VERIFY_COMMUNITY:
+          navigate(`/${communityId}/manage/integrations/stake`);
+          break;
+        case VerificationItemType.COMPLETE_CONTEST:
+          navigate(`/${communityId}/manage/contests`);
+          break;
+      }
     }
+    setIsCommunityModalOpen(false);
+    setSelectedAction(null);
   };
 
   return (
@@ -105,6 +123,7 @@ const UserTrustLevel = () => {
       <CommunitySelectionModal
         isOpen={isCommunityModalOpen}
         onClose={() => setIsCommunityModalOpen(false)}
+        onSelect={handleCommunitySelect}
         communities={userData.communities}
       />
     </div>

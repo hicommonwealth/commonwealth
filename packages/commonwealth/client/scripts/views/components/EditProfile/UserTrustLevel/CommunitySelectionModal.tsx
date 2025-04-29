@@ -21,12 +21,14 @@ interface UserCommunity {
 interface CommunitySelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelect: (communityId: string | null) => void;
   communities: UserCommunity[];
 }
 
 const CommunitySelectionModal = ({
   isOpen,
   onClose,
+  onSelect,
   communities,
 }: CommunitySelectionModalProps) => {
   const navigate = useNavigate();
@@ -53,8 +55,7 @@ const CommunitySelectionModal = ({
                 options={communityOptions}
                 onChange={(option) => {
                   if (option) {
-                    navigate(`/${option.value}`);
-                    onClose();
+                    onSelect(option.value);
                   }
                 }}
                 placeholder="Select a community..."
@@ -66,8 +67,7 @@ const CommunitySelectionModal = ({
                   buttonType="primary"
                   buttonHeight="lg"
                   onClick={() => {
-                    navigate('/createCommunity');
-                    onClose();
+                    onSelect(null);
                   }}
                 />
               </div>

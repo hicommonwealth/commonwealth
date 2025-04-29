@@ -35,13 +35,18 @@ export const levels: VerificationLevel[] = [
     color: 'gray',
     items: [
       {
+        label: 'Launch a Coin',
+        type: VerificationItemType.LAUNCH_COIN,
+        status: 'Not Started',
+      },
+      {
         label: 'Verify Community',
         type: VerificationItemType.VERIFY_COMMUNITY,
         status: 'Not Started',
       },
       {
-        label: 'Verify Domain Ownership',
-        type: VerificationItemType.VERIFY_DOMAIN,
+        label: 'Complete a Contest',
+        type: VerificationItemType.COMPLETE_CONTEST,
         status: 'Not Started',
       },
     ],
