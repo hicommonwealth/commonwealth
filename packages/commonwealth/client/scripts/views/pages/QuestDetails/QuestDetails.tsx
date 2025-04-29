@@ -299,6 +299,10 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }
+      case 'OneOffContestManagerDeployed': {
+        // TODO: navigation needed
+        break;
+      }
       default:
         return;
     }
