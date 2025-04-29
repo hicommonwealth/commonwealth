@@ -1,4 +1,5 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { notifySuccess } from 'controllers/app/notifications';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -7,6 +8,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
@@ -50,13 +52,30 @@ const WalletCard = () => {
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
 
-  const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens } =
+  const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
     useUserWalletHoldings({
       userSelectedAddress,
     });
 
+  const handleRefresh = async () => {
+    await refetch();
+    notifySuccess('Wallet balances refreshed successfully');
+  };
+
   return (
-    <RewardsCard title="Wallet Balance" icon="cardholder">
+    <RewardsCard
+      title="Wallet Balance"
+      icon="cardholder"
+      customAction={
+        <div style={{ marginLeft: 'auto' }}>
+          <CWIconButton
+            iconName="arrowClockwise"
+            onClick={handleRefresh}
+            disabled={isLoadingTokensInfo}
+          />
+        </div>
+      }
+    >
       <div className="WalletCard">
         <CWSelectList
           components={{
