@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Aura Points</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: var(--tg-theme-bg-color, white);
+        color: var(--tg-theme-text-color, black);
+      }
+      .container {
+        text-align: center;
+      }
+      .points {
+        font-size: 2em;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      /* Basic styling - Telegram provides theme variables */
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Your Aura Balance</h1>
+      <!-- TODO: Fetch and display real points later -->
+      <div class="points" id="aura-points">Loading...</div>
+    </div>
+
+    <!-- Include Telegram WebApp script for integration -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      // Initialize Telegram Web App
+      Telegram.WebApp.ready();
+
+      // --- Placeholder to display dummy points ---
+      // In a real app, you'd fetch this, maybe using data passed
+      // in the initial URL or by calling an API on your bot's backend.
+      const dummyPoints = 123; // Same dummy value as in bot.py for consistency
+      document.getElementById('aura-points').innerText = dummyPoints;
+
+      // Example: Send data back to bot (not needed for just displaying)
+      // Telegram.WebApp.sendData("User viewed points");
+
+      // Example: Close the web app
+      // Telegram.WebApp.close();
+    </script>
+  </body>
+</html>
