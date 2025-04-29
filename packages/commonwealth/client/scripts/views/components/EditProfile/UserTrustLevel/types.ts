@@ -4,6 +4,7 @@ export enum VerificationItemType {
   VERIFY_COMMUNITY = 'VERIFY_COMMUNITY',
   LAUNCH_COIN = 'LAUNCH_COIN',
   COMPLETE_CONTEST = 'COMPLETE_CONTEST',
+  VERIFY_SOCIAL = 'VERIFY_SOCIAL',
 }
 
 export interface VerificationItem {

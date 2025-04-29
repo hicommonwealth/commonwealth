@@ -52,13 +52,11 @@ const UserTrustLevel = () => {
       : undefined;
   };
 
-  const handleLevelClick = (level: number) => {
-    if (level === 3) {
-      setIsAuthModalOpen(true);
-    }
-  };
-
   const handleItemClick = (item: VerificationItem) => {
+    if (item.type === VerificationItemType.VERIFY_SOCIAL) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSelectedAction(item.type);
     setIsCommunityModalOpen(true);
   };
@@ -110,7 +108,6 @@ const UserTrustLevel = () => {
             icon={icon}
             items={level.items}
             showArrow={level.redirect}
-            onClick={() => handleLevelClick(level.level)}
             onItemClick={handleItemClick}
           />
         );

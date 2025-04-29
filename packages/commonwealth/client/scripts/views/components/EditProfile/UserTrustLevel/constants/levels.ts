@@ -24,7 +24,13 @@ export const levels: VerificationLevel[] = [
     description: 'Basic verification through social media accounts.',
     status: 'Not Started',
     color: 'gray',
-    items: [],
+    items: [
+      {
+        label: 'Verify Social Accounts',
+        type: VerificationItemType.VERIFY_SOCIAL,
+        status: 'Not Started',
+      },
+    ],
     redirect: true,
   },
   {
