@@ -1,5 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import type * as suiSDK from '@mysten/sui';
+import { SuiClient } from '@mysten/sui/client';
 import BN from 'bn.js';
 
 import moment from 'moment';
@@ -25,7 +25,7 @@ export default class SuiChain implements IChainModule<SuiToken, SuiAccount> {
     return this._app;
   }
 
-  private _client: suiSDK.SuiClient;
+  private _client: SuiClient;
   public get client() {
     return this._client;
   }
@@ -45,8 +45,8 @@ export default class SuiChain implements IChainModule<SuiToken, SuiAccount> {
 
     // Create SuiClient instance with connection to the network
     try {
-      const suiSDK = await import('@mysten/sui');
-      this._client = new suiSDK.SuiClient({ url });
+      // Use direct import instead of dynamic import
+      this._client = new SuiClient({ url });
 
       // Get the latest system state for chain info
       const systemState = await this._client.getLatestSuiSystemState();

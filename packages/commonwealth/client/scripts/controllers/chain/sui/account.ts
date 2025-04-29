@@ -24,7 +24,6 @@ export default class SuiAccount extends Account {
 
   private updateBalance = _.throttle(async () => {
     try {
-      const suiSDK = await import('@mysten/sui');
       // Get the coin balances for the account
       const { totalBalance } = await this._Chain.client.getBalance({
         owner: this.address,
@@ -32,7 +31,7 @@ export default class SuiAccount extends Account {
       });
 
       console.log(`Fetched Sui balance: ${totalBalance}`);
-      this._balance = this._Chain.coins(totalBalance);
+      this._balance = this._Chain.coins(parseInt(totalBalance));
     } catch (e) {
       // if coins is null, they have a zero balance
       console.log(`No Sui balance found: ${e.message}`);

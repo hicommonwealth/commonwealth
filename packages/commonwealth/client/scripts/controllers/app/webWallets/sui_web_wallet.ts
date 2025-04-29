@@ -37,6 +37,7 @@ class SuiWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[] = [];
   private _wallet: Wallet | null = null;
+  private _session: any;
 
   public readonly name = WalletId.SuiWallet;
   public readonly label = 'Sui Wallet';
@@ -141,6 +142,14 @@ class SuiWebWalletController implements IWebWallet<string> {
     // When Canvas.js adds direct Sui support, this method should be updated to use
     // the proper implementation (similar to SolanaSigner, CosmosSigner, etc.)
     return placeholderSigner;
+  }
+
+  public setSession(session: any) {
+    this._session = session;
+  }
+
+  public getSession() {
+    return this._session;
   }
 
   /**
