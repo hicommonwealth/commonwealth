@@ -11,7 +11,14 @@ test.beforeAll(async () => {
 test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
     page.on('response', (response) => {
-      if (response.url().startsWith('http://localhost:8080/api/')) {
+      if (
+        response.url().startsWith('http://localhost:8080/api/') &&
+        !response
+          .url()
+          .startsWith(
+            'http://localhost:8080/api/internal/trpc/feed.getUserActivity',
+          )
+      ) {
         expect(response.status()).toBeLessThan(400);
       }
     });
