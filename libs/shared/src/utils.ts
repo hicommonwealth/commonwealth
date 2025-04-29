@@ -490,8 +490,10 @@ export const buildContestPrizes = (
   payoutStructure?: number[],
   decimals?: number,
 ): string[] => {
+  const prizeSharePercentage = 0.01;
   // 10% fee deducted from prize pool
-  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  const netContestBalance =
+    calculateNetContestBalance(Number(contestBalance)) * prizeSharePercentage;
   return netContestBalance && payoutStructure
     ? payoutStructure.map((percentage) => {
         const prize =

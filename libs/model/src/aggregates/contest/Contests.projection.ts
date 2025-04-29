@@ -240,7 +240,9 @@ export async function updateScore(contest_address: string, contest_id: number) {
       details.payout_structure,
       contest_id,
       details.interval === 0,
+      true,
     );
+
     await models.Contest.update(
       {
         score: scores,

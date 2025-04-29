@@ -104,7 +104,7 @@ const ContestsList = ({
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={!contest.funding_token_address}
+                isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
                 isFarcaster={contest.is_farcaster_contest}
                 score={score || []}
@@ -131,7 +131,7 @@ const ContestsList = ({
                 }
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={!contest.funding_token_address}
+                isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
                 isFarcaster={contest.is_farcaster_contest}
                 score={sc?.score || []}
