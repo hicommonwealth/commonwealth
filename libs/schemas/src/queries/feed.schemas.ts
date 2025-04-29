@@ -51,6 +51,27 @@ export const ActivityThread = z.object({
   recent_comments: z.array(ActivityComment).nullish(),
 });
 
+export const GlobalFeed = {
+  input: z.object({
+    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+    cursor: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .optional()
+      .default(1)
+      .describe(
+        'required for tRPC useInfiniteQuery hook, equivalent to page number',
+      ),
+    comment_limit: z.number().int().min(0).max(10).optional().default(3),
+  }),
+  output: z.object({
+    results: z.array(ActivityThread),
+    limit: z.number(),
+    page: z.number(),
+  }),
+};
+
 export const ActivityFeed = {
   input: PaginationParamsSchema.extend({
     thread_limit: z.number().optional(),

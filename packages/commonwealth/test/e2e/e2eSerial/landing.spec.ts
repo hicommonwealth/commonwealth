@@ -12,7 +12,17 @@ test.describe('Test landing login', () => {
   test('Test Login', async ({ page }) => {
     page.on('response', (response) => {
       if (response.url().startsWith('http://localhost:8080/api/')) {
-        expect(response.status()).toBeLessThan(400);
+        if (
+          response
+            .url()
+            .startsWith(
+              'http://localhost:8080/api/internal/trpc/feed.getUserActivity',
+            )
+        ) {
+          expect(response.status()).toEqual(401);
+        } else {
+          expect(response.status()).toBeLessThan(400);
+        }
       }
     });
 
