@@ -1,9 +1,10 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';
-import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';
 import { TradingMode } from '../../types';
@@ -36,7 +37,10 @@ const useCommonTradeTokenForm = ({
   const [selectedAddress, setSelectedAddress] = useState<string>();
 
   // base chain node info
-  const baseNode = app.chain.meta.ChainNode as NodeInfo;
+  const nodes = fetchCachedNodes();
+  const baseNode = nodes?.find(
+    (n) => n.ethChainId === parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
+  ) as NodeInfo;
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
@@ -44,6 +48,21 @@ const useCommonTradeTokenForm = ({
       enabled: !!tradeConfig.token.community_id,
       includeNodeInfo: true,
     });
+
+  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
+  const rpcUrl = tokenCommunity?.ChainNode?.url;
+
+  const { isWrongNetwork, promptNetworkSwitch } = useNetworkSwitching({
+    ethChainId,
+    rpcUrl,
+    // Provider is needed for network switching in non-Magic wallets,
+    // but CommonTrade doesn't directly handle wallet connection UI like Uniswap modal.
+    // We might need a different approach here if we want to *force*
+    // connection before switching, or assume a provider exists.
+    // For now, leaving provider as undefined, which might limit switching
+    // capabilities for non-Magic users if they aren't already connected.
+    provider: undefined, // TODO: Revisit provider handling for network switching
+  });
 
   useRunOnceOnCondition({
     callback: () => setSelectedAddress(userAddresses[0]),
@@ -94,6 +113,11 @@ const useCommonTradeTokenForm = ({
 
   const onCTAClick = () => {
     if (isActionPending) return;
+
+    if (isWrongNetwork) {
+      void promptNetworkSwitch();
+      return; // Prevent trade execution
+    }
 
     switch (tradingMode) {
       case TradingMode.Buy:

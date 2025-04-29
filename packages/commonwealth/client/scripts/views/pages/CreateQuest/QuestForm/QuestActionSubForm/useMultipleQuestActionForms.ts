@@ -1,12 +1,13 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
+  doesActionAllowChainId,
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
   doesActionRequireChainEvent,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -147,10 +148,12 @@ const useQuestActionMultiFormsState = ({
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
+      const allowsChainId =
+        allowsContentId && doesActionAllowChainId(chosenAction);
       const allowsTwitterTweetUrl =
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
-      const requiresDiscordServerURL =
-        doesActionRequireDiscordServerURL(chosenAction);
+      const requiresDiscordServerId =
+        doesActionRequireDiscordServerId(chosenAction);
       const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
@@ -166,8 +169,10 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
-        requires_discord_server_id: requiresDiscordServerURL,
         requires_chain_event: doesActionRequireChainEvent(chosenAction),
+        requires_discord_server_id: requiresDiscordServerId,
+        with_optional_chain_id:
+          allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
       };
@@ -187,12 +192,12 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
-      // reset errors/values if action doesn't require content link
+      // reset errors/values if action doesn't require content identifier
       if (!allowsContentId) {
-        updatedSubForms[index].values.contentLink = undefined;
+        updatedSubForms[index].values.contentIdentifier = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
 
@@ -208,6 +213,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.DiscordServer;
           break;
         }
+        case 'CommunityCreated': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Chain;
+          break;
+        }
         case 'MembershipsRefreshed': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Group;
@@ -218,7 +228,7 @@ const useQuestActionMultiFormsState = ({
         }
       }
 
-      // set/reset default values/config if action allows content link
+      // set/reset default values/config if action allows content identifier
       if (allowsContentId) {
         updatedSubForms[index].values.contentIdScope =
           updateBody.contentIdScope ||
@@ -234,7 +244,10 @@ const useQuestActionMultiFormsState = ({
             !allowsTwitterTweetUrl) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
-            !requiresDiscordServerURL) ||
+            !requiresDiscordServerId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Chain &&
+            !allowsChainId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Group &&
             !requiresGroupId)
@@ -246,7 +259,7 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdScope: undefined,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
     }

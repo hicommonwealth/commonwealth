@@ -68,6 +68,7 @@ export const TrendingCommunitiesPreview = () => {
               icon_url: sortedCommunity.community.icon_url || '',
               id: sortedCommunity.community.id || '',
               base: sortedCommunity.community.base || '',
+              tier: sortedCommunity.community.tier,
             }}
             monthlyThreadCount={
               sortedCommunity.community.last_30_day_thread_count || 0

@@ -12,6 +12,7 @@ import {
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
+import { config } from '../config';
 import { models } from '../database';
 
 function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
@@ -28,14 +29,16 @@ export async function incrementUserCount(
   user_id: number,
   counter: 'creates' | 'upvotes',
 ) {
-  const cacheKey = builtKey(user_id, counter);
-  const value = await cache().incrementKey(
-    CacheNamespaces.Tiered_Counter,
-    cacheKey,
-    1,
-    60,
-  );
-  return value;
+  if (!config.DISABLE_TIER_RATE_LIMITS) {
+    const cacheKey = builtKey(user_id, counter);
+    const value = await cache().incrementKey(
+      CacheNamespaces.Tiered_Counter,
+      cacheKey,
+      1,
+      60,
+    );
+    return value;
+  }
 }
 
 export function tiered({

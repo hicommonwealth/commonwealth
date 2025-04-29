@@ -1,13 +1,17 @@
-import axios from 'axios';
+import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import {
+  doesActionAllowChainId,
   doesActionAllowThreadId,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
-import { SERVER_URL } from 'state/api/config';
-import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
+import {
+  QuestAction,
+  QuestActionContentIdScope,
+  QuestActionSubFormConfig,
+} from './QuestActionSubForm';
 
 export type ContentIdType =
   | 'comment'
@@ -15,7 +19,8 @@ export type ContentIdType =
   | 'topic'
   | 'group'
   | 'tweet_url'
-  | 'discord_server_id';
+  | 'discord_server_id'
+  | 'chain';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -26,10 +31,12 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Topic;
     if (doesActionRequireTwitterTweetURL(action as QuestAction))
       return QuestActionContentIdScope.TwitterTweet;
-    if (doesActionRequireDiscordServerURL(action as QuestAction))
+    if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
+    if (doesActionAllowChainId(action as QuestAction))
+      return QuestActionContentIdScope.Chain;
     if (doesActionRequireGroupId(action as QuestAction))
       return QuestActionContentIdScope.Group;
     return undefined;
@@ -43,6 +50,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
+    case 'chain':
+      return QuestActionContentIdScope.Chain;
     case 'group':
       return QuestActionContentIdScope.Group;
     default:
@@ -50,69 +59,60 @@ export const inferContentIdTypeFromContentId = (
   }
 };
 
-export const buildContentIdFromURL = async (
-  url: string,
+export const buildContentIdFromIdentifier = (
+  identifier: string, // can be a url or a string containing the identifier value
   idType: ContentIdType,
 ) => {
+  if (idType === 'tweet_url' || idType === 'discord_server_id') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'chain') {
+    return `${idType}:${identifier}`;
+  }
+
+  // this is used by all the remaining idType's below
+  const urlObj = new URL(identifier);
+  const searchParams = new URLSearchParams(urlObj.search);
+
   if (idType === 'comment') {
     return `${idType}:${parseInt(
-      url.includes('discussion/comment/')
-        ? url.split('discussion/comment/')[1] // remove comment redirector path
-        : url.split('?comment=')[1], // remove remove query string param
+      identifier.includes('discussion/comment/')
+        ? urlObj.pathname.split('/').at(-1) || '' // get comment id from url pathname
+        : searchParams.get('comment') || '', // get comment id from url search params
     )}`;
   }
   if (idType === 'thread') {
     return `${idType}:${parseInt(
-      url
-        .split('?')[0] // remove query string
+      urlObj.pathname
         .split('discussion/')[1] // remove thread redirector path
         .split('-')[0],
     )}`;
   }
   if (idType === 'topic') {
-    const foundId = parseInt(
-      `${url.split('?')[0]?.split('/').filter(Boolean).at(-1)}`,
-    );
+    // check if url is in a redirect format
+    if (identifier.includes(`${urlObj.origin}/discussion/topic/`)) {
+      const topicId = parseInt(identifier.split('/').at(-1) || '');
+      if (topicId) return `${idType}:${topicId}`;
+    }
 
-    if (foundId) return `${idType}:${foundId}`;
-
-    const communityId = url?.split('/')?.filter?.(Boolean)?.at?.(2) || '';
-    const topicName = decodeURIComponent(
-      url?.split('/')?.filter(Boolean)?.at(4)?.split('?')?.at(0) || '',
-    );
-    // Note: This is not a good approach and is only added temporarily.
-    // The core problem here is that we don't get topic ids from topic page urls, so we need to fetch the topics list
-    // for the community and then find a topic which matches the topic name from url, and then extract its id for api
-    // storage. The solution is to update topic urls to store topic ids, and should be done in a followup
-    // https://github.com/hicommonwealth/commonwealth/issues/11546
-    const communityTopics = (
-      await axios.get(
-        // eslint-disable-next-line max-len
-        `${SERVER_URL}/internal/trpc/community.getTopics?batch=1&input=%7B%220%22%3A%7B%22community_id%22%3A%22${communityId}%22%7D%7D`,
-      )
-    ).data?.[0]?.result?.data;
-    const foundTopic = communityTopics?.find(
-      (t) => t.name.toLowerCase().trim() === topicName.toLowerCase().trim(),
-    );
-    if (foundTopic) return `${idType}:${foundTopic.id}`;
-    throw new Error(`invalid topic url ${url}`);
+    // check if url is in a resolved format
+    const topicIdentifier = generateTopicIdentifiersFromUrl(identifier);
+    if (topicIdentifier?.topicId) return `${idType}:${topicIdentifier.topicId}`;
+    throw new Error(`invalid topic url ${identifier}`);
   }
   if (idType === 'group') {
     return `${idType}:${parseInt(
-      url.includes('group/')
-        ? new URL(url).pathname.split('/').at(-1) || '' // get group id from url pathname
-        : new URLSearchParams(new URL(url).search).get('groupId') || '', // get group id from url search params
+      identifier.includes('group/')
+        ? urlObj.pathname.split('/').at(-1) || '' // get group id from url pathname
+        : searchParams.get('groupId') || '', // get group id from url search params
     )}`;
-  }
-  if (idType === 'tweet_url') {
-    return `${idType}:${url}`;
-  }
-  if (idType === 'discord_server_id') {
-    return `discord_server_id:${url}`;
   }
 };
 
-export const buildURLFromContentId = (contentId: string, withParams = {}) => {
+export const buildRedirectURLFromContentId = (
+  contentId: string,
+  withParams = {},
+) => {
   const [id, ...rest] = contentId.split(':');
   const idType = id as ContentIdType;
   const idOrURL = Array.isArray(rest) ? rest.join(':') : rest;
@@ -131,9 +131,26 @@ export const buildURLFromContentId = (contentId: string, withParams = {}) => {
   if (idType === 'topic') {
     return `${origin}/discussion/topic/${idOrURL}${params}`;
   }
+  if (idType === 'chain') {
+    return `${idOrURL}`;
+  }
   if (idType === 'group') {
     return `${origin}/group/${idOrURL}${params}`;
   }
 
   return '';
+};
+
+export const doesConfigAllowContentIdField = (
+  config: QuestActionSubFormConfig,
+) => {
+  return (
+    config?.with_optional_comment_id ||
+    config?.with_optional_thread_id ||
+    config?.with_optional_topic_id ||
+    config?.requires_twitter_tweet_link ||
+    config?.requires_discord_server_id ||
+    config?.with_optional_chain_id ||
+    config?.requires_group_id
+  );
 };

@@ -1,12 +1,10 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { calculateTokenPricing } from 'helpers/launchpad';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -16,6 +14,7 @@ import TradeTokenModal, {
   TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
@@ -74,14 +73,6 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
-
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -107,7 +98,7 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      {isInitialLoading || isLoadingETHToCurrencyRate ? (
+      {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
@@ -124,31 +115,10 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
       ) : (
         <div className="list">
           {(tokens || []).map((token) => {
-            const pricing = calculateTokenPricing(
-              token as z.infer<typeof TokenView>,
-              ethToUsdRate,
-            );
-
             return (
               <TokenCard
                 key={token.name}
-                name={token.name}
-                symbol={token.symbol}
-                price={pricing.currentPrice}
-                pricePercentage24HourChange={
-                  pricing.pricePercentage24HourChange
-                }
-                marketCap={{
-                  current: pricing.marketCapCurrent,
-                  goal: pricing.marketCapGoal,
-                  isCapped: pricing.isMarketCapGoalReached,
-                }}
-                mode={
-                  pricing.isMarketCapGoalReached
-                    ? TradingMode.Swap
-                    : TradingMode.Buy
-                }
-                iconURL={token.icon_url || ''}
+                token={token as LaunchpadToken}
                 onCTAClick={(mode) => {
                   handleCTAClick(
                     mode,

@@ -40,15 +40,43 @@ export const slugify = (str: string): string => {
 };
 /* eslint-disable */
 
-export const splitAndDecodeURL = (locationPathname: string) => {
+export const generateTopicIdentifiersFromUrl = (url: string) => {
   //checks if a url is custom or not and decodes the url after splitting it
   //this is to check for malformed urls on a topics page in /discussions
-  const splitURLPath = locationPathname.split('/');
+  const urlObj = new URL(url);
+  const splitURLPath = urlObj.pathname.split('/');
+
+  const generateTopicIdentifiersFromUrlPart = (urlPart: string) => {
+    const topicIdentifier = decodeURIComponent(urlPart);
+    const [_topicIdOrName, ..._remainingTopicNameParts] =
+      topicIdentifier.split('-');
+    const joinedTopicNameParts = _remainingTopicNameParts.join('-');
+    const topicName = !!joinedTopicNameParts
+      ? joinedTopicNameParts
+      : _topicIdOrName; // for this case, it will have the topic name instead of id
+    const topicId: number | null =
+      !!_topicIdOrName && !!joinedTopicNameParts
+        ? parseInt(_topicIdOrName, 10)
+        : null;
+    return { topicName, topicId };
+  };
+
   if (splitURLPath[2] === 'discussions') {
-    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
+    return splitURLPath[3]
+      ? generateTopicIdentifiersFromUrlPart(splitURLPath?.[3] || '')
+      : null;
   }
-  splitURLPath[1] === 'discussions';
-  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
+
+  if (!splitURLPath[2]) return null;
+
+  return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
+};
+
+export const generateUrlPartForTopicIdentifiers = (
+  topicId: string | number | undefined,
+  topicName: string,
+) => {
+  return topicId ? `${topicId}-${topicName}` : `${topicName}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -526,3 +554,9 @@ export type TurnstileWidgetNames =
   | 'create-community'
   | 'create-thread'
   | 'create-comment';
+
+export const CountAggregatorKeys = {
+  ThreadViewCount: 'thread_view_count',
+  CommunityProfileCount: 'community_profile_count_changed',
+  CommunityThreadCount: 'community_thread_count_changed',
+};

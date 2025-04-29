@@ -7,8 +7,10 @@ import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
   doesActionRequireRewardShare,
   doesActionRewardShareForReferrer,
+  getTotalRepititionCountsForQuestAction,
 } from 'helpers/quest';
 import React from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -30,6 +32,8 @@ type QuestActionCardProps = {
   inEligibilityReason?: string;
   canStartAction?: boolean;
   actionStartBlockedReason?: string;
+  questStartDate: Date;
+  questEndDate: Date;
 };
 
 const QuestActionCard = ({
@@ -42,6 +46,8 @@ const QuestActionCard = ({
   canStartAction,
   inEligibilityReason,
   questAction,
+  questStartDate,
+  questEndDate,
 }: QuestActionCardProps) => {
   const creatorXP = {
     percentage: roundDecimalsOrReturnWhole(
@@ -56,13 +62,38 @@ const QuestActionCard = ({
   const hideShareSplit =
     doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
 
+  // Function to determine the button label based on quest action type
+  const getButtonLabel = () => {
+    const hasDiscordLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'discord',
+    );
+
+    const hasTwitterLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'twitter',
+    );
+
+    if (questAction.event_name === 'DiscordServerJoined' && !hasDiscordLinked) {
+      return 'Connect Discord & Start';
+    }
+
+    if (questAction.event_name === 'TweetEngagement' && !hasTwitterLinked) {
+      return 'Connect Twitter & Start';
+    }
+
+    return 'Start';
+  };
+
   const isRepeatableQuest =
     questAction?.participation_limit === QuestParticipationLimit.OncePerPeriod;
   const questRepeatitionCycle = questAction?.participation_period;
   const questParticipationLimitPerCycle =
     questAction?.participation_times_per_period || 0;
-  const attemptsLeft =
-    questParticipationLimitPerCycle - (xpLogsForActions || []).length;
+  const totalActionRepititions = getTotalRepititionCountsForQuestAction(
+    questStartDate,
+    questEndDate,
+    questAction,
+  ).totalRepititions;
+  const attemptsLeft = totalActionRepititions - (xpLogsForActions || []).length;
 
   return (
     <div className="QuestActionCard">
@@ -93,14 +124,24 @@ const QuestActionCard = ({
             <CWText type="b1" fontWeight="semiBold">
               {actionCopies.title[questAction.event_name]}
             </CWText>
-            {(questAction.event_name === 'TweetEngagement' ||
-              questAction.event_name === 'DiscordServerJoined' ||
-              questAction.event_name === 'XpChainEventCreated') && (
+            {[
+              'TweetEngagement',
+              'DiscordServerJoined',
+              'CommunityCreated',
+              'XpChainEventCreated',
+            ].includes(questAction.event_name) && (
               <>
-                <CWDivider />
-                <CWText type="caption" fontWeight="semiBold">
-                  {actionCopies.pre_reqs[questAction.event_name]()}
-                </CWText>
+                {questAction.event_name === 'CommunityCreated' &&
+                !questAction.content_id ? (
+                  <></>
+                ) : (
+                  <CWDivider />
+                )}
+                {actionCopies.pre_reqs[questAction.event_name]() && (
+                  <CWText type="caption" fontWeight="semiBold">
+                    {actionCopies.pre_reqs[questAction.event_name]()}
+                  </CWText>
+                )}
                 {questAction.event_name === 'TweetEngagement' && (
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
@@ -110,6 +151,18 @@ const QuestActionCard = ({
                     )}
                   </CWText>
                 )}
+                {questAction.event_name === 'CommunityCreated' &&
+                  questAction.content_id && (
+                    <CWText type="caption">
+                      {actionCopies.explainer[questAction.event_name](
+                        fetchCachedNodes()?.find?.(
+                          (node) =>
+                            `${questAction.content_id?.split(`:`)?.at(-1)}` ===
+                            `${node.id}`,
+                        )?.name,
+                      )}
+                    </CWText>
+                  )}
                 {questAction.event_name === 'XpChainEventCreated' && (
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
@@ -142,7 +195,7 @@ const QuestActionCard = ({
               />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
-                attemptsLeft !== questParticipationLimitPerCycle && (
+                attemptsLeft !== totalActionRepititions && (
                   <CWTag
                     type="group"
                     label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
@@ -179,7 +232,7 @@ const QuestActionCard = ({
                 <CWButton
                   buttonType="secondary"
                   buttonAlt="green"
-                  label="Start"
+                  label={getButtonLabel()}
                   buttonHeight="sm"
                   buttonWidth="narrow"
                   iconRight="arrowRightPhosphor"

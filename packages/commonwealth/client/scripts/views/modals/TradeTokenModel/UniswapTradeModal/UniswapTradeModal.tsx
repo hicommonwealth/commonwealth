@@ -112,6 +112,12 @@ const UniswapTradeModal = ({
     uniswapWidget.connectWallet,
   ]);
 
+  useEffect(() => {
+    if (isOpen && isWrongNetwork) {
+      void promptNetworkSwitch();
+    }
+  }, [isOpen, isWrongNetwork, promptNetworkSwitch]);
+
   const nodes = fetchCachedNodes();
   const jsonRpcUrlMap = formatJsonRpcMap(nodes);
 

@@ -114,6 +114,8 @@ const QuestList = ({
                   completed: (quest.action_metas || [])
                     .map((action) =>
                       isQuestActionComplete(
+                        new Date(quest.start_date),
+                        new Date(quest.end_date),
                         action as QuestAction,
                         xpProgressions as unknown as XPLog[],
                       ),

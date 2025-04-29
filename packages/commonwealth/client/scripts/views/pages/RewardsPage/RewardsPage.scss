@@ -1,8 +1,24 @@
 @import '../../../styles/shared';
 
+// Layout class using viewport units minus nav height
+.RewardsPageLayout {
+  min-height: calc(100vh - 80px); // Adjust 80px if nav height differs
+  // height: 100%; // Replaced with min-height calc
+  overflow-y: auto; // Allow layout to scroll if content exceeds min-height
+
+  .layout-container {
+    // height: 100%; // No longer needed as parent controls height
+    display: flex; // Ensure children can use flex: 1
+    flex-direction: column; // Match RewardsPage direction
+  }
+}
+
 .RewardsPage {
   display: flex;
   flex-direction: column;
+  // min-height: 100%; // Replaced by flex: 1
+  flex: 1; // Make it fill the height-constrained layout
+  overflow: hidden;
   width: 100%;
   gap: 16px;
 

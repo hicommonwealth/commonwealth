@@ -49,7 +49,6 @@ const NotificationSettings = lazy(
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
@@ -359,9 +358,13 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/proposal/:type/:identifier"
     path="/:scope/proposal/:type/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
 
   <Route
