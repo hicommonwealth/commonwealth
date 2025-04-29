@@ -15,6 +15,7 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
+    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -31,6 +32,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
+    ['LaunchpadTokenCreated']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -82,6 +84,7 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['LaunchpadTokenCreated']: '',
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -97,5 +100,6 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['LaunchpadTokenCreated']: '',
   },
 };

@@ -35,7 +35,7 @@ import CWPopover, {
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
-import { AuthOptionTypes } from 'views/modals/AuthModal/types';
+import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
@@ -64,9 +64,11 @@ const QuestDetails = ({ id }: { id: number }) => {
   const [authModalConfig, setAuthModalConfig] = useState<{
     type: AuthModalType | undefined;
     options: AuthOptionTypes[] | undefined;
+    specificAuthOption?: AuthOptions;
   }>({
     type: undefined,
     options: undefined,
+    specificAuthOption: undefined,
   });
 
   const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
@@ -231,16 +233,52 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'TweetEngagement': {
-        if (actionContentId) {
-          window.open(buildRedirectURLFromContentId(actionContentId), '_blank');
+        // Check if user has Twitter linked
+        const hasTwitterLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'twitter',
+        );
+
+        if (hasTwitterLinked) {
+          if (actionContentId) {
+            window.open(
+              buildRedirectURLFromContentId(actionContentId),
+              '_blank',
+            );
+          } else {
+            notifyError(`Linked twitter tweet url is invalid`);
+          }
         } else {
-          notifyError(`Linked twitter tweet url is invalid`);
+          // Open Twitter SSO modal if Twitter isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+            specificAuthOption: 'x', // only show twitter option
+          });
         }
         break;
       }
       case 'DiscordServerJoined': {
-        // requires a start link
-        notifyError(`Start link is invalid for this action`);
+        // Check if user has Discord linked and if there's a start link
+        const hasDiscordLinked = user.addresses?.some(
+          (address) => address.walletSsoSource === 'discord',
+        );
+
+        if (!action.start_link) {
+          // requires a start link
+          notifyError(`Start link is invalid for this action`);
+          return;
+        }
+
+        if (hasDiscordLinked && action.start_link) {
+          window.open(action.start_link, '_blank');
+        } else {
+          // Open Discord SSO modal if Discord isn't linked
+          setAuthModalConfig({
+            type: AuthModalType.SignIn,
+            options: ['sso'],
+            specificAuthOption: 'discord', // only show discord option
+          });
+        }
         break;
       }
       case 'MembershipsRefreshed': {
@@ -255,6 +293,10 @@ const QuestDetails = ({ id }: { id: number }) => {
         } else {
           notifyError(`Linked group url is invalid`);
         }
+        break;
+      }
+      case 'LaunchpadTokenCreated': {
+        navigate(`/createTokenCommunity`, {}, null);
         break;
       }
       default:
@@ -556,6 +598,9 @@ const QuestDetails = ({ id }: { id: number }) => {
         showWalletsFor={
           (app?.chain?.base as Exclude<ChainBase, ChainBase.NEAR>) || undefined
         }
+        {...(authModalConfig.specificAuthOption && {
+          showAuthOptionFor: authModalConfig.specificAuthOption,
+        })}
         showAuthOptionTypesFor={authModalConfig.options}
         isOpen={!!(authModalConfig.type && authModalConfig.options)}
       />

@@ -7,29 +7,42 @@ import { TokenCardProps } from 'client/scripts/views/components/TokenCard/TokenC
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import clsx from 'clsx';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { smartTrim } from 'shared/utils';
+import { TradingMode } from 'views/modals/TradeTokenModel';
 import './TrendingToken.scss';
 
-interface TrendingTokenCardProps extends TokenCardProps {
-  communityId: string;
-}
-
-const TreandingToken = ({
-  communityId,
-  name,
-  symbol,
-  iconURL,
-  pricePercentage24HourChange,
-  mode,
+const TrendingToken = ({
   className,
   onCardBodyClick,
   onCTAClick,
-}: TrendingTokenCardProps) => {
+  token,
+}: TokenCardProps) => {
+  const { name, symbol, icon_url, community_id } = token;
   const navigate = useCommonNavigate();
+
+  const { pricing } = useTokenPricing({ token });
 
   const handleBodyClick = (e: React.MouseEvent) =>
     e.target === e.currentTarget && onCardBodyClick?.();
+
+  // Get the raw percentage
+  const rawPercentage = pricing.pricePercentage24HourChange;
+  // Format the percentage value based on magnitude
+  let percentageToDisplay: number = rawPercentage ?? 0;
+  if (rawPercentage != null) {
+    const formattedString =
+      Math.abs(rawPercentage) >= 1000
+        ? rawPercentage.toFixed(0) // >= 1000, show 0 decimals
+        : rawPercentage.toFixed(2); // < 1000, show 2 decimals
+    // Convert formatted string back to number
+    percentageToDisplay = parseFloat(formattedString);
+  }
+
+  const mode = pricing.isMarketCapGoalReached
+    ? TradingMode.Swap
+    : TradingMode.Buy;
 
   return (
     <div
@@ -40,9 +53,9 @@ const TreandingToken = ({
     >
       <div className="header">
         <div className="token-data">
-          <img src={iconURL} className="image" alt={name} />
+          <img src={icon_url || ''} className="image" alt={name} />
           <div className="info">
-            <CWText fontWeight="semiBold">{smartTrim(name, 17)}</CWText>
+            <CWText fontWeight="semiBold">{smartTrim(name, 12)}</CWText>
             <div className="detail">
               <CWText className="creator" type="caption">
                 by
@@ -54,7 +67,8 @@ const TreandingToken = ({
           </div>
         </div>
         <PricePercentageChange
-          pricePercentage24HourChange={pricePercentage24HourChange}
+          // Pass the formatted number
+          pricePercentage24HourChange={percentageToDisplay}
           show24Hour={false}
           useIcon
           tokenCard
@@ -70,7 +84,7 @@ const TreandingToken = ({
             navigateToCommunity({
               navigate,
               path: '',
-              chain: communityId,
+              chain: community_id,
             })
           }
         />
@@ -86,4 +100,4 @@ const TreandingToken = ({
   );
 };
 
-export default TreandingToken;
+export default TrendingToken;

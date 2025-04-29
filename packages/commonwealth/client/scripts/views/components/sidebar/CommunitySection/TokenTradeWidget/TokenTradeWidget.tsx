@@ -1,15 +1,9 @@
-import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { formatAddressShort } from 'helpers';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
-import { calculateTokenPricing } from 'helpers/launchpad';
-import NodeInfo from 'models/NodeInfo';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import React, { useState } from 'react';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
-import { useEthPerTokenQuery } from 'state/api/launchPad';
-import { fetchCachedNodes } from 'state/api/nodes';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -27,7 +21,6 @@ import TradeTokenModal, {
 } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/types';
-import { z } from 'zod';
 import './TokenTradeWidget.scss';
 import { TokenTradeWidgetSkeleton } from './TokenTradeWidgetSkeleton';
 import { useTokenTradeWidget } from './useTokenTradeWidget';
@@ -44,24 +37,8 @@ export const TokenTradeWidget = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const { data: tokenCommunity } = useGetCommunityByIdQuery({
-    id: communityToken?.community_id || 'ethereum',
-    enabled: !!communityToken?.community_id,
-    includeNodeInfo: true,
-  });
-
-  const nodes = fetchCachedNodes();
-  const communityNode = nodes?.find(
-    (n) => n.id === tokenCommunity?.chain_node_id,
-  ) as NodeInfo;
-
-  const { data: ethPerToken = 0 } = useEthPerTokenQuery({
-    ethChainId: communityNode?.ethChainId || 1,
-    chainRpc: communityNode?.url,
-    tokenAddress: (communityToken as LaunchpadToken)?.token_address,
-    enabled:
-      !!tokenCommunity && !!(communityToken as LaunchpadToken)?.token_address,
-  });
+  const { pricing: tokenPricing, isLoading: isLoadingETHToCurrencyRate } =
+    useTokenPricing({ token: communityToken as LaunchpadToken });
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -70,22 +47,6 @@ export const TokenTradeWidget = ({
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
-  const tokenPricing =
-    !isPinnedToken && communityToken
-      ? calculateTokenPricing(
-          communityToken as z.infer<typeof TokenView>,
-          ethToUsdRate,
-          ethPerToken,
-        )
-      : null;
 
   const handleCTAClick = (mode: TradingMode) => {
     // Opening modal even if user is not logged in
@@ -113,6 +74,9 @@ export const TokenTradeWidget = ({
     (communityToken as ExternalToken)?.logo;
 
   const isLaunched = (communityToken as LaunchpadToken).liquidity_transferred;
+
+  const finalMarketCap = tokenPricing?.marketCapCurrent ?? 0;
+
   return (
     <section className="TokenTradeWidget">
       <div className="pad-8 header">
@@ -192,7 +156,7 @@ export const TokenTradeWidget = ({
               />
               <MarketCapProgress
                 marketCap={{
-                  current: tokenPricing.marketCapCurrent,
+                  current: finalMarketCap,
                   goal: tokenPricing.marketCapGoal,
                   isCapped: tokenPricing.isMarketCapGoalReached,
                 }}

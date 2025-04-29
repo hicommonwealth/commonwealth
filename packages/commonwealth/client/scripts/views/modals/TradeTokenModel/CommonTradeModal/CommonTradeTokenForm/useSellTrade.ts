@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'; // Import BigNumber for precision
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
 import {
@@ -75,8 +76,22 @@ const useSellTrade = ({
     if (typeof change == 'number') {
       // not handling number type preset amounts atm
     } else if (typeof change == 'string') {
+      const balance = new BigNumber(selectedAddressTokenBalance || '0');
+      if (balance.isZero()) {
+        setTokenSellAmountString('0'); // Cannot sell if balance is zero
+        return;
+      }
+
       if (change === 'Max') {
-        setTokenSellAmountString(selectedAddressTokenBalance);
+        setTokenSellAmountString(balance.toString());
+      } else if (change.endsWith('%')) {
+        const percentage = parseFloat(change.replace('%', ''));
+        if (!isNaN(percentage) && percentage > 0 && percentage <= 100) {
+          const amountToSell = balance.multipliedBy(percentage / 100);
+          // Avoid scientific notation and format nicely if possible, adjust decimals as needed for display?
+          // For now, use toString() which might include many decimals.
+          setTokenSellAmountString(amountToSell.toString());
+        }
       }
     } else {
       const value = change.target.value;

@@ -84,6 +84,7 @@ import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_h
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
+import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -537,6 +538,7 @@ function setupRouter(
   // proxies
   setupCosmosProxy(router, cacheDecorator);
   setupIpfsProxy(router, cacheDecorator);
+  setupUniswapProxy(router, cacheDecorator);
 
   app.use(endpoint, router);
 

@@ -39,6 +39,20 @@
         font-size: var(--font-size);
         font-weight: bold;
         color: $black;
+        transition: font-size 0.1s ease-in-out;
+
+        &.font-size-normal {
+          font-size: 28px;
+        }
+        &.font-size-medium {
+          font-size: 22px;
+        }
+        &.font-size-small {
+          font-size: 18px;
+        }
+        &.font-size-xsmall {
+          font-size: 14px;
+        }
 
         &:focus-within {
           border-color: $primary-500 !important;

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
+import { useGetLaunchpadTradesQuery } from 'state/api/tokens';
 import {
   useGetUserReferralFeesQuery,
   useGetUserReferralsQuery,
@@ -9,6 +10,7 @@ import {
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
+import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -32,6 +34,8 @@ import {
   typeToIcon,
 } from './utils';
 
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+
 const RewardsPage = () => {
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
@@ -52,6 +56,24 @@ const RewardsPage = () => {
     apiCallEnabled: !!user?.id,
     distributedTokenAddress: ZERO_ADDRESS,
   });
+
+  // Fetch launchpad trades data using the original query hook
+  const { data: launchpadTradesData, isLoading: isLaunchpadTradesLoading } =
+    useGetLaunchpadTradesQuery(
+      { token_address: ZERO_ADDRESS },
+      {
+        enabled: tableTab === TableType.TokenTXHistory,
+      },
+    );
+
+  // Handle hook return type (can be {}, undefined, or actual data)
+  const launchpadTrades: GetLaunchpadTradesOutput | undefined = useMemo(() => {
+    // Check if data is an array before returning
+    if (Array.isArray(launchpadTradesData)) {
+      return launchpadTradesData;
+    }
+    return undefined; // Return undefined if data is {}, null, or undefined
+  }, [launchpadTradesData]);
 
   const trendValue = calculateReferralTrend(referralFees || []);
   const totalEarnings = calculateTotalEarnings(referralFees || []);
@@ -131,7 +153,12 @@ const RewardsPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {tableTab === TableType.TokenTXHistory && <TokenTXHistoryTable />}
+        {tableTab === TableType.TokenTXHistory && (
+          <TokenTXHistoryTable
+            trades={launchpadTrades}
+            isLoading={isLaunchpadTradesLoading}
+          />
+        )}
         {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
     </CWPageLayout>
