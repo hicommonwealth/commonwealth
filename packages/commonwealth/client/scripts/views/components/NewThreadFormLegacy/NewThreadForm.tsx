@@ -69,6 +69,8 @@ import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotPro
 import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
 import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
+import { ImageActionCard } from '../ImageActionCard/ImageActionCard';
+import { ImageActionModal } from '../ImageActionModal/ImageActionModal';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -104,6 +106,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
@@ -628,6 +631,25 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+  const handleOpenImageModal = useCallback(() => setIsImageModalOpen(true), []);
+  const handleCloseImageModal = useCallback(
+    () => setIsImageModalOpen(false),
+    [],
+  );
+
+  const handleApplyImage = useCallback(
+    (imageUrl: string) => {
+      const currentText = getTextFromDelta(threadContentDelta);
+      const imageMarkdown = `![Generated image](${imageUrl})`;
+      const combinedText = currentText + imageMarkdown;
+      const newDelta = createDeltaFromText(combinedText, true); // Mark as Markdown
+      setThreadContentDelta(newDelta);
+
+      handleCloseImageModal(); // Close the modal
+    },
+    [threadContentDelta, setThreadContentDelta, handleCloseImageModal],
+  );
+
   const sidebarComponent = [
     {
       label: 'Links',
@@ -681,6 +703,14 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           },
         ]
       : []),
+    {
+      label: 'Image',
+      item: (
+        <div className="cards-column">
+          <ImageActionCard onClick={handleOpenImageModal} />
+        </div>
+      ),
+    },
   ];
 
   const proposalDetailSidebar = [
@@ -1133,6 +1163,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           )}
         </div>
       </CWPageLayout>
+      <ImageActionModal
+        isOpen={isImageModalOpen}
+        onClose={handleCloseImageModal}
+        onApply={handleApplyImage}
+      />
       {JoinCommunityModals}
     </>
   );
