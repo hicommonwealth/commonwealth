@@ -1,22 +1,14 @@
 @import '../../../styles/shared.scss';
 
+// Styles now target the inner content div passed to CWContentPageCard
 .ImageActionCard {
-  // Add component-specific styles here
   display: flex;
   flex-direction: column;
-  gap: 8px; // Use 8px hardcoded value instead of $spacing-sm
+  gap: 16px; // Increased gap to match linked_proposals_card
+  padding: 16px; // Added padding to match linked_proposals_card
+  width: 100%; // Ensure it takes full width within the card content area
 
-  .card-header-content {
-    // Styles for the title container if needed
-    h4 {
-      margin: 0; // Remove default margin
-      font-weight: 600; // Use 600 (semibold) instead of undefined variable
-    }
-  }
-
-  .card-body-content {
-    // Styles for the button container if needed
-    display: flex; // Allow button alignment if necessary
-    // justify-content: flex-start; // Align button left (default)
-  }
+  // Removed styles for .card-header-content and .card-body-content as those divs are gone
+  // .card-header-content { ... }
+  // .card-body-content { ... }
 }

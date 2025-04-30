@@ -94,3 +94,12 @@ div[class*='CWModal'] div[class*='reference-grid'] > div[class*='grid-item'] {
   display: inline-block !important;
   margin-right: 8px !important;
 }
+
+// Style for the modal footer
+.ImageActionModalFooter {
+  padding: 24px; // Added padding based on screenshot comparison
+  // Add other footer-specific styles if needed, like gap or justification
+  // display: flex; // Already handled by CWModalFooter likely
+  // gap: 8px;
+  // justify-content: flex-end;
+}

@@ -142,7 +142,7 @@ export const ImageActionModal = ({
             fontWeight="regular"
             className="reference-subheading"
           >
-            Use images to influence the generation.
+            Add images to direct image generation.
           </CWText>
 
           {/* Reference image grid */}
@@ -197,7 +197,7 @@ export const ImageActionModal = ({
         {/* --- Add Reference Button (Modal Level) --- */}
         {/* ---- Button Moved to CWImageInput ---- */}
       </CWModalBody>
-      <CWModalFooter>
+      <CWModalFooter className="ImageActionModalFooter">
         {/* ---- Button Moved to CWImageInput ---- */}
         {/* {imageUrlToApply &&
           canAddMoreReferences &&

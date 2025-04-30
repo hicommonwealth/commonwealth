@@ -75,18 +75,7 @@ export const UploadControl = ({
     referenceImageUrls,
   });
 
-  // --- Debugging START ---
-  const isSmallScreen = isWindowExtraSmall; // Alias for clarity
-  console.log('--- UploadControl Render Debug ---');
-  console.log('isSmallScreen:', isSmallScreen);
-  console.log('hasAnyGeneratedImages:', hasAnyGeneratedImages);
-  console.log('imageToRender:', imageToRender);
-  console.log('imagePrompt:', imagePrompt);
-  console.log(
-    'Condition (hasAnyGeneratedImages && imageToRender):',
-    hasAnyGeneratedImages && !!imageToRender,
-  );
-  // --- Debugging END ---
+  const isSmallScreen = isWindowExtraSmall;
 
   return (
     <div
@@ -244,7 +233,7 @@ export const UploadControl = ({
                   <CWButton
                     label="Redo"
                     iconLeft="arrowClockwise"
-                    buttonHeight="md"
+                    buttonHeight="sm"
                     buttonWidth="narrow"
                     type="button"
                     containerClassName="btn-focus-styles"
