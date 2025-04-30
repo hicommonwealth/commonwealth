@@ -10,7 +10,10 @@ import useSidebarStore from 'state/ui/sidebar/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
-import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import {
+  NewThreadForm,
+  NewThreadFormHandles,
+} from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { MobileInput } from './MobileInput';
@@ -29,9 +32,12 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const menuVisible = useSidebarStore((state) => state.menuVisible);
   const stickyInputRef = useRef<HTMLDivElement>(null);
+  const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
+  const newThreadFormRef = useRef<NewThreadFormHandles>(null);
 
   const handleCancel = useCallback(() => {
     setFocused(false);
+    setOpenModalOnExpand(false);
   }, []);
 
   const handleAiReply = useCallback(
@@ -71,6 +77,11 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     setFocused(true);
   }, []);
 
+  const handleImageClickFromCollapsed = useCallback(() => {
+    setOpenModalOnExpand(true);
+    handleFocused();
+  }, [handleFocused]);
+
   useEffect(() => {
     const node = stickyInputRef.current;
     if (!node) return;
@@ -85,6 +96,15 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       node.removeEventListener('touchmove', preventScroll);
     };
   }, [focused]);
+
+  useEffect(() => {
+    if (focused && openModalOnExpand && mode === 'thread') {
+      setTimeout(() => {
+        newThreadFormRef.current?.openImageModal();
+      }, 0);
+      setOpenModalOnExpand(false);
+    }
+  }, [focused, openModalOnExpand, mode]);
 
   const parent = document.getElementById('MobileNavigationHead');
 
@@ -110,7 +130,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
           </div>
 
           {mode === 'thread' ? (
-            <NewThreadForm onCancel={handleCancel} />
+            <NewThreadForm ref={newThreadFormRef} onCancel={handleCancel} />
           ) : (
             <CommentEditor
               {...props}
@@ -136,6 +156,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       <MobileInput
         {...props}
         onFocus={handleFocused}
+        onImageClick={handleImageClickFromCollapsed}
         aiCommentsToggleEnabled={aiCommentsToggleEnabled}
       />
     </div>,

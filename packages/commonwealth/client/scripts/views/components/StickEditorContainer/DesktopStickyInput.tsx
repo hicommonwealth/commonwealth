@@ -1,8 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user';
-import { CommentEditor } from 'views/components/Comments/CommentEditor';
-import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import CommentEditor, {
+  CommentEditorProps,
+} from 'views/components/Comments/CommentEditor/CommentEditor';
+import {
+  NewThreadForm,
+  NewThreadFormHandles,
+} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import './DesktopStickyInput.scss';
 import { useStickComment } from './context/StickCommentProvider';
@@ -13,6 +19,9 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
+  const commentEditorRef = useRef<any>(null);
+  const newThreadFormRef = useRef<NewThreadFormHandles>(null);
 
   const handleFocused = useCallback(() => {
     setIsExpanded(true);
@@ -21,10 +30,18 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const handleCancel = useCallback(
     (event: React.MouseEvent | undefined) => {
       setIsExpanded(false);
+      setOpenModalOnExpand(false);
       onCancel?.(event);
     },
     [onCancel, setIsExpanded],
   );
+
+  useEffect(() => {
+    if (isExpanded && openModalOnExpand && mode === 'thread') {
+      newThreadFormRef.current?.openImageModal();
+      setOpenModalOnExpand(false);
+    }
+  }, [isExpanded, openModalOnExpand, mode]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -86,12 +103,12 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
 
   const useExpandedEditor = isExpanded || isReplying;
 
-  const editorProps = {
+  const editorProps: CommentEditorProps & { ref?: React.Ref<any> } = {
     ...props,
+    ref: commentEditorRef,
     shouldFocus: true,
     onCancel: handleCancel,
     aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
     handleSubmitComment: handleEnhancedSubmit,
     onAiReply: handleAiReply,
     streamingReplyIds,
@@ -102,11 +119,16 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     },
   };
 
+  const newThreadFormProps = {
+    ref: newThreadFormRef,
+    onCancel: handleCancel,
+  };
+
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
-        <div className="DesktopStickyInputCollapsed" onClick={handleFocused}>
-          <div className="container">
+        <div className="DesktopStickyInputCollapsed">
+          <div className="container" onClick={handleFocused}>
             <input
               type="text"
               className="form-control"
@@ -117,13 +139,36 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                     ? `Reply to ${replyingToAuthor}...`
                     : 'Write a comment...'
               }
+              readOnly
+            />
+            <CWTooltip
+              content="Add or Generate Image"
+              placement="top"
+              renderTrigger={(handleInteraction, isOpen) => (
+                <CWIconButton
+                  iconName="image"
+                  buttonSize="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (mode === 'thread') {
+                      setOpenModalOnExpand(true);
+                      handleFocused();
+                    }
+                  }}
+                  aria-label="Add or Generate Image"
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  data-tooltip-open={isOpen}
+                  className="collapsed-image-button"
+                />
+              )}
             />
           </div>
         </div>
       ) : (
         <div className="DesktopStickyInputExpanded">
           {mode === 'thread' ? (
-            <NewThreadForm onCancel={handleCancel} />
+            <NewThreadForm {...newThreadFormProps} />
           ) : (
             <CommentEditor {...editorProps} />
           )}

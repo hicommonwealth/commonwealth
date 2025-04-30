@@ -14,6 +14,7 @@ import type { CommentEditorProps } from 'views/components/Comments/CommentEditor
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -24,6 +25,7 @@ export type MobileInputProps = CommentEditorProps & {
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
   parentCommentText?: string;
+  onImageClick?: () => void;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -38,6 +40,7 @@ export const MobileInput = (props: MobileInputProps) => {
     aiCommentsToggleEnabled,
     parentCommentText,
     thread: originalThread,
+    onImageClick,
   } = props;
 
   const { mode } = useContext(StickCommentContext);
@@ -250,12 +253,31 @@ export const MobileInput = (props: MobileInputProps) => {
             onChange={handleChange}
             value={value}
             className="input"
+            onFocus={onFocus}
           />
           <div className="ai-toggle-row">
             <div className="RightButton">
               {isReplying && (
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
+              <CWTooltip
+                content="Add or Generate Image"
+                placement="top"
+                disablePortal
+                renderTrigger={(handleInteraction, isOpen) => (
+                  <CWIconButton
+                    iconName="image"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onImageClick?.();
+                    }}
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                    data-tooltip-open={isOpen}
+                    aria-label="Add or Generate Image"
+                  />
+                )}
+              />
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
               <CWIconButton
                 iconName="paperPlaneTilt"
@@ -264,6 +286,7 @@ export const MobileInput = (props: MobileInputProps) => {
                     console.error('Error submitting comment:', error);
                   });
                 }}
+                disabled={value.trim() === '' && !aiCommentsToggleEnabled}
               />
             </div>
           </div>

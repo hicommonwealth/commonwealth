@@ -1,0 +1,22 @@
+@import '../../../styles/shared.scss';
+
+.ImageActionCard {
+  // Add component-specific styles here
+  display: flex;
+  flex-direction: column;
+  gap: 8px; // Use 8px hardcoded value instead of $spacing-sm
+
+  .card-header-content {
+    // Styles for the title container if needed
+    h4 {
+      margin: 0; // Remove default margin
+      font-weight: 600; // Use 600 (semibold) instead of undefined variable
+    }
+  }
+
+  .card-body-content {
+    // Styles for the button container if needed
+    display: flex; // Allow button alignment if necessary
+    // justify-content: flex-start; // Align button left (default)
+  }
+}

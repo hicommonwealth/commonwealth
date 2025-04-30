@@ -58,6 +58,7 @@ import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { ImageActionCard } from '../../components/ImageActionCard/ImageActionCard';
 import MetaTags from '../../components/MetaTags';
 import {
   CWContentPage,
@@ -566,6 +567,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
+  const handleOpenImageModalPlaceholder = () => {
+    console.log(
+      'TODO: Implement opening ImageActionModal from ViewThreadPage sidebar',
+    );
+    notifyError('Functionality not yet implemented.');
+    // Later: This should focus the CreateComment input and trigger the modal
+  };
+
   const sidebarComponent = [
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [
@@ -654,6 +663,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]
       : []),
+    {
+      label: 'Add Image',
+      item: (
+        <div className="cards-column">
+          <ImageActionCard
+            onClick={handleOpenImageModalPlaceholder}
+            // Disable if user can't comment?
+            disabled={!canComment}
+            tooltipText={
+              typeof disabledActionsTooltipText === 'function'
+                ? disabledActionsTooltipText?.('comment')
+                : disabledActionsTooltipText
+            }
+          />
+        </div>
+      ),
+    },
   ];
 
   const governanceType = proposal
