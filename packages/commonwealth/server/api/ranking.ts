@@ -361,7 +361,7 @@ async function updatePostgresRank(threadId: number, rankIncrease: number) {
       type: QueryTypes.UPDATE,
       replacements: { rankIncrease: Math.round(rankIncrease), threadId },
     },
-  )) as unknown as [{ community_rank: number; global_rank: number }[], number];
+  )) as unknown as [{ community_rank: string; global_rank: string }[], number];
   return rank[0];
 }
 

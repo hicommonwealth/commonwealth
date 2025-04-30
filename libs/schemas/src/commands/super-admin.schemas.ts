@@ -28,6 +28,15 @@ export const SetCommunityTier = {
   }),
 };
 
+export const RerankThreads = {
+  input: z.object({
+    community_id: z.string().optional(),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
 export const EnableDigestEmail = {
   input: z.object({
     communityId: z.string(),

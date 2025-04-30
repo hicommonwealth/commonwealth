@@ -18,4 +18,5 @@ export const trpcRouter = trpc.router({
     SuperAdmin.SetCommunityTier,
     trpc.Tag.SuperAdmin,
   ),
+  rerankThreads: trpc.command(SuperAdmin.RerankThreads, trpc.Tag.SuperAdmin),
 });
