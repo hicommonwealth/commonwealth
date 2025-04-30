@@ -49,6 +49,7 @@ export type CommentEditorProps = {
   thread?: Thread;
   parentCommentText?: string;
   triggerImageModalOpen?: boolean;
+  placeholder?: string;
 };
 
 const CommentEditor = forwardRef<unknown, CommentEditorProps>(
@@ -72,6 +73,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       thread,
       parentCommentText,
       triggerImageModalOpen,
+      placeholder,
     },
     ref,
   ) => {
@@ -283,6 +285,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
           tooltipLabel={tooltipText}
           shouldFocus={shouldFocus}
           onKeyDown={handleKeyDown}
+          placeholder={placeholder}
         />
 
         {isTurnstileEnabled && <TurnstileWidget />}
@@ -363,5 +366,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
     );
   },
 );
+
+CommentEditor.displayName = 'CommentEditor';
 
 export default CommentEditor;
