@@ -33,7 +33,7 @@ export default class SuiChain implements IChainModule<SuiToken, SuiAccount> {
   constructor(app: IApp) {
     this._app = app;
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(chain: z.infer<typeof ExtendedCommunity>, reset = false) {
     // default to 9 decimals for SUI
     const decimals = getChainDecimals(chain.id || '', chain.base) || 9;
@@ -72,7 +72,7 @@ export default class SuiChain implements IChainModule<SuiToken, SuiAccount> {
     }
   }
 
-  public async deinit() {
+  public deinit() {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
     // No explicit cleanup needed for SuiClient
     // @ts-expect-error StrictNullChecks
@@ -84,10 +84,15 @@ export default class SuiChain implements IChainModule<SuiToken, SuiAccount> {
   }
 
   public createTXModalData(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     author: SuiAccount,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txFunc,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     txName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     objName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cb?: (success: boolean) => void,
   ): ITXModalData {
     throw new Error('Sui transactions not yet implemented');

@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare let window: any;
-
 // Using a more generic type since @canvas-js/chain-sui might not be available
 import { Awaitable, SessionSigner } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
@@ -37,6 +34,7 @@ class SuiWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[] = [];
   private _wallet: Wallet | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _session: any;
 
   public readonly name = WalletId.SuiWallet;
@@ -114,6 +112,7 @@ class SuiWebWalletController implements IWebWallet<string> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
   public async getRecentBlock(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     chainIdentifier: string,
   ): Promise<BlockInfo | null> {
     return null;
@@ -144,6 +143,7 @@ class SuiWebWalletController implements IWebWallet<string> {
     return placeholderSigner;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public setSession(session: any) {
     this._session = session;
   }

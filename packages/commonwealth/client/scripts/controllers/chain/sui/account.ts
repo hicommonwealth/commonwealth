@@ -15,7 +15,7 @@ export default class SuiAccount extends Account {
     // @ts-expect-error StrictNullChecks
     return this.updateBalance().then(() => this._balance);
   }
-
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async publicKey() {
     // For Sui, the address is the public key in string format
     // Just return the address, as Sui SDK doesn't have a specific PublicKey class
