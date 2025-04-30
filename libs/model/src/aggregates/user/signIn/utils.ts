@@ -149,7 +149,10 @@ export async function findOrCreateUser({
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
   const tier =
-    privyUserId && ssoInfo?.emailVerified
+    privyUserId &&
+    ssoInfo &&
+    'emailVerified' in ssoInfo &&
+    ssoInfo.emailVerified
       ? UserTierMap.SocialVerified
       : await checkNativeWalletBalance(address, foundUser, ethChainId);
 
