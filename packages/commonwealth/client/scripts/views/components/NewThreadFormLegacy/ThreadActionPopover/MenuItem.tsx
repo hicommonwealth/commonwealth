@@ -37,16 +37,16 @@ const MenuItem = ({
           />
           <CWText type="b2">{title}</CWText>
         </div>
-        {isAdded ? (
-          <CWIcon
-            iconName="check"
-            iconSize="small"
-            className="caret-icon"
-            weight="light"
-            onClick={onAdd}
-          />
-        ) : (
-          <>
+        <div className="menu-item__action">
+          {isAdded ? (
+            <CWIcon
+              iconName="check"
+              iconSize="small"
+              className="caret-icon"
+              weight="light"
+              onClick={onAdd}
+            />
+          ) : (
             <CWButton
               containerClassName="dismissBtn"
               buttonType="tertiary"
@@ -55,8 +55,8 @@ const MenuItem = ({
               onClick={onAdd}
               label={buttonText}
             />
-          </>
-        )}
+          )}
+        </div>
       </div>
       <CWText type="b2" fontWeight="regular">
         {subtext}

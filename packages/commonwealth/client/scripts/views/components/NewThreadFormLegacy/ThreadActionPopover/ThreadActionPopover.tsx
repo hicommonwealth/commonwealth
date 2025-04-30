@@ -27,12 +27,13 @@ const items = [
     subtext: 'Add existing proposal from Snapshot space.',
     buttonText: 'Add',
   },
-  {
-    icon: 'cardholder',
-    title: 'Funding',
-    subtext: 'Request funds from the community wallet.',
-    buttonText: 'Add',
-  },
+  //currently we did not implemented fundCard feature
+  // {
+  //   icon: 'cardholder',
+  //   title: 'Funding',
+  //   subtext: 'Request funds from the community wallet.',
+  //   buttonText: 'Add',
+  // },
 ];
 export const ThreadActionPopover = ({
   setSelectedActionCard,
@@ -73,7 +74,9 @@ export const ThreadActionPopover = ({
             fill="#656167"
             color="#656167"
           />
-          <CWText type="b2">Actions</CWText>
+          <CWText type="caption" className="title">
+            Actions
+          </CWText>
         </div>
 
         <CWPopover

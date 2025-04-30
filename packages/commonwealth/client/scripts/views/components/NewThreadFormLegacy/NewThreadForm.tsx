@@ -1133,9 +1133,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 />
               </div>
 
+              {!selectedActionCard?.length && <CWText>No Action Found</CWText>}
               {!isCollapsed &&
                 sidebarComponent &&
-                sidebarComponent?.map((c) => (
+                sidebarComponent.map((c) => (
                   <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
                 ))}
               {proposalDetailSidebar &&

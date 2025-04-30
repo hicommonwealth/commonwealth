@@ -145,6 +145,12 @@
             }
           }
         }
+
+        .action-cards {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
       }
     }
 
@@ -220,6 +226,9 @@
     align-items: center;
     max-width: 300px;
     width: 248px;
+    svg {
+      cursor: pointer;
+    }
 
     .left-container {
       display: flex;

@@ -1,16 +1,22 @@
+@import '../../../../styles/shared.scss';
+
 .ThreadActionPopover {
+  cursor: pointer;
   .left-container {
     display: flex;
     align-items: center;
+    padding-top: 2px;
+    justify-content: center;
+    align-items: center;
   }
   .left-container svg {
-    color: #656167;
+    color: $neutral-500;
     height: 16px;
     width: 16px;
   }
 
   .left-container .Text {
-    color: #656167;
+    color: $neutral-500;
   }
 }
 .ThreadActionPopoverPopover {
