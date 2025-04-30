@@ -190,6 +190,7 @@ export const ImageActionModal = ({
             usePersistentPromptMode={true}
             onAddCurrentToReference={handleAddReferenceFromInput}
             canAddCurrentToReference={canAddCurrentToReference}
+            referenceImageUrls={referenceImageUrls}
           />
         </div>
 

@@ -28,6 +28,7 @@ export const UploadControl = ({
   usePersistentPromptMode,
   onAddCurrentToReference,
   canAddCurrentToReference,
+  referenceImageUrls,
 }: UploadControlProps) => {
   const {
     areActionsDisabled,
@@ -71,6 +72,7 @@ export const UploadControl = ({
     usePersistentPromptMode,
     onAddCurrentToReference,
     canAddCurrentToReference,
+    referenceImageUrls,
   });
 
   // --- Debugging START ---
@@ -211,7 +213,7 @@ export const UploadControl = ({
                     canAddCurrentToReference &&
                     onAddCurrentToReference && (
                       <CWButton
-                        label="Update Remix"
+                        label="Save to Remix"
                         iconLeft="plusCircle"
                         buttonType="secondary"
                         buttonHeight="sm"
@@ -242,7 +244,7 @@ export const UploadControl = ({
                   <CWButton
                     label="Redo"
                     iconLeft="arrowClockwise"
-                    buttonHeight="sm"
+                    buttonHeight="md"
                     buttonWidth="narrow"
                     type="button"
                     containerClassName="btn-focus-styles"
@@ -250,9 +252,11 @@ export const UploadControl = ({
                     onClick={(e) => {
                       e.stopPropagation();
                       imagePrompt.trim() &&
-                        generateImage({ prompt: imagePrompt.trim() }).catch(
-                          console.error,
-                        );
+                        generateImage({
+                          prompt: imagePrompt.trim(),
+                          referenceImageUrls,
+                          size: '1024x1024', // Example size
+                        }).catch(console.error);
                     }}
                   />
                 </>
@@ -293,9 +297,11 @@ export const UploadControl = ({
             if (e.key === 'Enter' && imagePrompt.trim()) {
               e.preventDefault();
               e.stopPropagation();
-              generateImage({ prompt: imagePrompt.trim() }).catch(
-                console.error,
-              );
+              generateImage({
+                prompt: imagePrompt.trim(),
+                referenceImageUrls,
+                size: '1024x1024', // Example size
+              }).catch(console.error);
             }
           }}
         >
@@ -345,9 +351,11 @@ export const UploadControl = ({
               disabled={areActionsDisabled || !imagePrompt.trim()}
               onClick={() => {
                 imagePrompt.trim() &&
-                  generateImage({ prompt: imagePrompt.trim() }).catch(
-                    console.error,
-                  );
+                  generateImage({
+                    prompt: imagePrompt.trim(),
+                    referenceImageUrls,
+                    size: '1024x1024', // Example size
+                  }).catch(console.error);
               }}
             />
           </div>

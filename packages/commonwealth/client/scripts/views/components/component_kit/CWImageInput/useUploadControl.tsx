@@ -21,6 +21,7 @@ export const useUploadControl = ({
   onImageUploaded,
   onProcessedImagesListChange,
   usePersistentPromptMode,
+  referenceImageUrls,
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [, setImageInputRefUpdated] = useState<boolean>(false); // sometimes the input ref doesnt get set in time
@@ -376,6 +377,27 @@ export const useUploadControl = ({
     setIsImageGenerationSectionOpen(true);
   }, [setIsImageGenerationSectionOpen]);
 
+  const generateAndHandle = async () => {
+    if (!imagePrompt.trim()) {
+      notifyError('Please enter a prompt to generate an image.');
+      return;
+    }
+    try {
+      // Pass reference images to the mutation
+      await generateImage({
+        prompt: imagePrompt,
+        referenceImageUrls,
+        size: '1024x1024',
+      });
+    } catch (error) {
+      // Error is handled by the mutation hook's onError, but log here if needed
+      console.error(
+        'Error explicitly caught during generateImage call:',
+        error,
+      );
+    }
+  };
+
   return {
     areActionsDisabled,
     isLoading,
@@ -402,5 +424,6 @@ export const useUploadControl = ({
     setImageInputRefUpdated,
     hasAnyGeneratedImages,
     startNewPrompt,
+    generateAndHandle,
   };
 };

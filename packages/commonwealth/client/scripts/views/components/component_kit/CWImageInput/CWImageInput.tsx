@@ -16,6 +16,7 @@ type CWImageInputProps = UploadControlProps &
     usePersistentPromptMode?: boolean;
     onAddCurrentToReference?: (image: string) => void;
     canAddCurrentToReference?: boolean;
+    referenceImageUrls?: string[];
   };
 
 export const CWImageInput = ({
@@ -45,6 +46,7 @@ export const CWImageInput = ({
   usePersistentPromptMode,
   onAddCurrentToReference,
   canAddCurrentToReference,
+  referenceImageUrls,
 }: CWImageInputProps) => {
   return (
     <div className={clsx('CWImageInput', containerClassname)}>
@@ -67,6 +69,7 @@ export const CWImageInput = ({
         usePersistentPromptMode={usePersistentPromptMode}
         onAddCurrentToReference={onAddCurrentToReference}
         canAddCurrentToReference={canAddCurrentToReference}
+        referenceImageUrls={referenceImageUrls}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}
