@@ -194,15 +194,13 @@ export const UploadControl = ({
             (usePersistentPromptMode &&
             hasAnyGeneratedImages &&
             processedImages.length > 0 ? (
-              // Persistent Mode: Regenerate / New Prompt / Add Ref
               <div className="persistent-actions-row">
-                {/* Larger Screens: Text Buttons -> Now combined logic */}
                 <>
                   {imageToRender &&
                     canAddCurrentToReference &&
                     onAddCurrentToReference && (
                       <CWButton
-                        label="Save to Remix"
+                        label={isSmallScreen ? 'Remix' : 'Save to Remix'}
                         iconLeft="plusCircle"
                         buttonType="secondary"
                         buttonHeight="sm"
@@ -217,7 +215,7 @@ export const UploadControl = ({
                       />
                     )}
                   <CWButton
-                    label="Edit"
+                    label={isSmallScreen ? 'Edit' : 'Edit'}
                     iconLeft="pencil"
                     buttonType="secondary"
                     buttonHeight="sm"
@@ -231,8 +229,9 @@ export const UploadControl = ({
                     }}
                   />
                   <CWButton
-                    label="Redo"
-                    iconLeft="arrowClockwise"
+                    label={isSmallScreen ? 'Redo' : 'Generate'}
+                    iconLeft="sparkle"
+                    buttonType="secondary"
                     buttonHeight="sm"
                     buttonWidth="narrow"
                     type="button"
@@ -251,7 +250,6 @@ export const UploadControl = ({
                 </>
               </div>
             ) : (
-              // Standard Mode: Generate Image Button (or initial persistent)
               <CWButton
                 buttonHeight="sm"
                 type="button"
@@ -275,7 +273,6 @@ export const UploadControl = ({
                 disabled={areActionsDisabled}
               />
             ))}
-          {/* --- Main Action Button Area END --- */}
         </>
       )}
       {isImageGenerationSectionOpen && (

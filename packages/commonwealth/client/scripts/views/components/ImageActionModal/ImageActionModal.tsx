@@ -193,29 +193,10 @@ export const ImageActionModal = ({
             referenceImageUrls={referenceImageUrls}
           />
         </div>
-
-        {/* --- Add Reference Button (Modal Level) --- */}
-        {/* ---- Button Moved to CWImageInput ---- */}
       </CWModalBody>
       <CWModalFooter className="ImageActionModalFooter">
-        {/* ---- Button Moved to CWImageInput ---- */}
-        {/* {imageUrlToApply &&
-          canAddMoreReferences &&
-          !referenceImageUrls.includes(imageUrlToApply) && (
-            <CWButton
-            label="Add Image to Refs"
-            onClick={handleAddReferenceFromInput}
-            disabled={isProcessing}
-            />
-        )} */}
         <CWButton
-          buttonType="secondary"
-          label="Cancel"
-          onClick={onClose}
-          disabled={isProcessing}
-        />
-        <CWButton
-          label="Apply to Thread"
+          label="Add to Thread"
           onClick={handleApply}
           disabled={!imageUrlToApply || isProcessing}
         />
