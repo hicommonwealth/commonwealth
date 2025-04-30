@@ -47,6 +47,7 @@ export default class SuiAccounts implements IAccountsModule<SuiAccount> {
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async init(ChainInfo: SuiChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;

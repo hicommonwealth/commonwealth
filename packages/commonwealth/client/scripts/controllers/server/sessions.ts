@@ -82,6 +82,7 @@ export async function getSessionFromWallet(
       const messageBytes = new TextEncoder().encode(message);
 
       // Use the wallet's signPersonalMessage method to sign
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { signature } = await (wallet as any).signPersonalMessage(
         messageBytes,
       );
@@ -103,9 +104,11 @@ export async function getSessionFromWallet(
           duration: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
         },
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (wallet as any).setSession(payload);
       return payload;
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const session = (wallet as any).getSession();
       return session;
     }
