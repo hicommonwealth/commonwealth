@@ -46,11 +46,9 @@ module.exports = {
       default_symbol: 'SUI',
       network: 'sui', // Using ChainNetwork enum from protocol.ts
       base: 'sui', // Using ChainBase.Sui from protocol.ts
-      social_links: [],
       icon_url: 'https://assets.commonwealth.im/sui-logo.png',
       active: true,
       stages_enabled: true,
-      custom_stages: [],
       type: 'chain', // Using ChainType.Chain from protocol.ts
       created_at: now,
       updated_at: now,
