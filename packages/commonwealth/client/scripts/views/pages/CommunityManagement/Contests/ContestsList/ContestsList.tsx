@@ -106,6 +106,7 @@ const ContestsList = ({
                 onFund={() => setFundDrawerContest(contest)}
                 isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
+                prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
                 score={score || []}
                 community={community}
@@ -133,6 +134,7 @@ const ContestsList = ({
                 onFund={() => setFundDrawerContest(contest)}
                 isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
+                prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
                 score={sc?.score || []}
                 community={community}
@@ -148,6 +150,7 @@ const ContestsList = ({
         contestAddress={fundDrawerContest?.contest_address || ''}
         fundingTokenAddress={fundDrawerContest?.funding_token_address}
         fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
+        isRecurring={(fundDrawerContest?.interval || 0) > 0}
       />
     </>
   );

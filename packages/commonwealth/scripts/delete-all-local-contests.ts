@@ -22,6 +22,7 @@ async function deleteAllLocalContests() {
   await models.Outbox.destroy({ truncate: true, cascade: true });
   await models.EvmEventSource.destroy({ truncate: true, cascade: true });
   log.debug('Deleted all local contests');
+  exit(0);
 }
 
 deleteAllLocalContests().catch((err) => {
