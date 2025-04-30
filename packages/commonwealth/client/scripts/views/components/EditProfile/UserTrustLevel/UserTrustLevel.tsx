@@ -11,25 +11,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from 'views/modals/AuthModal';
 import CommunitySelectionModal from './CommunitySelectionModal';
+import {
+  getLevelRedirect,
+  getLevelStatus,
+  getTierIcon,
+} from './helpers/helpers';
 import LevelBox from './LevelBox';
 import './UserTrustLevel.scss';
 
 type Status = 'Done' | 'Not Started';
-
-const getLevelColor = (tier: UserTierMap): string => {
-  switch (tier) {
-    case UserTierMap.NewlyVerifiedWallet:
-      return 'green';
-    case UserTierMap.VerifiedWallet:
-      return 'yellow';
-    default:
-      return 'gray';
-  }
-};
-
-const getLevelRedirect = (tier: UserTierMap): boolean => {
-  return [UserTierMap.SocialVerified, UserTierMap.ChainVerified].includes(tier);
-};
 
 const UserTrustLevel = () => {
   const userData = useUserStore();
@@ -44,19 +34,6 @@ const UserTrustLevel = () => {
   });
 
   const currentTier = data?.tier || 0;
-
-  const getLevelStatus = (level: number): Status => {
-    const tierEntry = Object.entries(USER_TIERS).find(([key]) => {
-      const tier = USER_TIERS[parseInt(key) as UserTierMap] as Tier & {
-        clientInfo?: { trustLevel: number };
-      };
-      return tier.clientInfo?.trustLevel === level;
-    });
-
-    if (!tierEntry) return 'Not Started';
-    const tierNum = parseInt(tierEntry[0]) as UserTierMap;
-    return tierNum <= currentTier ? 'Done' : 'Not Started';
-  };
 
   const handleItemClick = (item: UserVerificationItem) => {
     if (item.type === 'VERIFY_SOCIAL') {
@@ -115,14 +92,17 @@ const UserTrustLevel = () => {
         level: tierWithClientInfo.clientInfo?.trustLevel || 0,
         title: tier.name,
         description: tier.description,
-        status: getLevelStatus(tierWithClientInfo.clientInfo?.trustLevel || 0),
-        color: getLevelColor(tierNum),
+        status: getLevelStatus(
+          tierWithClientInfo.clientInfo?.trustLevel || 0,
+          currentTier,
+        ),
         items: tierWithClientInfo.clientInfo?.verificationItems
           ? Object.values(tierWithClientInfo.clientInfo.verificationItems).map(
               (item) => ({
                 ...item,
                 status: getLevelStatus(
                   tierWithClientInfo.clientInfo?.trustLevel || 0,
+                  currentTier,
                 ),
               }),
             )
@@ -136,19 +116,7 @@ const UserTrustLevel = () => {
     <div className="verification-container">
       {tiers.map((level) => {
         const isLocked = level.level > currentTier + 1;
-        const tierEntry = Object.entries(USER_TIERS).find(([key]) => {
-          const tier = USER_TIERS[parseInt(key) as UserTierMap] as Tier & {
-            clientInfo?: { trustLevel: number; componentIcon: string };
-          };
-          return tier.clientInfo?.trustLevel === level.level;
-        });
-        const icon = tierEntry
-          ? (
-              USER_TIERS[parseInt(tierEntry[0]) as UserTierMap] as Tier & {
-                clientInfo?: { componentIcon: string };
-              }
-            ).clientInfo?.componentIcon
-          : undefined;
+        const icon = getTierIcon(level.level);
 
         return (
           <LevelBox
@@ -156,7 +124,6 @@ const UserTrustLevel = () => {
             level={level.level}
             title={level.title}
             description={level.description}
-            color={level.color}
             status={level.status}
             isLocked={isLocked}
             icon={icon}

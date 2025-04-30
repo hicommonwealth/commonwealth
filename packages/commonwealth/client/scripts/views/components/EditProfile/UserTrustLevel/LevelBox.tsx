@@ -18,7 +18,6 @@ interface LevelBoxProps {
   level: number;
   title: string;
   description: string;
-  color: string;
   status: Status;
   isLocked: boolean;
   icon?: ComponentIcon;
@@ -36,7 +35,6 @@ const LevelBox = ({
   level,
   title,
   description,
-  color,
   status,
   isLocked,
   icon,
@@ -47,7 +45,7 @@ const LevelBox = ({
 }: LevelBoxProps) => {
   return (
     <div
-      className={`level-box level-${color} ${isLocked ? 'disabled' : ''} ${onClick ? 'clickable' : ''}`}
+      className={`level-box level-${level} ${isLocked ? 'disabled' : ''} ${onClick ? 'clickable' : ''}`}
       onClick={!isLocked ? onClick : undefined}
     >
       <div className="tier-icon">

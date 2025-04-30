@@ -36,15 +36,17 @@
     flex-direction: column;
   }
 
-  &.level-green {
+  &.level-1 {
     border-color: $green-200;
   }
 
-  &.level-yellow {
+  &.level-2 {
     border-color: $yellow-200;
   }
 
-  &.level-gray {
+  &.level-3,
+  &.level-4,
+  &.level-5 {
     border-color: $neutral-200;
   }
 
