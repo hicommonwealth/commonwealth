@@ -52,6 +52,7 @@ export type CommentEditorProps = {
   placeholder?: string;
 };
 
+// eslint-disable-next-line react/display-name
 const CommentEditor = forwardRef<unknown, CommentEditorProps>(
   (
     {
@@ -366,7 +367,5 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
     );
   },
 );
-
-CommentEditor.displayName = 'CommentEditor';
 
 export default CommentEditor;

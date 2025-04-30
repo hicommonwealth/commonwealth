@@ -116,6 +116,7 @@ export interface ExtendedPoll extends Poll {
   customDuration?: string;
 }
 
+// eslint-disable-next-line react/display-name
 export const NewThreadForm = forwardRef<
   NewThreadFormHandles,
   NewThreadFormProps
