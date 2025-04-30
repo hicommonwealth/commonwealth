@@ -26,12 +26,18 @@ abstract class ContractBase {
   async initialize(
     withWallet: boolean = false,
     chainId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<void> {
-    if (!this.initialized || withWallet) {
+    if (!this.initialized || withWallet || providerInstance) {
       try {
         this.chainId = chainId || '1';
         let provider = this.rpc;
-        if (withWallet) {
+
+        if (providerInstance) {
+          provider = providerInstance;
+          this.walletEnabled = true;
+        } else if (withWallet) {
           this.wallet = WebWalletController.Instance.availableWallets(
             ChainBase.Ethereum,
           )[0];

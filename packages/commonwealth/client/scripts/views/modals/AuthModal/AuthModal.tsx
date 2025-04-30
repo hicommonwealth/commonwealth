@@ -21,6 +21,7 @@ const AuthModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionFor,
   showAuthOptionTypesFor,
   isUserFromWebView,
 }: AuthModalProps) => {
@@ -58,6 +59,7 @@ const AuthModal = ({
       onClose,
       onSuccess: handleSuccess,
       showWalletsFor,
+      showAuthOptionFor,
       showAuthOptionTypesFor: (showAuthOptionTypesFor
         ? showAuthOptionTypesFor
         : mobileApp
@@ -81,6 +83,7 @@ const AuthModal = ({
             {...commonVariantProps}
             // TODO: session keys should support all wallet types, atm they only work with sso
             // this is broken in master branch, create a ticket for fix
+            // This is also intentionally meant to override the custom `showAuthOptionFor` value if provided
             {...(sessionKeyValidationError?.ssoSource &&
               sessionKeyValidationError?.ssoSource !==
                 WalletSsoSource.Unknown && {

@@ -1,9 +1,5 @@
-import { composeSequelizeLogger, logger } from '@hicommonwealth/core';
 import { QueryTypes, Transaction } from 'sequelize';
-import { config } from '../config';
 import { models } from '../database';
-
-const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 type Column = {
   setColumn: string;
@@ -11,13 +7,14 @@ type Column = {
 };
 
 /**
- * Warning: column name is not escaped.
+ * WARNING: NEVER USE WITH USER DERIVED INPUT. All inputs are NOT escaped!
  */
 export async function pgMultiRowUpdate(
   tableName: string,
   columns: [Column, ...Column[]],
   caseColumn: string,
   transaction?: Transaction,
+  updatedAtColumn?: boolean,
 ) {
   if (columns.length === 0) return false;
 
@@ -31,15 +28,13 @@ export async function pgMultiRowUpdate(
   if (!hasRows) return false;
 
   let updates = ``;
-  const replacements: unknown[] = [];
   for (const { setColumn, rows } of columns) {
     if (rows.length === 0) continue;
     if (updates.length > 0) updates += `, \n`;
 
     updates += `${setColumn} = CASE `;
     for (const { whenCaseValue, newValue } of rows) {
-      updates += `\n\tWHEN ${caseColumn} = ? THEN ?`;
-      replacements.push(whenCaseValue, newValue);
+      updates += `\n\tWHEN ${caseColumn} = ${whenCaseValue} THEN ${newValue}`;
     }
     updates += ` \n\tEND`;
   }
@@ -49,16 +44,13 @@ export async function pgMultiRowUpdate(
   );
   const query = `
     UPDATE "${tableName}"
-    SET ${updates}
-    WHERE ${caseColumn} IN (?);
+    SET ${updates} ${updatedAtColumn ? `, updated_at = NOW()` : ''}
+    WHERE ${caseColumn} IN (${Array.from(caseValues).join(', ')});
   `;
-  replacements.push(Array.from(caseValues));
 
   await models.sequelize.query(query, {
     transaction,
     type: QueryTypes.UPDATE,
-    logging: composeSequelizeLogger(log, config.TWITTER.LOG_LEVEL),
-    replacements,
   });
   return true;
 }

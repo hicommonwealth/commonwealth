@@ -1,6 +1,12 @@
 import React from 'react';
 import './CWSidebarHeader.scss';
 
+import {
+  COMMUNITY_TIERS,
+  CommunityTierMap,
+  hasCommunityTierClientInfo,
+} from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -11,6 +17,7 @@ import { Skeleton } from '../../Skeleton';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { CWIcon } from '../cw_icons/cw_icon';
 
 const SidebarHeader = ({
   isInsideCommunity,
@@ -20,6 +27,8 @@ const SidebarHeader = ({
   onMobile: boolean;
 }) => {
   const navigate = useCommonNavigate();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -50,26 +59,43 @@ const SidebarHeader = ({
             }
             placement="top"
             renderTrigger={(handleInteraction, isTooltipOpen) => (
-              <CWText
-                className="header"
-                type="h5"
-                onClick={() =>
-                  app.chain.id &&
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: app.chain.id,
-                  })
-                }
-                onMouseEnter={(e) => {
-                  handleMouseEnter({ e, isTooltipOpen, handleInteraction });
-                }}
-                onMouseLeave={(e) => {
-                  handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-                }}
-              >
-                {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
-              </CWText>
+              <div className="header-container">
+                <CWText
+                  className="header"
+                  type="h5"
+                  onClick={() =>
+                    app.chain.id &&
+                    navigateToCommunity({
+                      navigate,
+                      path: '',
+                      chain: app.chain.id,
+                    })
+                  }
+                  onMouseEnter={(e) => {
+                    handleMouseEnter({ e, isTooltipOpen, handleInteraction });
+                  }}
+                  onMouseLeave={(e) => {
+                    handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+                  }}
+                >
+                  {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
+                </CWText>
+                {trustLevelEnabled &&
+                  community?.tier &&
+                  (() => {
+                    const tier = community.tier as CommunityTierMap;
+                    return (
+                      hasCommunityTierClientInfo(tier) && (
+                        <CWIcon
+                          iconName={
+                            COMMUNITY_TIERS[tier].clientInfo.componentIcon
+                          }
+                          iconSize="small"
+                        />
+                      )
+                    );
+                  })()}
+              </div>
             )}
           />
         </>

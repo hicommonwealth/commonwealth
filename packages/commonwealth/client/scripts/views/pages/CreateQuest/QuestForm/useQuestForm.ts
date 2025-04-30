@@ -53,6 +53,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'SSOLinked',
       'DiscordServerJoined',
       'MembershipsRefreshed',
+      'LaunchpadTokenCreated',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };
@@ -218,72 +219,70 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const buildActionMetasPayload = async () => {
-    return await Promise.all(
-      questActionSubForms.map(async (subForm) => {
-        const contentIdScope = (() => {
-          const scope = subForm.values?.contentIdScope;
-          if (scope === QuestActionContentIdScope.TwitterTweet)
-            return 'tweet_url';
-          if (scope === QuestActionContentIdScope.DiscordServer)
-            return 'discord_server_id';
-          if (scope === QuestActionContentIdScope.Topic) return 'topic';
-          if (scope === QuestActionContentIdScope.Chain) return 'chain';
-          if (scope === QuestActionContentIdScope.Group) return 'group';
-          if (scope === QuestActionContentIdScope.Thread) {
-            if (subForm.config?.with_optional_comment_id) return 'comment';
-            return 'thread';
-          }
+  const buildActionMetasPayload = () => {
+    return questActionSubForms.map((subForm) => {
+      const contentIdScope = (() => {
+        const scope = subForm.values?.contentIdScope;
+        if (scope === QuestActionContentIdScope.TwitterTweet)
+          return 'tweet_url';
+        if (scope === QuestActionContentIdScope.DiscordServer)
+          return 'discord_server_id';
+        if (scope === QuestActionContentIdScope.Topic) return 'topic';
+        if (scope === QuestActionContentIdScope.Chain) return 'chain';
+        if (scope === QuestActionContentIdScope.Group) return 'group';
+        if (scope === QuestActionContentIdScope.Thread) {
+          if (subForm.config?.with_optional_comment_id) return 'comment';
           return 'thread';
-        })();
+        }
+        return 'thread';
+      })();
 
-        return {
-          event_name: subForm.values.action as QuestAction,
-          reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
-          ...(subForm.values.creatorRewardAmount && {
-            creator_reward_weight: calculateRemainingPercentageChangeFractional(
-              parseInt(`${subForm.values.rewardAmount}`, 10),
-              parseInt(`${subForm.values.creatorRewardAmount || 0}`, 10),
+      return {
+        event_name: subForm.values.action as QuestAction,
+        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        ...(subForm.values.creatorRewardAmount && {
+          creator_reward_weight: calculateRemainingPercentageChangeFractional(
+            parseInt(`${subForm.values.rewardAmount}`, 10),
+            parseInt(`${subForm.values.creatorRewardAmount || 0}`, 10),
+          ),
+        }),
+        ...(subForm.values.contentIdentifier &&
+          (subForm.config?.with_optional_comment_id ||
+            subForm.config?.with_optional_thread_id ||
+            subForm.config?.with_optional_chain_id ||
+            subForm.config?.with_optional_topic_id ||
+            subForm.config?.requires_twitter_tweet_link ||
+            subForm.config?.requires_discord_server_id ||
+            subForm.config?.requires_group_id) && {
+            content_id: buildContentIdFromIdentifier(
+              subForm.values.contentIdentifier,
+              contentIdScope,
             ),
           }),
-          ...(subForm.values.contentIdentifier &&
-            (subForm.config?.with_optional_comment_id ||
-              subForm.config?.with_optional_thread_id ||
-              subForm.config?.with_optional_chain_id ||
-              subForm.config?.with_optional_topic_id ||
-              subForm.config?.requires_twitter_tweet_link ||
-              subForm.config?.requires_discord_server_id ||
-              subForm.config?.requires_group_id) && {
-              content_id: await buildContentIdFromIdentifier(
-                subForm.values.contentIdentifier,
-                contentIdScope,
-              ),
-            }),
-          ...(subForm.values.startLink && {
-            start_link: subForm.values.startLink.trim(),
-          }),
-          ...((subForm.values.noOfLikes ||
-            subForm.values.noOfRetweets ||
-            subForm.values.noOfReplies) && {
-            tweet_engagement_caps: {
-              likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
-              retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
-              replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
-            },
-          }),
-          participation_limit: subForm.values.participationLimit,
-          participation_period: subForm.values
-            .participationPeriod as QuestParticipationPeriod,
-          participation_times_per_period: parseInt(
-            `${subForm.values.participationTimesPerPeriod}`,
-          ),
-          ...(subForm.values.instructionsLink && {
-            instructions_link: subForm.values.instructionsLink.trim(),
-          }),
-          amount_multiplier: 0,
-        };
-      }),
-    );
+        ...(subForm.values.startLink && {
+          start_link: subForm.values.startLink.trim(),
+        }),
+        ...((subForm.values.noOfLikes ||
+          subForm.values.noOfRetweets ||
+          subForm.values.noOfReplies) && {
+          tweet_engagement_caps: {
+            likes: parseInt(`${subForm.values.noOfLikes || 0}`) || 0,
+            retweets: parseInt(`${subForm.values.noOfRetweets || 0}`) || 0,
+            replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
+          },
+        }),
+        participation_limit: subForm.values.participationLimit,
+        participation_period: subForm.values
+          .participationPeriod as QuestParticipationPeriod,
+        participation_times_per_period: parseInt(
+          `${subForm.values.participationTimesPerPeriod}`,
+        ),
+        ...(subForm.values.instructionsLink && {
+          instructions_link: subForm.values.instructionsLink.trim(),
+        }),
+        amount_multiplier: 0,
+      };
+    });
   };
 
   const handleCreateQuest = async (
@@ -305,7 +304,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (quest && quest.id) {
       await updateQuest({
         quest_id: quest.id,
-        action_metas: await buildActionMetasPayload(),
+        action_metas: buildActionMetasPayload(),
       });
     }
   };
@@ -330,7 +329,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       max_xp_to_end: parseInt(values.max_xp_to_end),
       image_url: values.image || getDefaultContestImage(),
       community_id: values?.community?.value || null, // send null to remove community association
-      action_metas: await buildActionMetasPayload(),
+      action_metas: buildActionMetasPayload(),
     });
   };
 
@@ -475,7 +474,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             (form) =>
               form.config?.with_optional_topic_id &&
               form.values.contentIdScope === QuestActionContentIdScope.Topic &&
-              error.includes(form.values?.contentIdentifier?.trim()),
+              error.includes(
+                form.values?.contentIdentifier?.trim()?.toLowerCase(),
+              ),
           );
           if (foundSubForm) {
             foundSubForm.errors = {

@@ -73,6 +73,7 @@ export const outboxEvents: Events[] = [
   'NominatorSettled',
   'NominatorNominated',
   'JudgeNominated',
+  'CommunityDirectoryTagsUpdated',
 ] as const;
 
 export const Outbox = z.union(

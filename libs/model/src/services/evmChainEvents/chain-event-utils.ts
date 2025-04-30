@@ -139,8 +139,9 @@ const contestManagerDeployedMapper: EvmMapper<
     namespace: namespace as string,
     contest_address: contest_address as string,
     block_number: Number(event.block.number),
+    transaction_hash: event.rawLog.transactionHash,
+    eth_chain_id: event.eventSource.ethChainId,
   };
-
   if (decoded.args.oneOff) {
     return {
       event_name: 'OneOffContestManagerDeployed',

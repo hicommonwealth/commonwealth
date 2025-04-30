@@ -33,8 +33,8 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         throw new AppError('eth_chain_id is not supported');
       }
 
-      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
-        throw new ServerError('Contest bot private key not set!');
+      if (!config.WEB3.LAUNCHPAD_PRIVATE_KEY)
+        throw new ServerError('Launchpad private key not set!');
 
       const communityId = _.kebabCase(name.toLowerCase());
       const existingCommunity = await models.Community.findOne({
@@ -54,7 +54,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
 
       const web3 = cp.createPrivateEvmClient({
         rpc: chainNode.private_url!,
-        privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+        privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY,
       });
       const launchpadContract = new web3.eth.Contract(
         LaunchpadAbi,

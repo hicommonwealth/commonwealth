@@ -113,6 +113,14 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.LAUNCHPAD_CHAIN_ID':
       JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
+    'process.env.LAUNCHPAD_CONNECTOR_WEIGHT':
+      JSON.stringify(env.LAUNCHPAD_CONNECTOR_WEIGHT) ||
+      JSON.stringify('830000'),
+    'process.env.LAUNCHPAD_INITIAL_PRICE':
+      JSON.stringify(env.LAUNCHPAD_INITIAL_PRICE) ||
+      JSON.stringify('416700000'),
+    'process.env.ENABLED_TRPC_BATCHING':
+      JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
   };
 
   return {
@@ -169,6 +177,7 @@ export default defineConfig(({ mode }) => {
         'numeral',
         'firebase/app',
         'firebase/messaging',
+        'eventsource-client',
       ],
     },
     build: {

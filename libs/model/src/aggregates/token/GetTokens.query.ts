@@ -50,7 +50,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
                                  ORDER BY token_address, timestamp DESC),
                older_trades AS (SELECT DISTINCT ON (token_address) *
                                 FROM "LaunchpadTrades"
-                                WHERE timestamp >= (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
+                                WHERE timestamp <= (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
                                 ORDER BY token_address, timestamp ASC),
                trades AS (SELECT lt.token_address,
                                  lt.price as latest_price,
