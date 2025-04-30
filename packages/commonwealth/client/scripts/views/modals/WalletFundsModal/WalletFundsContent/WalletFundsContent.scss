@@ -1,15 +1,81 @@
-.WalletFundsModal {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .WalletFundsContent {
-  .fund-options {
-    margin-top: 24px;
+  .CWModalBody {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
+
+    .amount-input-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: -130px;
+
+      .TextInput {
+        width: auto;
+
+        .input-and-icon-container {
+          input {
+            font-weight: 500;
+            font-size: 40px !important;
+            text-align: right;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            height: 52px !important;
+            width: auto;
+            min-width: 60px;
+
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+
+            &[type='number'] {
+              -moz-appearance: textfield;
+            }
+
+            &:focus {
+              border: none !important;
+              outline: none !important;
+              box-shadow: none !important;
+            }
+          }
+        }
+      }
+
+      .amount-text {
+        margin-top: 16px;
+      }
+    }
+
+    .usd-value {
+      color: #757575;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .refresh-link {
+      color: #0064c8;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .fund-options {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
   }
 }
