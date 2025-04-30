@@ -298,8 +298,11 @@ async function isGraduatedContest(
           LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
           LP_CONTEST_MANAGER_ADDRESS_ANVIL,
         ];
-  const validDeployers = [...lpContestManagerAddresses, account.address];
-  return validDeployers.includes(deployerAddress);
+  // compare all addresses as lowercase
+  const validDeployers = [...lpContestManagerAddresses, account.address].map(
+    (address) => address.toLowerCase(),
+  );
+  return validDeployers.includes(deployerAddress.toLowerCase());
 }
 
 export function Contests(): Projection<typeof inputs> {
