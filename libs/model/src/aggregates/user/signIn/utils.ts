@@ -151,8 +151,7 @@ export async function findOrCreateUser({
   const tier =
     privyUserId &&
     ssoInfo &&
-    'emailVerified' in ssoInfo &&
-    ssoInfo.emailVerified
+    (!('emailVerified' in ssoInfo) || ssoInfo.emailVerified)
       ? UserTierMap.SocialVerified
       : await checkNativeWalletBalance(address, foundUser, ethChainId);
 
