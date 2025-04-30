@@ -144,7 +144,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
               token_address: launchpadToken?.token_address,
               token_symbol: launchpadToken?.symbol,
               token_decimals: 18,
-              vote_weight_multiplier: 100,
+              vote_weight_multiplier: 1,
               chain_node_id: community.chain_node_id,
             };
           }
