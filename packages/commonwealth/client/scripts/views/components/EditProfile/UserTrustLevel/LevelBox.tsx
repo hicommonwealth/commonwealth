@@ -2,7 +2,8 @@ import React from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
-import { Status } from './types';
+
+type Status = 'Done' | 'Not Started';
 
 type ComponentIcon =
   | 'stopSymbol'

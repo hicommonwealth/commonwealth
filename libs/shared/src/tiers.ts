@@ -1,3 +1,8 @@
+export type UserVerificationItem = {
+  label: string;
+  type: string;
+};
+
 type TierClientInfo = {
   trustLevel: 1 | 2 | 3 | 4 | 5;
   icon: string;
@@ -9,6 +14,7 @@ type TierClientInfo = {
     | 'pins'
     | 'whiteCheck'
     | 'starGolden';
+  verificationItems?: Record<string, UserVerificationItem>;
 };
 
 type TierRateLimits = {
@@ -108,6 +114,12 @@ export const USER_TIERS = {
       trustLevel: 3,
       icon: '🌐',
       componentIcon: 'globe',
+      verificationItems: {
+        VERIFY_SOCIAL: {
+          label: 'Verify Social Accounts',
+          type: 'VERIFY_SOCIAL',
+        },
+      },
     },
     hourlyRateLimits: {
       create: 5,
@@ -125,6 +137,20 @@ export const USER_TIERS = {
       trustLevel: 4,
       icon: '🔗',
       componentIcon: 'pins',
+      verificationItems: {
+        LAUNCH_COIN: {
+          label: 'Launch a Coin',
+          type: 'LAUNCH_COIN',
+        },
+        VERIFY_COMMUNITY: {
+          label: 'Verify Community',
+          type: 'VERIFY_COMMUNITY',
+        },
+        COMPLETE_CONTEST: {
+          label: 'Complete a Contest',
+          type: 'COMPLETE_CONTEST',
+        },
+      },
     },
   },
   [UserTierMap.ManuallyVerified]: {
@@ -136,7 +162,7 @@ export const USER_TIERS = {
       componentIcon: 'starGolden',
     },
   },
-} as const satisfies Record<UserTierMap, UserTier>;
+} as const;
 
 export enum CommunityTierMap {
   SpamCommunity = 0,
@@ -253,3 +279,7 @@ export function hasCommunityTierClientInfo(
 ): tier is CommunityTierWithClientInfo {
   return 'clientInfo' in COMMUNITY_TIERS[tier];
 }
+
+export type UserVerificationItemType =
+  | keyof (typeof USER_TIERS)[UserTierMap.SocialVerified]['clientInfo']['verificationItems']
+  | keyof (typeof USER_TIERS)[UserTierMap.ChainVerified]['clientInfo']['verificationItems'];
