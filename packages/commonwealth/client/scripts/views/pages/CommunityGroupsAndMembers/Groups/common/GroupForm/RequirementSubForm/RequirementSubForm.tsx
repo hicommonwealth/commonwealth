@@ -35,9 +35,11 @@ const RequirementSubForm = ({
   const isSPLRequirement =
     requirementType === SPL_SPECIFICATION ||
     requirementType === SOL_NFT_SPECIFICATION;
+  const isSuiRequirement = requirementType === TOKENS.SUI_TOKEN;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [TOKENS.SUI_TOKEN]: 'Using 9 decimal precision',
     [SPL_SPECIFICATION]: 'Using 6 decimal precision',
     [SOL_NFT_SPECIFICATION]: 'Using 6 decimal precision',
     [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
@@ -74,10 +76,12 @@ const RequirementSubForm = ({
                 : app.chain.base === ChainBase.Solana
                   ? [SPL_SPECIFICATION].includes(x.value) ||
                     [SOL_NFT_SPECIFICATION].includes(x.value)
-                  : [
-                      TOKENS.EVM_TOKEN,
-                      ...Object.values(ERC_SPECIFICATIONS),
-                    ].includes(x.value),
+                  : app.chain.base === ChainBase.Sui
+                    ? [TOKENS.SUI_TOKEN].includes(x.value)
+                    : [
+                        TOKENS.EVM_TOKEN,
+                        ...Object.values(ERC_SPECIFICATIONS),
+                      ].includes(x.value),
             )
             .map((requirement) => ({
               label: requirement.label,
@@ -137,7 +141,9 @@ const RequirementSubForm = ({
                     ? 'cosmos'
                     : isSPLRequirement
                       ? 'solana'
-                      : 'ethereum'),
+                      : isSuiRequirement
+                        ? 'sui'
+                        : 'ethereum'),
               )
               ?.map((chainType) => ({
                 label: chainType.label,

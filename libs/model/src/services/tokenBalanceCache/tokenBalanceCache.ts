@@ -2,6 +2,7 @@ import { logger, stats } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { getCosmosBalances, getEvmBalances } from './providers';
 import { getSolanaBalances } from './providers/getSolanaBalances';
+import { getSuiBalances } from './providers/getSuiBalances';
 import {
   Balances,
   GetBalancesOptions,
@@ -9,6 +10,7 @@ import {
   GetErcBalanceOptions,
   GetEvmBalancesOptions,
   GetSPLBalancesOptions,
+  GetSuiNativeBalanceOptions,
 } from './types';
 
 const log = logger(import.meta);
@@ -37,21 +39,29 @@ export async function getBalances(
       options.balanceSourceType == BalanceSourceType.SOLNFT
     ) {
       balances = await getSolanaBalances(options, ttl);
+    } else if (options.balanceSourceType === BalanceSourceType.SuiNative) {
+      balances = await getSuiBalances(
+        options as GetSuiNativeBalanceOptions,
+        ttl,
+      );
     } else {
       balances = await getEvmBalances(options as GetEvmBalancesOptions, ttl);
     }
   } catch (e) {
     const chainId =
-      options.balanceSourceType == BalanceSourceType.SPL
+      options.balanceSourceType === BalanceSourceType.SPL
         ? 'solana'
-        : (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
-          (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
+        : options.balanceSourceType === BalanceSourceType.SuiNative
+          ? (options as GetSuiNativeBalanceOptions).sourceOptions.suiNetwork
+          : (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
+            (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
     const contractAddress =
       (options as GetSPLBalancesOptions).mintAddress ||
-      (options as GetErcBalanceOptions).sourceOptions.contractAddress;
+      (options as GetErcBalanceOptions).sourceOptions.contractAddress ||
+      (options as GetSuiNativeBalanceOptions).sourceOptions.objectId;
     const msg =
       `Failed to fetch balance(s) for ${options.addresses.length} address(es)` +
-      `on chain ${chainId}${contractAddress && ' for contract '}${
+      `on chain ${chainId}${contractAddress ? ' for contract ' : ''}${
         contractAddress || ''
       }`;
 
@@ -59,10 +69,13 @@ export async function getBalances(
       fingerprint: `TBC: ${chainId} - ${contractAddress}`,
       addresses: options.addresses.slice(0, 5),
       contractAddress: (options as GetErcBalanceOptions).sourceOptions
-        .contractAddress,
-      evmChainId: (options as GetEvmBalancesOptions).sourceOptions.evmChainId,
+        ?.contractAddress,
+      evmChainId: (options as GetEvmBalancesOptions).sourceOptions?.evmChainId,
       cosmosChainId: (options as GetCosmosBalancesOptions).sourceOptions
-        .cosmosChainId,
+        ?.cosmosChainId,
+      suiNetwork: (options as GetSuiNativeBalanceOptions).sourceOptions
+        ?.suiNetwork,
+      objectId: (options as GetSuiNativeBalanceOptions).sourceOptions?.objectId,
     });
   }
 

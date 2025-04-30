@@ -39,6 +39,7 @@
     "@hicommonwealth/shared": "workspace:*",
     "@magic-sdk/admin": "^2.4.1",
     "@metaplex-foundation/js": "^0.20.1",
+    "@mysten/sui.js": "^0.54.1",
     "@neynar/nodejs-sdk": "^1.55.0",
     "@privy-io/server-auth": "^1.19.0",
     "@sendgrid/mail": "^6.5.0",

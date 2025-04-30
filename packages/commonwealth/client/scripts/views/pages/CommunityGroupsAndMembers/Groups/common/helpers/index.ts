@@ -105,6 +105,29 @@ export const makeGroupDataBaseAPIPayload = (
       return;
     }
 
+    // for sui base
+    if (x.requirementType === TOKENS.SUI_TOKEN) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            ...(x.requirementContractAddress && {
+              object_id: x.requirementContractAddress.trim(),
+            }),
+          },
+        },
+      });
+      return;
+    }
+
     // for cosmos base
     if (
       x.requirementType === TOKENS.COSMOS_TOKEN ||

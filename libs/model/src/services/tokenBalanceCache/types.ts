@@ -28,6 +28,13 @@ type GetCosmosBalancesBase = {
   };
 } & TbcConfigOptions;
 
+type GetSuiBalancesBase = {
+  addresses: string[];
+  sourceOptions: {
+    suiNetwork: string;
+  };
+} & TbcConfigOptions;
+
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
   sourceOptions: {
@@ -79,6 +86,13 @@ export type GetSPLBalancesOptions = {
   solanaNetwork?: string;
 } & TbcConfigOptions;
 
+export type GetSuiNativeBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiNative;
+  sourceOptions: {
+    objectId?: string;
+  };
+};
+
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
@@ -100,7 +114,8 @@ export type GetCwBalancesOptions =
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
   | GetCosmosBalancesOptions
-  | GetSPLBalancesOptions;
+  | GetSPLBalancesOptions
+  | GetSuiNativeBalanceOptions;
 
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;

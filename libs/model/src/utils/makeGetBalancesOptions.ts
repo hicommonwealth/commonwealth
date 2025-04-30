@@ -5,6 +5,7 @@ import {
   type CosmosSource,
   type NativeSource,
   type SolanaSource,
+  type SuiSource,
 } from '@hicommonwealth/shared';
 import type { GroupAttributes } from '../models/group';
 import type {
@@ -15,6 +16,7 @@ import type {
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
   GetSPLBalancesOptions,
+  GetSuiNativeBalanceOptions,
 } from '../services';
 
 export function makeGetBalancesOptions(
@@ -169,6 +171,30 @@ export function makeGetBalancesOptions(
                 balanceSourceType: castedSource.source_type,
                 mintAddress: castedSource.contract_address,
                 solanaNetwork: castedSource.solana_network,
+                addresses,
+              });
+            }
+            break;
+          }
+          // SuiSource
+          case BalanceSourceType.SuiNative: {
+            const castedSource = requirement.data.source as SuiSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetSuiNativeBalanceOptions;
+              return (
+                castedOpt.balanceSourceType === BalanceSourceType.SuiNative &&
+                castedOpt.sourceOptions.suiNetwork ===
+                  castedSource.sui_network &&
+                castedOpt.sourceOptions.objectId === castedSource.object_id
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.SuiNative,
+                sourceOptions: {
+                  suiNetwork: castedSource.sui_network,
+                  objectId: castedSource.object_id,
+                },
                 addresses,
               });
             }

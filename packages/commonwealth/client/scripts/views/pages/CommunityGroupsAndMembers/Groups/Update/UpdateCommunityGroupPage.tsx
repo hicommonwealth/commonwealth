@@ -110,6 +110,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   requirement.data.source.cosmos_chain_id ||
                   requirement.data.source.evm_chain_id ||
                   requirement.data.source.solana_network ||
+                  requirement.data.source.sui_network ||
                   0
                 }`,
                 label: chainTypes?.find(
@@ -117,11 +118,14 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                     chain.value ==
                     (requirement.data.source.cosmos_chain_id ||
                       requirement.data.source.evm_chain_id ||
-                      requirement.data.source.solana_network),
+                      requirement.data.source.solana_network ||
+                      requirement.data.source.sui_network),
                 )?.label,
               },
               requirementContractAddress:
-                requirement.data.source.contract_address || '',
+                requirement.data.source.contract_address ||
+                requirement.data.source.object_id ||
+                '',
               // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
               requirementCondition: conditionTypes.find(
                 (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
