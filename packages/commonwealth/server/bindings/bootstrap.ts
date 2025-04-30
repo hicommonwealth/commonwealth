@@ -1,42 +1,26 @@
-import {
-  RabbitMQAdapter,
-  buildRetryStrategy,
-  createRmqConfig,
-} from '@hicommonwealth/adapters';
+import { RabbitMQAdapter, createRmqConfig } from '@hicommonwealth/adapters';
 import {
   Broker,
+  EventSchemas,
+  EventsHandlerMetadata,
+  RetryStrategyFn,
   broker,
   handleEvent,
   logger,
-  stats,
 } from '@hicommonwealth/core';
-import {
-  ChainEventPolicy,
-  CommunityGoalsPolicy,
-  Contest,
-  ContestWorker,
-  CreateUnverifiedUser,
-  DiscordBotPolicy,
-  FarcasterWorker,
-  LaunchpadPolicy,
-  NotificationsPolicy,
-  TwitterEngagementPolicy,
-  User,
-  models,
-} from '@hicommonwealth/model';
+import { ContestWorker, models } from '@hicommonwealth/model';
 import { Client } from 'pg';
 import { config } from 'server/config';
-import { NotificationsSettingsPolicy } from 'server/workers/knock/NotificationsSettings.policy';
 import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-export async function bootstrapBindings(
-  skipRmqAdapter?: boolean,
-  knockWorker?: boolean,
-): Promise<void> {
+export async function bootstrapBindings(options?: {
+  skipRmqAdapter?: boolean;
+  worker?: string;
+}): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
@@ -46,10 +30,8 @@ export async function bootstrapBindings(
       }),
     );
     await rmqAdapter.init();
-    if (!skipRmqAdapter) {
-      broker({
-        adapter: rmqAdapter,
-      });
+    if (!options?.skipRmqAdapter) {
+      broker({ adapter: rmqAdapter });
     }
     brokerInstance = rmqAdapter;
   } catch (e) {
@@ -59,52 +41,22 @@ export async function bootstrapBindings(
     throw e;
   }
 
-  if (knockWorker) {
-    await brokerInstance.subscribe(
-      NotificationsPolicy,
-      // This disables retry strategies on any handler error/failure
-      // This is because we cannot guarantee whether a Knock workflow trigger
-      // call was successful or not. It is better to 'miss' notifications then
-      // to double send a notification
-      buildRetryStrategy((err, topic, content, ackOrNackFn, log_) => {
-        log_.error(err.message, err, {
-          topic,
-          message: content,
-        });
-        ackOrNackFn({ strategy: 'ack' });
-        return true;
-      }),
-    );
-    await brokerInstance.subscribe(NotificationsSettingsPolicy);
-    return;
-  }
+  for (const item of rascalConsumerMap) {
+    let consumer: () => EventsHandlerMetadata<EventSchemas>;
+    let worker: string | undefined;
+    let retryStrategy: RetryStrategyFn | undefined;
 
-  await brokerInstance.subscribe(ChainEventPolicy);
-  await brokerInstance.subscribe(
-    ContestWorker,
-    buildRetryStrategy(undefined, 20_000),
-    {
-      beforeHandleEvent: (topic, event, context) => {
-        context.start = Date.now();
-      },
-      afterHandleEvent: (topic, event, context) => {
-        const duration = Date.now() - context.start;
-        const handler = `${topic}.${event.name}`;
-        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
-      },
-    },
-  );
-  await brokerInstance.subscribe(Contest.Contests);
-  await brokerInstance.subscribe(User.Xp);
-  await brokerInstance.subscribe(
-    FarcasterWorker,
-    buildRetryStrategy(undefined, 20_000),
-  );
-  await brokerInstance.subscribe(DiscordBotPolicy);
-  await brokerInstance.subscribe(LaunchpadPolicy);
-  await brokerInstance.subscribe(CreateUnverifiedUser);
-  await brokerInstance.subscribe(TwitterEngagementPolicy);
-  await brokerInstance.subscribe(CommunityGoalsPolicy);
+    if (typeof item === 'function') consumer = item;
+    else {
+      consumer = item.consumer;
+      worker = item.worker;
+      retryStrategy = item.retryStrategy;
+    }
+
+    // match worker name
+    if ((options?.worker || '') !== (worker || '')) continue;
+    await brokerInstance.subscribe(consumer, retryStrategy);
+  }
 }
 
 export async function bootstrapRelayer(
