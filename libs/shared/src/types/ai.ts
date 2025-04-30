@@ -57,6 +57,7 @@ export interface CompletionOptions {
   maxTokens?: number;
   stream?: boolean;
   useOpenRouter?: boolean;
+  useWebSearch?: boolean;
 }
 
 export interface CompletionResponse {

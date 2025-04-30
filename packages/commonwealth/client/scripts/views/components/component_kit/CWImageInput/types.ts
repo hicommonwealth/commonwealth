@@ -21,7 +21,7 @@ export type ImageProcessingProps = {
 export type UploadControlProps = {
   imageURL?: string;
   onImageProcessingChange?: (process: ImageProcessingProps) => void;
-  onProcessedImagesListChange?: (processedImages: ImageProcessed[]) => void;
+  onProcessedImagesListChange?: (images: ImageProcessed[]) => void;
   onImageGenerated?: (generatedImageUrl: string) => void;
   onImageUploaded?: (uploadedImageURL: string) => void;
   canSwitchBetweenProcessedImages?: boolean;
@@ -33,4 +33,8 @@ export type UploadControlProps = {
   hookToForm?: boolean;
   imageBehavior?: ImageBehavior;
   uploadControlClassName?: string;
+  usePersistentPromptMode?: boolean;
+  onAddCurrentToReference?: () => void;
+  canAddCurrentToReference?: boolean;
+  referenceImageUrls?: string[];
 };

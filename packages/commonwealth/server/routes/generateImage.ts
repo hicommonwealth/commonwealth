@@ -25,6 +25,22 @@ if (process.env.OPENAI_API_KEY) {
 
 type generateImageReq = {
   description: string;
+  model?: string;
+  n?: number;
+  quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
+  response_format?: 'url' | 'b64_json';
+  size?:
+    | '256x256'
+    | '512x512'
+    | '1024x1024'
+    | '1792x1024'
+    | '1024x1792'
+    | '1536x1024'
+    | '1024x1536'
+    | 'auto';
+  style?: 'vivid' | 'natural';
+  referenceImageUrls?: string[];
+  maskUrl?: string;
 };
 
 type generateImageResp = {
@@ -36,17 +52,49 @@ const generateImageHandler = async (
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>,
 ) => {
-  const { description } = req.body;
+  log.info('Received /generateImage request with body:', req.body);
+
+  const {
+    description,
+    model,
+    n,
+    quality,
+    response_format,
+    size,
+    style,
+    referenceImageUrls,
+    maskUrl,
+  } = req.body;
 
   if (!description) {
+    log.warn('/generateImage: No description provided in request body');
     throw new AppError('No description provided');
   }
 
+  const options: Parameters<typeof generateImage>[2] = {
+    model,
+    n,
+    quality,
+    response_format,
+    size,
+    style,
+    referenceImageUrls,
+    maskUrl,
+  };
+
+  log.info('/generateImage: Calling generateImage function with options:', {
+    promptLength: description.length,
+    ...options,
+  });
+
   try {
-    const imageUrl = await generateImage(description, openai);
+    const imageUrl = await generateImage(description, openai, options);
+    log.info('/generateImage: Successfully generated and uploaded image', {
+      imageUrl,
+    });
     return success(res, { imageUrl });
   } catch (e) {
-    log.error('Problem generating image', e);
+    log.error('Problem generating image in handler', e);
     throw new ServerError('Problem Generating Image!', e);
   }
 };
