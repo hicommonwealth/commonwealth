@@ -106,9 +106,8 @@ async function checkNativeWalletBalance(
   foundUser: UserAttributes | null,
   ethChainId?: number,
 ): Promise<UserTierMap> {
-  if (
-    (foundUser?.tier || UserTierMap.IncompleteUser) < UserTierMap.SocialVerified
-  ) {
+  const tier = foundUser?.tier || UserTierMap.NewlyVerifiedWallet;
+  if (tier < UserTierMap.SocialVerified) {
     const balances = ethChainId
       ? await tokenBalanceCache.getBalances({
           addresses: [address],
@@ -120,7 +119,7 @@ async function checkNativeWalletBalance(
     const minBalance = BigInt(config.TIER.SOCIAL_VERIFIED_MIN_ETH * 1e18);
     if (balance >= minBalance) return UserTierMap.SocialVerified;
   }
-  return UserTierMap.NewlyVerifiedWallet;
+  return tier;
 }
 
 export async function findOrCreateUser({
@@ -150,7 +149,7 @@ export async function findOrCreateUser({
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
   const tier =
-    privyUserId && ssoInfo
+    privyUserId && ssoInfo?.emailVerified
       ? UserTierMap.SocialVerified
       : await checkNativeWalletBalance(address, foundUser, ethChainId);
 
