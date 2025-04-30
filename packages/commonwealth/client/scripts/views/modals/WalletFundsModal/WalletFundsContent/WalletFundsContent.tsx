@@ -24,9 +24,14 @@ const WalletFundsContent = () => {
             onClick={() => console.log('MoonPay clicked')}
           />
           <FundWalletItem
-            icon="wallet"
+            icon="cardholder"
             title="Transfer from wallet"
             onClick={() => console.log('Transfer clicked')}
+          />
+          <FundWalletItem
+            icon="barcode"
+            title="Scan QR code"
+            onClick={() => console.log('Scan QR code clicked')}
           />
         </div>
       </CWModalBody>
