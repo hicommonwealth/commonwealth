@@ -16,7 +16,7 @@ import {
 } from 'views/components/NewThreadFormLegacy/NewThreadForm';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
-import { MobileInput } from './MobileInput';
+import MobileInput from './MobileInput';
 import './MobileStickyInput.scss';
 import StickyInput from './StickyInput';
 import { StickCommentContext } from './context/StickCommentProvider';
@@ -52,6 +52,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   const customHandleSubmitComment = useCallback(async (): Promise<number> => {
     setFocused(false);
+    setOpenModalOnExpand(false);
 
     const commentId = await handleSubmitComment();
 
@@ -83,6 +84,19 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   }, [handleFocused]);
 
   useEffect(() => {
+    if (focused && openModalOnExpand) {
+      if (mode === 'thread') {
+        setTimeout(() => {
+          newThreadFormRef.current?.openImageModal();
+        }, 0);
+        setOpenModalOnExpand(false);
+      } else if (mode === 'comment') {
+        setOpenModalOnExpand(false);
+      }
+    }
+  }, [focused, openModalOnExpand, mode]);
+
+  useEffect(() => {
     const node = stickyInputRef.current;
     if (!node) return;
 
@@ -97,15 +111,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     };
   }, [focused]);
 
-  useEffect(() => {
-    if (focused && openModalOnExpand && mode === 'thread') {
-      setTimeout(() => {
-        newThreadFormRef.current?.openImageModal();
-      }, 0);
-      setOpenModalOnExpand(false);
-    }
-  }, [focused, openModalOnExpand, mode]);
-
   const parent = document.getElementById('MobileNavigationHead');
 
   if (!parent) {
@@ -118,6 +123,9 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   }
 
   if (focused) {
+    const shouldOpenImageModalInEditor =
+      mode === 'comment' && openModalOnExpand;
+
     return (
       <div className="MobileStickyInputFocused">
         <div className="mobile-editor-container">
@@ -140,6 +148,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
               handleSubmitComment={customHandleSubmitComment}
               onAiReply={handleAiReply}
               streamingReplyIds={streamingReplyIds}
+              triggerImageModalOpen={shouldOpenImageModalInEditor}
             />
           )}
         </div>

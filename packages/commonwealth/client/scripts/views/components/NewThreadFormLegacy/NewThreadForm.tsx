@@ -11,7 +11,13 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
@@ -98,13 +104,25 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
+  onContentAppended?: (markdown: string) => void;
 }
+
+export interface NewThreadFormHandles {
+  openImageModal: () => void;
+  appendContent: (markdown: string) => void;
+}
+
 export interface ExtendedPoll extends Poll {
   customDuration?: string;
 }
-export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
+
+export const NewThreadForm = forwardRef<
+  NewThreadFormHandles,
+  NewThreadFormProps
+>(({ onCancel, onContentAppended }, ref) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
@@ -551,7 +569,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     },
     [handleNewThreadCreation],
   );
-  const forceRerender = useForceRerender();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -631,7 +648,32 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-  const handleOpenImageModal = useCallback(() => setIsImageModalOpen(true), []);
+
+  const handleAppendContent = useCallback(
+    (markdown: string) => {
+      const currentText = getTextFromDelta(threadContentDelta);
+      const combinedText = currentText
+        ? `${currentText}\n\n${markdown}`
+        : markdown;
+      const newDelta = createDeltaFromText(combinedText, true);
+      setThreadContentDelta(newDelta);
+      forceRerender();
+    },
+    [threadContentDelta, setThreadContentDelta, forceRerender],
+  );
+
+  useEffect(() => {
+    if (onContentAppended) {
+      // This effect ensures that if the prop function changes, we are aware,
+      // but the actual appending happens via handleAppendContent.
+      // The parent will call handleAppendContent via a ref method.
+    }
+  }, [onContentAppended, handleAppendContent]);
+
+  const handleOpenImageModal = useCallback(() => {
+    setIsImageModalOpen(true);
+  }, []);
+
   const handleCloseImageModal = useCallback(
     () => setIsImageModalOpen(false),
     [],
@@ -757,6 +799,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         ]
       : []),
   ];
+
+  React.useImperativeHandle(ref, () => ({
+    openImageModal: handleOpenImageModal,
+    appendContent: handleAppendContent,
+  }));
 
   return (
     <>
@@ -1171,6 +1218,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       {JoinCommunityModals}
     </>
   );
-};
+});
 
 export default NewThreadForm;

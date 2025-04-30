@@ -16,11 +16,9 @@ import { useStickComment } from './context/StickCommentProvider';
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const { mode, isExpanded, setIsExpanded } = useStickComment();
-  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useLocalAISettingsStore();
+  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
-  const commentEditorRef = useRef<any>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
 
   const handleFocused = useCallback(() => {
@@ -37,9 +35,15 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   );
 
   useEffect(() => {
-    if (isExpanded && openModalOnExpand && mode === 'thread') {
-      newThreadFormRef.current?.openImageModal();
-      setOpenModalOnExpand(false);
+    if (isExpanded && openModalOnExpand) {
+      if (mode === 'thread') {
+        setTimeout(() => {
+          newThreadFormRef.current?.openImageModal();
+        }, 0);
+        setOpenModalOnExpand(false);
+      } else if (mode === 'comment') {
+        setOpenModalOnExpand(false);
+      }
     }
   }, [isExpanded, openModalOnExpand, mode]);
 
@@ -56,6 +60,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const handleEnhancedSubmit = useCallback(
     async (turnstileToken?: string | null): Promise<number> => {
       setIsExpanded(false);
+      setOpenModalOnExpand(false);
 
       const commentId = await handleSubmitComment(turnstileToken);
 
@@ -103,9 +108,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
 
   const useExpandedEditor = isExpanded || isReplying;
 
-  const editorProps: CommentEditorProps & { ref?: React.Ref<any> } = {
+  const editorProps: CommentEditorProps = {
     ...props,
-    ref: commentEditorRef,
     shouldFocus: true,
     onCancel: handleCancel,
     aiCommentsToggleEnabled,
@@ -123,6 +127,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     ref: newThreadFormRef,
     onCancel: handleCancel,
   };
+
+  const shouldOpenImageModalInEditor = mode === 'comment' && openModalOnExpand;
 
   return (
     <div className="DesktopStickyInput">
@@ -150,10 +156,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                   buttonSize="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (mode === 'thread') {
-                      setOpenModalOnExpand(true);
-                      handleFocused();
-                    }
+                    setOpenModalOnExpand(true);
+                    handleFocused();
                   }}
                   aria-label="Add or Generate Image"
                   onMouseEnter={handleInteraction}
@@ -170,7 +174,10 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
           {mode === 'thread' ? (
             <NewThreadForm {...newThreadFormProps} />
           ) : (
-            <CommentEditor {...editorProps} />
+            <CommentEditor
+              {...editorProps}
+              triggerImageModalOpen={shouldOpenImageModalInEditor}
+            />
           )}
         </div>
       )}

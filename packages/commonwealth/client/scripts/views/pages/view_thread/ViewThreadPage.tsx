@@ -45,7 +45,10 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import {
+  StickCommentProvider,
+  useStickComment,
+} from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -58,7 +61,7 @@ import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
-import { ImageActionCard } from '../../components/ImageActionCard/ImageActionCard';
+import { ImageActionModal } from '../../components/ImageActionModal/ImageActionModal';
 import MetaTags from '../../components/MetaTags';
 import {
   CWContentPage,
@@ -114,6 +117,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const initalAiCommentPosted = useRef(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+  const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
+  const { setContentToAppend } = useStickComment();
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -567,12 +572,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
-  const handleOpenImageModalPlaceholder = () => {
-    console.log(
-      'TODO: Implement opening ImageActionModal from ViewThreadPage sidebar',
-    );
-    notifyError('Functionality not yet implemented.');
-    // Later: This should focus the CreateComment input and trigger the modal
+  const handleOpenImageModal = () => {
+    setImageActionModalOpen(true);
   };
 
   const sidebarComponent = [
@@ -663,23 +664,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
         ]
       : []),
-    {
-      label: 'Add Image',
-      item: (
-        <div className="cards-column">
-          <ImageActionCard
-            onClick={handleOpenImageModalPlaceholder}
-            // Disable if user can't comment?
-            disabled={!canComment}
-            tooltipText={
-              typeof disabledActionsTooltipText === 'function'
-                ? disabledActionsTooltipText?.('comment')
-                : disabledActionsTooltipText
-            }
-          />
-        </div>
-      ),
-    },
   ];
 
   const governanceType = proposal
@@ -1107,6 +1091,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         />
       </CWPageLayout>
       {JoinCommunityModals}
+
+      {imageActionModalOpen && (
+        <ImageActionModal
+          isOpen={imageActionModalOpen}
+          onClose={() => setImageActionModalOpen(false)}
+          onApply={(imageUrl) => {
+            const imageMarkdown = `![Generated image](${imageUrl})`;
+            setContentToAppend(imageMarkdown);
+            setImageActionModalOpen(false);
+            // TODO: Optionally focus the sticky editor or scroll to it?
+          }}
+          applyButtonLabel="Add to Comment"
+        />
+      )}
     </StickCommentProvider>
   );
 };

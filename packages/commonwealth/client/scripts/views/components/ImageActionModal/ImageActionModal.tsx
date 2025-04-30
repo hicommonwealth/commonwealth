@@ -21,6 +21,7 @@ interface ImageActionModalProps {
   onClose: () => void;
   onApply: (imageUrl: string) => void;
   initialPrompt?: string;
+  applyButtonLabel?: string;
 }
 
 export const ImageActionModal = ({
@@ -28,6 +29,7 @@ export const ImageActionModal = ({
   onClose,
   onApply,
   initialPrompt = '',
+  applyButtonLabel = 'Add to Thread',
 }: ImageActionModalProps) => {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [imageUrlToApply, setImageUrlToApply] = useState<string | null>(null);
@@ -196,7 +198,7 @@ export const ImageActionModal = ({
       </CWModalBody>
       <CWModalFooter className="ImageActionModalFooter">
         <CWButton
-          label="Add to Thread"
+          label={applyButtonLabel}
           onClick={handleApply}
           disabled={!imageUrlToApply || isProcessing}
         />
