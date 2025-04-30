@@ -487,11 +487,15 @@ export const calculateNetContestBalance = (originalBalance: number) => {
 // returns array of prize amounts
 export const buildContestPrizes = (
   contestBalance: number,
+  prizePercentage?: number,
   payoutStructure?: number[],
   decimals?: number,
 ): string[] => {
-  // 10% fee deducted from prize pool
-  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  let netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  // for recurring contests, apply prize percentage
+  if (prizePercentage) {
+    netContestBalance = netContestBalance * (prizePercentage / 100);
+  }
   return netContestBalance && payoutStructure
     ? payoutStructure.map((percentage) => {
         const prize =
