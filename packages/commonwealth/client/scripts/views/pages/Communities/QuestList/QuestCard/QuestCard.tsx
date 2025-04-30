@@ -10,6 +10,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './QuestCard.scss';
 
@@ -39,7 +40,7 @@ const QuestCard = ({
   description,
   communityId,
   iconURL,
-  // xpPoints,
+  xpPoints,
   startDate,
   endDate,
   className,
@@ -147,7 +148,7 @@ const QuestCard = ({
         </div>
         <CWDivider />
         <div className="xp-row">
-          {/*<CWTag type="proposal" label={`${xpPoints} Aura`} />*/}
+          <CWTag type="proposal" label={`${xpPoints} Aura`} />
           <CWButton
             iconLeft="upvote"
             label="Leaderboard"

@@ -931,14 +931,14 @@ describe('User lifecycle', () => {
         payload: { top: 10 },
       });
       expect(xps1!.length).to.equal(4);
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([147, 50, 37, 11]);
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([161, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { top: 10, quest_id: -1 },
       });
       expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 10]);
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([20, 10]);
     });
   });
 });

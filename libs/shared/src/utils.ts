@@ -554,3 +554,9 @@ export type TurnstileWidgetNames =
   | 'create-community'
   | 'create-thread'
   | 'create-comment';
+
+export const CountAggregatorKeys = {
+  ThreadViewCount: 'thread_view_count',
+  CommunityProfileCount: 'community_profile_count_changed',
+  CommunityThreadCount: 'community_thread_count_changed',
+};

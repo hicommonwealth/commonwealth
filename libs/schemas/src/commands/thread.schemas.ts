@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ReactionContext, ThreadContext, TopicContext } from '../context';
-import { Reaction, Thread } from '../entities';
+import { COMMUNITY_TIER, Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -25,7 +25,7 @@ export const CreateThread = {
     is_linking_token: z.boolean().optional(),
     turnstile_token: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ community_tier: COMMUNITY_TIER }),
   context: TopicContext,
 };
 
@@ -52,7 +52,7 @@ export const UpdateThread = {
     is_linking_token: z.boolean().optional(),
     launchpad_token_address: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ spam_toggled: z.boolean() }),
   context: ThreadContext,
 };
 
@@ -66,7 +66,7 @@ export const ThreadCanvasReaction = z.object({
 
 export const CreateThreadReaction = {
   input: ThreadCanvasReaction,
-  output: Reaction.extend({ community_id: z.string() }),
+  output: Reaction.extend({ community_id: z.string(), thread_id: PG_INT }),
   context: ThreadContext,
 };
 
@@ -78,6 +78,7 @@ export const DeleteThread = {
   }),
   output: z.object({
     thread_id: PG_INT,
+    community_id: z.string(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
