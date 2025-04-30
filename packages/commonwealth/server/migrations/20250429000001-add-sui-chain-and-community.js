@@ -50,7 +50,6 @@ module.exports = {
       icon_url: 'https://assets.commonwealth.im/sui-logo.png',
       active: true,
       stages_enabled: true,
-      custom_stages: [],
       type: 'chain', // Using ChainType.Chain from protocol.ts
       created_at: now,
       updated_at: now,
