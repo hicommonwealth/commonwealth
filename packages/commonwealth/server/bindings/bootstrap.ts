@@ -1,6 +1,7 @@
 import { RabbitMQAdapter, createRmqConfig } from '@hicommonwealth/adapters';
 import {
   Broker,
+  ConsumerHooks,
   EventSchemas,
   EventsHandlerMetadata,
   RetryStrategyFn,
@@ -45,17 +46,19 @@ export async function bootstrapBindings(options?: {
     let consumer: () => EventsHandlerMetadata<EventSchemas>;
     let worker: string | undefined;
     let retryStrategy: RetryStrategyFn | undefined;
+    let hooks: ConsumerHooks | undefined;
 
     if (typeof item === 'function') consumer = item;
     else {
       consumer = item.consumer;
       worker = item.worker;
       retryStrategy = item.retryStrategy;
+      hooks = item.hooks;
     }
 
     // match worker name
     if ((options?.worker || '') !== (worker || '')) continue;
-    await brokerInstance.subscribe(consumer, retryStrategy);
+    await brokerInstance.subscribe(consumer, retryStrategy, hooks);
   }
 }
 
