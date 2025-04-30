@@ -125,20 +125,24 @@ export const ImageActionModal = ({
 
   // --- Derived State ---
   const canAddMoreReferences = referenceImageUrls.length < MAX_REFERENCE_IMAGES;
+  const canAddCurrentToReference =
+    !!imageUrlToApply &&
+    canAddMoreReferences &&
+    !referenceImageUrls.includes(imageUrlToApply);
 
   return (
     <CWResponsiveDialog open={isOpen} onClose={onClose}>
       <CWModalHeader label="Generate Image" onModalClose={onClose} />
       <CWModalBody>
-        {/* --- Reference Image Row --- */}
+        {/* --- Remix Image Row --- */}
         <div className="reference-images-container">
-          <span className="reference-label">Reference Images:</span>
+          <span className="reference-label">Remix Images:</span>
           <CWText
             type="caption"
             fontWeight="regular"
             className="reference-subheading"
           >
-            These images help guide the generation process.
+            Use images to influence the generation.
           </CWText>
 
           {/* Reference image grid */}
@@ -183,23 +187,26 @@ export const ImageActionModal = ({
             onImageProcessingChange={handleImageProcessingChange}
             loading={isProcessing}
             canSwitchBetweenProcessedImages={true}
+            usePersistentPromptMode={true}
+            onAddCurrentToReference={handleAddReferenceFromInput}
+            canAddCurrentToReference={canAddCurrentToReference}
           />
         </div>
 
         {/* --- Add Reference Button (Modal Level) --- */}
-        {imageUrlToApply &&
+        {/* ---- Button Moved to CWImageInput ---- */}
+      </CWModalBody>
+      <CWModalFooter>
+        {/* ---- Button Moved to CWImageInput ---- */}
+        {/* {imageUrlToApply &&
           canAddMoreReferences &&
           !referenceImageUrls.includes(imageUrlToApply) && (
             <CWButton
-              label="Use Current Image as Reference"
-              onClick={handleAddReferenceFromInput}
-              buttonType="tertiary"
-              className="add-reference-button"
-              disabled={isProcessing}
+            label="Add Image to Refs"
+            onClick={handleAddReferenceFromInput}
+            disabled={isProcessing}
             />
-          )}
-      </CWModalBody>
-      <CWModalFooter>
+        )} */}
         <CWButton
           buttonType="secondary"
           label="Cancel"

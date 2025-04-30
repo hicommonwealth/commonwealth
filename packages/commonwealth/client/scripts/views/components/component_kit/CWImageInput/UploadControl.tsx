@@ -25,6 +25,9 @@ export const UploadControl = ({
   onImageGenerated,
   onImageUploaded,
   onProcessedImagesListChange,
+  usePersistentPromptMode,
+  onAddCurrentToReference,
+  canAddCurrentToReference,
 }: UploadControlProps) => {
   const {
     areActionsDisabled,
@@ -48,6 +51,8 @@ export const UploadControl = ({
     isImageGenerationSectionOpen,
     imagePrompt,
     generateImage,
+    hasAnyGeneratedImages,
+    startNewPrompt,
   } = useUploadControl({
     name,
     hookToForm,
@@ -63,7 +68,23 @@ export const UploadControl = ({
     onImageGenerated,
     onImageUploaded,
     onProcessedImagesListChange,
+    usePersistentPromptMode,
+    onAddCurrentToReference,
+    canAddCurrentToReference,
   });
+
+  // --- Debugging START ---
+  const isSmallScreen = isWindowExtraSmall; // Alias for clarity
+  console.log('--- UploadControl Render Debug ---');
+  console.log('isSmallScreen:', isSmallScreen);
+  console.log('hasAnyGeneratedImages:', hasAnyGeneratedImages);
+  console.log('imageToRender:', imageToRender);
+  console.log('imagePrompt:', imagePrompt);
+  console.log(
+    'Condition (hasAnyGeneratedImages && imageToRender):',
+    hasAnyGeneratedImages && !!imageToRender,
+  );
+  // --- Debugging END ---
 
   return (
     <div
@@ -134,7 +155,7 @@ export const UploadControl = ({
                 className="gray"
               />
               <CWText
-                type={isWindowExtraSmall ? 'caption' : 'b1'}
+                type={isSmallScreen ? 'caption' : 'b1'}
                 fontWeight="medium"
                 className="gray"
               >
@@ -142,6 +163,10 @@ export const UploadControl = ({
               </CWText>
             </>
           )}
+
+          {/* --- Add to References Button START --- */}
+          {/* ---- MOVED ---- */}
+          {/* --- Add to References Button END --- */}
 
           {canSwitchBetweenProcessedImages && activeImageIndex >= 0 && (
             <>
@@ -173,30 +198,91 @@ export const UploadControl = ({
             </>
           )}
 
-          {withAIImageGeneration && (
-            <CWButton
-              buttonHeight="sm"
-              type="button"
-              buttonType="secondary"
-              label="Generate Image"
-              containerClassName={clsx('btn-focus-styles generate-img-btn', {
-                autoMarginTop:
-                  imageToRender &&
-                  (imageBehavior === ImageBehavior.Fill ||
-                    imageBehavior === ImageBehavior.Tiled),
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsImageGenerationSectionOpen(true);
-              }}
-              buttonWidth={
-                !imageToRender || imageBehavior === ImageBehavior.Circle
-                  ? 'narrow'
-                  : 'full'
-              }
-              disabled={areActionsDisabled}
-            />
-          )}
+          {/* --- Main Action Button Area START --- */}
+          {withAIImageGeneration &&
+            (usePersistentPromptMode &&
+            hasAnyGeneratedImages &&
+            processedImages.length > 0 ? (
+              // Persistent Mode: Regenerate / New Prompt / Add Ref
+              <div className="persistent-actions-row">
+                {/* Larger Screens: Text Buttons -> Now combined logic */}
+                <>
+                  <CWButton
+                    label="Regen"
+                    iconLeft="arrowClockwise"
+                    buttonHeight="med"
+                    buttonWidth="narrow"
+                    type="button"
+                    containerClassName="btn-focus-styles"
+                    disabled={areActionsDisabled || !imagePrompt.trim()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      imagePrompt.trim() &&
+                        generateImage({ prompt: imagePrompt.trim() }).catch(
+                          console.error,
+                        );
+                    }}
+                  />
+                  <CWButton
+                    label="New"
+                    iconLeft="pencil"
+                    buttonType="secondary"
+                    buttonHeight="med"
+                    buttonWidth="narrow"
+                    type="button"
+                    containerClassName="btn-focus-styles"
+                    disabled={areActionsDisabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startNewPrompt();
+                    }}
+                  />
+                  {imageToRender &&
+                    canAddCurrentToReference &&
+                    onAddCurrentToReference && (
+                      <CWButton
+                        label="Remix"
+                        iconLeft="plusCircle"
+                        buttonType="secondary"
+                        buttonHeight="med"
+                        buttonWidth="narrow"
+                        type="button"
+                        containerClassName="btn-focus-styles add-to-ref-btn"
+                        disabled={isLoading || areActionsDisabled}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAddCurrentToReference();
+                        }}
+                      />
+                    )}
+                </>
+              </div>
+            ) : (
+              // Standard Mode: Generate Image Button (or initial persistent)
+              <CWButton
+                buttonHeight="sm"
+                type="button"
+                buttonType="secondary"
+                label="Generate Image"
+                containerClassName={clsx('btn-focus-styles generate-img-btn', {
+                  autoMarginTop:
+                    imageToRender &&
+                    (imageBehavior === ImageBehavior.Fill ||
+                      imageBehavior === ImageBehavior.Tiled),
+                })}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent opening file picker
+                  setIsImageGenerationSectionOpen(true);
+                }}
+                buttonWidth={
+                  !imageToRender || imageBehavior === ImageBehavior.Circle
+                    ? 'narrow'
+                    : 'full'
+                }
+                disabled={areActionsDisabled}
+              />
+            ))}
+          {/* --- Main Action Button Area END --- */}
         </>
       )}
       {isImageGenerationSectionOpen && (
@@ -248,20 +334,23 @@ export const UploadControl = ({
               />
             }
           />
-          <CWButton
-            label="Generate"
-            buttonHeight="sm"
-            buttonWidth="narrow"
-            type="button"
-            containerClassName="btn-focus-styles"
-            disabled={areActionsDisabled}
-            onClick={() => {
-              imagePrompt.trim() &&
-                generateImage({ prompt: imagePrompt.trim() }).catch(
-                  console.error,
-                );
-            }}
-          />
+          {/* Button inside the modal - always "Generate" */}
+          <div className="generate-buttons-row">
+            <CWButton
+              label="Generate"
+              buttonHeight="sm"
+              buttonWidth="narrow"
+              type="button"
+              containerClassName="btn-focus-styles"
+              disabled={areActionsDisabled || !imagePrompt.trim()}
+              onClick={() => {
+                imagePrompt.trim() &&
+                  generateImage({ prompt: imagePrompt.trim() }).catch(
+                    console.error,
+                  );
+              }}
+            />
+          </div>
         </div>
       )}
       {formFieldErrorMessage && (

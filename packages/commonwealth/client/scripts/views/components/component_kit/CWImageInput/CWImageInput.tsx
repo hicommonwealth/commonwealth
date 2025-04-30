@@ -13,6 +13,9 @@ type CWImageInputProps = UploadControlProps &
   ImageBehaviorSelectorProps & {
     label?: string;
     containerClassname?: string;
+    usePersistentPromptMode?: boolean;
+    onAddCurrentToReference?: (image: string) => void;
+    canAddCurrentToReference?: boolean;
   };
 
 export const CWImageInput = ({
@@ -39,6 +42,9 @@ export const CWImageInput = ({
   label = 'Accepts JPG and PNG files.',
   disabled,
   containerClassname,
+  usePersistentPromptMode,
+  onAddCurrentToReference,
+  canAddCurrentToReference,
 }: CWImageInputProps) => {
   return (
     <div className={clsx('CWImageInput', containerClassname)}>
@@ -58,6 +64,9 @@ export const CWImageInput = ({
         onImageProcessingChange={onImageProcessingChange}
         onProcessedImagesListChange={onProcessedImagesListChange}
         processedImages={processedImages}
+        usePersistentPromptMode={usePersistentPromptMode}
+        onAddCurrentToReference={onAddCurrentToReference}
+        canAddCurrentToReference={canAddCurrentToReference}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}
