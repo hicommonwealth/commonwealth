@@ -47,7 +47,7 @@ const UserTrustLevel = () => {
   const tiers = mapTiers(currentTier);
 
   return (
-    <div className="verification-container">
+    <div className="UserTrustLevel">
       {tiers.map((level) => {
         const isLocked = level.level > currentTier + 1;
 
