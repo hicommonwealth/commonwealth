@@ -1,6 +1,6 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, CommunityTierMap } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
@@ -97,6 +97,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
             actor.address!,
             community,
           );
+        community.tier = CommunityTierMap.ChainVerified;
       }
 
       // TODO: use getDeltas to determine which fields to update
