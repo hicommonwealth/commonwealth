@@ -145,12 +145,6 @@
             }
           }
         }
-
-        .action-cards {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
       }
     }
 
@@ -210,6 +204,11 @@
       display: flex;
       align-items: center;
       gap: 4px;
+    }
+    .action-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
   }
   .sidebar {
