@@ -19,8 +19,6 @@ import {
 import LevelBox from './LevelBox';
 import './UserTrustLevel.scss';
 
-type Status = 'Done' | 'Not Started';
-
 const UserTrustLevel = () => {
   const userData = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
