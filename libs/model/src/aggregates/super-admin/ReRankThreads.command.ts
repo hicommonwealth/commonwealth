@@ -45,7 +45,7 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                                   JOIN "Comments" C ON C.thread_id = T.id
                                   JOIN "Reactions" R ON R.thread_id = T.id
                                   JOIN "Communities" CO ON CO.id = T.community_id
-                           WHERE T.created_at > T.created_at - INTERVAL '1 week'
+                           WHERE T.created_at > T.created_at - INTERVAL '3 months'
                              AND T.marked_as_spam_at IS NULL
                              AND T.deleted_at IS NULL
                              ${community_id ? 'AND T.community_id = :community_id' : ''}
@@ -53,7 +53,8 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                  base_ranks AS (SELECT id,
                                        view_count * :viewCountWeight +
                                        COALESCE(user_tier_at_creation, 3) * :creatorTierWeight +
-                                       created_at * :createdDateWeight + COALESCE(comment_total, 0) * :commentWeight +
+                                       EXTRACT(EPOCH FROM created_at) / 60 * :createdDateWeight + 
+                                       COALESCE(comment_total, 0) * :commentWeight +
                                        COALESCE(reaction_total, 0) * :reactionWeight AS base_rank,
                                        community_tier,
                                        community_id
@@ -126,6 +127,8 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
           globalRankUpdates,
         );
       });
+
+      return { success: true };
     },
   };
 }

@@ -359,7 +359,7 @@ async function updatePostgresRank(threadId: number, rankIncrease: number) {
     `,
     {
       type: QueryTypes.UPDATE,
-      replacements: { rankIncrease: Math.round(rankIncrease), threadId },
+      replacements: { rankIncrease, threadId },
     },
   )) as unknown as [{ community_rank: string; global_rank: string }[], number];
   return rank[0];
@@ -374,17 +374,22 @@ export async function createThreadRank(
   community: { id: string; tier: CommunityTierMap },
 ) {
   const communityRank =
-    Math.floor((thread.created_at?.getTime() || Date.now()) / 1000) *
-      config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT +
-    thread.user_tier_at_creation *
-      config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT;
-  const globalRank =
-    Math.round(communityRank) +
-    config.HEURISTIC_WEIGHTS.COMMUNITY_TIER_WEIGHT * community.tier;
+    Math.round(
+      Math.floor((thread.created_at?.getTime() || Date.now()) / 1000 / 60) *
+        config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT,
+    ) +
+    Math.round(
+      thread.user_tier_at_creation *
+        config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT,
+    );
+  const globalRank = Math.round(
+    communityRank +
+      config.HEURISTIC_WEIGHTS.COMMUNITY_TIER_WEIGHT * community.tier,
+  );
 
   await models.ThreadRank.create({
     thread_id: thread.id!,
-    community_rank: BigInt(Math.round(communityRank)),
+    community_rank: BigInt(communityRank),
     global_rank: BigInt(globalRank),
   });
   await incrementCachedRank(
@@ -423,7 +428,7 @@ export async function incrementThreadRank(
   updateWeight: number,
   { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
 ) {
-  const rankIncrease = user_tier_at_creation * updateWeight;
+  const rankIncrease = Math.round(user_tier_at_creation * updateWeight);
   const rank = await updatePostgresRank(thread_id, rankIncrease);
   if (rank.length === 0) {
     log.trace(`No thread rank found for thread ${thread_id}`);
@@ -441,7 +446,7 @@ export async function decrementThreadRank(
   weight: number,
   { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
 ) {
-  const rankDecrease = user_tier_at_creation * weight;
+  const rankDecrease = Math.round(user_tier_at_creation * weight);
   const rank = await updatePostgresRank(thread_id, -rankDecrease);
   if (rank.length === 0) {
     log.trace(`No thread rank found for thread ${thread_id}`);

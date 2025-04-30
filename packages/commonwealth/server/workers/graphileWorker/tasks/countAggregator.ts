@@ -176,8 +176,9 @@ async function processViewCounts() {
   for (const [threadId, count] of <[string, string][]>(
     Object.entries(threadIdHash)
   )) {
-    const threadRankIncrease =
-      config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count);
+    const threadRankIncrease = Math.round(
+      config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count),
+    );
     if (threadRankIncrease > 0) {
       communityRankUpdates.push({
         newValue: `community_rank + ${threadRankIncrease}`,
