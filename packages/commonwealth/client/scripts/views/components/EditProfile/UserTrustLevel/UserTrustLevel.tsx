@@ -12,7 +12,11 @@ import { useNavigate } from 'react-router-dom';
 import { AuthModal } from 'views/modals/AuthModal';
 import TrustLevelRole from '../../TrustLevelRole/TrustLevelRole';
 import CommunitySelectionModal from './CommunitySelectionModal';
-import { getLevelRedirect, getLevelStatus } from './helpers/helpers';
+import {
+  getCommunityNavigation,
+  getLevelRedirect,
+  getLevelStatus,
+} from './helpers/helpers';
 import LevelBox from './LevelBox';
 import './UserTrustLevel.scss';
 
@@ -40,28 +44,8 @@ const UserTrustLevel = () => {
   };
 
   const handleCommunitySelect = (communityId: string | null) => {
-    if (!communityId) {
-      switch (selectedAction) {
-        case 'LAUNCH_COIN':
-          navigate('/createTokenCommunity');
-          break;
-        case 'VERIFY_COMMUNITY':
-        case 'COMPLETE_CONTEST':
-          navigate('/createCommunity');
-          break;
-      }
-    } else {
-      switch (selectedAction) {
-        case 'LAUNCH_COIN':
-          navigate(`/${communityId}/manage/integrations/token`);
-          break;
-        case 'VERIFY_COMMUNITY':
-          navigate(`/${communityId}/manage/integrations/stake`);
-          break;
-        case 'COMPLETE_CONTEST':
-          navigate(`/${communityId}/manage/contests`);
-          break;
-      }
+    if (selectedAction) {
+      navigate(getCommunityNavigation(selectedAction, communityId));
     }
     setIsCommunityModalOpen(false);
     setSelectedAction(null);
