@@ -10,12 +10,9 @@ import useUserStore from 'client/scripts/state/ui/user';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from 'views/modals/AuthModal';
+import TrustLevelRole from '../../TrustLevelRole/TrustLevelRole';
 import CommunitySelectionModal from './CommunitySelectionModal';
-import {
-  getLevelRedirect,
-  getLevelStatus,
-  getTierIcon,
-} from './helpers/helpers';
+import { getLevelRedirect, getLevelStatus } from './helpers/helpers';
 import LevelBox from './LevelBox';
 import './UserTrustLevel.scss';
 
@@ -114,7 +111,6 @@ const UserTrustLevel = () => {
     <div className="verification-container">
       {tiers.map((level) => {
         const isLocked = level.level > currentTier + 1;
-        const icon = getTierIcon(level.level);
 
         return (
           <LevelBox
@@ -124,7 +120,7 @@ const UserTrustLevel = () => {
             description={level.description}
             status={level.status}
             isLocked={isLocked}
-            icon={icon}
+            icon={<TrustLevelRole type="user" level={level.level} size="xl" />}
             items={level.items}
             showArrow={level.redirect}
             onItemClick={handleItemClick}

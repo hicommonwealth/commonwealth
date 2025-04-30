@@ -1,18 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
 
 type Status = 'Done' | 'Not Started';
-
-type ComponentIcon =
-  | 'stopSymbol'
-  | 'socialVerified'
-  | 'sandClock'
-  | 'globe'
-  | 'pins'
-  | 'whiteCheck'
-  | 'starGolden';
 
 interface LevelBoxProps {
   level: number;
@@ -20,7 +11,7 @@ interface LevelBoxProps {
   description: string;
   status: Status;
   isLocked: boolean;
-  icon?: ComponentIcon;
+  icon?: ReactNode;
   items?: Array<{ label: string }>;
   showArrow?: boolean;
   onClick?: () => void;
@@ -48,9 +39,7 @@ const LevelBox = ({
       className={`level-box level-${level} ${isLocked ? 'disabled' : ''} ${onClick ? 'clickable' : ''}`}
       onClick={!isLocked ? onClick : undefined}
     >
-      <div className="tier-icon">
-        {icon && <CWIcon iconName={icon} iconSize="xl" />}
-      </div>
+      <div className="tier-icon">{icon}</div>
       <div className="level-box-content">
         <div className="level-header">
           <div className="level-title">
