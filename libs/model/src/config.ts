@@ -76,6 +76,7 @@ const {
   CREATOR_USER_TIER_WEIGHT,
   COMMUNITY_TIER_WEIGHT,
   DISABLE_TIER_RATE_LIMITS,
+  TIER_SOCIAL_VERIFIED_MIN_ETH,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -89,6 +90,7 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   TWITTER_LOG_LEVEL: 'info' as const,
+  TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
 };
 
 export const config = configure(
@@ -258,6 +260,11 @@ export const config = configure(
       !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
         ? true
         : DISABLE_TIER_RATE_LIMITS === 'true',
+    TIER: {
+      SOCIAL_VERIFIED_MIN_ETH: parseFloat(
+        TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
+      ),
+    },
   },
   z.object({
     DB: z.object({
@@ -542,5 +549,8 @@ export const config = configure(
         (data) => !(target.APP_ENV === 'production' && data),
         'Tier rate limits cannot be disabled in production',
       ),
+    TIER: z.object({
+      SOCIAL_VERIFIED_MIN_ETH: z.number(),
+    }),
   }),
 );
