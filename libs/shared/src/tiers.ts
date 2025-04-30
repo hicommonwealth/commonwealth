@@ -162,7 +162,7 @@ export const USER_TIERS = {
       componentIcon: 'starGolden',
     },
   },
-} as const;
+} as const satisfies Record<UserTierMap, UserTier>;
 
 export enum CommunityTierMap {
   SpamCommunity = 0,
