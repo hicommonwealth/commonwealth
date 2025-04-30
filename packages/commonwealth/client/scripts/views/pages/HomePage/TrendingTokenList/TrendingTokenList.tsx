@@ -2,11 +2,12 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity } from 'navigation/helpers';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -35,8 +36,9 @@ const TrendingTokensList = ({
   filters = { withCommunitySortBy: CommunitySortOptions.MarketCap },
 }: TokensListProps) => {
   const user = useUserStore();
-  const navigate = useCommonNavigate();
+  const navigate = useNavigate();
   const launchpadEnabled = useFlag('launchpad');
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
@@ -118,10 +120,41 @@ const TrendingTokensList = ({
         <div
           className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
         >
-          <CWText type="h3">
-            No tokens found. Launch a new token&nbsp;
-            <Link to="/createTokenCommunity">here</Link>.
-          </CWText>
+          {isWindowSmallInclusive ? (
+            <>
+              <span className="type-h3">
+                Ready to launch? Create your own token&nbsp;
+              </span>
+              <a
+                href="/createTokenCommunity"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/createTokenCommunity');
+                }}
+                style={{ verticalAlign: 'baseline' }}
+                className="type-h3 link"
+              >
+                here
+              </a>
+              <span className="type-h3">&nbsp;and see it trend.</span>
+            </>
+          ) : (
+            <CWText type="h3">
+              Ready to launch? Create your own token&nbsp;
+              <a
+                href="/createTokenCommunity"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/createTokenCommunity');
+                }}
+                style={{ verticalAlign: 'baseline' }}
+                className="link"
+              >
+                here
+              </a>
+              &nbsp;and see it trend.
+            </CWText>
+          )}
         </div>
       ) : (
         <div className="list">
