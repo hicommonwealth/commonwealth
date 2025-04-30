@@ -83,6 +83,7 @@ describe('Upgrade Tiers lifecycle', () => {
           last_active: new Date().toISOString(),
         },
       ],
+      environment: config.APP_ENV,
     });
 
     const [topic1] = await seed('Topic', {
@@ -139,7 +140,7 @@ describe('Upgrade Tiers lifecycle', () => {
 
       await emitEvent(models.Outbox, [
         buildNominatorNominatedEvent(
-          namespaceAddress,
+          namespace,
           userAddress,
         ) as EventPair<'NominatorNominated'>,
       ]);
@@ -151,9 +152,7 @@ describe('Upgrade Tiers lifecycle', () => {
       const communityAfter = await models.Community.findByPk(community.id);
       expect(communityAfter!.namespace_verified).toBe(true);
     });
-  });
 
-  describe('Contest Upgrade Policy', async () => {
     test('should upgrade user to ChainVerified tier when contest is funded and there is contest activity', async () => {
       await models.User.update(
         { tier: UserTierMap.IncompleteUser },

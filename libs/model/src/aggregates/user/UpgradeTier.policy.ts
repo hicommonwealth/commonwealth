@@ -9,7 +9,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes, Transaction } from 'sequelize';
-import { models } from '../../database';
+import { models, sequelize } from '../../database';
 import {
   USDC_BASE_MAINNET_ADDRESS,
   USDC_BASE_SEPOLIA_ADDRESS,
@@ -60,6 +60,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
           log.warn(`User not found for address ${nominator}`);
           return;
         }
+
         if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
 
         // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
@@ -76,10 +77,17 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
         if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-        await upgradeUserTier(
-          nominatedAddress!.User!.id!,
-          UserTierMap.ChainVerified,
-        );
+        await sequelize.transaction(async (transaction) => {
+          await upgradeUserTier(
+            nominatedAddress!.User!.id!,
+            UserTierMap.ChainVerified,
+            transaction,
+          );
+          await models.Community.update(
+            { namespace_verified: true },
+            { where: { id: community.id }, transaction },
+          );
+        });
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
