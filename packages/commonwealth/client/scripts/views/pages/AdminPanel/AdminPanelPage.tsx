@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
 import Permissions from 'utils/Permissions';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import RerankThreads from 'views/pages/AdminPanel/RerankThreads';
 import UpdateCommunityIdTask from 'views/pages/AdminPanel/UpdateCommunityIdTask';
 import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTask';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -46,6 +47,9 @@ const AdminPanelPage = () => {
         <CWDivider />
         <CWText type="h2">Spam Tools</CWText>
         <CommunityTier />
+        <CWDivider />
+        <CWText type="h2">Content Ranking</CWText>
+        <RerankThreads />
         <CWDivider />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />
