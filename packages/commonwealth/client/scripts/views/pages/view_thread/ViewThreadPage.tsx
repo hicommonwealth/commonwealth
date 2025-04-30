@@ -572,10 +572,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
-  const handleOpenImageModal = () => {
-    setImageActionModalOpen(true);
-  };
-
   const sidebarComponent = [
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [

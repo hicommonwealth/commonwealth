@@ -20,7 +20,6 @@ interface ImageActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (imageUrl: string) => void;
-  initialPrompt?: string;
   applyButtonLabel?: string;
 }
 
@@ -28,10 +27,8 @@ export const ImageActionModal = ({
   isOpen,
   onClose,
   onApply,
-  initialPrompt = '',
   applyButtonLabel = 'Add to Thread',
 }: ImageActionModalProps) => {
-  const [_prompt, _setPrompt] = useState('');
   const [imageUrlToApply, setImageUrlToApply] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [referenceImageUrls, setReferenceImageUrls] = useState<string[]>([]);

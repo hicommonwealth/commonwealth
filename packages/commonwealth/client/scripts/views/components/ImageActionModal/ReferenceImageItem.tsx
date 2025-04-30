@@ -6,7 +6,6 @@ interface ReferenceImageItemProps {
   imageUrl?: string;
   onRemove?: () => void;
   onUploadClick?: () => void;
-  uploadInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 /**
@@ -17,7 +16,6 @@ export const ReferenceImageItem: React.FC<ReferenceImageItemProps> = ({
   imageUrl,
   onRemove,
   onUploadClick,
-  uploadInputRef,
 }) => {
   const hasImage = !!imageUrl;
 

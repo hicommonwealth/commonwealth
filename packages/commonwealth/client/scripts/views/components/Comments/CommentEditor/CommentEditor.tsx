@@ -76,7 +76,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       triggerImageModalOpen,
       placeholder,
     },
-    ref,
+    _ref,
   ) => {
     const aiCommentsFeatureEnabled = useFlag('aiComments');
     const {
