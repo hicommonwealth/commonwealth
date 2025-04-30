@@ -1,13 +1,6 @@
 import { logger, type Query } from '@hicommonwealth/core';
-import { ValidChains } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
+import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { Network } from 'alchemy-sdk';
-import z from 'zod';
-
-const ethChainIdToAlchemy: Record<number, Network> = {
-  [ValidChains.Base]: Network.BASE_MAINNET,
-};
 
 const errorObject = {
   network: '',
@@ -27,7 +20,13 @@ export function GetTokenInfoAlchemy(): Query<
     body: async ({ payload }) => {
       const { eth_chain_id, token_address } = payload;
 
-      const network = ethChainIdToAlchemy[eth_chain_id];
+      const node = await models.ChainNode.findOne({
+        where: { eth_chain_id },
+        attributes: ['alchemy_metadata'],
+      });
+
+      const network = node?.alchemy_metadata?.network_id;
+
       if (!network) {
         log.error(
           `network for chain_id ${eth_chain_id} not supported by alchemy`,
@@ -69,7 +68,7 @@ export function GetTokenInfoAlchemy(): Query<
         );
         return errorObject;
       }
-      return json as z.infer<typeof schemas.GetTokenInfoAlchemy.output>;
+      return schemas.GetTokenInfoAlchemy.output.parse(json);
     },
   };
 }
