@@ -219,6 +219,8 @@ export const EventRegistry = {
   [ValidChains.Anvil]: {
     [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Anvil].communityNomination]:
+      communityNominationsSource,
     [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
     [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
     [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
