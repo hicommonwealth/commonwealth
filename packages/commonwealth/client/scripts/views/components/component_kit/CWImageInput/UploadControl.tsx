@@ -207,10 +207,42 @@ export const UploadControl = ({
               <div className="persistent-actions-row">
                 {/* Larger Screens: Text Buttons -> Now combined logic */}
                 <>
+                  {imageToRender &&
+                    canAddCurrentToReference &&
+                    onAddCurrentToReference && (
+                      <CWButton
+                        label="Update Remix"
+                        iconLeft="plusCircle"
+                        buttonType="secondary"
+                        buttonHeight="sm"
+                        buttonWidth="narrow"
+                        type="button"
+                        containerClassName="btn-focus-styles add-to-ref-btn"
+                        disabled={isLoading || areActionsDisabled}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAddCurrentToReference();
+                        }}
+                      />
+                    )}
                   <CWButton
-                    label="Regen"
+                    label="Edit"
+                    iconLeft="pencil"
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    buttonWidth="narrow"
+                    type="button"
+                    containerClassName="btn-focus-styles"
+                    disabled={areActionsDisabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startNewPrompt();
+                    }}
+                  />
+                  <CWButton
+                    label="Redo"
                     iconLeft="arrowClockwise"
-                    buttonHeight="med"
+                    buttonHeight="sm"
                     buttonWidth="narrow"
                     type="button"
                     containerClassName="btn-focus-styles"
@@ -223,38 +255,6 @@ export const UploadControl = ({
                         );
                     }}
                   />
-                  <CWButton
-                    label="New"
-                    iconLeft="pencil"
-                    buttonType="secondary"
-                    buttonHeight="med"
-                    buttonWidth="narrow"
-                    type="button"
-                    containerClassName="btn-focus-styles"
-                    disabled={areActionsDisabled}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      startNewPrompt();
-                    }}
-                  />
-                  {imageToRender &&
-                    canAddCurrentToReference &&
-                    onAddCurrentToReference && (
-                      <CWButton
-                        label="Remix"
-                        iconLeft="plusCircle"
-                        buttonType="secondary"
-                        buttonHeight="med"
-                        buttonWidth="narrow"
-                        type="button"
-                        containerClassName="btn-focus-styles add-to-ref-btn"
-                        disabled={isLoading || areActionsDisabled}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAddCurrentToReference();
-                        }}
-                      />
-                    )}
                 </>
               </div>
             ) : (
