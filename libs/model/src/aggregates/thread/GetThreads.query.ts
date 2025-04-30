@@ -1,6 +1,6 @@
 import { InvalidInput, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -42,7 +42,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         limit: _limit,
         offset: _limit * (_page - 1) || 0,
         from_date,
-        to_date: to_date || moment().toISOString(),
+        to_date: to_date || dayjs().toISOString(),
         community_id,
         stage,
         topic_id,

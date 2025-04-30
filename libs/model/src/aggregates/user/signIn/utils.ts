@@ -8,7 +8,7 @@ import { config } from '../../../config';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
-import { tokenBalanceCache } from '../../../services';
+import * as services from '../../../services';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { emitSignInEvents } from './emitSignInEvents';
 
@@ -109,7 +109,7 @@ async function checkNativeWalletBalance(
   const tier = foundUser?.tier || UserTierMap.NewlyVerifiedWallet;
   if (tier < UserTierMap.SocialVerified) {
     const balances = ethChainId
-      ? await tokenBalanceCache.getBalances({
+      ? await services.tokenBalanceCache.getBalances({
           addresses: [address],
           balanceSourceType: BalanceSourceType.ETHNative,
           sourceOptions: { evmChainId: ethChainId },

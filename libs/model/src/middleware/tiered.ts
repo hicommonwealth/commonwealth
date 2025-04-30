@@ -9,7 +9,7 @@ import {
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { ZodSchema } from 'zod';
 import { config } from '../config';
@@ -71,7 +71,7 @@ export function tiered({
     let tier = user.tier;
     if (
       tier === UserTierMap.NewlyVerifiedWallet &&
-      moment().diff(moment(user.created_at), 'weeks') >= 1
+      dayjs().diff(dayjs(user.created_at), 'weeks') >= 1
     )
       tier = UserTierMap.VerifiedWallet;
 
