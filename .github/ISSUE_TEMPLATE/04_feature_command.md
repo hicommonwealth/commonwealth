@@ -3,6 +3,7 @@ name: Command Feature Request
 about: Use this template for requesting a command feature within a user story.
 labels: command, enhancement, needs estimate
 title: 🟦 <Command Name>
+type: Feature
 ---
 
 ## Description

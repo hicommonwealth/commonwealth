@@ -202,11 +202,12 @@ export class RabbitMQAdapter implements Broker {
     const topic = consumer.name;
 
     if (!this.initialized) {
+      this._log.fatal('Adapter not initialized', undefined, { topic });
       return false;
     }
 
     if (!this.subscribers.includes(topic)) {
-      this._log.error(
+      this._log.fatal(
         `${topic} not supported by this adapter instance`,
         undefined,
         {

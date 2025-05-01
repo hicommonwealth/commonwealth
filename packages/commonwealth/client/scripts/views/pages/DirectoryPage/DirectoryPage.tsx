@@ -360,12 +360,11 @@ const DirectoryPage = () => {
           />
         </div>
         <CWText className="page-description">
-          Access relevant communities linked to your base chain for a connected
-          experience.
+          Discover related communities that your admin has curated for you.
         </CWText>
         <CWDivider />
         <CWText type="h4" className="subtitle">
-          {baseChain?.name} ecosystem
+          {community?.name} ecosystem
         </CWText>
         <div className="search-row-and-filter">
           <div className="search-row">

@@ -79,6 +79,7 @@ export * from './starred_community';
 export * from './subscription_preference';
 export * from './tags';
 export * from './thread';
+export * from './thread_rank';
 export * from './thread_version_history';
 export * from './topic';
 export * from './twitter_cursor';

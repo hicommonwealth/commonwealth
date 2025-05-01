@@ -236,6 +236,8 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -247,6 +249,8 @@ export const events = {
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
