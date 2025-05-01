@@ -4,11 +4,11 @@ import {
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ethers } from 'ethers';
-import { exit } from 'process';
 
 // This script lists event signatures for all specified events
 
 type AbiEntry = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abi: any;
   events: Array<string>;
 };
@@ -33,7 +33,7 @@ function getEventSignature(abi, eventName) {
   };
 }
 
-async function main() {
+function main() {
   for (const [name, { abi, events }] of Object.entries(abis)) {
     for (const eventName of events) {
       const result = getEventSignature(abi, eventName);
@@ -47,7 +47,4 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  exit(1);
-});
+main();
