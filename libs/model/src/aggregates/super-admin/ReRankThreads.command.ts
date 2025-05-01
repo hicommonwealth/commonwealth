@@ -26,10 +26,32 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
       }
 
       await models.sequelize.transaction(async (transaction) => {
-        await models.ThreadRank.truncate({ transaction });
+        if (!community_id) {
+          await models.ThreadRank.truncate({ transaction });
+        } else {
+          await models.sequelize.query(
+            `
+              DELETE
+              FROM "ThreadRanks"
+                USING "Threads"
+              WHERE "ThreadRanks".thread_id = "Threads".id
+                AND "Threads".community_id = :community_id;
+            `,
+            { replacements: { community_id }, transaction },
+          );
+        }
 
-        await cache().deleteNamespaceKeys(CacheNamespaces.CommunityThreadRanks);
-        await cache().deleteNamespaceKeys(CacheNamespaces.GlobalThreadRanks);
+        if (!community_id) {
+          await cache().deleteNamespaceKeys(CacheNamespaces.GlobalThreadRanks);
+          await cache().deleteNamespaceKeys(
+            CacheNamespaces.CommunityThreadRanks,
+          );
+        } else {
+          await cache().deleteKey(
+            CacheNamespaces.CommunityThreadRanks,
+            community_id,
+          );
+        }
 
         const ranks = (await models.sequelize.query(
           `
@@ -53,18 +75,20 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                  base_ranks AS (SELECT id,
                                        view_count * :viewCountWeight +
                                        COALESCE(user_tier_at_creation, 3) * :creatorTierWeight +
-                                       EXTRACT(EPOCH FROM created_at) / 60 * :createdDateWeight + 
+                                       EXTRACT(EPOCH FROM created_at) / 60 * :createdDateWeight +
                                        COALESCE(comment_total, 0) * :commentWeight +
                                        COALESCE(reaction_total, 0) * :reactionWeight AS base_rank,
                                        community_tier,
                                        community_id
                                 FROM ranks)
-            UPDATE "ThreadRanks"
-            SET community_rank = br.base_rank,
-                global_rank    = br.base_rank + br.community_tier * :communityTierWeight
+            INSERT
+            INTO "ThreadRanks" (thread_id, community_rank, global_rank, updated_at)
+            SELECT br.id,
+                   br.base_rank,
+                   br.base_rank + (br.community_tier * :communityTierWeight),
+                   NOW()
             FROM base_ranks br
-            WHERE br.id = thread_id
-            RETURNING thread_id, community_rank, global_rank, community_id;
+            RETURNING thread_id, community_rank, global_rank;
           `,
           {
             type: QueryTypes.UPDATE,
@@ -86,21 +110,31 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
             thread_id: number;
             community_rank: string;
             global_rank: string;
-            community_id: string;
           }[],
           number,
         ];
+
+        const communityIds = (
+          await models.Thread.findAll({
+            attributes: ['id', 'community_id'],
+            where: {
+              id: ranks[0].map((r) => r.thread_id),
+            },
+          })
+        ).reduce(
+          (acc, val) => {
+            acc[String(val.id)] = val.community_id;
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
 
         const communityRankUpdates: {
           [community_id: string]: { value: string; score: number }[];
         } = {};
         const globalRankUpdates: { value: string; score: number }[] = [];
-        for (const {
-          thread_id,
-          community_rank,
-          global_rank,
-          community_id,
-        } of ranks[0]) {
+        for (const { thread_id, community_rank, global_rank } of ranks[0]) {
+          const community_id = communityIds[String(thread_id)];
           if (!communityRankUpdates[community_id]) {
             communityRankUpdates[community_id] = [];
           }
@@ -115,17 +149,22 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
         }
 
         for (const community_id in communityRankUpdates) {
+          if (communityRankUpdates[community_id].length > 0) {
+            await cache().addToSortedSet(
+              CacheNamespaces.CommunityThreadRanks,
+              community_id,
+              communityRankUpdates[community_id],
+            );
+          }
+        }
+
+        if (globalRankUpdates.length > 0) {
           await cache().addToSortedSet(
-            CacheNamespaces.CommunityThreadRanks,
-            community_id,
-            communityRankUpdates[community_id],
+            CacheNamespaces.GlobalThreadRanks,
+            'all',
+            globalRankUpdates,
           );
         }
-        await cache().addToSortedSet(
-          CacheNamespaces.GlobalThreadRanks,
-          'all',
-          globalRankUpdates,
-        );
       });
 
       return { success: true };
