@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
@@ -292,6 +293,58 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   };
 };
 
+const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorSettled',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorSettled',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'JudgeNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'JudgeNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -312,6 +365,14 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
+
+  // Community Nominations
+  [EvmEventSignatures.CommunityNominations.NominatorSettled]:
+    nominatorSettledMapper,
+  [EvmEventSignatures.CommunityNominations.NominatorNominated]:
+    nominatorNominatedMapper,
+  [EvmEventSignatures.CommunityNominations.JudgeNominated]:
+    judgeNominatedMapper,
 
   // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
