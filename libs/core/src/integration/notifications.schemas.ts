@@ -244,5 +244,6 @@ export const TradeEventNotification = z.object({
 });
 
 export const CapReachedNotification = z.object({
+  community_id: z.string().describe('The community associated with the token'),
   symbol: z.string().describe('The token symbol'),
 });

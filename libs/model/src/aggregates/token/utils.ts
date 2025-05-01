@@ -101,6 +101,7 @@ export async function handleCapReached(
           users: notifyUsers,
           data: {
             symbol: tokenHolders[0].symbol,
+            community_id: tokenHolders[0].community_id,
           },
         });
       }
