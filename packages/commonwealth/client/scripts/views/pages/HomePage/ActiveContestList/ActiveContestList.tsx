@@ -18,6 +18,26 @@ interface ActiveContestListProps {
   isCommunityHomePage?: boolean;
 }
 
+const useConditionalTokenData = (isCommunityHomePage: boolean) => {
+  const { communityToken, isLoadingToken, isPinnedToken } =
+    useTokenTradeWidget();
+  const { isLoading: isLoadingPricing } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
+  });
+
+  if (!isCommunityHomePage) {
+    return {
+      communityToken: null,
+      isLoadingToken: false,
+      isPinnedToken: false,
+      isLoadingPricing: false,
+    };
+  }
+
+  // Return actual hook results when on community page
+  return { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing };
+};
+
 const ActiveContestList = ({
   isCommunityHomePage = false,
 }: ActiveContestListProps) => {
@@ -30,11 +50,8 @@ const ActiveContestList = ({
     isCommunityHomePage,
   });
 
-  const { communityToken, isLoadingToken, isPinnedToken } =
-    useTokenTradeWidget();
-  const { isLoading: isLoadingPricing } = useTokenPricing({
-    token: communityToken as LaunchpadToken,
-  });
+  const { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing } =
+    useConditionalTokenData(isCommunityHomePage);
 
   const isLoading = isContestDataLoading || isLoadingToken || isLoadingPricing;
 
@@ -98,9 +115,9 @@ const ActiveContestList = ({
       <>
         {shouldRenderPotentialCard && <PotentialContestCard />}
         {!isLoading &&
-          activeContestsLimited.length === 0 &&
           !shouldRenderPotentialCard &&
-          hasActiveContests && (
+          !isCommunityHomePage &&
+          !hasActiveContests && (
             <CWText type="h2" className="empty-contests">
               No active contests found
             </CWText>

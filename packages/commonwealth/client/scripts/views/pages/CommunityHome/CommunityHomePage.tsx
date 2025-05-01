@@ -34,8 +34,6 @@ import { StickyCommentElementSelector } from 'views/components/StickEditorContai
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer/StickyEditorContainer';
 
-let communityHomeInstanceCounter = 0;
-
 const CommunityHome = () => {
   const user = useUserStore();
 
