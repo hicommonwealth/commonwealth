@@ -31,24 +31,12 @@ function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
     ),
     async function (req, res) {
       try {
-        // Get the original URL parameters from the request
-        const queryParams = new URLSearchParams();
-        Object.keys(req.query).forEach((key) => {
-          if (key !== 'endpoint' && key !== 'path') {
-            queryParams.append(key, req.query[key] as string);
-          }
-        });
-
-        // Get the endpoint and path from the query params
-        const endpoint = (req.query.endpoint as string) || '';
-        const path = (req.query.path as string) || 'quote';
-        const queryString = queryParams.toString()
-          ? `?${queryParams.toString()}`
-          : '';
+        // request looks like: /uniswapProxy?path=${apiPath}?${outparams}
+        const [, proxiedCommand] = req.url.split('path=');
 
         // Make the request to Uniswap API
         const response = await axios.get(
-          `https://api.uniswap.org/v1/${path}${endpoint ? '/' + endpoint : ''}${queryString}`,
+          `https://api.uniswap.org/v1/${proxiedCommand}`,
           {
             headers: {
               origin: process.env.SERVER_URL || 'https://commonwealth.im',
