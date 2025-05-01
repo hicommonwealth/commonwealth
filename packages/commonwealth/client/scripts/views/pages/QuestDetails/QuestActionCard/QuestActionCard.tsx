@@ -128,6 +128,7 @@ const QuestActionCard = ({
               'TweetEngagement',
               'DiscordServerJoined',
               'CommunityCreated',
+              'XpChainEventCreated',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -162,6 +163,15 @@ const QuestActionCard = ({
                       )}
                     </CWText>
                   )}
+                {questAction.event_name === 'XpChainEventCreated' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.ChainEventXpSource?.contract_address || '',
+                      questAction?.ChainEventXpSource?.ChainNode
+                        ?.eth_chain_id || '',
+                    )}
+                  </CWText>
+                )}
               </>
             )}
             {!hideShareSplit &&

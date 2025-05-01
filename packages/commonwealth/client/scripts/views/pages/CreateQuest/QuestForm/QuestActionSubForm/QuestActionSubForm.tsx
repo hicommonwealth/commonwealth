@@ -12,6 +12,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
 import ActionContentIdScopeSelector from './SpecialCaseDynamicFields/ActionContentIdScopeSelector';
+import ChainEventFields from './SpecialCaseDynamicFields/ChainEventFields';
 import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
 import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
 import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
@@ -147,6 +148,12 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
             config={config}
           />
           <TwitterFields
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ChainEventFields
             defaultValues={defaultValues}
             errors={errors}
             onChange={onChange}

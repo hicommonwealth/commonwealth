@@ -287,7 +287,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
       eth_chain_id: event.eventSource.ethChainId,
       quest_action_meta_id: event.meta.quest_action_meta_id,
       transaction_hash: event.rawLog.transactionHash,
-      created_at: new Date(Number(event.block.timestamp)),
+      created_at: new Date(Number(event.block.timestamp) * 1_000),
     },
   };
 };

@@ -8,6 +8,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -145,6 +146,18 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
+                contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
+                ethChainId: action.ChainEventXpSource?.chain_node_id
+                  ? `${
+                      fetchCachedNodes()?.find(
+                        (x) =>
+                          x.id === action.ChainEventXpSource?.chain_node_id,
+                      )?.ethChainId || ''
+                    }`
+                  : ``,
+                // important to use readable signature instead of event signature here
+                eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
+                transactionHash: `${action.ChainEventXpSource?.transaction_hash || ''}`,
               })),
             }}
           />
