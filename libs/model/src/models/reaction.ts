@@ -29,6 +29,7 @@ export default (
         type: Sequelize.DECIMAL(78, 0),
         allowNull: true,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_msg_id: { type: Sequelize.STRING, allowNull: true },

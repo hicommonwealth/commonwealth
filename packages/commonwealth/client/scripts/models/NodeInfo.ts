@@ -10,6 +10,7 @@ class NodeInfo {
   public readonly cosmosGovernanceVersion?: string;
   public readonly block_explorer?: string;
   public readonly slip44?: number;
+  public readonly alchemyMetadata?: object;
 
   constructor({
     id,
@@ -23,6 +24,7 @@ class NodeInfo {
     cosmos_gov_version,
     block_explorer,
     slip44,
+    alchemy_metadata,
   }) {
     this.id = id;
     this.name = name;
@@ -35,6 +37,7 @@ class NodeInfo {
     this.cosmosGovernanceVersion = cosmos_gov_version;
     this.block_explorer = block_explorer;
     this.slip44 = slip44;
+    this.alchemyMetadata = alchemy_metadata;
   }
 
   public static fromJSON(json) {

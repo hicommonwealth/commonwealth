@@ -1,7 +1,8 @@
 ---
-name: Bug Report
+name: Eng Bug Report
 about: Use this template for reporting bugs.
-labels: bug, needs estimate, tow
+labels: bug, needs estimate
+type: Bug
 ---
 
 ## Describe the bug
@@ -21,7 +22,6 @@ labels: bug, needs estimate, tow
 ## Reproduction steps
 <!-- Steps to reproduce, or note if cannot be reproduced -->
 
-
 ## Actual behavior
 <!-- A clear and concise description of what is expect to happen. -->
 
@@ -30,6 +30,7 @@ labels: bug, needs estimate, tow
 
 ## Screenshots / Video
 <!-- Omit if not applicable -->
+<!-- If on a browser include a screenshot of the console -->
 
 ## Reporter
 <!-- e.g. external client, engineering team, growth team -->
