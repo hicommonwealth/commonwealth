@@ -1,6 +1,6 @@
-import { boolToQueryValue, getBaseUrl } from 'client/scripts/utils/gekoUtils';
+import { boolToQueryValue, getBaseUrl } from 'client/scripts/utils/geckoUtils';
 import React from 'react';
-import './GekoTerminalChart.scss';
+import './GeckoTerminalChart.scss';
 
 export interface GeckoTerminalEmbedProps {
   chain: string;
