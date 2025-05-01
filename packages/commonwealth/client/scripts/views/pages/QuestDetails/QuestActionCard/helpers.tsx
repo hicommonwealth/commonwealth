@@ -16,6 +16,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['OneOffContestManagerDeployed']: 'Create a 1-time contest',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -33,6 +34,7 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
+    ['OneOffContestManagerDeployed']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -82,9 +84,19 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['DiscordServerJoined']: '',
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['DiscordServerJoined']: () => '',
+    ['MembershipsRefreshed']: () => '',
+    ['LaunchpadTokenCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['OneOffContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -101,5 +113,6 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
+    ['OneOffContestManagerDeployed']: '',
   },
 };

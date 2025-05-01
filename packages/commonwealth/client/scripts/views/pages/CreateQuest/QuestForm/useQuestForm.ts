@@ -54,6 +54,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'DiscordServerJoined',
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
+      'OneOffContestManagerDeployed',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };

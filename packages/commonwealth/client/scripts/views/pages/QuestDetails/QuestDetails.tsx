@@ -299,6 +299,19 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }
+      case 'OneOffContestManagerDeployed': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests/launch`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
       default:
         return;
     }
