@@ -69,7 +69,6 @@ export const PotentialContestCard = ({
 
   const projectedTotalPrizePool =
     (tokenPricing?.marketCapGoal || 0) * PRIZE_POOL_PERCENTAGE;
-  const tokenAddress = launchpadToken?.token_address;
 
   const projectedPrizes = PRIZE_DISTRIBUTION_PERCENTAGES.map(
     (percentage) => projectedTotalPrizePool * percentage,

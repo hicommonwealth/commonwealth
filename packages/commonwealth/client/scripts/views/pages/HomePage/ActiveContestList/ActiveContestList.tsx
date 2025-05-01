@@ -32,11 +32,9 @@ const ActiveContestList = ({
 
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
-  const { pricing: tokenPricing, isLoading: isLoadingPricing } =
-    useTokenPricing({
-      token: communityToken as LaunchpadToken,
-      enabled: !!communityToken && !isPinnedToken,
-    });
+  const { isLoading: isLoadingPricing } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
+  });
 
   const isLoading = isContestDataLoading || isLoadingToken || isLoadingPricing;
 
@@ -52,8 +50,6 @@ const ActiveContestList = ({
 
   const shouldRenderPotentialCard =
     showPotentialCardCase1 || showPotentialCardCase2;
-
-  const isEmptyStateWithPotentialCard = showPotentialCardCase1 && !isLoading;
 
   const activeContestsLimited = isCommunityHomePage
     ? activeContests.length > 0
@@ -103,7 +99,8 @@ const ActiveContestList = ({
         {shouldRenderPotentialCard && <PotentialContestCard />}
         {!isLoading &&
           activeContestsLimited.length === 0 &&
-          !showPotentialCardCase1 && (
+          !shouldRenderPotentialCard &&
+          hasActiveContests && (
             <CWText type="h2" className="empty-contests">
               No active contests found
             </CWText>
