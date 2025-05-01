@@ -17,9 +17,10 @@ export const actionCopies = {
     ['MembershipsRefreshed']: 'Join a Group',
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
   },
   pre_reqs: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -32,12 +33,13 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
-    ['MembershipsRefreshed']: '',
+    ['MembershipsRefreshed']: () => '',
     ['XpChainEventCreated']: () => '',
-    ['LaunchpadTokenCreated']: '',
+    ['LaunchpadTokenCreated']: () => '',
+    ['RecurringContestManagerDeployed']: '',
   },
   explainer: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -84,8 +86,8 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['DiscordServerJoined']: '',
-    ['MembershipsRefreshed']: '',
+    ['DiscordServerJoined']: () => '',
+    ['MembershipsRefreshed']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['XpChainEventCreated']: (
       contractAddress: string,
@@ -105,7 +107,17 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['LaunchpadTokenCreated']: '',
+    ['LaunchpadTokenCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['RecurringContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -123,5 +135,6 @@ export const actionCopies = {
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenCreated']: '',
+    ['RecurringContestManagerDeployed']: '',
   },
 };
