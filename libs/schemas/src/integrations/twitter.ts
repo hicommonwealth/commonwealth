@@ -34,10 +34,12 @@ const GetResponseBase = z.object({
       }),
     )
     .optional(),
-  meta: z.object({
-    result_count: z.number(),
-    next_token: z.string().optional(),
-  }),
+  meta: z
+    .object({
+      result_count: z.number(),
+      next_token: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const GetTwitterMentionsTimelineResponse = GetResponseBase.extend({

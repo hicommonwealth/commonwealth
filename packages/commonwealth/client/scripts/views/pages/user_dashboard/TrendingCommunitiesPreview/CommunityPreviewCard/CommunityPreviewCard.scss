@@ -67,6 +67,16 @@
   .community-name {
     display: flex;
     flex-direction: column;
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .Icon {
+      margin-left: 2px;
+    }
   }
 
   .join-community {

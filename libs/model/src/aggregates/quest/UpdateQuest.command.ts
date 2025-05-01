@@ -1,23 +1,27 @@
-import { Command, InvalidInput } from '@hicommonwealth/core';
+import { Command, InvalidInput, logger } from '@hicommonwealth/core';
+import { verifyEventSource } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
-import z from 'zod';
+import { toEventHash } from 'viem';
+import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
-import { isSuperAdmin } from '../../middleware';
 import {
+  isSuperAdmin,
   mustBeValidDateRange,
   mustExist,
   mustNotBeStarted,
   mustNotExist,
-} from '../../middleware/guards';
+} from '../../middleware';
 import { QuestInstance } from '../../models/quest';
 import {
   GraphileTaskNames,
   removeJob,
-  rescheduleJobs,
   scheduleTask,
 } from '../../services/graphileWorker';
 import { getDelta, tweetExists } from '../../utils';
+
+const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 async function updateQuestInstance(
   quest: QuestInstance,
@@ -53,11 +57,8 @@ async function updateQuestInstance(
 }
 
 async function updateChannelQuest(
-  eventName: 'TweetEngagement',
   quest: QuestInstance,
-  actionMetas:
-    | Omit<z.infer<typeof schemas.QuestActionMeta>, 'quest_id'>[]
-    | undefined,
+  actionMetas: z.infer<typeof schemas.ActionMetaInput>[] | undefined,
   payload: z.infer<(typeof schemas.UpdateQuest)['input']>,
 ) {
   if (quest.quest_type !== 'channel') return;
@@ -69,7 +70,6 @@ async function updateChannelQuest(
       const existingMeta = await models.QuestActionMeta.findOne({
         where: {
           quest_id: quest.id!,
-          event_name: eventName,
         },
         transaction,
       });
@@ -89,32 +89,59 @@ async function updateChannelQuest(
       'Cannot have more than one action per channel quest',
     );
   const actionMeta = actionMetas[0];
-  if (actionMeta.event_name !== eventName)
+
+  if (
+    !['TweetEngagement', 'XpChainEventCreated'].includes(actionMeta.event_name)
+  ) {
     throw new InvalidInput(
       `Invalid action "${actionMeta.event_name}" for channel quest`,
     );
+  }
 
   // UPDATE OR CREATE
-  if (eventName === 'TweetEngagement') {
+  if (actionMeta.event_name === 'TweetEngagement') {
     if (!actionMeta.content_id)
       throw new InvalidInput('TweetEngagement action must have a Tweet url');
     const [, ...rest] = actionMeta.content_id.split(':'); // this has been validated by the schema
     const tweetUrl = rest.join(':');
-    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetUrl));
+    const tweetId = tweetUrl.split('/').at(-1)!;
+    mustExist(`Tweet with url "${tweetUrl}"`, await tweetExists(tweetId));
     mustExist(`Tweet engagement caps`, actionMeta.tweet_engagement_caps);
 
     await models.sequelize.transaction(async (transaction) => {
       await updateQuestInstance(quest, payload, transaction);
-      const [actionMetaInstance, created] = await models.QuestActionMeta.upsert(
+
+      const existingActionMeta = await models.QuestActionMeta.findOne({
+        where: {
+          quest_id: quest.id!,
+        },
+        transaction,
+      });
+      if (existingActionMeta) {
+        await models.QuestTweets.destroy({
+          where: {
+            quest_action_meta_id: existingActionMeta.id!,
+          },
+          transaction,
+        });
+        await existingActionMeta.destroy({ transaction });
+        if (quest.scheduled_job_id) {
+          await removeJob({
+            jobId: quest.scheduled_job_id,
+            transaction,
+          });
+        }
+      }
+      const actionMetaInstance = await models.QuestActionMeta.create(
         {
           ...actionMeta,
           quest_id: quest.id!,
         },
         { transaction },
       );
-      await models.QuestTweets.upsert(
+      await models.QuestTweets.create(
         {
-          tweet_id: tweetUrl.split('/').at(-1)!,
+          tweet_id: tweetId,
           tweet_url: tweetUrl,
           quest_action_meta_id: actionMetaInstance.id!,
           like_cap: actionMeta.tweet_engagement_caps!.likes,
@@ -123,35 +150,85 @@ async function updateChannelQuest(
         },
         { transaction },
       );
-      if (created) {
-        const job = await scheduleTask(
-          GraphileTaskNames.AwardTwitterQuestXp,
-          {
-            quest_id: quest.id!,
-            quest_ended: true,
-          },
-          {
-            transaction,
-          },
-        );
-        quest.scheduled_job_id = job.id;
-        await quest.save({ transaction });
-      }
+      log.trace(`Created quest tweet ${tweetId} for quest ${quest.id}`);
+      const job = await scheduleTask(
+        GraphileTaskNames.AwardTwitterQuestXp,
+        {
+          quest_id: quest.id!,
+          quest_ended: true,
+        },
+        {
+          runAt: quest.end_date,
+          transaction,
+        },
+      );
+      log.trace(`Scheduled job ${job.id} for quest ${quest.id}`);
+      quest.scheduled_job_id = job.id;
+      await quest.save({ transaction });
+    });
+  } else if (actionMeta.event_name === 'XpChainEventCreated') {
+    const chainEvent = actionMeta.chain_event;
+    if (!chainEvent) throw new InvalidInput('Missing chain event source data');
+    await models.sequelize.transaction(async (transaction) => {
+      await updateQuestInstance(quest, payload, transaction);
 
-      // If quest end date is updated then reschedule the job
-      if (
-        quest.end_date !== payload.end_date &&
-        !created &&
-        quest.scheduled_job_id
-      ) {
-        await rescheduleJobs({
-          jobIds: [quest.scheduled_job_id],
-          options: {
-            runAt: payload.end_date,
+      const existingActionMeta = await models.QuestActionMeta.findOne({
+        where: {
+          quest_id: quest.id!,
+        },
+        transaction,
+      });
+      if (existingActionMeta) {
+        await models.ChainEventXpSource.destroy({
+          where: {
+            quest_action_meta_id: existingActionMeta.id!,
           },
           transaction,
         });
+        await existingActionMeta.destroy({ transaction });
       }
+
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: {
+            eth_chain_id: chainEvent.eth_chain_id,
+          },
+          transaction,
+        },
+      );
+      mustExist(`Chain node`, chainNode);
+
+      const verificationRes = await verifyEventSource({
+        rpc: chainNode.private_url!,
+        contractAddress: chainEvent.contract_address,
+        readableEventSignature: chainEvent.event_signature,
+        txHash: chainEvent.tx_hash,
+      });
+
+      if (!verificationRes.valid) {
+        throw new InvalidInput(verificationRes.reason);
+      }
+
+      const actionMetaInstance = await models.QuestActionMeta.create(
+        {
+          ...actionMeta,
+          quest_id: quest.id!,
+        },
+        { transaction },
+      );
+      await models.ChainEventXpSource.create(
+        {
+          chain_node_id: chainNode.id!,
+          contract_address: chainEvent.contract_address,
+          event_signature: toEventHash(chainEvent.event_signature),
+          transaction_hash: chainEvent.tx_hash,
+          readable_signature: chainEvent.event_signature,
+          quest_action_meta_id: actionMetaInstance.id!,
+          active: true,
+        },
+        { transaction },
+      );
+      log.trace(`Created chain event xp source for quest ${quest.id}`);
     });
   }
 }
@@ -288,12 +365,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
       );
 
       if (quest.quest_type === 'channel') {
-        await updateChannelQuest(
-          'TweetEngagement',
-          quest,
-          action_metas,
-          payload,
-        );
+        await updateChannelQuest(quest, action_metas, payload);
       } else {
         await updateCommonQuest(quest, payload);
       }

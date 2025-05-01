@@ -259,7 +259,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     let wallet_id: string;
     let chain_id: string;
     let sessionSigner: SessionSigner;
-    if (chain === 'ethereum' || chain === 'alex') {
+    if (chain === 'ethereum' || chain === 'alex' || chain === 'sushi') {
       wallet_id = 'metamask';
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
       sessionSigner = new SIWESigner({

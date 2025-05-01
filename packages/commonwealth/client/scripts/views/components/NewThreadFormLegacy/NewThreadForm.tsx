@@ -1,5 +1,4 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { DisabledCommunitySpamTier } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import {
   SessionKeyError,
@@ -24,7 +23,11 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
-import { useCreateThreadMutation } from 'state/api/threads';
+import {
+  useAddThreadLinksMutation,
+  useCreateThreadMutation,
+  useCreateThreadPollMutation,
+} from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import useGetTokenizedThreadsAllowedQuery from 'state/api/tokens/getTokenizedThreadsAllowed';
@@ -43,15 +46,31 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { ThreadKind, ThreadStage } from '../../../models/types';
+import { AnyProposal, ThreadKind, ThreadStage } from '../../../models/types';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-// eslint-disable-next-line max-len
+
+import { DisabledCommunitySpamTier, LinkSource } from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
+
+import Poll from 'client/scripts/models/Poll';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
+import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
+import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
+import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
+import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
+import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
+import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
+import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
+import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
@@ -59,6 +78,11 @@ import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../component_kit/new_designs/cw_toggle';
+import DetailCard from '../proposals/DetailCard';
+import TimeLineCard from '../proposals/TimeLineCard';
+import VotingResultView from '../proposals/VotingResultView';
+import { VotingActions } from '../proposals/voting_actions';
+import { VotingResults } from '../proposals/voting_results';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -75,10 +99,21 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
 }
-
+export interface ExtendedPoll extends Poll {
+  customDuration?: string;
+}
 export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [showVotesDrawer, setShowVotesDrawer] = useState(false);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+  const [linkedProposals, setLinkedProposals] =
+    useState<ProposalState | null>();
+  const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+
+  const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -97,12 +132,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
   const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
 
-  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [selectedCommunityId, setSelectedCommunityId] = useState(
     app.activeChainId() || '',
   );
+
   const [userSelectedAddress, setUserSelectedAddress] = useState(
     user?.activeAccount?.address,
   );
@@ -154,6 +189,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     communityId: selectedCommunityId,
     apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
     topicId: threadTopic?.id,
+  });
+
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    communityId: app.activeChainId() || '',
   });
 
   const { generateCompletion } = useAiCompletion();
@@ -334,6 +373,30 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       });
 
       const thread = await createThread(input);
+      if (thread && linkedProposals) {
+        addThreadLinks({
+          communityId: app.activeChainId() || '',
+          threadId: thread.id!,
+          links: [
+            {
+              source: linkedProposals.source as LinkSource,
+              identifier: linkedProposals.identifier,
+              title: linkedProposals.title,
+            },
+          ],
+        }).catch(console.error);
+      }
+
+      if (thread && pollsData && pollsData?.length) {
+        await createPoll({
+          threadId: thread.id,
+          prompt: pollsData[0]?.prompt,
+          options: pollsData[0]?.options,
+          customDuration: pollsData[0]?.customDuration || undefined,
+          authorCommunity: user.activeAccount?.community?.id || '',
+          address: user.activeAccount?.address || '',
+        });
+      }
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
@@ -408,6 +471,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     isTurnstileEnabled,
     turnstileToken,
     resetTurnstile,
+    addThreadLinks,
+    linkedProposals,
+    createPoll,
+    pollsData,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -490,7 +557,84 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     },
     [handleNewThreadCreation],
   );
+  const forceRerender = useForceRerender();
 
+  const snapshotLink = linkedProposals?.source === 'snapshot';
+  const cosmosLink = linkedProposals?.source === 'proposal';
+  const {
+    proposal: snapshotProposal,
+    symbol,
+    votes,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    activeUserAddress,
+    loadVotes,
+    power,
+    threads,
+  } = useSnapshotProposal({
+    identifier: linkedProposals?.proposalId || '',
+    snapshotId: linkedProposals?.snapshotIdentifier || '',
+    enabled: !!snapshotLink,
+  });
+
+  const { proposal, threads: cosmosThreads } = useCosmosProposal({
+    proposalId: linkedProposals?.identifier || '',
+    enabled: !!cosmosLink,
+  });
+
+  useEffect(() => {
+    proposal?.isFetched?.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched?.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
+  const snapShotVotingResult = React.useMemo(() => {
+    if (!snapshotProposal || !votes) return [];
+    const { choices } = snapshotProposal;
+    const totalVoteCount = totals.sumOfResultsBalance || 0;
+
+    return choices.map((label: string, index: number) => {
+      const voteCount = votes
+        .filter((vote) => vote.choice === index + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      const percentage =
+        totalVoteCount > 0
+          ? ((voteCount / totalVoteCount) * 100).toFixed(2)
+          : '0';
+      const results = voteCount.toFixed(4); // Adjust precision as needed
+
+      return {
+        label,
+        percentage,
+        results,
+      };
+    });
+  }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
+
+  // eslint-disable-next-line max-len
+  const governanceUrl = `https://snapshot.box/#/s:${linkedProposals?.snapshotIdentifier}/proposal/${linkedProposals?.proposalId}`;
+
+  const governanceType = proposal
+    ? 'cosmos'
+    : snapshotProposal
+      ? 'snapshot'
+      : '';
+  const status = snapshotProposal?.state || proposal?.status;
+
+  const toggleShowVotesDrawer = (newModalState: boolean) => {
+    setShowVotesDrawer(newModalState);
+  };
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
   const sidebarComponent = [
     {
       label: 'Links',
@@ -500,6 +644,103 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         </div>
       ),
     },
+    {
+      label: 'Links',
+      item: (
+        <div className="cards-column">
+          <LinkedProposalsCard
+            thread={null}
+            showAddProposalButton={true}
+            setLinkedProposals={setLinkedProposals}
+            linkedProposals={linkedProposals}
+            communityId={selectedCommunityId}
+          />
+        </div>
+      ),
+    },
+    ...((pollsData && pollsData?.length > 0) ||
+    !app.chain?.meta?.admin_only_polling ||
+    isAdmin
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(
+                    pollsData?.map((poll) => [poll?.id, poll]),
+                  ).values(),
+                ].map((poll: Poll) => {
+                  return (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      isTopicMembershipRestricted={isRestrictedMembership}
+                      showDeleteButton={true}
+                      isCreateThreadPage={true}
+                      setLocalPoll={setPollData}
+                    />
+                  );
+                })}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
+                  <ThreadPollEditorCard
+                    threadAlreadyHasPolling={!pollsData?.length}
+                    setLocalPoll={setPollData}
+                    isCreateThreadPage={true}
+                    threadTitle={threadTitle}
+                    threadContentDelta={threadContentDelta}
+                  />
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+  ];
+
+  const proposalDetailSidebar = [
+    ...(!isWindowSmallInclusive && (snapshotProposal || proposal)
+      ? [
+          {
+            label: 'Detail',
+            item: (
+              <DetailCard
+                status={status || ''}
+                governanceType={governanceType}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={snapshotProposal?.created || proposal.createdAt}
+                id={linkedProposals?.proposalId}
+                Threads={threads || cosmosThreads}
+                scope={selectedCommunityId}
+              />
+            ),
+          },
+
+          {
+            label: 'Timeline',
+            item: (
+              <TimeLineCard proposalData={snapshotProposal || proposal?.data} />
+            ),
+          },
+
+          {
+            label: 'Results',
+            item: (
+              <>
+                {!snapshotLink ? (
+                  <VotingResults proposal={proposal as AnyProposal} />
+                ) : (
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
+                    governanceUrl={governanceUrl}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -809,6 +1050,86 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                   )}
               </div>
             </div>
+            <>
+              {isWindowSmallInclusive && (snapshotProposal || proposal) && (
+                <>
+                  <DetailCard
+                    status={status || ''}
+                    governanceType={governanceType}
+                    publishDate={
+                      // @ts-expect-error <StrictNullChecks/>
+                      snapshotProposal?.created || proposal.createdAt
+                    }
+                    id={linkedProposals?.proposalId}
+                    Threads={threads || cosmosThreads}
+                    scope={selectedCommunityId}
+                  />
+                  <TimeLineCard
+                    proposalData={snapshotProposal || proposal?.data}
+                  />
+                </>
+              )}
+              {snapshotProposal ? (
+                <>
+                  <SnapshotPollCardContainer
+                    activeUserAddress={activeUserAddress}
+                    fetchedPower={!!power}
+                    identifier={linkedProposals?.proposalId || ''}
+                    proposal={snapshotProposal as SnapshotProposal}
+                    scores={[]}
+                    space={space as SnapshotSpace}
+                    symbol={symbol}
+                    totals={totals}
+                    totalScore={totalScore}
+                    validatedAgainstStrategies={validatedAgainstStrategies}
+                    votes={votes}
+                    loadVotes={async () => loadVotes()}
+                    snapShotVotingResult={snapShotVotingResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                  />
+                  {isWindowSmallInclusive && (
+                    <VotingResultView
+                      voteOptions={snapShotVotingResult}
+                      showCombineBarOnly={false}
+                      governanceUrl={governanceUrl}
+                    />
+                  )}
+                  <ProposalVotesDrawer
+                    header="Votes"
+                    votes={votes}
+                    choices={snapshotProposal?.choices}
+                    isOpen={showVotesDrawer}
+                    setIsOpen={setShowVotesDrawer}
+                  />
+                </>
+              ) : (
+                <>
+                  {proposal && (
+                    <>
+                      <VotingActions
+                        onModalClose={onModalClose}
+                        proposal={proposal}
+                        toggleVotingModal={toggleVotingModal}
+                        votingModalOpen={votingModalOpen}
+                        redrawProposals={redrawProposals}
+                        proposalRedrawState={proposalRedrawState}
+                        toggleShowVotesDrawer={toggleShowVotesDrawer}
+                      />
+                      {isWindowSmallInclusive && (
+                        <VotingResults proposal={proposal} />
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+              {isWindowSmallInclusive && (
+                <div className="action-cards">
+                  {sidebarComponent.map((view) => (
+                    <div key={view.label}>{view.item}</div>
+                  ))}
+                </div>
+              )}
+            </>
           </div>
           {!isWindowSmallInclusive && (
             <div className="sidebar">
@@ -834,6 +1155,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
 
               {!isCollapsed &&
                 sidebarComponent?.map((c) => (
+                  <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
+                ))}
+              {proposalDetailSidebar &&
+                proposalDetailSidebar.map((c) => (
                   <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
                 ))}
             </div>

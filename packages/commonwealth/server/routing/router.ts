@@ -7,6 +7,7 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
 import {
+  aiTieredMiddleware,
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
@@ -84,6 +85,7 @@ import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_h
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
+import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -424,6 +426,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true }),
     generateImageHandler.bind(this, models),
   );
 
@@ -436,6 +439,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true, text: true }),
     async (req, res) => {
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
@@ -514,7 +518,6 @@ function setupRouter(
     router,
     'get',
     '/groups',
-    databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
   );
 
@@ -532,12 +535,14 @@ function setupRouter(
     'post',
     '/aicompletion',
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ text: true }),
     aiCompletionHandler,
   );
 
   // proxies
   setupCosmosProxy(router, cacheDecorator);
   setupIpfsProxy(router, cacheDecorator);
+  setupUniswapProxy(router, cacheDecorator);
 
   app.use(endpoint, router);
 

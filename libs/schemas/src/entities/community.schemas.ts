@@ -7,6 +7,7 @@ import {
   CommunityTierMap,
   DefaultPage,
   DisabledCommunitySpamTier,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
@@ -19,17 +20,18 @@ import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const COMMUNITY_TIER = z.nativeEnum(CommunityTierMap);
+export const COMMUNITY_SPAM_TIER = z.union([
+  z.literal(DisabledCommunitySpamTier),
+  z.literal(UserTierMap.NewlyVerifiedWallet),
+  z.literal(UserTierMap.VerifiedWallet),
+]);
 
 export const Community = z.object({
   // 1. Regular fields are nullish when nullable instead of optional
   id: z.string(),
   name: z.string(),
   tier: COMMUNITY_TIER,
-  spam_tier_level: z.union([
-    z.literal(DisabledCommunitySpamTier),
-    z.literal(2),
-    z.literal(3),
-  ]),
+  spam_tier_level: COMMUNITY_SPAM_TIER,
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
@@ -62,6 +64,9 @@ export const Community = z.object({
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
   namespace_creator_address: z.string().nullish(),
+  namespace_verification_configured: z.boolean().optional(),
+  namespace_nominations: z.array(z.string()).nullish(),
+  namespace_verified: z.boolean().optional(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -70,6 +75,7 @@ export const Community = z.object({
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
+  environment: z.string().optional(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),

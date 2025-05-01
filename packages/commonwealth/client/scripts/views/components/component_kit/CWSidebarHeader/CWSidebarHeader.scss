@@ -15,6 +15,11 @@
   max-height: $global-sidebar-header-height !important;
   height: $global-sidebar-header-height !important;
 
+  .header-container {
+    display: flex;
+    align-items: center;
+  }
+
   .header {
     padding: 0px 8px 0px 12px;
     display: block;

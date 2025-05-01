@@ -49,8 +49,33 @@ IMPORTANT: Return only the comment without any introduction, explanations, or me
   `;
 };
 
+const generatePollPrompt = (context: string) => {
+  return `
+You are an AI assistant skilled in analyzing discussion threads to create engaging polls.
+Based on the following thread content, generate one poll suggestion in JSON format that reflects the main debate, topic,
+ or question raised.
+THREAD CONTENT:
+${context}
+
+Guidelines:
+- Identify a key theme, opinion, or question discussed in the thread.
+- Create only one concise, neutral, and relevant poll that encourages participation.
+- The poll must include:
+  - A clear question (max 100 characters).
+  - 2–3 short, specific answer options.
+- If the thread is vague or lacks a clear debate, suggest a broader, inclusive poll relevant to the content.
+- Requests only one poll suggestion.
+- Removes conflicting instructions about generating three polls or returning an array.
+- Outputs just one JSON object (not wrapped in an array), like:
+  { "question": "string", "options": ["string", "string", ...] }
+
+IMPORTANT: Return only the JSON object without any introduction, explanation, or meta-text.
+  `;
+};
+
 export {
   generateCommentPrompt,
+  generatePollPrompt,
   generateThreadPrompt,
   generateThreadTitlePrompt,
 };

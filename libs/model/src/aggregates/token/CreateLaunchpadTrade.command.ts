@@ -1,21 +1,12 @@
+import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import { Command, InvalidState } from '@hicommonwealth/core';
-import {
-  commonProtocol,
-  getLaunchpadTradeTransaction,
-} from '@hicommonwealth/evm-protocols';
+import { getPublicClient } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
+import { parseEventLogs } from 'viem';
 import z from 'zod';
 import { models } from '../../database';
-import { mustExist } from '../../middleware/guards';
-
-const launchpadEthChainIds = Object.values(
-  commonProtocol.factoryContracts,
-).reduce<number[]>((acc, contract) => {
-  if ('launchpad' in contract) {
-    acc.push(contract.chainId);
-  }
-  return acc;
-}, []);
+import { mustExist } from '../../middleware';
+import { handleCapReached } from './utils';
 
 export function CreateLaunchpadTrade(): Command<
   typeof schemas.CreateLaunchpadTrade
@@ -25,11 +16,6 @@ export function CreateLaunchpadTrade(): Command<
     auth: [],
     body: async ({ payload }) => {
       const { eth_chain_id, transaction_hash } = payload;
-      if (!launchpadEthChainIds.includes(eth_chain_id)) {
-        throw Error(
-          `EVM Chain ${eth_chain_id} does not have deployed launchpad`,
-        );
-      }
 
       const existingTrade = await models.LaunchpadTrade.findOne({
         where: {
@@ -51,29 +37,63 @@ export function CreateLaunchpadTrade(): Command<
         },
       );
       mustExist('Chain Node', chainNode);
-
-      const result = await getLaunchpadTradeTransaction({
-        rpc: chainNode.private_url! || chainNode.url!,
-        transactionHash: transaction_hash,
+      const url = chainNode.private_url! || chainNode.url!;
+      const client = getPublicClient({
+        eth_chain_id,
+        rpc: url,
       });
-      if (!result) {
+
+      const receipt = await client.getTransactionReceipt({
+        hash: transaction_hash as `0x${string}`,
+      });
+
+      if (!receipt) {
         throw new InvalidState('Transaction not found');
+      }
+
+      const parsedLogs = parseEventLogs({
+        abi: LPBondingCurveAbi,
+        eventName: 'Trade',
+        logs: receipt.logs,
+      });
+
+      if (parsedLogs.length === 0) {
+        throw new InvalidState('Data could not be processed from txReceipt');
+      }
+
+      const result = parsedLogs[0].args;
+
+      const tx = await client.getTransaction({
+        hash: transaction_hash as `0x${string}`,
+      });
+      const block = await client.getBlock({ blockNumber: tx.blockNumber });
+
+      // If cap reached, transfer to uniswap
+      await handleCapReached(
+        result.tokenAddress.toLowerCase(),
+        result.floatingSupply,
+        result.trader,
+        eth_chain_id,
+        url,
+        result.isBuy,
+      );
+
+      // This case happens when liquidity is bought out
+      if (result.tokenAmount === BigInt(0)) {
+        return;
       }
 
       const trade = await models.LaunchpadTrade.create({
         eth_chain_id,
         transaction_hash,
-        token_address: result.parsedArgs.tokenAddress.toLowerCase(),
-        trader_address: result.parsedArgs.traderAddress,
-        is_buy: result.parsedArgs.isBuy,
-        community_token_amount: result.parsedArgs.communityTokenAmount,
+        token_address: result.tokenAddress.toLowerCase(),
+        trader_address: result.trader.toLowerCase(),
+        is_buy: result.isBuy,
+        community_token_amount: result.tokenAmount,
         price:
-          Number(
-            (result.parsedArgs.ethAmount * BigInt(1e18)) /
-              result.parsedArgs.communityTokenAmount,
-          ) / 1e18,
-        floating_supply: result.parsedArgs.floatingSupply,
-        timestamp: Number(result.block.timestamp),
+          Number((result.ethAmount * BigInt(1e18)) / result.tokenAmount) / 1e18,
+        floating_supply: result.floatingSupply,
+        timestamp: Number(block.timestamp),
       });
 
       return trade.get({ plain: true }) as unknown as z.infer<

@@ -1,3 +1,4 @@
+import { config } from '@hicommonwealth/core';
 import {
   BalanceType,
   ChainBase,
@@ -310,6 +311,8 @@ export const seedDb = async () => {
         has_homepage: 'false' as any,
         collapsed_on_homepage: false,
         directory_page_enabled: false,
+        namespace_verified: false,
+        environment: config.APP_ENV,
       })),
     );
 

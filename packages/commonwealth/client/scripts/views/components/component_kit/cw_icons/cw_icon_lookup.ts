@@ -72,6 +72,7 @@ import {
   Notepad,
   PaperPlaneTilt,
   PencilSimple,
+  Play,
   Plus,
   PlusCircle,
   PushPin,
@@ -323,6 +324,7 @@ export const iconLookup = {
   xTwitter: withPhosphorIcon(XLogo),
   discordLogo: withPhosphorIcon(DiscordLogo),
   warpcast: Icons.CWWarpcast,
+  play: withPhosphorIcon(Play),
   starFour: withPhosphorIcon(StarFour),
   // Chain icons with distinct names
   solanaChain: CustomIcons.CWSolana,
@@ -330,11 +332,20 @@ export const iconLookup = {
   ethChain: CustomIcons.CWEth,
   cosmosChain: CustomIcons.CWCosmos,
   polkadotChain: CustomIcons.CWPolkadot,
+  globe: Icons.CWGlobe,
+  whiteCheck: Icons.CWWhiteCheck,
+  pins: Icons.CWPin,
+  starGolden: Icons.CWStarGolden,
+  socialVerified: Icons.CWSocialVerified,
+  sandClock: Icons.CWSandClock,
+  stopSymbol: Icons.CWStopSymbol,
 };
 
 export const customIconLookup = {
   base: CustomIcons.CWBase,
   blast: CustomIcons.CWBlast,
+  google: Icons.CWGoogle,
+  github: Icons.CWGithub,
   email: CustomIcons.CWEmail,
   solana: CustomIcons.CWSolana,
   nearIcon: CustomIcons.CWNearIcon,
@@ -342,11 +353,8 @@ export const customIconLookup = {
   cosmos: CustomIcons.CWCosmos,
   polkadot: CustomIcons.CWPolkadot,
   discordIcon: CustomIcons.CWDiscord,
-  githubIcon: CustomIcons.CWGithub,
-  twitterIcon: CustomIcons.CWTwitter,
-  envelope: CustomIcons.CWEnvelop,
-  'keplr-ethereum': CustomIcons.CWKeplr,
-  'cosm-metamask': CustomIcons.CWMetaMask,
+  octocat: Icons.CWOctocat,
+  hamburger: Icons.CWHamburger,
   keplr: CustomIcons.CWKeplr,
   leap: CustomIcons.CWLeap,
   magic: CustomIcons.CWMagic,
@@ -365,6 +373,11 @@ export const customIconLookup = {
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatText),
   privy: CustomIcons.CWPrivy,
+  okx: CustomIcons.CWOKX,
+  twitterIcon: CustomIcons.CWTwitter,
+  envelope: CustomIcons.CWEnvelop,
+  'keplr-ethereum': CustomIcons.CWKeplr,
+  'cosm-metamask': CustomIcons.CWMetaMask,
 };
 
 export type IconName = keyof typeof iconLookup;

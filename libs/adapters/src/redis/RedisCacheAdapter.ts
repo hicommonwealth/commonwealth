@@ -75,6 +75,10 @@ export class RedisCache implements Cache {
     return 'RedisCache';
   }
 
+  public get client(): RedisClientType {
+    return this._client;
+  }
+
   public async dispose(): Promise<void> {
     try {
       await this._client.disconnect();
@@ -450,6 +454,192 @@ export class RedisCache implements Cache {
       this._log.error(msg, e as Error);
       return null;
     }
+  }
+
+  public async incrementHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    increment: number = 1,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HINCRBY(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        increment,
+      );
+    } catch (e) {
+      this._log.error(
+        'An error occurred while incrementing hash key',
+        e as Error,
+      );
+    }
+    return 0;
+  }
+
+  public async getHash(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<Record<string, string>> {
+    if (!this.isReady()) return {};
+    try {
+      return this._client.HGETALL(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return {};
+  }
+
+  public async setHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HSET(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return 0;
+  }
+
+  public async addToSet(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.SADD(
+        RedisCache.getNamespaceKey(namespace, key),
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while adding item to set', e as Error);
+    }
+    return 0;
+  }
+
+  public async getSet(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      return this._client.SMEMBERS(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting set', e as Error);
+    }
+    return [];
+  }
+
+  public async getSortedSetSize(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zCard(RedisCache.getNamespaceKey(namespace, key));
+  }
+
+  public async sliceSortedSetWithScores(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRangeWithScores(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
+    );
+  }
+
+  public async sliceSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<string[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRange(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
+    );
+  }
+
+  public async delSortedSetItemsByRank(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRemRangeByRank(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+    );
+  }
+
+  public async addToSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    items:
+      | { value: string; score: number }[]
+      | { value: string; score: number },
+    options?: {
+      updateOnly?: boolean;
+    },
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zAdd(
+      RedisCache.getNamespaceKey(namespace, key),
+      items,
+      {
+        ...(options?.updateOnly ? { XX: true } : {}),
+      },
+    );
+  }
+
+  public async sortedSetPopMin(
+    namespace: CacheNamespaces,
+    key: string,
+    numToPop = 1,
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zPopMinCount(
+      RedisCache.getNamespaceKey(namespace, key),
+      numToPop,
+    );
+  }
+
+  public async delSortedSetItemsByValue(
+    namespace: CacheNamespaces,
+    key: string,
+    values: string[] | string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRem(
+      RedisCache.getNamespaceKey(namespace, key),
+      values,
+    );
   }
 
   public async flushAll(): Promise<void> {

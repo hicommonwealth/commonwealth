@@ -228,6 +228,22 @@
       gap: 4px;
     }
   }
+
+  .turnstile-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    max-width: 300px;
+    width: 248px;
+
+    .left-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+    }
+  }
 }
 
 .tokenized-status {

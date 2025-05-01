@@ -1,10 +1,6 @@
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
-import {
-  calculateTotalXPForQuestActions,
-  isQuestActionComplete,
-  QuestAction,
-  XPLog,
-} from 'helpers/quest';
+import { isQuestActionComplete, QuestAction, XPLog } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -15,6 +11,8 @@ import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { z } from 'zod';
+import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
 import QuestCard from './QuestCard';
 import './QuestList.scss';
 
@@ -94,13 +92,6 @@ const QuestList = ({
       ) : (
         <div className="list">
           {(quests || []).map((quest) => {
-            const totalUserXP = calculateTotalXPForQuestActions({
-              questActions: (quest.action_metas as QuestAction[]) || [],
-              isUserReferred: !!user.referredByAddress,
-              questStartDate: new Date(quest.start_date),
-              questEndDate: new Date(quest.end_date),
-            });
-
             return (
               <QuestCard
                 key={quest.name}
@@ -108,12 +99,26 @@ const QuestList = ({
                 description={quest.description}
                 communityId={quest.community_id || ''}
                 iconURL={quest.image_url}
-                xpPoints={totalUserXP}
+                xpPointsElement={
+                  <TotalQuestXPTag
+                    questId={quest.id}
+                    questStartDate={new Date(quest.start_date)}
+                    questEndDate={new Date(quest.end_date)}
+                    questActions={
+                      (quest.action_metas as z.infer<
+                        typeof QuestActionMeta
+                      >[]) || []
+                    }
+                    hideGainedXp
+                  />
+                }
                 tasks={{
                   total: quest.action_metas?.length || 0,
                   completed: (quest.action_metas || [])
                     .map((action) =>
                       isQuestActionComplete(
+                        new Date(quest.start_date),
+                        new Date(quest.end_date),
                         action as QuestAction,
                         xpProgressions as unknown as XPLog[],
                       ),

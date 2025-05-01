@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { config, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   bech32ToHex,
@@ -154,6 +154,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             stages_enabled: true,
             allow_tokenized_threads,
             thread_purchase_token,
+            namespace_verified: false,
+            environment: config.APP_ENV,
           },
           { transaction },
         );

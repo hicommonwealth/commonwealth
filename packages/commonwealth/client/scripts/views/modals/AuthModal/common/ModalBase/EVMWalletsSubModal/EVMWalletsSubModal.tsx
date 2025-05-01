@@ -72,7 +72,7 @@ const EVMWalletsSubModal = ({
                   variant={
                     isUserFromWebView ? 'light' : isLightMode ? 'light' : 'dark'
                   }
-                  showDescription={false}
+                  showDescription={wallet === 'okx'}
                   // @ts-expect-error <StrictNullChecks/>
                   onClick={() => onWalletSelect(wallet)}
                   disabled={disabled}

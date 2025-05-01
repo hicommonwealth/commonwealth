@@ -17,7 +17,8 @@ import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/T
 import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import useGetCommunityByIdQuery from '../../../../state/api/communities/getCommuityById';
 import { PageNotFound } from '../../404';
-import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
+import CommunityOnchainTransactions from '../../CreateCommunity/steps/CommunityOnchainTransactions';
+import { TransactionType } from '../../CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 import CanBeDisabled from './CanBeDisabled';
 import ContractInfo from './ContractInfo';
 import './StakeIntegration.scss';
@@ -133,18 +134,24 @@ const StakeIntegration = ({
             )}
           </>
         ) : (
-          <CommunityStakeStep
+          <CommunityOnchainTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             namespace={community?.namespace}
             symbol={community?.default_symbol}
             selectedAddress={selectedAddress as AddressInfo}
             chainId={communityChainId}
+            transactionTypes={[
+              TransactionType.DeployNamespace,
+              TransactionType.ConfigureStakes,
+            ]}
             isTopicFlow={isTopicFlow}
-            onEnableStakeStepCancel={goBack}
-            onSignTransactionsStepLaunchStakeSuccess={
-              handleSignTransactionsStepLaunchStakeSuccess
-            }
+            onConfirmNamespaceDataStepCancel={goBack}
+            onSignTransaction={(type) => {
+              if (type === TransactionType.ConfigureStakes) {
+                handleSignTransactionsStepLaunchStakeSuccess();
+              }
+            }}
             onSignTransactionsStepCancel={goBack}
           />
         )}
