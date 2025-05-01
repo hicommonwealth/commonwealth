@@ -28,26 +28,57 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
       } = payload;
 
       const token_address = token_address_unformatted.toLowerCase();
-
       const chainNode = await chainNodeMustExist(eth_chain_id);
 
-      await models.LaunchpadTrade.findOrCreate({
-        where: { eth_chain_id, transaction_hash },
-        defaults: {
-          eth_chain_id,
-          transaction_hash,
-          token_address,
-          trader_address,
-          is_buy,
-          community_token_amount,
-          price:
-            Number((eth_amount * BigInt(1e18)) / community_token_amount) / 1e18,
-          floating_supply,
-          timestamp: Number(block_timestamp),
-        },
+      await models.sequelize.transaction(async (transaction) => {
+        const [, created] = await models.LaunchpadTrade.findOrCreate({
+          where: { eth_chain_id, transaction_hash },
+          defaults: {
+            eth_chain_id,
+            transaction_hash,
+            token_address,
+            trader_address,
+            is_buy,
+            community_token_amount,
+            price:
+              Number((eth_amount * BigInt(1e18)) / community_token_amount) /
+              1e18,
+            floating_supply,
+            timestamp: Number(block_timestamp),
+          },
+          transaction,
+        });
+
+        // auto-join community after trades
+        if (created) {
+          const token = await models.LaunchpadToken.findOne({
+            where: { token_address },
+            attributes: ['namespace'],
+          });
+          if (token) {
+            const community = await models.Community.findOne({
+              where: { namespace: token.namespace },
+              attributes: ['id'],
+            });
+            if (community)
+              await models.Address.findOrCreate({
+                where: { address: trader_address, community_id: community.id },
+                defaults: {
+                  address: trader_address,
+                  community_id: community.id,
+                  role: 'member',
+                  is_user_default: false,
+                  ghost_address: false,
+                  is_banned: false,
+                },
+                transaction,
+              });
+          }
+        }
       });
 
       // If cap reached, transfer to uniswap
+      // TODO: what happens if something goes wrong here? Should this be a policy with a retry?
       await handleCapReached(
         token_address,
         floating_supply,
