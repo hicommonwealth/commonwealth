@@ -12,6 +12,7 @@ import {
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
+import { ZodSchema } from 'zod';
 
 const log = logger(import.meta);
 
@@ -22,10 +23,10 @@ export enum RascalExchanges {
 
 type Consumers =
   | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      consumer: () => EventsHandlerMetadata<EventSchemas, ZodSchema>;
       overrides: Record<string, string | null | undefined>;
     }
-  | (() => EventsHandlerMetadata<EventSchemas>);
+  | (() => EventsHandlerMetadata<EventSchemas, ZodSchema>);
 
 /**
  * Generates the RabbitMQ configuration on the fly given a set of policies
