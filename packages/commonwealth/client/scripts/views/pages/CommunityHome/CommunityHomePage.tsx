@@ -3,12 +3,21 @@ import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import useUserStore from 'client/scripts/state/ui/user';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import useCreateThreadMutation, {
+  buildCreateThreadInput,
+} from 'state/api/threads/createThread';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+} from 'views/components/react_quill_editor';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -20,16 +29,6 @@ import './CommunityHomePage.scss';
 import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
 import TokenPerformance from './TokenPerformance/TokenPerformance';
-// eslint-disable-next-line max-len
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useCreateThreadMutation, {
-  buildCreateThreadInput,
-} from 'state/api/threads/createThread';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-} from 'views/components/react_quill_editor';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
@@ -66,7 +65,6 @@ const CommunityHome = () => {
 
   const [selectedCommunityId] = useState<string>();
 
-  // Sticky Editor State
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
@@ -75,7 +73,6 @@ const CommunityHome = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  // Function to handle thread creation - Returns thread ID on success, -1 on failure
   const handleCreateThread = async (): Promise<number> => {
     if (!user.activeAccount || !community || !topics || topics.length === 0) {
       notifyError('User, community data, or topics missing.');
@@ -88,36 +85,30 @@ const CommunityHome = () => {
       return -1;
     }
 
-    // --- Limitation: Extracting Title and Finding Topic --- //
-    const title = bodyText.split('\n')[0].substring(0, 140); // Use first line as title
-    const targetTopic = topics[0]; // Use the first available topic
-
-    // Default stage - adjust if needed
+    const title = bodyText.split('\n')[0].substring(0, 140);
+    const targetTopic = topics[0];
     const stage = 'Discussion';
-    // --- End Limitation --- //
 
     try {
       const input = await buildCreateThreadInput({
         address: user.activeAccount.address,
         kind: 'discussion',
-        stage: stage, // Use defined stage
+        stage,
         communityId: community.id,
         communityBase: community.base,
-        title: title,
-        topic: targetTopic, // Use the found topic
+        title,
+        topic: targetTopic,
         body: bodyText,
-        // Ensure eth_chain_id is not null before passing
         ethChainIdOrBech32Prefix:
           app.chain.meta.ChainNode?.eth_chain_id ?? undefined,
-        // turnstileToken: null,
       });
 
       const newThread = await createThread(input);
 
       if (newThread && newThread.id) {
         notifySuccess('Thread created successfully!');
-        handleCancelStickyEditor(); // Clear editor on success
-        return newThread.id; // Return the new thread ID
+        handleCancelStickyEditor();
+        return newThread.id;
       } else {
         throw new Error('Thread creation response missing ID.');
       }
@@ -126,14 +117,9 @@ const CommunityHome = () => {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       notifyError(`Failed to create thread: ${errorMessage}`);
-      return -1; // Return -1 on error
+      return -1;
     }
   };
-
-  // Component lifecycle tracking
-  useEffect(() => {
-    return () => {};
-  }, [instanceId]);
 
   return (
     <StickCommentProvider mode="thread">
@@ -180,7 +166,7 @@ const CommunityHome = () => {
           {user.isLoggedIn && user.activeAccount && (
             <StickyEditorContainer
               parentType={ContentType.Thread}
-              canComment={true} // Assuming logged-in users can create threads
+              canComment={true}
               handleSubmitComment={handleCreateThread}
               errorMsg=""
               contentDelta={threadContentDelta}
