@@ -39,7 +39,7 @@ function setupUniswapProxy(router: Router, cacheDecorator: CacheDecorator) {
           `https://api.uniswap.org/v1/${proxiedCommand}`,
           {
             headers: {
-              origin: process.env.SERVER_URL || 'https://commonwealth.im',
+              origin: 'http://localhost:8080',
               'Content-Type': 'application/json',
             },
             timeout: 10000,
