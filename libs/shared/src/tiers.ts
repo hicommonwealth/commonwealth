@@ -253,3 +253,12 @@ export function hasCommunityTierClientInfo(
 ): tier is CommunityTierWithClientInfo {
   return 'clientInfo' in COMMUNITY_TIERS[tier];
 }
+
+export function bumpTier<T extends UserTierLevels | CommunityTierLevels>(
+  tier: T,
+  object: { tier: T | null },
+) {
+  if (!object.tier || object.tier < tier) {
+    object.tier = tier;
+  }
+}

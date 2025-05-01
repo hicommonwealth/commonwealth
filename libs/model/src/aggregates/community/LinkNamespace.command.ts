@@ -1,6 +1,10 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType, CommunityTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  bumpTier,
+  CommunityTierMap,
+} from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -100,8 +104,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
       });
       mustExist('Community', community);
 
-      if (!log_removed && community.tier < CommunityTierMap.ChainVerified)
-        community.tier = CommunityTierMap.ChainVerified;
+      if (!log_removed) bumpTier(CommunityTierMap.ChainVerified, community);
 
       community.namespace_creator_address = deployer_address;
 
