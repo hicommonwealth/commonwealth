@@ -6,7 +6,6 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
-import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
@@ -47,54 +46,46 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         );
       }
 
-      const [token] = await models.LaunchpadToken.findOrCreate({
-        where: {
-          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
-          namespace: tokenData.parsedArgs.namespace,
-        },
-        defaults: {
-          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
-          namespace: tokenData.parsedArgs.namespace,
-          name: tokenInfo.name,
-          symbol: tokenInfo.symbol,
-          initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
-          liquidity_transferred: false,
-          launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
-          eth_market_cap_target: commonProtocol.getTargetMarketCap(),
-          description: description ?? null,
-          icon_url: icon_url ?? null,
-          creator_address: actor.address,
-        },
-      });
-
-      const response = token!.toJSON() as unknown as z.infer<typeof TokenView>;
-
-      const threadId = Number(tokenInfo.name);
-
-      // generic token launch case
-      if (!threadId) {
-        return response;
-      }
-
-      // If token launch is a tokenized thread, link to thread
-      await models.sequelize.query(
-        `
-        UPDATE "Threads"
-        SET launchpad_token_address = :launchpadTokenAddress, is_linking_token = false
-        WHERE id = :threadId AND is_linking_token = false;
-      `,
-        {
-          replacements: {
-            launchpadTokenAddress:
-              tokenData.parsedArgs.tokenAddress.toLowerCase(),
-            threadId: tokenInfo.name,
+      return models.sequelize.transaction(async (transaction) => {
+        const [token] = await models.LaunchpadToken.findOrCreate({
+          where: {
+            token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
+            namespace: tokenData.parsedArgs.namespace,
           },
-          type: QueryTypes.SELECT,
-        },
-      );
+          defaults: {
+            token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
+            namespace: tokenData.parsedArgs.namespace,
+            name: tokenInfo.name,
+            symbol: tokenInfo.symbol,
+            initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
+            liquidity_transferred: false,
+            launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+            eth_market_cap_target: commonProtocol.getTargetMarketCap(),
+            description: description ?? null,
+            icon_url: icon_url ?? null,
+            creator_address: actor.address,
+          },
+          transaction,
+        });
 
-      // tokenized thread linking done, return regular response
-      return response;
+        // If token launch is a tokenized thread, link to thread
+        if (Number(tokenInfo.name))
+          await models.sequelize.query(
+            `UPDATE "Threads"
+              SET launchpad_token_address = :launchpadTokenAddress, is_linking_token = false
+              WHERE id = :threadId AND is_linking_token = false;`,
+            {
+              replacements: {
+                launchpadTokenAddress:
+                  tokenData.parsedArgs.tokenAddress.toLowerCase(),
+                threadId: tokenInfo.name,
+              },
+              transaction,
+            },
+          );
+
+        return token!.toJSON() as unknown as z.infer<typeof TokenView>;
+      });
     },
   };
 }
