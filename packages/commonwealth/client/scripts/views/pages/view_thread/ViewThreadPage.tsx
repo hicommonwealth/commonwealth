@@ -1082,27 +1082,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 streamingReplyIds={streamingReplyIds}
                 setStreamingReplyIds={setStreamingReplyIds}
               />
-
-              <WithDefaultStickyComment>
-                {thread &&
-                  !thread.readOnly &&
-                  !fromDiscordBot &&
-                  !isGloballyEditing &&
-                  user.isLoggedIn && (
-                    <CreateComment
-                      rootThread={thread}
-                      canComment={canComment}
-                      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                      tooltipText={
-                        typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('comment')
-                          : disabledActionsTooltipText
-                      }
-                    />
-                  )}
-              </WithDefaultStickyComment>
-
-              <StickyCommentElementSelector />
             </>
           }
           editingDisabled={isTopicInContest}
@@ -1110,6 +1089,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           proposalDetailSidebar={proposalDetailSidebar as SidebarComponents}
           showActionIcon={true}
         />
+        <WithDefaultStickyComment>
+          {thread &&
+            !thread.readOnly &&
+            !fromDiscordBot &&
+            !isGloballyEditing &&
+            user.isLoggedIn && (
+              <CreateComment
+                rootThread={thread}
+                canComment={canComment}
+                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                tooltipText={
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('comment')
+                    : disabledActionsTooltipText
+                }
+              />
+            )}
+        </WithDefaultStickyComment>
+
+        <StickyCommentElementSelector />
       </CWPageLayout>
       {JoinCommunityModals}
 

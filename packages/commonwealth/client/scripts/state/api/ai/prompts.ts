@@ -73,8 +73,70 @@ IMPORTANT: Return only the JSON object without any introduction, explanation, or
   `;
 };
 
+/**
+ * Generates a prompt for image generation, incorporating context from text and indicating the use of reference images.
+ * @param basePrompt The user-provided base prompt.
+ * @param referenceTexts Optional array of context strings (e.g., "Key: Value").
+ * @param hasReferenceImages Whether reference images are being provided.
+ * @returns The combined prompt string.
+ */
+const generateImagePromptWithContext = (
+  basePrompt: string,
+  referenceTexts?: string[],
+  hasReferenceImages?: boolean,
+): string => {
+  const trimmedBasePrompt = basePrompt.trim();
+  if (!trimmedBasePrompt) {
+    return '';
+  }
+
+  const contextMap: { [key: string]: string } = {};
+  if (referenceTexts && referenceTexts.length > 0) {
+    referenceTexts.forEach((text) => {
+      const parts = text.split(':');
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join(':').trim();
+        if (key && value) {
+          contextMap[key.toLowerCase()] = value;
+        }
+      }
+    });
+  }
+
+  const hasTextContext = Object.keys(contextMap).length > 0;
+  let prompt = trimmedBasePrompt;
+
+  if (hasReferenceImages && hasTextContext) {
+    let contextString = 'Consider the following context:\n';
+    if (contextMap.community)
+      contextString += `- Community/Topic: ${contextMap.community}\n`;
+    if (contextMap.description)
+      contextString += `- Description: ${contextMap.description}\n`;
+    if (contextMap.title)
+      contextString += `- Title/Body Context: ${contextMap.title}\n`;
+
+    prompt = `Remix the provided reference image(s) based on the following prompt: "${trimmedBasePrompt}". \n\n${contextString}`;
+  } else if (hasReferenceImages) {
+    prompt = `Using the provided reference image(s), create a variation based on the prompt: "${trimmedBasePrompt}".`;
+  } else if (hasTextContext) {
+    let contextString = 'Keep the following context in mind:\n';
+    if (contextMap.community)
+      contextString += `- Community/Topic: ${contextMap.community}\n`;
+    if (contextMap.description)
+      contextString += `- Description: ${contextMap.description}\n`;
+    if (contextMap.title)
+      contextString += `- Title/Body Context: ${contextMap.title}\n`;
+
+    prompt = `Generate an image based on the prompt: "${trimmedBasePrompt}". \n\n${contextString}`;
+  }
+
+  return prompt;
+};
+
 export {
   generateCommentPrompt,
+  generateImagePromptWithContext,
   generatePollPrompt,
   generateThreadPrompt,
   generateThreadTitlePrompt,

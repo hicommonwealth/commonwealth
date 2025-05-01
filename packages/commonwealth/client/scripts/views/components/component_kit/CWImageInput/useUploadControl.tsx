@@ -22,6 +22,7 @@ export const useUploadControl = ({
   onProcessedImagesListChange,
   usePersistentPromptMode,
   referenceImageUrls,
+  referenceTexts,
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [, setImageInputRefUpdated] = useState<boolean>(false); // sometimes the input ref doesnt get set in time
@@ -425,5 +426,6 @@ export const useUploadControl = ({
     hasAnyGeneratedImages,
     startNewPrompt,
     generateAndHandle,
+    referenceTexts,
   };
 };

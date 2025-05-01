@@ -93,6 +93,7 @@ import { VotingResults } from '../proposals/voting_results';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
+  getImageUrlsFromDelta,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
@@ -132,6 +133,13 @@ export const NewThreadForm = forwardRef<
   const [linkedProposals, setLinkedProposals] =
     useState<ProposalState | null>();
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+
+  // --- State for Image Modal Context ---
+  const [imageModalContext, setImageModalContext] = useState<{
+    initialReferenceText?: string;
+    initialReferenceImageUrls?: string[];
+    contextSource?: 'thread';
+  } | null>(null);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
@@ -672,13 +680,38 @@ export const NewThreadForm = forwardRef<
   }, [onContentAppended, handleAppendContent]);
 
   const handleOpenImageModal = useCallback(() => {
-    setIsImageModalOpen(true);
-  }, []);
+    // Gather context from the form
+    const title = threadTitle.trim();
+    const bodyText = getTextFromDelta(threadContentDelta).trim();
+    // TODO: Extract image URLs from threadContentDelta if needed
+    const imageUrls: string[] = getImageUrlsFromDelta(threadContentDelta);
 
-  const handleCloseImageModal = useCallback(
-    () => setIsImageModalOpen(false),
-    [],
-  );
+    let combinedContextText = '';
+    if (title) {
+      combinedContextText += `Title: ${title}\n\n`;
+    }
+    if (bodyText) {
+      combinedContextText += `Body: ${bodyText}`;
+    }
+
+    console.log('--- Opening Image Modal with Context ---');
+    console.log('Gathered Title:', title);
+    console.log('Gathered Body Text:', bodyText);
+    console.log('Gathered Image URLs (placeholder):', imageUrls);
+    console.log('Combined Text Context:', combinedContextText);
+
+    setImageModalContext({
+      initialReferenceText: combinedContextText || undefined,
+      initialReferenceImageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+      contextSource: 'thread',
+    });
+
+    setIsImageModalOpen(true);
+  }, [threadTitle, threadContentDelta]);
+
+  const handleCloseImageModal = useCallback(() => {
+    setIsImageModalOpen(false);
+  }, []);
 
   const handleApplyImage = useCallback(
     (imageUrl: string) => {
@@ -1215,6 +1248,9 @@ export const NewThreadForm = forwardRef<
         isOpen={isImageModalOpen}
         onClose={handleCloseImageModal}
         onApply={handleApplyImage}
+        initialReferenceText={imageModalContext?.initialReferenceText}
+        initialReferenceImageUrls={imageModalContext?.initialReferenceImageUrls}
+        contextSource={imageModalContext?.contextSource}
       />
       {JoinCommunityModals}
     </>

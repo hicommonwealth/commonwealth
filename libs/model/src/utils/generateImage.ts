@@ -1,7 +1,7 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { Buffer } from 'buffer';
 import fetch from 'node-fetch';
-import { OpenAI } from 'openai';
+import OpenAI, { toFile } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import { compressServerImage } from './imageCompression';
@@ -124,66 +124,58 @@ const editImageWithOpenAI = async (
       `[editImageWithOpenAI] Multiple reference images provided (${referenceImagesData.length}), but using only the first one due to current limitations.`,
     );
   }
-  const primaryReferenceImage = {
-    file: referenceImagesData[0].buffer,
-    name: referenceImagesData[0].filename || 'reference.png',
-  };
-
-  const editParams: OpenAI.Images.ImageEditParams = {
-    image: primaryReferenceImage as any,
-    prompt,
-    model: options.model || 'gpt-image-1',
-    n: options.n || 1,
-    size: options.size || '1024x1024',
-  };
-
-  if (options.mask) {
-    editParams.mask = {
-      file: options.mask,
-      name: 'mask.png',
-    } as any;
-  }
-
-  Object.keys(editParams).forEach((key) => {
-    const paramKey = key as keyof typeof editParams;
-    if (editParams[paramKey] === undefined || editParams[paramKey] === null) {
-      delete editParams[paramKey];
-    }
-  });
-
-  log.info('[editImageWithOpenAI] Calling OpenAI API with params:', {
-    ...editParams,
-    image: `[${referenceImagesData.length} images]`,
-    mask: editParams.mask ? '[mask provided]' : '[no mask]',
-  });
 
   try {
-    const imageResponse = await openai.images.edit(editParams as any);
+    // Convert buffer to File-like object using toFile helper, explicitly setting type
+    const imageFile = await toFile(
+      referenceImagesData[0].buffer,
+      referenceImagesData[0].filename || 'reference.png',
+      { type: 'image/png' }, // Specify the MIME type
+    );
+
+    const payload: OpenAI.Images.ImageEditParams = {
+      image: imageFile,
+      prompt,
+      model: options.model || 'gpt-image-1',
+      n: options.n || 1,
+      size: options.size || '1024x1024',
+    };
+
+    // Add mask if provided, converting it using toFile with explicit type
+    if (options.mask) {
+      payload.mask = await toFile(
+        options.mask,
+        'mask.png',
+        { type: 'image/png' }, // Specify the MIME type
+      );
+    }
+
+    log.info('[editImageWithOpenAI] Calling OpenAI edit API with', {
+      prompt,
+      model: payload.model,
+      hasImage: true, // We know image exists due to check above
+      hasMask: !!payload.mask,
+    });
+
+    // Use the OpenAI SDK to handle the request formatting
+    const imageResponse = await openai.images.edit(payload);
     log.info('[editImageWithOpenAI] OpenAI API response received.');
 
     return { b64_json: imageResponse.data[0].b64_json || '' };
   } catch (error) {
-    if (error instanceof Error) {
-      log.error('[editImageWithOpenAI] OpenAI API call failed.', error);
-    } else {
-      log.error(
-        '[editImageWithOpenAI] OpenAI API call failed with unknown error type:',
-        new Error(String(error)),
-      );
-    }
+    // Convert to standard Error object
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    log.error('[editImageWithOpenAI] OpenAI API call failed.', errorObj);
 
-    const paramsForLogging = {
-      prompt: editParams.prompt,
-      model: editParams.model,
-      n: editParams.n,
-      size: editParams.size,
-      image_present: !!editParams.image,
-      mask_present: !!editParams.mask,
+    // Log parameters for debugging
+    const params = {
+      prompt,
+      model: options.model || 'gpt-image-1',
+      size: options.size || '1024x1024',
+      hasReferenceImage: referenceImagesData.length > 0,
+      hasMask: !!options.mask,
     };
-    log.info(
-      '[editImageWithOpenAI] Parameters used in failed call:',
-      paramsForLogging,
-    );
+    log.info('[editImageWithOpenAI] Parameters used in failed call:', params);
 
     throw new Error(ImageGenerationErrors.ImageEditFailure);
   }
@@ -249,49 +241,35 @@ export const generateImage = async (
             log.info(
               `[generateImage] Fetching reference image from URL: ${url}`,
             );
-            const resp = await fetch(url);
-            if (!resp.ok) {
-              throw new Error(`HTTP error ${resp.status} fetching ${url}`);
+            const response = await fetch(url);
+            if (!response.ok) {
+              log.error(
+                `[generateImage] Failed to fetch reference image from URL: ${url}`,
+              );
+              throw new Error(ImageGenerationErrors.FetchReferenceImageFailed);
             }
-            const buffer = await resp.buffer();
-            const filename =
-              url.substring(url.lastIndexOf('/') + 1) || `${uuidv4()}.png`;
-            referenceImagesData.push({ filename, buffer });
-            log.info(`[generateImage] Fetched reference image: ${filename}`);
+            const buffer = await response.buffer();
+            referenceImagesData.push({
+              filename: url.split('/').pop() || 'reference.png',
+              buffer,
+            });
           } catch (fetchError) {
+            // Fix error type to ensure it's an Error object
+            const errorObj =
+              fetchError instanceof Error
+                ? fetchError
+                : new Error(String(fetchError));
             log.error(
-              `[generateImage] Failed to fetch reference image from ${url}`,
-              fetchError as Error,
+              `[generateImage] Error fetching reference image from URL: ${url}`,
+              errorObj,
             );
             throw new Error(ImageGenerationErrors.FetchReferenceImageFailed);
           }
         }
 
-        let maskBuffer: Buffer | undefined;
-        if (options.maskUrl) {
-          try {
-            log.info(
-              `[generateImage] Fetching mask image from URL: ${options.maskUrl}`,
-            );
-            const resp = await fetch(options.maskUrl);
-            if (!resp.ok) {
-              throw new Error(
-                `HTTP error ${resp.status} fetching mask ${options.maskUrl}`,
-              );
-            }
-            maskBuffer = await resp.buffer();
-            log.info(`[generateImage] Fetched mask image.`);
-          } catch (fetchError) {
-            log.error(
-              `[generateImage] Failed to fetch mask image from ${options.maskUrl}`,
-              fetchError as Error,
-            );
-            log.warn(
-              '[generateImage] Proceeding without mask due to fetch error.',
-            );
-          }
-        }
-
+        const maskBuffer = options.maskUrl
+          ? await fetch(options.maskUrl).then((res) => res.buffer())
+          : undefined;
         imageResult = await editImageWithOpenAI(
           prompt,
           referenceImagesData,
@@ -300,11 +278,12 @@ export const generateImage = async (
             mask: maskBuffer,
             model: 'gpt-image-1',
             n: options.n,
-            size: options.size as
-              | '256x256'
-              | '512x512'
-              | '1024x1024'
-              | undefined,
+            size:
+              options.size === '256x256' ||
+              options.size === '512x512' ||
+              options.size === '1024x1024'
+                ? options.size
+                : '1024x1024',
           },
         );
       } else {
@@ -312,7 +291,9 @@ export const generateImage = async (
         imageResult = await generateImageWithOpenAI(prompt, openai, {
           model: options.model || 'gpt-image-1',
           n: options.n,
-          quality: options.quality as 'low' | 'medium' | 'high' | undefined,
+          quality: (options.quality === 'standard' || options.quality === 'hd'
+            ? 'high'
+            : options.quality) as 'low' | 'medium' | 'high' | undefined,
           size: options.size as
             | '1024x1024'
             | '1536x1024'
@@ -325,19 +306,9 @@ export const generateImage = async (
   } catch (e) {
     log.error(
       '[generateImage] Error during image generation/editing step',
-      e as Error,
+      e instanceof Error ? e : new Error(String(e)),
     );
-    if (
-      e instanceof Error &&
-      Object.values(ImageGenerationErrors).includes(e.message)
-    ) {
-      throw e;
-    }
-    throw new Error(
-      useEditEndpoint
-        ? ImageGenerationErrors.ImageEditFailure
-        : ImageGenerationErrors.ImageGenerationFailure,
-    );
+    throw new Error(ImageGenerationErrors.ImageGenerationFailure);
   }
 
   log.info('[generateImage] Generation/Edit successful, preparing upload.', {
@@ -347,13 +318,13 @@ export const generateImage = async (
 
   try {
     let imageBuffer: Buffer;
-    let contentType = 'image/png';
+    let contentType = 'image/png'; // Default to png
 
     if (imageResult.b64_json) {
       log.info('[generateImage] Processing b64_json result.');
       imageBuffer = Buffer.from(imageResult.b64_json, 'base64');
     } else if (imageResult.url) {
-      log.info('[generateImage] Processing URL result.');
+      log.info('[generateImage] Processing URL result (fetching buffer).');
       const resp = await fetch(imageResult.url);
       if (!resp.ok) {
         throw new Error(
@@ -385,7 +356,7 @@ export const generateImage = async (
   } catch (e) {
     log.error(
       '[generateImage] Error processing or uploading image to S3',
-      e as Error,
+      e instanceof Error ? e : new Error(String(e)),
     );
     throw new Error(ImageGenerationErrors.UploadFailed);
   }

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
+import { generateImagePromptWithContext } from 'state/api/ai/prompts';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { CWButton } from '../new_designs/CWButton';
@@ -29,6 +30,7 @@ export const UploadControl = ({
   onAddCurrentToReference,
   canAddCurrentToReference,
   referenceImageUrls,
+  referenceTexts,
 }: UploadControlProps) => {
   const {
     areActionsDisabled,
@@ -73,6 +75,7 @@ export const UploadControl = ({
     onAddCurrentToReference,
     canAddCurrentToReference,
     referenceImageUrls,
+    referenceTexts,
   });
 
   const isSmallScreen = isWindowExtraSmall;
@@ -117,6 +120,9 @@ export const UploadControl = ({
       {isLoading ? (
         <div className="loading-container">
           <CWCircleMultiplySpinner />
+          <CWText type="caption" fontWeight="medium" className="loading-text">
+            Image generation may take up to 15-20 seconds...
+          </CWText>
         </div>
       ) : (
         <>
@@ -241,7 +247,12 @@ export const UploadControl = ({
                       e.stopPropagation();
                       imagePrompt.trim() &&
                         generateImage({
-                          prompt: imagePrompt.trim(),
+                          prompt: generateImagePromptWithContext(
+                            imagePrompt,
+                            referenceTexts,
+                            !!referenceImageUrls &&
+                              referenceImageUrls.length > 0,
+                          ),
                           referenceImageUrls,
                           size: '1024x1024', // Example size
                         }).catch(console.error);
@@ -284,7 +295,11 @@ export const UploadControl = ({
               e.preventDefault();
               e.stopPropagation();
               generateImage({
-                prompt: imagePrompt.trim(),
+                prompt: generateImagePromptWithContext(
+                  imagePrompt,
+                  referenceTexts,
+                  !!referenceImageUrls && referenceImageUrls.length > 0,
+                ),
                 referenceImageUrls,
                 size: '1024x1024', // Example size
               }).catch(console.error);
@@ -338,7 +353,11 @@ export const UploadControl = ({
               onClick={() => {
                 imagePrompt.trim() &&
                   generateImage({
-                    prompt: imagePrompt.trim(),
+                    prompt: generateImagePromptWithContext(
+                      imagePrompt,
+                      referenceTexts,
+                      !!referenceImageUrls && referenceImageUrls.length > 0,
+                    ),
                     referenceImageUrls,
                     size: '1024x1024', // Example size
                   }).catch(console.error);

@@ -37,4 +37,24 @@ export type UploadControlProps = {
   onAddCurrentToReference?: () => void;
   canAddCurrentToReference?: boolean;
   referenceImageUrls?: string[];
+  referenceTexts?: string[];
 };
+
+export interface CWImageInputProps {
+  name: string;
+  label?: string;
+  hookToForm?: boolean;
+  initialImageUrl?: string;
+  initialPrompt?: string;
+  onImageUploaded?: (url: string) => void;
+  onImageGenerated?: (url: string) => void;
+  onImageProcessingChange?: (status: ImageProcessingProps) => void;
+  onAddCurrentToReference?: () => void;
+  withAIImageGeneration?: boolean;
+  loading?: boolean;
+  canSwitchBetweenProcessedImages?: boolean;
+  usePersistentPromptMode?: boolean;
+  canAddCurrentToReference?: boolean;
+  referenceImageUrls?: string[];
+  referenceTexts?: string[];
+}

@@ -1,67 +1,56 @@
-// @import '../../../styles/utils.scss'; // Import utils first for variables - REVERTED
 @import '../../../styles/shared.scss';
 
-// Target the entire modal structure specifically
+.CWResponsiveDialog .CWModal .CWModalBody {
+  overflow-y: auto;
+  max-height: 75vh;
+  padding-bottom: var(--spacing-large);
+}
+
 .CWResponsiveDialog .CWModal .CWModalBody .ImageActionModal,
 .ImageActionModal {
-  // Add specific styles for the modal here later if needed
   width: 100%;
 
   .image-input-container {
     width: 100%;
-    display: flex; // Use flex to help center/align content if needed
-    justify-content: center; // Center the input horizontally
-    align-items: center; // Center the input vertically if container has height
-    padding: 16px 0; // Use 16px hardcoded value instead of $spacing-md
-
-    // Target the CWImageInput component specifically if needed
-    // .CWImageInput {
-    //   width: 100%; // Or specific width
-    // }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
   }
 
   .reference-images-container {
-    margin-bottom: 24px; // Replaced $spacing-lg
-    border-bottom: 1px solid $neutral-200; // Keep color variable
-    padding-bottom: 24px; // Replaced $spacing-lg
-    width: 100%; // Make sure container takes full width
-    // Force block display for this container
+    margin-bottom: var(--spacing-large);
+    border-bottom: 1px solid $neutral-200;
+    padding-bottom: 24px;
+    width: 100%;
     display: block !important;
-
-    .reference-label {
-      display: block;
-      margin-bottom: 8px; // Replaced $spacing-sm
-      font-weight: 600; // Semibold
-      color: $neutral-600 !important; // Keep color variable
-      font-size: 14px;
-    }
-
-    // Subheading text styling (now using CWText)
-    .reference-subheading {
-      margin-bottom: 12px; // Add space before avatars
-      margin-top: -4px; // Adjust spacing relative to label
-      color: $neutral-500; // Match the color of "Accepts JPG and PNG files"
-    }
-
-    // Simple horizontal layout for reference images
-    .reference-grid {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      gap: 8px; // 8px spacing between items
-      margin-top: 12px;
-      overflow-x: auto; // Allow horizontal scrolling if needed
-
-      // Grid items
-      .grid-item {
-        flex: 0 0 auto; // Don't grow or shrink
-        width: 60px;
-        height: 60px;
-      }
-    }
   }
 
-  // Empty uploader placeholder
+  .reference-label {
+    display: block;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-xxsmall);
+    color: var(--text-primary);
+  }
+
+  .reference-subheading {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-medium);
+    display: block;
+  }
+
+  .reference-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--spacing-small);
+    margin-bottom: var(--spacing-medium);
+  }
+
+  .grid-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+  }
+
   .empty-reference-uploader {
     width: 60px;
     height: 60px;
@@ -84,11 +73,70 @@
   }
 
   .add-reference-button {
-    margin-top: 16px; // Replaced $spacing-md
+    margin-top: 16px;
+  }
+
+  .reference-text-container {
+    margin-bottom: var(--spacing-large);
+    border-bottom: 1px solid $neutral-200;
+    padding-bottom: 24px;
+  }
+
+  .reference-text-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-small);
+  }
+
+  .reference-text-list .Tag.pill {
+    background-color: $neutral-100 !important;
+    border: 1px solid $neutral-300 !important;
+    padding: 4px 8px !important;
+    margin-bottom: var(--spacing-small);
+
+    .Text {
+      color: $neutral-700 !important;
+      font-weight: var(--font-weight-regular) !important;
+    }
+
+    .close-container {
+      background-color: transparent !important;
+      margin-left: 6px;
+
+      svg {
+        color: $neutral-500 !important;
+      }
+
+      &:hover {
+        svg {
+          background-color: $neutral-200 !important;
+          color: $neutral-700 !important;
+        }
+      }
+    }
+
+    &:hover {
+      background-color: $neutral-200 !important;
+      border-color: $neutral-400 !important;
+
+      .Text {
+        color: $neutral-800 !important;
+      }
+
+      .close-container svg {
+        color: $neutral-700 !important;
+      }
+    }
+  }
+
+  .debug-context-button {
+    margin-top: var(--spacing-medium);
+  }
+
+  .ImageActionModalFooter {
   }
 }
 
-// For maximum specificity to override any CWModal styles
 div[class*='CWModal'] div[class*='reference-grid'] > div[class*='grid-item'] {
   display: inline-block !important;
   margin-right: 8px !important;
