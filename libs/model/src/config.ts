@@ -297,11 +297,7 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) =>
-            !(
-              target.APP_ENV === 'production' ||
-              (target.APP_ENV === 'beta' && !data)
-            ),
+          (data) => !(target.APP_ENV === 'production' && data),
           'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
         ),
       CONTEST_BOT_PRIVATE_KEY: z
