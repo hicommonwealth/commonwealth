@@ -57,6 +57,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'DiscordServerJoined',
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
+      'RecurringContestManagerDeployed',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
