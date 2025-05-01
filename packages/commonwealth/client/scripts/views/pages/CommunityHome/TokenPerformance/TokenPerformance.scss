@@ -47,7 +47,6 @@
         max-width: 50%;
       }
 
-      // Add responsive behavior for mobile screens
       @include mediumSmallInclusive {
         flex-direction: column;
 

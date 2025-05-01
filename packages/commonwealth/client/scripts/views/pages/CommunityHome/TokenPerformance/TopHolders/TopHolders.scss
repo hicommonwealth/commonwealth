@@ -34,8 +34,6 @@
     border-radius: 6px;
     border: 1px solid $neutral-100;
     overflow: hidden;
-
-    // Make the table content scrollable on small screens
     overflow-x: auto;
 
     .Table {
@@ -131,7 +129,6 @@
       }
     }
 
-    // Specific mobile adjustments
     @include extraSmall {
       .Table {
         table {
