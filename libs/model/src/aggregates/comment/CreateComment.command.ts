@@ -103,6 +103,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
               marked_as_spam_at,
+              user_tier_at_creation: user.tier,
             },
             {
               transaction,
@@ -139,20 +140,22 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             { transaction },
           );
 
-          await emitEvent(
-            models.Outbox,
-            [
-              {
-                event_name: 'CommentCreated',
-                event_payload: {
-                  ...comment.toJSON(),
-                  community_id: thread.community_id,
-                  users_mentioned: mentions.map((u) => parseInt(u.userId)),
+          if (!marked_as_spam_at) {
+            await emitEvent(
+              models.Outbox,
+              [
+                {
+                  event_name: 'CommentCreated',
+                  event_payload: {
+                    ...comment.toJSON(),
+                    community_id: thread.community_id,
+                    users_mentioned: mentions.map((u) => parseInt(u.userId)),
+                  },
                 },
-              },
-            ],
-            transaction,
-          );
+              ],
+              transaction,
+            );
+          }
 
           mentions.length &&
             (await emitMentions(transaction, {

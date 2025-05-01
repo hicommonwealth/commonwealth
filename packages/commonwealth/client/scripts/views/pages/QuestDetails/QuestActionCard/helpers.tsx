@@ -15,6 +15,7 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
+    ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
   },
@@ -27,12 +28,13 @@ export const actionCopies = {
     ['CommentCreated']: () => '',
     ['CommentUpvoted']: () => '',
     ['WalletLinked']: () => '',
-    ['SSOLinked']: () => () => '',
+    ['SSOLinked']: () => '',
     ['TweetEngagement']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: () => '',
+    ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
   },
@@ -84,9 +86,28 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['DiscordServerJoined']: '',
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['DiscordServerJoined']: () => '',
+    ['MembershipsRefreshed']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['XpChainEventCreated']: (
+      contractAddress: string,
+      ethChainId: number | string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Any user address who&apos;s transaction emits the event on the
+            ethereum chain: {ethChainId} and contract: {contractAddress}, will
+            receive Aura.
+          </li>
+          <li>
+            ● Aura goes to the initiator of the transaction, and not the
+            receiver/target of it.
+          </li>
+        </ul>
+      </div>
+    ),
+    ['LaunchpadTokenCreated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -126,6 +147,7 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: '',
     ['LaunchpadTokenCreated']: '',
     ['LaunchpadTokenTraded']: '',
   },

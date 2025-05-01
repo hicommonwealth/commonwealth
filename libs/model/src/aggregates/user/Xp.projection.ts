@@ -30,7 +30,11 @@ async function getUserByAddress(address: string) {
  * Finds all active quest action metas for a given event
  */
 async function getQuestActionMetas(
-  event_payload: { community_id?: string; created_at?: Date },
+  event_payload: {
+    community_id?: string;
+    created_at?: Date;
+    quest_action_meta_id?: number;
+  },
   event_name: keyof typeof schemas.QuestEvents,
 ) {
   // make sure quest was active when event was created
@@ -45,7 +49,12 @@ async function getQuestActionMetas(
         required: true,
         model: models.QuestActionMeta,
         as: 'action_metas',
-        where: { event_name },
+        where: {
+          event_name,
+          ...(event_payload.quest_action_meta_id && {
+            id: event_payload.quest_action_meta_id,
+          }),
+        },
       },
     ],
   });
@@ -600,13 +609,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
         const user_id = await getUserByAddress(getEvmAddress(tx.from));
         if (!user_id) return;
-        const action_meta = await models.QuestActionMeta.findOne({
-          where: {
-            id: payload.quest_action_meta_id,
-          },
-        });
-        if (!action_meta) return;
-        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'XpChainEventCreated',
+        );
+
+        // should never happen
+        if (action_metas.length > 1)
+          throw new Error(
+            'Too many action metas for XpChainEventCreated event',
+          );
+
+        if (action_metas.length === 0) return;
+        await recordXpsForQuest(user_id, payload.created_at, action_metas);
       },
       MembershipsRefreshed: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(

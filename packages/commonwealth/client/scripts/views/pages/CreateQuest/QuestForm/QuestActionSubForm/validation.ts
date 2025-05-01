@@ -1,4 +1,6 @@
 import {
+  EVM_ADDRESS_STRICT_REGEX,
+  EVM_EVENT_SIGNATURE_STRICT_REGEX,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -11,6 +13,7 @@ import {
   stringHasNumbersOnlyValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import { parseAbiItem } from 'viem';
 import { z } from 'zod';
 import { QuestActionSubFormConfig } from './types';
 
@@ -39,6 +42,7 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_token_trade_threshold;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerId = config?.requires_discord_server_id;
+  const requiresChainEvent = config?.requires_chain_event;
   const requiresGroupId = config?.requires_group_id;
   const requiresStartLink = config?.requires_start_link;
   const requiresAmountMultipler = config?.requires_amount_multipler;
@@ -56,7 +60,8 @@ export const buildQuestSubFormValidationSchema = (
     requiresGroupId ||
     requiresStartLink ||
     allowsChainIdAsContentId ||
-    allowsTokenThresholdAmountAsContentId;
+    allowsTokenThresholdAmountAsContentId ||
+    requiresChainEvent;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -204,6 +209,45 @@ export const buildQuestSubFormValidationSchema = (
   if (requiresDiscordServerId) {
     baseSchema = baseSchema.extend({
       contentIdentifier: stringHasNumbersOnlyValidationSchema,
+    }) as unknown as typeof baseSchema;
+  }
+  if (requiresChainEvent) {
+    baseSchema = baseSchema.extend({
+      ethChainId: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+      contractAddress: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000`,
+          ),
+        }),
+      eventSignature: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine(
+          (val) => {
+            try {
+              parseAbiItem(val);
+              return true;
+            } catch (e) {
+              return false;
+            }
+          },
+          {
+            message: 'Invalid event signature: failed to parse ABI',
+          },
+        ),
+      transactionHash: z
+        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+        .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {
+          message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+            `0x0000000000000000000000000000000000000000000000000000000000000000`,
+          ),
+        }),
     }) as unknown as typeof baseSchema;
   }
 

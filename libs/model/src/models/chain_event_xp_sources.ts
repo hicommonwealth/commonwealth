@@ -27,6 +27,8 @@ export default (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      readable_signature: { type: Sequelize.STRING, allowNull: false },
+      transaction_hash: { type: Sequelize.STRING, allowNull: false },
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,

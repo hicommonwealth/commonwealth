@@ -66,6 +66,10 @@ export const doesActionRequireDiscordServerId = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
 };
 
+export const doesActionRequireChainEvent = (action: QuestActionType) => {
+  return action === 'XpChainEventCreated';
+};
+
 export const doesActionAllowRepetition = (action: QuestActionType) => {
   return action !== 'TweetEngagement';
 };
@@ -102,8 +106,12 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'SSOLinked',
     'DiscordServerJoined',
     'MembershipsRefreshed',
+    'LaunchpadTokenCreated',
   ];
-  const channelQuest: QuestActionType[] = ['TweetEngagement'];
+  const channelQuest: QuestActionType[] = [
+    'TweetEngagement',
+    'XpChainEventCreated',
+  ];
 
   return [...commonQuests, ...channelQuest].includes(action);
 };

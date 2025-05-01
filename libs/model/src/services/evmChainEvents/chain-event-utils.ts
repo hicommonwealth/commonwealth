@@ -138,8 +138,9 @@ const contestManagerDeployedMapper: EvmMapper<
     namespace: namespace as string,
     contest_address: contest_address as string,
     block_number: Number(event.block.number),
+    transaction_hash: event.rawLog.transactionHash,
+    eth_chain_id: event.eventSource.ethChainId,
   };
-
   if (decoded.args.oneOff) {
     return {
       event_name: 'OneOffContestManagerDeployed',
@@ -286,7 +287,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
       eth_chain_id: event.eventSource.ethChainId,
       quest_action_meta_id: event.meta.quest_action_meta_id,
       transaction_hash: event.rawLog.transactionHash,
-      created_at: new Date(Number(event.block.timestamp)),
+      created_at: new Date(Number(event.block.timestamp) * 1_000),
     },
   };
 };

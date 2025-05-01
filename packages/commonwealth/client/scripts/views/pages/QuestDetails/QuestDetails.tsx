@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
@@ -276,6 +277,26 @@ const QuestDetails = ({ id }: { id: number }) => {
           );
         } else {
           notifyError(`Linked group url is invalid`);
+        }
+        break;
+      }
+      case 'XpChainEventCreated': {
+        // build block explorer url with contract address and redirect to it
+        try {
+          const foundAction = quest?.action_metas?.find(
+            (x) => x.event_name === `XpChainEventCreated`,
+          );
+          if (!foundAction) throw new Error(`Invalid url`);
+
+          const foundBlockExplorer = fetchCachedNodes()?.find(
+            (x) => x.id === foundAction?.ChainEventXpSource?.chain_node_id,
+          )?.block_explorer;
+          if (!foundBlockExplorer) throw new Error(`Invalid url`);
+
+          const url = `${foundBlockExplorer}/address/${foundAction?.ChainEventXpSource?.contract_address}`;
+          window.open(url, '_blank');
+        } catch {
+          notifyError(`Failed to redirect to block explorer`);
         }
         break;
       }

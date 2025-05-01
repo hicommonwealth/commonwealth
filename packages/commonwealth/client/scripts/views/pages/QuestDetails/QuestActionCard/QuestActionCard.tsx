@@ -114,6 +114,7 @@ const QuestActionCard = ({
               'DiscordServerJoined',
               'CommunityCreated',
               'LaunchpadTokenTraded',
+              'XpChainEventCreated',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -153,6 +154,15 @@ const QuestActionCard = ({
                     {actionCopies.explainer[questAction.event_name](
                       questAction.amount_multiplier || 0,
                       `${questAction?.content_id?.split(':').at(-1) || ''}`,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'XpChainEventCreated' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.ChainEventXpSource?.contract_address || '',
+                      questAction?.ChainEventXpSource?.ChainNode
+                        ?.eth_chain_id || '',
                     )}
                   </CWText>
                 )}

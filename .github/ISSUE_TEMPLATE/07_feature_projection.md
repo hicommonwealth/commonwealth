@@ -3,6 +3,7 @@ name: Projection Feature Request
 about: Use this template for requesting a projection within a user story.
 labels: projection, enhancement, needs estimate
 title: 🟩 <Projection Name>
+type: Feature
 ---
 
 ## Description
