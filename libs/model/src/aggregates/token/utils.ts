@@ -37,10 +37,10 @@ export async function handleCapReached(
     symbol: string;
   }>(
     `
-      SELECT U.user_id, C.community_id, T.symbol from "Users" U
-      JOIN "Addresses" A ON U.user_id = A.user_id
+      SELECT DISTINCT ON (A.user_id) A.user_id, C.id as community_id, T.symbol
+      FROM "Addresses" A
       JOIN "Communities" C ON C.id = A.community_id
-      JOIN "Tokens" T ON T.namespace = C.namespace
+      JOIN "LaunchpadTokens" T ON T.namespace = C.namespace
       WHERE :token_address = T.token_address;
     `,
     {
@@ -50,7 +50,7 @@ export async function handleCapReached(
   );
 
   await provider.triggerWorkflow({
-    key: WorkflowKeys.TradeEvent,
+    key: WorkflowKeys.LaunchpadTradeEvent,
     users: tokenHolders.map((u) => ({ id: String(u.user_id) })),
     data: {
       community_id: tokenHolders[0].community_id,
@@ -91,7 +91,7 @@ export async function handleCapReached(
       });
 
       await provider.triggerWorkflow({
-        key: WorkflowKeys.CapReached,
+        key: WorkflowKeys.LaunchpadCapReached,
         users: tokenHolders.map((u) => ({ id: String(u.user_id) })),
         data: {
           symbol: tokenHolders[0].symbol,

@@ -499,8 +499,8 @@ export enum WorkflowKeys {
   ReferrerCommunityJoined = 'referrer-community-joined',
   ReferrerCommunityCreated = 'referrer-community-created',
   // Launchpad
-  TradeEvent = 'trade-event',
-  CapReached = 'cap-reached',
+  LaunchpadTradeEvent = 'launchpad-trade-event',
+  LaunchpadCapReached = 'launchpad-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -594,11 +594,11 @@ export type NotificationsProviderTriggerOptions =
           }
         | {
             data: z.infer<typeof TradeEventNotification>;
-            key: WorkflowKeys.TradeEvent;
+            key: WorkflowKeys.LaunchpadTradeEvent;
           }
         | {
             data: z.infer<typeof CapReachedNotification>;
-            key: WorkflowKeys.CapReached;
+            key: WorkflowKeys.LaunchpadCapReached;
           }
       ))
   | WebhookProviderOptions;

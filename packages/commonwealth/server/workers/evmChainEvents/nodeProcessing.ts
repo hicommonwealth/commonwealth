@@ -152,7 +152,7 @@ export async function scheduleNodeProcessing(
     return;
   }
 
-  const ethChainIds = Object.keys(evmSources);
+  const ethChainIds = Object.keys(evmSources).filter((c) => c === '31337');
   const betweenInterval = interval / numEvmSources;
 
   ethChainIds.forEach((ethChainId, index) => {

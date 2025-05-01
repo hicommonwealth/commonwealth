@@ -1,5 +1,4 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { config } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
 const log = logger(import.meta);
@@ -35,7 +34,7 @@ export async function startEvmPolling(
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  startEvmPolling(config.EVM_CE.POLL_INTERVAL_MS).catch((e) => {
+  startEvmPolling(100).catch((e) => {
     log.fatal('Evm poller shutting down due to a critical error:', e);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
