@@ -96,7 +96,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
                   },
                 },
               ],
-              is_system_managed: false,
+              is_system_managed: true,
             },
             { transaction },
           );
