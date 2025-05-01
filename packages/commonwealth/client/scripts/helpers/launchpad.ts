@@ -8,7 +8,8 @@ export const calculateTokenPricing = (
   ethToUsdRate: number,
   ethPerToken: number,
 ) => {
-  const currentRate = ethPerToken * ethToUsdRate || 0;
+  const currentRate =
+    (ethPerToken || token?.latest_price || 0) * ethToUsdRate || 0;
   const price24HrAgo =
     (token?.old_price ||
       parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000') / 1e18) *

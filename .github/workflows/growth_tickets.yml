@@ -1,0 +1,41 @@
+name: Growth Issue Label Automation
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  apply-label:
+    runs-on: ubuntu-latest
+    # Only run this job when the 'external' label is applied
+    if: contains(github.event.issue.labels.*.name, 'external')
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const body = context.payload.issue.body;
+            
+            const priorityMatch = body.match(/### Priority\s*\n\s*(.*?)(?:\n|$)/);
+            let priority;
+            if (priorityMatch && priorityMatch[1]) {
+              priority = priorityMatch[1].trim();
+              console.log(`Priority selected: ${priority}`);
+            }
+            
+            if (!priority) return;
+            
+            if (!['P0', 'P1', 'P2', 'P3', 'P4'].includes(priority)) {
+              console.error(`Unknown priority: ${priority}`);
+              return;
+            }
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [priority]
+            });

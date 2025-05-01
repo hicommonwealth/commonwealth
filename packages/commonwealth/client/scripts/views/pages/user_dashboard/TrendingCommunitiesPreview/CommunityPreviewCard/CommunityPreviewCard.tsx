@@ -100,26 +100,28 @@ const CommunityPreviewCard = ({
               size="large"
             />
             <div className="community-name">
-              {community?.name && (
-                <CWText type="h4" fontWeight="medium">
-                  {smartTrim(community?.name, 8)}
-                </CWText>
-              )}
-              {trustLevelEnabled &&
-                community?.tier &&
-                (() => {
-                  const tier = community.tier as CommunityTierMap;
-                  return (
-                    hasCommunityTierClientInfo(tier) && (
-                      <CWIcon
-                        iconName={
-                          COMMUNITY_TIERS[tier].clientInfo.componentIcon
-                        }
-                        iconSize="small"
-                      />
-                    )
-                  );
-                })()}
+              <div className="header">
+                {community?.name && (
+                  <CWText type="h4" fontWeight="medium">
+                    {smartTrim(community?.name, 8)}
+                  </CWText>
+                )}
+                {trustLevelEnabled &&
+                  community?.tier &&
+                  (() => {
+                    const tier = community.tier as CommunityTierMap;
+                    return (
+                      hasCommunityTierClientInfo(tier) && (
+                        <CWIcon
+                          iconName={
+                            COMMUNITY_TIERS[tier].clientInfo.componentIcon
+                          }
+                          iconSize="small"
+                        />
+                      )
+                    );
+                  })()}
+              </div>
 
               <div className="thread-counts">
                 <CWIcon iconName="notepad" weight="light" />

@@ -18,15 +18,11 @@ import TradeTokenModal, {
   TradingMode,
 } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import './PotentialContestCard.scss'; // We'll create this next
+import './PotentialContestCard.scss';
 
-// Placeholder for potential future countdown feature
-// import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
-
-// Constants for prize structure
-const PRIZE_POOL_PERCENTAGE = 0.0015; // 0.15%
-const PRIZE_POOL_DISPLAY_PERCENTAGE = '0.15%'; // For display
-const PRIZE_DISTRIBUTION_PERCENTAGES = [0.5, 0.35, 0.15]; // 50%, 35%, 15%
+const PRIZE_POOL_PERCENTAGE = 0.0015;
+const PRIZE_POOL_DISPLAY_PERCENTAGE = '0.15%';
+const PRIZE_DISTRIBUTION_PERCENTAGES = [0.5, 0.35, 0.15];
 
 export const PotentialContestCard = ({
   currency = SupportedCurrencies.USD,
@@ -49,8 +45,6 @@ export const PotentialContestCard = ({
   }>({ isOpen: false, tradeConfig: undefined });
 
   const isLoading = isLoadingToken || isLoadingPricing;
-
-  // Determine if this card should be shown
   const isLaunchpadToken = communityToken && !isPinnedToken;
   const launchpadToken = communityToken as LaunchpadToken;
   const isLaunched = launchpadToken?.liquidity_transferred;
@@ -63,7 +57,6 @@ export const PotentialContestCard = ({
     isGoalReached === undefined ||
     isGoalReached
   ) {
-    // If loading, show a skeleton placeholder
     if (isLoading) {
       return (
         <CWCard className="PotentialContestCard PotentialContestCard--Skeleton">
@@ -71,14 +64,12 @@ export const PotentialContestCard = ({
         </CWCard>
       );
     }
-    return null; // Otherwise, don't render if conditions aren't met
+    return null;
   }
 
   const projectedTotalPrizePool =
-    (tokenPricing?.marketCapGoal || 0) * PRIZE_POOL_PERCENTAGE;
-  const tokenAddress = launchpadToken?.token_address;
+    (tokenPricing?.marketCapCurrent || 0) * PRIZE_POOL_PERCENTAGE;
 
-  // Calculate projected prizes based on distribution
   const projectedPrizes = PRIZE_DISTRIBUTION_PERCENTAGES.map(
     (percentage) => projectedTotalPrizePool * percentage,
   );
@@ -98,7 +89,6 @@ export const PotentialContestCard = ({
     <CWCard className="PotentialContestCard">
       <div className="contest-body">
         <div className="header-row">
-          {/* Keep header simple - prize breakdown is below */}
           <CWText type="h4">Projected Weekly Prizes</CWText>
           <CWIcon
             iconName="trophy"
@@ -107,12 +97,10 @@ export const PotentialContestCard = ({
           />
         </div>
 
-        {/* Prize Breakdown Section - mimicking ContestCard */}
         <div className="prizes prizes--projected">
           {projectedPrizes.map((prizeValue, index) => (
             <div className={`prize-row prize-row-${index + 1}`} key={index}>
               <CWText className="label" fontWeight="bold">
-                {/* Use moment to get ordinal (1st, 2nd, 3rd) */}
                 {moment.localeData().ordinal(index + 1)} Prize
               </CWText>
               <CWText fontWeight="bold">
@@ -145,7 +133,7 @@ export const PotentialContestCard = ({
 
         <div className="actions">
           <CWButton
-            label="Swap Token" // Changed from "Buy Token" for consistency
+            label="Swap Token"
             iconLeft="transfer"
             buttonType="primary"
             buttonHeight="sm"

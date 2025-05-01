@@ -224,6 +224,8 @@ const TrendingThreadList = ({
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
 
+  // TODO: we don't need to be fetching global activity feed when using this
+  //  component from inside a community...
   const {
     data: feed,
     isLoading: feedIsLoading,

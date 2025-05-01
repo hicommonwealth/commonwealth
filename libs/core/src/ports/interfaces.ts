@@ -9,6 +9,7 @@ import {
 } from '../framework';
 import {
   AddressOwnershipTransferredNotification,
+  CapReachedNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
@@ -19,6 +20,7 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
@@ -82,12 +84,12 @@ export enum CacheNamespaces {
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
-  Thread_View_Count = 'thread_view_count',
-  Community_Thread_Count_Changed = 'community_thread_count_changed',
+  CountAggregator = 'count_aggregator',
   Thread_Reaction_Count_Changed = 'thread_reaction_count_changed',
-  Community_Profile_Count_Changed = 'community_profile_count_changed',
   Tiered_Counter = 'tiered_counter',
   External_Api_Usage_Counter = 'api_key_counter',
+  CommunityThreadRanks = 'community_thread_ranks',
+  GlobalThreadRanks = 'global_thread_ranks',
 }
 
 /**
@@ -157,6 +159,201 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+
+  // Hash methods
+  /**
+   * Increments the numeric value of a given field within a hash (object) in the specified namespace + key.
+   *
+   * @param {CacheNamespaces} namespace - The namespace where the hash key is stored.
+   * @param {string} key - The name of the hash key to be incremented.
+   * @param {string} field - The field within the hash key whose value should be incremented.
+   * @param {number} [increment=1] - The value to increment by. Defaults to 1 if not provided.
+   * @return {Promise<number>} - A promise that resolves to the updated value of the field after the increment.
+   */
+  incrementHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    increment?: number,
+  ): Promise<number>;
+
+  /**
+   * Retrieves a hash (object) from the specified namespace and key.
+   *
+   * @param {CacheNamespaces} namespace - The namespace where the hash is stored.
+   * @param {string} key - The key associated with the hash.
+   * @return {Promise<Record<string, string>>} A promise that resolves to an object representing the hash.
+   */
+  getHash(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<Record<string, string>>;
+
+  /**
+   * Sets a hash key in a specified namespace with the provided key, field, and value.
+   *
+   * @param {CacheNamespaces} namespace - The namespace within the cache to store the hash key.
+   * @param {string} key - The unique identifier for the hash.
+   * @param {string} field - The specific field within the hash to set the value.
+   * @param {string} value - The value to be stored in the specified field of the hash.
+   * @return {Promise<number>} A promise that resolves to the result status of the operation.
+   */
+  setHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    value: string,
+  ): Promise<number>;
+
+  // Set methods
+  /**
+   * Adds a value to a set stored in the cache for a specific namespace and key.
+   *
+   * @param {CacheNamespaces} namespace - The namespace that defines the scope of the cache.
+   * @param {string} key - The key associated with the set in the cache.
+   * @param {string} value - The value to be added to the set.
+   * @return {Promise<number>} A promise that resolves to the number of elements in the set after the addition, or
+   *  rejects if an error occurs.
+   */
+  addToSet(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+  ): Promise<number>;
+
+  /**
+   * Retrieves a set of strings associated with a given namespace and key.
+   *
+   * @param {CacheNamespaces} namespace - The namespace used to organize the cache entries.
+   * @param {string} key - The key associated with the desired set of strings.
+   * @return {Promise<string[]>} A promise that resolves to an array of strings corresponding to the set.
+   */
+  getSet(namespace: CacheNamespaces, key: string): Promise<string[]>;
+
+  // Sorted set methods
+  /**
+   * Retrieves a subset of elements from a sorted set stored in a cache namespace, along with their associated scores.
+   *
+   * @param {CacheNamespaces} namespace - The namespace where the sorted set is stored.
+   * @param {string} key - The key identifying the sorted set within the namespace.
+   * @param {number} [start] - The starting index of the range to retrieve (inclusive). Defaults to the beginning of
+   *  the set if not provided.
+   * @param {number} [end] - The ending index of the range to retrieve (inclusive). Defaults to first element of the
+   *  set if not provided.
+   * @param {Object} [options] - Optional parameters for the query.
+   * @param {'ASC'|'DESC'} [options.order] - The order in which to retrieve items, either ascending ('ASC') or
+   *  descending ('DESC'). Defaults to ascending.
+   * @return {Promise<{ value: string; score: number }[]>} A promise that resolves to an array of objects, each
+   *  containing a value and its associated score.
+   */
+  sliceSortedSetWithScores(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    end?: number,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<
+    {
+      value: string;
+      score: number;
+    }[]
+  >;
+
+  /**
+   * Retrieves a slice of elements from a sorted set stored in a cache.
+   * The elements are retrieved based on their order (ascending or descending).
+   *
+   * @param {CacheNamespaces} namespace - The namespace of the cache where the sorted set is stored.
+   * @param {string} key - The key of the sorted set in the cache.
+   * @param {number} [start] - The starting index of the slice (inclusive). Defaults to the beginning of the set if
+   *  not provided.
+   * @param {number} [end] - The ending index of the slice (inclusive). Defaults to the first element if not provided.
+   * @param {Object} [options] - Additional options for the operation.
+   * @param {'ASC'|'DESC'} [options.order] - Specifies the order of retrieval: 'ASC' for ascending or 'DESC' for
+   *  descending.
+   * @return {Promise<string[]>} A promise that resolves with an array of strings representing the sliced elements from
+   *  the sorted set.
+   */
+  sliceSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    end?: number,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<string[]>;
+
+  /**
+   * Retrieves the size of a sorted set stored in the cache.
+   *
+   * @param {CacheNamespaces} namespace - The namespace under which the sorted set is stored.
+   * @param {string} key - The key identifying the sorted set within the namespace.
+   * @return {Promise<number>} A promise resolving to the size of the sorted set.
+   */
+  getSortedSetSize(namespace: CacheNamespaces, key: string): Promise<number>;
+
+  /**
+   * Deletes items in a sorted set by their rank (index) range.
+   *
+   * @param {CacheNamespaces} namespace - The namespace where the sorted set is stored.
+   * @param {string} key - The key of the sorted set to modify.
+   * @param {number} start - The starting rank in the range (inclusive).
+   * @param {number} end - The ending rank in the range (inclusive).
+   * @return {Promise<number>} A promise that resolves to the number of items removed from the sorted set.
+   */
+  delSortedSetItemsByRank(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number,
+    end: number,
+  ): Promise<number>;
+
+  /**
+   * Adds one or more items with a specified score to a sorted set in the cache.
+   *
+   * @param {CacheNamespaces} namespace - The namespace in which the sorted set resides.
+   * @param {string} key - The key identifying the sorted set.
+   * @param {{ value: string; score: number }[] | { value: string; score: number }} items - The item or items to add,
+   *  each with a value and a score.
+   * @param {{ updateOnly?: boolean }} [options] - Optional parameters, such as whether to only update existing entries.
+   * @return {Promise<number>} A promise that resolves to the number of elements successfully added to the sorted set.
+   */
+  addToSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    items:
+      | { value: string; score: number }[]
+      | { value: string; score: number },
+    options?: { updateOnly?: boolean },
+  ): Promise<number>;
+
+  /**
+   * Removes and returns the specified number of elements with the lowest scores from a sorted set.
+   *
+   * @param {CacheNamespaces} namespace - The namespace within the cache where the sorted set is stored.
+   * @param {string} key - The key identifying the sorted set.
+   * @param {number} [numToPop] - The number of elements to remove and return. Defaults to 1 if not specified.
+   * @return {Promise<{ value: string; score: number }[]>} A promise that resolves to an array of objects, where each
+   *  object contains the value and score of the removed elements.
+   */
+  sortedSetPopMin(
+    namespace: CacheNamespaces,
+    key: string,
+    numToPop?: number,
+  ): Promise<{ value: string; score: number }[]>;
+
+  /**
+   * Deletes items from a sorted set in the cache by their values.
+   *
+   * @param {CacheNamespaces} namespace - The namespace of the cache where the sorted set is stored.
+   * @param {string} key - The key identifying the sorted set within the specified namespace.
+   * @param {string[] | string} values - The value or values to be removed from the sorted set.
+   * @return {Promise<number>} A promise that resolves to the number of items successfully removed.
+   */
+  delSortedSetItemsByValue(
+    namespace: CacheNamespaces,
+    key: string,
+    values: string[] | string,
+  ): Promise<number>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -301,6 +498,9 @@ export enum WorkflowKeys {
   ReferrerSignedUp = 'referrer-signed-up',
   ReferrerCommunityJoined = 'referrer-community-joined',
   ReferrerCommunityCreated = 'referrer-community-created',
+  // Launchpad
+  LaunchpadTradeEvent = 'launchpad-trade-event',
+  LaunchpadCapReached = 'launchpad-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -391,6 +591,14 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ReferrerCommunityCreatedNotification>;
             key: WorkflowKeys.ReferrerCommunityCreated;
+          }
+        | {
+            data: z.infer<typeof TradeEventNotification>;
+            key: WorkflowKeys.LaunchpadTradeEvent;
+          }
+        | {
+            data: z.infer<typeof CapReachedNotification>;
+            key: WorkflowKeys.LaunchpadCapReached;
           }
       ))
   | WebhookProviderOptions;

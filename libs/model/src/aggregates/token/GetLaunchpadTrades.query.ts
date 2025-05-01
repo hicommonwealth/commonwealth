@@ -23,7 +23,7 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
 
       let whereClauseCondition = '';
       if (payload.token_address) {
-        whereClauseCondition = `WHERE token.token_address = :token_address`;
+        whereClauseCondition = `WHERE tokens.token_address = :token_address`;
       } else if (payload.trader_addresses && uniqueAddresses.length > 0) {
         whereClauseCondition = `WHERE trades.trader_address IN (:uniqueAddresses)`;
       }

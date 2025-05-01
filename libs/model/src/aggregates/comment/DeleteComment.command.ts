@@ -9,7 +9,7 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
     ...schemas.DeleteComment,
     auth: [authComment({ author: true, roles: ['admin', 'moderator'] })],
     body: async ({ actor, context }) => {
-      const { comment } = mustBeAuthorizedComment(actor, context);
+      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
@@ -49,6 +49,9 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
 
       return {
         comment_id: comment.id!,
+        thread_id: comment.thread_id,
+        community_id,
+        user_tier_at_creation: comment.user_tier_at_creation,
         canvas_signed_data: comment.canvas_signed_data,
         canvas_msg_id: comment.canvas_msg_id,
       };

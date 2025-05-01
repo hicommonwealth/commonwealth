@@ -13,7 +13,7 @@ interface QuestCardProps {
   community_id?: string | undefined | null;
   description: string;
   iconURL: string;
-  xpPoints: number;
+  xpPointsElement: ReactNode;
   startDate: Date;
   endDate: Date;
   className?: string;
@@ -27,7 +27,7 @@ const MAX_CHARS_FOR_LABELS = 14;
 const QuestCard = ({
   name,
   iconURL,
-  // xpPoints,
+  xpPointsElement,
   endDate,
   className,
   onCardBodyClick,
@@ -96,7 +96,7 @@ const QuestCard = ({
         <div className="quest-list">
           <div className="quest">
             <CWText fontWeight="medium">Complete All Tasks</CWText>
-            {/*<CWText fontWeight="medium">{xpPoints} Aura</CWText>*/}
+            {xpPointsElement}
           </div>
         </div>
 

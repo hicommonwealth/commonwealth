@@ -70,6 +70,9 @@ export const outboxEvents: Events[] = [
   'TweetEngagementCapReached',
   'CommunityTagsUpdated',
   'MembershipsRefreshed',
+  'NominatorSettled',
+  'NominatorNominated',
+  'JudgeNominated',
   'CommunityDirectoryTagsUpdated',
 ] as const;
 

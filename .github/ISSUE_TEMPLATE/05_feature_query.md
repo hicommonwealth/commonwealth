@@ -3,6 +3,7 @@ name: Query Feature Request
 about: Use this template for requesting a query within a user story.
 labels: query, enhancement, needs estimate
 title: 🟩 <Query Name>
+type: Feature
 ---
 
 ## Description
