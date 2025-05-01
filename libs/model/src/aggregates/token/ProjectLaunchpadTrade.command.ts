@@ -53,6 +53,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         floating_supply,
         eth_chain_id,
         chainNode.private_url!,
+        is_buy,
       );
     },
   };

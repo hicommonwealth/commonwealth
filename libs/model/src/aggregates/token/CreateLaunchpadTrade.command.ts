@@ -74,6 +74,7 @@ export function CreateLaunchpadTrade(): Command<
         result.floatingSupply,
         eth_chain_id,
         url,
+        result.isBuy,
       );
 
       // This case happens when liquidity is bought out

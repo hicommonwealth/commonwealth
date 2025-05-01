@@ -9,6 +9,7 @@ import {
 } from '../framework';
 import {
   AddressOwnershipTransferredNotification,
+  CapReachedNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
@@ -19,6 +20,7 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
@@ -496,6 +498,9 @@ export enum WorkflowKeys {
   ReferrerSignedUp = 'referrer-signed-up',
   ReferrerCommunityJoined = 'referrer-community-joined',
   ReferrerCommunityCreated = 'referrer-community-created',
+  // Launchpad
+  TradeEvent = 'trade-event',
+  CapReached = 'cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -586,6 +591,14 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ReferrerCommunityCreatedNotification>;
             key: WorkflowKeys.ReferrerCommunityCreated;
+          }
+        | {
+            data: z.infer<typeof TradeEventNotification>;
+            key: WorkflowKeys.TradeEvent;
+          }
+        | {
+            data: z.infer<typeof CapReachedNotification>;
+            key: WorkflowKeys.CapReached;
           }
       ))
   | WebhookProviderOptions;
