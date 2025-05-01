@@ -37,7 +37,6 @@ import { StickyEditorContainer } from 'views/components/StickEditorContainer/Sti
 let communityHomeInstanceCounter = 0;
 
 const CommunityHome = () => {
-  const instanceId = useState(() => ++communityHomeInstanceCounter)[0];
   const user = useUserStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
