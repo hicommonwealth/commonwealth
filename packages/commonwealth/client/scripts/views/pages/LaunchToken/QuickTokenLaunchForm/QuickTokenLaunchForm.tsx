@@ -287,6 +287,7 @@ export const QuickTokenLaunchForm = ({
             icon_url: sanitizedTokenInfo.imageURL,
           }),
           default_page: DefaultPage.Homepage,
+          launchpad_weighted_voting: true,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
@@ -437,7 +438,7 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community. 
+                body={`Launching token will create a complimentary community.
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">

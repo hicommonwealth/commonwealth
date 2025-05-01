@@ -80,6 +80,7 @@ interface ContestCardProps {
   };
   hideWhenNoPrizes?: boolean;
   contestBalance?: number;
+  prizePercentage?: number;
 }
 
 const ContestCard = ({
@@ -103,6 +104,7 @@ const ContestCard = ({
   community,
   hideWhenNoPrizes = false,
   contestBalance = 0,
+  prizePercentage,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -133,6 +135,7 @@ const ContestCard = ({
   const prizes = buildContestPrizes(
     // if onchain balance is zero, use projected balance
     Number(onchainContestBalance || contestBalance),
+    prizePercentage,
     payoutStructure,
     decimals,
   );
