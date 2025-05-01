@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import './cw_text_area.scss';
 
+import clsx from 'clsx';
 import { useFormContext } from 'react-hook-form';
 import { CWLabel } from './cw_label';
 import type { BaseTextInputProps } from './cw_text_input';
@@ -15,6 +16,7 @@ type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
   instructionalMessage?: string;
+  containerClassName?: string;
   resizeWithText?: boolean;
 };
 
@@ -51,6 +53,7 @@ export const CWTextArea = (props: TextAreaProps) => {
     hookToForm,
     instructionalMessage,
     customError,
+    containerClassName,
   } = props;
 
   const formContext = useFormContext();
@@ -85,7 +88,7 @@ export const CWTextArea = (props: TextAreaProps) => {
   }, [value, resizeWithText]);
 
   return (
-    <div className={ComponentType.TextArea}>
+    <div className={clsx(ComponentType.TextArea, containerClassName)}>
       {label && (
         <MessageRow
           hasFeedback={!!inputValidationFn}

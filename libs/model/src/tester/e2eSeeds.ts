@@ -142,6 +142,7 @@ export const e2eTestEntities = async function (
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
           directory_page_enabled: false,
+          namespace_verified: false,
         })),
       )),
     );

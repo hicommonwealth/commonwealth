@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import { pluralize } from 'helpers';
 import React from 'react';
 
@@ -14,9 +13,10 @@ export const actionCopies = {
     ['WalletLinked']: 'Link a new wallet',
     ['SSOLinked']: 'Link a new social (SSO)',
     ['TweetEngagement']: 'Engage on Tweet',
-    ['DiscordServerJoined']: "Join Common's Discord Community",
+    ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
     ['XpChainEventCreated']: 'Engage on Blockchain',
+    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -34,10 +34,12 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: () => '',
+    ['LaunchpadTokenCreated']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
-    ['CommunityCreated']: () => '',
+    ['CommunityCreated']: (chainName?: string) =>
+      chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
     ['ThreadUpvoted']: () => '',
@@ -84,6 +86,7 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    // eslint-disable-next-line react/no-multi-comp
     ['XpChainEventCreated']: (
       contractAddress: string,
       ethChainId: number | string,
@@ -102,6 +105,7 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    ['LaunchpadTokenCreated']: '',
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -118,5 +122,6 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
+    ['LaunchpadTokenCreated']: '',
   },
 };

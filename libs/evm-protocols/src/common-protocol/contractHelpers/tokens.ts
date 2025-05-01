@@ -1,4 +1,7 @@
-import { ContestGovernorSingleAbi } from '@commonxyz/common-protocol-abis';
+import {
+  ContestGovernorAbi,
+  ContestGovernorSingleAbi,
+} from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -15,6 +18,7 @@ export const getTokenAttributes = async (
   address: string,
   rpcNodeUrl: string,
   fetchFromContest: boolean,
+  isOneOffContest?: boolean,
 ): Promise<{
   ticker: string | Denominations;
   decimals: number;
@@ -22,7 +26,8 @@ export const getTokenAttributes = async (
   const web3 = new Web3(rpcNodeUrl);
   let addr = address;
   if (fetchFromContest) {
-    const contest = new web3.eth.Contract(ContestGovernorSingleAbi, address);
+    const abi = isOneOffContest ? ContestGovernorSingleAbi : ContestGovernorAbi;
+    const contest = new web3.eth.Contract(abi, address);
     addr = await contest.methods.contestToken().call();
   }
   if (addr === ZERO_ADDRESS) {
@@ -31,7 +36,6 @@ export const getTokenAttributes = async (
       decimals: WeiDecimals[Denominations.ETH],
     });
   }
-
   const contract = new web3.eth.Contract(
     [
       {
@@ -55,12 +59,10 @@ export const getTokenAttributes = async (
     ] as AbiItem[],
     addr,
   );
-
   const [symbol, decimals] = await Promise.all([
     contract.methods.symbol().call(),
     contract.methods.decimals().call(),
   ]);
-
   return {
     ticker: String(symbol),
     decimals: parseInt(String(decimals)),

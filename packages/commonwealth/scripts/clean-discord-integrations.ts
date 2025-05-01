@@ -21,26 +21,35 @@ async function deleteDiscordConfig(community_id: string) {
       },
       transaction,
     });
+    await models.Topic.update(
+      { channel_id: null },
+      {
+        where: {
+          community_id,
+        },
+        transaction,
+      },
+    );
   });
 }
 
 async function main() {
   const communitiesToMaintain = [
-    'Dinero',
-    'Madlads',
-    'Siennanetwork',
-    'Divastaking',
-    'Sandbox',
-    'Cryptocats',
-    'Pawthereum',
-    'Tangle',
-    'Qwoyn-network',
-    'Sake Finance',
-    'Edgeware',
-    'Common',
-    'Sentinel',
-    'Oraichain',
-    'Unilend',
+    'madlads',
+    'siennanetwork',
+    'dinero',
+    'divastaking',
+    'sandbox',
+    'cryptocats',
+    'pawthereum',
+    'tangle',
+    'qwoyn-network',
+    'sake-finance',
+    'edgeware',
+    'common',
+    'sentinel',
+    'oraichain',
+    'unilend-finance',
   ];
 
   const toLeaveCommunities = await models.DiscordBotConfig.findAll({
@@ -105,6 +114,7 @@ async function main() {
       }
     }
   }
+
   client.once('ready', () => {
     leaveGuild()
       .then(() => console.log('Guild exodus complete.'))

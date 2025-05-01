@@ -3,5 +3,6 @@ export * from './CreateToken.command';
 export * from './GetAllowTokenizedThread.query';
 export * from './GetLaunchpadTrades.query';
 export * from './GetToken.query';
+export * from './GetTokenInfoAlchemy.query';
 export * from './GetTokens.query';
 export * from './ProjectLaunchpadTrade.command';

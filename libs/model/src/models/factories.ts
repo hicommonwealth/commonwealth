@@ -11,6 +11,7 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
+import CommunityDirectoryTags from './community_directory_tags';
 import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -40,6 +41,7 @@ import StarredCommunity from './starred_community';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Thread from './thread';
+import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
@@ -65,6 +67,7 @@ export const Factories = {
   CommunityGoalReached,
   CommunityStake,
   CommunityTags,
+  CommunityDirectoryTags,
   Contest,
   ContestAction,
   ContestManager,
@@ -93,8 +96,9 @@ export const Factories = {
   Tags,
   SubscriptionPreference,
   Thread,
-  ThreadVersionHistory,
+  ThreadRank,
   ThreadSubscription,
+  ThreadVersionHistory,
   Topic,
   TwitterCursor,
   User,
