@@ -68,7 +68,7 @@ export const PotentialContestCard = ({
   }
 
   const projectedTotalPrizePool =
-    (tokenPricing?.marketCapGoal || 0) * PRIZE_POOL_PERCENTAGE;
+    (tokenPricing?.marketCapCurrent || 0) * PRIZE_POOL_PERCENTAGE;
 
   const projectedPrizes = PRIZE_DISTRIBUTION_PERCENTAGES.map(
     (percentage) => projectedTotalPrizePool * percentage,
