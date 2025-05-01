@@ -487,6 +487,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           setQuestActionSubForms([...tempForm]);
           return;
         }
+        if (error.includes('tweet url is already part of a quest')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) => form.values?.action === 'TweetEngagement',
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentIdentifier: `This tweet is already part of another quest.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
+          return;
+        }
         notifyError(`Failed to ${mode} quest!`);
       }
     };
