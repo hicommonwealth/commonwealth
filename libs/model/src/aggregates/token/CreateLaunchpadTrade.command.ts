@@ -72,6 +72,7 @@ export function CreateLaunchpadTrade(): Command<
       await handleCapReached(
         result.tokenAddress.toLowerCase(),
         result.floatingSupply,
+        result.trader,
         eth_chain_id,
         url,
         result.isBuy,

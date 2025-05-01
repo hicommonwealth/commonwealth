@@ -18,6 +18,7 @@ const log = logger(import.meta);
 export async function handleCapReached(
   token_address: string,
   floating_supply: bigint,
+  trader_address: string,
   eth_chain_id: number,
   url: string,
   is_buy: boolean,
@@ -41,23 +42,27 @@ export async function handleCapReached(
       FROM "Addresses" A
       JOIN "Communities" C ON C.id = A.community_id
       JOIN "LaunchpadTokens" T ON T.namespace = C.namespace
-      WHERE :token_address = T.token_address;
+      WHERE :token_address = T.token_address AND A.address != :trader_address;
     `,
     {
-      replacements: { token_address },
+      replacements: { token_address, trader_address },
       type: QueryTypes.SELECT,
     },
   );
 
-  await provider.triggerWorkflow({
-    key: WorkflowKeys.LaunchpadTradeEvent,
-    users: tokenHolders.map((u) => ({ id: String(u.user_id) })),
-    data: {
-      community_id: tokenHolders[0].community_id,
-      symbol: tokenHolders[0].symbol,
-      is_buy,
-    },
-  });
+  const notifyUsers = tokenHolders.map((u) => ({ id: String(u.user_id) }));
+
+  if (notifyUsers.length > 0) {
+    await provider.triggerWorkflow({
+      key: WorkflowKeys.LaunchpadTradeEvent,
+      users: notifyUsers,
+      data: {
+        community_id: tokenHolders[0].community_id,
+        symbol: tokenHolders[0].symbol,
+        is_buy,
+      },
+    });
+  }
 
   const transferLiquidityThreshold = BigInt(1000);
   const remainingLiquidity =
@@ -90,13 +95,15 @@ export async function handleCapReached(
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
 
-      await provider.triggerWorkflow({
-        key: WorkflowKeys.LaunchpadCapReached,
-        users: tokenHolders.map((u) => ({ id: String(u.user_id) })),
-        data: {
-          symbol: tokenHolders[0].symbol,
-        },
-      });
+      if (notifyUsers.length > 0) {
+        await provider.triggerWorkflow({
+          key: WorkflowKeys.LaunchpadCapReached,
+          users: notifyUsers,
+          data: {
+            symbol: tokenHolders[0].symbol,
+          },
+        });
+      }
 
       token.liquidity_transferred = true;
       log.debug(`Liquidity transferred to ${token_address}`);

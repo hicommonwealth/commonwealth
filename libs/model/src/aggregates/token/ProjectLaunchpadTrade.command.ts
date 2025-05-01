@@ -51,6 +51,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
       await handleCapReached(
         token_address,
         floating_supply,
+        trader_address,
         eth_chain_id,
         chainNode.private_url!,
         is_buy,
