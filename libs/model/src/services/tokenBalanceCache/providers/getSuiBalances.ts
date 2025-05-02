@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { SuiClient } from '@mysten/sui.js/client';
 import { models } from '../../../database';
 import {
@@ -58,25 +59,24 @@ async function __get_sui_balances(
     // Process each address individually
     for (const address of batchAddresses) {
       try {
-        // Check if we're dealing with a token balance option (has coinType)
-        if (
-          'coinType' in options.sourceOptions &&
-          options.sourceOptions.coinType
-        ) {
-          // Get the balance for the specific coin type
+        // Determine what type of balance to fetch based on the source type
+        if (options.balanceSourceType === BalanceSourceType.SuiToken) {
+          // This is a custom Sui token with a specific coin type
+          const suiTokenOptions = options as GetSuiTokenBalanceOptions;
           const coinBalance = await client.getBalance({
             owner: address,
-            coinType: options.sourceOptions.coinType,
+            coinType: suiTokenOptions.sourceOptions.coinType,
           });
 
           balances[address] = coinBalance.totalBalance;
         }
         // If objectId is provided, get the balance of the specific coin
         else if (
+          options.balanceSourceType === BalanceSourceType.SuiNative &&
           'objectId' in options.sourceOptions &&
           options.sourceOptions.objectId
         ) {
-          // Get the specific object balance - to be used for SUI tokens or custom tokens
+          // Get the specific object balance
           const objectInfo = await client.getObject({
             id: options.sourceOptions.objectId,
             options: {

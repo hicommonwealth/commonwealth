@@ -6,6 +6,7 @@ import {
   type NativeSource,
   type SolanaSource,
   type SuiSource,
+  type SuiTokenSource,
 } from '@hicommonwealth/shared';
 import type { GroupAttributes } from '../models/group';
 import type {
@@ -17,6 +18,7 @@ import type {
   GetEthNativeBalanceOptions,
   GetSPLBalancesOptions,
   GetSuiNativeBalanceOptions,
+  GetSuiTokenBalanceOptions,
 } from '../services';
 
 export function makeGetBalancesOptions(
@@ -194,6 +196,30 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   suiNetwork: castedSource.sui_network,
                   objectId: castedSource.object_id,
+                },
+                addresses,
+              });
+            }
+            break;
+          }
+          // SuiTokenSource
+          case BalanceSourceType.SuiToken: {
+            const castedSource = requirement.data.source as SuiTokenSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetSuiTokenBalanceOptions;
+              return (
+                castedOpt.balanceSourceType === BalanceSourceType.SuiToken &&
+                castedOpt.sourceOptions.suiNetwork ===
+                  castedSource.sui_network &&
+                castedOpt.sourceOptions.coinType === castedSource.coin_type
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.SuiToken,
+                sourceOptions: {
+                  suiNetwork: castedSource.sui_network,
+                  coinType: castedSource.coin_type,
                 },
                 addresses,
               });

@@ -120,6 +120,12 @@ function _thresholdCheck(
         objectId = thresholdData.source.object_id!;
         break;
       }
+      case 'sui_token': {
+        balanceSourceType = BalanceSourceType.SuiToken;
+        chainId = thresholdData.source.sui_network.toString();
+        contractAddress = thresholdData.source.coin_type;
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -204,6 +210,11 @@ function _thresholdCheck(
               );
             }
             return b.options.sourceOptions.suiNetwork === chainId;
+          case BalanceSourceType.SuiToken:
+            return (
+              b.options.sourceOptions.suiNetwork === chainId &&
+              b.options.sourceOptions.coinType === contractAddress
+            );
           default:
             return null;
         }
