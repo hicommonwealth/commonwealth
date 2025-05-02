@@ -18,14 +18,14 @@ import CreateCommunityButton from '../../components/sidebar/CreateCommunityButto
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
-import './Communities.scss';
 import CommunitiesList from './CommunitiesList';
 import ExploreContestList from './ExploreContestList';
+import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
 import TokensList from './TokensList';
 
-const CommunitiesPage = () => {
+const ExplorePage = () => {
   const containerRef = useRef();
   const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
@@ -81,8 +81,8 @@ const CommunitiesPage = () => {
 
   return (
     // @ts-expect-error <StrictNullChecks/>
-    <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
-      <div className="CommunitiesPage">
+    <CWPageLayout ref={containerRef} className="ExplorePageLayout">
+      <div className="ExplorePage">
         <div className="header-section">
           <div className="description">
             <CWText
@@ -184,4 +184,4 @@ const CommunitiesPage = () => {
   );
 };
 
-export default CommunitiesPage;
+export default ExplorePage;

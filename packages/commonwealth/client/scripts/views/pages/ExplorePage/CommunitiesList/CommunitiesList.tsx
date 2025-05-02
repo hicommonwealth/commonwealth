@@ -21,7 +21,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { z } from 'zod';
-import '../Communities.scss';
+import '../ExplorePage.scss';
 import {
   CommunityFilters,
   CommunitySortDirections,
