@@ -41,7 +41,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
 import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
-import QuestCard from '../Explore/QuestList/QuestCard';
+import QuestCard from '../ExplorePage/QuestList/QuestCard';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 import TotalQuestXPTag from './TotalQuestXPTag';

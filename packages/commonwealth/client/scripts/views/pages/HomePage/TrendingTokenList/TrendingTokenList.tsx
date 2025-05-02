@@ -19,7 +19,7 @@ import {
   CommunityFilters,
   CommunitySortOptions,
   communitySortOptionsLabelToKeysMap,
-} from '../../Explore/CommunitiesList/FiltersDrawer';
+} from '../../ExplorePage/CommunitiesList/FiltersDrawer';
 import TrendingToken from '../TrendingToken/TrendingToken';
 import './TrendingTokenList.scss';
 

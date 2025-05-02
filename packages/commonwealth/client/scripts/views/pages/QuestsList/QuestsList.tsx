@@ -3,7 +3,7 @@ import React from 'react';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
-import QuestList from '../Explore/QuestList';
+import QuestList from '../ExplorePage/QuestList';
 import './QuestsList.scss';
 
 const QuestsList = () => {
