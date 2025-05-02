@@ -675,21 +675,9 @@ export class RedisCache implements Cache {
     if (!this.isReady()) return false;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
-
-      // Create a multi command (transaction)
-      const multi = this._client.multi();
-
-      // Add LPUSH command to the transaction
-      multi.lPush(finalKey, value);
-
-      // Add LTRIM command to the transaction to keep only the first maxLength elements
-      multi.lTrim(finalKey, 0, maxLength - 1);
-
-      // Execute the transaction
-      const results = await multi.exec();
-
-      // The first result is from LPUSH, which returns the new length of the list
-      return (results?.[0] as number) || false;
+      const newLength = await this._client.lPush(finalKey, value);
+      await this._client.lTrim(finalKey, 0, maxLength - 1);
+      return newLength;
     } catch (e) {
       const msg = `An error occurred during lpushAndTrim for key: ${key}`;
       this._log.error(msg, e as Error);

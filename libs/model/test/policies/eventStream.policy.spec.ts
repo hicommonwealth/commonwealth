@@ -1,3 +1,4 @@
+import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { ContestManager, events } from '@hicommonwealth/schemas';
@@ -19,7 +20,16 @@ import {
 } from '../../src/policies/EventStream.policy';
 import { drainOutbox } from '../utils/outbox-drain';
 
-import { RedisCache } from '@hicommonwealth/adapters';
+beforeAll(async () => {
+  cache({
+    adapter: new RedisCache('redis://localhost:6379'),
+  });
+  await cache().ready();
+  await cache().deleteKey(
+    CacheNamespaces.Function_Response,
+    getEventStreamCacheKey(),
+  );
+});
 
 const isValidUrl = (urlString: string): boolean => {
   try {
@@ -35,28 +45,12 @@ const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-// mock cache key
-vi.mock('../../src/policies/EventStream.policy', async () => {
-  const actual = await vi.importActual('../../src/policies/EventStream.policy');
-  return {
-    ...(actual as object),
-    EVENT_STREAM_FN_CACHE_KEY: 'test-cache-key',
-    getEventStreamCacheKey: () => 'test-cache-key',
-  };
-});
-
 describe('EventStream Policy Integration Tests', () => {
   const communityId = 'test-community';
   const threadId = 123;
   let contestManagers: z.infer<typeof ContestManager>[];
 
   beforeAll(async () => {
-    // Set up Redis with the same configuration as in redisCache.spec.ts
-    cache({
-      adapter: new RedisCache('redis://localhost:6379'),
-    });
-    await cache().ready();
-
     const [community] = await tester.seed('Community', {
       id: communityId,
       name: 'Test Community',
@@ -298,11 +292,11 @@ describe('EventStream Policy Integration Tests', () => {
     const eventStreamItems = await getEventStream();
 
     expect(eventStreamItems).toHaveLength(3);
-    expect(eventStreamItems[0].type).toBe(outboxEvents[0].event_name);
+    expect(eventStreamItems[0].type).toBe(outboxEvents[2].event_name);
     expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
     expect(eventStreamItems[1].type).toBe(outboxEvents[1].event_name);
     expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
-    expect(eventStreamItems[2].type).toBe(outboxEvents[2].event_name);
+    expect(eventStreamItems[2].type).toBe(outboxEvents[0].event_name);
     expect(isValidUrl(eventStreamItems[2].url)).toBe(true);
   });
 
@@ -327,6 +321,7 @@ describe('EventStream Policy Integration Tests', () => {
 
     // event stream length should be max
     expect(eventStreamItems).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+
     // verify all URLs are valid with http prefix
     eventStreamItems.forEach((item) => {
       expect(isValidUrl(item.url)).toBe(true);
@@ -356,9 +351,8 @@ describe('EventStream Policy Integration Tests', () => {
     });
 
     // oldest event should be removed
-    const oldestEvent = eventStreamItemsAfter[0].data as z.infer<
-      typeof ContestManager
-    >;
+    const oldestEvent = eventStreamItemsAfter[EVENT_STREAM_WINDOW_SIZE - 1]
+      .data as z.infer<typeof ContestManager>;
     expect(oldestEvent.name).toEqual('Test Contest #2');
   });
 });
