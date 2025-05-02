@@ -12,6 +12,8 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
     body: async ({ payload }) => {
       const { community_id, limit = 10 } = payload;
 
+      // TODO: fix and find efficient way to sort by token balances
+      // Mocked at the moment without filtering rejected members
       const sql = `
         WITH token_group AS (
           SELECT g.id AS group_id
@@ -31,10 +33,11 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
           0 as percentage,
           a.role,
           u.tier
-        FROM token_group tg
-        JOIN "Memberships" m ON m.group_id = tg.group_id
-        JOIN "Addresses" a ON m.address_id = a.id AND a.community_id = :community_id
-        JOIN "Users" u ON a.user_id = u.id
+        FROM
+          token_group tg
+          JOIN "Memberships" m ON m.group_id = tg.group_id --AND m.reject_reason IS NULL
+          JOIN "Addresses" a ON m.address_id = a.id AND a.community_id = :community_id
+          JOIN "Users" u ON a.user_id = u.id
         LIMIT :limit;
       `;
 
