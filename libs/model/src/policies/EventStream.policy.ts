@@ -9,6 +9,7 @@ import {
   Community,
   ContestManager,
   events,
+  LaunchpadToken,
   Thread,
 } from '@hicommonwealth/schemas';
 import {
@@ -47,6 +48,18 @@ const EventStreamSchemas = {
   ThreadCreated: {
     input: events.ThreadCreated,
     output: Thread.extend({}),
+  },
+  LaunchpadTokenCreated: {
+    input: events.LaunchpadTokenCreated,
+    output: LaunchpadToken.extend({}),
+  },
+  LaunchpadTokenTraded: {
+    input: events.LaunchpadTokenTraded,
+    output: LaunchpadToken.extend({}),
+  },
+  LaunchpadTokenGraduated: {
+    input: events.LaunchpadTokenGraduated,
+    output: LaunchpadToken.extend({}),
   },
 } as const;
 
