@@ -119,15 +119,7 @@ export const getContestStatus = async (
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
   };
 
-  const [
-    startTime,
-    endTime,
-    currentContentId,
-    contestInterval,
-    prizeShare,
-    voterShare,
-    contestToken,
-  ] = await Promise.all([
+  const promises = [
     client.readContract({
       ...contract,
       functionName: 'startTime',
@@ -146,17 +138,32 @@ export const getContestStatus = async (
     }),
     client.readContract({
       ...contract,
-      functionName: 'prizeShare',
-    }),
-    client.readContract({
-      ...contract,
       functionName: 'voterShare',
     }),
     client.readContract({
       ...contract,
       functionName: 'contestToken',
     }),
-  ]);
+  ];
+
+  if (!oneOff) {
+    promises.push(
+      client.readContract({
+        ...contract,
+        functionName: 'prizeShare',
+      }),
+    );
+  }
+
+  const [
+    startTime,
+    endTime,
+    currentContentId,
+    contestInterval,
+    voterShare,
+    contestToken,
+    prizeShare,
+  ] = await Promise.all(promises);
 
   return {
     startTime: Number(startTime),
