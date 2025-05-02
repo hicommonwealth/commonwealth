@@ -7,6 +7,7 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
 import {
+  aiTieredMiddleware,
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
@@ -425,6 +426,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true }),
     generateImageHandler.bind(this, models),
   );
 
@@ -437,6 +439,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true, text: true }),
     async (req, res) => {
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
@@ -532,6 +535,7 @@ function setupRouter(
     'post',
     '/aicompletion',
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ text: true }),
     aiCompletionHandler,
   );
 

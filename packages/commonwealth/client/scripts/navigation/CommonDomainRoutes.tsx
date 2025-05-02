@@ -131,7 +131,7 @@ const CommunityNotFoundPage = lazy(
 );
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
@@ -259,9 +259,9 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
-    key="/rewards"
-    path="/rewards"
-    element={withLayout(RewardsPage, { type: 'common' })}
+    key="/wallet"
+    path="/wallet"
+    element={withLayout(WalletPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -781,6 +781,7 @@ const CommonDomainRoutes = () => [
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
+  <Route key="/rewards" path="/rewards" element={<Navigate to="/wallet" />} />,
   // LEGACY REDIRECTS END
 
   // Community not found page - This should be at the end

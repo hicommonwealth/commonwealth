@@ -15,6 +15,7 @@ const {
   DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
+  LAUNCHPAD_PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
   MAX_USER_POSTS_PER_CONTEST,
@@ -76,6 +77,7 @@ const {
   CREATOR_USER_TIER_WEIGHT,
   COMMUNITY_TIER_WEIGHT,
   DISABLE_TIER_RATE_LIMITS,
+  TIER_SOCIAL_VERIFIED_MIN_ETH,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -89,6 +91,7 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   TWITTER_LOG_LEVEL: 'info' as const,
+  TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
 };
 
 export const config = configure(
@@ -102,6 +105,7 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
     },
     TBC: {
@@ -258,6 +262,11 @@ export const config = configure(
       !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
         ? true
         : DISABLE_TIER_RATE_LIMITS === 'true',
+    TIER: {
+      SOCIAL_VERIFIED_MIN_ETH: parseFloat(
+        TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
+      ),
+    },
   },
   z.object({
     DB: z.object({
@@ -283,6 +292,13 @@ export const config = configure(
           (data) =>
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
+        ),
+      LAUNCHPAD_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
         ),
       CONTEST_BOT_PRIVATE_KEY: z
         .string()
@@ -539,8 +555,11 @@ export const config = configure(
     DISABLE_TIER_RATE_LIMITS: z
       .boolean()
       .refine(
-        (data) => !(target.APP_ENV === 'production' && data),
+        (data) => !(target.APP_ENV === 'production' && !data),
         'Tier rate limits cannot be disabled in production',
       ),
+    TIER: z.object({
+      SOCIAL_VERIFIED_MIN_ETH: z.number(),
+    }),
   }),
 );

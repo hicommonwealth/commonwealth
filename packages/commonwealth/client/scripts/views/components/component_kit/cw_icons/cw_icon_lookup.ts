@@ -1,6 +1,7 @@
 import {
   ArchiveTray,
   ArrowBendUpRight,
+  ArrowClockwise,
   ArrowFatDown,
   ArrowFatUp,
   ArrowLeft,
@@ -141,7 +142,8 @@ export const iconLookup = {
   arrowUpHalfGreen: Icons.CWArrowUpHalfGreen,
   arrowDownHalfOrange: Icons.CWArrowDownHalfOrange,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
-  arrowClockwise: withPhosphorIcon(ArrowsClockwise),
+  arrowsClockwise: withPhosphorIcon(ArrowsClockwise),
+  arrowClockwise: withPhosphorIcon(ArrowClockwise),
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowUpBlue500: Icons.CWArrowUpBlue500,
   arrowUpNeutral400: Icons.CWArrowUpNeutral400,

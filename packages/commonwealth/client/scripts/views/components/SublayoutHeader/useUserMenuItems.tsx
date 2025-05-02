@@ -33,8 +33,8 @@ import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
-import { MobileTabType } from '../../pages/RewardsPage/types';
-import { mobileTabParam } from '../../pages/RewardsPage/utils';
+import { MobileTabType } from '../../pages/WalletPage/types';
+import { mobileTabParam } from '../../pages/WalletPage/utils';
 import { useCommunityStake } from '../CommunityStake';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 import UserMenuItem from './UserMenuItem';
@@ -306,7 +306,7 @@ const useUserMenuItems = ({
         onClick: () =>
           navigate(
             rewardsEnabled
-              ? `/rewards?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
+              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
               : `/myTransactions`,
             {},
             null,
