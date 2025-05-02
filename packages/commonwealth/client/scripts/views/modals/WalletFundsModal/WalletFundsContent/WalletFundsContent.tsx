@@ -29,7 +29,6 @@ const WalletFundsContent = ({
     magic,
     userAddress,
     isLoading: isMagicLoading,
-    showWalletInfo,
   } = useMagicWallet({ chainId });
 
   const {
@@ -52,6 +51,18 @@ const WalletFundsContent = ({
       setAmount('0');
     } else {
       setAmount(cleanValue);
+    }
+  };
+
+  const handleShowWalletAddress = async (): Promise<void> => {
+    if (magic) {
+      await magic.wallet.showAddress();
+    }
+  };
+
+  const handleShowOnRamp = async (): Promise<void> => {
+    if (magic) {
+      await magic.wallet.showOnRamp();
     }
   };
 
@@ -93,12 +104,12 @@ const WalletFundsContent = ({
           <FundWalletItem
             icon="coinbase"
             title="Coinbase OnRamp"
-            onClick={() => console.log('Coinbase clicked')}
+            onClick={handleShowOnRamp}
           />
           <FundWalletItem
             icon="barcode"
             title="View wallet information"
-            onClick={showWalletInfo}
+            onClick={handleShowWalletAddress}
           />
         </div>
       </CWModalBody>

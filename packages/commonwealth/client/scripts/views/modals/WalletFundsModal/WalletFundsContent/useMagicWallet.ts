@@ -17,7 +17,6 @@ interface UseMagicWalletResult {
   web3: Web3 | null;
   userAddress: string;
   isLoading: boolean;
-  showWalletInfo: () => Promise<void>;
 }
 
 const useMagicWallet = ({
@@ -57,18 +56,11 @@ const useMagicWallet = ({
     initMagic();
   }, [chainId]);
 
-  const showWalletInfo = async (): Promise<void> => {
-    if (magic) {
-      await magic.wallet.showUI();
-    }
-  };
-
   return {
     magic,
     web3,
     userAddress,
     isLoading,
-    showWalletInfo,
   };
 };
 
