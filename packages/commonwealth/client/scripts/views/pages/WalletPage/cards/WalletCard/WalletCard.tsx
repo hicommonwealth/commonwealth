@@ -5,10 +5,11 @@ import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
@@ -22,6 +23,7 @@ import {
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
+import { WalletFundsModal } from 'views/modals/WalletFundsModal/WalletFundsModal';
 import RewardsCard from '../../RewardsCard';
 import './WalletCard.scss';
 import useUserWalletHoldings from './useUserWalletHoldings';
@@ -35,7 +37,7 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
-
+  const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
   const user = useUserStore();
 
   const { openMagicWallet } = useAuthentication({});
@@ -115,18 +117,7 @@ const WalletCard = () => {
           <FractionalValue type="h4" value={userCombinedUSDBalance} />
         </CWText>
         <CWDivider />
-        {isSelectedAddressMagic && (
-          <button
-            type="button"
-            className="add-funds-btn"
-            onClick={() => {
-              openMagicWallet().catch(console.error);
-            }}
-          >
-            <CWIcon iconName="plus" iconSize="small" />
-            <CWText type="caption">Add Funds</CWText>
-          </button>
-        )}
+
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (
             <CWTab
@@ -157,7 +148,24 @@ const WalletCard = () => {
             <CWText isCentered>🚧 Coming Soon, Hang tight!</CWText>
           )}
         </div>
+        {isSelectedAddressMagic && (
+          <CWButton
+            label="Deposit Funds"
+            buttonWidth="full"
+            type="submit"
+            buttonHeight="sm"
+            onClick={() => setIsFundsModalOpen(true)}
+          />
+        )}
       </div>
+      <CWModal
+        size="medium"
+        open={isFundsModalOpen}
+        onClose={() => setIsFundsModalOpen(false)}
+        content={
+          <WalletFundsModal onClose={() => setIsFundsModalOpen(false)} />
+        }
+      />
     </RewardsCard>
   );
 };

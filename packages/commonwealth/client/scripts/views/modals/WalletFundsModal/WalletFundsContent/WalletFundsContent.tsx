@@ -1,22 +1,55 @@
-import React, { useState } from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import React, { useEffect, useState } from 'react';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
+import { useGetEthereumBalanceQuery } from 'state/api/tokens';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { FundWalletItem } from './FundWalletItem';
 
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { FundWalletItem } from './FundWalletItem';
+import {
+  fetchUserAddress,
+  formatUsdBalance,
+  handleRefreshBalance,
+  magic,
+} from './utils';
+
 import './WalletFundsContent.scss';
 
 const WalletFundsContent = () => {
   const [amount, setAmount] = useState('0.05');
+  const [userAddress, setUserAddress] = useState<string>('');
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  useEffect(() => {
+    const getUserAddress = async () => {
+      const address = await fetchUserAddress();
+      setUserAddress(address);
+    };
 
-    // Remove leading zeros
+    getUserAddress();
+  }, []);
+
+  const {
+    data: userBalance = '0',
+    isLoading,
+    refetch,
+  } = useGetEthereumBalanceQuery({
+    userAddress,
+    rpcProvider: magic.rpcProvider,
+    enabled: !!userAddress,
+  });
+
+  const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: 'ETH',
+  });
+
+  const handleQrCodeClick = async (): Promise<void> => {
+    await magic.wallet.showAddress();
+  };
+
+  const handleInputChange = (value: string): void => {
     const cleanValue = value.replace(/^0+(?=\d)/, '');
     if (value === '' || value === '0') {
       setAmount('0');
@@ -25,6 +58,12 @@ const WalletFundsContent = () => {
     }
   };
 
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
+
+  const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
+
   return (
     <div className="WalletFundsContent">
       <CWModalBody>
@@ -32,7 +71,7 @@ const WalletFundsContent = () => {
           <CWTextInput
             type="number"
             value={amount}
-            onInput={handleInput}
+            onInput={(e) => handleInputChange(e.target.value)}
             min={0}
             step={0.001}
           />
@@ -41,8 +80,16 @@ const WalletFundsContent = () => {
           </CWText>
         </div>
 
-        <CWText className="usd-value">$180.84 USD</CWText>
-        <CWText className="refresh-link">Refresh Balance</CWText>
+        <CWText className="usd-value">
+          {isLoading ? '' : formattedBalanceUsd}
+        </CWText>
+        <CWText
+          className="refresh-link"
+          onClick={() => handleRefreshBalance(refetch)}
+          role="button"
+        >
+          Refresh Balance
+        </CWText>
 
         <div className="fund-options">
           <FundWalletItem
@@ -51,24 +98,14 @@ const WalletFundsContent = () => {
             onClick={() => console.log('Coinbase clicked')}
           />
           <FundWalletItem
-            icon="moonpay"
-            title="MoonPay"
-            onClick={() => console.log('MoonPay clicked')}
-          />
-          <FundWalletItem
-            icon="cardholder"
-            title="Transfer from wallet"
-            onClick={() => console.log('Transfer clicked')}
-          />
-          <FundWalletItem
             icon="barcode"
             title="View wallet information"
-            onClick={() => console.log('View wallet information clicked')}
+            onClick={handleQrCodeClick}
           />
         </div>
       </CWModalBody>
       <CWModalFooter>
-        <CWButton label="Next" buttonWidth="full" type="submit" />
+        <></>
       </CWModalFooter>
     </div>
   );
