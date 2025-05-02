@@ -1,4 +1,4 @@
-import { type Query } from '@hicommonwealth/core';
+import { cache, CacheNamespaces, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -10,45 +10,61 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, limit = 10 } = payload;
+      const { community_id, limit = 10, cursor = 1 } = payload;
 
-      // TODO: fix and find efficient way to sort by token balances
-      // Mocked at the moment without filtering rejected members
+      const topIds = await cache().sliceSortedSet(
+        CacheNamespaces.TokenTopHolders,
+        community_id,
+        (cursor - 1) * limit,
+        cursor * limit - 1,
+        { order: 'ASC' },
+      );
+
+      // TODO: if we run out of ranked threads should we return something else
+      if (!topIds.length)
+        return {
+          results: [],
+          page: cursor,
+          limit,
+        };
+
       const sql = `
-        WITH token_group AS (
-          SELECT g.id AS group_id
-          FROM
-            "LaunchpadTokens" lt
-            JOIN "Communities" c ON c.namespace = lt.namespace
-            JOIN "Groups" g ON g.community_id = c.id AND g.metadata->>'name' = lt.symbol || ' Holders'
-            WHERE c.id = :community_id
-          LIMIT 1
+        WITH A AS (
+          SELECT A.id, A.user_id, A.address, A.role
+          FROM "Addresses" A
+          WHERE A.community_id = :community_id AND A.id IN (:address_ids)
         )
         SELECT 
-          u.id as user_id,
-          a.address,
-          u.profile->>'name' as name,
-          u.profile->>'avatar_url' as avatar_url,
-          0 as tokens,
-          0 as percentage,
-          a.role,
-          u.tier
+          U.id as user_id,
+          A.address,
+          U.profile->>'name' as name,
+          U.profile->>'avatar_url' as avatar_url,
+          A.role,
+          U.tier
         FROM
-          token_group tg
-          JOIN "Memberships" m ON m.group_id = tg.group_id --AND m.reject_reason IS NULL
-          JOIN "Addresses" a ON m.address_id = a.id AND a.community_id = :community_id
-          JOIN "Users" u ON a.user_id = u.id
-        LIMIT :limit;
+          A JOIN "Users" U ON A.user_id = U.id
+          ORDER BY ARRAY_POSITION(ARRAY[:address_ids], A.id);
       `;
 
       const holders = await models.sequelize.query<
         z.infer<typeof schemas.HolderView>
       >(sql, {
-        replacements: { community_id, limit },
+        replacements: {
+          community_id,
+          address_ids: topIds.map((t) => parseInt(t)),
+        },
         type: QueryTypes.SELECT,
       });
 
-      return holders;
+      return {
+        results: holders.map((h) => ({
+          ...h,
+          tokens: 0,
+          percentage: 0,
+        })),
+        page: cursor,
+        limit,
+      };
     },
   };
 }

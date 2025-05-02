@@ -41,7 +41,7 @@ const TopHolders = () => {
     },
   ];
 
-  const rowData = topHolders?.map((holder) => {
+  const rowData = topHolders?.results.map((holder) => {
     const name = holder.name || '';
     return {
       user: {

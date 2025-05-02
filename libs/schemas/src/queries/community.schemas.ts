@@ -311,7 +311,12 @@ export const HolderView = z.object({
 export const GetTopHolders = {
   input: z.object({
     community_id: z.string(),
-    limit: z.number(),
+    limit: z.number().optional(),
+    cursor: z.number().optional(),
   }),
-  output: z.array(HolderView),
+  output: z.object({
+    results: z.array(HolderView),
+    limit: z.number(),
+    page: z.number(),
+  }),
 };
