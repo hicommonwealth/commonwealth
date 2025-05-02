@@ -14,6 +14,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import CommonTrade from './CommonTrade/CommonTrade';
 import './TokenPerformance.scss';
+import TopHolders from './TopHolders/TopHolders';
 import UniswapTrade from './UniswapTrade/UniswapTrade';
 
 const TokenPerformance = () => {
@@ -119,7 +120,7 @@ const TokenPerformance = () => {
                 tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
               />
             )}
-        {/* {!hasReachedGoal && <TopHolders />} Hide top holders for now */}
+        {!hasReachedGoal && <TopHolders />}
       </div>
     </div>
   );

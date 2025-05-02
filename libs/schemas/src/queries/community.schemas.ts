@@ -296,3 +296,21 @@ export const UpdateCommunityDirectoryTags = {
   }),
   context: AuthContext,
 };
+
+export const HolderView = z.object({
+  user_id: z.number(),
+  address: z.string(),
+  name: z.string().nullable(),
+  tokens: z.number(),
+  percentage: z.number(),
+  role: z.string(),
+  tier: z.number(),
+});
+
+export const GetTopHolders = {
+  input: z.object({
+    community_id: z.string(),
+    limit: z.number(),
+  }),
+  output: z.array(HolderView),
+};

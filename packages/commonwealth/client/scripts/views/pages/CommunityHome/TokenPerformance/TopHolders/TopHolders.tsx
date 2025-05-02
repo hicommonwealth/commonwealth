@@ -1,5 +1,7 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React from 'react';
+import app from 'state';
+import { useGetTopHoldersQuery } from 'state/api/communities/getTopHolders';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -8,75 +10,14 @@ import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/Form
 import { FullUser } from 'views/components/user/fullUser';
 import './TopHolders.scss';
 
-// Mock data for top holders
-const mockTopHolders = [
-  {
-    address: '0x421',
-    userId: 1,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 21312312,
-    percentage: 21,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 2,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 1231231,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 3,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 4,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 5,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 6,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-];
-
 const TopHolders = () => {
   const navigate = useCommonNavigate();
+  const communityId = app.activeChainId() || '';
 
-  // Hardcode isWindowSmallInclusive to false for now to prevent resize issues
-  const isWindowSmallInclusive = false;
+  const { data: topHolders, isLoading } = useGetTopHoldersQuery({
+    community_id: communityId,
+    limit: 10,
+  });
 
   const columnInfo: CWTableColumnInfo[] = [
     {
@@ -100,54 +41,48 @@ const TopHolders = () => {
     },
   ];
 
-  // Use a memoized date for all rows to reduce re-renders
-  const lastActiveDate = useState(() => new Date().toISOString())[0];
-
-  // Transform mock data to the format expected by CWTable
-  const rowData = mockTopHolders.map((holder) => {
-    return {
-      user: {
-        customElement: (
-          <FullUser
-            userAddress={holder.address}
-            userCommunityId={holder.communityId}
-            profile={{
-              address: holder.address,
-              name: holder.name,
-              userId: holder.userId,
-              tier: holder.tier,
-              lastActive: lastActiveDate,
-              avatarUrl: '',
+  const rowData = topHolders?.map((holder) => ({
+    user: {
+      customElement: (
+        <FullUser
+          userAddress={holder.address}
+          userCommunityId={communityId}
+          profile={{
+            address: holder.address,
+            name: holder.name!,
+            userId: holder.user_id,
+            tier: holder.tier,
+            lastActive: new Date().toISOString(),
+            avatarUrl: '',
+          }}
+          shouldShowPopover
+          shouldShowRole
+          shouldShowAddressWithDisplayName={true}
+          className="top-holder-user"
+          avatarSize={24}
+        />
+      ),
+    },
+    tokens: {
+      customElement: (
+        <div className="tokens-cell">
+          <FormattedDisplayNumber
+            value={holder.tokens}
+            options={{
+              decimals: 1,
+              useShortSuffixes: true,
             }}
-            shouldShowPopover
-            shouldShowRole
-            shouldShowAddressWithDisplayName={!isWindowSmallInclusive}
-            className="top-holder-user"
-            avatarSize={24}
+            tooltipContent={holder.tokens.toLocaleString()}
           />
-        ),
-      },
-      tokens: {
-        customElement: (
-          <div className="tokens-cell">
-            <FormattedDisplayNumber
-              value={holder.tokens}
-              options={{
-                decimals: 1,
-                useShortSuffixes: true,
-              }}
-              tooltipContent={holder.tokens.toLocaleString()}
-            />
-          </div>
-        ),
-        sortValue: holder.tokens,
-      },
-      percentDisplay: {
-        customElement: <div className="percent-cell">{holder.percentage}%</div>,
-        sortValue: holder.percentage,
-      },
-    };
-  });
+        </div>
+      ),
+      sortValue: holder.tokens,
+    },
+    percentDisplay: {
+      customElement: <div className="percent-cell">{holder.percentage}%</div>,
+      sortValue: holder.percentage,
+    },
+  }));
 
   return (
     <div className="TopHolders">
@@ -164,7 +99,11 @@ const TopHolders = () => {
         </div>
       </div>
       <div className="holders-table">
-        <CWTable columnInfo={columnInfo} rowData={rowData} />
+        {isLoading ? (
+          <CWText>Loading...</CWText>
+        ) : (
+          <CWTable columnInfo={columnInfo} rowData={rowData!} />
+        )}
       </div>
     </div>
   );
