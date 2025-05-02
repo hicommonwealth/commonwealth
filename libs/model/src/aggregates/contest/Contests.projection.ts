@@ -281,11 +281,13 @@ async function isGraduatedContest(
   mustExist('env LAUNCHPAD_PRIVATE_KEY', !!config.WEB3.LAUNCHPAD_PRIVATE_KEY);
 
   const {
-    tx: { from: deployerAddress },
+    tx: { from: deployerAddress, chainId },
   } = await getTransaction({
     rpc,
     txHash: payload.transaction_hash,
   });
+
+  console.log('chainId', chainId);
 
   const account = privateKeyToAccount(
     config.WEB3.LAUNCHPAD_PRIVATE_KEY! as `0x${string}`,

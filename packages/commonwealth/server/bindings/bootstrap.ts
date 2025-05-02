@@ -146,5 +146,5 @@ export function bootstrapContestRolloverLoop() {
   // TODO: move to external service triggered via scheduler?
   setInterval(() => {
     loop().catch(console.error);
-  }, 1_000 * 60);
+  }, 1_000 * 15);
 }
