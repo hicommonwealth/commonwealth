@@ -14,6 +14,7 @@ interface RewardsCardProps {
   icon: IconName;
   onSeeAllClick?: () => void;
   isAlreadySelected?: boolean;
+  customAction?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -23,6 +24,7 @@ const RewardsCard = ({
   icon,
   onSeeAllClick,
   isAlreadySelected = false,
+  customAction,
   children,
 }: RewardsCardProps) => {
   return (
@@ -32,7 +34,9 @@ const RewardsCard = ({
         <CWText type="h4" fontWeight="bold">
           {title}
         </CWText>
-        {onSeeAllClick && (
+        {customAction ? (
+          customAction
+        ) : onSeeAllClick ? (
           <CWText
             className={clsx('see-all-text', { disabled: isAlreadySelected })}
             onClick={isAlreadySelected ? undefined : onSeeAllClick}
@@ -40,7 +44,7 @@ const RewardsCard = ({
           >
             See all
           </CWText>
-        )}
+        ) : null}
       </div>
       {description && (
         <CWText className="rewards-card-description" type="b2">
