@@ -67,6 +67,11 @@ export const USER_TIERS = {
         text: 0,
       },
     },
+    clientInfo: {
+      icon: '🚫',
+      trustLevel: 0,
+      componentIcon: 'stopSymbol',
+    },
   },
   [UserTierMap.NewlyVerifiedWallet]: {
     name: 'New Verified Wallet',
