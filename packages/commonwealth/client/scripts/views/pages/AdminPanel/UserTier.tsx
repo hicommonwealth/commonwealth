@@ -36,7 +36,7 @@ const userTierOptions = Object.keys(USER_TIERS)
   }));
 
 const UserTier = () => {
-  const [userId, setUserId] = useState<string>('');
+  const [userId, setUserId] = useState<number | undefined>();
   const debouncedUserId = useDebounce<string | undefined>(userId, 500);
   const { data: user, isLoading: isLoadingUser } = useFetchProfileByIdQuery({
     userId: debouncedUserId ? parseInt(debouncedUserId) : undefined,
@@ -73,7 +73,7 @@ const UserTier = () => {
           buttonHeight: 'sm',
           onClick: () => {
             setUserTier({
-              user_id: userId,
+              user_id: userId!,
               tier: selectedUserTier,
             })
               .then(() => {
@@ -101,7 +101,9 @@ const UserTier = () => {
       <div className="TaskRow">
         <CWTextInput
           value={userId}
-          onInput={(e) => setUserId(e?.target?.value?.trim() || '')}
+          onInput={(e) =>
+            setUserId(parseInt(e?.target?.value?.trim()) || undefined)
+          }
           customError={userNotFound ? 'User not found' : ''}
           placeholder="User id"
           fullWidth
