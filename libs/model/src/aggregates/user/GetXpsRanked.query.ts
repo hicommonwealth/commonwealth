@@ -1,5 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -23,11 +24,12 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
 with top as (
 	select
 		user_id,
-		sum(xp_points)::int + sum(coalesce(creator_xp_points, 0))::int as xp_points
+		sum(xp_points)::int + sum(coalesce(creator_xp_points, 0))::int as xp_points,
 	from "XpLogs" l
 		join "QuestActionMetas" m on l.action_meta_id = m.id
 		join "Quests" q on m.quest_id = q.id
-	where q.id = :quest_id
+	  join "Users" u on l.user_id = u.id 
+	where q.id = :quest_id AND u.tier != ${UserTierMap.BannedUser}
 	group by user_id
 	order by 2 desc
 	limit :top
