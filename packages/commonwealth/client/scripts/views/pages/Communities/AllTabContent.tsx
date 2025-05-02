@@ -6,22 +6,16 @@ import CWSectionHeader from '../../components/component_kit/new_designs/CWSectio
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview';
+import './AllTabContent.scss';
 import ExploreContestList from './ExploreContestList';
-import { CommunityFilters } from './FiltersDrawer';
 import QuestList from './QuestList';
 import TokensList from './TokensList';
 
-import './AllTabContent.scss';
-
 interface AllTabContentProps {
   containerRef: MutableRefObject<HTMLElement | undefined>;
-  filters: CommunityFilters;
 }
 
-const AllTabContent: React.FC<AllTabContentProps> = ({
-  containerRef,
-  filters,
-}) => {
+const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
   const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
@@ -35,7 +29,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
             seeAllText="See all tokens"
             onSeeAllClick={() => navigate('/explore?tab=tokens')}
           />
-          <TokensList filters={filters} hideHeader />
+          <TokensList hideHeader />
         </div>
       )}
 

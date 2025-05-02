@@ -18,10 +18,9 @@ import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/ty
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
-  CommunityFilters,
   CommunitySortOptions,
   communitySortOptionsLabelToKeysMap,
-} from '../FiltersDrawer';
+} from '../CommunitiesList/FiltersDrawer';
 import './TokensList.scss';
 
 const TokenWithCommunity = TokenView.extend({
@@ -29,11 +28,10 @@ const TokenWithCommunity = TokenView.extend({
 });
 
 type TokensListProps = {
-  filters: CommunityFilters;
   hideHeader?: boolean;
 };
 
-const TokensList = ({ filters, hideHeader }: TokensListProps) => {
+const TokensList = ({ hideHeader }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -43,6 +41,8 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const filters = {} as any; // TODO: fix this
 
   const {
     data: tokensList,
@@ -56,13 +56,13 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     with_stats: true,
     order_by: (() => {
       if (
-        filters.withCommunitySortBy &&
+        filters?.withCommunitySortBy &&
         [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
-          filters.withCommunitySortBy,
+          filters?.withCommunitySortBy,
         )
       ) {
         return communitySortOptionsLabelToKeysMap[
-          filters.withCommunitySortBy
+          filters?.withCommunitySortBy
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] as any;
       }

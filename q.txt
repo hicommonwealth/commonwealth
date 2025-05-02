@@ -1,0 +1,9 @@
+1. Add optino to Delete quest when create quest error occurs
+
+0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
+
+735965332958871634
+
+
+contract: https://base-sepolia.blockscout.com/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e then just pick any txn and provide event Transfer(address indexed from, address indexed to, uint256 value) as the signature
