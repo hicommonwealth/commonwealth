@@ -25,6 +25,16 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
         if (!community) throw new InvalidInput('Community not found');
       }
 
+      let ranks:
+        | [
+            {
+              thread_id: number;
+              community_rank: string;
+              global_rank: string;
+            }[],
+            number,
+          ]
+        | undefined;
       await models.sequelize.transaction(async (transaction) => {
         if (!community_id) {
           await models.ThreadRank.truncate({ transaction });
@@ -53,7 +63,7 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
           );
         }
 
-        const ranks = (await models.sequelize.query(
+        ranks = (await models.sequelize.query(
           `
             WITH ranks AS (SELECT T.id,
                                   T.user_tier_at_creation,
@@ -61,15 +71,16 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                                   T.created_at,
                                   CO.tier                      as community_tier,
                                   T.community_id,
-                                  SUM(C.user_tier_at_creation) as comment_total,
-                                  SUM(R.user_tier_at_creation) as reaction_total
+                                  SUM(COALESCE(C.user_tier_at_creation, 0)) as comment_total,
+                                  SUM(COALESCE(R.user_tier_at_creation, 0)) as reaction_total
                            FROM "Threads" T
-                                  JOIN "Comments" C ON C.thread_id = T.id
-                                  JOIN "Reactions" R ON R.thread_id = T.id
+                                  LEFT JOIN "Comments" C ON C.thread_id = T.id
+                                  LEFT JOIN "Reactions" R ON R.thread_id = T.id
                                   JOIN "Communities" CO ON CO.id = T.community_id
-                           WHERE T.created_at > T.created_at - INTERVAL '3 months'
+                           WHERE T.created_at > T.created_at - INTERVAL '1 week'
                              AND T.marked_as_spam_at IS NULL
                              AND T.deleted_at IS NULL
+                            
                              ${community_id ? 'AND T.community_id = :community_id' : ''}
                            GROUP BY T.id, T.user_tier_at_creation, T.view_count, T.created_at, CO.tier, T.community_id),
                  base_ranks AS (SELECT id,
@@ -167,7 +178,7 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
         }
       });
 
-      return { success: true };
+      return { numThreadsReranked: ranks ? ranks[0].length : 0 };
     },
   };
 }

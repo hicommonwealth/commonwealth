@@ -33,7 +33,7 @@ export const RerankThreads = {
     community_id: z.string().optional(),
   }),
   output: z.object({
-    success: z.boolean(),
+    numThreadsReranked: z.number(),
   }),
 };
 
