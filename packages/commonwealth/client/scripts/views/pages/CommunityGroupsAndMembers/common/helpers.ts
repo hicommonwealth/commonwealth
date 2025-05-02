@@ -13,6 +13,7 @@ const converter = (
     | 'eth_native'
     | 'cosmos_native'
     | 'sui_native'
+    | 'sui_token'
     | 'spl'
     | 'metaplex',
   amount: string,
@@ -29,7 +30,10 @@ const converter = (
     return converterFunc(amount, 18);
   }
 
-  if (requirementType === TOKENS.SUI_TOKEN) {
+  if (
+    requirementType === TOKENS.SUI_TOKEN ||
+    requirementType === TOKENS.SUI_TOKEN_TYPE
+  ) {
     return converterFunc(amount, 9);
   }
 
@@ -52,6 +56,7 @@ export const convertRequirementAmountFromWeiToTokens = (
     | 'eth_native'
     | 'cosmos_native'
     | 'sui_native'
+    | 'sui_token'
     | 'spl'
     | 'metaplex',
   amount: string,
@@ -66,6 +71,7 @@ export const convertRequirementAmountFromTokensToWei = (
     | 'eth_native'
     | 'cosmos_native'
     | 'sui_native'
+    | 'sui_token'
     | 'spl'
     | 'metaplex',
   amount: string,

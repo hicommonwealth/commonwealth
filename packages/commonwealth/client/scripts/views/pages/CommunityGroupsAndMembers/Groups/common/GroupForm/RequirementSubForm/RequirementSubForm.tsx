@@ -36,10 +36,12 @@ const RequirementSubForm = ({
     requirementType === SPL_SPECIFICATION ||
     requirementType === SOL_NFT_SPECIFICATION;
   const isSuiRequirement = requirementType === TOKENS.SUI_TOKEN;
+  const isSuiTokenRequirement = requirementType === TOKENS.SUI_TOKEN_TYPE;
   const helperTextForAmount = {
     [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
     [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
     [TOKENS.SUI_TOKEN]: 'Using 9 decimal precision',
+    [TOKENS.SUI_TOKEN_TYPE]: 'Using 9 decimal precision',
     [SPL_SPECIFICATION]: 'Using 6 decimal precision',
     [SOL_NFT_SPECIFICATION]: 'Using 6 decimal precision',
     [ERC_SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
@@ -77,7 +79,9 @@ const RequirementSubForm = ({
                   ? [SPL_SPECIFICATION].includes(x.value) ||
                     [SOL_NFT_SPECIFICATION].includes(x.value)
                   : app.chain.base === ChainBase.Sui
-                    ? [TOKENS.SUI_TOKEN].includes(x.value)
+                    ? [TOKENS.SUI_TOKEN, TOKENS.SUI_TOKEN_TYPE].includes(
+                        x.value,
+                      )
                     : [
                         TOKENS.EVM_TOKEN,
                         ...Object.values(ERC_SPECIFICATIONS),
@@ -118,8 +122,10 @@ const RequirementSubForm = ({
             'row-1': boolean;
             'row-2': boolean;
           }>({
-            'cols-3': isTokenRequirement,
-            'cols-4': !isTokenRequirement && !is1155Requirement,
+            'cols-3': isTokenRequirement && !isSuiTokenRequirement,
+            'cols-4':
+              (!isTokenRequirement && !is1155Requirement) ||
+              isSuiTokenRequirement,
             'cols-5': !isTokenRequirement && is1155Requirement,
             'row-1': !isTokenRequirement && is1155Requirement,
             'row-2': !(!isTokenRequirement && is1155Requirement),
@@ -141,7 +147,7 @@ const RequirementSubForm = ({
                     ? 'cosmos'
                     : isSPLRequirement
                       ? 'solana'
-                      : isSuiRequirement
+                      : isSuiRequirement || isSuiTokenRequirement
                         ? 'sui'
                         : 'ethereum'),
               )
@@ -158,7 +164,7 @@ const RequirementSubForm = ({
             // @ts-expect-error <StrictNullChecks/>
             customError={errors.requirementChain}
           />
-          {!isTokenRequirement && (
+          {!isTokenRequirement && !isSuiTokenRequirement && (
             <CWTextInput
               key={defaultValues.requirementContractAddress}
               name="requirementContractAddress"
@@ -177,6 +183,27 @@ const RequirementSubForm = ({
               }}
               // @ts-expect-error <StrictNullChecks/>
               customError={errors.requirementContractAddress}
+            />
+          )}
+          {isSuiTokenRequirement && (
+            <CWTextInput
+              key={defaultValues.requirementCoinType}
+              name="requirementCoinType"
+              label="Coin Type"
+              placeholder="e.g. 0x2::sui::SUI"
+              containerClassName="w-full"
+              fullWidth
+              manualStatusMessage=""
+              {...(defaultValues.requirementCoinType && {
+                defaultValue: defaultValues.requirementCoinType,
+              })}
+              onInput={(e) => {
+                onChange({
+                  requirementCoinType: (e.target as any).value,
+                });
+              }}
+              // @ts-expect-error <StrictNullChecks/>
+              customError={errors.requirementCoinType}
             />
           )}
           <CWSelectList

@@ -4,6 +4,7 @@ export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
   EVM_TOKEN: 'eth_native',
   SUI_TOKEN: 'sui_native',
+  SUI_TOKEN_TYPE: 'sui_token',
 };
 
 export const SPL_SPECIFICATION = 'spl';
@@ -43,6 +44,7 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
   { value: TOKENS.SUI_TOKEN, label: 'Sui native token' },
+  { value: TOKENS.SUI_TOKEN_TYPE, label: 'Sui custom token' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
   { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
 ];

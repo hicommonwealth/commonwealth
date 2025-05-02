@@ -1,13 +1,17 @@
 import { logger } from '@hicommonwealth/core';
 import { SuiClient } from '@mysten/sui.js/client';
 import { models } from '../../../database';
-import { Balances, GetSuiNativeBalanceOptions } from '../types';
+import {
+  Balances,
+  GetSuiNativeBalanceOptions,
+  GetSuiTokenBalanceOptions,
+} from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 
 const log = logger(import.meta);
 
 export async function getSuiBalances(
-  options: GetSuiNativeBalanceOptions,
+  options: GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
   ttl?: number,
 ): Promise<Balances> {
   const cachedBalances = await getCachedBalances(options, options.addresses);
@@ -41,7 +45,7 @@ export async function getSuiBalances(
 
 async function __get_sui_balances(
   rpcEndpoint: string,
-  options: GetSuiNativeBalanceOptions,
+  options: GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
 ): Promise<Balances> {
   const balances: Balances = {};
   const batchSize = options.batchSize || 100;
@@ -54,8 +58,24 @@ async function __get_sui_balances(
     // Process each address individually
     for (const address of batchAddresses) {
       try {
+        // Check if we're dealing with a token balance option (has coinType)
+        if (
+          'coinType' in options.sourceOptions &&
+          options.sourceOptions.coinType
+        ) {
+          // Get the balance for the specific coin type
+          const coinBalance = await client.getBalance({
+            owner: address,
+            coinType: options.sourceOptions.coinType,
+          });
+
+          balances[address] = coinBalance.totalBalance;
+        }
         // If objectId is provided, get the balance of the specific coin
-        if (options.sourceOptions.objectId) {
+        else if (
+          'objectId' in options.sourceOptions &&
+          options.sourceOptions.objectId
+        ) {
           // Get the specific object balance - to be used for SUI tokens or custom tokens
           const objectInfo = await client.getObject({
             id: options.sourceOptions.objectId,

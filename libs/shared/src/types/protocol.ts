@@ -9,6 +9,7 @@ export enum BalanceSourceType {
   SPL = 'spl',
   SOLNFT = 'metaplex',
   SuiNative = 'sui_native',
+  SuiToken = 'sui_token',
 }
 
 export enum BalanceType {
@@ -38,9 +39,15 @@ export type SolanaSource = {
 };
 
 export type SuiSource = {
-  source_type: 'sui_native';
+  source_type: BalanceSourceType.SuiNative;
   sui_network: string;
   object_id?: string;
+};
+
+export type SuiTokenSource = {
+  source_type: BalanceSourceType.SuiToken;
+  sui_network: string;
+  coin_type: string;
 };
 
 export type NativeSource = {
@@ -68,7 +75,8 @@ export type ThresholdData = {
     | CosmosSource
     | CosmosContractSource
     | SolanaSource
-    | SuiSource;
+    | SuiSource
+    | SuiTokenSource;
 };
 
 export type AbiType = Record<string, unknown>[];

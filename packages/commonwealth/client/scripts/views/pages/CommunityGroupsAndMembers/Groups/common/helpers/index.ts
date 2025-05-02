@@ -128,6 +128,28 @@ export const makeGroupDataBaseAPIPayload = (
       return;
     }
 
+    // for sui token with custom coinType
+    if (x.requirementType === TOKENS.SUI_TOKEN_TYPE) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            // @ts-expect-error StrictNullChecks
+            coin_type: x.requirementCoinType.trim(),
+          },
+        },
+      });
+      return;
+    }
+
     // for cosmos base
     if (
       x.requirementType === TOKENS.COSMOS_TOKEN ||
