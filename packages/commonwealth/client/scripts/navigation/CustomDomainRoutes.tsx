@@ -737,7 +737,7 @@ const CustomDomainRoutes = () => {
       element={<Navigate to="/profile/edit" />}
     />,
 
-    // LEGACY LINKING REDIRECTS
+    // LEGACY LINKING REDIRECTS!
     // These redirects exist so we can land on a properly identified page
     // without loading additional metadata on the view thread page to construct
     // a proper link. Each of these routes will:
@@ -750,6 +750,11 @@ const CustomDomainRoutes = () => {
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,
       })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={<Navigate to="/wallet" />}
     />,
   ];
 };

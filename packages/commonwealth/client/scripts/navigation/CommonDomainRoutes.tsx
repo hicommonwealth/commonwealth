@@ -781,6 +781,7 @@ const CommonDomainRoutes = () => [
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
+  <Route key="/rewards" path="/rewards" element={<Navigate to="/wallet" />} />,
   // LEGACY REDIRECTS END
 
   // Community not found page - This should be at the end
