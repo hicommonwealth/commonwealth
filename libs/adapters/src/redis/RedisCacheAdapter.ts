@@ -675,8 +675,10 @@ export class RedisCache implements Cache {
     if (!this.isReady()) return false;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
-      const newLength = await this._client.lPush(finalKey, value);
-      await this._client.lTrim(finalKey, 0, maxLength - 1);
+      const multi = this._client.multi();
+      multi.lPush(finalKey, value);
+      multi.lTrim(finalKey, 0, maxLength - 1);
+      const [newLength] = (await multi.exec()) as [number, unknown];
       return newLength;
     } catch (e) {
       const msg = `An error occurred during lpushAndTrim for key: ${key}`;

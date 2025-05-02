@@ -20,17 +20,6 @@ import {
 } from '../../src/policies/EventStream.policy';
 import { drainOutbox } from '../utils/outbox-drain';
 
-beforeAll(async () => {
-  cache({
-    adapter: new RedisCache('redis://localhost:6379'),
-  });
-  await cache().ready();
-  await cache().deleteKey(
-    CacheNamespaces.Function_Response,
-    getEventStreamCacheKey(),
-  );
-});
-
 const isValidUrl = (urlString: string): boolean => {
   try {
     // Check if URL starts with http or https
@@ -51,6 +40,15 @@ describe('EventStream Policy Integration Tests', () => {
   let contestManagers: z.infer<typeof ContestManager>[];
 
   beforeAll(async () => {
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+    });
+    await cache().ready();
+    await cache().deleteKey(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+    );
+
     const [community] = await tester.seed('Community', {
       id: communityId,
       name: 'Test Community',
