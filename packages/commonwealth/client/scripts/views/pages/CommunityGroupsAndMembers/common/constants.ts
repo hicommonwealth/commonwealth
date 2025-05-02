@@ -7,6 +7,8 @@ export const TOKENS = {
 
 export const SPL_SPECIFICATION = 'spl';
 
+export const SOL_NFT_SPECIFICATION = 'metaplex';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -40,6 +42,7 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
+  { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
 ];
 
 export const conditionTypes = [
@@ -63,6 +66,11 @@ export const chainTypes =
         : chain.balanceType === 'solana'
           ? 'solana'
           : 'cosmos',
-      value: chain.ethChainId || chain.cosmosChainId || 0,
+      value:
+        chain.balanceType === 'solana'
+          ? chain.name
+          : chain.ethChainId || chain.cosmosChainId
+            ? chain.ethChainId || chain.cosmosChainId
+            : 0,
       label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
     })) || [];

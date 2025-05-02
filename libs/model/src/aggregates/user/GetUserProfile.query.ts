@@ -18,10 +18,12 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         where: { id: user_id },
         attributes: [
           'profile',
+          'tier',
           'referred_by_address',
           'referral_count',
           'referral_eth_earnings',
           'xp_points',
+          'xp_referrer_points',
         ],
       });
 
@@ -81,6 +83,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
 
       return {
         userId: user_id!,
+        tier: user!.tier,
         profile: user!.profile,
         totalUpvotes,
         addresses: addresses.map((a) => {
@@ -115,6 +118,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         referral_count: user!.referral_count ?? 0,
         referral_eth_earnings: user!.referral_eth_earnings ?? 0,
         xp_points: user!.xp_points ?? 0,
+        xp_referrer_points: user!.xp_referrer_points ?? 0,
       };
     },
   };

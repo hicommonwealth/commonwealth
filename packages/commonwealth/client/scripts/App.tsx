@@ -9,13 +9,15 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
+import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
+import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
+import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
-import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
-import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import FarcasterFrameProvider from './views/components/FarcasterProvider';
 import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
@@ -23,34 +25,28 @@ OpenFeature.setProvider(openFeatureProvider);
 
 const App = () => {
   const { isLoading } = useInitApp();
-  const { isAddedToHomeScreen, isMarketingPage, isIOS, isAndroid } =
-    useAppStatus();
-
   return (
     <StrictMode>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <DisableMavaOnMobile />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
               <OpenFeatureProvider client={undefined}>
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <>
-                    <OnBoardingWrapperForMobile>
-                      <ReactNativeBridgeUser />
-                      <ReactNativeLogForwarder />
-                      <RouterProvider router={router()} />
-                      {isAddedToHomeScreen || isMarketingPage ? null : (
-                        <AddToHomeScreenPrompt
-                          isIOS={isIOS}
-                          isAndroid={isAndroid}
-                          displayDelayMilliseconds={1000}
-                        />
-                      )}
-                    </OnBoardingWrapperForMobile>
-                  </>
+                  <DefaultPrivyProvider>
+                    <ForceMobileAuth>
+                      <OnBoardingWrapperForMobile>
+                        <ReactNativeBridgeUser />
+                        <ReactNativeLogForwarder />
+                        <ReactNativeScrollToTopListener />
+                        <RouterProvider router={router()} />
+                      </OnBoardingWrapperForMobile>
+                    </ForceMobileAuth>
+                  </DefaultPrivyProvider>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && <ReactQueryDevtools />}

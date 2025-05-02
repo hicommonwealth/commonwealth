@@ -6,15 +6,22 @@ import {
   getContestScore,
   getContestStatus,
   getTokenAttributes,
+  getTransaction,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
+  LP_CONTEST_MANAGER_ADDRESS_ANVIL,
+  LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
+  LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
   buildContestLeaderboardUrl,
   buildFarcasterContestFrameUrl,
   getBaseUrl,
+  getDefaultContestImage,
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { privateKeyToAccount } from 'viem/accounts';
+import { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';
@@ -25,19 +32,9 @@ import {
   getChainNodeUrl,
   publishCast,
 } from '../../utils';
+import { findActiveContestManager } from '../../utils/findActiveContestManager';
 
 const log = logger(import.meta);
-
-export class MissingContestManager extends Error {
-  constructor(
-    message: string,
-    public readonly namespace: string,
-    public readonly contest_address: string,
-  ) {
-    super(message);
-    this.name = 'Missing Contest Manager';
-  }
-}
 
 const inputs = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
@@ -56,6 +53,7 @@ async function createInitialContest(
   interval: number,
   isOneOff: boolean,
   blockNumber: number,
+  isTokenGraduation: boolean = false,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -82,15 +80,54 @@ async function createInitialContest(
     contest_address,
     url,
     true,
-  );
-
-  const { startTime, endTime } = await getContestStatus(
-    url,
-    contest_address,
     isOneOff,
   );
 
+  const { startTime, endTime, prizeShare, contestToken } =
+    await getContestStatus(
+      { rpc: url, eth_chain_id: ethChainId },
+      contest_address,
+      isOneOff,
+    );
+
   await models.sequelize.transaction(async (transaction) => {
+    if (isTokenGraduation) {
+      // get general topic
+      const topic = await models.Topic.findOne({
+        where: {
+          community_id: community!.id,
+          name: 'General',
+        },
+      });
+      if (!topic) {
+        log.warn(`General topic not found for community ${community!.id}`);
+        return;
+      }
+      await models.ContestManager.create(
+        {
+          contest_address,
+          interval,
+          ticker,
+          decimals,
+          community_id: community!.id,
+          created_at: new Date(),
+          name: 'Top Posts of the Week',
+          description:
+            'Top content of the week gets rewarded by community owned pool',
+          image_url: getDefaultContestImage(),
+          prize_percentage: prizeShare,
+          payout_structure: [50, 35, 15],
+          topic_id: topic.id,
+          funding_token_address: contestToken,
+          is_farcaster_contest: false,
+          cancelled: false,
+          ended: false,
+          environment: config.APP_ENV,
+        },
+        { transaction },
+      );
+    }
+
     const [contestManager] = await models.ContestManager.update(
       {
         interval,
@@ -144,6 +181,7 @@ async function createInitialContest(
 }
 
 type ContestDetails = {
+  eth_chain_id: number;
   url: string;
   prize_percentage: number;
   payout_structure: number[];
@@ -158,7 +196,8 @@ async function getContestDetails(
 ): Promise<ContestDetails | undefined> {
   const [result] = await models.sequelize.query<ContestDetails>(
     `
-        select cn.private_url,
+        select CN.eth_chain_id,
+               cn.private_url,
                cn.url,
                cm.prize_percentage,
                cm.payout_structure,
@@ -192,14 +231,18 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
+    cp.mustBeProtocolChainId(details.eth_chain_id);
+
     const { scores, contestBalance } = await getContestScore(
-      details.url,
+      { eth_chain_id: details.eth_chain_id, rpc: details.url },
       contest_address,
       details.prize_percentage,
       details.payout_structure,
-      undefined,
+      contest_id,
       details.interval === 0,
+      true,
     );
+
     await models.Contest.update(
       {
         score: scores,
@@ -215,11 +258,84 @@ export async function updateScore(contest_address: string, contest_id: number) {
   }
 }
 
+async function isGraduatedContest(
+  payload: z.infer<typeof inputs.RecurringContestManagerDeployed>,
+): Promise<boolean> {
+  const chain = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      eth_chain_id: payload.eth_chain_id,
+    },
+  });
+  if (!chain) {
+    log.warn(
+      `ChainNode (${payload.eth_chain_id}) not found for contest ${payload.contest_address}`,
+    );
+    return false;
+  }
+  const rpc = chain.private_url || chain.url;
+  if (!rpc) {
+    log.warn(`Chain node url not found on contest ${payload.contest_address}`);
+    return false;
+  }
+
+  mustExist('env LAUNCHPAD_PRIVATE_KEY', !!config.WEB3.LAUNCHPAD_PRIVATE_KEY);
+
+  const {
+    tx: { from: deployerAddress },
+  } = await getTransaction({
+    rpc,
+    txHash: payload.transaction_hash,
+  });
+
+  const account = privateKeyToAccount(
+    config.WEB3.LAUNCHPAD_PRIVATE_KEY! as `0x${string}`,
+  );
+
+  const lpContestManagerAddresses =
+    config.APP_ENV === 'production'
+      ? [LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET]
+      : [
+          LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
+          LP_CONTEST_MANAGER_ADDRESS_ANVIL,
+        ];
+  // compare all addresses as lowercase
+  const validDeployers = [...lpContestManagerAddresses, account.address].map(
+    (address) => address.toLowerCase(),
+  );
+  return validDeployers.includes(deployerAddress.toLowerCase());
+}
+
 export function Contests(): Projection<typeof inputs> {
   return {
     inputs,
     body: {
       RecurringContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          const isGraduated = await isGraduatedContest(payload);
+          if (isGraduated) {
+            // onchain contest was created via token graduation
+            await createInitialContest(
+              payload.namespace,
+              payload.contest_address,
+              payload.interval,
+              false,
+              payload.block_number,
+              true,
+            );
+            return;
+          }
+
+          // Contest manager should have been created by user, but was not found in this DB.
+          // This is usually happens if the contest was created in another environment, e.g. QA/prod.
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -231,6 +347,16 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       OneOffContestManagerDeployed: async ({ payload }) => {
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
+        if (!contestManager) {
+          log.warn(
+            `ContestManager not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
+
         // on-chain genesis event
         await createInitialContest(
           payload.namespace,
@@ -241,14 +367,8 @@ export function Contests(): Projection<typeof inputs> {
         );
 
         // if bot-created farcaster contest, notify author
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-          },
-        });
-        mustExist('Contest Manager', contestManager);
 
-        if (contestManager.farcaster_author_cast_hash) {
+        if (contestManager?.farcaster_author_cast_hash) {
           await publishCast(
             contestManager.farcaster_author_cast_hash,
             ({ username }) => {
@@ -256,6 +376,7 @@ export function Contests(): Projection<typeof inputs> {
                 payoutStructure: [winner1, winner2, winner3],
                 voterShare,
               } = DEFAULT_CONTEST_BOT_PARAMS;
+              // eslint-disable-next-line max-len
               return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
             },
             {
@@ -274,12 +395,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const contestManager = await models.ContestManager.findOne({
-          where: {
-            contest_address: payload.contest_address,
-            environment: config.APP_ENV,
-          },
-        });
+        const contestManager = await findActiveContestManager(
+          payload.contest_address,
+        );
         if (!contestManager) {
           log.warn(
             `ContestManager not found for contest ${payload.contest_address}`,
@@ -341,6 +459,12 @@ export function Contests(): Projection<typeof inputs> {
             },
           ],
         });
+        if (!add_action) {
+          log.warn(
+            `ContestAction not found for contest ${payload.contest_address}`,
+          );
+          return;
+        }
 
         let calculated_voting_weight: string | undefined;
 

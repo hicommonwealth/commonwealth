@@ -4,6 +4,7 @@ import {
   BASE_ID,
   BLAST_ID,
   POLYGON_ETH_CHAIN_ID,
+  SONIEUM_ID,
 } from 'views/components/CommunityInformationForm/constants';
 import { z } from 'zod';
 import { CommunitySortDirections, CommunitySortOptions } from './types';
@@ -18,6 +19,7 @@ export const communityChains = {
   Base: parseInt(BASE_ID),
   Polygon: POLYGON_ETH_CHAIN_ID,
   Blast: parseInt(BLAST_ID),
+  Sonieum: parseInt(SONIEUM_ID),
 };
 
 export const communityTypes = Object.keys(CommunityType) as CommunityType[];
@@ -46,6 +48,28 @@ export const sortOrderLabelsToDirectionsMap = {
   [CommunitySortDirections.Descending]: 'DESC',
 };
 
-export const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20', // only allowing ERC20 for now
-);
+export const communityNetworks: string[] = Object.keys(ChainNetwork)
+  .filter((val) =>
+    [
+      'ArbitrumMainnet',
+      'Arthera',
+      'Avalanche',
+      'Base',
+      'Blast',
+      'BSC',
+      'Celo',
+      'Core',
+      'ERC20',
+      'EthereumMainnet',
+      'Fantom',
+      'FuseMainnet',
+      'Gnosis',
+      'Harmony',
+      'HorizenEON',
+      'Linea',
+      'Optimism',
+      'Polygon',
+      'Soneium',
+    ].includes(val),
+  )
+  .sort((a, b) => a.localeCompare(b));

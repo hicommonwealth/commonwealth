@@ -3,7 +3,8 @@ import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import app from 'state';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useAiCompletion } from 'state/api/ai';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -14,6 +15,7 @@ import { StickCommentContext } from 'views/components/StickEditorContainer/conte
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
@@ -21,6 +23,7 @@ export type MobileInputProps = CommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
+  parentCommentText?: string;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -33,12 +36,14 @@ export const MobileInput = (props: MobileInputProps) => {
     onCancel,
     onAiReply,
     aiCommentsToggleEnabled,
+    parentCommentText,
+    thread: originalThread,
   } = props;
 
   const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
   const stickyCommentReset = useActiveStickCommentReset();
 
   const communityId = app.activeChainId() || '';
@@ -59,6 +64,15 @@ export const MobileInput = (props: MobileInputProps) => {
   // Define default constants (must match NewThreadForm and ViewThreadPage)
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
+
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: mode === 'thread' ? 'create-thread' : 'create-comment',
+  });
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -96,6 +110,12 @@ export const MobileInput = (props: MobileInputProps) => {
 
     if (mode === 'thread') {
       try {
+        // Check for turnstile verification if enabled
+        if (isTurnstileEnabled && !turnstileToken) {
+          notifyError('Please complete the Turnstile verification');
+          return;
+        }
+
         // Find a default topic (prefer "General" if it exists)
         const defaultTopic =
           sortedTopics.find(
@@ -130,12 +150,14 @@ export const MobileInput = (props: MobileInputProps) => {
           title: effectiveTitle,
           topic: defaultTopic,
           body: effectiveBody,
+          turnstileToken,
         });
 
         const thread = await createThreadMutation(threadInput);
 
-        // Clear the input
+        // Clear the input and reset turnstile
         setValue('');
+        resetTurnstile();
 
         // Construct the correct navigation path with proper URL encoding
         const encodedTitle = encodeURIComponent(
@@ -149,16 +171,29 @@ export const MobileInput = (props: MobileInputProps) => {
       } catch (error) {
         console.error('Error creating thread:', error);
         notifyError('Failed to create thread');
+
+        // Reset turnstile on error
+        resetTurnstile();
       }
     } else {
       // --- Traditional Comment Submission Logic ---
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
-          aiPromise = generateComment(submittedText);
+          const context = `
+          Thread: ${originalThread?.title || ''}
+          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+          `;
+
+          const prompt = generateCommentPrompt(context);
+
+          aiPromise = generateCompletion(prompt, {
+            stream: false,
+            model: 'gpt-4o-mini',
+          });
         }
         // Call the actual comment submission logic passed in as a prop.
-        const commentId = await handleSubmitComment();
+        const commentId = await handleSubmitComment(turnstileToken);
         setValue('');
         stickyCommentReset();
 
@@ -222,10 +257,24 @@ export const MobileInput = (props: MobileInputProps) => {
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
+              <CWIconButton
+                iconName="paperPlaneTilt"
+                onClick={() => {
+                  handleSubmit().catch((error) => {
+                    console.error('Error submitting comment:', error);
+                  });
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
+
+      {mode === 'thread' && isTurnstileEnabled && (
+        <div className="mobile-turnstile-container">
+          <TurnstileWidget />
+        </div>
+      )}
     </div>
   );
 };

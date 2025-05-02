@@ -9,10 +9,12 @@ import useAuthentication from 'client/scripts/views/modals/AuthModal/useAuthenti
 import React from 'react';
 import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
+import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import { getChainIcon, getSsoIconName } from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
 import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
@@ -33,7 +35,7 @@ type AddressItemProps = {
 const AddressItem = (props: AddressItemProps) => {
   const { addressInfo, toggleRemoveModal, isSelected, isInsideCommunity } =
     props;
-  const { address, walletId, community } = addressInfo;
+  const { address, walletId, community, walletSsoSource } = addressInfo;
 
   const { openMagicWallet } = useAuthentication({});
 
@@ -51,9 +53,16 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWIcon iconName="ethereum" iconSize="small" />
+          <CWCustomIcon
+            iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
+            iconSize="small"
+          />
           <CWIdentificationTag
-            iconLeft={walletId}
+            iconLeft={
+              walletId === WalletId.Magic
+                ? getSsoIconName(walletSsoSource)
+                : walletId
+            }
             address={`\u2022 ${formatAddressShort(address)}`}
           />
         </div>

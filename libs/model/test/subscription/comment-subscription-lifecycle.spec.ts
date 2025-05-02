@@ -1,6 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
@@ -29,6 +29,7 @@ describe('Comment subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.CommunityVerified,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -36,6 +37,7 @@ describe('Comment subscription lifecycle', () => {
         {
           role: 'member',
           user_id: user!.id,
+          verified: new Date(),
         },
       ],
       topics: [{}],
@@ -62,7 +64,7 @@ describe('Comment subscription lifecycle', () => {
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },
-      address: undefined,
+      address: community?.Addresses?.at(0)?.address,
     };
   });
 

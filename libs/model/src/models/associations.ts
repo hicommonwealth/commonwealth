@@ -30,16 +30,17 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
+
   db.QuestActionMeta.withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
   })
-    .withMany(db.ChainEventXpSource, {
+    .withOne(db.ChainEventXpSource, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     })
-    .withMany(db.QuestTweets, {
+    .withOne(db.QuestTweets, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -74,6 +75,11 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
+  db.DiscordBotConfig.withOne(db.Community, {
+    foreignKey: 'discord_config_id',
+    targetKey: 'id',
+  });
+
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
       asOne: 'community',
@@ -99,7 +105,8 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withOne(db.DiscordBotConfig, {
-      targetKey: 'discord_config_id',
+      foreignKey: 'community_id',
+      targetKey: 'id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {
@@ -141,7 +148,10 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.ThreadVersionHistory);
+    .withMany(db.ThreadVersionHistory)
+    .withOne(db.ThreadRank, {
+      onDelete: 'CASCADE',
+    });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -241,6 +251,18 @@ export const buildAssociations = (db: DB) => {
       model: db.User,
       as: 'commentSubscriptions',
       onDelete: 'CASCADE',
+    },
+  );
+
+  db.CommunityGoalReached.withManyToMany(
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.CommunityGoalMeta,
+      onDelete: 'CASCADE',
+      asOne: 'meta',
     },
   );
 

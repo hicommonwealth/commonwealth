@@ -5,6 +5,7 @@ import {
   tester,
   type DB,
 } from '@hicommonwealth/model';
+import { UserTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
@@ -56,6 +57,7 @@ describe('DatabaseCleaner Tests', async () => {
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
         profile: {},
+        tier: UserTierMap.ManuallyVerified,
       });
       // @ts-expect-error StrictNullChecks
       await models.Address.create({
@@ -71,6 +73,7 @@ describe('DatabaseCleaner Tests', async () => {
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
         profile: {},
+        tier: UserTierMap.ManuallyVerified,
       });
       // @ts-expect-error StrictNullChecks
       const address = await models.Address.create({
@@ -103,6 +106,7 @@ describe('DatabaseCleaner Tests', async () => {
         comment_count: 0,
         search: getThreadSearchVector('Testing', ''),
         topic_id: topic!.id!,
+        is_linking_token: false,
       });
 
       const comment = await models.Comment.create({

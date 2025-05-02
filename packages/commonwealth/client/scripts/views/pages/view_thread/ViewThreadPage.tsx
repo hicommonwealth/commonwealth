@@ -4,17 +4,22 @@ import {
   MIN_CHARS_TO_SHOW_MORE,
   getThreadUrl,
 } from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
+import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { Thread, ThreadView } from 'client/scripts/models/Thread';
+import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
-import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
@@ -27,16 +32,13 @@ import React, {
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
-  useEditThreadMutation,
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import { buildUpdateThreadInput } from 'state/api/threads/editThread';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
@@ -57,8 +59,10 @@ import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import MetaTags from '../../components/MetaTags';
-import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import {
+  CWContentPage,
+  SidebarComponents,
+} from '../../components/component_kit/CWContentPage';
 import { CWGatedTopicBanner } from '../../components/component_kit/CWGatedTopicBanner';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -67,7 +71,16 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import DetailCard from '../../components/proposals/DetailCard';
+import TimeLineCard from '../../components/proposals/TimeLineCard';
+import VotingResultView from '../../components/proposals/VotingResultView';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/voting_results';
 import { getTextFromDelta } from '../../components/react_quill_editor/';
+import ProposalVotesDrawer from '../NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
+import { useCosmosProposal } from '../NewProposalViewPage/useCosmosProposal';
+import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal';
+import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
@@ -85,7 +98,6 @@ type ViewThreadPageProps = {
 };
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
-  const stickyEditor = useFlag('stickyEditor');
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -95,18 +107,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
-  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
-  const [streamingTitle, setStreamingTitle] = useState('');
-
-  const { generateComment } = useGenerateCommentText();
+  const [showVotesDrawer, setShowVotesDrawer] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
+  const initalAiCommentPosted = useRef(false);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
+
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-
+  useInitChainIfNeeded(app);
   const user = useUserStore();
   const commentsRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const forceRerender = useForceRerender();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -138,6 +154,75 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return t ? new Thread(t as ThreadView) : undefined;
   }, [data]);
 
+  //  snapshot proposal hook
+  const snapshotLink = thread?.links?.find(
+    (link) => link?.source === 'snapshot',
+  );
+  const proposalLink = thread?.links?.find(
+    (link) => link?.source === LinkSource.Proposal,
+  );
+
+  const [snapshotId, proposalId] = snapshotLink?.identifier?.split('/') || [
+    '',
+    '',
+  ];
+
+  const {
+    proposal: snapshotProposal,
+    symbol,
+    votes,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    activeUserAddress,
+    loadVotes,
+    power,
+    threads,
+  } = useSnapshotProposal({
+    identifier: proposalId,
+    snapshotId: snapshotId,
+    enabled: !!snapshotLink,
+  });
+
+  const { proposal, threads: cosmosThreads } = useCosmosProposal({
+    // @ts-expect-error <StrictNullChecks/>
+    proposalId: proposalLink?.identifier,
+    enabledApi: !!proposalLink,
+  });
+  useEffect(() => {
+    proposal?.isFetched?.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched?.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
+  const snapShotVotingResult = React.useMemo(() => {
+    if (!snapshotProposal || !votes) return [];
+    const { choices } = snapshotProposal;
+    const totalVoteCount = totals.sumOfResultsBalance || 0;
+
+    return choices.map((label: string, index: number) => {
+      const voteCount = votes
+        .filter((vote) => vote.choice === index + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      const percentage =
+        totalVoteCount > 0
+          ? ((voteCount / totalVoteCount) * 100).toFixed(2)
+          : '0';
+      const results = voteCount.toFixed(4); // Adjust precision as needed
+
+      return {
+        label,
+        percentage,
+        results,
+      };
+    });
+  }, [votes, totals.sumOfResultsBalance, snapshotProposal]);
+
+  const governanceUrl = `https://snapshot.box/#/s:${snapshotId}/proposal/${proposalId}`;
+
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
   >(null);
@@ -168,14 +253,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
 
-  const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId,
-    threadId: Number(threadId),
-    threadMsgId: thread?.canvasMsgId || '',
-    currentStage: thread?.stage || ThreadStage.Discussion,
-    currentTopicId: thread?.topic?.id || 0,
-  });
-
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleGenerateAIComment = useCallback(
@@ -185,13 +262,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       }
 
       // Only generate AI comment if there are no existing comments
-      if (thread?.numberOfComments && thread.numberOfComments > 0) {
+      if (
+        (thread?.numberOfComments && thread.numberOfComments > 0) ||
+        initalAiCommentPosted.current
+      ) {
         return;
       }
 
       // Using await to satisfy the linter requirement
       await Promise.resolve();
+
       setStreamingReplyIds([mainThreadId]);
+      initalAiCommentPosted.current = true;
     },
     [aiCommentsToggleEnabled, user.activeAccount, thread],
   );
@@ -295,73 +377,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
-  // Add title generation logic
-  const generateTitleFromBody = useCallback(async () => {
-    const activeAccount = user.activeAccount;
-    if (!thread?.body || isGeneratingTitle || !activeAccount?.address) {
-      return;
-    }
-
-    setIsGeneratingTitle(true);
-    setStreamingTitle('');
-    let fullTitle = '';
-
-    try {
-      await generateComment(
-        `Based on this thread content, generate a concise 2-6 word title. Content: ${thread.body}`,
-        (chunk) => {
-          const chunkStr =
-            typeof chunk === 'string' ? chunk : String(chunk || '');
-          const cleanChunk = chunkStr
-            .replace(/["']/g, '')
-            .replace(/[.!?]$/, '');
-          fullTitle = (fullTitle + cleanChunk).slice(0, 100);
-          setStreamingTitle(fullTitle);
-        },
-      );
-
-      if (fullTitle.trim()) {
-        if (!thread.id || !thread.canvasMsgId) {
-          return;
-        }
-
-        const input = await buildUpdateThreadInput({
-          address: activeAccount.address,
-          communityId: communityId || '',
-          threadId: thread.id,
-          threadMsgId: thread.canvasMsgId,
-          newTitle: fullTitle.trim(),
-          newBody: thread.body,
-        });
-
-        await editThread(input);
-        setDraftTitle(fullTitle.trim());
-      }
-    } catch (error) {
-      notifyError('Failed to generate title');
-    } finally {
-      setIsGeneratingTitle(false);
-    }
-  }, [
-    thread?.body,
-    thread?.id,
-    thread?.canvasMsgId,
-    communityId,
-    user.activeAccount,
-    generateComment,
-    editThread,
-    isGeneratingTitle,
-  ]);
-
-  // Add effect to trigger title generation when thread is loaded without a title
-  useEffect(() => {
-    if (!thread) return;
-    if (isGeneratingTitle || thread.title !== 'Untitled Discussion') return;
-    if (thread.id && thread.canvasMsgId && thread.body) {
-      void generateTitleFromBody();
-    }
-  }, [thread, isGeneratingTitle, generateTitleFromBody]); // Only run when thread changes
-
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -444,16 +459,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       }
     }
   };
+  const handleSnapshotChangeWrapper = ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    handleNewSnapshotChange({ id, snapshot_title }).catch((error) => {
+      console.error('Failed to handle snapshot change:', error);
+    });
+  };
 
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
   );
   const isStageDefault = thread && isDefaultStage(app, thread.stage);
-
-  const tabsShouldBePresent =
-    showLinkedProposalOptions ||
-    showLinkedThreadOptions ||
-    pollsData?.length > 0;
 
   const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
@@ -547,6 +568,158 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
 
+  const sidebarComponent = [
+    ...(showLinkedProposalOptions || showLinkedThreadOptions
+      ? [
+          {
+            label: 'Links',
+            item: (
+              <div className="cards-column">
+                {showLinkedProposalOptions && (
+                  <LinkedProposalsCard
+                    thread={thread!}
+                    showAddProposalButton={isAuthor || isAdminOrMod}
+                  />
+                )}
+                {showLinkedThreadOptions && (
+                  <LinkedThreadsCard
+                    thread={thread!}
+                    allowLinking={isAuthor || isAdminOrMod}
+                  />
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(isAuthor || isAdmin || hasWebLinks
+      ? [
+          {
+            label: 'Web Links',
+            item: (
+              <div className="cards-column">
+                <LinkedUrlCard
+                  thread={thread!}
+                  allowLinking={isAuthor || isAdminOrMod}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(canCreateSnapshotProposal && !hasSnapshotProposal
+      ? [
+          {
+            label: 'Snapshot',
+            item: (
+              <div className="cards-column">
+                <SnapshotCreationCard
+                  thread={thread!}
+                  allowSnapshotCreation={isAuthor || isAdminOrMod}
+                  onChangeHandler={handleSnapshotChangeWrapper}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(pollsData?.length > 0 ||
+    (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(
+                    pollsData?.map((poll) => [poll.id, poll]),
+                  ).values(),
+                ].map((poll: Poll) => {
+                  return (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      isTopicMembershipRestricted={isRestrictedMembership}
+                      showDeleteButton={isAuthor || isAdmin}
+                    />
+                  );
+                })}
+                {isAuthor &&
+                  (!app.chain?.meta?.admin_only_polling || isAdmin) && (
+                    <ThreadPollEditorCard
+                      thread={thread}
+                      threadAlreadyHasPolling={!pollsData?.length}
+                    />
+                  )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+  ];
+
+  const governanceType = proposal
+    ? 'cosmos'
+    : snapshotProposal
+      ? 'snapshot'
+      : '';
+  const status = snapshotProposal?.state || proposal?.status;
+
+  const proposalDetailSidebar = [
+    ...(!isWindowSmallInclusive && (snapshotProposal || proposal)
+      ? [
+          {
+            label: 'Detail',
+            item: (
+              <DetailCard
+                status={status || ''}
+                governanceType={governanceType || ''}
+                // @ts-expect-error <StrictNullChecks/>
+                publishDate={snapshotProposal?.created || proposal.createdAt}
+                id={proposalId || proposalLink?.identifier}
+                Threads={threads || cosmosThreads}
+                scope={thread?.communityId}
+              />
+            ),
+          },
+
+          {
+            label: 'Timeline',
+            item: (
+              <TimeLineCard proposalData={snapshotProposal || proposal?.data} />
+            ),
+          },
+
+          {
+            label: 'Results',
+            item: (
+              <>
+                {!snapshotLink ? (
+                  <VotingResults proposal={proposal as AnyProposal} />
+                ) : (
+                  <VotingResultView
+                    voteOptions={snapShotVotingResult}
+                    showCombineBarOnly={false}
+                    governanceUrl={governanceUrl}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]
+      : []),
+  ];
+  const toggleShowVotesDrawer = (newModalState: boolean) => {
+    setShowVotesDrawer(newModalState);
+  };
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+
   return (
     <StickCommentProvider>
       <MetaTags
@@ -619,14 +792,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       <CWPageLayout ref={pageRef}>
         <CWContentPage
-          showTabs={isCollapsedSize && tabsShouldBePresent}
+          showTabs={false}
           contentBodyLabel="Thread"
           showSidebar={
-            showLinkedProposalOptions ||
-            showLinkedThreadOptions ||
-            pollsData?.length > 0 ||
-            isAuthor ||
-            !!hasWebLinks
+            !isWindowSmallInclusive &&
+            (!isWindowSmallInclusive ||
+              !showLinkedProposalOptions ||
+              showLinkedThreadOptions ||
+              pollsData?.length > 0 ||
+              isAuthor ||
+              !!hasWebLinks)
           }
           onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}
@@ -638,11 +813,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 }}
                 value={draftTitle}
               />
-            ) : isGeneratingTitle ? (
-              <div className="streaming-title">
-                <CWIcon iconName="sparkle" iconSize="small" />
-                <CWText>{streamingTitle || 'Generating title...'}</CWText>
-              </div>
             ) : (
               thread?.title
             )
@@ -762,17 +932,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      {!stickyEditor && (
-                        <CreateComment
-                          rootThread={thread}
-                          canComment={canComment}
-                          tooltipText={
-                            typeof disabledActionsTooltipText === 'function'
-                              ? disabledActionsTooltipText?.('comment')
-                              : disabledActionsTooltipText
-                          }
-                        />
-                      )}
                       {foundGatedTopic &&
                         !hideGatingBanner &&
                         isRestrictedMembership && (
@@ -795,6 +954,111 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               )}
             </div>
           )}
+          subBody={
+            <>
+              {isWindowSmallInclusive && (snapshotProposal || proposal) && (
+                <>
+                  <DetailCard
+                    status={status || ''}
+                    governanceType={governanceType || ''}
+                    publishDate={
+                      // @ts-expect-error <StrictNullChecks/>
+                      snapshotProposal?.created || proposal.createdAt
+                    }
+                    id={proposalId || proposalLink?.identifier}
+                    Threads={threads || cosmosThreads}
+                    scope={thread?.communityId}
+                  />
+                  <TimeLineCard
+                    proposalData={snapshotProposal || proposal?.data}
+                  />
+                </>
+              )}
+              {snapshotProposal ? (
+                <>
+                  <SnapshotPollCardContainer
+                    activeUserAddress={activeUserAddress}
+                    fetchedPower={!!power}
+                    identifier={proposalId}
+                    proposal={snapshotProposal as SnapshotProposal}
+                    scores={[]}
+                    space={space as SnapshotSpace}
+                    symbol={symbol}
+                    totals={totals}
+                    totalScore={totalScore}
+                    validatedAgainstStrategies={validatedAgainstStrategies}
+                    votes={votes}
+                    loadVotes={async () => loadVotes()}
+                    snapShotVotingResult={snapShotVotingResult}
+                    toggleShowVotesDrawer={toggleShowVotesDrawer}
+                  />
+                  {isWindowSmallInclusive && (
+                    <VotingResultView
+                      voteOptions={snapShotVotingResult}
+                      showCombineBarOnly={false}
+                      governanceUrl={governanceUrl}
+                    />
+                  )}
+                  <ProposalVotesDrawer
+                    header="Votes"
+                    votes={votes}
+                    choices={snapshotProposal?.choices}
+                    isOpen={showVotesDrawer}
+                    setIsOpen={setShowVotesDrawer}
+                  />
+                </>
+              ) : (
+                <>
+                  {proposal && (
+                    <>
+                      <VotingActions
+                        onModalClose={onModalClose}
+                        proposal={proposal}
+                        toggleVotingModal={toggleVotingModal}
+                        votingModalOpen={votingModalOpen}
+                        redrawProposals={redrawProposals}
+                        proposalRedrawState={proposalRedrawState}
+                        toggleShowVotesDrawer={toggleShowVotesDrawer}
+                      />
+                      {isWindowSmallInclusive && (
+                        <VotingResults proposal={proposal} />
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+              {isWindowSmallInclusive && (
+                <div className="mobile-action-card-container ">
+                  <div className="actions">
+                    <div className="left-container">
+                      <CWIcon
+                        iconName="squaresFour"
+                        iconSize="medium"
+                        weight="bold"
+                      />
+                      <CWText type="h5" fontWeight="semiBold">
+                        Actions
+                      </CWText>
+                    </div>
+                    <CWIcon
+                      iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                      iconSize="small"
+                      className="caret-icon"
+                      weight="bold"
+                      onClick={() => setIsCollapsed(!isCollapsed)}
+                    />
+                  </div>
+
+                  <div className="action-cards">
+                    {!isCollapsed &&
+                      sidebarComponent.map((view) => (
+                        <div key={view.label}>{view.item}</div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </>
+          }
           comments={
             <>
               <CommentTree
@@ -814,8 +1078,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               />
 
               <WithDefaultStickyComment>
-                {stickyEditor &&
-                  thread &&
+                {thread &&
                   !thread.readOnly &&
                   !fromDiscordBot &&
                   !isGloballyEditing &&
@@ -823,6 +1086,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
+                      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
                       tooltipText={
                         typeof disabledActionsTooltipText === 'function'
                           ? disabledActionsTooltipText?.('comment')
@@ -836,100 +1100,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             </>
           }
           editingDisabled={isTopicInContest}
-          sidebarComponents={
-            [
-              ...(showLinkedProposalOptions || showLinkedThreadOptions
-                ? [
-                    {
-                      label: 'Links',
-                      item: (
-                        <div className="cards-column">
-                          {showLinkedProposalOptions && (
-                            <LinkedProposalsCard
-                              thread={thread!}
-                              showAddProposalButton={isAuthor || isAdminOrMod}
-                            />
-                          )}
-                          {showLinkedThreadOptions && (
-                            <LinkedThreadsCard
-                              thread={thread!}
-                              allowLinking={isAuthor || isAdminOrMod}
-                            />
-                          )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(isAuthor || isAdmin || hasWebLinks
-                ? [
-                    {
-                      label: 'Web Links',
-                      item: (
-                        <div className="cards-column">
-                          <LinkedUrlCard
-                            thread={thread!}
-                            allowLinking={isAuthor || isAdminOrMod}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(canCreateSnapshotProposal && !hasSnapshotProposal
-                ? [
-                    {
-                      label: 'Snapshot',
-                      item: (
-                        <div className="cards-column">
-                          <SnapshotCreationCard
-                            thread={thread!}
-                            allowSnapshotCreation={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleNewSnapshotChange}
-                          />
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              ...(pollsData?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.admin_only_polling || isAdmin))
-                ? [
-                    {
-                      label: 'Polls',
-                      item: (
-                        <div className="cards-column">
-                          {[
-                            ...new Map(
-                              pollsData?.map((poll) => [poll.id, poll]),
-                            ).values(),
-                          ].map((poll: Poll) => {
-                            return (
-                              <ThreadPollCard
-                                poll={poll}
-                                key={poll.id}
-                                isTopicMembershipRestricted={
-                                  isRestrictedMembership
-                                }
-                                showDeleteButton={isAuthor || isAdmin}
-                              />
-                            );
-                          })}
-                          {isAuthor &&
-                            (!app.chain?.meta?.admin_only_polling ||
-                              isAdmin) && (
-                              <ThreadPollEditorCard
-                                thread={thread}
-                                threadAlreadyHasPolling={!pollsData?.length}
-                              />
-                            )}
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-            ] as SidebarComponents
-          }
+          sidebarComponents={sidebarComponent as unknown as SidebarComponents}
+          proposalDetailSidebar={proposalDetailSidebar as SidebarComponents}
+          showActionIcon={true}
         />
       </CWPageLayout>
       {JoinCommunityModals}

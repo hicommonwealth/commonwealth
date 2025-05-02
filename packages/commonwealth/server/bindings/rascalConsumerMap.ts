@@ -1,13 +1,17 @@
 import { RoutingKeyTags } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityGoalsPolicy,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
+  LaunchpadPolicy,
+  NominationsWorker,
   NotificationsPolicy,
+  TwitterEngagementPolicy,
   User,
 } from '@hicommonwealth/model';
 import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
@@ -16,10 +20,14 @@ export const rascalConsumerMap = [
   ChainEventPolicy,
   DiscordBotPolicy,
   Contest.Contests,
+  NominationsWorker,
   FarcasterWorker,
   EventStreamPolicy,
   NotificationsSettingsPolicy,
   CreateUnverifiedUser,
+  TwitterEngagementPolicy,
+  CommunityGoalsPolicy,
+  LaunchpadPolicy,
   {
     consumer: ContestWorker,
     overrides: {

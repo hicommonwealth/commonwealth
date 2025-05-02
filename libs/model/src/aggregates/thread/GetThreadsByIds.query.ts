@@ -41,7 +41,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
                 model: models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id', 'profile'],
+                attributes: ['id', 'profile', 'tier'],
               },
             ],
           },
@@ -53,7 +53,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
                 model: models.User,
                 as: 'User',
                 required: true,
-                attributes: ['id', 'profile'],
+                attributes: ['id', 'profile', 'tier'],
               },
             ],
           },
@@ -75,7 +75,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
                     model: models.User,
                     as: 'User',
                     required: true,
-                    attributes: ['id', 'profile'],
+                    attributes: ['id', 'profile', 'tier'],
                   },
                 ],
               },
@@ -125,7 +125,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
         ],
       });
 
-      return threads.map(
+      return threads!.map(
         (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
       );
     },

@@ -1,5 +1,9 @@
 import * as schemas from '@hicommonwealth/schemas';
-import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
+import {
+  ProposalType,
+  UserTierMap,
+  getDecodedString,
+} from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
@@ -213,6 +217,8 @@ export class Thread implements IUniqueId {
   > | null;
   public readonly latestActivity?: Moment;
   public contentUrl?: string | null;
+  public isLinkingToken?: boolean;
+  public launchpadTokenAddress?: string | null;
 
   public readonly profile: UserProfile;
 
@@ -235,6 +241,7 @@ export class Thread implements IUniqueId {
       reactionWeights?: number[];
       userId?: number;
       user_id?: number;
+      user_tier?: number;
       avatar_url?: string | null;
       address_last_active?: string;
       associatedReactions?: ReactionView[];
@@ -283,7 +290,7 @@ export class Thread implements IUniqueId {
       ? moment(t.last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
         ? moment(this.versionHistory[0].timestamp)
-        : t.updated_at
+        : t.updated_at && moment(t.updated_at).isAfter(moment(t.created_at))
           ? moment(t.updated_at)
           : undefined;
     this.markedAsSpamAt = t.marked_as_spam_at
@@ -320,6 +327,9 @@ export class Thread implements IUniqueId {
       t.ContestActions,
     );
     this.contentUrl = t.content_url;
+    this.isLinkingToken = t.is_linking_token;
+    this.launchpadTokenAddress = t.launchpad_token_address;
+
     this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>
         new Comment({
@@ -369,6 +379,7 @@ export class Thread implements IUniqueId {
         address: t.Address?.address ?? '',
         lastActive: t.address_last_active ?? '',
         avatarUrl: t.avatar_url ?? '',
+        tier: t.user_tier ?? UserTierMap.IncompleteUser,
       };
     }
   }

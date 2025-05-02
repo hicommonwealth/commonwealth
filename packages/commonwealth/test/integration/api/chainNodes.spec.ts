@@ -1,6 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
@@ -22,7 +22,13 @@ describe('ChainNode Tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
+      userAttributes: {
+        email: '',
+        id: 1,
+        isAdmin: true,
+        profile: {},
+        tier: UserTierMap.ManuallyVerified,
+      },
     }) as UserInstance;
     const resp = await controller.createChainNode({
       user,

@@ -97,6 +97,7 @@ export async function completeClientLogin(account: Account) {
         address: account.address,
         community: account.community,
         walletId: account.walletId,
+        walletSsoSource: account.walletSsoSource,
       });
       user.addresses.push(addressInfo);
     }
@@ -206,24 +207,31 @@ export function updateActiveUser(data) {
       isWelcomeOnboardFlowComplete: false,
       isLoggedIn: false,
       referredByAddress: undefined,
+      xpPoints: 0,
+      xpReferrerPoints: 0,
     });
   } else {
-    const addresses = data.addresses.map(
-      (a) =>
-        new AddressInfo({
-          userId: user.id,
-          id: a.id,
-          address: a.address,
-          community: {
-            id: a.community_id,
-            base: a.Community.base,
-            ss58Prefix: a.Community.ss58_prefix,
-          },
-          walletId: a.wallet_id,
-          ghostAddress: a.ghost_address,
-          lastActive: a.last_active,
-        }),
-    );
+    const addresses = data.addresses.map((a) => {
+      // Map the oauth_provider string to WalletSsoSource enum
+      const ssoSource = a.oauth_provider
+        ? (a.oauth_provider as WalletSsoSource)
+        : undefined;
+
+      return new AddressInfo({
+        userId: user.id,
+        id: a.id,
+        address: a.address,
+        community: {
+          id: a.community_id,
+          base: a.Community.base,
+          ss58Prefix: a.Community.ss58_prefix,
+        },
+        walletId: a.wallet_id,
+        ghostAddress: a.ghost_address,
+        lastActive: a.last_active,
+        walletSsoSource: ssoSource,
+      });
+    });
 
     user.setData({
       id: data.id || 0,
@@ -245,6 +253,9 @@ export function updateActiveUser(data) {
       })),
       isLoggedIn: true,
       referredByAddress: data?.referred_by_address,
+      xpPoints: data?.xp_points,
+      xpReferrerPoints: data?.xp_referrer_points,
+      tier: data?.tier,
     });
   }
 }

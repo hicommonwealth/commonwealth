@@ -1,6 +1,8 @@
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
+import { distributeSkale } from 'utils/skaleUtils';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -12,6 +14,7 @@ abstract class ContractBase {
   protected initialized: boolean;
   protected walletEnabled: boolean;
   protected rpc: string;
+  protected chainId: string;
   private abi: any;
 
   constructor(contractAddress: string, abi: any, rpc: string) {
@@ -23,11 +26,18 @@ abstract class ContractBase {
   async initialize(
     withWallet: boolean = false,
     chainId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<void> {
-    if (!this.initialized || withWallet) {
+    if (!this.initialized || withWallet || providerInstance) {
       try {
+        this.chainId = chainId || '1';
         let provider = this.rpc;
-        if (withWallet) {
+
+        if (providerInstance) {
+          provider = providerInstance;
+          this.walletEnabled = true;
+        } else if (withWallet) {
           this.wallet = WebWalletController.Instance.availableWallets(
             ChainBase.Ethereum,
           )[0];
@@ -39,6 +49,8 @@ abstract class ContractBase {
           await this.wallet.switchNetwork(chainId);
           provider = this.wallet.api.givenProvider;
           this.walletEnabled = true;
+
+          await distributeSkale(this.wallet.accounts[0], chainId);
         }
 
         this.web3 = new Web3(provider);
@@ -69,6 +81,9 @@ abstract class ContractBase {
   }
 
   async estimateGas(): Promise<bigint | null> {
+    if (this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST) {
+      return BigInt(0.00012 * 1e9);
+    }
     try {
       const latestBlock = await this.web3.eth.getBlock('latest');
 

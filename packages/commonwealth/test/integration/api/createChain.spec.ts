@@ -1,4 +1,5 @@
 import { models, UserInstance } from '@hicommonwealth/model';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { assert } from 'chai';
 import { describe, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
@@ -11,7 +12,13 @@ describe('create chain tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
+      userAttributes: {
+        email: '',
+        id: 1,
+        isAdmin: true,
+        profile: {},
+        tier: UserTierMap.ManuallyVerified,
+      },
     }) as UserInstance;
     try {
       await controller.createChainNode({
@@ -34,7 +41,13 @@ describe('create chain tests', () => {
     const controller = new ServerCommunitiesController(models, null);
     const user: UserInstance = buildUser({
       models,
-      userAttributes: { email: '', id: 1, isAdmin: true, profile: {} },
+      userAttributes: {
+        email: '',
+        id: 1,
+        isAdmin: true,
+        profile: {},
+        tier: UserTierMap.ManuallyVerified,
+      },
     }) as UserInstance;
     try {
       await controller.createChainNode({

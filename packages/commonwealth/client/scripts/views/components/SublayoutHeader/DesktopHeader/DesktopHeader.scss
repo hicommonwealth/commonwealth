@@ -10,6 +10,11 @@
   min-height: $global-header-height;
   padding: 0 12px;
 
+  body.token-launch-drawer-open & {
+    position: fixed;
+    z-index: 0;
+  }
+
   .header-left.desktop {
     padding-left: 68px;
   }
@@ -23,7 +28,8 @@
 
   .searchbar {
     width: 608px;
-
+    display: flex;
+    gap: 4px;
     .SearchBar {
       @include extraSmall {
         display: none;
@@ -72,6 +78,11 @@
           align-items: center;
           justify-content: center;
           cursor: pointer;
+          gap: 4px;
+
+          .Text {
+            color: $neutral-500;
+          }
 
           .earnings {
             margin-inline: 4px;

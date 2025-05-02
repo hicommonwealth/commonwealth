@@ -3,6 +3,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import ExploreCard from '../common/ExploreCard';
 import './TelegramBotExplorer.scss';
+import { CWTag } from '/views/components/component_kit/new_designs/CWTag';
 
 const TelegramBotExplorer = () => {
   return (
@@ -20,8 +21,8 @@ const TelegramBotExplorer = () => {
       </div>
       <ExploreCard
         label="Tap-to-Earn"
-        description="Earn XP in our new TG Mini App!"
-        xpPoints={100}
+        description="Earn Aura in our new TG Mini App!"
+        xpPointsElement={<CWTag label="100" type="proposal" />}
         featuredIconName="telegram"
         onExploreClick={() => {}}
       />

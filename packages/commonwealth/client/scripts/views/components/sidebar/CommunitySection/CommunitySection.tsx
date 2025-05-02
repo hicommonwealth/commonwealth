@@ -25,7 +25,6 @@ import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manag
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
-import CreateCommunityButton from '../CreateCommunityButton';
 import DirectoryMenuItem from '../DirectoryMenuItem';
 import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import { DiscussionSection } from '../discussion_section';
@@ -51,7 +50,6 @@ export const CommunitySection = ({
   isInsideCommunity,
 }: CommunitySectionProps) => {
   const launchpadEnabled = useFlag('launchpad');
-  const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
@@ -115,6 +113,7 @@ export const CommunitySection = ({
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       return;
@@ -169,9 +168,7 @@ export const CommunitySection = ({
           </>
         )}
 
-        {(launchpadEnabled || uniswapTradeEnabled) && <TokenTradeWidget />}
-
-        <CreateCommunityButton />
+        {launchpadEnabled && <TokenTradeWidget />}
 
         <CWDivider />
         <DiscussionSection

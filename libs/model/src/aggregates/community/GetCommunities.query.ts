@@ -1,6 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { CommunityType } from '@hicommonwealth/shared';
+import { CommunityTierMap, CommunityType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -64,6 +64,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   ),
         "community_CTE" AS (
           SELECT  "Community"."id",
+                  "Community"."tier",
+                  "Community"."spam_tier_level",
                   "Community"."chain_node_id",
                   "Community"."name",
                   "Community"."discord_config_id",
@@ -104,7 +106,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   ${iQ(threadFilter, `, COALESCE(tc.thread_count, 0) as last_30_day_thread_count`)}
           FROM    "Communities" AS "Community"
           ${iQ(threadFilter, 'LEFT JOIN thread_counts tc ON tc.community_id = "Community".id')}
-          WHERE  "Community"."active" = true
+          WHERE  "Community"."active" = true AND "Community".tier != ${CommunityTierMap.SpamCommunity}
               ${iQ(base, `AND "Community"."base" = '${base}'`)}
               ${iQ(network, `AND "Community"."network" = '${network}'`)}
               ${iQ(

@@ -78,7 +78,6 @@ export const CompletedProposalVotingResult = (
     yesPct,
     yesResults,
   } = props;
-
   return (
     <div className="VotingResult">
       <div className="results-column">

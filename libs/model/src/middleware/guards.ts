@@ -7,10 +7,13 @@ import {
 import {
   AuthContext,
   CommentContext,
+  Community,
   PollContext,
   ThreadContext,
 } from '@hicommonwealth/schemas';
-import moment from 'moment';
+import { CommunityTierMap } from '@hicommonwealth/shared';
+import dayjs from 'dayjs';
+import { z } from 'zod';
 import type {
   AddressInstance,
   CommentInstance,
@@ -146,9 +149,9 @@ export function mustBeValidDateRange(
   startDaysInTheFuture = 0,
   minDaysInRange = 1,
 ) {
-  const today = moment(new Date());
-  const start = moment(start_date);
-  const end = moment(end_date);
+  const today = dayjs(new Date());
+  const start = dayjs(start_date);
+  const end = dayjs(end_date);
 
   // check if start date is in the future by more than startDaysInTheFuture
   const firstValidStartDate = today.add(startDaysInTheFuture, 'days');
@@ -174,10 +177,19 @@ export function mustBeValidDateRange(
  * @param start_date start date
  */
 export function mustNotBeStarted(start_date: Date) {
-  const start = moment(start_date);
+  const start = dayjs(start_date);
   if (start.isBefore(new Date()))
     throw new InvalidState(
       `Start date ${start.format('YYYY-MM-DD')} already passed`,
       { start_date },
     );
+}
+
+export function mustBeValidCommunity(community: z.infer<typeof Community>) {
+  if (community.tier === CommunityTierMap.SpamCommunity) {
+    throw new InvalidState('Community marked as spam');
+  }
+  if (!community.active) {
+    throw new InvalidState('Community is deactivated');
+  }
 }

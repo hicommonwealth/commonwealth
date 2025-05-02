@@ -1,6 +1,6 @@
+import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { Memberships } from 'state/api/groups/refreshMembership';
 import useUserStore from 'state/ui/user';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import useGetMembersQuery from '../../../../state/api/members/getMembers';

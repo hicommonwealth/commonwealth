@@ -1,6 +1,11 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  CommunityTierMap,
+  UserTierMap,
+  WalletId,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -59,10 +64,13 @@ export async function seedCommunity({
     referral_count: 0,
     referral_eth_earnings: 0,
     xp_points: 0,
+    tier: UserTierMap.ManuallyVerified,
+    emailVerified: false,
   }));
 
   // seed base community
   const [base] = await seed('Community', {
+    tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     active: true,
@@ -81,6 +89,7 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
+    tier: CommunityTierMap.CommunityVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     bech32_prefix,

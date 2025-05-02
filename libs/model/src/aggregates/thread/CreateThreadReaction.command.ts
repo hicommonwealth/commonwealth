@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { authThread } from '../../middleware';
+import { authThread, mustExist, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
@@ -20,6 +20,7 @@ export function CreateThreadReaction(): Command<
         action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
       }),
       verifyReactionSignature,
+      tiered({ upvotes: true }),
     ],
     body: async ({ payload, actor, context }) => {
       const { address, thread } = mustBeAuthorizedThread(actor, context);
@@ -31,6 +32,12 @@ export function CreateThreadReaction(): Command<
         thread.topic_id!,
         address.address,
       );
+
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
 
       // == mutation transaction boundary ==
       const new_reaction_id = await models.sequelize.transaction(
@@ -48,6 +55,7 @@ export function CreateThreadReaction(): Command<
               calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
+              user_tier_at_creation: user.tier,
             },
             transaction,
           });
@@ -64,6 +72,7 @@ export function CreateThreadReaction(): Command<
       return {
         ...reaction!.toJSON(),
         community_id: thread.community_id,
+        thread_id: thread.id!,
       };
     },
   };

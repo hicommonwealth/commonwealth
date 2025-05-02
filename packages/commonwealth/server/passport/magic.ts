@@ -17,6 +17,7 @@ import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
+  UserTierMap,
   WalletId,
   WalletSsoSource,
   deserializeCanvas,
@@ -139,6 +140,7 @@ async function createMagicAddressInstances(
     walletSsoSource,
     transaction,
     accessToken,
+    oauthInfo,
   }: {
     generatedAddresses: Array<{ address: string; community_id: string }>;
     user: UserAttributes;
@@ -148,16 +150,15 @@ async function createMagicAddressInstances(
     walletSsoSource: WalletSsoSource;
     accessToken?: string;
     transaction?: Transaction;
+    oauthInfo?: OauthInfo;
   },
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
 
-  const verifiedInfo = await getVerifiedInfo(
-    magicUserMetadata,
-    walletSsoSource,
-    accessToken,
-  );
+  const verifiedInfo =
+    oauthInfo ||
+    (await getVerifiedInfo(magicUserMetadata, walletSsoSource, accessToken));
   const {
     oauth_provider,
     oauth_email,
@@ -261,6 +262,12 @@ async function createNewMagicUser({
   walletSsoSource,
   referrer_address,
 }: MagicLoginContext): Promise<UserInstance> {
+  const oauthInfo = await getVerifiedInfo(
+    magicUserMetadata,
+    walletSsoSource,
+    accessToken,
+  );
+
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.create(
@@ -275,8 +282,11 @@ async function createNewMagicUser({
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord -> Discord allows oauth
         // sign in with unverified email addresses)
         emailVerified: !!magicUserMetadata.email,
-        profile: {},
+        profile: {
+          // name: oauth_username, ?
+        },
         referred_by_address: referrer_address,
+        tier: UserTierMap.SocialVerified, // verified SSO
       },
       { transaction },
     );
@@ -302,6 +312,7 @@ async function createNewMagicUser({
         walletSsoSource,
         accessToken,
         transaction,
+        oauthInfo,
       });
 
     // create token with provided user/address

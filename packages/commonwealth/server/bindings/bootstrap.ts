@@ -12,33 +12,32 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityGoalsPolicy,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
+  LaunchpadPolicy,
+  NominationsWorker,
+  NotificationsPolicy,
+  TwitterEngagementPolicy,
   User,
   models,
 } from '@hicommonwealth/model';
 import { Client } from 'pg';
 import { config } from 'server/config';
+import { NotificationsSettingsPolicy } from 'server/workers/knock/NotificationsSettings.policy';
 import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-function checkSubscriptionResponse(subRes: boolean, topic: string) {
-  if (!subRes) {
-    log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
-      topic,
-    });
-  }
-}
-
 export async function bootstrapBindings(
   skipRmqAdapter?: boolean,
+  knockWorker?: boolean,
 ): Promise<void> {
   let brokerInstance: Broker;
   try {
@@ -62,10 +61,28 @@ export async function bootstrapBindings(
     throw e;
   }
 
-  const chainEventSubRes = await brokerInstance.subscribe(ChainEventPolicy);
-  checkSubscriptionResponse(chainEventSubRes, ChainEventPolicy.name);
+  if (knockWorker) {
+    await brokerInstance.subscribe(
+      NotificationsPolicy,
+      // This disables retry strategies on any handler error/failure
+      // This is because we cannot guarantee whether a Knock workflow trigger
+      // call was successful or not. It is better to 'miss' notifications then
+      // to double send a notification
+      buildRetryStrategy((err, topic, content, ackOrNackFn, log_) => {
+        log_.error(err.message, err, {
+          topic,
+          message: content,
+        });
+        ackOrNackFn({ strategy: 'ack' });
+        return true;
+      }),
+    );
+    await brokerInstance.subscribe(NotificationsSettingsPolicy);
+    return;
+  }
 
-  const contestWorkerSubRes = await brokerInstance.subscribe(
+  await brokerInstance.subscribe(ChainEventPolicy);
+  await brokerInstance.subscribe(
     ContestWorker,
     buildRetryStrategy(undefined, 20_000),
     {
@@ -79,36 +96,19 @@ export async function bootstrapBindings(
       },
     },
   );
-  checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
-
-  const contestProjectionsSubRes = await brokerInstance.subscribe(
-    Contest.Contests,
-  );
-  checkSubscriptionResponse(contestProjectionsSubRes, Contest.Contests.name);
-
-  const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
-  checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
-
-  const farcasterWorkerSubRes = await brokerInstance.subscribe(
+  await brokerInstance.subscribe(NominationsWorker);
+  await brokerInstance.subscribe(Contest.Contests);
+  await brokerInstance.subscribe(User.Xp);
+  await brokerInstance.subscribe(
     FarcasterWorker,
     buildRetryStrategy(undefined, 20_000),
   );
-  checkSubscriptionResponse(farcasterWorkerSubRes, FarcasterWorker.name);
-
-  const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
-  checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
-
-  const eventStreamSubRes = await brokerInstance.subscribe(EventStreamPolicy);
-  checkSubscriptionResponse(eventStreamSubRes, EventStreamPolicy.name);
-
-  // @timolegros can we automate subscriptions by iterating
-  // over the rascal consumer map?... we can add retry strategies to the map
-  const createUnverifiedUserSubRes =
-    await brokerInstance.subscribe(CreateUnverifiedUser);
-  checkSubscriptionResponse(
-    createUnverifiedUserSubRes,
-    CreateUnverifiedUser.name,
-  );
+  await brokerInstance.subscribe(DiscordBotPolicy);
+  await brokerInstance.subscribe(LaunchpadPolicy);
+  await brokerInstance.subscribe(CreateUnverifiedUser);
+  await brokerInstance.subscribe(TwitterEngagementPolicy);
+  await brokerInstance.subscribe(CommunityGoalsPolicy);
+  await brokerInstance.subscribe(EventStreamPolicy);
 }
 
 export async function bootstrapRelayer(

@@ -1,5 +1,11 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  COMMUNITY_TIERS,
+  CommunityTierMap,
+  hasCommunityTierClientInfo,
+} from '@hicommonwealth/shared';
 import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
@@ -14,6 +20,7 @@ import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
+
 type CommunityPreviewCardProps = {
   monthlyThreadCount?: number;
   isCommunityMember?: boolean;
@@ -22,15 +29,18 @@ type CommunityPreviewCardProps = {
 } & (
   | {
       isExploreMode: true;
+      customExploreText?: string;
       community?: never;
     }
   | {
       isExploreMode?: never;
+      customExploreText?: never;
       community: NonNullable<{
         name: string;
         icon_url: string;
         id: string;
         base: ChainBase;
+        tier?: number;
       }>;
     }
 );
@@ -42,12 +52,15 @@ const CommunityPreviewCard = ({
   hasNewContent,
   onClick,
   isExploreMode,
+  customExploreText,
 }: CommunityPreviewCardProps) => {
   const user = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
   const userAddress = user.addresses?.[0];
   const isJoined = Permissions.isCommunityMember(community?.id);
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const { register, trigger } = useDeferredConditionTriggerCallback({
     shouldRunTrigger: user.isLoggedIn,
@@ -74,7 +87,8 @@ const CommunityPreviewCard = ({
       >
         {isExploreMode ? (
           <CWText type="h4" className="explore-label">
-            Explore communities <CWIcon iconName="arrowRightPhosphor" />
+            {customExploreText || 'Explore communities'}{' '}
+            <CWIcon iconName="arrowRightPhosphor" />
           </CWText>
         ) : (
           <>
@@ -86,11 +100,28 @@ const CommunityPreviewCard = ({
               size="large"
             />
             <div className="community-name">
-              {community?.name && (
-                <CWText type="h4" fontWeight="medium">
-                  {smartTrim(community?.name, 10)}
-                </CWText>
-              )}
+              <div className="header">
+                {community?.name && (
+                  <CWText type="h4" fontWeight="medium">
+                    {smartTrim(community?.name, 8)}
+                  </CWText>
+                )}
+                {trustLevelEnabled &&
+                  community?.tier &&
+                  (() => {
+                    const tier = community.tier as CommunityTierMap;
+                    return (
+                      hasCommunityTierClientInfo(tier) && (
+                        <CWIcon
+                          iconName={
+                            COMMUNITY_TIERS[tier].clientInfo.componentIcon
+                          }
+                          iconSize="small"
+                        />
+                      )
+                    );
+                  })()}
+              </div>
 
               <div className="thread-counts">
                 <CWIcon iconName="notepad" weight="light" />

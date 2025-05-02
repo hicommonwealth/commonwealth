@@ -1,15 +1,16 @@
-import { blobStorage } from '@hicommonwealth/core';
-import fetch from 'node-fetch';
+import { logger } from '@hicommonwealth/core';
 import { OpenAI } from 'openai';
 import {
   ChatCompletionMessage,
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index.mjs';
-import { v4 as uuidv4 } from 'uuid';
 import { config } from '../../config';
 import { models } from '../../database';
 import { LaunchpadTokenInstance } from '../../models/token';
-import { compressServerImage } from '../../utils/imageCompression';
+import {
+  generateImage,
+  ImageGenerationErrors,
+} from '../../utils/generateImage';
 
 type GenerateTokenIdeaProps = {
   ideaPrompt?: string;
@@ -28,11 +29,11 @@ const TOKEN_AI_PROMPTS_CONFIG = {
       or emojis. Restrict your answer to between 3 and 6 characters.`,
   description: `
       Provide a description for the token. Make it funny and keep it in the vein of ironic, sardonic, twitter personae.
-      There are no emoji restrictions. Keep the description to 3 sentences. DO NOT BE OVERLY POSITIVE about global 
-      phenomenon, only the asset itself. Restrict your answer to between 1 and 3 sentences and less than 180 characters.
+      There are no emoji restrictions. You don't have to say 'introducing' or 'new token'. Keep the description to 1 sentence. DO NOT BE OVERLY POSITIVE about global 
+      phenomenon, only the asset itself. Restrict your answer to between 1 sentences and less than 180 characters.
     `,
   image: (name: string, symbol: string) => `
-      Please create an image for a web3 token named "${name}", having a symbol of "${symbol}". 
+      Please create an image for a web3 token called "${name}" with symbol "${symbol}". 
     `,
 };
 
@@ -42,12 +43,13 @@ const TokenErrors = {
   RequestFailed: 'failed to generate complete token idea',
   IdeaPromptVoilatesSecurityPolicy:
     'provided `ideaPrompt` voilates content security policy',
-  ImageGenerationFailure: 'failed to generate image for token idea',
 };
 
 // we have to maintain this to have "conversational" context with OpenAI
 const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
   [];
+
+const log = logger(import.meta);
 
 const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   convoHistory.push({ role: 'user', content: prompt }); // user msg
@@ -58,16 +60,18 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   });
   convoHistory.push(response.choices[0].message); // assistant msg
 
-  return (response.choices[0].message.content || 'NO_RESPONSE').replace(
+  const result = (response.choices[0].message.content || 'NO_RESPONSE').replace(
     /^"|"$/g, // sometimes openAI adds `"` at the start/end of the response + tweaking the prompt also doesn't help
     '',
   );
+  return result;
 };
 
 const generateTokenIdea = async function* ({
   ideaPrompt,
 }: GenerateTokenIdeaProps): AsyncGenerator {
   if (!config.OPENAI.API_KEY) {
+    log.error(TokenErrors.OpenAINotConfigured);
     yield { error: TokenErrors.OpenAINotConfigured };
   }
 
@@ -77,6 +81,7 @@ const generateTokenIdea = async function* ({
   });
 
   if (!openai) {
+    log.error(TokenErrors.OpenAIInitFailed);
     yield { error: TokenErrors.OpenAIInitFailed };
   }
 
@@ -117,28 +122,15 @@ const generateTokenIdea = async function* ({
     yield `data: ${tokenDescription}\n\n`;
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
-    const imageResponse = await openai.images.generate({
-      prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
-      size: '1024x1024',
-      model: 'dall-e-3',
-      n: 1,
-      response_format: 'url',
-    });
-    const imageUrl = imageResponse.data[0].url || '';
+    const imageUrl = await generateImage(
+      TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
+      openai,
+    );
 
-    // upload image to s3 and then send finalized imageURL
-    const resp = await fetch(imageUrl);
-    const buffer = await resp.buffer();
-    const compressedBuffer = await compressServerImage(buffer);
-    const { url } = await blobStorage().upload({
-      key: `${uuidv4()}.png`,
-      bucket: 'assets',
-      content: compressedBuffer,
-      contentType: 'image/png',
-    });
     yield 'event: imageURL\n';
-    yield `data: ${url}\n\n`;
+    yield `data: ${imageUrl}\n\n`;
   } catch (e) {
+    log.error('Error in generateTokenIdea', e as Error);
     let error = TokenErrors.RequestFailed;
 
     if (
@@ -148,8 +140,7 @@ const generateTokenIdea = async function* ({
       if (ideaPrompt && !tokenName) {
         error = TokenErrors.IdeaPromptVoilatesSecurityPolicy;
       } else {
-        // this usually happens in the image generation calls
-        error = TokenErrors.ImageGenerationFailure;
+        error = ImageGenerationErrors.ImageGenerationFailure;
       }
     }
 

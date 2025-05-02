@@ -144,7 +144,7 @@ const CommunityMembersPage = () => {
     },
     {
       key: 'actions',
-      header: 'Onchain Role',
+      header: 'Permissions',
       numeric: false,
       sortable: false,
     },
@@ -292,7 +292,7 @@ const CommunityMembersPage = () => {
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
   const updateActiveTab = (activeTab: TabValues) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(window.location.search);
     params.set('tab', activeTab);
     navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
@@ -478,6 +478,7 @@ const CommunityMembersPage = () => {
             tableState={tableState}
             extraColumns={extraColumns}
             refetch={() => void refetchMembers()}
+            canManagePermissions={isAdmin}
           />
         )}
       </section>

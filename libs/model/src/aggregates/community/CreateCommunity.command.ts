@@ -1,15 +1,23 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { config, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
+  bech32ToHex,
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   DefaultPage,
-  bech32ToHex,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
+import {
+  authVerified,
+  mustBeSuperAdmin,
+  mustExist,
+  tiered,
+  turnstile,
+} from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 
@@ -45,7 +53,11 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [],
+    auth: [
+      authVerified(),
+      tiered({ creates: true }),
+      turnstile({ widgetName: 'create-community' }),
+    ],
     body: async ({ actor, payload }) => {
       const {
         id,
@@ -63,6 +75,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         token_name,
         chain_node_id,
+        allow_tokenized_threads,
+        thread_purchase_token,
       } = payload;
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -118,6 +132,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             id,
             name,
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             default_symbol,
             icon_url,
             description,
@@ -136,6 +152,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             directory_page_enabled: false,
             snapshot_spaces: [],
             stages_enabled: true,
+            allow_tokenized_threads,
+            thread_purchase_token,
+            namespace_verified: false,
+            environment: config.APP_ENV,
           },
           { transaction },
         );
@@ -148,6 +168,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             featured_in_sidebar: true,
             featured_in_new_post: false,
             group_ids: [],
+            allow_tokenized_threads: false,
           },
           { transaction },
         );
@@ -188,6 +209,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               event_payload: {
                 community_id: id,
                 user_id: user.id!,
+                social_links: uniqueLinksArray,
                 referrer_address: user.referred_by_address ?? undefined,
                 created_at: created.created_at!,
               },

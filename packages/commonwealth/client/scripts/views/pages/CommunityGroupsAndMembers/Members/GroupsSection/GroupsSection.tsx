@@ -1,3 +1,5 @@
+import { jumpHighlightElement } from 'helpers/html';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import Group from 'models/Group';
 import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -40,15 +42,32 @@ const GroupsSection = ({
     profiles?.map((p) => [p.address, p]),
   );
 
+  useRunOnceOnCondition({
+    callback: () => {
+      const groupIdToHighlight = new URLSearchParams(
+        window.location.search,
+      ).get(`groupId`);
+      if (groupIdToHighlight) {
+        setTimeout(() => {
+          jumpHighlightElement({
+            elementQuerySelecter: `.group-${groupIdToHighlight}`,
+          });
+        }, 200);
+      }
+    },
+    shouldRun: filteredGroups?.length > 0,
+  });
+
   return (
     <section className="GroupsSection">
       {hasNoGroups && <TopicGatingHelpMessage />}
 
       {filteredGroups?.length > 0 && (
         <section className="list-container">
-          {filteredGroups?.map((group, index) => (
+          {filteredGroups?.map((group) => (
             <GroupCard
-              key={index}
+              key={group.id}
+              groupId={group.id}
               groupName={group.name}
               groupDescription={group.description}
               // @ts-expect-error <StrictNullChecks/>
@@ -66,6 +85,7 @@ const GroupsSection = ({
                           `${
                             r?.data?.source?.evm_chain_id ||
                             r?.data?.source?.cosmos_chain_id ||
+                            r?.data?.source?.solana_network ||
                             ''
                           }`,
                       )

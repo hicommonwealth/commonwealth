@@ -10,6 +10,7 @@ import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
+import useDeleteContestMutation from 'state/api/contests/deleteContest';
 import useUserStore from 'state/ui/user';
 import { Skeleton } from 'views/components/Skeleton';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
@@ -19,6 +20,7 @@ import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -32,10 +34,13 @@ import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
+import { smartTrim } from 'shared/utils';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
+
+const MAX_CHARS_FOR_TITLE = 28;
 
 const noFundsProps = {
   title: 'There are no funds for this contest',
@@ -75,6 +80,7 @@ interface ContestCardProps {
   };
   hideWhenNoPrizes?: boolean;
   contestBalance?: number;
+  prizePercentage?: number;
 }
 
 const ContestCard = ({
@@ -98,11 +104,13 @@ const ContestCard = ({
   community,
   hideWhenNoPrizes = false,
   contestBalance = 0,
+  prizePercentage,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
+  const { mutateAsync: deleteContest } = useDeleteContestMutation();
 
   const newContestPage = useFlag('newContestPage');
 
@@ -127,6 +135,7 @@ const ContestCard = ({
   const prizes = buildContestPrizes(
     // if onchain balance is zero, use projected balance
     Number(onchainContestBalance || contestBalance),
+    prizePercentage,
     payoutStructure,
     decimals,
   );
@@ -137,6 +146,15 @@ const ContestCard = ({
       community_id: app.activeChainId() || '',
     }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
+    });
+  };
+
+  const handleDelete = () => {
+    deleteContest({
+      contest_address: address,
+      community_id: app.activeChainId() || '',
+    }).catch((error) => {
+      console.error('Failed to delete contest: ', error);
     });
   };
 
@@ -161,6 +179,27 @@ const ContestCard = ({
     });
   };
 
+  const handleDeleteContest = () => {
+    openConfirmation({
+      title: 'You are about to delete your contest',
+      description:
+        'Are you sure you want to delete your contest? This action cannot be undone.',
+      buttons: [
+        {
+          label: 'Keep contest',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Delete contest',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: handleDelete,
+        },
+      ],
+    });
+  };
+
   const handleEditContest = () => {
     navigate(
       `/manage/contests/${address}${
@@ -170,7 +209,8 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    newContestPage
+    // after removing feature flag, we can remove the isFarcaster check as well
+    newContestPage || isFarcaster
       ? navigate(`/contests/${address}`, {}, community?.id)
       : navigate(
           `/discussions?featured=mostLikes&contest=${address}`,
@@ -206,6 +246,28 @@ const ContestCard = ({
     return null;
   }
 
+  const isTitleTrimmed = name.length > MAX_CHARS_FOR_TITLE;
+  const trimmedTitle = smartTrim(name, MAX_CHARS_FOR_TITLE);
+
+  const renderTitleWithTooltip = (title: string, isTrimmed: boolean) => {
+    if (!isTrimmed) return <CWText type="h4">{title}</CWText>;
+
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={name}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            <CWText type="h4">{trimmedTitle}</CWText>
+          </span>
+        )}
+      />
+    );
+  };
+
   return (
     <CWCard
       className={clsx('ContestCard', {
@@ -240,7 +302,7 @@ const ContestCard = ({
                 iconUrl: community?.iconUrl || '',
               }}
             />
-            <CWText type="h3">{name}</CWText>
+            {renderTitleWithTooltip(trimmedTitle, isTitleTrimmed)}
           </div>
           {finishDate ? (
             <CWCountDownTimer
@@ -258,6 +320,13 @@ const ContestCard = ({
             />
           </div>
         </div>
+        {ticker && (
+          <CWTag
+            label={`Weighted voting using ${ticker}`}
+            type="group"
+            classNames="contest-tag"
+          />
+        )}
         {!isFarcaster && topics?.length > 0 && (
           <CWText className="topics">
             Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
@@ -365,6 +434,14 @@ const ContestCard = ({
         <div className="contest-footer">
           <CWDivider />
           <div className="buttons">
+            {!isActive && (
+              <CWButton
+                containerClassName="cta-btn"
+                label="Delete contest"
+                buttonType="destructive"
+                onClick={handleDeleteContest}
+              />
+            )}
             <CWButton
               containerClassName="cta-btn"
               label="Cancel contest"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 // eslint-disable-next-line max-len
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import {
@@ -25,10 +25,21 @@ export const PushNotificationsToggle = (
 
   const toggle = useSubscriptionPreferenceSettingToggle([pref]);
 
+  const handleToggle = useCallback(
+    (activate: boolean) => {
+      async function doAsync() {
+        await toggle(activate);
+      }
+
+      doAsync().catch(console.error);
+    },
+    [toggle],
+  );
+
   return (
     <CWToggle
       checked={checked}
-      onChange={() => toggle(!checked)}
+      onChange={() => handleToggle(!checked)}
       disabled={!mobile_push_notifications_enabled}
     />
   );

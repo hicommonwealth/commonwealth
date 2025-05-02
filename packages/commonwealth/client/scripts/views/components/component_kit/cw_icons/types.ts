@@ -1,3 +1,4 @@
+import type { IconWeight } from '@phosphor-icons/react';
 import type React from 'react';
 
 import type { ComponentType } from '../types';
@@ -27,11 +28,11 @@ export type IconStyleProps = {
 export type IconProps = IconStyleProps & {
   componentType?: ComponentType;
   onClick?: (e?: React.MouseEvent<HTMLElement | SVGSVGElement>) => void;
-  weight?: 'fill' | 'bold' | 'light';
+  weight?: IconWeight;
 } & React.SVGProps<SVGSVGElement>;
 
 export type IconComponentProps = IconProps & {
-  iconName: IconName;
+  iconName: IconName | CustomIconName;
   weight?: 'fill' | 'bold' | 'light';
 };
 

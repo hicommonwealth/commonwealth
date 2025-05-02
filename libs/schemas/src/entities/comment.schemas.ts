@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';
-import { Address } from './user.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 export const CommentVersionHistory = z.object({
   id: PG_INT.optional(),
@@ -29,6 +29,7 @@ export const Comment = z.object({
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
   marked_as_spam_at: z.coerce.date().nullish(),
+  user_tier_at_creation: USER_TIER.nullish(),
 
   discord_meta: z
     .object({
@@ -49,7 +50,7 @@ export const Comment = z.object({
       return /^[0-9]+$/.test(str); // only numbers
     })
     .nullish(),
-  search: z.union([z.string(), z.record(z.any())]),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
 
   Address: Address.nullish(),
   Thread: Thread.nullish(),

@@ -1,5 +1,5 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
-import { configure } from '@hicommonwealth/core';
+import { configure, config as target } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
 import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -27,12 +27,12 @@ const {
   DEV_MODULITH,
   ENABLE_CLIENT_PUBLISHING,
   EVM_CE_LOG_TRACE,
-  TWITTER_WORKER_POLL_INTERVAL,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
+  TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
-  TWITTER_APP_BEARER_TOKEN,
+  EVM_CE_ETH_CHAIN_ID_OVERRIDE,
 } = process.env;
 
 const DEFAULTS = {
@@ -52,7 +52,7 @@ const DEFAULTS = {
 };
 
 export const config = configure(
-  { ...model_config, ...adapters_config },
+  [model_config, adapters_config],
   {
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
@@ -102,11 +102,16 @@ export const config = configure(
         MESSAGE_RELAYER_PREFETCH ?? DEFAULTS.MESSAGE_RELAYER_PREFETCH,
         10,
       ),
-      EVM_CE_POLL_INTERVAL_MS: parseInt(
+    },
+    EVM_CE: {
+      POLL_INTERVAL_MS: parseInt(
         EVM_CE_POLL_INTERVAL ?? DEFAULTS.EVM_CE_POLL_INTERVAL,
         10,
       ),
-      EVM_CE_TRACE: EVM_CE_LOG_TRACE !== 'false',
+      LOG_TRACE: EVM_CE_LOG_TRACE !== 'false',
+      ETH_CHAIN_ID_OVERRIDE: EVM_CE_ETH_CHAIN_ID_OVERRIDE
+        ? EVM_CE_ETH_CHAIN_ID_OVERRIDE.split(',').map((id) => parseInt(id))
+        : undefined,
     },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
@@ -122,13 +127,12 @@ export const config = configure(
       WORKER_POLL_INTERVAL: (() => {
         if (TWITTER_WORKER_POLL_INTERVAL)
           return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
-        else if (model_config.APP_ENV === 'local')
+        else if (target.APP_ENV === 'local')
           return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
         else return 0;
       })(),
       ENABLED_BOTS:
         (TWITTER_ENABLED_BOTS?.split(',') as TwitterBotName[]) || [],
-      APP_BEARER_TOKEN: TWITTER_APP_BEARER_TOKEN,
     },
     CACHE_TTL: {
       GET_COMMUNITIES_TRENDING_SIGNED_IN:
@@ -200,8 +204,6 @@ export const config = configure(
     WORKERS: z.object({
       MESSAGE_RELAYER_TIMEOUT_MS: z.number().int().positive(),
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
-      EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
-      EVM_CE_TRACE: z.boolean().optional(),
     }),
     LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
@@ -229,17 +231,25 @@ export const config = configure(
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
     TWITTER: z
       .object({
-        APP_BEARER_TOKEN: z.string().optional(),
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
         ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
       })
       .refine(
-        (data) => !(data.ENABLED_BOTS.length > 0 && !data.APP_BEARER_TOKEN),
+        (data) =>
+          !(
+            data.ENABLED_BOTS.length > 0 &&
+            !model_config.TWITTER.APP_BEARER_TOKEN
+          ),
       ),
     CACHE_TTL: z.object({
       GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
       GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
       GET_COMMUNITIES_JOIN_COMMUNITY: z.number(),
+    }),
+    EVM_CE: z.object({
+      POLL_INTERVAL_MS: z.number().int().positive(),
+      LOG_TRACE: z.boolean(),
+      ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
     }),
   }),
 );

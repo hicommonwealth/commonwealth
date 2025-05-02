@@ -1,4 +1,4 @@
-import { express, trpc } from '@hicommonwealth/adapters';
+import { trpc } from '@hicommonwealth/adapters';
 import {
   Comment,
   Community,
@@ -41,6 +41,7 @@ const {
   deleteGroup,
   joinCommunity,
   banAddress,
+  updateRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -59,7 +60,8 @@ const {
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
-const { createToken, createTrade, getLaunchpadTrades } = launchpad.trpcRouter;
+const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
+  launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
 
 const api = {
@@ -117,9 +119,11 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  updateRole,
   toggleCommentSpam,
   createToken,
   createTrade,
+  getTokenInfoAlchemy,
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
     forceSecure: true,
   }),
@@ -135,7 +139,6 @@ router.use(
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'api-key', 'address'],
   }),
-  express.statsMiddleware,
 );
 
 // ===============================================================================
@@ -170,4 +173,4 @@ const oasOptions: trpc.OasOptions = {
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
-export { PATH, oasOptions, router, trpcRouter };
+export { oasOptions, PATH, router, trpcRouter };
