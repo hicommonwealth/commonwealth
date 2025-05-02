@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
@@ -306,6 +306,20 @@ export async function signInUser({
       signedInUser,
       ethChainId,
     });
+    if (userRes.user.tier === UserTierMap.BannedUser) {
+      throw new InvalidActor(
+        {
+          user: {
+            email: userRes.user.email || '',
+            id: userRes.user.id,
+            emailVerified: userRes.user.emailVerified ?? false,
+            isAdmin: userRes.user.isAdmin ?? false,
+          },
+          address: payload.address,
+        },
+        'User is banned',
+      );
+    }
     foundOrCreatedUser = userRes.user;
     newUser = userRes.newUser;
 

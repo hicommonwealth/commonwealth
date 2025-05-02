@@ -797,6 +797,16 @@ async function magicLoginRoute(
     },
     referrer_address: body.referrer_address,
   };
+
+  if (loggedInUser && loggedInUser.tier === UserTierMap.BannedUser) {
+    return cb('User is banned');
+  } else if (
+    existingUserInstance &&
+    existingUserInstance.tier === UserTierMap.BannedUser
+  ) {
+    return cb('User is banned');
+  }
+
   try {
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
@@ -819,6 +829,10 @@ async function magicLoginRoute(
   } catch (e) {
     log.error(`Failed to sign in user ${JSON.stringify(e, null, 2)}`);
     return cb(e);
+  }
+
+  if (finalUser.tier === UserTierMap.BannedUser) {
+    return cb('User is banned');
   }
 
   log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);

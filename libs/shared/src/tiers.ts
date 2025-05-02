@@ -1,5 +1,5 @@
 type TierClientInfo = {
-  trustLevel: 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
   icon: string;
   componentIcon:
     | 'stopSymbol'
