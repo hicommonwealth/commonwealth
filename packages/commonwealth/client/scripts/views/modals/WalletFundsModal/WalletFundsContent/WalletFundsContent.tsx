@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,47 +8,43 @@ import {
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-
 import { FundWalletItem } from './FundWalletItem';
-import {
-  fetchUserAddress,
-  formatUsdBalance,
-  handleRefreshBalance,
-  magic,
-} from './utils';
+import useMagicWallet from './useMagicWallet';
+import { formatUsdBalance, handleRefreshBalance } from './utils';
 
 import './WalletFundsContent.scss';
 
-const WalletFundsContent = () => {
+const BASE_MAINNET_CHAIN_ID = commonProtocol.ValidChains.Base;
+
+interface WalletFundsContentProps {
+  chainId?: number;
+}
+
+const WalletFundsContent = ({
+  chainId = BASE_MAINNET_CHAIN_ID,
+}: WalletFundsContentProps = {}) => {
   const [amount, setAmount] = useState('0.05');
-  const [userAddress, setUserAddress] = useState<string>('');
 
-  useEffect(() => {
-    const getUserAddress = async () => {
-      const address = await fetchUserAddress();
-      setUserAddress(address);
-    };
-
-    getUserAddress();
-  }, []);
+  const {
+    magic,
+    userAddress,
+    isLoading: isMagicLoading,
+    showWalletInfo,
+  } = useMagicWallet({ chainId });
 
   const {
     data: userBalance = '0',
-    isLoading,
+    isLoading: isBalanceLoading,
     refetch,
   } = useGetEthereumBalanceQuery({
     userAddress,
-    rpcProvider: magic.rpcProvider,
-    enabled: !!userAddress,
+    rpcProvider: magic?.rpcProvider,
+    enabled: !!userAddress && !!magic?.rpcProvider,
   });
 
   const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: 'ETH',
   });
-
-  const handleQrCodeClick = async (): Promise<void> => {
-    await magic.wallet.showAddress();
-  };
 
   const handleInputChange = (value: string): void => {
     const cleanValue = value.replace(/^0+(?=\d)/, '');
@@ -63,6 +60,7 @@ const WalletFundsContent = () => {
   );
 
   const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
+  const isLoading = isMagicLoading || isBalanceLoading;
 
   return (
     <div className="WalletFundsContent">
@@ -100,7 +98,7 @@ const WalletFundsContent = () => {
           <FundWalletItem
             icon="barcode"
             title="View wallet information"
-            onClick={handleQrCodeClick}
+            onClick={showWalletInfo}
           />
         </div>
       </CWModalBody>
