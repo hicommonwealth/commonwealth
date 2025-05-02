@@ -1,5 +1,6 @@
 import { Command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../../policies/utils/utils';
@@ -60,19 +61,35 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
               where: { namespace: token.namespace },
               attributes: ['id'],
             });
-            if (community)
-              await models.Address.findOrCreate({
-                where: { address: trader_address, community_id: community.id },
-                defaults: {
+            if (community) {
+              // find user_id from address
+              const address = await models.Address.findOne({
+                where: {
                   address: trader_address,
-                  community_id: community.id,
-                  role: 'member',
-                  is_user_default: false,
-                  ghost_address: false,
-                  is_banned: false,
+                  user_id: { [Op.not]: null },
                 },
-                transaction,
+                attributes: ['user_id'],
               });
+              if (address) {
+                await models.Address.findOrCreate({
+                  where: {
+                    community_id: community.id,
+                    address: trader_address,
+                    user_id: address.user_id,
+                  },
+                  defaults: {
+                    community_id: community.id,
+                    address: trader_address,
+                    user_id: address.user_id,
+                    role: 'member',
+                    is_user_default: false,
+                    ghost_address: false,
+                    is_banned: false,
+                  },
+                  transaction,
+                });
+              }
+            }
           }
         }
       });
