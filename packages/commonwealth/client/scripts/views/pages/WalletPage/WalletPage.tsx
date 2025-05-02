@@ -21,7 +21,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
-import './RewardsPage.scss';
+import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
@@ -36,7 +36,7 @@ import {
 
 type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
 
-const RewardsPage = () => {
+const WalletPage = () => {
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
   const xpEnabled = useFlag('xp');
@@ -91,14 +91,14 @@ const RewardsPage = () => {
   }
 
   return (
-    <CWPageLayout className="RewardsPageLayout">
-      <section className="RewardsPage">
+    <CWPageLayout className="WalletPageLayout">
+      <section className="WalletPage">
         <CWText type="h2" className="header">
-          Rewards
+          Wallet
         </CWText>
 
         {/* visible only on mobile */}
-        <div className="rewards-button-tabs">
+        <div className="wallet-button-tabs">
           {Object.values(MobileTabType).map((type) => {
             if (type === MobileTabType.Quests && !xpEnabled) return null;
             return (
@@ -114,7 +114,9 @@ const RewardsPage = () => {
         </div>
 
         {/* on mobile show only one card */}
-        <div className="rewards-card-container">
+        <div className="wallet-card-container">
+          {(!isWindowSmallInclusive ||
+            mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.Referrals) && (
             <ReferralCard
@@ -125,13 +127,12 @@ const RewardsPage = () => {
               isReferralsTabSelected={tableTab === TableType.Referrals}
             />
           )}
-          {(!isWindowSmallInclusive ||
-            mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
+
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
             xpEnabled && <QuestSummaryCard />}
         </div>
 
-        <div className="rewards-tab-container">
+        <div className="wallet-tab-container">
           <CWTabsRow>
             {Object.values(TableType).map((type) =>
               type === TableType.XPEarnings && !xpEnabled ? (
@@ -150,14 +151,14 @@ const RewardsPage = () => {
           </CWTabsRow>
         </div>
 
-        {tableTab === TableType.Referrals && (
-          <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
-        )}
         {tableTab === TableType.TokenTXHistory && (
           <TokenTXHistoryTable
             trades={launchpadTrades}
             isLoading={isLaunchpadTradesLoading}
           />
+        )}
+        {tableTab === TableType.Referrals && (
+          <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
         {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
@@ -165,4 +166,4 @@ const RewardsPage = () => {
   );
 };
 
-export default RewardsPage;
+export default WalletPage;

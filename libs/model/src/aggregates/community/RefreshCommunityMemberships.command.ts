@@ -1,7 +1,7 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import type { Requirement } from '@hicommonwealth/shared';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
@@ -65,11 +65,11 @@ async function processMemberships(
       const memberships = address.Memberships ?? [];
       const found = memberships.find(({ group_id }) => group_id === group.id);
       if (found) {
-        const expiresAt = moment(found.last_checked).add(
+        const expiresAt = dayjs(found.last_checked).add(
           config.MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
-        if (moment().isAfter(expiresAt) || force_refresh) {
+        if (dayjs().isAfter(expiresAt) || force_refresh) {
           const updated = computeMembership(address, group, balances);
           toUpdate.push(updated);
           // make sure we only emit actual changes to membership, not just refreshed dates

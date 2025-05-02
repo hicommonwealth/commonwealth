@@ -6,14 +6,14 @@ import {
 import type { z } from 'zod';
 
 export enum MobileTabType {
-  Referrals = 'Referrals',
   WalletBalance = 'Wallet Balance',
+  Referrals = 'Referrals',
   Quests = 'Quests',
 }
 
 export enum TableType {
-  Referrals = 'Referrals',
   TokenTXHistory = 'Token TX History',
+  Referrals = 'Referrals',
   XPEarnings = 'Your Aura',
 }
 

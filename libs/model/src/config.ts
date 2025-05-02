@@ -297,11 +297,7 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) =>
-            !(
-              target.APP_ENV === 'production' ||
-              (target.APP_ENV === 'beta' && !data)
-            ),
+          (data) => !(target.APP_ENV === 'production' && !data),
           'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
         ),
       CONTEST_BOT_PRIVATE_KEY: z
@@ -559,7 +555,7 @@ export const config = configure(
     DISABLE_TIER_RATE_LIMITS: z
       .boolean()
       .refine(
-        (data) => !(target.APP_ENV === 'production' && data),
+        (data) => !(target.APP_ENV === 'production' && !data),
         'Tier rate limits cannot be disabled in production',
       ),
     TIER: z.object({

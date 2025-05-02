@@ -111,7 +111,7 @@ export const QuestActionMeta = z
 
     // associations
     QuestTweet: QuestTweet.nullish(),
-    ChainEventXpSource: ChainEventXpSource.optional(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
