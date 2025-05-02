@@ -79,7 +79,7 @@ const WalletFundsContent = ({
         </div>
 
         <CWText className="usd-value">
-          {isLoading ? '' : formattedBalanceUsd}
+          {isLoading ? 'Loading...' : formattedBalanceUsd}
         </CWText>
         <CWText
           className="refresh-link"

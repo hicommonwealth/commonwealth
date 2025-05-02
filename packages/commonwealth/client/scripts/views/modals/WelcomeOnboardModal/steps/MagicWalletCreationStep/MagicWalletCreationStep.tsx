@@ -1,12 +1,8 @@
 import React from 'react';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import magicWalletModalImage from '../../../../../../assets/img/magic-wallet-modal-image.svg';
-import { WalletFundsModal } from '../../../WalletFundsModal';
+import { WalletFundsContent } from '../../../WalletFundsModal/WalletFundsContent';
 
 import './MagicWalletCreationStep.scss';
-
-const newWalletFunding = false;
 
 type MagicWalletCreationStepProps = {
   onComplete: () => void;
@@ -15,25 +11,18 @@ type MagicWalletCreationStepProps = {
 const MagicWalletCreationStep = ({
   onComplete,
 }: MagicWalletCreationStepProps) => {
-  if (newWalletFunding) {
-    return <WalletFundsModal />;
-  }
-
   return (
     <section className="MagicWalletCreationStep">
-      <CWText type="h4" fontWeight="semiBold">
-        Your Magic Wallet is ready.
-      </CWText>
-      <img src={magicWalletModalImage} alt="" className="img" />
-      <CWText type="b2">
-        Use it to add funds, mint, and vote. Access your wallet in your profile
-      </CWText>
-      <CWButton
-        label="Next"
-        buttonWidth="full"
-        type="submit"
-        onClick={onComplete}
-      />
+      <WalletFundsContent />
+      <div className="button-container">
+        <CWButton
+          label="Skip"
+          type="submit"
+          onClick={onComplete}
+          buttonType="secondary"
+        />
+        <CWButton label="Next" type="submit" onClick={onComplete} />
+      </div>
     </section>
   );
 };
