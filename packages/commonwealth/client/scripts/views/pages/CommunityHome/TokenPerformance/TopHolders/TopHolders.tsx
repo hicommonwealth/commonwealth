@@ -41,48 +41,51 @@ const TopHolders = () => {
     },
   ];
 
-  const rowData = topHolders?.map((holder) => ({
-    user: {
-      customElement: (
-        <FullUser
-          userAddress={holder.address}
-          userCommunityId={communityId}
-          profile={{
-            address: holder.address,
-            name: holder.name!,
-            userId: holder.user_id,
-            tier: holder.tier,
-            lastActive: new Date().toISOString(),
-            avatarUrl: '',
-          }}
-          shouldShowPopover
-          shouldShowRole
-          shouldShowAddressWithDisplayName={true}
-          className="top-holder-user"
-          avatarSize={24}
-        />
-      ),
-    },
-    tokens: {
-      customElement: (
-        <div className="tokens-cell">
-          <FormattedDisplayNumber
-            value={holder.tokens}
-            options={{
-              decimals: 1,
-              useShortSuffixes: true,
+  const rowData = topHolders?.map((holder) => {
+    const name = holder.name || '';
+    return {
+      user: {
+        customElement: (
+          <FullUser
+            userAddress={holder.address}
+            userCommunityId={communityId}
+            profile={{
+              address: holder.address,
+              name: name.length > 8 ? name.substring(0, 8) + '...' : name,
+              userId: holder.user_id,
+              tier: holder.tier,
+              lastActive: new Date().toISOString(),
+              avatarUrl: holder.avatar_url || '',
             }}
-            tooltipContent={holder.tokens.toLocaleString()}
+            shouldShowPopover
+            shouldShowRole
+            shouldShowAddressWithDisplayName={true}
+            className="top-holder-user"
+            avatarSize={24}
           />
-        </div>
-      ),
-      sortValue: holder.tokens,
-    },
-    percentDisplay: {
-      customElement: <div className="percent-cell">{holder.percentage}%</div>,
-      sortValue: holder.percentage,
-    },
-  }));
+        ),
+      },
+      tokens: {
+        customElement: (
+          <div className="tokens-cell">
+            <FormattedDisplayNumber
+              value={holder.tokens}
+              options={{
+                decimals: 1,
+                useShortSuffixes: true,
+              }}
+              tooltipContent={holder.tokens.toLocaleString()}
+            />
+          </div>
+        ),
+        sortValue: holder.tokens,
+      },
+      percentDisplay: {
+        customElement: <div className="percent-cell">{holder.percentage}%</div>,
+        sortValue: holder.percentage,
+      },
+    };
+  });
 
   return (
     <div className="TopHolders">

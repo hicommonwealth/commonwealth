@@ -1,5 +1,8 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
+import { models } from '../../database';
 
 export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
   return {
@@ -7,81 +10,42 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      //const { community_id, limit } = payload;
+      const { community_id, limit = 10 } = payload;
 
-      // const sql = `
-      //   WITH total_balance AS (
-      //     SELECT SUM(balance) as total
-      //     FROM "Addresses"
-      //     WHERE community_id = :community_id
-      //       AND EXISTS (
-      //         SELECT 1 FROM "Memberships" m
-      //         JOIN "Groups" g ON m.group_id = g.id
-      //         WHERE g.name = 'holders'
-      //           AND g.community_id = :community_id
-      //           AND m.address_id = "Addresses".id
-      //       )
-      //   )
-      //   SELECT
-      //     u.id as "userId",
-      //     a.address,
-      //     u.profile_name as name,
-      //     a.balance as tokens,
-      //     CAST((a.balance::float / NULLIF(tb.total, 0) * 100) as DECIMAL(5,2)) as percentage,
-      //     a.role,
-      //     u.tier
-      //   FROM "Addresses" a
-      //   JOIN "Users" u ON a.user_id = u.id
-      //   CROSS JOIN total_balance tb
-      //   WHERE a.community_id = :community_id
-      //     AND EXISTS (
-      //       SELECT 1 FROM "Memberships" m
-      //       JOIN "Groups" g ON m.group_id = g.id
-      //       WHERE g.name = 'holders'
-      //         AND g.community_id = :community_id
-      //         AND m.address_id = a.id
-      //     )
-      //   ORDER BY a.balance DESC
-      //   LIMIT :limit;
-      // `;
+      const sql = `
+        WITH token_group AS (
+          SELECT g.id AS group_id
+          FROM
+            "LaunchpadTokens" lt
+            JOIN "Communities" c ON c.namespace = lt.namespace
+            JOIN "Groups" g ON g.community_id = c.id AND g.metadata->>'name' = lt.symbol || ' Holders'
+            WHERE c.id = :community_id
+          LIMIT 1
+        )
+        SELECT 
+          u.id as user_id,
+          a.address,
+          u.profile->>'name' as name,
+          u.profile->>'avatar_url' as avatar_url,
+          0 as tokens,
+          0 as percentage,
+          a.role,
+          u.tier
+        FROM token_group tg
+        JOIN "Memberships" m ON m.group_id = tg.group_id
+        JOIN "Addresses" a ON m.address_id = a.id AND a.community_id = :community_id
+        JOIN "Users" u ON a.user_id = u.id
+        LIMIT :limit;
+      `;
 
-      // return await models.sequelize.query<z.infer<typeof schemas.HolderView>>(
-      //   sql,
-      //   {
-      //     replacements: { community_id, limit },
-      //     type: QueryTypes.SELECT,
-      //   },
-      // );
+      const holders = await models.sequelize.query<
+        z.infer<typeof schemas.HolderView>
+      >(sql, {
+        replacements: { community_id, limit },
+        type: QueryTypes.SELECT,
+      });
 
-      return [
-        {
-          user_id: 1,
-          address: '0x1234567890abcdef',
-          name: 'John Doe',
-          tokens: 1000,
-          percentage: 10.0,
-          role: 'holder',
-          tier: 1,
-        },
-        {
-          user_id: 2,
-          address: '0x1234567890abcdef',
-          name: 'John Doe',
-          tokens: 1000,
-          percentage: 10.0,
-          role: 'holder',
-          tier: 2,
-        },
-        {
-          user_id: 3,
-          address: '0x1234567890abcdef',
-          name: 'John Doe',
-          tokens: 1000,
-          percentage: 10.0,
-          role: 'holder',
-          tier: 3,
-        },
-      ];
+      return holders;
     },
   };
 }
