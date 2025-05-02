@@ -1,15 +1,15 @@
-import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
-import CWSectionHeader from '../../components/component_kit/new_designs/CWSectionHeader';
-import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
-import XPTable from '../Leaderboard/XPTable/XPTable';
-import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview';
+import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
+import CWSectionHeader from 'views/components/component_kit/new_designs/CWSectionHeader';
+import TrendingThreadList from '../../HomePage/TrendingThreadList/TrendingThreadList';
+import XPTable from '../../Leaderboard/XPTable/XPTable';
+import { TrendingCommunitiesPreview } from '../../user_dashboard/TrendingCommunitiesPreview';
+import ExploreContestList from '../ExploreContestList';
+import QuestList from '../QuestList';
+import TokensList from '../TokensList';
 import './AllTabContent.scss';
-import ExploreContestList from './ExploreContestList';
-import QuestList from './QuestList';
-import TokensList from './TokensList';
 
 interface AllTabContentProps {
   containerRef: MutableRefObject<HTMLElement | undefined>;
