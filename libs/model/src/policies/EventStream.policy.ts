@@ -2,9 +2,11 @@ import {
   cache,
   CacheNamespaces,
   config,
+  InvalidState,
   logger,
   Policy,
 } from '@hicommonwealth/core';
+import { getLaunchpadTokenCreatedTransaction } from '@hicommonwealth/evm-protocols';
 import {
   Community,
   ContestManager,
@@ -148,6 +150,82 @@ const eventStreamMappers: EventStreamMappers = {
       url: threadUrl,
     };
   },
+  LaunchpadTokenCreated: async (payload) => {
+    const { eth_chain_id, transaction_hash } = payload;
+    const chainNode = await models.ChainNode.scope('withPrivateUrl').findOne({
+      where: { eth_chain_id },
+      attributes: ['eth_chain_id', 'url', 'private_url'],
+    });
+    mustExist('Chain Node', chainNode);
+    const tokenData = await getLaunchpadTokenCreatedTransaction({
+      rpc: chainNode.private_url! || chainNode.url!,
+      transactionHash: transaction_hash,
+    });
+    if (!tokenData) {
+      throw new InvalidState('Transaction not found');
+    }
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: tokenData.parsedArgs.tokenAddress },
+      include: [
+        {
+          model: models.Community,
+          attributes: ['id'],
+        },
+      ],
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenCreated',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
+  LaunchpadTokenTraded: async (payload) => {
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: payload.token_address },
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenTraded',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
+  LaunchpadTokenGraduated: async (payload) => {
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: payload.token.token_address },
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenGraduated',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
 };
 
 export function EventStreamPolicy(): Policy<{
@@ -160,6 +238,9 @@ export function EventStreamPolicy(): Policy<{
       ContestEnded: EventStreamSchemas.ContestEnded.input,
       CommunityCreated: EventStreamSchemas.CommunityCreated.input,
       ThreadCreated: EventStreamSchemas.ThreadCreated.input,
+      LaunchpadTokenCreated: EventStreamSchemas.LaunchpadTokenCreated.input,
+      LaunchpadTokenTraded: EventStreamSchemas.LaunchpadTokenTraded.input,
+      LaunchpadTokenGraduated: EventStreamSchemas.LaunchpadTokenGraduated.input,
     },
     body: {
       ContestStarted: async ({ payload }) => {
@@ -183,6 +264,21 @@ export function EventStreamPolicy(): Policy<{
       ThreadCreated: async ({ payload }) => {
         await pushToEventStream(
           await eventStreamMappers.ThreadCreated(payload),
+        );
+      },
+      LaunchpadTokenCreated: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenCreated(payload),
+        );
+      },
+      LaunchpadTokenTraded: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenTraded(payload),
+        );
+      },
+      LaunchpadTokenGraduated: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenGraduated(payload),
         );
       },
     },

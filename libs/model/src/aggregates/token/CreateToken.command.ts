@@ -20,7 +20,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       const { chain_node_id, transaction_hash, description, icon_url } =
         payload;
 
-      const chainNode = await models.ChainNode.findOne({
+      const chainNode = await models.ChainNode.scope('withPrivateUrl').findOne({
         where: { id: chain_node_id },
         attributes: ['eth_chain_id', 'url', 'private_url'],
       });

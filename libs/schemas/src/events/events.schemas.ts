@@ -393,6 +393,12 @@ export const events = {
     }),
   }),
 
+  LaunchpadTokenCreated: z.object({
+    block_timestamp: z.coerce.bigint(),
+    transaction_hash: z.string(),
+    eth_chain_id: z.number(),
+  }),
+
   LaunchpadTokenGraduated: z.object({
     token: LaunchpadToken.extend({}),
     launchpadLiquidity: z.coerce.bigint(),
@@ -414,12 +420,6 @@ export const events = {
     eth_amount: z.coerce.bigint(),
     community_token_amount: z.coerce.bigint(),
     floating_supply: z.coerce.bigint(),
-  }),
-
-  LaunchpadTokenCreated: z.object({
-    block_timestamp: z.coerce.bigint(),
-    transaction_hash: z.string(),
-    eth_chain_id: z.number(),
   }),
 
   ReferralFeeDistributed: ChainEventBase.extend({
