@@ -5,9 +5,10 @@ import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
-import { chainTypes, requirementTypes } from '../../common/constants';
+import { getChainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
@@ -37,6 +38,8 @@ const GroupsSection = ({
     profileChainIds: [communityId],
     apiCallEnabled: profileAddresses?.length > 0,
   });
+
+  const { data: chainNodes } = useFetchNodesQuery();
 
   const profileMap = new Map<string, MinimumProfile>(
     profiles?.map((p) => [p.address, p]),
@@ -78,7 +81,7 @@ const GroupsSection = ({
                     (x) => x.value === r?.data?.source?.source_type,
                   )?.label,
                   requirementChain:
-                    chainTypes
+                    getChainTypes(chainNodes || [])
                       ?.find(
                         (x) =>
                           `${x.value}` ===
