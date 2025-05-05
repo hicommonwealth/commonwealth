@@ -111,18 +111,6 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
                     },
                   },
                 );
-                // await models.GroupPermission.upsert(
-                //   {
-                //     allowed_actions: permissions,
-                //   },
-                //   {
-                //     where: {
-                //       group_id: group_id,
-                //       topic_id: t.id,
-                //     },
-                //     transaction,
-                //   },
-                // );
               }
             }),
           );
