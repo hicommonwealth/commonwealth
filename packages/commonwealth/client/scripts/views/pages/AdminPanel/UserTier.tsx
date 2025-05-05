@@ -65,7 +65,9 @@ const UserTier = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update User Tier',
-      description: `Are you sure you want to update the tier for ${userId}${user?.profile?.name ? ` (${user.profile.name})` : ''} to ${selectedOption?.label || ''}?`,
+      description:
+        'Are you sure you want to update the tier for ' +
+        `${userId}${user?.profile?.name ? ` (${user.profile.name})` : ''} to ${selectedOption?.label || ''}?`,
       buttons: [
         {
           label: 'Update',
