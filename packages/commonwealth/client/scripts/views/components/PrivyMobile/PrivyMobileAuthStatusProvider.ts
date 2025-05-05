@@ -20,6 +20,10 @@ export const PrivyMobileAuthStatusProvider = (props: Props) => {
       const obj = messageToObject(message.data);
       if (obj && typeof message.data === 'object') {
         if (isPrivyAuthStatusMessage(obj)) {
+          console.log(
+            'Privy auth status message received',
+            JSON.stringify(obj, null, 2),
+          );
           setState({ status: obj.data });
         }
       }

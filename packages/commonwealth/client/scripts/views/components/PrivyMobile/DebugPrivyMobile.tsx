@@ -7,7 +7,7 @@ export const DebugPrivyMobile = () => {
   return (
     <div>
       <div>
-        <b>:privyMobileAuthStatus:</b>
+        <b>privyMobileAuthStatus:</b>
       </div>
       <div>{JSON.stringify(privyMobileAuthStatus, null, 2)}</div>
     </div>
