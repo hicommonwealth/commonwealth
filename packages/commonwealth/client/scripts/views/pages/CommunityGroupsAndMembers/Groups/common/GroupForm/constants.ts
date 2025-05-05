@@ -15,6 +15,7 @@ export const TOPIC_PERMISSIONS = {
   [GroupTopicPermissionEnum.POST_AND_COMMENT]: 'Post & Comment',
   [GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST]:
     'Upvote & Comment & Post',
+  [GroupTopicPermissionEnum.NONE]: 'No permissions set!',
 };
 
 export type TopicPermissions =

@@ -92,18 +92,37 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
             (payload.topics || [])?.map(async (t) => {
               const permissions = t.permissions;
               if (group.id) {
-                await models.GroupPermission.update(
+                const allowed_actions = `ARRAY[${permissions
+                  .map((p) => `'${p}'`)
+                  .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`;
+                await models.sequelize.query(
+                  `
+                  INSERT INTO "GroupPermissions" (group_id, topic_id, allowed_actions, created_at, updated_at)
+                  VALUES (:group_id, :topic_id, ${allowed_actions}, NOW(), NOW())
+                  ON CONFLICT(group_id, topic_id) DO UPDATE
+                    SET allowed_actions = EXCLUDED.allowed_actions,
+                        updated_at      = NOW();
+                `,
                   {
-                    allowed_actions: permissions,
-                  },
-                  {
-                    where: {
-                      group_id: group_id,
+                    transaction,
+                    replacements: {
+                      group_id,
                       topic_id: t.id,
                     },
-                    transaction,
                   },
                 );
+                // await models.GroupPermission.upsert(
+                //   {
+                //     allowed_actions: permissions,
+                //   },
+                //   {
+                //     where: {
+                //       group_id: group_id,
+                //       topic_id: t.id,
+                //     },
+                //     transaction,
+                //   },
+                // );
               }
             }),
           );
