@@ -85,8 +85,6 @@ export const generateImage = async ({
     }
   });
 
-  console.log('payload model', payload.model);
-
   const res = await axios.post(
     `${SERVER_URL}/${ApiEndpoints.GENERATE_IMAGE}`,
     payload,
