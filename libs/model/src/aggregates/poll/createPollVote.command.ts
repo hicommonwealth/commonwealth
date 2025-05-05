@@ -1,9 +1,12 @@
 import { Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import moment from 'moment/moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { models } from '../../database';
 import { authPoll } from '../../middleware';
 import { mustBeAuthorizedPoll } from '../../middleware/guards';
+
+dayjs.extend(utc);
 
 export const CreateVotePollErrors = {
   InvalidOption: 'Invalid response option',
@@ -20,10 +23,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
     ],
     body: async ({ actor, payload, context }) => {
       const { poll, address } = mustBeAuthorizedPoll(actor, context);
-      if (
-        !poll.ends_at &&
-        moment(poll.ends_at).utc().isBefore(moment().utc())
-      ) {
+      if (!poll.ends_at && dayjs(poll.ends_at).utc().isBefore(dayjs().utc())) {
         throw new InvalidState(CreateVotePollErrors.PollingClosed);
       }
 
