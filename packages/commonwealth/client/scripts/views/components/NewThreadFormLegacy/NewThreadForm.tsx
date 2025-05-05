@@ -694,12 +694,6 @@ export const NewThreadForm = forwardRef<
       combinedContextText += `Body: ${bodyText}`;
     }
 
-    console.log('--- Opening Image Modal with Context ---');
-    console.log('Gathered Title:', title);
-    console.log('Gathered Body Text:', bodyText);
-    console.log('Gathered Image URLs (placeholder):', imageUrls);
-    console.log('Combined Text Context:', combinedContextText);
-
     setImageModalContext({
       initialReferenceText: combinedContextText || undefined,
       initialReferenceImageUrls: imageUrls.length > 0 ? imageUrls : undefined,
@@ -718,10 +712,10 @@ export const NewThreadForm = forwardRef<
       const currentText = getTextFromDelta(threadContentDelta);
       const imageMarkdown = `![Generated image](${imageUrl})`;
       const combinedText = currentText + imageMarkdown;
-      const newDelta = createDeltaFromText(combinedText, true); // Mark as Markdown
+      const newDelta = createDeltaFromText(combinedText, true);
       setThreadContentDelta(newDelta);
 
-      handleCloseImageModal(); // Close the modal
+      handleCloseImageModal();
     },
     [threadContentDelta, setThreadContentDelta, handleCloseImageModal],
   );

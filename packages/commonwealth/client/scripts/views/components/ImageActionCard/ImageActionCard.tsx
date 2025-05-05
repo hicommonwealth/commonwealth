@@ -1,12 +1,12 @@
 import React from 'react';
 import { CWContentPageCard } from '../component_kit/CWContentPageCard';
 import { CWButton } from '../component_kit/new_designs/CWButton';
-import './ImageActionCard.scss'; // Ensure SCSS file is imported
+
+import './ImageActionCard.scss';
 
 interface ImageActionCardProps {
-  onClick: () => void; // onClick is now for the button
+  onClick: () => void;
   disabled?: boolean;
-  // tooltipText is removed as it's likely not needed for this card structure
 }
 
 export const ImageActionCard = ({
@@ -23,7 +23,6 @@ export const ImageActionCard = ({
             onClick={onClick}
             disabled={disabled}
             buttonHeight="sm"
-            // No icon shown in screenshot
           />
         </div>
       }

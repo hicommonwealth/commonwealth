@@ -1,14 +1,9 @@
 @import '../../../styles/shared.scss';
 
-// Styles now target the inner content div passed to CWContentPageCard
 .ImageActionCard {
   display: flex;
   flex-direction: column;
-  gap: 16px; // Increased gap to match linked_proposals_card
-  padding: 16px; // Added padding to match linked_proposals_card
-  width: 100%; // Ensure it takes full width within the card content area
-
-  // Removed styles for .card-header-content and .card-body-content as those divs are gone
-  // .card-header-content { ... }
-  // .card-body-content { ... }
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
 }

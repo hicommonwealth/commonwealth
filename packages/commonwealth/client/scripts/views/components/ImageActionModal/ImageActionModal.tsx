@@ -1,6 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useUploadFileMutation } from 'state/api/general';
 import { CWImageInput } from '../component_kit/CWImageInput';
 import { ImageProcessingProps } from '../component_kit/CWImageInput/types';
@@ -24,10 +23,9 @@ interface ImageActionModalProps {
   onClose: () => void;
   onApply: (imageUrl: string) => void;
   applyButtonLabel?: string;
-  // --- Context Props (as per plan) ---
   initialReferenceText?: string;
   initialReferenceImageUrls?: string[];
-  contextSource?: 'comment' | 'thread' | 'community'; // Optional: To potentially tailor behavior
+  contextSource?: 'comment' | 'thread' | 'community';
 }
 
 export const ImageActionModal = ({
@@ -35,7 +33,6 @@ export const ImageActionModal = ({
   onClose,
   onApply,
   applyButtonLabel = 'Add to Thread',
-  // --- Context Props ---
   initialReferenceText,
   initialReferenceImageUrls,
   contextSource,
@@ -47,9 +44,9 @@ export const ImageActionModal = ({
   );
   const [referenceTexts, setReferenceTexts] = useState<string[]>(
     initialReferenceText ? initialReferenceText.split('\n') : [],
-  ); // Basic split, refine later if needed
-
-  const location = useLocation();
+  );
+  const [isUploadingReferenceImage, setIsUploadingReferenceImage] =
+    useState(false);
 
   // Callbacks for modifying reference texts and images
   const handleAddReferenceTexts = useCallback((newTexts: string[]) => {
@@ -97,9 +94,13 @@ export const ImageActionModal = ({
   // Upload mutation for reference images
   const { mutateAsync: uploadReferenceImage } = useUploadFileMutation({
     onSuccess: (uploadUrl) => {
+      setIsUploadingReferenceImage(false);
       if (referenceImageUrls.length < MAX_REFERENCE_IMAGES) {
         setReferenceImageUrls((prevUrls) => [...prevUrls, uploadUrl]);
       }
+    },
+    onError: () => {
+      setIsUploadingReferenceImage(false);
     },
   });
 
@@ -132,8 +133,10 @@ export const ImageActionModal = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        setIsUploadingReferenceImage(true);
         // Upload the selected file
         uploadReferenceImage({ file }).catch((err) => {
+          setIsUploadingReferenceImage(false);
           console.error('Failed to upload reference image:', err);
           notifyError('Failed to upload reference image');
         });
@@ -190,7 +193,11 @@ export const ImageActionModal = ({
   }, []);
 
   return (
-    <CWResponsiveDialog open={isOpen} onClose={onClose}>
+    <CWResponsiveDialog
+      open={isOpen}
+      onClose={onClose}
+      className="ImageActionModal"
+    >
       <CWModalHeader label="Generate Image" onModalClose={onClose} />
       <CWModalBody>
         {/* --- Remix Image Row --- */}
@@ -221,6 +228,7 @@ export const ImageActionModal = ({
               <div className="grid-item">
                 <ReferenceImageItem
                   onUploadClick={handleReferenceUploadClick}
+                  loading={isUploadingReferenceImage}
                 />
                 {/* Hidden file input */}
                 <input

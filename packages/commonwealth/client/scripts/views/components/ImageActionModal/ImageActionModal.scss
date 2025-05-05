@@ -1,12 +1,10 @@
 @import '../../../styles/shared.scss';
 
-.CWResponsiveDialog .CWModal .CWModalBody {
+.ImageActionModal.CWResponsiveDialog .CWModal .CWModalBody {
   overflow-y: auto;
   max-height: 75vh;
-  padding-bottom: var(--spacing-large);
 }
 
-.CWResponsiveDialog .CWModal .CWModalBody .ImageActionModal,
 .ImageActionModal {
   width: 100%;
 
@@ -19,36 +17,27 @@
   }
 
   .reference-images-container {
-    margin-bottom: var(--spacing-large);
     border-bottom: 1px solid $neutral-200;
-    padding-bottom: 24px;
     width: 100%;
     display: block !important;
   }
 
   .reference-label {
     display: block;
-    font-weight: var(--font-weight-bold);
-    margin-bottom: var(--spacing-xxsmall);
-    color: var(--text-primary);
   }
 
   .reference-subheading {
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-medium);
     display: block;
   }
 
   .reference-grid {
+    padding-block: 12px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: var(--spacing-small);
-    margin-bottom: var(--spacing-medium);
   }
 
   .grid-item {
     position: relative;
-    aspect-ratio: 1 / 1;
   }
 
   .empty-reference-uploader {
@@ -77,26 +66,23 @@
   }
 
   .reference-text-container {
-    margin-bottom: var(--spacing-large);
     border-bottom: 1px solid $neutral-200;
-    padding-bottom: 24px;
   }
 
   .reference-text-list {
+    padding-block: 16px;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-small);
+    gap: 8px;
   }
 
   .reference-text-list .Tag.pill {
     background-color: $neutral-100 !important;
     border: 1px solid $neutral-300 !important;
     padding: 4px 8px !important;
-    margin-bottom: var(--spacing-small);
 
     .Text {
       color: $neutral-700 !important;
-      font-weight: var(--font-weight-regular) !important;
     }
 
     .close-container {
@@ -129,11 +115,8 @@
     }
   }
 
-  .debug-context-button {
-    margin-top: var(--spacing-medium);
-  }
-
   .ImageActionModalFooter {
+    padding: 16px 24px 24px 24px !important;
   }
 }
 

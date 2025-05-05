@@ -1,4 +1,5 @@
 import React from 'react';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import './ReferenceImageItem.scss';
 
@@ -6,6 +7,7 @@ interface ReferenceImageItemProps {
   imageUrl?: string;
   onRemove?: () => void;
   onUploadClick?: () => void;
+  loading?: boolean;
 }
 
 /**
@@ -16,6 +18,7 @@ export const ReferenceImageItem: React.FC<ReferenceImageItemProps> = ({
   imageUrl,
   onRemove,
   onUploadClick,
+  loading = false,
 }) => {
   const hasImage = !!imageUrl;
 
@@ -52,6 +55,8 @@ export const ReferenceImageItem: React.FC<ReferenceImageItemProps> = ({
       <div className="content-container">
         {hasImage ? (
           <img src={imageUrl} alt="Reference" />
+        ) : loading ? (
+          <Skeleton circle width={60} height={60} />
         ) : (
           <div className="empty-state" />
         )}

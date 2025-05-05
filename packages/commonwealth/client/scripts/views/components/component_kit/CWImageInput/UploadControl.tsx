@@ -207,7 +207,7 @@ export const UploadControl = ({
                     onAddCurrentToReference && (
                       <CWButton
                         label={isSmallScreen ? 'Remix' : 'Save to Remix'}
-                        iconLeft="plusCircle"
+                        iconLeft="plusCirclePhosphor"
                         buttonType="secondary"
                         buttonHeight="sm"
                         buttonWidth="narrow"
