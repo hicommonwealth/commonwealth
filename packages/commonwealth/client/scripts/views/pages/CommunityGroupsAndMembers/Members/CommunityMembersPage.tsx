@@ -289,7 +289,10 @@ const CommunityMembersPage = () => {
     return clonedFilteredGroups;
   }, [groups, searchFilters, memberships]);
 
-  const totalResults = members?.pages?.[0]?.totalResults || 0;
+  let totalResults = members?.pages?.[0]?.totalResults || 0;
+  if (totalResults < 20) {
+    totalResults = members?.pages?.[0]?.results?.length || 1;
+  }
 
   const updateActiveTab = (activeTab: TabValues) => {
     const params = new URLSearchParams(window.location.search);
