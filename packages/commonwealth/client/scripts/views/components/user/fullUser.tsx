@@ -53,7 +53,7 @@ export const FullUser = ({
       id: userCommunityId || '',
       enabled: !!userCommunityId,
     });
-  const { mutateAsync: setUserTier, isLoading } = useSetUserTierMutation();
+  const { mutateAsync: setUserTier } = useSetUserTierMutation();
 
   const banUserConfirmationModal = () => {
     openConfirmation({
@@ -67,8 +67,9 @@ export const FullUser = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: () => {
+            if (!profile?.userId) return;
             setUserTier({
-              user_id: profile?.userId!,
+              user_id: profile.userId,
               tier: UserTierMap.BannedUser,
             })
               .then(() => {
