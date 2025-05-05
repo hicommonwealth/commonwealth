@@ -3,40 +3,52 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // First clear any existing records that might conflict
-    await queryInterface.sequelize.query(
-      `DELETE FROM "ChainNodes" WHERE LOWER(name) LIKE '%sui%'`,
-    );
-    await queryInterface.bulkDelete('Topics', { community_id: 'sui' });
-    await queryInterface.bulkDelete('Communities', { id: 'sui' });
-
-    // Create the Sui chain node
-    const suiChainNode = {
-      name: 'Sui',
-      url: 'https://fullnode.mainnet.sui.io',
-      balance_type: 'sui',
-      block_explorer: 'https://suiscan.com/',
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-
-    await queryInterface.bulkInsert('ChainNodes', [suiChainNode]);
-
-    // Get the ID of the newly created Sui chain node
-    const [suiChainNodes] = await queryInterface.sequelize.query(
-      `SELECT id FROM "ChainNodes" WHERE name = 'Sui' AND url = 'https://fullnode.mainnet.sui.io'`,
-    );
-
-    if (suiChainNodes.length === 0) {
-      throw new Error('Failed to create Sui chain node');
-    }
-
-    const suiChainNodeId = suiChainNodes[0].id;
     const now = new Date();
 
-    // Create the base Sui community using the chain node ID
+    // Check if Sui chain node exists
+    const [existingSuiNodes] = await queryInterface.sequelize.query(
+      `SELECT id FROM "ChainNodes" WHERE LOWER(name) = 'sui mainnet'`,
+    );
+
+    let suiChainNodeId;
+
+    // Define the Sui chain node data
+    const suiChainNode = {
+      name: 'Sui Mainnet',
+      description: 'Sui Mainnet RPC Node',
+      url: 'https://fullnode.mainnet.sui.io',
+      alt_wallet_url: 'https://fullnode.mainnet.sui.io',
+      private_url: 'https://fullnode.mainnet.sui.io',
+      balance_type: 'sui',
+      block_explorer: 'https://suiscan.com/',
+      updated_at: now,
+    };
+
+    if (existingSuiNodes.length > 0) {
+      // Update existing node
+      suiChainNodeId = existingSuiNodes[0].id;
+      await queryInterface.bulkUpdate('ChainNodes', suiChainNode, {
+        id: suiChainNodeId,
+      });
+    } else {
+      // Create new node
+      suiChainNode.created_at = now;
+      await queryInterface.bulkInsert('ChainNodes', [suiChainNode]);
+
+      // Get the ID of the newly created node
+      const [suiChainNodes] = await queryInterface.sequelize.query(
+        `SELECT id FROM "ChainNodes" WHERE name = 'Sui Mainnet' AND url = 'https://fullnode.mainnet.sui.io'`,
+      );
+
+      if (suiChainNodes.length === 0) {
+        throw new Error('Failed to create Sui chain node');
+      }
+
+      suiChainNodeId = suiChainNodes[0].id;
+    }
+
+    // Define the Sui community data
     const suiCommunity = {
-      id: 'sui',
       tier: 0, // Default tier
       spam_tier_level: 0, // Default spam tier level
       chain_node_id: suiChainNodeId,
@@ -50,23 +62,49 @@ module.exports = {
       active: true,
       stages_enabled: true,
       type: 'chain', // Using ChainType.Chain from protocol.ts
-      created_at: now,
       updated_at: now,
     };
 
-    await queryInterface.bulkInsert('Communities', [suiCommunity]);
+    // Check if Sui community exists
+    const [existingSuiCommunity] = await queryInterface.sequelize.query(
+      `SELECT id FROM "Communities" WHERE id = 'sui'`,
+    );
 
-    // Add a general topic for the Sui community
-    await queryInterface.bulkInsert('Topics', [
-      {
-        name: 'General',
-        community_id: 'sui',
-        featured_in_sidebar: true,
-        featured_in_new_post: true,
-        created_at: now,
-        updated_at: now,
-      },
-    ]);
+    if (existingSuiCommunity.length > 0) {
+      // Update existing community
+      await queryInterface.bulkUpdate('Communities', suiCommunity, {
+        id: 'sui',
+      });
+    } else {
+      // Create new community
+      suiCommunity.id = 'sui';
+      suiCommunity.created_at = now;
+      await queryInterface.bulkInsert('Communities', [suiCommunity]);
+    }
+
+    // Check if General topic exists for Sui
+    const [existingSuiTopic] = await queryInterface.sequelize.query(
+      `SELECT id FROM "Topics" WHERE community_id = 'sui' AND name = 'General'`,
+    );
+
+    const generalTopic = {
+      name: 'General',
+      community_id: 'sui',
+      featured_in_sidebar: true,
+      featured_in_new_post: true,
+      updated_at: now,
+    };
+
+    if (existingSuiTopic.length > 0) {
+      // Update existing topic
+      await queryInterface.bulkUpdate('Topics', generalTopic, {
+        id: existingSuiTopic[0].id,
+      });
+    } else {
+      // Create new topic
+      generalTopic.created_at = now;
+      await queryInterface.bulkInsert('Topics', [generalTopic]);
+    }
   },
 
   async down(queryInterface, Sequelize) {
