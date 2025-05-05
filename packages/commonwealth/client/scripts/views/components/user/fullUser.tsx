@@ -73,10 +73,10 @@ export const FullUser = ({
               tier: UserTierMap.BannedUser,
             })
               .then(() => {
-                notifySuccess('User tier updated');
+                notifySuccess('User banned');
               })
               .catch((e) => {
-                notifyError('Error updating user tier');
+                notifyError('Error banning user');
                 console.error(e);
               });
           },
