@@ -62,7 +62,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake_to_set] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
@@ -78,7 +78,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,

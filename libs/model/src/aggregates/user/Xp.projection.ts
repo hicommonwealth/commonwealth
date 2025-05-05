@@ -57,7 +57,7 @@ async function getQuestActionMetas(
   event_payload: {
     community_id?: string;
     created_at?: Date;
-    quest_action_meta_id?: number;
+    quest_action_meta_ids?: number[];
   },
   event_name: keyof typeof schemas.QuestEvents,
 ) {
@@ -75,8 +75,8 @@ async function getQuestActionMetas(
         as: 'action_metas',
         where: {
           event_name,
-          ...(event_payload.quest_action_meta_id && {
-            id: event_payload.quest_action_meta_id,
+          ...(event_payload.quest_action_meta_ids && {
+            id: event_payload.quest_action_meta_ids,
           }),
         },
       },
