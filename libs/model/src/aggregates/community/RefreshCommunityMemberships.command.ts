@@ -1,6 +1,11 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import {
+  cache,
+  CacheNamespaces,
+  logger,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import type { Requirement } from '@hicommonwealth/shared';
+import { BalanceSourceType, type Requirement } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -21,17 +26,16 @@ import {
 
 const log = logger(import.meta);
 
-type Membership = z.infer<typeof schemas.Membership>;
+type Membership = z.infer<typeof schemas.Membership> & { balance?: bigint };
 
 function computeMembership(
   address: AddressAttributes,
   group: GroupAttributes,
   balances: OptionsWithBalances[],
 ): Membership {
-  const { requirements } = group;
-  const { isValid, messages } = validateGroupMembership(
+  const { isValid, messages, balance } = validateGroupMembership(
     address.address,
-    requirements as Requirement[],
+    group.requirements as Requirement[],
     balances,
     group.metadata.required_requirements!,
   );
@@ -40,6 +44,7 @@ function computeMembership(
     address_id: address.id!,
     reject_reason: isValid ? undefined : (messages ?? undefined),
     last_checked: new Date(),
+    balance,
   };
 }
 
@@ -60,7 +65,21 @@ async function processMemberships(
     created: boolean;
     rejected: boolean;
   }>;
+  let tokenHolderGroupId: number | undefined;
+
   for (const group of groups) {
+    // determine if this is a token holder group
+    const singleRequirement =
+      group.requirements?.length === 1 ? group.requirements?.[0] : undefined;
+    tokenHolderGroupId =
+      singleRequirement &&
+      singleRequirement.rule === 'threshold' &&
+      singleRequirement.data.source.source_type === BalanceSourceType.ERC20 &&
+      // TODO: compare to launchpad contract address
+      singleRequirement.data.source.contract_address
+        ? group.id
+        : tokenHolderGroupId;
+
     for (const address of addresses) {
       const memberships = address.Memberships ?? [];
       const found = memberships.find(({ group_id }) => group_id === group.id);
@@ -96,7 +115,32 @@ async function processMemberships(
       }
     }
   }
+
   if (toCreate.length === 0 && toUpdate.length === 0) return [0, 0, 0];
+
+  // cache token balances for token holders group
+  if (tokenHolderGroupId) {
+    const toCache = [
+      ...toCreate
+        .filter((m) => m.group_id === tokenHolderGroupId && m.balance)
+        .map((m) => ({
+          value: m.address_id.toString(),
+          score: Number(m.balance) / 1e18,
+        })),
+      ...toUpdate
+        .filter((m) => m.group_id === tokenHolderGroupId && m.balance)
+        .map((m) => ({
+          value: m.address_id.toString(),
+          score: Number(m.balance) / 1e18,
+        })),
+    ];
+    console.log({ tokenHolderGroupId, toCache });
+    await cache()
+      .addToSortedSet(CacheNamespaces.TokenTopHolders, community_id, toCache)
+      .catch((err) => {
+        log.error(`Failed to cache token holders for ${community_id}`, err);
+      });
+  }
 
   await models.sequelize.transaction(async (transaction) => {
     await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
@@ -119,6 +163,7 @@ async function processMemberships(
         transaction,
       );
   });
+
   return [toCreate.length, toUpdate.length, toEmit.length];
 }
 

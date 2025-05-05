@@ -13,6 +13,7 @@ export type ValidateGroupMembershipResponse = {
   isValid: boolean;
   messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
+  balance?: bigint;
 };
 
 /**
@@ -37,10 +38,11 @@ export function validateGroupMembership(
   let numRequirementsMet = 0;
 
   requirements.forEach((requirement) => {
-    let checkResult: { result: boolean; message: string };
+    let checkResult: { result: boolean; message: string; balance?: bigint };
     switch (requirement.rule) {
       case 'threshold': {
         checkResult = _thresholdCheck(userAddress, requirement.data, balances);
+        response.balance = checkResult.balance;
         break;
       }
       case 'allow': {
@@ -93,7 +95,7 @@ function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
   balances: OptionsWithBalances[],
-): { result: boolean; message: string } {
+): { result: boolean; message: string; balance?: bigint } {
   try {
     let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
@@ -159,7 +161,7 @@ function _thresholdCheck(
         break;
     }
 
-    const balance = balances
+    const _balance = balances
       .filter((b) => b.options.balanceSourceType === balanceSourceType)
       .find((b) => {
         switch (b.options.balanceSourceType) {
@@ -193,16 +195,19 @@ function _thresholdCheck(
         }
       })?.balances[userAddress];
 
-    if (typeof balance !== 'string') {
+    if (typeof _balance !== 'string') {
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
+    const balance = BigInt(_balance);
+    const result = balance > toBigInt(thresholdData.threshold);
+
     return {
       result,
       message: !result
-        ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
+        ? `User Balance of ${_balance} below threshold ${thresholdData.threshold}`
         : 'pass',
+      balance,
     };
   } catch (error) {
     return {
