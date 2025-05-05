@@ -2,7 +2,7 @@ import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
-  bumpTier,
+  bumpCommunityTier,
   CommunityTierMap,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
 } from '@hicommonwealth/shared';
@@ -114,7 +114,8 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         return;
       }
 
-      if (!log_removed) bumpTier(CommunityTierMap.ChainVerified, community);
+      if (!log_removed)
+        bumpCommunityTier(CommunityTierMap.ChainVerified, community);
 
       community.namespace_creator_address = deployer_address;
 

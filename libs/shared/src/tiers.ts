@@ -259,11 +259,14 @@ export function hasCommunityTierClientInfo(
   return 'clientInfo' in COMMUNITY_TIERS[tier];
 }
 
-export function bumpTier<T extends UserTierLevels | CommunityTierLevels>(
-  tier: T,
-  object: { tier: T | null },
+export function bumpCommunityTier(
+  tier: CommunityTierMap,
+  object: { tier: CommunityTierMap | null },
 ) {
-  if (!object.tier || object.tier < tier) {
+  if (
+    object.tier === null ||
+    (object.tier !== CommunityTierMap.SpamCommunity && object.tier < tier)
+  ) {
     object.tier = tier;
   }
 }
