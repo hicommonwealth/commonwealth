@@ -1,26 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError, logger } from '@hicommonwealth/core';
+import { logger, ServerError } from '@hicommonwealth/core';
 import {
   AddressAttributes,
   AddressInstance,
   CommunityInstance,
   DB,
-  UserInstance,
-  VerifiedUserInfo,
   emitEvent,
   getVerifiedUserInfo,
   sequelize,
+  UserInstance,
+  VerifiedUserInfo,
 } from '@hicommonwealth/model';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
+  bumpUserTier,
   CANVAS_TOPIC,
   ChainBase,
+  deserializeCanvas,
+  getSessionSignerForDid,
   UserTierMap,
   WalletId,
   WalletSsoSource,
-  deserializeCanvas,
-  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
@@ -133,11 +134,10 @@ async function bumpTier(
   transaction?: Transaction,
 ) {
   if (
-    user.tier < UserTierMap.SocialVerified &&
-    (!verifiedInfo.oauth_email ||
-      (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified))
+    !verifiedInfo.oauth_email ||
+    (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified)
   ) {
-    user.tier = UserTierMap.SocialVerified;
+    bumpUserTier({ newTier: UserTierMap.SocialVerified, targetObject: user });
     await user.save({ transaction });
   }
 }

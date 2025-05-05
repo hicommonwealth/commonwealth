@@ -1,6 +1,10 @@
 import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  bumpUserTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -163,12 +167,20 @@ export async function findOrCreateUser({
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    if (signedInUser.tier < tier) values.tier = tier;
+    bumpUserTier({
+      oldTier: signedInUser.tier,
+      newTier: tier,
+      targetObject: values,
+    });
     await updateUser(signedInUser.id, values);
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    if (foundUser.tier < tier) values.tier = tier;
+    bumpUserTier({
+      oldTier: foundUser.tier,
+      newTier: tier,
+      targetObject: values,
+    });
     await updateUser(foundUser.id, values);
   }
 
