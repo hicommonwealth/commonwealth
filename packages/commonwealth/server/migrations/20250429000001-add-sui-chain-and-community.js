@@ -73,6 +73,7 @@ module.exports = {
         stages_enabled: true,
         type: 'chain', // Using ChainType.Chain from protocol.ts
         updated_at: now,
+        environment: 'production',
       };
 
       // Check if Sui community exists
