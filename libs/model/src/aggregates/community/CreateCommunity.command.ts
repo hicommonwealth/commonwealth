@@ -156,6 +156,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             thread_purchase_token,
             namespace_verified: false,
             environment: config.APP_ENV,
+            profile_count: 1,
           },
           { transaction },
         );
