@@ -449,7 +449,7 @@ export const events = {
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),

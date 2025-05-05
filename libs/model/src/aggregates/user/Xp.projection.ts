@@ -5,7 +5,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
+import {
+  isWithinPeriod,
+  UserTierMap,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
@@ -14,14 +18,34 @@ async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
     where: { id: address_id },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.ne]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address },
+    where: { address, user_id: { [Op.not]: null } },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.ne]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
@@ -33,7 +57,7 @@ async function getQuestActionMetas(
   event_payload: {
     community_id?: string;
     created_at?: Date;
-    quest_action_meta_id?: number;
+    quest_action_meta_ids?: number[];
   },
   event_name: keyof typeof schemas.QuestEvents,
 ) {
@@ -51,8 +75,8 @@ async function getQuestActionMetas(
         as: 'action_metas',
         where: {
           event_name,
-          ...(event_payload.quest_action_meta_id && {
-            id: event_payload.quest_action_meta_id,
+          ...(event_payload.quest_action_meta_ids && {
+            id: event_payload.quest_action_meta_ids,
           }),
         },
       },
@@ -233,7 +257,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
         const referee_address = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.ne]: UserTierMap.BannedUser },
+          },
         });
         const action_metas = await getQuestActionMetas(
           payload,
@@ -271,7 +298,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityJoined',
         );
         const user = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.ne]: UserTierMap.BannedUser },
+          },
         });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
@@ -465,7 +495,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
       },
       LaunchpadTokenCreated: async ({ payload }) => {
-        const created_at = new Date(Number(payload.block_timestamp));
+        const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
           { created_at },
           'LaunchpadTokenCreated',
@@ -477,13 +507,27 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user_id = await getUserByAddress(payload.trader_address);
         if (!user_id) return;
 
-        const created_at = new Date(Number(payload.block_timestamp));
+        const token = await models.LaunchpadToken.findOne({
+          where: { token_address: payload.token_address.toLowerCase() },
+        });
+        if (!token) return;
+
+        const community = await models.Community.findOne({
+          where: { namespace: token.namespace },
+        });
+
+        const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
-          { created_at },
+          { community_id: community?.id, created_at },
           'LaunchpadTokenTraded',
         );
+
+        // payload eth_amount is in wei, a little misleading
+        const eth_amount = Number(payload.eth_amount) / 1e18;
+        //console.log({ payload, action_metas, eth_amount });
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
-          amount: Number(payload.eth_amount),
+          amount: eth_amount,
+          threshold: eth_amount,
         });
       },
       WalletLinked: async ({ payload }) => {

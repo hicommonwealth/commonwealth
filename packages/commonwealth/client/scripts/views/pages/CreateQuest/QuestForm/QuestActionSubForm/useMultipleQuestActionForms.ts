@@ -5,7 +5,10 @@ import {
   doesActionAllowContentId,
   doesActionAllowRepetition,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
+  doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
@@ -144,6 +147,8 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
+      const requiresBasicPoints =
+        doesActionRequireBasicRewardAmount(chosenAction);
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
@@ -154,12 +159,16 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerId =
         doesActionRequireDiscordServerId(chosenAction);
-      const requiresGroupId = doesActionRequireGroupId(chosenAction);
+      const requiresGroupId =
+        allowsContentId && doesActionRequireGroupId(chosenAction);
+      const allowsTokenTradeThreshold =
+        allowsContentId && doesActionAllowTokenTradeThreshold(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
+        requires_basic_points: requiresBasicPoints,
         requires_creator_points: requiresCreatorPoints,
         is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
@@ -175,6 +184,9 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
+        requires_amount_multipler:
+          doesActionRequireAmountMultipler(chosenAction),
+        with_optional_token_trade_threshold: allowsTokenTradeThreshold,
       };
 
       // set fixed action repitition per certain actions
@@ -223,6 +235,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.Group;
           break;
         }
+        case 'LaunchpadTokenTraded': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.TokenTradeThreshold;
+          break;
+        }
         default: {
           break;
         }
@@ -250,7 +267,10 @@ const useQuestActionMultiFormsState = ({
             !allowsChainId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Group &&
-            !requiresGroupId)
+            !requiresGroupId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.TokenTradeThreshold &&
+            !allowsTokenTradeThreshold)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;

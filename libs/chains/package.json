@@ -27,7 +27,6 @@
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@osmonauts/lcd": "^0.10.0",
     "long": "^5.2.3",
-    "moment": "^2.23.0",
     "protobufjs": "^6.1.13"
   },
   "devDependencies": {
