@@ -5,13 +5,18 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import utc from 'dayjs/plugin/utc';
 import {
   CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
 } from './constants';
+
+dayjs.extend(isBetween);
+dayjs.extend(utc);
 
 /**
  * Decamelizes a string
@@ -391,14 +396,16 @@ export function buildFarcasterContestFrameUrl(contestAddress: string) {
 }
 
 // Date utils
+export type UnitOfTime = 'day' | 'week' | 'month';
 export function isWithinPeriod(
   refDate: Date,
   targetDate: Date,
-  period: moment.unitOfTime.Base,
+  period: UnitOfTime,
 ): boolean {
-  const start = moment(refDate).startOf(period);
-  const end = moment(refDate).endOf(period);
-  return moment(targetDate).isBetween(start, end, null, '[]');
+  const ref = dayjs(refDate);
+  const start = ref.startOf(period);
+  const end = ref.endOf(period);
+  return dayjs(targetDate).isBetween(start, end, null, '[]');
 }
 
 export async function alchemyGetTokenPrices({
@@ -487,11 +494,15 @@ export const calculateNetContestBalance = (originalBalance: number) => {
 // returns array of prize amounts
 export const buildContestPrizes = (
   contestBalance: number,
+  prizePercentage?: number,
   payoutStructure?: number[],
   decimals?: number,
 ): string[] => {
-  // 10% fee deducted from prize pool
-  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  let netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  // for recurring contests, apply prize percentage
+  if (prizePercentage) {
+    netContestBalance = netContestBalance * (prizePercentage / 100);
+  }
   return netContestBalance && payoutStructure
     ? payoutStructure.map((percentage) => {
         const prize =
@@ -554,3 +565,9 @@ export type TurnstileWidgetNames =
   | 'create-community'
   | 'create-thread'
   | 'create-comment';
+
+export const CountAggregatorKeys = {
+  ThreadViewCount: 'thread_view_count',
+  CommunityProfileCount: 'community_profile_count_changed',
+  CommunityThreadCount: 'community_thread_count_changed',
+};

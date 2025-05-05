@@ -35,7 +35,7 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
   })
-    .withMany(db.ChainEventXpSource, {
+    .withOne(db.ChainEventXpSource, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -148,7 +148,10 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.ThreadVersionHistory);
+    .withMany(db.ThreadVersionHistory)
+    .withOne(db.ThreadRank, {
+      onDelete: 'CASCADE',
+    });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',

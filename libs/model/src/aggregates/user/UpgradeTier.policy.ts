@@ -1,9 +1,15 @@
-import { logger, Policy } from '@hicommonwealth/core';
+import { config, logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { tokenBalanceCache } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import { UserTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  NAMESPACE_MIN_NOMINATION_BALANCE,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { Op, QueryTypes, Transaction } from 'sequelize';
-import { models } from '../../database';
+import { models, sequelize } from '../../database';
 import {
   USDC_BASE_MAINNET_ADDRESS,
   USDC_BASE_SEPOLIA_ADDRESS,
@@ -18,6 +24,7 @@ export const UPGRADE_MIN_LAUNCHPAD_BALANCE = 1_000_000_000_000_000_000n; // 1 * 
 const log = logger(import.meta);
 
 const inputs = {
+  NominatorNominated: events.NominatorNominated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
@@ -27,61 +34,61 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
-      // TODO: update to nomination event
+      NominatorNominated: async ({ payload }) => {
+        const {
+          parsedArgs: { namespace, nominator },
+        } = payload;
 
-      // NamespaceTransferSingle: async ({ payload }) => {
-      //   const {
-      //     parsedArgs: { from, to: userAddress, id: tokenId },
-      //     rawLog: { address: namespaceAddress },
-      //   } = payload;
-      //   if (tokenId !== BigInt(NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID)) return; // must be community nomination token
+        const community = await models.Community.findOne({
+          where: { namespace, environment: config.APP_ENV },
+        });
+        if (!community) {
+          log.warn(`Community not found for namespace ${namespace}`);
+          return;
+        }
 
-      //   if (from !== ZERO_ADDRESS) return; // must be minted
+        const nominatedAddress = await models.Address.findOne({
+          where: { address: nominator },
+          include: [
+            {
+              model: models.User,
+              required: true,
+            },
+          ],
+        });
+        if (!nominatedAddress?.User) {
+          log.warn(`User not found for address ${nominator}`);
+          return;
+        }
 
-      //   const community = await models.Community.findOne({
-      //     where: { namespace_address: namespaceAddress },
-      //   });
-      //   if (!community) {
-      //     log.warn(
-      //       `Community not found for namespace address ${namespaceAddress}`,
-      //     );
-      //     return;
-      //   }
+        if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
 
-      //   const nominatedAddress = await models.Address.findOne({
-      //     where: { address: userAddress },
-      //     include: [
-      //       {
-      //         model: models.User,
-      //         required: true,
-      //       },
-      //     ],
-      //   });
-      //   if (!nominatedAddress?.User) {
-      //     log.warn(`User not found for address ${userAddress}`);
-      //     return;
-      //   }
-      //   if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
+        // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
+        const balances = await tokenBalanceCache.getBalances({
+          addresses: [nominatedAddress.address],
+          balanceSourceType: BalanceSourceType.ERC1155,
+          sourceOptions: {
+            evmChainId: payload.eventSource.ethChainId,
+            contractAddress: community.namespace_address!,
+            tokenId: NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+          },
+          cacheRefresh: true,
+        });
+        const balance = parseInt(balances[nominatedAddress.address] ?? '0');
+        if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-      //   // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
-      //   const balances = await tokenBalanceCache.getBalances({
-      //     addresses: [nominatedAddress.address],
-      //     balanceSourceType: BalanceSourceType.ERC1155,
-      //     sourceOptions: {
-      //       evmChainId: payload.eventSource.ethChainId,
-      //       contractAddress: community.namespace_address!,
-      //       tokenId: NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
-      //     },
-      //     cacheRefresh: true,
-      //   });
-      //   const balance = parseInt(balances[nominatedAddress.address] ?? '0');
-      //   if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
-
-      //   await upgradeUserTier(
-      //     nominatedAddress!.User!.id!,
-      //     UserTierMap.ChainVerified,
-      //   );
-      // },
+        await sequelize.transaction(async (transaction) => {
+          await upgradeUserTier(
+            nominatedAddress!.User!.id!,
+            UserTierMap.ChainVerified,
+            transaction,
+          );
+          await models.Community.update(
+            { namespace_verified: true },
+            { where: { id: community.id }, transaction },
+          );
+        });
+      },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;
 
