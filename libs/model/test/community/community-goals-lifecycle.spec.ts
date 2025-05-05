@@ -86,7 +86,7 @@ describe('community goals lifecycle', () => {
     superadmin = actors.superadmin;
 
     const [target] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       base: community!.base,
       chain_node_id: community!.chain_node_id!,
       active: true,

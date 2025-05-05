@@ -66,6 +66,8 @@ export function tiered({
       ],
     });
     if (!user?.id) throw new InvalidActor(actor, 'Unverified user');
+    if (user.tier === UserTierMap.BannedUser)
+      throw new InvalidActor(actor, 'Banned user');
 
     // upgrade tier after a week
     let tier = user.tier;
