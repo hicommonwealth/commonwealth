@@ -303,7 +303,6 @@ export const HolderView = z.object({
   name: z.string().nullable(),
   avatar_url: z.string().nullable(),
   tokens: z.number(),
-  percentage: z.number(),
   role: z.string(),
   tier: z.number(),
 });

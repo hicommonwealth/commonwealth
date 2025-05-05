@@ -58,7 +58,6 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
         results: holders.map((h, index) => ({
           ...h,
           tokens: top[index].score,
-          percentage: 0, // TODO: how to get percentage from redis cache?
         })),
         page: cursor,
         limit,
