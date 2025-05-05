@@ -103,6 +103,22 @@ export default {
       },
       required: ['source_type', 'sui_network'],
     },
+    SuiTokenSource: {
+      type: 'object',
+      properties: {
+        source_type: {
+          type: 'string',
+          enum: ['sui_token'],
+        },
+        sui_network: {
+          type: 'string',
+        },
+        coin_type: {
+          type: 'string',
+        },
+      },
+      required: ['source_type', 'sui_network', 'coin_type'],
+    },
     ThresholdData: {
       type: 'object',
       properties: {
@@ -117,6 +133,7 @@ export default {
             { $ref: '#/definitions/CosmosSource' },
             { $ref: '#/definitions/CosmosContractSource' },
             { $ref: '#/definitions/SuiSource' },
+            { $ref: '#/definitions/SuiTokenSource' },
           ],
         },
       },
