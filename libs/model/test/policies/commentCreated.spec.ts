@@ -61,7 +61,7 @@ describe('CommentCreated Event Handler', () => {
     [mentionedUser] = await tester.seed('User', {});
 
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       custom_domain: customDomain,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
