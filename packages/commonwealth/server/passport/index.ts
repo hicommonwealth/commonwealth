@@ -1,7 +1,9 @@
 import { stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { UserTierMap } from '@hicommonwealth/shared';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
+import { Op } from 'sequelize';
 import { config } from '../config';
 import '../types';
 import { initMagicAuth } from './magic';
@@ -24,7 +26,12 @@ function initDefaultUserAuth(models: DB) {
       async (jwtPayload, done) => {
         try {
           models.User.scope('withPrivateData')
-            .findOne({ where: { id: jwtPayload.id } })
+            .findOne({
+              where: {
+                id: jwtPayload.id,
+                tier: { [Op.not]: UserTierMap.BannedUser },
+              },
+            })
             .then((user) => {
               if (user) {
                 // note the return removed with passport JWT - add this return for passport local
@@ -57,9 +64,15 @@ export function setupPassport(models: DB) {
   passport.deserializeUser((userId, done) => {
     models.User.scope('withPrivateData')
       // @ts-expect-error StrictNullChecks
-      .findOne({ where: { id: userId } })
+      .findOne({
+        where: { id: userId, tier: { [Op.not]: UserTierMap.BannedUser } },
+      })
       .then((user) => {
-        done(null, user);
+        if (!user) {
+          done(new Error('Invalid user'), false);
+        } else {
+          done(null, user);
+        }
       })
       .catch((err) => {
         done(err, null);
