@@ -1,5 +1,5 @@
 type TierClientInfo = {
-  trustLevel: 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
   icon: string;
   componentIcon:
     | 'stopSymbol'
@@ -66,6 +66,11 @@ export const USER_TIERS = {
         images: 0,
         text: 0,
       },
+    },
+    clientInfo: {
+      icon: '🚫',
+      trustLevel: 0,
+      componentIcon: 'stopSymbol',
     },
   },
   [UserTierMap.NewlyVerifiedWallet]: {
@@ -257,6 +262,43 @@ export function hasCommunityTierClientInfo(
   tier: CommunityTierLevels,
 ): tier is CommunityTierWithClientInfo {
   return 'clientInfo' in COMMUNITY_TIERS[tier];
+}
+
+/**
+ * Used to bump a user tier to a higher tier. Will never bump a user who is
+ * already banned. [SIDE EFFECT] The targetObject is modified with the new tier.
+ */
+export function bumpUserTier<
+  T extends { tier?: UserTierMap | null | undefined },
+>({
+  oldTier,
+  newTier,
+  targetObject,
+}: {
+  newTier: UserTierMap;
+  targetObject: T;
+  oldTier?: UserTierMap;
+}) {
+  // Prevent bumping banned users
+  if (
+    (oldTier && oldTier === UserTierMap.BannedUser) ||
+    targetObject.tier === UserTierMap.BannedUser
+  ) {
+    return;
+  }
+
+  if (oldTier && oldTier < newTier) {
+    targetObject.tier = newTier;
+    return;
+  }
+
+  if (
+    targetObject.tier === undefined ||
+    targetObject.tier === null ||
+    targetObject.tier < newTier
+  ) {
+    targetObject.tier = newTier;
+  }
 }
 
 export function bumpCommunityTier(
