@@ -45,10 +45,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
-import {
-  StickCommentProvider,
-  useStickComment,
-} from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -118,8 +115,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
-  const { setContentToAppend } = useStickComment();
-
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -1116,9 +1111,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         <ImageActionModal
           isOpen={imageActionModalOpen}
           onClose={() => setImageActionModalOpen(false)}
-          onApply={(imageUrl) => {
-            const imageMarkdown = `![Generated image](${imageUrl})`;
-            setContentToAppend(imageMarkdown);
+          onApply={() => {
             setImageActionModalOpen(false);
             // TODO: Optionally focus the sticky editor or scroll to it?
           }}

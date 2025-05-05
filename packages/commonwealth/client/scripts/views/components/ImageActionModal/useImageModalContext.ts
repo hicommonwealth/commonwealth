@@ -6,7 +6,6 @@ import { getImageUrlsFromMarkdown } from '../react_quill_editor/utils';
 
 interface ImageContextHookProps {
   isOpen: boolean;
-  contextSource?: 'comment' | 'thread' | 'community';
   initialReferenceText?: string;
   initialReferenceImageUrls?: string[];
   onAddReferenceTexts: (texts: string[]) => void;
@@ -21,16 +20,12 @@ interface ParsedUrlContext {
 
 export const useImageModalContext = ({
   isOpen,
-  contextSource,
-  initialReferenceText,
-  initialReferenceImageUrls,
   onAddReferenceTexts,
   onAddReferenceImages,
 }: ImageContextHookProps) => {
   const location = useLocation();
   const [communityId, setCommunityId] = useState<string | null>(null);
   const [threadId, setThreadId] = useState<number | null>(null);
-  const [commentId, setCommentId] = useState<number | null>(null);
 
   // Data fetching for detected context
   const { data: communityData, isLoading: isLoadingCommunity } =
@@ -53,7 +48,7 @@ export const useImageModalContext = ({
     const pathParts = location.pathname.split('/').filter(Boolean);
     let communityIdFromUrl: string | null = null;
     let threadIdFromUrl: number | null = null;
-    let commentIdFromUrl: number | null = null;
+    const commentIdFromUrl: number | null = null;
 
     // Basic URL parsing, adjust based on actual route structure
     if (
@@ -145,23 +140,11 @@ export const useImageModalContext = ({
     onAddReferenceImages,
   ]);
 
-  // Fetch thread/comment data if relevant IDs are present
-  useEffect(() => {
-    if (!isOpen) return; // Only run when modal opens
-
-    // Context gathering logic was here, logs removed
-
-    const fetchData = async () => {
-      // ... existing code ...
-    };
-  }, [isOpen]);
-
   return {
     gatherContext,
     contextData: {
       communityId,
       threadId,
-      commentId,
       communityData,
       threadData,
     },

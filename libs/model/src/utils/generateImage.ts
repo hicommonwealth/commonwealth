@@ -67,8 +67,10 @@ const generateImageWithOpenAI = async (
     prompt,
     model: options.model || 'gpt-image-1',
     n: options.n || 1,
-    quality: options.quality,
-    size: options.size || '1024x1024',
+    // quality: options.quality,
+    // size: options.size || '1024x1024',
+    quality: 'low',
+    size: '1024x1024',
   };
   // Remove undefined keys before logging and sending
   Object.keys(generationParams).forEach((key) => {

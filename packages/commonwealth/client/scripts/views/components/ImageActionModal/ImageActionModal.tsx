@@ -14,7 +14,6 @@ import { CWResponsiveDialog } from '../component_kit/new_designs/CWResponsiveDia
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import './ImageActionModal.scss';
 import { ReferenceImageItem } from './ReferenceImageItem';
-import { useImageModalContext } from './useImageModalContext';
 
 const MAX_REFERENCE_IMAGES = 4;
 
@@ -35,7 +34,6 @@ export const ImageActionModal = ({
   applyButtonLabel = 'Add to Thread',
   initialReferenceText,
   initialReferenceImageUrls,
-  contextSource,
 }: ImageActionModalProps) => {
   const [imageUrlToApply, setImageUrlToApply] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,36 +46,6 @@ export const ImageActionModal = ({
   const [isUploadingReferenceImage, setIsUploadingReferenceImage] =
     useState(false);
 
-  // Callbacks for modifying reference texts and images
-  const handleAddReferenceTexts = useCallback((newTexts: string[]) => {
-    setReferenceTexts((prevTexts) => {
-      const uniqueNewTexts = newTexts.filter(
-        (text) => !prevTexts.includes(text),
-      );
-      return [...prevTexts, ...uniqueNewTexts];
-    });
-  }, []);
-
-  const handleAddReferenceImages = useCallback((newUrls: string[]) => {
-    setReferenceImageUrls((prevUrls) => {
-      const uniqueNewUrls = newUrls.filter((url) => !prevUrls.includes(url));
-      // Add only enough new URLs to not exceed the max limit
-      const combined = [...prevUrls, ...uniqueNewUrls];
-      return combined.slice(0, MAX_REFERENCE_IMAGES);
-    });
-  }, []);
-
-  // Use the context hook
-  const { gatherContext } = useImageModalContext({
-    isOpen,
-    contextSource,
-    initialReferenceText,
-    initialReferenceImageUrls,
-    onAddReferenceTexts: handleAddReferenceTexts,
-    onAddReferenceImages: handleAddReferenceImages,
-  });
-
-  // Initialize state from props when they change
   useEffect(() => {
     setReferenceImageUrls(initialReferenceImageUrls || []);
   }, [initialReferenceImageUrls]);

@@ -116,7 +116,8 @@ const generateImagePromptWithContext = (
     if (contextMap.title)
       contextString += `- Title/Body Context: ${contextMap.title}\n`;
 
-    prompt = `Remix the provided reference image(s) based on the following prompt: "${trimmedBasePrompt}". \n\n${contextString}`;
+    prompt = `Remix the provided reference image(s) based on the 
+    following prompt: "${trimmedBasePrompt}". \n\n${contextString}`;
   } else if (hasReferenceImages) {
     prompt = `Using the provided reference image(s), create a variation based on the prompt: "${trimmedBasePrompt}".`;
   } else if (hasTextContext) {
