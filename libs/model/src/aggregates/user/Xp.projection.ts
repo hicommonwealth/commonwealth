@@ -5,7 +5,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
+import {
+  isWithinPeriod,
+  UserTierMap,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
@@ -14,6 +18,16 @@ async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
     where: { id: address_id },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.not]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
@@ -22,6 +36,16 @@ async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
     where: { address, user_id: { [Op.not]: null } },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.not]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
@@ -233,7 +257,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
         const referee_address = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.not]: UserTierMap.BannedUser },
+          },
         });
         const action_metas = await getQuestActionMetas(
           payload,
@@ -271,7 +298,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityJoined',
         );
         const user = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.not]: UserTierMap.BannedUser },
+          },
         });
         if (action_metas.length > 0) {
           await recordXpsForQuest(

@@ -9,7 +9,7 @@ export function SetUserTier(): Command<typeof schemas.SetUserTier> {
     ...schemas.SetUserTier,
     auth: [isSuperAdmin],
     body: async ({ actor, payload }) => {
-      const { user_id, tier, delete_from_existence } = payload;
+      const { user_id, tier } = payload;
 
       if (
         user_id === actor.user.id &&
@@ -23,13 +23,6 @@ export function SetUserTier(): Command<typeof schemas.SetUserTier> {
 
       if (user.tier === tier) {
         return { success: true };
-      }
-
-      if (tier === UserTierMap.BannedUser && delete_from_existence) {
-        await models.sequelize.transaction(async (transaction) => {
-          await models.Thread.destroy();
-        });
-        // TODO
       }
 
       user.tier = tier;

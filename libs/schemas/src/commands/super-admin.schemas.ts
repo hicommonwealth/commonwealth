@@ -33,7 +33,6 @@ export const SetUserTier = {
     .object({
       user_id: z.number(),
       tier: z.nativeEnum(UserTierMap),
-      delete_from_existence: z.boolean().optional().default(false),
     })
     .refine(
       ({ tier, delete_from_existence }) =>
