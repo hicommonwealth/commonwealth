@@ -19,8 +19,6 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
         cursor * limit - 1,
         { order: 'ASC' },
       );
-
-      // TODO: if we run out of ranked threads should we return something else
       if (!top.length)
         return {
           results: [],
@@ -60,7 +58,7 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
         results: holders.map((h, index) => ({
           ...h,
           tokens: top[index].score,
-          percentage: 0, // TODO: in UI?
+          percentage: 0, // TODO: how to get percentage from redis cache?
         })),
         page: cursor,
         limit,
