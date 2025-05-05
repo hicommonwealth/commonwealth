@@ -41,7 +41,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: null,
       lifetime_thread_count: 0,
       profile_count: 0,

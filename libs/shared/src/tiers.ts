@@ -147,7 +147,7 @@ export enum CommunityTierMap {
   SpamCommunity = 0,
   Unverified = 1,
   SocialVerified = 2,
-  CommunityVerified = 3,
+  ChainVerified = 3,
   ManuallyVerified = 4,
   PremiumVerification = 5,
 }
@@ -175,7 +175,7 @@ export const COMMUNITY_TIERS = {
       componentIcon: 'globe',
     },
   },
-  [CommunityTierMap.CommunityVerified]: {
+  [CommunityTierMap.ChainVerified]: {
     name: 'Community Verified',
     description: 'Ownership of verified community or domain',
     clientInfo: {
@@ -257,4 +257,16 @@ export function hasCommunityTierClientInfo(
   tier: CommunityTierLevels,
 ): tier is CommunityTierWithClientInfo {
   return 'clientInfo' in COMMUNITY_TIERS[tier];
+}
+
+export function bumpCommunityTier(
+  tier: CommunityTierMap,
+  object: { tier: CommunityTierMap | null },
+) {
+  if (
+    object.tier === null ||
+    (object.tier !== CommunityTierMap.SpamCommunity && object.tier < tier)
+  ) {
+    object.tier = tier;
+  }
 }
