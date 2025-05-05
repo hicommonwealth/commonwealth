@@ -263,6 +263,12 @@ const CommunitiesPage = () => {
               Explore {launchpadEnabled ? '' : 'Communities'}
             </CWText>
 
+            {/* Add description text below the header */}
+            <CWText type="body" color="gray" className="mt-2 mb-4">
+              Discover communities, tokens, quests, discussions, and more across
+              the Commonwealth ecosystem.
+            </CWText>
+
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
               {!isWindowSmallInclusive ? communitiesCount : <></>}
