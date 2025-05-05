@@ -1,6 +1,7 @@
 import type { ReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { messageToObject } from './utils';
 
 declare global {
   interface Window {
@@ -61,16 +62,6 @@ export const ReactNativeBridgeRouter = () => {
 
   return null;
 };
-
-function messageToObject(message: string | object): object | null {
-  try {
-    return typeof message === 'string' ? JSON.parse(message) : message;
-  } catch (e) {
-    // this could happen if another library is sending non-JSON data via
-    // postMessage
-    return null;
-  }
-}
 
 function getPathAndQuery(url: string): string {
   // only navigate with the path and query because we don't want to include
