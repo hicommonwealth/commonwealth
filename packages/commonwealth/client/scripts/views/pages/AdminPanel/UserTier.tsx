@@ -22,7 +22,6 @@ const getTierLabel = (tier: UserTierMap) => {
   return label;
 };
 
-console.log('USER_TIERS_KEYS:', Object.keys(USER_TIERS));
 const userTierOptions = Object.keys(USER_TIERS)
   .filter(
     (t) =>
