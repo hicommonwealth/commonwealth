@@ -59,7 +59,7 @@ export const FullUser = ({
     openConfirmation({
       title: 'Ban User',
       description:
-        'Are you sure you want to permanently ban this user? ' +
+        'Are you sure you want to permanently ban this user from ALL communities? ' +
         'They will no longer be able to sign in but this will not remove their history.',
       buttons: [
         {
