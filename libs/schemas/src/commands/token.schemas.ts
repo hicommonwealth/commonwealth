@@ -11,7 +11,10 @@ export const CreateToken = {
     description: z.string().nullish(),
     icon_url: z.string().nullish(),
   }),
-  output: TokenView,
+  output: TokenView.extend({
+    community_id: z.string().nullish(),
+    group_id: z.number().nullish(),
+  }),
   context: AuthContext,
 };
 

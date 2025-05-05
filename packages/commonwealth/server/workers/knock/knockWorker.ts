@@ -41,7 +41,7 @@ async function startKnockWorker() {
     });
   else notificationsProvider();
 
-  await bootstrapBindings(false, true);
+  await bootstrapBindings({ worker: 'knock' });
 
   isServiceHealthy = true;
   log.info('Knock Worker started');

@@ -1,10 +1,5 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import {
-  EventSchemas,
-  EventsHandlerMetadata,
-  logger,
-  outboxEvents,
-} from '@hicommonwealth/core';
+import { Consumer, logger, outboxEvents } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
 import {
   BindingConfig,
@@ -19,13 +14,6 @@ export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
   MessageRelayer = 'MessageRelayerExchange',
 }
-
-type Consumers =
-  | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
-      overrides: Record<string, string | null | undefined>;
-    }
-  | (() => EventsHandlerMetadata<EventSchemas>);
 
 /**
  * Generates the RabbitMQ configuration on the fly given a set of policies
@@ -44,7 +32,7 @@ export function createRmqConfig({
 }: {
   rabbitMqUri: string;
   // TODO: @Roger - add types so that override keys are a partial record of consumer input type
-  map: Array<Consumers>;
+  map: Array<Consumer>;
 }) {
   let vhost: string;
   if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
