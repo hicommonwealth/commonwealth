@@ -11,8 +11,8 @@ import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
 import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
-import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import { PrivyMobileAuthStatusProvider } from 'views/components/PrivyMobile/PrivyMobileAuthStatusProvider';
+import { PrivyMobileAuthenticator } from 'views/components/PrivyMobile/PrivyMobileAuthenticator';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
@@ -39,16 +39,18 @@ const App = () => {
                   <Splash />
                 ) : (
                   <PrivyMobileAuthStatusProvider>
-                    <DefaultPrivyProvider>
-                      <ForceMobileAuth>
+                    <PrivyMobileAuthenticator>
+                      <DefaultPrivyProvider>
+                        {/*<ForceMobileAuth>*/}
                         <OnBoardingWrapperForMobile>
                           <ReactNativeBridgeUser />
                           <ReactNativeLogForwarder />
                           <ReactNativeScrollToTopListener />
                           <RouterProvider router={router()} />
                         </OnBoardingWrapperForMobile>
-                      </ForceMobileAuth>
-                    </DefaultPrivyProvider>
+                        {/*</ForceMobileAuth>*/}
+                      </DefaultPrivyProvider>
+                    </PrivyMobileAuthenticator>
                   </PrivyMobileAuthStatusProvider>
                 )}
                 <ToastContainer />

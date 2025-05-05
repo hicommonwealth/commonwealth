@@ -1,6 +1,5 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import usePrivyMobileAuthStatusStore from 'views/components/PrivyMobile/usePrivyMobileAuthStatusStore';
-import { LoadingIndicator } from 'views/components/react_quill_editor/loading_indicator';
 
 type Props = {
   children: ReactNode;
@@ -23,5 +22,6 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     return children;
   }
 
-  return <LoadingIndicator />;
+  //return <LoadingIndicator />;
+  return children;
 };
