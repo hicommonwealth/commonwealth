@@ -126,6 +126,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 requirement.data.source.contract_address ||
                 requirement.data.source.object_id ||
                 '',
+              requirementCoinType: requirement.data.source.coin_type || '',
               // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
               requirementCondition: conditionTypes.find(
                 (condition) => condition.value === AMOUNT_CONDITIONS.MORE,

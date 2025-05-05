@@ -44,7 +44,6 @@ export async function getBalances(
       options.balanceSourceType === BalanceSourceType.SuiNative ||
       options.balanceSourceType === BalanceSourceType.SuiToken
     ) {
-      console.log('here');
       balances = await getSuiBalances(
         options as GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
         ttl,

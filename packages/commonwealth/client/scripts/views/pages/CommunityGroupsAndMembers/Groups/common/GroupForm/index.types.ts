@@ -69,6 +69,7 @@ export type LabelType = {
 };
 
 export type RequirementSubTypeWithLabel = {
+  requirementCoinType?: string;
   requirementType?: LabelType;
   requirementContractAddress?: string;
   requirementChain?: LabelType;
