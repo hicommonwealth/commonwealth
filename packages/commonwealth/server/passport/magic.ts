@@ -6,7 +6,6 @@ import {
   AddressInstance,
   CommunityInstance,
   DB,
-  UserAttributes,
   UserInstance,
   VerifiedUserInfo,
   emitEvent,
@@ -128,6 +127,21 @@ async function updateAddressesOauth(
   }
 }
 
+async function bumpTier(
+  user: UserInstance,
+  verifiedInfo: OauthInfo,
+  transaction?: Transaction,
+) {
+  if (
+    user.tier < UserTierMap.SocialVerified &&
+    (!verifiedInfo.oauth_email ||
+      (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified))
+  ) {
+    user.tier = UserTierMap.SocialVerified;
+    await user.save({ transaction });
+  }
+}
+
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
   models: DB,
@@ -143,7 +157,7 @@ async function createMagicAddressInstances(
     oauthInfo,
   }: {
     generatedAddresses: Array<{ address: string; community_id: string }>;
-    user: UserAttributes;
+    user: UserInstance;
     isNewUser: boolean;
     decodedMagicToken: MagicUser;
     magicUserMetadata: MagicUserMetadata;
@@ -166,6 +180,7 @@ async function createMagicAddressInstances(
     oauth_phone_number,
     oauth_email_verified,
   } = verifiedInfo;
+  await bumpTier(user, verifiedInfo, transaction);
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -437,6 +452,8 @@ async function loginExistingMagicUser({
         walletSsoSource,
         accessToken,
       );
+
+      await bumpTier(existingUserInstance, verifiedInfo, transaction);
       await updateAddressesOauth(
         models,
         verifiedInfo,
