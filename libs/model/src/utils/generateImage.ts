@@ -1,4 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import { Buffer } from 'buffer';
 import fetch from 'node-fetch';
 import OpenAI, { toFile } from 'openai';
@@ -185,7 +186,7 @@ export const generateImage = async (
   prompt: string,
   openai?: OpenAI,
   options: {
-    model?: string;
+    model?: ImageGenerationModel;
     n?: number;
     quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
     response_format?: 'url' | 'b64_json';
@@ -206,9 +207,31 @@ export const generateImage = async (
   const useEditEndpoint =
     options.referenceImageUrls && options.referenceImageUrls.length > 0;
 
-  if (!config.IMAGE_GENERATION.FLAG_USE_RUNWARE && !openai) {
+  // --- Model selection logic ---
+  // If model starts with 'runware', use Runware. Otherwise, use OpenAI.
+  const model = options.model || 'gpt-image-1';
+  const isRunwareModel = model.toLowerCase().startsWith('runware');
+  const isOpenAIModel = !isRunwareModel;
+
+  if (isRunwareModel) {
+    if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
+      throw new Error(
+        ImageGenerationErrors.RunwareNotConfigured +
+          ': Runware model requested but API key is missing.',
+      );
+    }
+    if (useEditEndpoint) {
+      throw new Error(
+        'Runware does not support image editing with reference images.',
+      );
+    }
+  } else {
+    // OpenAI path
     if (!config.OPENAI.API_KEY) {
-      throw new Error(ImageGenerationErrors.OpenAINotConfigured);
+      throw new Error(
+        ImageGenerationErrors.OpenAINotConfigured +
+          ': OpenAI model requested but API key is missing.',
+      );
     }
     if (!openai) {
       throw new Error(ImageGenerationErrors.OpenAIInitFailed);
@@ -217,26 +240,21 @@ export const generateImage = async (
 
   let imageResult: { url?: string; b64_json?: string };
   try {
-    if (config.IMAGE_GENERATION.FLAG_USE_RUNWARE && !useEditEndpoint) {
+    if (isRunwareModel && !useEditEndpoint) {
       log.info('[generateImage] Using Runware for generation.');
-      if (!config.IMAGE_GENERATION.RUNWARE_API_KEY) {
-        throw new Error(ImageGenerationErrors.RunwareNotConfigured);
-      }
       const runwareUrl = await generateImageWithRunware(prompt);
       imageResult = { url: runwareUrl };
-    } else {
+    } else if (isOpenAIModel) {
       log.info('[generateImage] Using OpenAI for generation.');
-      if (!openai) {
-        log.error('[generateImage] OpenAI instance not available when needed.');
-        throw new Error(ImageGenerationErrors.OpenAIInitFailed);
-      }
-
       if (useEditEndpoint) {
         log.info(
           '[generateImage] Using OpenAI edits endpoint with reference images.',
         );
+        if (!openai) {
+          throw new Error(ImageGenerationErrors.OpenAIInitFailed);
+        }
         const referenceImagesData: { filename: string; buffer: Buffer }[] = [];
-        for (const url of options.referenceImageUrls!) {
+        for (const url of options.referenceImageUrls || []) {
           try {
             log.info(
               `[generateImage] Fetching reference image from URL: ${url}`,
@@ -254,7 +272,6 @@ export const generateImage = async (
               buffer,
             });
           } catch (fetchError) {
-            // Fix error type to ensure it's an Error object
             const errorObj =
               fetchError instanceof Error
                 ? fetchError
@@ -276,7 +293,7 @@ export const generateImage = async (
           openai,
           {
             mask: maskBuffer,
-            model: 'gpt-image-1',
+            model: model,
             n: options.n,
             size:
               options.size === '256x256' ||
@@ -288,8 +305,11 @@ export const generateImage = async (
         );
       } else {
         log.info('[generateImage] Using OpenAI generation endpoint.');
+        if (!openai) {
+          throw new Error(ImageGenerationErrors.OpenAIInitFailed);
+        }
         imageResult = await generateImageWithOpenAI(prompt, openai, {
-          model: options.model || 'gpt-image-1',
+          model: model,
           n: options.n,
           quality: (options.quality === 'standard' || options.quality === 'hd'
             ? 'high'
@@ -302,6 +322,10 @@ export const generateImage = async (
             | undefined,
         });
       }
+    } else {
+      throw new Error(
+        'Invalid model/backend combination or unsupported operation.',
+      );
     }
   } catch (e) {
     log.error(

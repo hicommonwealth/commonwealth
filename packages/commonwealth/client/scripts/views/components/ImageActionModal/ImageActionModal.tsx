@@ -99,9 +99,6 @@ export const ImageActionModal = ({
         setReferenceImageUrls((prevUrls) => [...prevUrls, uploadUrl]);
       }
     },
-    onError: () => {
-      setIsUploadingReferenceImage(false);
-    },
   });
 
   // --- Reference Image Handlers ---

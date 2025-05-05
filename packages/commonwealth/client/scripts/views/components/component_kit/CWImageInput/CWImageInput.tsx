@@ -1,3 +1,4 @@
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import React from 'react';
 import { MessageRow } from '../cw_text_input';
@@ -17,6 +18,7 @@ type CWImageInputProps = UploadControlProps &
     onAddCurrentToReference?: (image: string) => void;
     canAddCurrentToReference?: boolean;
     referenceImageUrls?: string[];
+    model?: ImageGenerationModel;
   };
 
 export const CWImageInput = ({
@@ -47,6 +49,7 @@ export const CWImageInput = ({
   onAddCurrentToReference,
   canAddCurrentToReference,
   referenceImageUrls,
+  model,
 }: CWImageInputProps) => {
   return (
     <div className={clsx('CWImageInput', containerClassname)}>
@@ -70,6 +73,7 @@ export const CWImageInput = ({
         onAddCurrentToReference={onAddCurrentToReference}
         canAddCurrentToReference={canAddCurrentToReference}
         referenceImageUrls={referenceImageUrls}
+        model={model}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}

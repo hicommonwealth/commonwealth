@@ -118,6 +118,10 @@
   .ImageActionModalFooter {
     padding: 16px 24px 24px 24px !important;
   }
+
+  .CWModalBody {
+    max-height: 650px;
+  }
 }
 
 div[class*='CWModal'] div[class*='reference-grid'] > div[class*='grid-item'] {

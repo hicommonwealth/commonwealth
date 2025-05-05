@@ -1,5 +1,6 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import { DB, generateImage } from '@hicommonwealth/model';
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import { OpenAI } from 'openai';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -25,7 +26,7 @@ if (process.env.OPENAI_API_KEY) {
 
 type generateImageReq = {
   description: string;
-  model?: string;
+  model?: ImageGenerationModel;
   n?: number;
   quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
   response_format?: 'url' | 'b64_json';

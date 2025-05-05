@@ -31,6 +31,7 @@ export const UploadControl = ({
   canAddCurrentToReference,
   referenceImageUrls,
   referenceTexts,
+  model,
 }: UploadControlProps) => {
   const {
     areActionsDisabled,
@@ -76,6 +77,7 @@ export const UploadControl = ({
     canAddCurrentToReference,
     referenceImageUrls,
     referenceTexts,
+    model,
   });
 
   const isSmallScreen = isWindowExtraSmall;
@@ -255,6 +257,7 @@ export const UploadControl = ({
                           ),
                           referenceImageUrls,
                           size: '1024x1024', // Example size
+                          model,
                         }).catch(console.error);
                     }}
                   />
@@ -302,6 +305,7 @@ export const UploadControl = ({
                 ),
                 referenceImageUrls,
                 size: '1024x1024', // Example size
+                model,
               }).catch(console.error);
             }
           }}
@@ -360,6 +364,7 @@ export const UploadControl = ({
                     ),
                     referenceImageUrls,
                     size: '1024x1024', // Example size
+                    model,
                   }).catch(console.error);
               }}
             />

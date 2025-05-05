@@ -23,6 +23,7 @@ export const useUploadControl = ({
   usePersistentPromptMode,
   referenceImageUrls,
   referenceTexts,
+  model,
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [, setImageInputRefUpdated] = useState<boolean>(false); // sometimes the input ref doesnt get set in time
@@ -384,11 +385,12 @@ export const useUploadControl = ({
       return;
     }
     try {
-      // Pass reference images to the mutation
+      // Pass reference images and model to the mutation
       await generateImage({
         prompt: imagePrompt,
         referenceImageUrls,
         size: '1024x1024',
+        model,
       });
     } catch (error) {
       // Error is handled by the mutation hook's onError, but log here if needed

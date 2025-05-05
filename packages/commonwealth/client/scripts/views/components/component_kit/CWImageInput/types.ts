@@ -1,3 +1,5 @@
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
+
 export enum ImageBehavior {
   Fill = 'cover',
   Tiled = 'repeat',
@@ -38,6 +40,7 @@ export type UploadControlProps = {
   canAddCurrentToReference?: boolean;
   referenceImageUrls?: string[];
   referenceTexts?: string[];
+  model?: ImageGenerationModel;
 };
 
 export interface CWImageInputProps {
@@ -57,4 +60,5 @@ export interface CWImageInputProps {
   canAddCurrentToReference?: boolean;
   referenceImageUrls?: string[];
   referenceTexts?: string[];
+  model?: ImageGenerationModel;
 }

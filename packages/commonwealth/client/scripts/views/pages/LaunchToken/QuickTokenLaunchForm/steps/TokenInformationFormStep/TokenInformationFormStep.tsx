@@ -240,6 +240,7 @@ const TokenInformationFormStep = ({
         hookToForm
         imageBehavior={ImageBehavior.Circle}
         withAIImageGeneration
+        model="runware:100@1"
         disabled={formDisabled}
         {...imageControlProps}
       />

@@ -1,3 +1,4 @@
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
@@ -6,7 +7,7 @@ import { userStore } from '../../ui/user';
 // Interface for the API call parameters
 interface GenerateImageApiParams {
   description: string;
-  model?: string;
+  model?: ImageGenerationModel;
   n?: number;
   quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
   response_format?: 'url' | 'b64_json';
@@ -28,7 +29,7 @@ interface GenerateImageApiParams {
 // Interface for the function/mutation parameters (use `prompt` for user-facing name)
 interface GenerateImageProps {
   prompt: string;
-  model?: string;
+  model?: ImageGenerationModel;
   n?: number;
   quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
   response_format?: 'url' | 'b64_json';
@@ -48,7 +49,7 @@ interface GenerateImageProps {
 
 export const generateImage = async ({
   prompt,
-  model,
+  model = 'gpt-image-1',
   n,
   quality,
   response_format,
@@ -74,7 +75,7 @@ export const generateImage = async ({
     style,
     referenceImageUrls,
     maskUrl,
-    jwt: currentJwt, // Use the non-null JWT
+    jwt: currentJwt,
   };
 
   // Filter out undefined values (except jwt and description)
@@ -83,6 +84,8 @@ export const generateImage = async ({
       delete payload[key];
     }
   });
+
+  console.log('payload model', payload.model);
 
   const res = await axios.post(
     `${SERVER_URL}/${ApiEndpoints.GENERATE_IMAGE}`,
