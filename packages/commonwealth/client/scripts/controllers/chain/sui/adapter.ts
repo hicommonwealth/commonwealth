@@ -32,7 +32,7 @@ class Sui extends IChainAdapter<SuiToken, SuiAccount> {
   public async deinit(): Promise<void> {
     await super.deinit();
     this.accounts.deinit();
-    await this.chain.deinit();
+    this.chain.deinit();
     console.log('Sui stopped.');
   }
 }
