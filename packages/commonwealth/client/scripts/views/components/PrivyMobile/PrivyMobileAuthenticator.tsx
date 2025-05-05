@@ -13,6 +13,11 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   const { children } = props;
   const { status: privyMobileAuthStatus } = usePrivyMobileAuthStatusStore();
 
+  console.log(
+    'PrivyMobileAuthenticator: Working with privyMobileAuthStatus:' +
+      JSON.stringify(privyMobileAuthStatus, null, 2),
+  );
+
   if (privyMobileAuthStatus?.enabled) {
     // the *client* doesn't have privy enabled so do not attempt to authenticate.
     return children;
