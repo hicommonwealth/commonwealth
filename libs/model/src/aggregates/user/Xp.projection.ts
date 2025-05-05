@@ -24,7 +24,7 @@ async function getUserByAddressId(address_id: number) {
         attributes: ['id'],
         required: true,
         where: {
-          tier: { [Op.not]: UserTierMap.BannedUser },
+          tier: { [Op.ne]: UserTierMap.BannedUser },
         },
       },
     ],
@@ -42,7 +42,7 @@ async function getUserByAddress(address: string) {
         attributes: ['id'],
         required: true,
         where: {
-          tier: { [Op.not]: UserTierMap.BannedUser },
+          tier: { [Op.ne]: UserTierMap.BannedUser },
         },
       },
     ],
@@ -259,7 +259,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const referee_address = await models.User.findOne({
           where: {
             id: payload.user_id,
-            tier: { [Op.not]: UserTierMap.BannedUser },
+            tier: { [Op.ne]: UserTierMap.BannedUser },
           },
         });
         const action_metas = await getQuestActionMetas(
@@ -300,7 +300,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user = await models.User.findOne({
           where: {
             id: payload.user_id,
-            tier: { [Op.not]: UserTierMap.BannedUser },
+            tier: { [Op.ne]: UserTierMap.BannedUser },
           },
         });
         if (action_metas.length > 0) {

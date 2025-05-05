@@ -37,9 +37,9 @@ const userTierOptions = Object.keys(USER_TIERS)
 
 const UserTier = () => {
   const [userId, setUserId] = useState<number | undefined>();
-  const debouncedUserId = useDebounce<string | undefined>(userId, 500);
+  const debouncedUserId = useDebounce<number | undefined>(userId, 500);
   const { data: user, isLoading: isLoadingUser } = useFetchProfileByIdQuery({
-    userId: debouncedUserId ? parseInt(debouncedUserId) : undefined,
+    userId: debouncedUserId,
     apiCallEnabled: !!debouncedUserId,
   });
 

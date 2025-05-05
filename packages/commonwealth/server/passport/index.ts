@@ -29,7 +29,7 @@ function initDefaultUserAuth(models: DB) {
             .findOne({
               where: {
                 id: jwtPayload.id,
-                tier: { [Op.not]: UserTierMap.BannedUser },
+                tier: { [Op.ne]: UserTierMap.BannedUser },
               },
             })
             .then((user) => {
@@ -62,21 +62,24 @@ export function setupPassport(models: DB) {
   });
 
   passport.deserializeUser((userId, done) => {
-    models.User.scope('withPrivateData')
-      // @ts-expect-error StrictNullChecks
-      .findOne({
-        where: { id: userId, tier: { [Op.not]: UserTierMap.BannedUser } },
-      })
-      .then((user) => {
-        if (!user) {
-          done(new Error('Invalid user'), false);
-        } else {
-          done(null, user);
-        }
-      })
-      .catch((err) => {
-        done(err, null);
-      });
+    if (!userId || (typeof userId !== 'string' && typeof userId !== 'number')) {
+      done(new Error('Invalid user'), false);
+    } else {
+      models.User.scope('withPrivateData')
+        .findOne({
+          where: { id: userId, tier: { [Op.ne]: UserTierMap.BannedUser } },
+        })
+        .then((user) => {
+          if (!user) {
+            done(new Error('Invalid user'), false);
+          } else {
+            done(null, user);
+          }
+        })
+        .catch((err) => {
+          done(err, null);
+        });
+    }
   });
 }
 
