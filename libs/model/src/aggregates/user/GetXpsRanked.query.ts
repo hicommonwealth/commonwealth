@@ -21,7 +21,7 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
       const { top, quest_id } = payload;
       const query = quest_id
         ? `
-with top as (
+with top_users as (
 	select
 		user_id,
 		sum(xp_points)::int + sum(coalesce(creator_xp_points, 0))::int as xp_points
@@ -35,13 +35,13 @@ with top as (
 	limit :top
 )
 select
- 	top.*,
+ 	top_users.*,
  	u.tier,
  	u.profile->>'name' as user_name,
  	u.profile->>'avatar_url' as avatar_url
 from
-	top
-	join "Users" u on top.user_id = u.id;
+	top_users
+	join "Users" u on top_users.user_id = u.id;
 `
         : `
 select
@@ -52,8 +52,8 @@ select
  	profile->>'avatar_url' as avatar_url
 from
 	"Users"
-order by
-	2 desc
+where tier != ${UserTierMap.BannedUser}
+order by xp_points desc
 limit :top;
 `;
       return await models.sequelize.query<RankedUser>(query, {
