@@ -43,7 +43,8 @@ const TopHolders = () => {
 
   const rowData = topHolders?.results.map((holder) => {
     const name = holder.name || '';
-    const percentage = 0; // TODO: Calculate percentage total supply / tokens ?
+    // TODO: Calculate percentage total supply / tokens ?
+    const percentage = (holder.tokens * 100) / 10_000_000_000;
     return {
       user: {
         customElement: (
@@ -82,7 +83,9 @@ const TopHolders = () => {
         sortValue: holder.tokens,
       },
       percentDisplay: {
-        customElement: <div className="percent-cell">{percentage}%</div>,
+        customElement: (
+          <div className="percent-cell">{percentage.toFixed(2)}%</div>
+        ),
         sortValue: percentage,
       },
     };
