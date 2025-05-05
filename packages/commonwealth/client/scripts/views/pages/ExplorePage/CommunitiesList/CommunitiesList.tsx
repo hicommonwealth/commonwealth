@@ -22,6 +22,8 @@ import { CWRelatedCommunityCard } from 'views/components/component_kit/new_desig
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { z } from 'zod';
 import '../ExplorePage.scss';
+import { getCommunityCountsString } from '../helpers';
+import './CommunitiesList.scss';
 import {
   CommunityFilters,
   CommunitySortDirections,
@@ -277,6 +279,11 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           onFiltersChange={(newFilters) => setFilters(newFilters)}
         />
       </div>
+      <CWText type="b2" className="communities-count">
+        {!isLoading && communities?.pages?.[0]?.totalResults
+          ? `Found ${getCommunityCountsString(communities?.pages?.[0]?.totalResults)}`
+          : 'No communities found'}
+      </CWText>
       {isLoadingCommunities && communitiesList.length === 0 ? (
         <CWCircleMultiplySpinner />
       ) : (

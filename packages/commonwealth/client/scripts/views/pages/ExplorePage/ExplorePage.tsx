@@ -1,5 +1,4 @@
 import { findDenominationString } from 'helpers/findDenomination';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useRef, useState } from 'react';
@@ -55,8 +54,6 @@ const ExplorePage = () => {
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
-  const { isWindowSmallInclusive } = useBrowserWindow({});
-
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
     trpc.community.getStakeHistoricalPrice.useQuery({
       past_date_epoch: oneDayAgo.current / 1000, // 24 hours ago
@@ -77,8 +74,6 @@ const ExplorePage = () => {
     navigate(`/explore?${params.toString()}`);
   };
 
-  const communitiesCount = <></>; // TODO: fix this
-
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">
@@ -92,9 +87,7 @@ const ExplorePage = () => {
               Explore {launchpadEnabled ? '' : 'Communities'}
             </CWText>
 
-            {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
-              {!isWindowSmallInclusive ? communitiesCount : <></>}
               {!launchpadEnabled && (
                 <CreateCommunityButton buttonHeight="med" withIcon />
               )}
