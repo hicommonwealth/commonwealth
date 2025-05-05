@@ -2,16 +2,19 @@ import { ChainBase, DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useSetUserTierMutation from 'state/api/superAdmin/setUserTier';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
@@ -50,6 +53,41 @@ export const FullUser = ({
       id: userCommunityId || '',
       enabled: !!userCommunityId,
     });
+  const { mutateAsync: setUserTier, isLoading } = useSetUserTierMutation();
+
+  const banUserConfirmationModal = () => {
+    openConfirmation({
+      title: 'Ban User',
+      description:
+        'Are you sure you want to permanently ban this user? ' +
+        'They will no longer be able to sign in but this will not remove their history.',
+      buttons: [
+        {
+          label: 'Ban',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: () => {
+            setUserTier({
+              user_id: profile?.userId!,
+              tier: UserTierMap.BannedUser,
+            })
+              .then(() => {
+                notifySuccess('User tier updated');
+              })
+              .catch((e) => {
+                notifyError('Error updating user tier');
+                console.error(e);
+              });
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
+  };
 
   if (showSkeleton || isLoadingUserCommunity) {
     return (
@@ -293,6 +331,13 @@ export const FullUser = ({
                 buttonType="destructive"
               />
             </div>
+          )}
+          {Permissions.isSiteAdmin() && (
+            <CWButton
+              onClick={banUserConfirmationModal}
+              label="Ban User"
+              buttonType="destructive"
+            />
           )}
         </div>
       )}
