@@ -38,6 +38,7 @@ export enum UserTierMap {
   SocialVerified = 4,
   ChainVerified = 5,
   ManuallyVerified = 6,
+  SystemUser = 7,
 }
 
 export const DisabledCommunitySpamTier = -1 as const;
@@ -135,6 +136,10 @@ export const USER_TIERS = {
       icon: '⭐',
       componentIcon: 'starGolden',
     },
+  },
+  [UserTierMap.SystemUser]: {
+    name: 'System User',
+    description: 'User created by the system.',
   },
 } as const satisfies Record<UserTierMap, UserTier>;
 

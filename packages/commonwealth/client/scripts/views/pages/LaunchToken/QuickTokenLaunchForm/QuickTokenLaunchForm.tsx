@@ -303,6 +303,10 @@ export const QuickTokenLaunchForm = ({
             .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
+        } else if (
+          e?.data?.message?.toLowerCase().includes('insufficient funds')
+        ) {
+          notifyError('Insufficient funds to launch token!');
         } else {
           notifyError('Failed to create token!');
         }

@@ -19,6 +19,7 @@ import {
   DiscordBotPolicy,
   FarcasterWorker,
   LaunchpadPolicy,
+  NominationsWorker,
   NotificationsPolicy,
   TwitterEngagementPolicy,
   User,
@@ -94,6 +95,7 @@ export async function bootstrapBindings(
       },
     },
   );
+  await brokerInstance.subscribe(NominationsWorker);
   await brokerInstance.subscribe(Contest.Contests);
   await brokerInstance.subscribe(User.Xp);
   await brokerInstance.subscribe(

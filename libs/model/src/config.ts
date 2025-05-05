@@ -555,7 +555,7 @@ export const config = configure(
     DISABLE_TIER_RATE_LIMITS: z
       .boolean()
       .refine(
-        (data) => !(target.APP_ENV === 'production' && data),
+        (data) => !(target.APP_ENV === 'production' && !data),
         'Tier rate limits cannot be disabled in production',
       ),
     TIER: z.object({

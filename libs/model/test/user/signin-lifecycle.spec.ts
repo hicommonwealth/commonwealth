@@ -1,3 +1,6 @@
+import * as services from '../../src/services';
+vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({});
+
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
