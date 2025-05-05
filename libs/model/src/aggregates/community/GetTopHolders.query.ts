@@ -12,7 +12,7 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
     body: async ({ payload }) => {
       const { community_id, limit = 10, cursor = 1 } = payload;
 
-      const topIds = await cache().sliceSortedSet(
+      const top = await cache().sliceSortedSetWithScores(
         CacheNamespaces.TokenTopHolders,
         community_id,
         (cursor - 1) * limit,
@@ -21,7 +21,7 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
       );
 
       // TODO: if we run out of ranked threads should we return something else
-      if (!topIds.length)
+      if (!top.length)
         return {
           results: [],
           page: cursor,
@@ -51,16 +51,16 @@ export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {
       >(sql, {
         replacements: {
           community_id,
-          address_ids: topIds.map((t) => parseInt(t)),
+          address_ids: top.map((t) => parseInt(t.value)),
         },
         type: QueryTypes.SELECT,
       });
 
       return {
-        results: holders.map((h) => ({
+        results: holders.map((h, index) => ({
           ...h,
-          tokens: 0,
-          percentage: 0,
+          tokens: top[index].score,
+          percentage: 0, // TODO: in UI?
         })),
         page: cursor,
         limit,

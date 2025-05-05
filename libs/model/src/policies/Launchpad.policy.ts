@@ -1,5 +1,6 @@
 import { Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import { RefreshCommunityMemberships } from '../aggregates/community';
 import { CreateToken, ProjectLaunchpadTrade } from '../aggregates/token';
 import { models } from '../database';
 import { systemActor } from '../middleware';
@@ -27,10 +28,20 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
         });
       },
       LaunchpadTokenTraded: async ({ payload }) => {
-        await command(ProjectLaunchpadTrade(), {
+        const output = await command(ProjectLaunchpadTrade(), {
           actor: systemActor({}),
           payload,
         });
+        if (output?.community_id) {
+          // TODO: filter by specific holders group or system groups
+          await command(RefreshCommunityMemberships(), {
+            actor: systemActor({}),
+            payload: {
+              community_id: output.community_id,
+              refresh_all: true,
+            },
+          }).catch(() => {});
+        }
       },
     },
   };

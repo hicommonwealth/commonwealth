@@ -8,7 +8,9 @@ import { handleCapReached } from './utils'; // TODO: place in utils
 
 const schema = {
   input: events.LaunchpadTokenTraded,
-  output: z.object({}),
+  output: z.object({
+    community_id: z.string().optional(),
+  }),
 };
 
 export function ProjectLaunchpadTrade(): Command<typeof schema> {
@@ -27,6 +29,8 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         community_token_amount,
         floating_supply,
       } = payload;
+
+      const output: z.infer<(typeof schema)['output']> = {};
 
       const token_address = token_address_unformatted.toLowerCase();
       const chainNode = await chainNodeMustExist(eth_chain_id);
@@ -62,6 +66,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
               attributes: ['id'],
             });
             if (community) {
+              output.community_id = community.id;
               // find user_id from address
               const address = await models.Address.findOne({
                 where: {
@@ -104,6 +109,8 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         chainNode.private_url!,
         is_buy,
       );
+
+      return output;
     },
   };
 }

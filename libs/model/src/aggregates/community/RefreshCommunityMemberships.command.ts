@@ -134,12 +134,14 @@ async function processMemberships(
           score: Number(m.balance) / 1e18,
         })),
     ];
-    console.log({ tokenHolderGroupId, toCache });
-    await cache()
-      .addToSortedSet(CacheNamespaces.TokenTopHolders, community_id, toCache)
-      .catch((err) => {
-        log.error(`Failed to cache token holders for ${community_id}`, err);
-      });
+    if (toCache.length > 0) {
+      // console.log({ tokenHolderGroupId, toCache });
+      await cache()
+        .addToSortedSet(CacheNamespaces.TokenTopHolders, community_id, toCache)
+        .catch((err) => {
+          log.error(`Failed to cache token holders for ${community_id}`, err);
+        });
+    }
   }
 
   await models.sequelize.transaction(async (transaction) => {
@@ -212,7 +214,7 @@ export function RefreshCommunityMemberships(): Command<
     ...schemas.RefreshCommunityMemberships,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { community_id, address, group_id } = payload;
+      const { community_id, address, group_id, refresh_all } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },
@@ -252,7 +254,7 @@ export function RefreshCommunityMemberships(): Command<
             try {
               result = await tokenBalanceCache.getBalances({
                 ...options,
-                cacheRefresh: false, // get cached balances
+                cacheRefresh: refresh_all || false,
               });
             } catch (err) {
               console.error(err);
