@@ -29,16 +29,10 @@ export const SetCommunityTier = {
 };
 
 export const SetUserTier = {
-  input: z
-    .object({
-      user_id: z.number(),
-      tier: z.nativeEnum(UserTierMap),
-    })
-    .refine(
-      ({ tier, delete_from_existence }) =>
-        !(tier !== UserTierMap.BannedUser && delete_from_existence),
-      'Can only delete from existence when tier is BannedUser',
-    ),
+  input: z.object({
+    user_id: z.number(),
+    tier: z.nativeEnum(UserTierMap),
+  }),
   output: z.object({
     success: z.boolean(),
   }),
