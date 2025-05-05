@@ -12,6 +12,7 @@ export const DebugPrivyMobile = () => {
   const handleSignMessage = () => {
     async function doAsync() {
       const result = await signMessage('hello');
+      console.log('FIXME.667', JSON.stringify(result));
       setSignature(result);
       console.log(result);
     }
