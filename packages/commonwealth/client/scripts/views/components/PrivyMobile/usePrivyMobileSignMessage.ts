@@ -6,10 +6,11 @@ import { useCallback } from 'react';
  * the browser.
  */
 export function usePrivyMobileSignMessage() {
-  return useCallback(async (message: string) => {
-    return await execWithinMobileApp({
+  return useCallback(async (message: string): Promise<string> => {
+    const result = await execWithinMobileApp({
       type: 'privy.sign_message',
       data: { message },
     });
+    return (result as any).signature;
   }, []);
 }

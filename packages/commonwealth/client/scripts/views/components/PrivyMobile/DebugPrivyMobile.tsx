@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import usePrivyMobileAuthStatusStore from 'views/components/PrivyMobile/usePrivyMobileAuthStatusStore';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
 
 export const DebugPrivyMobile = () => {
   const { status: privyMobileAuthStatus } = usePrivyMobileAuthStatusStore();
 
+  const [signature, setSignature] = useState<string | undefined>();
+
   const signMessage = usePrivyMobileSignMessage();
 
   const handleSignMessage = () => {
     async function doAsync() {
       const result = await signMessage('hello');
+      setSignature(result);
       console.log(result);
     }
 
@@ -25,6 +28,8 @@ export const DebugPrivyMobile = () => {
       <div>
         <button onClick={handleSignMessage}>sign message</button>
       </div>
+
+      {signature && <div>signature: {signature}</div>}
 
       <div>{JSON.stringify(privyMobileAuthStatus, null, 2)}</div>
     </div>
