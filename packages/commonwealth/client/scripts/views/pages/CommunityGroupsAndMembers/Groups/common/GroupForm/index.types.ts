@@ -9,6 +9,7 @@ export enum GroupTopicPermissionEnum {
   UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
   UPVOTE_AND_POST = 'UPVOTE_AND_POST',
   UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
+  NONE = 'NONE',
 }
 
 export type RequirementSubFormsState = {

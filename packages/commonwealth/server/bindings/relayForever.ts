@@ -1,4 +1,6 @@
 import { broker, logger, stats } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import _ from 'underscore';
 import { config } from '../config';
 import { relay } from './relay';
 
@@ -16,8 +18,25 @@ export function resetNumUnrelayedEvents() {
   numUnrelayedEvents = 0;
 }
 
+const debouncedErrLogger = _.debounce(
+  () => {
+    log.error('More than 1000 unrelayed events in the Outbox!', undefined, {
+      numUnrelayedEvents,
+    });
+  },
+  60_000,
+  true,
+);
+
+const debouncedGauge = _.debounce(
+  () => {
+    stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
+  },
+  15_000,
+  true,
+);
+
 export async function relayForever(maxIterations?: number) {
-  const { models } = await import('@hicommonwealth/model');
   const brokerInstance = broker();
   let iteration = 0;
   let errorTimeout = INITIAL_ERROR_TIMEOUT;
@@ -39,7 +58,7 @@ export async function relayForever(maxIterations?: number) {
         errorTimeout = INITIAL_ERROR_TIMEOUT;
       }
 
-      stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
+      debouncedGauge();
     }
 
     if (numUnrelayedEvents === 0) {
@@ -48,9 +67,7 @@ export async function relayForever(maxIterations?: number) {
         setTimeout(resolve, config.WORKERS.MESSAGE_RELAYER_TIMEOUT_MS),
       );
     } else if (numUnrelayedEvents > 1000) {
-      log.error('More than 1000 unrelayed events in the Outbox!', undefined, {
-        numUnrelayedEvents,
-      });
+      debouncedErrLogger();
     }
 
     if (maxIterations) {

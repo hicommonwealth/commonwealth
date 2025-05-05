@@ -15,6 +15,7 @@ const {
   DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
+  LAUNCHPAD_PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
   MAX_USER_POSTS_PER_CONTEST,
@@ -104,6 +105,7 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
     },
     TBC: {
@@ -290,6 +292,13 @@ export const config = configure(
           (data) =>
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
+        ),
+      LAUNCHPAD_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
         ),
       CONTEST_BOT_PRIVATE_KEY: z
         .string()
@@ -546,7 +555,7 @@ export const config = configure(
     DISABLE_TIER_RATE_LIMITS: z
       .boolean()
       .refine(
-        (data) => !(target.APP_ENV === 'production' && data),
+        (data) => !(target.APP_ENV === 'production' && !data),
         'Tier rate limits cannot be disabled in production',
       ),
     TIER: z.object({

@@ -114,6 +114,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
 
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -1026,10 +1028,33 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               )}
               {isWindowSmallInclusive && (
-                <div className="action-cards">
-                  {sidebarComponent.map((view) => (
-                    <div key={view.label}>{view.item}</div>
-                  ))}
+                <div className="mobile-action-card-container ">
+                  <div className="actions">
+                    <div className="left-container">
+                      <CWIcon
+                        iconName="squaresFour"
+                        iconSize="medium"
+                        weight="bold"
+                      />
+                      <CWText type="h5" fontWeight="semiBold">
+                        Actions
+                      </CWText>
+                    </div>
+                    <CWIcon
+                      iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                      iconSize="small"
+                      className="caret-icon"
+                      weight="bold"
+                      onClick={() => setIsCollapsed(!isCollapsed)}
+                    />
+                  </div>
+
+                  <div className="action-cards">
+                    {!isCollapsed &&
+                      sidebarComponent.map((view) => (
+                        <div key={view.label}>{view.item}</div>
+                      ))}
+                  </div>
                 </div>
               )}
             </>
