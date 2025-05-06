@@ -10,6 +10,7 @@ const _vote = z.object({
   address: z.string(),
   author_community_id: z.string(),
   community_id: z.string(),
+  calculated_voting_weight: z.string().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
