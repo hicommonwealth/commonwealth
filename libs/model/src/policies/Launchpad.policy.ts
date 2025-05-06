@@ -72,7 +72,6 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
             output.community_id,
             payload.token_address,
           );
-          console.log({ community_id: output.community_id, group_ids });
           if (group_ids.length)
             await command(RefreshCommunityMemberships(), {
               actor: systemActor({}),
