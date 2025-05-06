@@ -86,6 +86,8 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
       return options.sourceOptions.objectId
         ? `sui_${options.sourceOptions.suiNetwork}_${options.sourceOptions.objectId}_${address}`
         : `sui_${options.sourceOptions.suiNetwork}_${address}`;
+    case BalanceSourceType.SuiToken:
+      return `sui_${options.sourceOptions.suiNetwork}_${address}_${options.sourceOptions.coinType}`;
   }
 }
 
