@@ -72,21 +72,26 @@ export async function execWithinMobileApp<
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handler(message: MessageEvent<any>) {
-    console.log('FIXME execWithinMobileApp .111');
+    console.log('FIXME execWithinMobileApp handler received message!');
     const dataObj = messageToObject(message.data);
 
     // FIXME: it's possible messageToObject could be throwing an error?
 
-    console.log('FIXME.666: got message: ', JSON.stringify(dataObj, null, 2));
+    console.log(
+      'FIXME execWithinMobileApp: got message: ',
+      JSON.stringify(dataObj, null, 2),
+    );
 
     if (dataObj.__requestID === __requestID) {
       latch.resolve(dataObj as Output);
     }
   }
 
-  console.log('FIXME execWithinMobileApp .112');
+  console.log(
+    'FIXME execWithinMobileApp adding event listener to listen for response message',
+  );
 
-  addEventListener('message', handler);
+  window.addEventListener('message', handler);
 
   window.ReactNativeWebView!.postMessage(
     JSON.stringify({
@@ -95,17 +100,17 @@ export async function execWithinMobileApp<
     }),
   );
 
-  console.log('FIXME.112.1 execWithinMobileApp waiting fr resolution  ');
+  console.log('FIXME execWithinMobileApp waiting fr resolution  ');
 
   // the event listener we just registered will keep listening until the
   // latch is revolved and gets the response.
   const output = await latch.promise;
 
-  console.log('FIXME.113 execWithinMobileApp RESOLVED!!! ');
+  console.log('FIXME execWithinMobileApp RESOLVED!!! ');
 
   // now we have to remove the event listener before we return the latch and
   // clean up after ourselves.
-  removeEventListener('message', handler);
+  window.removeEventListener('message', handler);
 
   return output;
 }

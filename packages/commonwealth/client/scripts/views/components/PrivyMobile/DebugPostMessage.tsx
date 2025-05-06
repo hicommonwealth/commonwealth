@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 
 type Props = {
   children: React.ReactNode;
@@ -10,7 +10,8 @@ export const DebugPostMessage = memo(function DebugPostMessage(props: Props) {
     console.log('GOT POST MESSAGE' + message.data);
   }, []);
 
-  useCallback(() => {
+  useEffect(() => {
+    console.log('Listening for all post messages');
     window.addEventListener('message', handler);
 
     return () => {
