@@ -89,6 +89,8 @@ export type MarkdownEditorProps = Readonly<{
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
   onChange?: (markdown: MarkdownStr) => void;
   autoFocus?: boolean;
+  setSelectedActionCard?: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedActionCard?: string[];
 }>;
 
 export const MarkdownEditor = memo(function MarkdownEditor(
@@ -101,6 +103,8 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     onChange,
     autoFocus,
     tooltip,
+    setSelectedActionCard,
+    selectedActionCard,
   } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
@@ -409,6 +413,8 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 onImage={imageUploadHandlerWithMarkdownInsertion}
                 onImportMarkdown={handleImportMarkdown}
                 SubmitButton={SubmitButton}
+                setSelectedActionCard={setSelectedActionCard}
+                selectedActionCard={selectedActionCard}
               />
             )}
 

@@ -205,6 +205,11 @@
       align-items: center;
       gap: 4px;
     }
+    .action-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
   }
   .sidebar {
     display: flex;
@@ -220,6 +225,9 @@
     align-items: center;
     max-width: 300px;
     width: 248px;
+    svg {
+      cursor: pointer;
+    }
 
     .left-container {
       display: flex;

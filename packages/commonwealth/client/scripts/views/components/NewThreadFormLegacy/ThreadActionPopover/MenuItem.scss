@@ -1,0 +1,90 @@
+.menu-item {
+  padding: 10px 12px 10px 12px;
+  gap: 8px;
+  flex-direction: column;
+  display: flex;
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.menu-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 39px;
+
+  .menu-item__header_left {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .menu-item__icon {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    .menu-item__title {
+      flex: 1;
+      font-family: 'NeueHaasUnica';
+    }
+  }
+
+  .btn-border .Button.tertiary .Text.button-text {
+    font-size: 12px !important;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .menu-item__action {
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+  }
+}
+
+.menu-item__subtext {
+  color: #666;
+  font-size: 12px;
+  margin-left: 28px;
+}
+
+.menu-item__button {
+  background-color: #e0e0e0;
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #333;
+  &:hover {
+    background-color: #d0d0d0;
+  }
+}
+.dismissBtn {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  opacity: 1;
+  transform: scale(1);
+  &.hide {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+.check-icon {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  opacity: 1;
+  transform: scale(1);
+  color: #28a745; // Green color for the checkmark
+  cursor: pointer;
+  &.hide {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
++ :global(.caret-icon) {
+  font-size: 14px;
+}

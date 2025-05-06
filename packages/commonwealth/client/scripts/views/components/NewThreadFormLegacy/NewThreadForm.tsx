@@ -100,6 +100,10 @@ interface NewThreadFormProps {
 export interface ExtendedPoll extends Poll {
   customDuration?: string;
 }
+interface SidebarItem {
+  label: string;
+  item: JSX.Element;
+}
 export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -110,6 +114,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [linkedProposals, setLinkedProposals] =
     useState<ProposalState | null>();
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+  const [selectedActionCard, setSelectedActionCard] = useState<string[]>([]);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
@@ -415,7 +420,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         );
         return;
       }
-
       if (err?.message?.includes('limit')) {
         console.log('NewThreadForm: Contest limit exceeded');
         notifyError(
@@ -628,21 +632,25 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
-  const sidebarComponent = [
-    {
-      label: 'Links',
-      item: (
-        <div className="cards-column">
-          <LinkedProposalsCard
-            thread={null}
-            showAddProposalButton={true}
-            setLinkedProposals={setLinkedProposals}
-            linkedProposals={linkedProposals}
-            communityId={selectedCommunityId}
-          />
-        </div>
-      ),
-    },
+  const sidebarComponent: SidebarItem[] = [
+    ...(selectedActionCard.includes('Snapshot')
+      ? [
+          {
+            label: 'Links',
+            item: (
+              <div className="cards-column">
+                <LinkedProposalsCard
+                  thread={null}
+                  showAddProposalButton={true}
+                  setLinkedProposals={setLinkedProposals}
+                  linkedProposals={linkedProposals}
+                  communityId={selectedCommunityId}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...((pollsData && pollsData?.length > 0) ||
     !app.chain?.meta?.admin_only_polling ||
     isAdmin
@@ -667,15 +675,16 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                     />
                   );
                 })}
-                {(!app.chain?.meta?.admin_only_polling || isAdmin) && (
-                  <ThreadPollEditorCard
-                    threadAlreadyHasPolling={!pollsData?.length}
-                    setLocalPoll={setPollData}
-                    isCreateThreadPage={true}
-                    threadTitle={threadTitle}
-                    threadContentDelta={threadContentDelta}
-                  />
-                )}
+                {(!app.chain?.meta?.admin_only_polling || isAdmin) &&
+                  selectedActionCard.includes('Poll') && (
+                    <ThreadPollEditorCard
+                      threadAlreadyHasPolling={!pollsData?.length}
+                      setLocalPoll={setPollData}
+                      isCreateThreadPage={true}
+                      threadTitle={threadTitle}
+                      threadContentDelta={threadContentDelta}
+                    />
+                  )}
               </div>
             ),
           },
@@ -912,6 +921,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                         : disabledActionsTooltipText,
                   })}
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                  setSelectedActionCard={setSelectedActionCard}
+                  selectedActionCard={selectedActionCard}
                 />
 
                 <MessageRow
@@ -1092,9 +1103,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
               )}
               {isWindowSmallInclusive && (
                 <div className="action-cards">
-                  {sidebarComponent.map((view) => (
-                    <div key={view.label}>{view.item}</div>
-                  ))}
+                  {sidebarComponent?.length &&
+                    sidebarComponent?.map((view) => (
+                      <div key={view?.label}>{view?.item}</div>
+                    ))}
                 </div>
               )}
             </>
@@ -1121,8 +1133,10 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                 />
               </div>
 
+              {!selectedActionCard?.length && <CWText>No Action Found</CWText>}
               {!isCollapsed &&
-                sidebarComponent?.map((c) => (
+                sidebarComponent &&
+                sidebarComponent.map((c) => (
                   <React.Fragment key={c?.label}>{c?.item}</React.Fragment>
                 ))}
               {proposalDetailSidebar &&
