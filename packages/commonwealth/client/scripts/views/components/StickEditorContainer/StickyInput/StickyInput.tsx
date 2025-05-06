@@ -79,6 +79,9 @@ const StickyInput = (props: StickyInputProps) => {
   const modelSelectorRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
+  const isUpdatingFromInputRef = useRef(false);
+  const isUpdatingFromDeltaRef = useRef(false);
+  const lastInputValueRef = useRef('');
 
   // Turnstile
   const {
@@ -90,14 +93,20 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
-  // Initialize contentDelta with inputValue on mount
+  // Initialize contentDelta with inputValue on mount - only once
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && !isUpdatingFromDeltaRef.current) {
+      // This flag prevents the other effect from firing back
+      isUpdatingFromInputRef.current = true;
       setContentDelta(createDeltaFromText(inputValue));
+      // Reset the flag after a small delay
+      setTimeout(() => {
+        isUpdatingFromInputRef.current = false;
+      }, 0);
     }
   }, [inputValue, setContentDelta]);
 
-  // When expanding/collapsing, ensure contentDelta is synchronized
+  // When expanding, synchronize content to the editor
   useEffect(() => {
     if (expanded && inputValue && mode === 'thread') {
       // For thread mode, use appendContent when form expands
@@ -108,13 +117,19 @@ const StickyInput = (props: StickyInputProps) => {
       }, 0);
     } else if (expanded && inputValue && mode === 'comment') {
       // For comment mode, update contentDelta
-      setContentDelta(createDeltaFromText(inputValue));
+      if (!isUpdatingFromDeltaRef.current) {
+        isUpdatingFromInputRef.current = true;
+        setContentDelta(createDeltaFromText(inputValue));
+        setTimeout(() => {
+          isUpdatingFromInputRef.current = false;
+        }, 0);
+      }
     }
-  }, [expanded, inputValue, setContentDelta, mode]);
+  }, [expanded, mode, setContentDelta]);
 
   // When props.contentDelta changes from CommentEditor, update inputValue
   useEffect(() => {
-    if (props.contentDelta?.ops) {
+    if (props.contentDelta?.ops && !isUpdatingFromInputRef.current) {
       try {
         // Extract text content from the Delta object
         const text = props.contentDelta.ops.reduce((acc, op) => {
@@ -124,8 +139,15 @@ const StickyInput = (props: StickyInputProps) => {
           return acc;
         }, '');
 
-        if (text && text !== inputValue) {
+        // Only update if the text has actually changed to avoid loops
+        if (text && text !== inputValue && text !== lastInputValueRef.current) {
+          lastInputValueRef.current = text;
+          isUpdatingFromDeltaRef.current = true;
           setInputValue(text);
+          // Reset the flag after a small delay
+          setTimeout(() => {
+            isUpdatingFromDeltaRef.current = false;
+          }, 0);
         }
       } catch (error) {
         console.error('Error extracting text from props.contentDelta:', error);
@@ -135,8 +157,10 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleInputChange = (e) => {
     const value = e.target.value;
+    lastInputValueRef.current = value;
     setInputValue(value);
-    setContentDelta(createDeltaFromText(value));
+
+    // setContentDelta is now handled by the useEffect above
 
     const lastChar = value[value.length - 1];
     if (lastChar === '@') {
@@ -151,6 +175,21 @@ const StickyInput = (props: StickyInputProps) => {
       }
     }
   };
+
+  const handleThreadContentAppended = useCallback(
+    (markdown: string) => {
+      // Only update inputValue if content has actually changed
+      if (markdown !== inputValue) {
+        lastInputValueRef.current = markdown;
+        isUpdatingFromDeltaRef.current = true;
+        setInputValue(markdown);
+        setTimeout(() => {
+          isUpdatingFromDeltaRef.current = false;
+        }, 0);
+      }
+    },
+    [inputValue],
+  );
 
   const handleMentionSelect = (item: {
     id: string;
@@ -436,10 +475,7 @@ const StickyInput = (props: StickyInputProps) => {
               <NewThreadForm
                 ref={newThreadFormRef}
                 onCancel={handleCancel}
-                onContentAppended={(markdown) => {
-                  // Update inputValue when content is appended in the thread form
-                  setInputValue(markdown);
-                }}
+                onContentAppended={handleThreadContentAppended}
               />
             ) : (
               <CommentEditor
