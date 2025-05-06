@@ -53,18 +53,19 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
 
         window.addEventListener('message', handler);
 
-        const requestObj: ProtoRequestObject<Request> = {
+        const protoRequest: ProtoRequestObject<Request> = {
           $id,
           type: opts.type,
           variant: 'request',
           data: request,
         };
 
-        window.ReactNativeWebView!.postMessage(
-          JSON.stringify({
-            requestObj,
-          }),
+        console.log(
+          'FIXME: useMobileRPCSender sending message: ',
+          JSON.stringify(protoRequest),
         );
+
+        window.ReactNativeWebView!.postMessage(JSON.stringify(protoRequest));
       });
     },
     [opts.type],
