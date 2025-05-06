@@ -50,7 +50,7 @@ export function debounceRefresh(
 }
 
 export const refreshProfileCount = debounceRefresh(
-  async (community_id: string) => {
+  async ([community_id]: [string]) => {
     await models.sequelize.query(
       `
 UPDATE "Communities" C
@@ -68,7 +68,7 @@ WHERE C.id = :community_id;
 );
 
 export const refreshMemberships = debounceRefresh(
-  async (community_id: string, group_id?: number) => {
+  async ([community_id, group_id]: [string, undefined] | [string, number]) => {
     await command(RefreshCommunityMemberships(), {
       actor: systemActor({}),
       payload: { community_id, group_id },

@@ -14,7 +14,10 @@ import {
   doesActionAllowContentId,
   doesActionAllowRepetition,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
+  doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
@@ -37,7 +40,10 @@ import { z } from 'zod';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
-import { buildContentIdFromIdentifier } from './helpers';
+import {
+  buildContentIdFromIdentifier,
+  doesConfigAllowContentIdField,
+} from './helpers';
 import { QuestFormProps } from './types';
 import { buildDynamicQuestFormValidationSchema } from './validation';
 
@@ -57,6 +63,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'DiscordServerJoined',
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
+      'LaunchpadTokenTraded',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
@@ -105,6 +112,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
                   }),
+                  ...(doesActionRequireAmountMultipler(chosenAction) && {
+                    amountMultipler: subForm.amountMultipler || 0,
+                  }),
                   ...(doesActionRequireChainEvent(chosenAction) && {
                     contractAddress: subForm.contractAddress,
                     ethChainId: subForm.ethChainId,
@@ -118,6 +128,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 },
                 errors: {},
                 config: {
+                  requires_basic_points:
+                    doesActionRequireBasicRewardAmount(chosenAction),
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
                   is_action_repeatable: doesActionAllowRepetition(chosenAction),
@@ -140,6 +152,11 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_group_id:
                     allowsContentId && doesActionRequireGroupId(chosenAction),
                   requires_start_link: doesActionRequireStartLink(chosenAction),
+                  requires_amount_multipler:
+                    doesActionRequireAmountMultipler(chosenAction),
+                  with_optional_token_trade_threshold:
+                    allowsContentId &&
+                    doesActionAllowTokenTradeThreshold(chosenAction),
                 },
               };
             }),
@@ -187,7 +204,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           formMethodsRef?.current?.getValues('end_date') || new Date(),
         questStartDate:
           formMethodsRef?.current?.getValues('start_date') || new Date(),
-      }),
+      })?.totalXpFixed, // Note: dynamic xp calculation is not needed here
     );
   }, [questActionSubForms]);
 
@@ -241,6 +258,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Topic) return 'topic';
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
+        if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
+          return 'threshold';
+        }
         if (scope === QuestActionContentIdScope.Thread) {
           if (subForm.config?.with_optional_comment_id) return 'comment';
           return 'thread';
@@ -250,7 +270,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
       return {
         event_name: subForm.values.action as QuestAction,
-        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
             parseInt(`${subForm.values.rewardAmount}`, 10),
@@ -258,13 +278,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           ),
         }),
         ...(subForm.values.contentIdentifier &&
-          (subForm.config?.with_optional_comment_id ||
-            subForm.config?.with_optional_thread_id ||
-            subForm.config?.with_optional_chain_id ||
-            subForm.config?.with_optional_topic_id ||
-            subForm.config?.requires_twitter_tweet_link ||
-            subForm.config?.requires_discord_server_id ||
-            subForm.config?.requires_group_id) && {
+          subForm.config &&
+          doesConfigAllowContentIdField(subForm.config) && {
             content_id: buildContentIdFromIdentifier(
               subForm.values.contentIdentifier,
               contentIdScope,
@@ -305,7 +320,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         ...(subForm.values.instructionsLink && {
           instructions_link: subForm.values.instructionsLink.trim(),
         }),
-        amount_multiplier: 0,
+        amount_multiplier: subForm.config?.requires_amount_multipler
+          ? parseInt(`${subForm.values.amountMultipler || 0}`)
+          : 0,
       };
     });
   };
@@ -507,6 +524,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             foundSubForm.errors = {
               ...(foundSubForm.errors || {}),
               contentIdentifier: `Invalid topic link.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
+          return;
+        }
+        if (error.includes('tweet url is already part of a quest')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) => form.values?.action === 'TweetEngagement',
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentIdentifier: `This tweet is already part of another quest.`,
             };
           }
           setQuestActionSubForms([...tempForm]);
