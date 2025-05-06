@@ -20,16 +20,11 @@ import { StakeTransaction } from '../entities/stake.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { Topic } from '../entities/topic.schemas';
 import { Address } from '../entities/user.schemas';
-import { PG_INT, checkIconSize } from '../utils';
+import { PARSED_COMMUNITY_ID, PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
-    id: z
-      .string()
-      .regex(
-        /^[a-z0-9-]+$/,
-        'ID must be a valid slug containing only lowercase alphanumeric characters and dashes',
-      ),
+    id: PARSED_COMMUNITY_ID,
     name: z
       .string()
       .max(255)
@@ -39,6 +34,8 @@ export const CreateCommunity = {
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
+    namespace: z.string().optional(),
+    namespace_transaction_hash: z.string().optional(),
     chain_node_id: PG_INT,
     description: z.string().optional(),
     icon_url: z

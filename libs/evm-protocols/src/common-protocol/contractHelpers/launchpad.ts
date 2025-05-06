@@ -230,7 +230,7 @@ export async function getLaunchpadTokenCreatedTransaction({
     // 1: feeManager,
     // 2: signature,
     // 3: namespaceDeployer,
-    // 3: nameSpaceAddress,
+    3: nameSpaceAddress,
   } = web3.eth.abi.decodeParameters(
     ['string', 'address', 'bytes', 'address', 'address'],
     deployedNamespaceLog.data!.toString(),
@@ -267,6 +267,7 @@ export async function getLaunchpadTokenCreatedTransaction({
     block,
     parsedArgs: {
       namespace: namespace as string,
+      nameSpaceAddress: nameSpaceAddress as string,
       tokenAddress: tokenAddress as string,
       curveId: curveId as bigint,
       totalSupply: totalSupply as bigint,

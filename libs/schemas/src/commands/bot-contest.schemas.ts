@@ -6,7 +6,7 @@ import {
 import { z } from 'zod';
 import { Community } from '../entities';
 import { TokenView } from '../queries';
-import { checkIconSize } from '../utils';
+import { checkIconSize, PARSED_COMMUNITY_ID } from '../utils';
 
 export const CreateBotContest = {
   input: z.object({
@@ -46,6 +46,7 @@ export const CreateBotNamespace = {
 
 export const LaunchToken = {
   input: z.object({
+    id: PARSED_COMMUNITY_ID.optional(),
     name: z.string().describe('The name of the token'),
     symbol: z.string().describe('The symbol of the token'),
     totalSupply: z.number().describe('The total supply of the token'),

@@ -26,8 +26,15 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
     ...schemas.LaunchToken,
     auth: [],
     body: async ({ payload, actor }) => {
-      const { name, symbol, totalSupply, eth_chain_id, icon_url, description } =
-        payload;
+      const {
+        id,
+        name,
+        symbol,
+        totalSupply,
+        eth_chain_id,
+        icon_url,
+        description,
+      } = payload;
 
       if (!cp.isValidChain(eth_chain_id)) {
         throw new AppError('eth_chain_id is not supported');
@@ -36,7 +43,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       if (!config.WEB3.LAUNCHPAD_PRIVATE_KEY)
         throw new ServerError('Launchpad private key not set!');
 
-      const communityId = _.kebabCase(name.toLowerCase());
+      const communityId = id || _.kebabCase(name.toLowerCase());
       const existingCommunity = await models.Community.findOne({
         where: { id: communityId },
       });
@@ -130,14 +137,11 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
           type: ChainType.Offchain,
           social_links: [],
           directory_page_enabled: false,
-          tags: [],
+          tags: ['Launchpad'],
+          namespace: name,
+          namespace_transaction_hash: receipt.transactionHash,
         },
       });
-
-      await models.Community.update(
-        { namespace: name },
-        { where: { id: communityId } },
-      );
 
       const response = {
         community_url: `${config.SERVER_URL}/${communityId}`,

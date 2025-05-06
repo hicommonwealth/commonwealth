@@ -1,4 +1,5 @@
 import { config, InvalidInput, type Command } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   bech32ToHex,
@@ -126,6 +127,22 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       });
       mustExist('User', user);
 
+      let namespaceData:
+        | { namespace: string; namespace_address: string }
+        | undefined;
+      if (payload.namespace && payload.namespace_transaction_hash) {
+        namespaceData = {
+          namespace: payload.namespace,
+          namespace_address:
+            await commonProtocol.newNamespaceValidator.validateNamespace(
+              payload.namespace,
+              payload.namespace_transaction_hash,
+              actor.address!,
+              { chain_node_id: node.id },
+            ),
+        };
+      }
+
       // == command transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
         await models.Community.create(
@@ -156,6 +173,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             thread_purchase_token,
             namespace_verified: false,
             environment: config.APP_ENV,
+            ...(namespaceData ?? {}),
           },
           { transaction },
         );

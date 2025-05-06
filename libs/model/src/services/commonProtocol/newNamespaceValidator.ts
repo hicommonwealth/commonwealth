@@ -1,14 +1,14 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
+  commonProtocol as cp,
   decodeParameters,
   getNamespace,
   getTransactionReceipt,
-  mustBeProtocolChainId,
+  mustBeProtocolChainId, factoryContracts,
 } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { config, models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
 
@@ -29,7 +29,7 @@ export const validateNamespace = async (
   namespace: string,
   txHash: string,
   address: string,
-  community: CommunityAttributes,
+  community: { chain_node_id?: number | null },
 ): Promise<string> => {
   if (!community.chain_node_id) {
     throw new AppError('Invalid community');
@@ -103,10 +103,17 @@ export const validateNamespace = async (
     throw new AppError('Invalid tx hash for namespace creation');
   }
 
+  const addresses: string[] = [address];
+  for (const contractAddresses of Object.values(factoryContracts)) {
+    if ('tokenCommunityManager' in contractAddresses) {
+      addresses.push(contractAddresses.tokenCommunityManager);
+    }
+  }
+
   // Validate User as admin
   const balance = await getBalances({
     balanceSourceType: BalanceSourceType.ERC1155,
-    addresses: [address],
+    addresses: [address, factoryContracts.],
     sourceOptions: {
       contractAddress: activeNamespace,
       evmChainId: chainNode.eth_chain_id,
@@ -114,7 +121,16 @@ export const validateNamespace = async (
     },
     cacheRefresh: true,
   });
-  if (balance[address] !== '1') {
+  let adminMatch = false;
+  for (const address of addresses) {
+    if (balance[address] === '1') {
+      adminMatch = true;
+      break;
+    }
+  }
+  if (
+    !adminMatch
+  ) {
     throw new AppError('User not admin of namespace');
   }
 

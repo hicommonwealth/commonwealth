@@ -12,6 +12,7 @@ import {
   ChainType,
   slugifyPreserveDashes,
 } from '@hicommonwealth/shared';
+import { LaunchTokenBot } from '../aggregates/bot';
 import { CreateCommunity } from '../aggregates/community/CreateCommunity.command';
 import { mustExist, systemActor } from '../middleware';
 import { awardTweetEngagementXp, HttpError } from '../services/twitter';
@@ -56,6 +57,21 @@ export function TwitterPolicy(): Policy<typeof inputs> {
           const communityId =
             payload.id + '-' + slugifyPreserveDashes(communityName);
 
+          await models.User.findOne({});
+
+          await command(LaunchTokenBot(), {
+            actor: {},
+            payload: {
+              id: communityId,
+              name: communityName,
+              symbol,
+              eth_chain_id: ValidChains.Base,
+              icon_url: '', // TODO
+              description: `${symbol} token community created by ${payload.username} on X`,
+              totalSupply: 1e18, // TODO
+            },
+          });
+
           let community = await models.Community.findOne({
             where: {
               id: communityId,
@@ -76,7 +92,6 @@ export function TwitterPolicy(): Policy<typeof inputs> {
                 id: communityId,
                 name: communityName,
                 chain_node_id: chainNode.id!,
-                description: `${symbol} token community created by ${payload.username} on X`,
                 icon_url: '', // TODO: generate image?
                 social_links: [],
                 tags: ['Launchpad'],

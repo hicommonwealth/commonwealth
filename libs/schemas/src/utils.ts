@@ -77,3 +77,10 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
+
+export const PARSED_COMMUNITY_ID = z
+  .string()
+  .regex(
+    /^[a-z0-9-]+$/,
+    'ID must be a valid slug containing only lowercase alphanumeric characters and dashes',
+  );
