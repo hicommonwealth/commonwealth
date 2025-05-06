@@ -90,7 +90,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
                     threshold: '0',
                     source: {
                       source_type: BalanceSourceType.ERC20,
-                      evm_chain_id: chain_node_id,
+                      evm_chain_id: chainNode.eth_chain_id!,
                       contract_address: tokenData.parsedArgs.tokenAddress,
                     },
                   },
