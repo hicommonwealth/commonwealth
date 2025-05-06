@@ -47,6 +47,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
+    case ChainBase.Sui:
+      return ChainNetwork.Sui;
   }
 }
 

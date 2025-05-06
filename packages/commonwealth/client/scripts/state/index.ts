@@ -11,6 +11,7 @@ import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
+import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { userStore } from './ui/user';
 
@@ -28,6 +29,7 @@ export interface IApp {
     | NearAccount
     | SolanaAccount
     | SubstrateAccount
+    | SuiAccount
   >;
 
   // XXX: replace this with some app.chain helper
