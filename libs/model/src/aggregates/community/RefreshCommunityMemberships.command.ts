@@ -122,20 +122,23 @@ async function processMemberships(
   if (tokenHolderGroupId) {
     const toCache = [
       ...toCreate
-        .filter((m) => m.group_id === tokenHolderGroupId && m.balance)
+        .filter(
+          (m) => m.group_id === tokenHolderGroupId && (m.balance || 0) > 0,
+        )
         .map((m) => ({
           value: m.address_id.toString(),
           score: Number(m.balance) / 1e18,
         })),
       ...toUpdate
-        .filter((m) => m.group_id === tokenHolderGroupId && m.balance)
+        .filter(
+          (m) => m.group_id === tokenHolderGroupId && (m.balance || 0) > 0,
+        )
         .map((m) => ({
           value: m.address_id.toString(),
           score: Number(m.balance) / 1e18,
         })),
     ];
     if (toCache.length > 0) {
-      // console.log({ tokenHolderGroupId, toCache });
       await cache()
         .addToSortedSet(CacheNamespaces.TokenTopHolders, community_id, toCache)
         .catch((err) => {
