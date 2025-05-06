@@ -90,6 +90,49 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
+  // Initialize contentDelta with inputValue on mount
+  useEffect(() => {
+    if (inputValue) {
+      setContentDelta(createDeltaFromText(inputValue));
+    }
+  }, [inputValue, setContentDelta]);
+
+  // When expanding/collapsing, ensure contentDelta is synchronized
+  useEffect(() => {
+    if (expanded && inputValue && mode === 'thread') {
+      // For thread mode, use appendContent when form expands
+      setTimeout(() => {
+        if (newThreadFormRef.current?.appendContent) {
+          newThreadFormRef.current.appendContent(inputValue);
+        }
+      }, 0);
+    } else if (expanded && inputValue && mode === 'comment') {
+      // For comment mode, update contentDelta
+      setContentDelta(createDeltaFromText(inputValue));
+    }
+  }, [expanded, inputValue, setContentDelta, mode]);
+
+  // When props.contentDelta changes from CommentEditor, update inputValue
+  useEffect(() => {
+    if (props.contentDelta?.ops) {
+      try {
+        // Extract text content from the Delta object
+        const text = props.contentDelta.ops.reduce((acc, op) => {
+          if (typeof op.insert === 'string') {
+            return acc + op.insert;
+          }
+          return acc;
+        }, '');
+
+        if (text && text !== inputValue) {
+          setInputValue(text);
+        }
+      } catch (error) {
+        console.error('Error extracting text from props.contentDelta:', error);
+      }
+    }
+  }, [props.contentDelta, inputValue]);
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInputValue(value);
@@ -176,6 +219,12 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleFocused = () => {
     setExpanded(true);
+  };
+
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // When input is focused, don't expand to full screen
+    // but let the input handle focus
+    e.stopPropagation();
   };
 
   const handleCancel = useCallback(
@@ -275,28 +324,35 @@ const StickyInput = (props: StickyInputProps) => {
 
   const customHandleSubmitComment = useCallback(async (): Promise<number> => {
     setExpanded(false);
-    setInputValue('');
     setOpenModalOnExpand(false);
     stickyCommentReset();
 
-    const commentId = await handleSubmitComment(turnstileToken);
-
-    if (typeof commentId !== 'number' || isNaN(commentId)) {
-      console.error('StickyInput - Invalid comment ID:', commentId);
-      throw new Error('Invalid comment ID');
-    }
-
-    if (aiCommentsToggleEnabled) {
-      handleAiReply(commentId);
-    }
-
     try {
-      await listenForComment(commentId, aiCommentsToggleEnabled);
-    } catch (error) {
-      console.warn('StickyInput - Failed to jump to comment:', error);
-    }
+      const commentId = await handleSubmitComment(turnstileToken);
 
-    return commentId;
+      if (typeof commentId !== 'number' || isNaN(commentId)) {
+        console.error('StickyInput - Invalid comment ID:', commentId);
+        throw new Error('Invalid comment ID');
+      }
+
+      // Only clear input value after successful submission
+      setInputValue('');
+
+      if (aiCommentsToggleEnabled) {
+        handleAiReply(commentId);
+      }
+
+      try {
+        await listenForComment(commentId, aiCommentsToggleEnabled);
+      } catch (error) {
+        console.warn('StickyInput - Failed to jump to comment:', error);
+      }
+
+      return commentId;
+    } catch (error) {
+      console.error('StickyInput - Failed to submit comment:', error);
+      throw error;
+    }
   }, [
     handleSubmitComment,
     aiCommentsToggleEnabled,
@@ -353,430 +409,38 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [expanded, openModalOnExpand, mode]);
 
-  // For mobile, we need to use portal to ensure proper positioning
-  const renderMobileContent = () => {
-    const parent = document.getElementById('MobileNavigationHead');
-
-    if (!parent) {
-      console.warn('No parent container for mobile StickyInput');
-      return null;
-    }
-
-    const mobileContent = (
+  // Create a single render function that handles both mobile and desktop
+  const renderStickyInput = () => {
+    const inputContent = (
       <div
-        className={`StickyInput ${expanded ? 'expanded' : ''} mobile`}
+        className={`StickyInput ${expanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
         ref={containerRef}
       >
         {expanded ? (
-          <div className="MobileStickyInputFocused">
-            <div className="mobile-editor-container">
-              <div className="header-row">
-                <div className="left-section">
-                  <CWText type="h4">
-                    {mode === 'thread' ? 'Create Thread' : 'Write Comment'}
-                  </CWText>
-                </div>
-              </div>
-
-              {mode === 'thread' ? (
-                <NewThreadForm ref={newThreadFormRef} onCancel={handleCancel} />
-              ) : (
-                <CommentEditor
-                  {...props}
-                  shouldFocus={true}
-                  onCancel={handleCancel}
-                  aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                  handleSubmitComment={customHandleSubmitComment}
-                  onAiReply={handleAiReply}
-                  streamingReplyIds={streamingReplyIds}
-                  triggerImageModalOpen={
-                    openModalOnExpand && mode === 'comment'
-                  }
-                />
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            {threadTags.length > 0 && (
-              <div className="thread-tags-container">
-                <div className="tags-row">
-                  {threadTags.map((tag) => (
-                    <CWTag
-                      key={tag.id}
-                      type="pill"
-                      label={tag.label}
-                      trimAt={20}
-                      onCloseClick={() => handleRemoveThreadTag(tag.id)}
-                    />
-                  ))}
+          <div
+            className={`${isMobile ? 'MobileStickyInputFocused' : 'DesktopStickyInputExpanded'}`}
+          >
+            {isMobile && (
+              <div className="mobile-editor-container">
+                <div className="header-row">
+                  <div className="left-section">
+                    <CWText type="h4">
+                      {mode === 'thread' ? 'Create Thread' : 'Write Comment'}
+                    </CWText>
+                  </div>
                 </div>
               </div>
             )}
 
-            <div className="action-tags-container">
-              <div className="tags-row">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWTag
-                    key="draft"
-                    type="pill"
-                    classNames={`action-pill ${isGenerating ? 'disabled' : ''}`}
-                    label={
-                      isGenerating ? 'Generating...' : getActionPillLabel()
-                    }
-                    onClick={isGenerating ? undefined : handleGenerateAIContent}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="input-row">
-              <div className="text-input-container">
-                {showMentionPopover && (
-                  <div
-                    className="mention-dropdown mention-dropdown-above"
-                    ref={dropdownRef}
-                  >
-                    <div className="mention-items">
-                      {filteredMentions.length > 0 ? (
-                        filteredMentions.map((item) => {
-                          const isSelected =
-                            (item.type === 'thread' &&
-                              threadTags.some((tag) => tag.id === item.id)) ||
-                            (item.type === 'model' &&
-                              selectedModels.some(
-                                (model) => model.id === item.id,
-                              ));
-
-                          return (
-                            <div
-                              key={item.id}
-                              className={`mention-item ${item.type} ${isSelected ? 'selected' : ''}`}
-                              onClick={() => handleMentionSelect(item)}
-                            >
-                              <span className="mention-item-text">
-                                {item.name}
-                              </span>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="mention-empty">No matches found</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <CWTextInput
-                  inputRef={inputRef}
-                  fullWidth
-                  isCompact
-                  value={inputValue}
-                  onInput={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder={
-                    mode === 'thread'
-                      ? 'Create a thread...'
-                      : isReplying
-                        ? `Reply to ${replyingToAuthor}...`
-                        : 'Comment on thread...'
-                  }
-                  onClick={handleFocused}
-                />
-              </div>
-
-              <div className="model-selector" ref={modelSelectorRef}>
-                <button
-                  className="model-selector-button"
-                  onClick={() => setShowModelSelector(!showModelSelector)}
-                >
-                  {selectedModels.length === 0 ? (
-                    <CWIcon
-                      iconName="starFour"
-                      iconSize="small"
-                      weight="bold"
-                    />
-                  ) : (
-                    <>
-                      <CWIcon
-                        iconName="starFour"
-                        iconSize="small"
-                        weight="bold"
-                      />
-                      <span className="model-name">
-                        {selectedModels[0].label}
-                      </span>
-                      {selectedModels.length > 1 && (
-                        <span className="model-count">
-                          +{selectedModels.length - 1}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </button>
-                {showModelSelector && (
-                  <div className="mention-dropdown mention-dropdown-above model-selector-dropdown">
-                    <div className="mention-items">
-                      {MODELS.map((model) => {
-                        const isSelected = selectedModels.some(
-                          (m) => m.id === model.id,
-                        );
-                        return (
-                          <div
-                            key={model.id}
-                            className={`mention-item model ${isSelected ? 'selected' : ''}`}
-                            onClick={() => {
-                              const existingModelIndex =
-                                selectedModels.findIndex(
-                                  (m) => m.id === model.id,
-                                );
-                              if (existingModelIndex >= 0) {
-                                handleRemoveModel(model.id);
-                              } else {
-                                setSelectedModels([...selectedModels, model]);
-                              }
-                            }}
-                          >
-                            <span className="mention-item-text">
-                              {model.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                className="image-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleImageClick();
-                }}
-                aria-label="Add or Generate Image"
-              >
-                <CWIcon iconName="image" iconSize="small" weight="bold" />
-              </button>
-
-              <button className="expand-button" onClick={handleFocused}>
-                <CWIcon
-                  iconName="arrowsOutSimple"
-                  iconSize="small"
-                  weight="bold"
-                />
-              </button>
-
-              <button
-                className="send-button"
-                onClick={() => customHandleSubmitComment()}
-              >
-                <CWIcon
-                  iconName="paperPlaneTilt"
-                  iconSize="small"
-                  weight="bold"
-                />
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    );
-
-    return createPortal(mobileContent, parent);
-  };
-
-  // For desktop, we render directly
-  const renderDesktopContent = () => {
-    return (
-      <div className="DesktopStickyInput">
-        {!expanded ? (
-          <div className="StickyInput">
-            {threadTags.length > 0 && (
-              <div className="thread-tags-container">
-                <div className="tags-row">
-                  {threadTags.map((tag) => (
-                    <CWTag
-                      key={tag.id}
-                      type="pill"
-                      label={tag.label}
-                      trimAt={20}
-                      onCloseClick={() => handleRemoveThreadTag(tag.id)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="action-tags-container">
-              <div className="tags-row">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWTag
-                    key="draft"
-                    type="pill"
-                    classNames={`action-pill ${isGenerating ? 'disabled' : ''}`}
-                    label={
-                      isGenerating ? 'Generating...' : getActionPillLabel()
-                    }
-                    onClick={isGenerating ? undefined : handleGenerateAIContent}
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="input-row">
-              <div className="text-input-container">
-                {showMentionPopover && (
-                  <div
-                    className="mention-dropdown mention-dropdown-above"
-                    ref={dropdownRef}
-                  >
-                    <div className="mention-items">
-                      {filteredMentions.length > 0 ? (
-                        filteredMentions.map((item) => {
-                          const isSelected =
-                            (item.type === 'thread' &&
-                              threadTags.some((tag) => tag.id === item.id)) ||
-                            (item.type === 'model' &&
-                              selectedModels.some(
-                                (model) => model.id === item.id,
-                              ));
-
-                          return (
-                            <div
-                              key={item.id}
-                              className={`mention-item ${item.type} ${isSelected ? 'selected' : ''}`}
-                              onClick={() => handleMentionSelect(item)}
-                            >
-                              <span className="mention-item-text">
-                                {item.name}
-                              </span>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="mention-empty">No matches found</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <CWTextInput
-                  inputRef={inputRef}
-                  fullWidth
-                  isCompact
-                  value={inputValue}
-                  onInput={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder={
-                    mode === 'thread'
-                      ? 'Create a thread...'
-                      : isReplying
-                        ? `Reply to ${replyingToAuthor}...`
-                        : 'Write a comment...'
-                  }
-                  onClick={handleFocused}
-                />
-              </div>
-
-              <div className="model-selector" ref={modelSelectorRef}>
-                <button
-                  className="model-selector-button"
-                  onClick={() => setShowModelSelector(!showModelSelector)}
-                >
-                  {selectedModels.length === 0 ? (
-                    <CWIcon
-                      iconName="starFour"
-                      iconSize="small"
-                      weight="bold"
-                    />
-                  ) : (
-                    <>
-                      <CWIcon
-                        iconName="starFour"
-                        iconSize="small"
-                        weight="bold"
-                      />
-                      <span className="model-name">
-                        {selectedModels[0].label}
-                      </span>
-                      {selectedModels.length > 1 && (
-                        <span className="model-count">
-                          +{selectedModels.length - 1}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </button>
-                {showModelSelector && (
-                  <div className="mention-dropdown mention-dropdown-above model-selector-dropdown">
-                    <div className="mention-items">
-                      {MODELS.map((model) => {
-                        const isSelected = selectedModels.some(
-                          (m) => m.id === model.id,
-                        );
-                        return (
-                          <div
-                            key={model.id}
-                            className={`mention-item model ${isSelected ? 'selected' : ''}`}
-                            onClick={() => {
-                              const existingModelIndex =
-                                selectedModels.findIndex(
-                                  (m) => m.id === model.id,
-                                );
-                              if (existingModelIndex >= 0) {
-                                handleRemoveModel(model.id);
-                              } else {
-                                setSelectedModels([...selectedModels, model]);
-                              }
-                            }}
-                          >
-                            <span className="mention-item-text">
-                              {model.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                className="image-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleImageClick();
-                }}
-                aria-label="Add or Generate Image"
-              >
-                <CWIcon iconName="image" iconSize="small" weight="bold" />
-              </button>
-
-              <button className="expand-button" onClick={handleFocused}>
-                <CWIcon
-                  iconName="arrowsOutSimple"
-                  iconSize="small"
-                  weight="bold"
-                />
-              </button>
-
-              <button
-                className="send-button"
-                onClick={() => customHandleSubmitComment()}
-              >
-                <CWIcon
-                  iconName="paperPlaneTilt"
-                  iconSize="small"
-                  weight="bold"
-                />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="DesktopStickyInputExpanded">
             {mode === 'thread' ? (
-              <NewThreadForm ref={newThreadFormRef} onCancel={handleCancel} />
+              <NewThreadForm
+                ref={newThreadFormRef}
+                onCancel={handleCancel}
+                onContentAppended={(markdown) => {
+                  // Update inputValue when content is appended in the thread form
+                  setInputValue(markdown);
+                }}
+              />
             ) : (
               <CommentEditor
                 {...props}
@@ -787,15 +451,139 @@ const StickyInput = (props: StickyInputProps) => {
                 onAiReply={handleAiReply}
                 streamingReplyIds={streamingReplyIds}
                 triggerImageModalOpen={openModalOnExpand && mode === 'comment'}
+                editorValue={inputValue}
               />
             )}
           </div>
+        ) : (
+          <>
+            <div className="action-tags-container">
+              <div className="tags-row">
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <CWTag
+                    key="draft"
+                    type="pill"
+                    classNames={`action-pill ${isGenerating ? 'disabled' : ''}`}
+                    label={
+                      isGenerating ? 'Generating...' : getActionPillLabel()
+                    }
+                    onClick={isGenerating ? undefined : handleGenerateAIContent}
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="input-row">
+              <div className="text-input-container">
+                {showMentionPopover && (
+                  <div
+                    className="mention-dropdown mention-dropdown-above"
+                    ref={dropdownRef}
+                  >
+                    <div className="mention-items">
+                      {filteredMentions.length > 0 ? (
+                        filteredMentions.map((item) => {
+                          const isSelected =
+                            (item.type === 'thread' &&
+                              threadTags.some((tag) => tag.id === item.id)) ||
+                            (item.type === 'model' &&
+                              selectedModels.some(
+                                (model) => model.id === item.id,
+                              ));
+
+                          return (
+                            <div
+                              key={item.id}
+                              className={`mention-item ${item.type} ${isSelected ? 'selected' : ''}`}
+                              onClick={() => handleMentionSelect(item)}
+                            >
+                              <span className="mention-item-text">
+                                {item.name}
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="mention-empty">No matches found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <CWTextInput
+                  inputRef={inputRef}
+                  fullWidth
+                  isCompact
+                  value={inputValue}
+                  onInput={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleInputFocus}
+                  placeholder={
+                    mode === 'thread'
+                      ? 'Create a thread...'
+                      : isReplying
+                        ? `Reply to ${replyingToAuthor}...`
+                        : isMobile
+                          ? 'Comment on thread...'
+                          : 'Write a comment...'
+                  }
+                />
+              </div>
+
+              <div className="button-group">
+                <button
+                  className="image-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleImageClick();
+                  }}
+                  aria-label="Add or Generate Image"
+                >
+                  <CWIcon iconName="image" iconSize="small" weight="bold" />
+                </button>
+
+                <button className="expand-button" onClick={handleFocused}>
+                  <CWIcon
+                    iconName="arrowsOutSimple"
+                    iconSize="small"
+                    weight="bold"
+                  />
+                </button>
+
+                <button
+                  className="send-button"
+                  onClick={() => customHandleSubmitComment()}
+                  disabled={!inputValue.trim()}
+                  aria-label="Send Comment"
+                >
+                  <CWIcon
+                    iconName="paperPlaneTilt"
+                    iconSize="small"
+                    weight="bold"
+                  />
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     );
+
+    // For mobile, we need to use portal to ensure proper positioning
+    if (isMobile) {
+      const parent = document.getElementById('MobileNavigationHead');
+      if (!parent) {
+        console.warn('No parent container for mobile StickyInput');
+        return null;
+      }
+      return createPortal(inputContent, parent);
+    }
+
+    // For desktop, we wrap in a positioning container
+    return <div className="DesktopStickyInput">{inputContent}</div>;
   };
 
-  return isMobile ? renderMobileContent() : renderDesktopContent();
+  return renderStickyInput();
 };
 
 export default StickyInput;
