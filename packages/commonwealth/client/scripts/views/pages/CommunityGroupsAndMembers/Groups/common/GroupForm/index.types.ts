@@ -25,6 +25,7 @@ export type RequirementSubType = {
   requirementCondition?: string;
   requirementAmount?: string;
   requirementTokenId?: string;
+  requirementCoinType?: string;
 };
 
 export type TopicPermissions =
