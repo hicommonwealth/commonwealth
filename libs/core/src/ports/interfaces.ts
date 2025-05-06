@@ -417,6 +417,23 @@ export class CustomRetryStrategyError extends Error {
   }
 }
 
+export type ConsumerHooks = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  beforeHandleEvent: (topic: string, content: any, context: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  afterHandleEvent: (topic: string, content: any, context: any) => void;
+};
+
+export type Consumer =
+  | {
+      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      worker?: string;
+      retryStrategy?: RetryStrategyFn;
+      hooks?: ConsumerHooks;
+      overrides: Record<string, string | null | undefined>;
+    }
+  | (() => EventsHandlerMetadata<EventSchemas>);
+
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
 type EventNamesType = `${Events}`;
@@ -433,12 +450,7 @@ export interface Broker extends Disposable {
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
-    hooks?: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      beforeHandleEvent: (topic: string, content: any, context: any) => void;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      afterHandleEvent: (topic: string, content: any, context: any) => void;
-    },
+    hooks?: ConsumerHooks,
   ): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
