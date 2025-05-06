@@ -1,1 +1,1 @@
-export * from './createPollVote.command';
+export * from './CreatePollVote.command';
