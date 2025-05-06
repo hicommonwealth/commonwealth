@@ -125,6 +125,9 @@ const generateTokenIdea = async function* ({
     const imageUrl = await generateImage(
       TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
       openai,
+      {
+        model: 'runware:100@1',
+      },
     );
 
     yield 'event: imageURL\n';

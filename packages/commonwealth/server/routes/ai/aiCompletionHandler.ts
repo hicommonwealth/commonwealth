@@ -13,6 +13,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       maxTokens = 1000,
       stream = true,
       useOpenRouter = false,
+      useWebSearch = false,
     } = req.body as CompletionOptions;
 
     // Validate inputs
@@ -33,12 +34,20 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     }
 
     // Determine actual model ID based on provider
-    // OpenRouter needs full model path, OpenAI uses shorter names
-    const modelId = useOR
+    let modelId = useOR
       ? model // OpenRouter models already include provider prefix
       : model.includes('/')
         ? model.split('/')[1]
         : model; // Strip provider prefix for OpenAI
+
+    // Append :online suffix if using OpenRouter and web search is enabled
+    if (useOR && useWebSearch) {
+      // Avoid appending if already present (e.g., if client sent it directly)
+      if (!modelId.endsWith(':online')) {
+        modelId = `${modelId}:online`;
+      }
+      console.log(`Web search enabled for OpenRouter model.`);
+    }
 
     // Log provider and model information
     console.log(`AI Completion Request:
