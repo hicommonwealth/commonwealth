@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 import { DebugPostMessage } from 'views/components/PrivyMobile/DebugPostMessage';
-import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyFoo';
+import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import usePrivyMobileAuthStatusStore from 'views/components/PrivyMobile/usePrivyMobileAuthStatusStore';
 import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
