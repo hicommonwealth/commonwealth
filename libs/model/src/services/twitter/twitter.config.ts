@@ -12,7 +12,6 @@ export const TwitterBotConfigs = {
     consumerSecret: config.TWITTER.CONSUMER_SECRET,
     accessToken: config.TWITTER.ACCESS_TOKEN,
     accessTokenSecret: config.TWITTER.ACCESS_TOKEN_SECRET,
-    mentionsPollingEnabled: false,
   },
   [TwitterBotName.ContestBot]: {
     name: TwitterBotName.ContestBot,
@@ -24,7 +23,6 @@ export const TwitterBotConfigs = {
     consumerSecret: config.TWITTER.CONSUMER_SECRET,
     accessToken: config.TWITTER.ACCESS_TOKEN,
     accessTokenSecret: config.TWITTER.ACCESS_TOKEN_SECRET,
-    mentionsPollingEnabled: false,
   },
   [TwitterBotName.Common]: {
     name: TwitterBotName.Common,
@@ -35,7 +33,6 @@ export const TwitterBotConfigs = {
     consumerSecret: config.TWITTER.CONSUMER_SECRET,
     accessToken: config.TWITTER.ACCESS_TOKEN,
     accessTokenSecret: config.TWITTER.ACCESS_TOKEN_SECRET,
-    mentionsPollingEnabled: false,
   },
   [TwitterBotName.CreateOnCommon]: {
     name: TwitterBotName.CreateOnCommon,
@@ -46,6 +43,5 @@ export const TwitterBotConfigs = {
     consumerSecret: config.TWITTER.CONSUMER_SECRET,
     accessToken: config.TWITTER.ACCESS_TOKEN,
     accessTokenSecret: config.TWITTER.ACCESS_TOKEN_SECRET,
-    mentionsPollingEnabled: true,
   },
 } as const;

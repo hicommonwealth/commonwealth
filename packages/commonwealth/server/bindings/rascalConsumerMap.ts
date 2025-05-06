@@ -11,7 +11,7 @@ import {
   LaunchpadPolicy,
   NominationsWorker,
   NotificationsPolicy,
-  TwitterEngagementPolicy,
+  TwitterPolicy,
   User,
 } from '@hicommonwealth/model';
 import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
@@ -24,7 +24,7 @@ export const rascalConsumerMap: Consumer[] = [
   FarcasterWorker,
   NotificationsSettingsPolicy,
   CreateUnverifiedUser,
-  TwitterEngagementPolicy,
+  TwitterPolicy,
   CommunityGoalsPolicy,
   LaunchpadPolicy,
   {

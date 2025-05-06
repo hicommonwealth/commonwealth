@@ -40,7 +40,7 @@ startHealthCheckLoop({
 const DEFAULT_POLL_START_TIME = new Date(Date.now() - 1000 * 60 * 10);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function pollMentions(twitterBotConfig: TwitterBotConfig) {
+export async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   try {
     const cachedStartTime = await models.TwitterCursor.findOne({
       where: { bot_name: twitterBotConfig.name },
@@ -59,6 +59,8 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
       startTime,
       endTime,
     });
+
+    console.log('Mentions:', res.mentions);
 
     await models.sequelize.transaction(async (transaction) => {
       await emitEvent(
@@ -81,7 +83,7 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   }
 }
 
-async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
+export async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
     const quests = await models.Quest.findAll({
       where: {

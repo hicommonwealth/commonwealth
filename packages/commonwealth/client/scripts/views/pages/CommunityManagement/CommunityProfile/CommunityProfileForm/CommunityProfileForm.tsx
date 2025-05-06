@@ -1,4 +1,4 @@
-import { DefaultPage } from '@hicommonwealth/shared';
+import { DefaultPage, slugifyPreserveDashes } from '@hicommonwealth/shared';
 import { useUpdateCommunityTags } from 'client/scripts/state/api/communities/editCommunityTags';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -6,7 +6,6 @@ import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
-import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,

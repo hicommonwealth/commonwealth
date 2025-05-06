@@ -24,7 +24,12 @@ import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
-    id: z.string(),
+    id: z
+      .string()
+      .regex(
+        /^[a-z0-9-]+$/,
+        'ID must be a valid slug containing only lowercase alphanumeric characters and dashes',
+      ),
     name: z
       .string()
       .max(255)

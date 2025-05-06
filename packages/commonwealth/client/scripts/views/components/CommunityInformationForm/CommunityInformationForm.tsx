@@ -1,5 +1,5 @@
+import { slugifyPreserveDashes } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
-import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useFetchConfigurationQuery } from 'state/api/configuration';

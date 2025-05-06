@@ -571,3 +571,19 @@ export const CountAggregatorKeys = {
   CommunityProfileCount: 'community_profile_count_changed',
   CommunityThreadCount: 'community_thread_count_changed',
 };
+
+export const slugifyPreserveDashes = (str: string): string => {
+  // Remove any character that isn't a alphanumeric character, a
+  // space, or a dash, and then replace any sequence of spaces with a single dash.
+
+  // return str
+  //   .toLowerCase()
+  //   .trim()
+  //   .replace(/[^A-Za-z0-9]+/g, '-');
+
+  return str
+    .replace(/[^A-Za-z0-9 -]/g, '')
+    .replace(/(\s|-)+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+};

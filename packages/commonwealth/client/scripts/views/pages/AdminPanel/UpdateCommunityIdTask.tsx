@@ -1,7 +1,9 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import {
+  PRODUCTION_DOMAIN,
+  slugifyPreserveDashes,
+} from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
-import { slugifyPreserveDashes } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';

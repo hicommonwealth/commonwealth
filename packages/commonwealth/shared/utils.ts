@@ -6,22 +6,6 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 
-export const slugifyPreserveDashes = (str: string): string => {
-  // Remove any character that isn't a alphanumeric character, a
-  // space, or a dash, and then replace any sequence of spaces with a single dash.
-
-  // return str
-  //   .toLowerCase()
-  //   .trim()
-  //   .replace(/[^A-Za-z0-9]+/g, '-');
-
-  return str
-    .replace(/[^A-Za-z0-9 -]/g, '')
-    .replace(/(\s|-)+/g, '-')
-    .replace(/^-|-$/g, '')
-    .toLowerCase();
-};
-
 export const smartTrim = (
   text: string | undefined,
   maxLength = 200,

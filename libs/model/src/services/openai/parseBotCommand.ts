@@ -28,6 +28,7 @@ export type ContestMetadataResponse = {
 
 const system_prompt: ChatCompletionMessage = {
   role: 'assistant',
+  refusal: null,
   content: `
     You are a data extraction system that extracts information from the user.
 
