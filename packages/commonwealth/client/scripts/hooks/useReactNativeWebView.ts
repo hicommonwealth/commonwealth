@@ -75,6 +75,8 @@ export async function execWithinMobileApp<
     console.log('FIXME execWithinMobileApp .111');
     const dataObj = messageToObject(message.data);
 
+    // FIXME: it's possible messageToObject could be throwing an error?
+
     console.log('FIXME.666: got message: ', JSON.stringify(dataObj, null, 2));
 
     if (dataObj.__requestID === __requestID) {
