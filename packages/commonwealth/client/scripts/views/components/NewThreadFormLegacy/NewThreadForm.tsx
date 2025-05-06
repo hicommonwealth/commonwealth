@@ -409,13 +409,16 @@ export const NewThreadForm = forwardRef<
       }
 
       if (thread && pollsData && pollsData?.length) {
+        const custom_duration = pollsData[0]?.customDuration
+          ? pollsData[0]?.customDuration === 'Infinity'
+            ? 'Infinite'
+            : parseInt(pollsData[0]?.customDuration)
+          : undefined;
         await createPoll({
-          threadId: thread.id,
+          thread_id: thread.id!,
           prompt: pollsData[0]?.prompt,
           options: pollsData[0]?.options,
-          customDuration: pollsData[0]?.customDuration || undefined,
-          authorCommunity: user.activeAccount?.community?.id || '',
-          address: user.activeAccount?.address || '',
+          custom_duration,
         });
       }
 

@@ -28,7 +28,7 @@ export const Poll = z.object({
   // associations
   Thread: Thread.optional(),
   Community: Community.optional(),
-  votes: _vote.optional(),
+  votes: _vote.array().optional(),
 });
 
 export const Vote = _vote.extend({

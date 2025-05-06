@@ -48,9 +48,8 @@ export const ThreadPollCard = ({
   const handleDeletePoll = async () => {
     try {
       await deletePoll({
-        pollId: poll.id,
-        address: user.activeAccount?.address || '',
-        authorCommunity: user.activeAccount?.community?.id || '',
+        thread_id: poll.threadId,
+        poll_id: poll.id,
       });
       notifySuccess('Poll deleted');
     } catch (e) {

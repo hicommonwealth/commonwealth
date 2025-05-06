@@ -120,12 +120,14 @@ export const PollEditorModal = ({
     try {
       if (thread) {
         await createPoll({
-          threadId: thread?.id,
+          thread_id: thread?.id,
           prompt,
           options,
-          customDuration: customDurationEnabled ? customDuration : undefined,
-          authorCommunity: user.activeAccount?.community?.id || '',
-          address: user.activeAccount?.address || '',
+          custom_duration: customDurationEnabled
+            ? customDuration === 'Infinity'
+              ? 'Infinite'
+              : parseInt(customDuration)
+            : undefined,
         }).catch(console.error);
 
         notifySuccess('Poll creation succeeded');

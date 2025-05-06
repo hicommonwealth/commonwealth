@@ -146,7 +146,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
-    communityId,
     apiCallEnabled: !!threadId && !!communityId,
   });
 
