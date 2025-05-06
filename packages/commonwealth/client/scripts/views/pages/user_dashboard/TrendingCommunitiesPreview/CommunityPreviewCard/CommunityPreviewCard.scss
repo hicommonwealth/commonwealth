@@ -66,7 +66,13 @@
 
   .community-name {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
     .Icon {
       margin-left: 2px;

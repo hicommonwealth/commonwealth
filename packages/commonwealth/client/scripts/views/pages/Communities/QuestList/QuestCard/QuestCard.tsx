@@ -2,7 +2,7 @@ import { getRandomAvatar } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { calculateQuestTimelineLabel } from 'helpers/quest';
 import moment from 'moment';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Skeleton } from 'views/components/Skeleton';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
@@ -18,7 +18,7 @@ interface QuestCardProps {
   description: string;
   communityId?: string;
   iconURL: string;
-  xpPoints: number;
+  xpPointsElement: ReactNode;
   startDate: Date;
   endDate: Date;
   className?: string;
@@ -39,7 +39,7 @@ const QuestCard = ({
   description,
   communityId,
   iconURL,
-  // xpPoints,
+  xpPointsElement,
   startDate,
   endDate,
   className,
@@ -147,7 +147,7 @@ const QuestCard = ({
         </div>
         <CWDivider />
         <div className="xp-row">
-          {/*<CWTag type="proposal" label={`${xpPoints} Aura`} />*/}
+          {xpPointsElement}
           <CWButton
             iconLeft="upvote"
             label="Leaderboard"

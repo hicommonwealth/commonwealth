@@ -149,7 +149,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           {address && (
             <CWMobileTab
               label={MobileTabType.TokenSwap}
-              icon="arrowClockwise"
+              icon="arrowsClockwise"
               isActive={selectedMobileTab === MobileTabType.TokenSwap}
               onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
             />

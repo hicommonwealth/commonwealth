@@ -18,4 +18,5 @@ export const trpcRouter = trpc.router({
     SuperAdmin.SetCommunityTier,
     trpc.Tag.SuperAdmin,
   ),
+  setUserTier: trpc.command(SuperAdmin.SetUserTier, trpc.Tag.SuperAdmin),
 });

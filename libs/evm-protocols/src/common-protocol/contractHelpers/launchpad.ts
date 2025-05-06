@@ -19,6 +19,7 @@ export const launchToken = async (
   tokenCommunityManager: string,
   value: number = 4.4400042e14,
   maxFeePerGas?: bigint,
+  chainId?: string,
 ) => {
   const contractCall = await contract.methods.launchTokenWithLiquidity(
     name,
@@ -28,7 +29,9 @@ export const launchToken = async (
     totalSupply,
     1,
     0,
-    '0x0000000000000000000000000000000000000000',
+    chainId === '8453'
+      ? '0x8e67278d7782dB5e2E07c02206F219A2F495d493'
+      : '0x0000000000000000000000000000000000000000',
     tokenCommunityManager,
     connectorWeight,
   );

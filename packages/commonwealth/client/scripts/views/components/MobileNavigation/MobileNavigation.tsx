@@ -61,9 +61,9 @@ const MobileNavigation = () => {
     ...(user.isLoggedIn && rewardsEnabled
       ? [
           {
-            type: 'rewards' as const,
-            onClick: () => navigate('/rewards', {}, null),
-            selected: !!matchRoutes([{ path: '/rewards' }], location),
+            type: 'wallet' as const,
+            onClick: () => navigate('/wallet', {}, null),
+            selected: !!matchRoutes([{ path: '/wallet' }], location),
           },
         ]
       : []),
