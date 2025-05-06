@@ -152,9 +152,9 @@ export function ContestWorker(): Policy<typeof inputs> {
           (contestManager) => {
             // if judged contest, only allow judge to vote
             if (contestManager.namespace_judge_token_id) {
-              const isJudge = contestManager.namespace_judges?.includes(
-                payload.address!,
-              );
+              const isJudge = contestManager.namespace_judges
+                ?.map((addr) => addr.toLowerCase())
+                .includes(payload.address!.toLowerCase());
               if (!isJudge) {
                 log.warn(
                   `ThreadUpvoted: ${payload.address} is not a judge for contest ${contestManager.contest_address}– vote skipped`,
