@@ -199,6 +199,7 @@ const GroupForm = ({
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
             requirementTokenId: x?.requirementTokenId || '',
+            requirementCoinType: x?.requirementCoinType || '',
           },
           errors: {},
         })),
