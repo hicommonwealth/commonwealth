@@ -1,4 +1,5 @@
 import { fetchCachedNodes } from 'state/api/nodes';
+import NodeInfo from '../../../../models/NodeInfo';
 
 export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
@@ -52,15 +53,17 @@ export const conditionTypes = [
 ];
 
 // Get chain id's from the fetchCachedNodes for all eth and cosmos chains
-export const chainTypes =
-  fetchCachedNodes()
-    ?.filter(
+export const chainTypes = getChainTypes(fetchCachedNodes() || []);
+
+export function getChainTypes(chainNodes: NodeInfo[]) {
+  return chainNodes
+    .filter(
       (chain) =>
         chain.ethChainId ||
         chain.cosmosChainId ||
         chain.balanceType === 'solana',
     )
-    ?.map((chain) => ({
+    .map((chain) => ({
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.balanceType === 'solana'
@@ -73,4 +76,5 @@ export const chainTypes =
             ? chain.ethChainId || chain.cosmosChainId
             : 0,
       label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-    })) || [];
+    }));
+}
