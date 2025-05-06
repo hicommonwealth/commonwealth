@@ -60,11 +60,6 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
           data: request,
         };
 
-        console.log(
-          'FIXME: useMobileRPCSender sending message: ',
-          JSON.stringify(protoRequest),
-        );
-
         window.ReactNativeWebView!.postMessage(JSON.stringify(protoRequest));
       });
     },
