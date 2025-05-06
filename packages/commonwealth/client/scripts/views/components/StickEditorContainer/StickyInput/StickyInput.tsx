@@ -29,8 +29,8 @@ import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
+
 import './StickyInput.scss';
-import { MENTION_ITEMS, ModelItem, MODELS, ThreadItem, THREADS } from './utils';
 
 export type ThreadMentionTagType = 'threadMention' | 'modelMention';
 
@@ -58,13 +58,6 @@ const StickyInput = (props: StickyInputProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const [inputValue, setInputValue] = useState('');
-  const [threadTags, setThreadTags] = useState<ThreadItem[]>([]);
-  const [showMentionPopover, setShowMentionPopover] = useState(false);
-  const [showModelSelector, setShowModelSelector] = useState(false);
-  const [mentionSearch, setMentionSearch] = useState('');
-  const [selectedModels, setSelectedModels] = useState<ModelItem[]>([
-    MODELS[0],
-  ]);
   const [expanded, setExpanded] = useState(false);
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -72,8 +65,6 @@ const StickyInput = (props: StickyInputProps) => {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const modelSelectorRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
   const isUpdatingFromInputRef = useRef(false);
@@ -145,19 +136,6 @@ const StickyInput = (props: StickyInputProps) => {
     const value = e.target.value;
     lastInputValueRef.current = value;
     setInputValue(value);
-
-    const lastChar = value[value.length - 1];
-    if (lastChar === '@') {
-      setShowMentionPopover(true);
-      setMentionSearch('');
-    } else if (showMentionPopover) {
-      const atIndex = value.lastIndexOf('@');
-      if (atIndex >= 0) {
-        setMentionSearch(value.slice(atIndex + 1));
-      } else {
-        setShowMentionPopover(false);
-      }
-    }
   };
 
   const handleThreadContentAppended = useCallback(
@@ -173,71 +151,6 @@ const StickyInput = (props: StickyInputProps) => {
     },
     [inputValue],
   );
-
-  const handleMentionSelect = (item: {
-    id: string;
-    name: string;
-    type: 'thread' | 'model';
-  }) => {
-    let isUnselecting = false;
-
-    if (item.type === 'thread') {
-      const threadItem = THREADS.find((thread) => thread.id === item.id);
-      if (!threadItem) return;
-
-      const existingTagIndex = threadTags.findIndex(
-        (tag) => tag.id === item.id,
-      );
-      if (existingTagIndex >= 0) {
-        setThreadTags(threadTags.filter((tag) => tag.id !== item.id));
-        isUnselecting = true;
-      } else {
-        setThreadTags([...threadTags, threadItem]);
-      }
-    } else {
-      const modelItem = MODELS.find((model) => model.id === item.id);
-      if (!modelItem) return;
-
-      const existingModelIndex = selectedModels.findIndex(
-        (model) => model.id === item.id,
-      );
-      if (existingModelIndex >= 0) {
-        setSelectedModels(
-          selectedModels.filter((model) => model.id !== item.id),
-        );
-        isUnselecting = true;
-      } else {
-        setSelectedModels([...selectedModels, modelItem]);
-      }
-    }
-
-    const atIndex = inputValue.lastIndexOf('@');
-    if (atIndex >= 0) {
-      if (isUnselecting) {
-        setInputValue(inputValue.substring(0, atIndex));
-      } else {
-        const beforeMention = inputValue.substring(0, atIndex);
-        const afterSearchText = inputValue.substring(
-          atIndex + mentionSearch.length + 1,
-        );
-        setInputValue(`${beforeMention}@${item.name} ${afterSearchText}`);
-      }
-    }
-
-    setShowMentionPopover(false);
-  };
-
-  const filteredMentions = MENTION_ITEMS.filter((item) =>
-    item.name.toLowerCase().includes(mentionSearch.toLowerCase()),
-  );
-
-  const handleRemoveThreadTag = (tagId: string) => {
-    setThreadTags(threadTags.filter((tag) => tag.id !== tagId));
-  };
-
-  const handleRemoveModel = (modelId: string) => {
-    setSelectedModels(selectedModels.filter((model) => model.id !== modelId));
-  };
 
   const handleFocused = () => {
     setExpanded(true);
@@ -403,35 +316,8 @@ const StickyInput = (props: StickyInputProps) => {
     ) {
       event.preventDefault();
       void customHandleSubmitComment();
-    } else if (event.key === 'Escape') {
-      if (showMentionPopover) setShowMentionPopover(false);
-      if (showModelSelector) setShowModelSelector(false);
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showMentionPopover &&
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowMentionPopover(false);
-      }
-      if (
-        showModelSelector &&
-        modelSelectorRef.current &&
-        !modelSelectorRef.current.contains(event.target as Node)
-      ) {
-        setShowModelSelector(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showMentionPopover, showModelSelector]);
 
   useEffect(() => {
     if (expanded && openModalOnExpand) {
@@ -508,41 +394,6 @@ const StickyInput = (props: StickyInputProps) => {
 
             <div className="input-row">
               <div className="text-input-container">
-                {showMentionPopover && (
-                  <div
-                    className="mention-dropdown mention-dropdown-above"
-                    ref={dropdownRef}
-                  >
-                    <div className="mention-items">
-                      {filteredMentions.length > 0 ? (
-                        filteredMentions.map((item) => {
-                          const isSelected =
-                            (item.type === 'thread' &&
-                              threadTags.some((tag) => tag.id === item.id)) ||
-                            (item.type === 'model' &&
-                              selectedModels.some(
-                                (model) => model.id === item.id,
-                              ));
-
-                          return (
-                            <div
-                              key={item.id}
-                              className={`mention-item ${item.type} ${isSelected ? 'selected' : ''}`}
-                              onClick={() => handleMentionSelect(item)}
-                            >
-                              <span className="mention-item-text">
-                                {item.name}
-                              </span>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="mention-empty">No matches found</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
                 <CWTextInput
                   inputRef={inputRef}
                   fullWidth
