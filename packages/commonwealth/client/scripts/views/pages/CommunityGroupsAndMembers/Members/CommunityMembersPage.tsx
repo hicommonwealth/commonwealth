@@ -290,7 +290,7 @@ const CommunityMembersPage = () => {
   }, [groups, searchFilters, memberships]);
 
   let totalResults = members?.pages?.[0]?.totalResults || 0;
-  if (totalResults < 20) {
+  if (totalResults < 30) {
     totalResults = members?.pages?.[0]?.results?.length || 1;
   }
 
