@@ -21,7 +21,7 @@ export const Poll = z.object({
   thread_id: z.number(),
   prompt: z.string(),
   options: z.string(),
-  ends_at: z.coerce.date(),
+  ends_at: z.coerce.date().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
