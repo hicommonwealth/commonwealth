@@ -112,6 +112,7 @@ export const makeGroupDataBaseAPIPayload = (
         rule: 'threshold',
         data: {
           threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             x.requirementType as any,
             // @ts-expect-error StrictNullChecks
             x.requirementAmount,
@@ -135,6 +136,7 @@ export const makeGroupDataBaseAPIPayload = (
         rule: 'threshold',
         data: {
           threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             x.requirementType as any,
             // @ts-expect-error StrictNullChecks
             x.requirementAmount,

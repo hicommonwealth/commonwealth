@@ -199,6 +199,7 @@ const RequirementSubForm = ({
               })}
               onInput={(e) => {
                 onChange({
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   requirementCoinType: (e.target as any).value,
                 });
               }}
