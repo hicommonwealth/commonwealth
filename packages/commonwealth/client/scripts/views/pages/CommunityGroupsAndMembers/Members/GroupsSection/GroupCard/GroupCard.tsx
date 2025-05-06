@@ -77,8 +77,7 @@ const GroupCard = ({
           ? 'All requirements must be satisfied'
           : `At least ${requirementsToFulfill} # of all requirements`}
       </CWText>
-      {/* @ts-expect-error StrictNullChecks*/}
-      {requirements.map((r, index) => (
+      {(requirements || []).map((r, index) => (
         <RequirementCard key={index} {...r} />
       ))}
 

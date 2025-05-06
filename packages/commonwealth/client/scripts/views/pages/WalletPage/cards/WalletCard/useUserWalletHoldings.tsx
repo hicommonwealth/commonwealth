@@ -18,35 +18,47 @@ const useUserWalletHoldings = ({
   const chainNode = cachedNodes?.find((c) => c.id === CHAIN_FOR_HOLDINGS);
 
   // get balances of all the tokens user is holding
-  const { data: tokenBalances, isLoading: isLoadingTokenBalances } =
-    useTokenBalanceQuery({
-      chainId: CHAIN_FOR_HOLDINGS,
-      tokenId: userSelectedAddress,
-    });
+  const {
+    data: tokenBalances,
+    isLoading: isLoadingTokenBalances,
+    refetch: refetchTokenBalances,
+  } = useTokenBalanceQuery({
+    chainId: CHAIN_FOR_HOLDINGS,
+    tokenId: userSelectedAddress,
+  });
   const tokenAddresses = tokenBalances?.tokenBalances.map(
     (b) => b.contractAddress,
   );
 
   // get metadata (name, symbol etc) of all the tokens user is holding
-  const { data: tokenMetadatas, isLoading: isLoadingTokensMetadata } =
-    useTokensMetadataQuery({
-      nodeEthChainId: chainNode?.ethChainId || 0,
-      tokenIds: tokenAddresses || [],
-      apiEnabled: !!(tokenAddresses && chainNode?.ethChainId),
-    });
+  const {
+    data: tokenMetadatas,
+    isLoading: isLoadingTokensMetadata,
+    refetch: refetchTokensMetadata,
+  } = useTokensMetadataQuery({
+    nodeEthChainId: chainNode?.ethChainId || 0,
+    tokenIds: tokenAddresses || [],
+    apiEnabled: !!(tokenAddresses && chainNode?.ethChainId),
+  });
 
   // get usd conversion rates of all the tokens user is holding
-  const { data: tokenToUsdDates, isLoading: isLoadingTokenToUsdDates } =
-    useFetchTokensUsdRateQuery({
-      tokenContractAddresses: tokenAddresses || [],
-      enabled: (tokenMetadatas || []).length > 0,
-    });
+  const {
+    data: tokenToUsdDates,
+    isLoading: isLoadingTokenToUsdDates,
+    refetch: refetchTokenToUsdDates,
+  } = useFetchTokensUsdRateQuery({
+    tokenContractAddresses: tokenAddresses || [],
+    enabled: (tokenMetadatas || []).length > 0,
+  });
 
   // get eth to usd rate
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
+  const {
+    data: ethToCurrencyRateData,
+    isLoading: isLoadingETHToCurrencyRate,
+    refetch: refetchEthToUsdRate,
+  } = useFetchTokenUsdRateQuery({
+    tokenSymbol: 'ETH',
+  });
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
@@ -109,11 +121,22 @@ const useUserWalletHoldings = ({
     isLoadingTokenToUsdDates ||
     isLoadingETHToCurrencyRate;
 
+  // Function to refetch all data
+  const refetch = async () => {
+    await Promise.all([
+      refetchTokenBalances(),
+      refetchTokensMetadata(),
+      refetchTokenToUsdDates(),
+      refetchEthToUsdRate(),
+    ]);
+  };
+
   return {
     isLoadingTokensInfo,
     userTokens,
     userCombinedUSDBalance,
     userCombinedETHBalanceInferredFromCombinedUSDBalance,
+    refetch,
   };
 };
 

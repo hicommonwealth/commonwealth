@@ -58,6 +58,7 @@ import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { ImageActionModal } from '../../components/ImageActionModal/ImageActionModal';
 import MetaTags from '../../components/MetaTags';
 import {
   CWContentPage,
@@ -113,7 +114,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const initalAiCommentPosted = useRef(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
-
+  const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -1076,27 +1077,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 streamingReplyIds={streamingReplyIds}
                 setStreamingReplyIds={setStreamingReplyIds}
               />
-
-              <WithDefaultStickyComment>
-                {thread &&
-                  !thread.readOnly &&
-                  !fromDiscordBot &&
-                  !isGloballyEditing &&
-                  user.isLoggedIn && (
-                    <CreateComment
-                      rootThread={thread}
-                      canComment={canComment}
-                      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                      tooltipText={
-                        typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('comment')
-                          : disabledActionsTooltipText
-                      }
-                    />
-                  )}
-              </WithDefaultStickyComment>
-
-              <StickyCommentElementSelector />
             </>
           }
           editingDisabled={isTopicInContest}
@@ -1104,8 +1084,40 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           proposalDetailSidebar={proposalDetailSidebar as SidebarComponents}
           showActionIcon={true}
         />
+        <WithDefaultStickyComment>
+          {thread &&
+            !thread.readOnly &&
+            !fromDiscordBot &&
+            !isGloballyEditing &&
+            user.isLoggedIn && (
+              <CreateComment
+                rootThread={thread}
+                canComment={canComment}
+                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                tooltipText={
+                  typeof disabledActionsTooltipText === 'function'
+                    ? disabledActionsTooltipText?.('comment')
+                    : disabledActionsTooltipText
+                }
+              />
+            )}
+        </WithDefaultStickyComment>
+
+        <StickyCommentElementSelector />
       </CWPageLayout>
       {JoinCommunityModals}
+
+      {imageActionModalOpen && (
+        <ImageActionModal
+          isOpen={imageActionModalOpen}
+          onClose={() => setImageActionModalOpen(false)}
+          onApply={() => {
+            setImageActionModalOpen(false);
+            // TODO: Optionally focus the sticky editor or scroll to it?
+          }}
+          applyButtonLabel="Add to Comment"
+        />
+      )}
     </StickCommentProvider>
   );
 };

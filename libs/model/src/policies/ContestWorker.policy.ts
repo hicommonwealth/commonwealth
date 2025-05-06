@@ -6,7 +6,7 @@ import {
   ServerError,
 } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../aggregates/contest';
@@ -167,10 +167,7 @@ const checkContests = async () => {
       const firstContent = contestManager.actions.find(
         (action) => action.action === 'added',
       );
-      const timeLeft = moment(contestManager.end_time).diff(
-        moment(),
-        'minutes',
-      );
+      const timeLeft = dayjs(contestManager.end_time).diff(dayjs(), 'minutes');
       const isEnding =
         !contestManager.ending && !!firstContent && timeLeft < 60;
       return isEnding;

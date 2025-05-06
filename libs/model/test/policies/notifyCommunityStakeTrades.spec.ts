@@ -53,7 +53,7 @@ describe('chainEventCreated Event Handler', () => {
     );
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode!.id,
       namespace_address: namespaceAddress,
       lifetime_thread_count: 0,

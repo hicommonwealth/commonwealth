@@ -184,4 +184,19 @@
       padding-bottom: 8px;
     }
   }
+
+  .generate-buttons-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .persistent-actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+  }
 }
