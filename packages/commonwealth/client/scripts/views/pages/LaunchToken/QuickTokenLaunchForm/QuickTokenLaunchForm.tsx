@@ -183,6 +183,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                model: 'runware:100@1',
               });
           }
 
@@ -287,6 +288,7 @@ export const QuickTokenLaunchForm = ({
             icon_url: sanitizedTokenInfo.imageURL,
           }),
           default_page: DefaultPage.Homepage,
+          launchpad_weighted_voting: true,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
@@ -302,6 +304,10 @@ export const QuickTokenLaunchForm = ({
             .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
+        } else if (
+          e?.data?.message?.toLowerCase().includes('insufficient funds')
+        ) {
+          notifyError('Insufficient funds to launch token!');
         } else {
           notifyError('Failed to create token!');
         }
@@ -437,7 +443,7 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community. 
+                body={`Launching token will create a complimentary community.
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">

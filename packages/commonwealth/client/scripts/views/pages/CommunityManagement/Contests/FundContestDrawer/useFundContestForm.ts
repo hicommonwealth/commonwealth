@@ -20,6 +20,7 @@ interface UseFundContestFormProps {
   ethChainId: number;
   userAddress: string;
   fundingTokenAddress?: string;
+  isRecurring?: boolean;
 }
 
 const useFundContestForm = ({
@@ -28,6 +29,7 @@ const useFundContestForm = ({
   ethChainId,
   userAddress,
   fundingTokenAddress,
+  isRecurring = false,
 }: UseFundContestFormProps) => {
   const [tokenAmount, setTokenAmount] = useState(INITIAL_AMOUNT);
   const { data: tokenMetadata } = useTokenMetadataQuery({
@@ -61,7 +63,7 @@ const useFundContestForm = ({
     contestAddress,
     chainRpc,
     ethChainId,
-    isOneOff: !!fundingTokenAddress,
+    isOneOff: !isRecurring,
   });
 
   const contestTokenBalance =

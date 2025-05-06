@@ -11,7 +11,10 @@ export const CreateToken = {
     description: z.string().nullish(),
     icon_url: z.string().nullish(),
   }),
-  output: TokenView,
+  output: TokenView.extend({
+    community_id: z.string().nullish(),
+    group_id: z.number().nullish(),
+  }),
   context: AuthContext,
 };
 
@@ -51,5 +54,25 @@ export const GetTokenizedThreadsAllowed = {
   output: z.object({
     tokenized_threads_enabled: z.boolean(),
     thread_purchase_token: z.string().nullish(),
+  }),
+};
+
+export const GetTokenInfoAlchemy = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    token_address: z.string(),
+  }),
+  output: z.object({
+    network: z.string(),
+    address: z.string(),
+    currency: z.string(),
+    data: z
+      .object({
+        value: z.string(),
+        timestamp: z.string(),
+        marketCap: z.string(),
+        totalVolume: z.string(),
+      })
+      .array(),
   }),
 };

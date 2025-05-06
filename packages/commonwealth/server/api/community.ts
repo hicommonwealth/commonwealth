@@ -170,4 +170,5 @@ export const trpcRouter = trpc.router({
     Community.UpdateCommunityDirectoryTags,
     trpc.Tag.Community,
   ),
+  getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
 });

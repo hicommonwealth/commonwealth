@@ -9,6 +9,7 @@ import {
 } from '../framework';
 import {
   AddressOwnershipTransferredNotification,
+  CapReachedNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
@@ -19,6 +20,7 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
@@ -88,6 +90,7 @@ export enum CacheNamespaces {
   External_Api_Usage_Counter = 'api_key_counter',
   CommunityThreadRanks = 'community_thread_ranks',
   GlobalThreadRanks = 'global_thread_ranks',
+  TokenTopHolders = 'token_top_holders',
 }
 
 /**
@@ -414,6 +417,23 @@ export class CustomRetryStrategyError extends Error {
   }
 }
 
+export type ConsumerHooks = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  beforeHandleEvent: (topic: string, content: any, context: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  afterHandleEvent: (topic: string, content: any, context: any) => void;
+};
+
+export type Consumer =
+  | {
+      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      worker?: string;
+      retryStrategy?: RetryStrategyFn;
+      hooks?: ConsumerHooks;
+      overrides: Record<string, string | null | undefined>;
+    }
+  | (() => EventsHandlerMetadata<EventSchemas>);
+
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
 type EventNamesType = `${Events}`;
@@ -430,12 +450,7 @@ export interface Broker extends Disposable {
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
-    hooks?: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      beforeHandleEvent: (topic: string, content: any, context: any) => void;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      afterHandleEvent: (topic: string, content: any, context: any) => void;
-    },
+    hooks?: ConsumerHooks,
   ): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
@@ -496,6 +511,9 @@ export enum WorkflowKeys {
   ReferrerSignedUp = 'referrer-signed-up',
   ReferrerCommunityJoined = 'referrer-community-joined',
   ReferrerCommunityCreated = 'referrer-community-created',
+  // Launchpad
+  LaunchpadTradeEvent = 'launchpad-trade-event',
+  LaunchpadCapReached = 'launchpad-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -586,6 +604,14 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ReferrerCommunityCreatedNotification>;
             key: WorkflowKeys.ReferrerCommunityCreated;
+          }
+        | {
+            data: z.infer<typeof TradeEventNotification>;
+            key: WorkflowKeys.LaunchpadTradeEvent;
+          }
+        | {
+            data: z.infer<typeof CapReachedNotification>;
+            key: WorkflowKeys.LaunchpadCapReached;
           }
       ))
   | WebhookProviderOptions;

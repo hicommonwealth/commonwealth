@@ -5,7 +5,7 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
@@ -228,7 +228,7 @@ describe('Quest lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(
-        `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
+        `Start date ${dayjs(now).format('YYYY-MM-DD')} already passed`,
       );
     });
 

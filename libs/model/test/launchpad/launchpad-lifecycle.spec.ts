@@ -32,7 +32,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       namespace: 'DogeMoonLanding',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,

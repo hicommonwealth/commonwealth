@@ -26,7 +26,6 @@
     "@hicommonwealth/schemas": "workspace:*",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
-    "moment": "^2.23.0",
     "node-object-hash": "^3.0.0",
     "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
