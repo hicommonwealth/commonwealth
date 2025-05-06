@@ -7,7 +7,7 @@ type Props = {
 export const DebugPostMessage = memo(function DebugPostMessage(props: Props) {
   const { children } = props;
   const handler = useCallback((message: MessageEvent<any>) => {
-    console.log('GOT POST MESSAGE' + message.data);
+    console.log('GOT POST MESSAGE' + JSON.stringify(message.data, null, 2));
   }, []);
 
   useEffect(() => {
@@ -15,6 +15,7 @@ export const DebugPostMessage = memo(function DebugPostMessage(props: Props) {
     window.addEventListener('message', handler);
 
     return () => {
+      console.log('Removing post message listener');
       window.removeEventListener('message', handler);
     };
   }, [handler]);
