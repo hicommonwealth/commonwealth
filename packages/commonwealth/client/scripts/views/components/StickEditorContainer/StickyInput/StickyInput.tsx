@@ -1,3 +1,4 @@
+import { notifyError } from 'controllers/app/notifications';
 import { useFlag } from 'hooks/useFlag';
 import React, {
   useCallback,
@@ -45,12 +46,10 @@ const StickyInput = (props: StickyInputProps) => {
     replyingToAuthor,
     onCancel,
     setContentDelta,
-    onAiReply,
     thread: originalThread,
     parentCommentText,
   } = props;
 
-  // States from context and store
   const { mode } = useContext(StickCommentContext);
   const { aiCommentsToggleEnabled, aiInteractionsToggleEnabled } =
     useLocalAISettingsStore();
@@ -58,21 +57,19 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  // Input component state
   const [inputValue, setInputValue] = useState('');
   const [threadTags, setThreadTags] = useState<ThreadItem[]>([]);
   const [showMentionPopover, setShowMentionPopover] = useState(false);
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [mentionSearch, setMentionSearch] = useState('');
   const [selectedModels, setSelectedModels] = useState<ModelItem[]>([
-    MODELS[0], // Claude 3.7 Sonnet is default
+    MODELS[0],
   ]);
   const [expanded, setExpanded] = useState(false);
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -83,7 +80,6 @@ const StickyInput = (props: StickyInputProps) => {
   const isUpdatingFromDeltaRef = useRef(false);
   const lastInputValueRef = useRef('');
 
-  // Turnstile
   const {
     turnstileToken,
     isTurnstileEnabled,
@@ -93,30 +89,24 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
-  // Initialize contentDelta with inputValue on mount - only once
   useEffect(() => {
     if (inputValue && !isUpdatingFromDeltaRef.current) {
-      // This flag prevents the other effect from firing back
       isUpdatingFromInputRef.current = true;
       setContentDelta(createDeltaFromText(inputValue));
-      // Reset the flag after a small delay
       setTimeout(() => {
         isUpdatingFromInputRef.current = false;
       }, 0);
     }
   }, [inputValue, setContentDelta]);
 
-  // When expanding, synchronize content to the editor
   useEffect(() => {
     if (expanded && inputValue && mode === 'thread') {
-      // For thread mode, use appendContent when form expands
       setTimeout(() => {
         if (newThreadFormRef.current?.appendContent) {
           newThreadFormRef.current.appendContent(inputValue);
         }
       }, 0);
     } else if (expanded && inputValue && mode === 'comment') {
-      // For comment mode, update contentDelta
       if (!isUpdatingFromDeltaRef.current) {
         isUpdatingFromInputRef.current = true;
         setContentDelta(createDeltaFromText(inputValue));
@@ -125,13 +115,11 @@ const StickyInput = (props: StickyInputProps) => {
         }, 0);
       }
     }
-  }, [expanded, mode, setContentDelta]);
+  }, [expanded, mode, setContentDelta, inputValue]);
 
-  // When props.contentDelta changes from CommentEditor, update inputValue
   useEffect(() => {
     if (props.contentDelta?.ops && !isUpdatingFromInputRef.current) {
       try {
-        // Extract text content from the Delta object
         const text = props.contentDelta.ops.reduce((acc, op) => {
           if (typeof op.insert === 'string') {
             return acc + op.insert;
@@ -139,12 +127,10 @@ const StickyInput = (props: StickyInputProps) => {
           return acc;
         }, '');
 
-        // Only update if the text has actually changed to avoid loops
         if (text && text !== inputValue && text !== lastInputValueRef.current) {
           lastInputValueRef.current = text;
           isUpdatingFromDeltaRef.current = true;
           setInputValue(text);
-          // Reset the flag after a small delay
           setTimeout(() => {
             isUpdatingFromDeltaRef.current = false;
           }, 0);
@@ -159,8 +145,6 @@ const StickyInput = (props: StickyInputProps) => {
     const value = e.target.value;
     lastInputValueRef.current = value;
     setInputValue(value);
-
-    // setContentDelta is now handled by the useEffect above
 
     const lastChar = value[value.length - 1];
     if (lastChar === '@') {
@@ -178,7 +162,6 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleThreadContentAppended = useCallback(
     (markdown: string) => {
-      // Only update inputValue if content has actually changed
       if (markdown !== inputValue) {
         lastInputValueRef.current = markdown;
         isUpdatingFromDeltaRef.current = true;
@@ -261,8 +244,6 @@ const StickyInput = (props: StickyInputProps) => {
   };
 
   const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    // When input is focused, don't expand to full screen
-    // but let the input handle focus
     e.stopPropagation();
   };
 
@@ -271,9 +252,12 @@ const StickyInput = (props: StickyInputProps) => {
       setExpanded(false);
       setOpenModalOnExpand(false);
       stickyCommentReset();
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
       onCancel?.(e);
     },
-    [onCancel, stickyCommentReset],
+    [onCancel, stickyCommentReset, isTurnstileEnabled, resetTurnstile],
   );
 
   const handleAiReply = useCallback(
@@ -299,7 +283,6 @@ const StickyInput = (props: StickyInputProps) => {
 
     try {
       if (mode === 'thread') {
-        // Generate AI thread
         const threadPrompt = generateThreadPrompt('');
 
         await generateCompletion(threadPrompt, {
@@ -315,7 +298,6 @@ const StickyInput = (props: StickyInputProps) => {
           },
         });
       } else {
-        // Generate AI comment/reply
         const context = `
           Thread: ${originalThread?.title || ''}
           ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
@@ -362,6 +344,11 @@ const StickyInput = (props: StickyInputProps) => {
   };
 
   const customHandleSubmitComment = useCallback(async (): Promise<number> => {
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return Promise.reject(new Error('Turnstile verification required'));
+    }
+
     setExpanded(false);
     setOpenModalOnExpand(false);
     stickyCommentReset();
@@ -374,8 +361,10 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
-      // Only clear input value after successful submission
       setInputValue('');
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
 
       if (aiCommentsToggleEnabled) {
         handleAiReply(commentId);
@@ -390,6 +379,9 @@ const StickyInput = (props: StickyInputProps) => {
       return commentId;
     } catch (error) {
       console.error('StickyInput - Failed to submit comment:', error);
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
       throw error;
     }
   }, [
@@ -398,11 +390,17 @@ const StickyInput = (props: StickyInputProps) => {
     handleAiReply,
     turnstileToken,
     stickyCommentReset,
+    isTurnstileEnabled,
+    resetTurnstile,
   ]);
 
-  // Handle key press, e.g., for submitting on Enter
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && !expanded && inputValue.trim() !== '') {
+    if (
+      event.key === 'Enter' &&
+      !expanded &&
+      inputValue.trim() !== '' &&
+      (!isTurnstileEnabled || turnstileToken)
+    ) {
       event.preventDefault();
       void customHandleSubmitComment();
     } else if (event.key === 'Escape') {
@@ -448,7 +446,6 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [expanded, openModalOnExpand, mode]);
 
-  // Create a single render function that handles both mobile and desktop
   const renderStickyInput = () => {
     const inputContent = (
       <div
@@ -589,7 +586,10 @@ const StickyInput = (props: StickyInputProps) => {
                 <button
                   className="send-button"
                   onClick={() => customHandleSubmitComment()}
-                  disabled={!inputValue.trim()}
+                  disabled={
+                    !inputValue.trim() ||
+                    (isTurnstileEnabled && !turnstileToken)
+                  }
                   aria-label="Send Comment"
                 >
                   <CWIcon
@@ -600,12 +600,17 @@ const StickyInput = (props: StickyInputProps) => {
                 </button>
               </div>
             </div>
+
+            {isTurnstileEnabled && (
+              <div className="turnstile-container">
+                <TurnstileWidget />
+              </div>
+            )}
           </>
         )}
       </div>
     );
 
-    // For mobile, we need to use portal to ensure proper positioning
     if (isMobile) {
       const parent = document.getElementById('MobileNavigationHead');
       if (!parent) {
@@ -615,7 +620,6 @@ const StickyInput = (props: StickyInputProps) => {
       return createPortal(inputContent, parent);
     }
 
-    // For desktop, we wrap in a positioning container
     return <div className="DesktopStickyInput">{inputContent}</div>;
   };
 

@@ -45,12 +45,13 @@
       flex-direction: column;
       background-color: white;
       z-index: 1100;
+      padding: 16px;
 
       .mobile-editor-container {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
         padding: 16px;
+        display: unset !important;
+        flex: unset !important;
+        height: unset !important;
 
         .header-row {
           display: flex;
@@ -208,6 +209,13 @@
         color: white;
       }
     }
+  }
+
+  .turnstile-container {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
 }
 
