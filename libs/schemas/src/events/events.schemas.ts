@@ -364,6 +364,9 @@ export const events = {
   TwitterCommonMentioned: Tweet.describe(
     'Emitted when a Twitter/X user mentions @commondotxyz',
   ),
+  TwitterCreateOnCommonMentioned: Tweet.describe(
+    'Emitted when a Twitter/X user mentions @createoncommon',
+  ),
 
   // Events mapped from ChainEvents
   CommunityStakeTrade: ChainEventBase.extend({

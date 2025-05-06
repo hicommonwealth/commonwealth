@@ -17,6 +17,10 @@ export type twitterMentions =
   | Array<{
       event_name: 'TwitterCommonMentioned';
       event_payload: z.infer<typeof events.TwitterCommonMentioned>;
+    }>
+  | Array<{
+      event_name: 'TwitterCreateOnCommonMentioned';
+      event_payload: z.infer<typeof events.TwitterCreateOnCommonMentioned>;
     }>;
 
 type AllKeys<T> = T extends unknown ? keyof T : never;

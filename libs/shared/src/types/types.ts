@@ -77,4 +77,5 @@ export enum TwitterBotName {
   MomBot = 'MomBot',
   ContestBot = 'ContestBot',
   Common = 'Common',
+  CreateOnCommon = 'CreateOnCommon',
 }
