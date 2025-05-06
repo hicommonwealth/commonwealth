@@ -120,7 +120,9 @@ const TokenPerformance = () => {
                 tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
               />
             )}
-        {!hasReachedGoal && <TopHolders />}
+        {!hasReachedGoal && 'initial_supply' in communityToken && (
+          <TopHolders supply={communityToken.initial_supply} />
+        )}
       </div>
     </div>
   );

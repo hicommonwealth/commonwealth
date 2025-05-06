@@ -10,7 +10,7 @@ import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/Form
 import { FullUser } from 'views/components/user/fullUser';
 import './TopHolders.scss';
 
-const TopHolders = () => {
+const TopHolders = ({ supply }: { supply: number }) => {
   const navigate = useCommonNavigate();
   const communityId = app.activeChainId() || '';
 
@@ -43,8 +43,7 @@ const TopHolders = () => {
 
   const rowData = topHolders?.results.map((holder) => {
     const name = holder.name || '';
-    // TODO: Calculate percentage total supply / tokens ?
-    const percentage = (holder.tokens * 100) / 10_000_000_000;
+    const percentage = (holder.tokens * 100) / supply;
     return {
       user: {
         customElement: (
