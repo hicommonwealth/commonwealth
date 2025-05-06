@@ -136,6 +136,9 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
+    const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
+    console.log({ judgeId });
+
     const singleJudged = {
       ethChainId,
       chainRpc,
@@ -145,7 +148,7 @@ const SignTransactionsStep = ({
       voterShare,
       walletAddress,
       exchangeToken,
-      judgeId: (judgeStatus?.current_judge_id || 100) + 1,
+      judgeId,
     } as DeploySingleJudgedContestOnchainProps;
 
     const recurring = {
@@ -226,6 +229,9 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
+      const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
+      console.log({ judgeId });
+
       await configureNominationsMutation({
         namespaceName,
         creatorOnly: true,
@@ -233,7 +239,7 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
-        judgeId: (judgeStatus?.current_judge_id || 100) + 1,
+        judgeId,
       });
 
       setConfigureNominationsData((prevState) => ({
