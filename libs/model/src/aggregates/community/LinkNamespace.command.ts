@@ -1,11 +1,17 @@
-import { type Command } from '@hicommonwealth/core';
+import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  bumpCommunityTier,
+  CommunityTierMap,
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+} from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-import { mustExist } from '../../middleware/guards';
 import { emitEvent } from '../../utils';
+
+const log = logger(import.meta);
 
 async function updateReferralCount(
   referrer_address: string,
@@ -24,8 +30,11 @@ async function updateReferralCount(
     (await referrer.update(
       {
         referral_count: models.sequelize.literal(`
-        (SELECT COUNT(DISTINCT referee_address) FROM "Referrals"
-         WHERE referrer_address = ${models.sequelize.escape(referrer_address)})
+        (SELECT COUNT(DISTINCT referee_address)
+        FROM "Referrals"
+        WHERE referrer_address IN (
+          SELECT address from "Addresses" WHERE user_id = ${referrer.id!}
+        ))
       `),
       },
       { transaction },
@@ -98,7 +107,15 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
           },
         ],
       });
-      mustExist('Community', community);
+      if (!community) {
+        log.warn(
+          `Community not found for namespace ${namespace_address}, skipping link`,
+        );
+        return;
+      }
+
+      if (!log_removed)
+        bumpCommunityTier(CommunityTierMap.ChainVerified, community);
 
       community.namespace_creator_address = deployer_address;
 
@@ -180,7 +197,8 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                       source_type: BalanceSourceType.ERC1155,
                       evm_chain_id: community.ChainNode!.eth_chain_id!,
                       contract_address: namespace_address,
-                      token_id: '3',
+                      token_id:
+                        NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID.toString(),
                     },
                   },
                 },

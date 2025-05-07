@@ -236,6 +236,8 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -247,6 +249,8 @@ export const events = {
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -445,7 +449,7 @@ export const events = {
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),
@@ -502,6 +506,31 @@ export const events = {
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
+
+  JudgeNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      judge: EVM_ADDRESS_STRICT.describe('Judge address'),
+      judgeId: z.coerce.bigint().describe('Judge ID'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+      currentNominations: z.coerce
+        .bigint()
+        .describe('Current nomination count'),
+    }),
+  }).describe('Contest judge nominated'),
+
+  NominatorNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+    }),
+  }).describe('Nomination token (ID 3) minted'),
+
+  NominatorSettled: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+    }),
+  }).describe('Nomination configured'),
 
   NamespaceLinked: z.object({
     namespace_address: z.string(),

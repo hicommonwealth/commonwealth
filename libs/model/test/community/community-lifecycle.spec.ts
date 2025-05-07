@@ -130,7 +130,7 @@ describe('Community lifecycle', () => {
     });
 
     const [ethBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
       active: true,
@@ -159,7 +159,7 @@ describe('Community lifecycle', () => {
     });
 
     const [cosmosBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _cosmosNode!.id!,
       base: ChainBase.CosmosSDK,
       active: true,
@@ -187,7 +187,7 @@ describe('Community lifecycle', () => {
     });
 
     const [substrateBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _substrateNode!.id!,
       base: ChainBase.Substrate,
       active: true,

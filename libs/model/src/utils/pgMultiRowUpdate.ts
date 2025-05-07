@@ -45,12 +45,15 @@ export async function pgMultiRowUpdate(
   const query = `
     UPDATE "${tableName}"
     SET ${updates} ${updatedAtColumn ? `, updated_at = NOW()` : ''}
-    WHERE ${caseColumn} IN (${Array.from(caseValues).join(', ')});
+    WHERE ${caseColumn} IN (:whereValues);
   `;
 
   await models.sequelize.query(query, {
     transaction,
     type: QueryTypes.UPDATE,
+    replacements: {
+      whereValues: Array.from(caseValues),
+    },
   });
   return true;
 }

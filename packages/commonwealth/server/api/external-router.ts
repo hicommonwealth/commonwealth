@@ -60,7 +60,8 @@ const {
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
-const { createToken, createTrade, getLaunchpadTrades } = launchpad.trpcRouter;
+const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
+  launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
 
 const api = {
@@ -122,6 +123,7 @@ const api = {
   toggleCommentSpam,
   createToken,
   createTrade,
+  getTokenInfoAlchemy,
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
     forceSecure: true,
   }),

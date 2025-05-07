@@ -32,7 +32,10 @@ export async function setupCommonwealthE2E() {
   // note need to run this in between so we can set up the rmq adapter
   await startMessageRelayer();
 
-  await Promise.all([setupEvmCe(), bootstrapBindings(true)]);
+  await Promise.all([
+    setupEvmCe(),
+    bootstrapBindings({ skipRmqAdapter: true }),
+  ]);
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
 
