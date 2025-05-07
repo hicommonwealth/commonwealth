@@ -17,7 +17,6 @@ import { ImageActionModal } from '../../ImageActionModal/ImageActionModal';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
@@ -293,22 +292,6 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
 
         <div className="form-bottom">
           <div className="form-buttons">
-            <CWTooltip
-              content="Add or Generate Image"
-              placement="top"
-              renderTrigger={(handleInteraction, isOpen) => (
-                <CWIconButton
-                  iconName="image"
-                  buttonSize="sm"
-                  onClick={handleOpenImageModal}
-                  aria-label="Add or Generate Image"
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  data-tooltip-open={isOpen}
-                  className="comment-image-button"
-                />
-              )}
-            />
             <CWButton
               buttonType="tertiary"
               containerClassName="cancel-button"
@@ -316,16 +299,19 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
               label="Cancel"
             />
             <div className="attribution-right-content">
-              <div className="ml-auto">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWThreadAction
-                    action="ai-reply"
-                    label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
-                    disabled={isSubmitDisabled}
-                    onClick={handleCommentWithAI}
-                  />
-                )}
-              </div>
+              <CWThreadAction
+                action="image"
+                label="Add or Generate Image"
+                onClick={handleOpenImageModal}
+              />
+              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                <CWThreadAction
+                  action="ai-reply"
+                  label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
+                  disabled={isSubmitDisabled}
+                  onClick={handleCommentWithAI}
+                />
+              )}
             </div>
 
             {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
