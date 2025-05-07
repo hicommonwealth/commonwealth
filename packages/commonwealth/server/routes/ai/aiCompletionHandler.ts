@@ -21,6 +21,9 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
+    // Log the received prompt
+    console.log('Received prompt:', prompt);
+
     // Choose between OpenAI and OpenRouter
     const useOR = useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
     const apiKey = useOR
@@ -34,11 +37,33 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     }
 
     // Determine actual model ID based on provider
-    let modelId = useOR
-      ? model // OpenRouter models already include provider prefix
-      : model.includes('/')
-        ? model.split('/')[1]
-        : model; // Strip provider prefix for OpenAI
+    // OpenRouter needs full model path, OpenAI uses shorter names
+    let modelId: string = model; // Start with the original model, explicitly typed as string
+    let addOpenAiWebSearchOptions = false;
+
+    if (useOR) {
+      // For OpenRouter, append :online if not already present
+      if (!model.endsWith(':online')) {
+        modelId = `${model}:online`;
+      }
+    } else {
+      // For OpenAI, strip provider prefix and map to search-preview models
+      // or use existing -search-preview models
+      const baseModel = model.includes('/') ? model.split('/')[1] : model;
+      if (baseModel === 'gpt-4o') {
+        modelId = 'gpt-4o-search-preview';
+        addOpenAiWebSearchOptions = true;
+      } else if (baseModel === 'gpt-4o-mini') {
+        modelId = 'gpt-4o-mini-search-preview';
+        addOpenAiWebSearchOptions = true;
+      } else if (baseModel.endsWith('-search-preview')) {
+        // If user explicitly passes a search-preview model
+        modelId = baseModel;
+        addOpenAiWebSearchOptions = true;
+      } else {
+        modelId = baseModel; // Use the stripped model name if no specific search preview version
+      }
+    }
 
     // Append :online suffix if using OpenRouter and web search is enabled
     if (useOR && useWebSearch) {
@@ -77,7 +102,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamConfig: any = {
-          model: modelId,
+          model: modelId as any,
           messages: [{ role: 'user', content: prompt }],
           temperature,
           max_tokens: maxTokens,
@@ -88,7 +113,11 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
               'X-Title': 'Common',
             },
           }),
+          ...(!useOR &&
+            addOpenAiWebSearchOptions && { web_search_options: {} }),
         };
+
+        console.log('Streaming request messages:', streamConfig.messages); // Log the messages for streaming
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamResponse: any =
@@ -140,7 +169,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const completionConfig: any = {
-          model: modelId,
+          model: modelId as any,
           messages: [{ role: 'user', content: prompt }],
           temperature,
           max_tokens: maxTokens,
@@ -150,10 +179,40 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
               'X-Title': 'Common',
             },
           }),
+          ...(!useOR &&
+            addOpenAiWebSearchOptions && { web_search_options: {} }),
         };
+
+        console.log('Completion request messages:', completionConfig.messages); // Log the messages for non-streaming
 
         const completion =
           await openai.chat.completions.create(completionConfig);
+
+        // Log the entire first choice message object from the AI
+        if (
+          completion.choices &&
+          completion.choices.length > 0 &&
+          completion.choices[0].message
+        ) {
+          console.log(
+            'Raw AI completion message:',
+            JSON.stringify(completion.choices[0].message, null, 2),
+          );
+          // Specifically log annotations if present in the non-streaming message
+          // Use index signature access to safely access potential custom 'annotations' field
+          const message = completion.choices[0].message as any; // Cast to any to access potentially custom fields
+          if (message.annotations) {
+            console.log(
+              'Extracted Annotations (non-streaming):',
+              JSON.stringify(message.annotations, null, 2),
+            );
+          }
+        } else {
+          console.log(
+            'Raw AI completion (no message in first choice or no choices):',
+            JSON.stringify(completion, null, 2),
+          );
+        }
 
         const responseText = completion.choices[0]?.message?.content || '';
         res.json({ completion: responseText });

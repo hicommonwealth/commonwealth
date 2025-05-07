@@ -88,6 +88,7 @@ type CommentCardProps = {
   // Add props for root-level comment generation
   isRootComment?: boolean;
   threadContext?: string;
+  threadTitle?: string;
 };
 
 export const CommentCard = ({
@@ -131,6 +132,7 @@ export const CommentCard = ({
   tokenNumDecimals,
   isRootComment,
   threadContext,
+  threadTitle,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -235,9 +237,12 @@ export const CommentCard = ({
     const generateAIReply = async () => {
       try {
         // Build context by combining thread context with parent comment if available
-        const threadPart = threadContext
-          ? `This is the thread body: ${threadContext}`
-          : '';
+        const threadPart = [
+          threadTitle ? `This is the thread title: ${threadTitle}` : '',
+          threadContext ? `This is the thread body: ${threadContext}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n');
         const parentPart = parentCommentText
           ? `This is the parent comment: ${parentCommentText}`
           : '';
@@ -294,6 +299,7 @@ export const CommentCard = ({
     isStreamingAIReply,
     isRootComment,
     threadContext,
+    threadTitle,
     parentCommentText,
     comment.id,
     comment.thread_id,

@@ -1,28 +1,33 @@
 const generateThreadPrompt = (context: string) => {
   return `
-You are an expert copywriter with deep technical knowledge of blockchain technologies,
-cryptocurrencies, and web3 concepts.
-Generate a compelling forum thread based on the following guidelines:
+You are an expert copywriter skilled in fostering engaging online community discussions.
+You are generating content for Common, a versatile platform for building and growing diverse online communities,
+from interest-based groups and startups to onchain projects. Common offers tools for discussion (forums, threads, comments),
+polling, governance, and community engagement.
 
-CONTEXT PROVIDED:
+Your task is to generate a compelling forum thread based on the following guidelines:
+
+CONTEXT PROVIDED (This will be the specific topic for your thread):
 ${context}
 
-Use this context as inspiration for your thread. Address specific points or questions mentioned above.
+Use this context as the primary inspiration for your thread. Address specific points or questions mentioned in the provided context.
+If the context implies a need for current information, recent developments, or a broader understanding of the topic (e.g., "latest trends in X", "what's new with Y"),
+you can use general web knowledge to inform your thread content and make it more comprehensive and up-to-date.
 
 Tips for an engaging thread:
-- Do not start with a thread title
-- Open with a hook that draws readers in
-- Present your main points clearly and concisely
-- Include relevant questions to encourage discussion
-- End with a call to action that invites responses
+- Do not start with a thread title.
+- Open with a hook that draws readers in.
+- Present your main points clearly and concisely.
+- Include relevant questions to encourage discussion.
+- End with a call to action that invites responses.
 
 Formatting guidelines:
-- Use Markdown to enhance readability (e.g., headers, bold, italics, lists)
-- Incorporate a few relevant emojis to add visual appeal (but don't overuse them)
-- Break up long paragraphs for better readability
-- Use bullet points or numbered lists when appropriate
+- Use Markdown to enhance readability (e.g., headers, bold, italics, lists).
+- Incorporate a few relevant emojis to add visual appeal (but don't overuse them).
+- Break up long paragraphs for better readability.
+- Use bullet points or numbered lists when appropriate.
 
-Be authentic, conversational, and focused on starting a meaningful community discussion.
+Be authentic, conversational, and focused on starting a meaningful community discussion on the Common platform.
 
 IMPORTANT: Return only the thread content without any introduction, explanations, or meta-text.
   `;
@@ -35,23 +40,32 @@ const generateThreadTitlePrompt = (context: string) => {
 
 const generateCommentPrompt = (context: string) => {
   return `
-You are a helpful forum assistant.
+You are a helpful forum assistant for a community on Common.
+Common is a platform that hosts diverse online communities, offering tools for discussion (forums, threads, comments),
+polling, governance, and engagement. You are replying to a comment within a specific thread in one of these community forums.
+
 Generate a thoughtful comment reply based on the following thread and parent comment: ${context}
 
-Your comment should be:
-- Detailed and relevant to the thread topic
-- Engaging and conversational in tone
-- Include a touch of humor where appropriate
-- Several sentences long (but not excessive)
-- Written in a way that encourages further discussion
+If the user's request or the parent comment implies a need for current information or a search (e.g., "latest news", "what's new with X"),
+you can use general web knowledge to inform your response. You can also reference other relevant threads within this specific forum if helpful,
+but do not search or reference external forums.
 
-IMPORTANT: Return only the comment without any introduction, explanations, or meta-text.
+Your comment should be:
+- Detailed and relevant to the thread topic and parent comment.
+- Engaging and conversational in tone.
+- Include a touch of humor where appropriate.
+- Several sentences long (but not excessive).
+- Written in a way that encourages further discussion within this Common community.
+
+IMPORTANT: Return only the comment content without any introduction, explanations, or meta-text.
   `;
 };
 
 const generatePollPrompt = (context: string) => {
   return `
-You are an AI assistant skilled in analyzing discussion threads to create engaging polls.
+You are an AI assistant skilled in analyzing discussion threads to create engaging polls for communities on the Common platform.
+Common hosts diverse online communities, offering tools for discussion, polling, and engagement.
+
 Based on the following thread content, generate one poll suggestion in JSON format that reflects the main debate, topic,
  or question raised.
 THREAD CONTENT:

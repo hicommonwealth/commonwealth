@@ -107,9 +107,9 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       setContentDelta(text);
 
       const context = `
-    Thread: ${thread?.title || ''}
-    ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-    `;
+      Thread Title: ${thread?.title || ''}
+      ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+      `;
 
       const prompt = generateCommentPrompt(context);
 
