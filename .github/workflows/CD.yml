@@ -68,7 +68,7 @@ jobs:
           echo "machine api.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}\nmachine git.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}" > ~/.netrc
           heroku container:login
 
-      - name: Build and Push Docker Images (web/process)
+      - name: Build and Push Docker Image (web)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -78,19 +78,88 @@ jobs:
           cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:buildcache
           cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:buildcache,mode=max
 
-      # Add more build-push steps here for other process types if needed (e.g. worker)
-      # - name: Build and Push Docker Images (worker/process)
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.worker
-      #     push: true
-      #     tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:latest
-      #     cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:buildcache
-      #     cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:buildcache,mode=max
+      - name: Build and Push Docker Image (consumer)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.consumer
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/consumer:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/consumer:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/consumer:buildcache,mode=max
 
-      - name: Release Heroku Container
+      - name: Build and Push Docker Image (discord_listener)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.discord_listener
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/discord_listener:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/discord_listener:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/discord_listener:buildcache,mode=max
+
+      - name: Build and Push Docker Image (evm_ce)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.evm_ce
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/evm_ce:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/evm_ce:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/evm_ce:buildcache,mode=max
+
+      - name: Build and Push Docker Image (graphile_worker)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.graphile_worker
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/graphile_worker:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/graphile_worker:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/graphile_worker:buildcache,mode=max
+
+      - name: Build and Push Docker Image (knock)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.knock
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/knock:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/knock:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/knock:buildcache,mode=max
+
+      - name: Build and Push Docker Image (message_relayer)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.message_relayer
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/message_relayer:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/message_relayer:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/message_relayer:buildcache,mode=max
+
+      - name: Build and Push Docker Image (release)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.release
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/release:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/release:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/release:buildcache,mode=max
+
+      - name: Build and Push Docker Image (twitter)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.twitter
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/twitter:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/twitter:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/twitter:buildcache,mode=max
+
+      - name: Release Heroku Containers
         env:
           HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
         run: |
-          heroku container:release web -a ${{ env.HEROKU_APP_NAME }}
+          heroku container:release web consumer discord_listener evm_ce graphile_worker knock message_relayer release twitter -a ${{ env.HEROKU_APP_NAME }}
