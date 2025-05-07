@@ -8,12 +8,15 @@ RUN corepack enable && \
 # Create a dependencies stage for better caching
 FROM base AS dependencies
 WORKDIR /usr/src/app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* \
-    packages/commonwealth/package.json \
-    libs/adapters/package.json libs/core/package.json libs/evm-protocols/package.json \
-    libs/model/package.json libs/schemas/package.json libs/shared/package.json libs/sitemaps/package.json \
-    ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
 COPY packages/commonwealth/package.json ./packages/commonwealth/package.json
+COPY libs/adapters/package.json ./libs/adapters/package.json
+COPY libs/core/package.json ./libs/core/package.json
+COPY libs/evm-protocols/package.json ./libs/evm-protocols/package.json
+COPY libs/model/package.json ./libs/model/package.json
+COPY libs/schemas/package.json ./libs/schemas/package.json
+COPY libs/shared/package.json ./libs/shared/package.json
+COPY libs/sitemaps/package.json ./libs/sitemaps/package.json
 
 RUN echo "==== DIRECTORY STRUCTURE AFTER COPYING CONFIG FILES ====" && \
     find . -type d -o -name "package.json" -o -name "pnpm*.yaml" | sort && \
