@@ -123,6 +123,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (consumer)
         uses: docker/build-push-action@v5
@@ -133,6 +134,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/consumer:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (discord_listener)
         uses: docker/build-push-action@v5
@@ -143,6 +145,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/discord_listener:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (evm_ce)
         uses: docker/build-push-action@v5
@@ -153,6 +156,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/evm_ce:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (graphile_worker)
         uses: docker/build-push-action@v5
@@ -163,6 +167,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/graphile_worker:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (knock)
         uses: docker/build-push-action@v5
@@ -173,6 +178,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/knock:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (message_relayer)
         uses: docker/build-push-action@v5
@@ -183,6 +189,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/message_relayer:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (release)
         uses: docker/build-push-action@v5
@@ -193,6 +200,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/release:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache,mode=max
+          provenance: false
 
       - name: Build and Push Docker Image (twitter)
         uses: docker/build-push-action@v5
@@ -203,6 +211,7 @@ jobs:
           tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/twitter:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
+          provenance: false
 
       - name: Release Heroku Containers
         env:
