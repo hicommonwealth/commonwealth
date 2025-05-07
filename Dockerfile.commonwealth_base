@@ -10,10 +10,6 @@ FROM base AS dependencies
 WORKDIR /usr/src/app
 COPY . .
 
-RUN echo "==== DIRECTORY STRUCTURE AFTER COPYING CONFIG FILES ====" && \
-    find . -type d -o -name "package.json" -o -name "pnpm*.yaml" | sort && \
-    echo "========================================================"
-
 # Install build dependencies in the same layer
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 make gcc g++ && \
