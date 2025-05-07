@@ -8,9 +8,7 @@ RUN corepack enable && \
 # Create a dependencies stage for better caching
 FROM base AS dependencies
 WORKDIR /usr/src/app
-# Copy only package files first to leverage caching
-COPY pnpm-lock.yaml package.json ./
-COPY packages/*/package.json ./packages/
+COPY . .
 
 # Install build dependencies in the same layer
 RUN apt-get update && \
