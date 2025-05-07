@@ -13,6 +13,7 @@ import {
   generateCommentPrompt,
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
+import useStickyInputStore, { StickyInputMode } from 'state/ui/stickyInput';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -50,15 +51,29 @@ const StickyInput = (props: StickyInputProps) => {
     parentCommentText,
   } = props;
 
-  const { mode } = useContext(StickCommentContext);
+  const { mode: contextMode } = useContext(StickCommentContext);
   const { aiCommentsToggleEnabled, aiInteractionsToggleEnabled } =
     useLocalAISettingsStore();
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  const [inputValue, setInputValue] = useState('');
-  const [expanded, setExpanded] = useState(false);
+  // Use the Zustand store for state management
+  const {
+    inputValue,
+    expanded,
+    mode,
+    setInputValue,
+    setExpanded,
+    resetContent,
+    setMode,
+  } = useStickyInputStore();
+
+  // Initialize the mode from context
+  useEffect(() => {
+    setMode(contextMode as StickyInputMode);
+  }, [contextMode, setMode]);
+
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -67,9 +82,6 @@ const StickyInput = (props: StickyInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
-  const isUpdatingFromInputRef = useRef(false);
-  const isUpdatingFromDeltaRef = useRef(false);
-  const lastInputValueRef = useRef('');
 
   const {
     turnstileToken,
@@ -80,36 +92,29 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
+  // Sync from input value to delta
   useEffect(() => {
-    if (inputValue && !isUpdatingFromDeltaRef.current) {
-      isUpdatingFromInputRef.current = true;
+    if (inputValue) {
       setContentDelta(createDeltaFromText(inputValue));
-      setTimeout(() => {
-        isUpdatingFromInputRef.current = false;
-      }, 0);
     }
   }, [inputValue, setContentDelta]);
 
+  // Handle content initialization when expanding
   useEffect(() => {
-    if (expanded && inputValue && mode === 'thread') {
-      setTimeout(() => {
-        if (newThreadFormRef.current?.appendContent) {
-          newThreadFormRef.current.appendContent(inputValue);
-        }
-      }, 0);
-    } else if (expanded && inputValue && mode === 'comment') {
-      if (!isUpdatingFromDeltaRef.current) {
-        isUpdatingFromInputRef.current = true;
-        setContentDelta(createDeltaFromText(inputValue));
+    if (expanded && inputValue) {
+      if (mode === 'thread' && newThreadFormRef.current?.appendContent) {
         setTimeout(() => {
-          isUpdatingFromInputRef.current = false;
+          newThreadFormRef.current?.appendContent(inputValue);
         }, 0);
+      } else if (mode === 'comment') {
+        setContentDelta(createDeltaFromText(inputValue));
       }
     }
   }, [expanded, mode, setContentDelta, inputValue]);
 
+  // Sync from contentDelta to input value
   useEffect(() => {
-    if (props.contentDelta?.ops && !isUpdatingFromInputRef.current) {
+    if (props.contentDelta?.ops) {
       try {
         const text = props.contentDelta.ops.reduce((acc, op) => {
           if (typeof op.insert === 'string') {
@@ -118,38 +123,27 @@ const StickyInput = (props: StickyInputProps) => {
           return acc;
         }, '');
 
-        if (text && text !== inputValue && text !== lastInputValueRef.current) {
-          lastInputValueRef.current = text;
-          isUpdatingFromDeltaRef.current = true;
-          setInputValue(text);
-          setTimeout(() => {
-            isUpdatingFromDeltaRef.current = false;
-          }, 0);
+        if (text && text !== inputValue) {
+          setInputValue(text, 'editor');
         }
       } catch (error) {
         console.error('Error extracting text from props.contentDelta:', error);
       }
     }
-  }, [props.contentDelta, inputValue]);
+  }, [props.contentDelta, inputValue, setInputValue]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    lastInputValueRef.current = value;
-    setInputValue(value);
+    setInputValue(value, 'input');
   };
 
   const handleThreadContentAppended = useCallback(
     (markdown: string) => {
       if (markdown !== inputValue) {
-        lastInputValueRef.current = markdown;
-        isUpdatingFromDeltaRef.current = true;
-        setInputValue(markdown);
-        setTimeout(() => {
-          isUpdatingFromDeltaRef.current = false;
-        }, 0);
+        setInputValue(markdown, 'editor');
       }
     },
-    [inputValue],
+    [inputValue, setInputValue],
   );
 
   const handleFocused = () => {
@@ -170,7 +164,13 @@ const StickyInput = (props: StickyInputProps) => {
       }
       onCancel?.(e);
     },
-    [onCancel, stickyCommentReset, isTurnstileEnabled, resetTurnstile],
+    [
+      onCancel,
+      stickyCommentReset,
+      isTurnstileEnabled,
+      resetTurnstile,
+      setExpanded,
+    ],
   );
 
   const handleAiReply = useCallback(
@@ -206,7 +206,7 @@ const StickyInput = (props: StickyInputProps) => {
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
-            setInputValue(bodyAccumulatedRef.current);
+            setInputValue(bodyAccumulatedRef.current, 'input');
             setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
           },
         });
@@ -226,7 +226,7 @@ const StickyInput = (props: StickyInputProps) => {
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
-            setInputValue(bodyAccumulatedRef.current);
+            setInputValue(bodyAccumulatedRef.current, 'input');
             setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
           },
         });
@@ -244,6 +244,7 @@ const StickyInput = (props: StickyInputProps) => {
     originalThread,
     parentCommentText,
     setContentDelta,
+    setInputValue,
   ]);
 
   const getActionPillLabel = () => {
@@ -274,7 +275,7 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
-      setInputValue('');
+      resetContent();
       if (isTurnstileEnabled) {
         resetTurnstile();
       }
@@ -305,6 +306,8 @@ const StickyInput = (props: StickyInputProps) => {
     stickyCommentReset,
     isTurnstileEnabled,
     resetTurnstile,
+    setExpanded,
+    resetContent,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -359,6 +362,9 @@ const StickyInput = (props: StickyInputProps) => {
                 ref={newThreadFormRef}
                 onCancel={handleCancel}
                 onContentAppended={handleThreadContentAppended}
+                onContentDeltaChange={(markdown: string) => {
+                  setInputValue(markdown, 'editor');
+                }}
               />
             ) : (
               <CommentEditor
