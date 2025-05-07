@@ -14,6 +14,7 @@ import {
   generateCommentPrompt,
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
+import useSidebarStore from 'state/ui/sidebar';
 import useStickyInputStore, { StickyInputMode } from 'state/ui/stickyInput';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -55,6 +56,7 @@ const StickyInput = (props: StickyInputProps) => {
 
   useResetStickyInputOnRouteChange(setContentDelta);
 
+  const { menuVisible } = useSidebarStore();
   const { mode: contextMode } = useContext(StickCommentContext);
   const {
     aiCommentsToggleEnabled,
@@ -421,6 +423,7 @@ const StickyInput = (props: StickyInputProps) => {
       <div
         className={`StickyInput ${expanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
         ref={containerRef}
+        style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
         {expanded ? (
           <div
