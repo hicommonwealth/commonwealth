@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Push Docker Image
 
 on:
   push:
@@ -50,14 +50,47 @@ jobs:
               ;;
           esac
           echo "HEROKU_APP_NAME=$APP_NAME" >> $GITHUB_ENV
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Deploy to Heroku
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Heroku Container Login
+        env:
+          HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
         run: |
-          chmod +x ./scripts/deploy-to-heroku.sh
-          ./scripts/deploy-to-heroku.sh "${{ secrets.HEROKU_EMAIL }}" "${{ secrets.HEROKU_API_TOKEN }}" "${{ env.HEROKU_APP_NAME }}"
+          echo "machine api.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}\nmachine git.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}" > ~/.netrc
+          heroku container:login
+
+      - name: Build and Push Docker Images (web/process)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.web
+          push: true
+          tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:latest
+          cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:buildcache
+          cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web:buildcache,mode=max
+
+      # Add more build-push steps here for other process types if needed (e.g. worker)
+      # - name: Build and Push Docker Images (worker/process)
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.worker
+      #     push: true
+      #     tags: registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:latest
+      #     cache-from: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:buildcache
+      #     cache-to: type=registry,ref=registry.heroku.com/${{ env.HEROKU_APP_NAME }}/worker:buildcache,mode=max
+
+      - name: Release Heroku Container
+        env:
+          HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
+        run: |
+          heroku container:release web -a ${{ env.HEROKU_APP_NAME }}
