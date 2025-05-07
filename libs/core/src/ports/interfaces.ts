@@ -90,6 +90,7 @@ export enum CacheNamespaces {
   External_Api_Usage_Counter = 'api_key_counter',
   CommunityThreadRanks = 'community_thread_ranks',
   GlobalThreadRanks = 'global_thread_ranks',
+  TokenTopHolders = 'token_top_holders',
 }
 
 /**

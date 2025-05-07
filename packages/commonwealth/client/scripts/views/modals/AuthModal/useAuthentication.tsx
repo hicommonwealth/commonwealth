@@ -166,6 +166,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ChainBase.Ethereum,
         ChainBase.Substrate,
         ChainBase.Solana,
+        ChainBase.Sui,
       ];
       setWallets(
         _.flatten(

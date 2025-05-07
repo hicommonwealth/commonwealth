@@ -47,6 +47,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
+    case ChainBase.Sui:
+      return ChainNetwork.Sui;
   }
 }
 
@@ -156,6 +158,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             thread_purchase_token,
             namespace_verified: false,
             environment: config.APP_ENV,
+            profile_count: 1,
           },
           { transaction },
         );
