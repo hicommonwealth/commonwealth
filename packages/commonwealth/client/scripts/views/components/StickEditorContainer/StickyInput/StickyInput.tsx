@@ -1,5 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import { useFlag } from 'hooks/useFlag';
+import useResetStickyInputOnRouteChange from 'hooks/useResetStickyInputOnRouteChange';
 import React, {
   useCallback,
   useContext,
@@ -52,6 +53,8 @@ const StickyInput = (props: StickyInputProps) => {
     parentCommentText,
   } = props;
 
+  useResetStickyInputOnRouteChange(setContentDelta);
+
   const { mode: contextMode } = useContext(StickCommentContext);
   const {
     aiCommentsToggleEnabled,
@@ -62,7 +65,6 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  // Use the Zustand store for state management
   const {
     inputValue,
     expanded,
@@ -71,9 +73,9 @@ const StickyInput = (props: StickyInputProps) => {
     setExpanded,
     resetContent,
     setMode,
+    resetState,
   } = useStickyInputStore();
 
-  // Initialize the mode from context
   useEffect(() => {
     setMode(contextMode as StickyInputMode);
   }, [contextMode, setMode]);
@@ -87,6 +89,11 @@ const StickyInput = (props: StickyInputProps) => {
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
 
+  // Add this ref for tracking the previous expanded state
+  const prevExpandedRef = useRef(false);
+  // Add a flag to control whether to sync content when expanding
+  const shouldSyncOnExpandRef = useRef(true);
+
   const {
     turnstileToken,
     isTurnstileEnabled,
@@ -96,17 +103,24 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
-  // Sync from input value to delta
+  // Sync from input value to delta - only when input is the source
   useEffect(() => {
-    if (inputValue) {
+    if (inputValue && !expanded) {
       setContentDelta(createDeltaFromText(inputValue));
     }
-  }, [inputValue, setContentDelta]);
+  }, [inputValue, setContentDelta, expanded]);
 
   // Handle content initialization when expanding
   useEffect(() => {
-    if (expanded && inputValue) {
+    // Only sync content when expanding (not when already expanded)
+    if (
+      expanded &&
+      !prevExpandedRef.current &&
+      inputValue &&
+      shouldSyncOnExpandRef.current
+    ) {
       if (mode === 'thread' && newThreadFormRef.current?.appendContent) {
+        // Use a timeout to ensure the NewThreadForm is fully rendered
         setTimeout(() => {
           newThreadFormRef.current?.appendContent(inputValue);
         }, 0);
@@ -114,9 +128,12 @@ const StickyInput = (props: StickyInputProps) => {
         setContentDelta(createDeltaFromText(inputValue));
       }
     }
+
+    // Update the ref with current value for next render
+    prevExpandedRef.current = expanded;
   }, [expanded, mode, setContentDelta, inputValue]);
 
-  // Sync from contentDelta to input value
+  // Sync from contentDelta to input value - only for compact view or comment mode
   useEffect(() => {
     if (props.contentDelta?.ops) {
       try {
@@ -128,13 +145,34 @@ const StickyInput = (props: StickyInputProps) => {
         }, '');
 
         if (text && text !== inputValue) {
-          setInputValue(text, 'editor');
+          // In thread mode, only update input from delta when in compact view
+          if (!expanded || mode === 'comment') {
+            setInputValue(text, 'editor');
+          }
         }
       } catch (error) {
         console.error('Error extracting text from props.contentDelta:', error);
       }
     }
-  }, [props.contentDelta, inputValue, setInputValue]);
+  }, [props.contentDelta, inputValue, setInputValue, expanded, mode]);
+
+  // Add this new useEffect to reset content upon cancellation
+  useEffect(() => {
+    // If transitioning from expanded to collapsed without submission
+    if (prevExpandedRef.current && !expanded) {
+      // Reset content when collapsing (canceling)
+      resetContent();
+      setContentDelta(createDeltaFromText(''));
+    }
+  }, [expanded, resetContent, setContentDelta]);
+
+  // Make the sync ref available to the useResetStickyInputOnRouteChange hook
+  useEffect(() => {
+    (window as any).__stickyInputSyncRef = shouldSyncOnExpandRef;
+    return () => {
+      (window as any).__stickyInputSyncRef = undefined;
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -144,7 +182,13 @@ const StickyInput = (props: StickyInputProps) => {
   const handleThreadContentAppended = useCallback(
     (markdown: string) => {
       if (markdown !== inputValue) {
+        // Temporarily disable syncing from input to NewThreadForm
+        shouldSyncOnExpandRef.current = false;
         setInputValue(markdown, 'editor');
+        // Re-enable syncing after the update has been processed
+        setTimeout(() => {
+          shouldSyncOnExpandRef.current = true;
+        }, 100);
       }
     },
     [inputValue, setInputValue],
@@ -160,6 +204,8 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleCancel = useCallback(
     (e: React.MouseEvent | undefined) => {
+      // Temporarily disable syncing to prevent unwanted updates
+      shouldSyncOnExpandRef.current = false;
       setExpanded(false);
       setOpenModalOnExpand(false);
       stickyCommentReset();
@@ -167,6 +213,11 @@ const StickyInput = (props: StickyInputProps) => {
         resetTurnstile();
       }
       onCancel?.(e);
+
+      // Re-enable syncing after a short delay
+      setTimeout(() => {
+        shouldSyncOnExpandRef.current = true;
+      }, 100);
     },
     [
       onCancel,
@@ -267,6 +318,8 @@ const StickyInput = (props: StickyInputProps) => {
       return Promise.reject(new Error('Turnstile verification required'));
     }
 
+    // Temporarily disable syncing to prevent unwanted updates
+    shouldSyncOnExpandRef.current = false;
     setExpanded(false);
     setOpenModalOnExpand(false);
     stickyCommentReset();
@@ -279,10 +332,12 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
-      // Clear the content in multiple ways to ensure it's properly reset
-      resetContent(); // Clear the store state
-      setInputValue('', 'input'); // Explicitly set input value to empty
-      setContentDelta(createDeltaFromText('')); // Reset the editor content
+      // Use the resetState function to fully reset all state in one call
+      resetState();
+      resetContent();
+      setInputValue('', 'input');
+      // Also reset the editor content since it's separate from the store
+      setContentDelta(createDeltaFromText(''));
 
       if (isTurnstileEnabled) {
         resetTurnstile();
@@ -298,12 +353,21 @@ const StickyInput = (props: StickyInputProps) => {
         console.warn('StickyInput - Failed to jump to comment:', error);
       }
 
+      // Re-enable syncing after a short delay
+      setTimeout(() => {
+        shouldSyncOnExpandRef.current = true;
+      }, 100);
+
       return commentId;
     } catch (error) {
       console.error('StickyInput - Failed to submit comment:', error);
       if (isTurnstileEnabled) {
         resetTurnstile();
       }
+      // Re-enable syncing in case of error
+      setTimeout(() => {
+        shouldSyncOnExpandRef.current = true;
+      }, 100);
       throw error;
     }
   }, [
@@ -311,13 +375,14 @@ const StickyInput = (props: StickyInputProps) => {
     aiCommentsToggleEnabled,
     handleAiReply,
     turnstileToken,
+    resetContent,
+    setInputValue,
+    setContentDelta,
     stickyCommentReset,
     isTurnstileEnabled,
     resetTurnstile,
     setExpanded,
-    resetContent,
-    setInputValue,
-    setContentDelta,
+    resetState,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

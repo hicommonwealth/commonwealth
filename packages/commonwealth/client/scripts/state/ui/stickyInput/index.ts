@@ -21,6 +21,8 @@ interface StickyInputState {
   resetContent: () => void;
   setMode: (mode: StickyInputMode) => void;
   toggleAiAutoReply: () => void;
+  // New action to reset the entire state when routes change
+  resetState: () => void;
 }
 
 export const stickyInputStore = createStore<StickyInputState>()(
@@ -73,6 +75,15 @@ export const stickyInputStore = createStore<StickyInputState>()(
           LocalAISettingsStore.getState();
         setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
       },
+
+      // Complete reset for route changes
+      resetState: () =>
+        set({
+          inputValue: '',
+          expanded: false,
+          isUpdatingFromInput: false,
+          isUpdatingFromEditor: false,
+        }),
     }),
     { name: 'sticky-input-store' },
   ),
