@@ -16,6 +16,7 @@ import OkxWebWalletController from './webWallets/okx_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import SolflareWebWalletController from './webWallets/solflare_web_wallet';
+import SuiWebWalletController from './webWallets/sui_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
@@ -130,6 +131,7 @@ export default class WebWalletController {
       new CoinbaseWebWalletController(),
       new BackpackWebWalletController(),
       new SolflareWebWalletController(),
+      new SuiWebWalletController(),
     ];
   }
 }

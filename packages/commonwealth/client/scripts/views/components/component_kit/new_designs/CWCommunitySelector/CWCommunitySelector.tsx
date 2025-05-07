@@ -19,6 +19,7 @@ export enum CommunityType {
   Solana = 'solana',
   Skale = 'skale',
   Sonieum = 'sonieum',
+  Sui = 'sui',
 }
 
 export type SelectedCommunity = {
