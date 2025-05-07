@@ -1,13 +1,13 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
-  commonProtocol as cp,
   decodeParameters,
+  factoryContracts,
   getNamespace,
   getTransactionReceipt,
-  mustBeProtocolChainId, factoryContracts,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { config, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
@@ -113,7 +113,7 @@ export const validateNamespace = async (
   // Validate User as admin
   const balance = await getBalances({
     balanceSourceType: BalanceSourceType.ERC1155,
-    addresses: [address, factoryContracts.],
+    addresses,
     sourceOptions: {
       contractAddress: activeNamespace,
       evmChainId: chainNode.eth_chain_id,
@@ -128,9 +128,7 @@ export const validateNamespace = async (
       break;
     }
   }
-  if (
-    !adminMatch
-  ) {
+  if (!adminMatch) {
     throw new AppError('User not admin of namespace');
   }
 
