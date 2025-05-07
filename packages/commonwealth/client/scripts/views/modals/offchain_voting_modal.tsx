@@ -7,7 +7,6 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
-import { prettyVoteWeight } from 'shared/adapters/currency';
 import './offchain_voting_modal.scss';
 
 type OffchainVotingModalProps = {
@@ -24,6 +23,19 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
 
   // @ts-expect-error <StrictNullChecks/>
   votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
+
+  // votes by weighted voting power
+  const totalVoteWeight = votes.reduce(
+    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || 1),
+    0n,
+  );
+  const votesPct = votes.map((vote) => ({
+    ...vote,
+    pct:
+      Number(
+        (BigInt(vote.calculatedVotingWeight || 1) * 10000n) / totalVoteWeight,
+      ) / 100,
+  }));
 
   return (
     <div className="OffchainVotingModal">
@@ -44,7 +56,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
             Download all votes as CSV
           </a>
         </div>
-        {votes.map((vote) => (
+        {votesPct.map((vote) => (
           <div className="offchain-poll-voter" key={vote.id}>
             <div className="offchain-poll-voter-user">
               <User
@@ -57,11 +69,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>
             <div className="offchain-poll-voter-weight">
-              {vote.calculatedVotingWeight
-                ? prettyVoteWeight(
-                    vote.calculatedVotingWeight,
-                  ) /* TODO: @masvelio how to show this? */
-                : ''}
+              {vote.calculatedVotingWeight ? vote.pct + '%' : ''}
             </div>
           </div>
         ))}

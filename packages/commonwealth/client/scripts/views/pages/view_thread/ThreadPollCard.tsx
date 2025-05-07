@@ -112,6 +112,19 @@ export const ThreadPollCard = ({
     user.activeAccount?.address || '',
   );
 
+  // votes by weighted voting power
+  const totalVoteWeight = poll.votes.reduce(
+    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || 1),
+    0n,
+  );
+  const voteInformation = poll.options.map((option) => ({
+    label: option,
+    value: option,
+    voteCount: poll.votes
+      .filter((v) => v.option === option)
+      .reduce((sum, val) => sum + BigInt(val.calculatedVotingWeight || 1), 0n),
+  }));
+
   return (
     <>
       <PollCard
@@ -128,14 +141,9 @@ export const ThreadPollCard = ({
           poll,
           poll?.endsAt && poll?.endsAt?.isBefore(moment().utc()),
         )}
-        totalVoteCount={poll.votes?.length}
-        voteInformation={poll.options.map((option) => {
-          return {
-            label: option,
-            value: option,
-            voteCount: poll.votes.filter((v) => v.option === option).length,
-          };
-        })}
+        totalVoteCount={poll.votes.length}
+        totalVoteWeight={totalVoteWeight}
+        voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
         tooltipErrorMessage={getTooltipErrorMessage()}
