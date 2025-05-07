@@ -44,8 +44,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     async function doAsync() {
       const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
+      console.log(
+        'FIXME: privyMobileAuthStatus',
+        JSON.stringify(privyMobileAuthStatus, null, 2),
+      );
+
       if (!privyMobileAuthStatus.enabled) {
-        console.log('Privy mobile auth is not enabled');
+        console.log('FIXME: Privy mobile auth is not enabled');
         return;
       }
 
@@ -53,7 +58,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         !privyMobileAuthStatus.authenticated ||
         !privyMobileAuthStatus.userAuth
       ) {
-        console.log('Privy mobile not authenticated.');
+        console.log('FIXME: Privy mobile not authenticated.');
         return;
       }
 
@@ -67,7 +72,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         newSession: true,
       });
 
-      console.log('Going to sign in now with privy mobile.');
+      console.log('FIXME: Going to sign in now with privy mobile.');
 
       await signIn(session, {
         address: privyMobileAuthStatus.userAuth.address,
@@ -87,8 +92,10 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   }, [ethereumProvider, getPrivyMobileAuthStatus, signIn, signMessageProvider]);
 
   if (!window.PRIVY_MOBILE_ENABLED) {
+    console.log('FIXME: Privy mobile is not enabled.');
     return children;
   }
+  console.log('FIXME: Privy mobile is ENABLED.');
 
   return children;
 };
