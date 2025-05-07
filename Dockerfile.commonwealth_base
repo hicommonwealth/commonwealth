@@ -13,7 +13,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* \
     libs/adapters/package.json libs/core/package.json libs/evm-protocols/package.json \
     libs/model/package.json libs/schemas/package.json libs/shared/package.json libs/sitemaps/package.json \
     ./
-COPY packages/commonwealth/package.json ./
+COPY packages/commonwealth/package.json ./packages/commonwealth/package.json
 
 RUN echo "==== DIRECTORY STRUCTURE AFTER COPYING CONFIG FILES ====" && \
     find . -type d -o -name "package.json" -o -name "pnpm*.yaml" | sort && \
