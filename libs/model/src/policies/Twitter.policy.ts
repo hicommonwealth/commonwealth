@@ -1,3 +1,4 @@
+import { TokenLaunchpadAbi } from '@commonxyz/common-protocol-abis';
 import {
   command,
   CustomRetryStrategyError,
@@ -5,7 +6,12 @@ import {
   logger,
   Policy,
 } from '@hicommonwealth/core';
-import { ValidChains } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol as cp,
+  createPrivateEvmClient,
+  erc20Abi,
+  ValidChains,
+} from '@hicommonwealth/evm-protocols';
 import { models, parseCreateOnCommonMentioned } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
@@ -17,8 +23,9 @@ import {
 import { WalletWithMetadata } from '@privy-io/server-auth';
 import { QueryTypes } from 'sequelize';
 import { LaunchTokenBot } from '../aggregates/bot';
+import { CreateThread } from '../aggregates/thread';
 import { privyClient } from '../aggregates/user/signIn/privyUtils';
-import { mustExist } from '../middleware';
+import { config } from '../config';
 import { awardTweetEngagementXp, HttpError } from '../services/twitter';
 
 const log = logger(import.meta);
@@ -57,69 +64,121 @@ export function TwitterPolicy(): Policy<typeof inputs> {
       TwitterCreateOnCommonMentioned: async ({ payload }) => {
         /**
          * { symbol: BTC, community: null } -> create community + launchpad token called BTC
-         * { symbol: BTC, community: Whalers }
-         *    -> Find or create community -> find or create launchpad token -> create post coin
+         * { symbol: BTC, community: Whalers } -> create post coin
          */
         let symbol: string | undefined;
-        let communityName: string | undefined | null;
+        let launchpadTokenName: string | undefined | null;
         try {
           const res = await parseCreateOnCommonMentioned(payload.text);
           symbol = res.symbol;
-          communityName = res.community;
+          launchpadTokenName = res.community;
         } catch (e) {
           // TODO
         }
         if (!symbol) return;
 
         const user = await getCommonUserFromTweet(payload);
+        const actor = {
+          user: {
+            id: user.user_id,
+            email: '',
+          },
+          address: user.address,
+        };
 
         // create community + launchpad token
-        if (!communityName) {
+        if (!launchpadTokenName) {
           // use symbol as community name
-          communityName = symbol + ' Token';
+          launchpadTokenName = symbol + ' Token';
           const communityId =
-            payload.id + '-' + slugifyPreserveDashes(communityName);
+            payload.id + '-' + slugifyPreserveDashes(launchpadTokenName);
 
-          const { community_url, token_address, name } = await command(
-            LaunchTokenBot(),
-            {
-              actor: {
-                user: {
-                  id: user.user_id,
-                  email: '',
-                },
-                address: user.address,
-              },
-              payload: {
-                id: communityId,
-                name: communityName,
-                symbol,
-                eth_chain_id: ValidChains.Base,
-                icon_url: '', // TODO
-                description: `${symbol} token community created by ${payload.username} on X`,
-                totalSupply: 1e18, // TODO
-              },
+          const res = await command(LaunchTokenBot(), {
+            actor,
+            payload: {
+              id: communityId,
+              name: launchpadTokenName,
+              symbol,
+              eth_chain_id: ValidChains.Base,
+              icon_url: '', // TODO
+              description: `${symbol} token community created by ${payload.username} on X`,
+              totalSupply: 1e18, // TODO
             },
-          );
+          });
+          if (!res) throw new Error('Failed to create community');
+          const { token_address, community_url } = res;
 
           return await replyToTweet();
         }
 
-        // Find or create community -> find or create launchpad token -> create post coin
+        // Create post coin
+        const launchpad = await models.LaunchpadToken.findOne({
+          where: {
+            name: launchpadTokenName,
+          },
+        });
+        if (!launchpad) {
+          // Reply to Tweet that launchpad not found
+          return await replyToTweet();
+        }
+        const community = await models.Community.findOne({
+          where: {
+            namespace: launchpad.namespace,
+          },
+          include: [
+            {
+              model: models.ChainNode,
+              required: true,
+            },
+          ],
+        });
+        if (!community) {
+          // TODO
+          throw new Error('Failed to find community');
+        }
 
-        const communityId =
-          payload.id + '-' + slugifyPreserveDashes(communityName);
-        let community = await models.Community.findOne({
-          where: {
-            id: communityId,
-          },
+        const thread = await command(CreateThread(), {
+          actor,
+          payload: {},
         });
-        const chainNode = await models.ChainNode.findOne({
-          where: {
-            eth_chain_id: ValidChains.Base,
-          },
+        if (!thread) throw new Error('Failed to create thread');
+
+        if (!config.WEB3.LAUNCHPAD_PRIVATE_KEY)
+          throw new Error('Missing private key');
+        const client = createPrivateEvmClient({
+          rpc: community.ChainNode!.private_url || community.ChainNode!.url,
+          privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY,
         });
-        mustExist('Chain Node', chainNode);
+        const launchpadFactory = new client.eth.Contract(
+          TokenLaunchpadAbi,
+          launchpad.token_address,
+        );
+        // TODO: use CreatePostCoinBot.command
+        const postToken = await cp.launchPostToken(
+          launchpadFactory,
+          launchpadTokenName,
+          symbol,
+          [8250, 1650, 100],
+          [user.address],
+          client.utils.toWei('1e9', 'ether'),
+          client.defaultAccount!,
+          830000,
+          thread.id!,
+          launchpad.token_address,
+          0.01e18, // TODO
+          new client.eth.Contract(erc20Abi, launchpad.token_address),
+        );
+        await models.Thread.update(
+          {
+            launchpad_token_address: '',
+            is_linking_token: false,
+          },
+          {
+            where: {
+              id: thread.id,
+            },
+          },
+        );
       },
     },
   };
@@ -206,7 +265,6 @@ async function getCommonUserFromTweet(
       admin = { address: address.address, user_id: user.id! };
     });
   }
-
   return admin!;
 }
 

@@ -26,6 +26,14 @@ export function createMentionEvents(
         event_name: 'TwitterMomBotMentioned',
         event_payload: t,
       };
+    } else if (
+      twitterBotConfig.twitterUserId ===
+      TwitterBotConfigs.CreateOnCommon.twitterUserId
+    ) {
+      return {
+        event_name: 'TwitterCreateOnCommonMentioned',
+        event_payload: t,
+      };
     } else {
       return {
         event_name: 'TwitterCommonMentioned',
