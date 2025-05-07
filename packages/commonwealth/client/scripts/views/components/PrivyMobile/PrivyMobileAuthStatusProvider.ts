@@ -10,6 +10,9 @@ type Props = {
 /**
  * This keeps the privy auth state, from the mobile app, using mobile privy,
  * available for use within the app.
+ *
+ * @deprecated TODO we don't need this now.
+ *
  */
 export const PrivyMobileAuthStatusProvider = (props: Props) => {
   const { children } = props;
