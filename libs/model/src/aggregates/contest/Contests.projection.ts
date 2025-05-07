@@ -129,7 +129,7 @@ async function createInitialContest(
       );
     }
 
-    const [_, [contestManager]] = await models.ContestManager.update(
+    const [, [contestManager]] = await models.ContestManager.update(
       {
         interval,
         ticker,
