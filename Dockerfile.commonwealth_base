@@ -8,7 +8,13 @@ RUN corepack enable && \
 # Create a dependencies stage for better caching
 FROM base AS dependencies
 WORKDIR /usr/src/app
-COPY . .
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
+COPY packages/*/package.json ./packages/
+COPY libs/*/package.json ./libs/
+
+RUN echo "==== DIRECTORY STRUCTURE AFTER COPYING CONFIG FILES ====" && \
+    find . -type d -o -name "package.json" -o -name "pnpm*.yaml" | sort && \
+    echo "========================================================"
 
 # Install build dependencies in the same layer
 RUN apt-get update && \
