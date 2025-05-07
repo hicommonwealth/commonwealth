@@ -2,8 +2,20 @@ import z from 'zod';
 import { Poll, Vote } from '../entities';
 import { PG_INT } from '../utils';
 
-export const VoteView = Vote;
-export const PollView = Poll;
+export const VoteView = Vote.omit({ poll: true }).extend({
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+});
+
+export const PollView = Poll.omit({
+  Thread: true,
+  Community: true,
+}).extend({
+  ends_at: z.date().or(z.string()).nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  votes: z.array(VoteView).nullish(),
+});
 
 export const GetPolls = {
   input: z.object({

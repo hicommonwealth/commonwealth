@@ -24,6 +24,8 @@ export function DeletePoll(): Command<typeof schemas.DeletePoll> {
         thread.has_poll = false;
         await thread.save({ transaction });
       });
+
+      return true;
     },
   };
 }

@@ -8,9 +8,7 @@ export const CreatePoll = {
     thread_id: PG_INT,
     prompt: z.string(),
     options: z.array(z.string()),
-    custom_duration: z
-      .union([PG_INT.min(0).max(31), z.literal('Infinite')])
-      .optional(),
+    custom_duration: PG_INT.min(1).max(31).default(5).nullish(), // null means infinite
   }),
   output: Poll,
   context: ThreadContext,

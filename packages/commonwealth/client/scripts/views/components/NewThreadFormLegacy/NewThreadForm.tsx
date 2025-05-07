@@ -410,10 +410,10 @@ export const NewThreadForm = forwardRef<
 
       if (thread && pollsData && pollsData?.length) {
         const custom_duration = pollsData[0]?.customDuration
-          ? pollsData[0]?.customDuration === 'Infinity'
-            ? 'Infinite'
+          ? pollsData[0]?.customDuration === 'Infinite'
+            ? null
             : parseInt(pollsData[0]?.customDuration)
-          : undefined;
+          : 5;
         await createPoll({
           thread_id: thread.id!,
           prompt: pollsData[0]?.prompt,

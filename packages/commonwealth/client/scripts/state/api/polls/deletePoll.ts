@@ -4,9 +4,8 @@ interface UseDeletePollMutationProps {
   threadId: number;
 }
 
-const utils = trpc.useUtils();
-
 const useDeletePollMutation = ({ threadId }: UseDeletePollMutationProps) => {
+  const utils = trpc.useUtils();
   return trpc.poll.deletePoll.useMutation({
     onSuccess: async () => {
       utils.poll.getPolls

@@ -19,12 +19,9 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
       );
       const { prompt, options, custom_duration } = payload;
 
-      const ends_at =
-        custom_duration === 'Infinite'
-          ? null
-          : custom_duration
-            ? dayjs().add(custom_duration, 'days').toDate()
-            : dayjs().add(5, 'days').toDate();
+      const ends_at = custom_duration
+        ? dayjs().add(custom_duration, 'days').toDate()
+        : null;
 
       const community = await models.Community.findByPk(community_id);
       mustExist('Community', community);

@@ -124,10 +124,10 @@ export const PollEditorModal = ({
           prompt,
           options,
           custom_duration: customDurationEnabled
-            ? customDuration === 'Infinity'
-              ? 'Infinite'
+            ? customDuration === 'Infinite'
+              ? null
               : parseInt(customDuration)
-            : undefined,
+            : 5,
         }).catch(console.error);
 
         notifySuccess('Poll creation succeeded');

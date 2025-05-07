@@ -1,8 +1,7 @@
 import { trpc } from 'utils/trpcClient';
 
-const utils = trpc.useUtils();
-
 const useCreateThreadPollMutation = () => {
+  const utils = trpc.useUtils();
   return trpc.poll.createPoll.useMutation({
     onSuccess: async (data) => {
       utils.poll.getPolls
