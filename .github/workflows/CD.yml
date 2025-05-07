@@ -61,12 +61,30 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Heroku Container Login
+      - name: Heroku CLI Auth and Remote Setup (match deploy-to-heroku.sh)
         env:
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
           HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
         run: |
-          echo "machine api.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}\nmachine git.heroku.com\n  login ${{ secrets.HEROKU_EMAIL }}\n  password ${{ secrets.HEROKU_API_TOKEN }}" > ~/.netrc
+          cat >~/.netrc <<EOF
+          machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_TOKEN
+          machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_TOKEN
+          EOF
           heroku container:login
+          heroku git:remote --app ${{ env.HEROKU_APP_NAME }}
+
+      - name: Copy correct .env for build
+        run: |
+          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.${{ env.HEROKU_APP_NAME }}
+          if [ ! -f "$ENV_PATH" ]; then
+            echo "Error: $ENV_PATH not found"
+            exit 1
+          fi
+          cp "$ENV_PATH" .env
 
       - name: Build and Push Docker Image (web)
         uses: docker/build-push-action@v5
