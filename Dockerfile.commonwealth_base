@@ -1,29 +1,42 @@
 FROM datadog-base AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
 ## Workaround here https://github.com/pnpm/pnpm/issues/9029
-RUN corepack prepare pnpm@9.14.2 --activate
+RUN corepack enable && \
+    corepack prepare pnpm@9.14.2 --activate
 
-FROM base AS build
-## needed for node-gyp to build
-RUN apt-get update && \
-    apt-get install -y python3 make gcc g++
-COPY . /usr/src/app
+# Create a dependencies stage for better caching
+FROM base AS dependencies
 WORKDIR /usr/src/app
+# Copy only package files first to leverage caching
+COPY pnpm-lock.yaml package.json ./
+COPY packages/*/package.json ./packages/
+
+# Install build dependencies in the same layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 make gcc g++ && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install dependencies - if lockfile/package.json don't change, this step will be cached
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
 
-RUN pnpm deploy -F commonwealth --prod /prod/commonwealth
-RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
+FROM dependencies AS build
+# Now copy the rest of the source code
+COPY . .
+# Build the application
+RUN pnpm run build && \
+    pnpm deploy -F commonwealth --prod /prod/commonwealth && \
+    mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
+# Final production image
 FROM base AS commonwealth
 ENV NODE_ENV=production
+# Copy only production artifacts from build stage
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
-COPY ./scripts/datadog-entrypoint.sh /prod/commonwealth
-RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh
-COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth/scripts
-RUN chmod +x /prod/commonwealth/scripts/get-max-old-space-size.sh
+# Copy necessary scripts
+COPY ./scripts/datadog-entrypoint.sh ./scripts/get-max-old-space-size.sh /prod/commonwealth/
+COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth/scripts/
+RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh /prod/commonwealth/scripts/get-max-old-space-size.sh
 ENV PORT=$PORT
