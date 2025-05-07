@@ -106,6 +106,7 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
   onContentAppended?: (markdown: string) => void;
+  onContentDeltaChange?: (markdown: string) => void;
 }
 
 export interface NewThreadFormHandles {
@@ -121,7 +122,7 @@ export interface ExtendedPoll extends Poll {
 export const NewThreadForm = forwardRef<
   NewThreadFormHandles,
   NewThreadFormProps
->(({ onCancel, onContentAppended }, ref) => {
+>(({ onCancel, onContentAppended, onContentDeltaChange }, ref) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const forceRerender = useForceRerender();
@@ -833,6 +834,18 @@ export const NewThreadForm = forwardRef<
     appendContent: handleAppendContent,
   }));
 
+  // Wrap setThreadContentDelta to also call onContentDeltaChange
+  const setThreadContentDeltaWithCallback = useCallback(
+    (delta) => {
+      setThreadContentDelta(delta);
+      if (onContentDeltaChange) {
+        const text = getTextFromDelta(delta);
+        onContentDeltaChange(text);
+      }
+    },
+    [setThreadContentDelta, onContentDeltaChange],
+  );
+
   return (
     <>
       <CWPageLayout>
@@ -1005,7 +1018,7 @@ export const NewThreadForm = forwardRef<
 
                 <ReactQuillEditor
                   contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
+                  setContentDelta={setThreadContentDeltaWithCallback}
                   {...(selectedCommunityId && {
                     isDisabled:
                       isRestrictedMembership ||

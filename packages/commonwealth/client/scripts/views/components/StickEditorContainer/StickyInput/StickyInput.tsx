@@ -21,6 +21,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import CWTextInput from 'views/components/component_kit/new_designs/CWTextInput/CWTextInput';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   NewThreadForm,
   NewThreadFormHandles,
@@ -52,8 +53,11 @@ const StickyInput = (props: StickyInputProps) => {
   } = props;
 
   const { mode: contextMode } = useContext(StickCommentContext);
-  const { aiCommentsToggleEnabled, aiInteractionsToggleEnabled } =
-    useLocalAISettingsStore();
+  const {
+    aiCommentsToggleEnabled,
+    aiInteractionsToggleEnabled,
+    setAICommentsToggleEnabled,
+  } = useLocalAISettingsStore();
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
@@ -335,6 +339,12 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [expanded, openModalOnExpand, mode]);
 
+  // Add toggle handler for the AI auto reply feature
+  const handleToggleAiAutoReply = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+  };
+
   const renderStickyInput = () => {
     const inputContent = (
       <div
@@ -421,40 +431,88 @@ const StickyInput = (props: StickyInputProps) => {
               </div>
 
               <div className="button-group">
-                <button
-                  className="image-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageClick();
-                  }}
-                  aria-label="Add or Generate Image"
-                >
-                  <CWIcon iconName="image" iconSize="small" weight="bold" />
-                </button>
-
-                <button className="expand-button" onClick={handleFocused}>
-                  <CWIcon
-                    iconName="arrowsOutSimple"
-                    iconSize="small"
-                    weight="bold"
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <CWTooltip
+                    content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
+                    AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
+                    placement="top"
+                    renderTrigger={(handleInteraction, isOpen) => (
+                      <button
+                        className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
+                        onClick={handleToggleAiAutoReply}
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                        data-tooltip-open={isOpen}
+                      >
+                        <CWIcon
+                          iconName="sparkle"
+                          iconSize="small"
+                          weight="bold"
+                        />
+                      </button>
+                    )}
                   />
-                </button>
+                )}
 
-                <button
-                  className="send-button"
-                  onClick={() => customHandleSubmitComment()}
-                  disabled={
-                    !inputValue.trim() ||
-                    (isTurnstileEnabled && !turnstileToken)
-                  }
-                  aria-label="Send Comment"
-                >
-                  <CWIcon
-                    iconName="paperPlaneTilt"
-                    iconSize="small"
-                    weight="bold"
-                  />
-                </button>
+                <CWTooltip
+                  content="Add or generate image"
+                  placement="top"
+                  renderTrigger={(handleInteraction) => (
+                    <button
+                      className="image-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImageClick();
+                      }}
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      <CWIcon iconName="image" iconSize="small" weight="bold" />
+                    </button>
+                  )}
+                />
+
+                <CWTooltip
+                  content="Expand editor"
+                  placement="top"
+                  renderTrigger={(handleInteraction) => (
+                    <button
+                      className="expand-button"
+                      onClick={handleFocused}
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      <CWIcon
+                        iconName="arrowsOutSimple"
+                        iconSize="small"
+                        weight="bold"
+                      />
+                    </button>
+                  )}
+                />
+
+                <CWTooltip
+                  content={`Submit ${mode === 'thread' ? 'thread' : isReplying ? 'reply' : 'comment'}`}
+                  placement="top"
+                  renderTrigger={(handleInteraction) => (
+                    <button
+                      className="send-button"
+                      onClick={() => customHandleSubmitComment()}
+                      disabled={
+                        !inputValue.trim() ||
+                        (isTurnstileEnabled && !turnstileToken)
+                      }
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      <CWIcon
+                        iconName="paperPlaneTilt"
+                        iconSize="small"
+                        weight="bold"
+                      />
+                    </button>
+                  )}
+                />
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { LocalAISettingsStore } from '../user/localAISettings';
 import { createBoundedUseStore } from '../utils';
 
 export type StickyInputMode = 'thread' | 'comment';
@@ -19,6 +20,7 @@ interface StickyInputState {
   setExpanded: (expanded: boolean) => void;
   resetContent: () => void;
   setMode: (mode: StickyInputMode) => void;
+  toggleAiAutoReply: () => void;
 }
 
 export const stickyInputStore = createStore<StickyInputState>()(
@@ -65,6 +67,12 @@ export const stickyInputStore = createStore<StickyInputState>()(
         }),
 
       setMode: (mode) => set({ mode }),
+
+      toggleAiAutoReply: () => {
+        const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+          LocalAISettingsStore.getState();
+        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+      },
     }),
     { name: 'sticky-input-store' },
   ),

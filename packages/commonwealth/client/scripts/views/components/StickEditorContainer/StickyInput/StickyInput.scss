@@ -179,7 +179,8 @@
     .action-button,
     .send-button,
     .image-button,
-    .expand-button {
+    .expand-button,
+    .ai-toggle-button {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -203,6 +204,27 @@
       &:disabled {
         background-color: #a4c1f7;
         cursor: not-allowed;
+      }
+
+      &.active {
+        background-color: #4285f4;
+
+        &:hover {
+          background-color: #3367d6;
+        }
+      }
+
+      &.inactive {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+
+        svg {
+          color: #757575;
+        }
       }
 
       svg {
@@ -264,7 +286,8 @@
       .action-button,
       .send-button,
       .image-button,
-      .expand-button {
+      .expand-button,
+      .ai-toggle-button {
         width: 36px;
         height: 36px;
         min-width: 36px;
@@ -285,7 +308,8 @@
       .action-button,
       .send-button,
       .image-button,
-      .expand-button {
+      .expand-button,
+      .ai-toggle-button {
         width: 32px;
         height: 32px;
         min-width: 32px;
