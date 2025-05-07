@@ -279,7 +279,11 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
-      resetContent();
+      // Clear the content in multiple ways to ensure it's properly reset
+      resetContent(); // Clear the store state
+      setInputValue('', 'input'); // Explicitly set input value to empty
+      setContentDelta(createDeltaFromText('')); // Reset the editor content
+
       if (isTurnstileEnabled) {
         resetTurnstile();
       }
@@ -312,6 +316,8 @@ const StickyInput = (props: StickyInputProps) => {
     resetTurnstile,
     setExpanded,
     resetContent,
+    setInputValue,
+    setContentDelta,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

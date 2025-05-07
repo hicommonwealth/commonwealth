@@ -328,20 +328,28 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
               </div>
             </div>
 
-            <div className="ai-toggle-wrapper">
-              <CWToggle
-                className="ai-toggle"
-                icon="sparkle"
-                iconColor="#757575"
-                checked={aiCommentsToggleEnabled}
-                onChange={() => {
-                  setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                }}
-              />
-              <CWText type="caption" className="toggle-label">
-                AI auto reply
-              </CWText>
-            </div>
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+              <div className="ai-toggle-wrapper">
+                <CWTooltip
+                  content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} AI auto reply`}
+                  placement="top"
+                  renderTrigger={() => (
+                    <CWToggle
+                      className="ai-toggle"
+                      icon="sparkle"
+                      iconColor="#757575"
+                      checked={aiCommentsToggleEnabled}
+                      onChange={() => {
+                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                      }}
+                    />
+                  )}
+                />
+                <CWText type="caption" className="toggle-label">
+                  AI auto reply
+                </CWText>
+              </div>
+            )}
             <CWButton
               containerClassName="post-button"
               buttonWidth="narrow"
