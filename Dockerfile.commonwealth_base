@@ -1,4 +1,4 @@
-FROM datadog-base AS base
+FROM ghcr.io/hicommonwealth/datadog-base:latest AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ## Workaround here https://github.com/pnpm/pnpm/issues/9029
