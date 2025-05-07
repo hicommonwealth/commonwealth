@@ -66,8 +66,8 @@ const LeaderboardSection = () => {
     limit: 30,
     community_id: communityId || '',
     include_roles: true,
-    order_by: 'earnings' as MemberResultsOrderBy,
-    order_direction: APIOrderDirection.Desc,
+    order_by: tableState.orderBy as MemberResultsOrderBy,
+    order_direction: tableState.orderDirection as APIOrderDirection,
     ...(debouncedSearchTerm && {
       search: debouncedSearchTerm,
     }),

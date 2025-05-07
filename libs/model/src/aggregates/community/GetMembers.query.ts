@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
-type OrderBy = 'name' | 'last_active' | 'referrals' | 'earnings';
+type OrderBy = 'name' | 'last_active' | 'referrals' | 'earnings' | 'aura';
 type OrderDirection = 'ASC' | 'DESC';
 
 const buildOrderBy = (by: OrderBy, direction: OrderDirection) => {
@@ -22,6 +22,9 @@ const buildOrderBy = (by: OrderBy, direction: OrderDirection) => {
 
     case 'earnings':
       return `referral_eth_earnings ${direction}`;
+
+    case 'aura':
+      return `(COALESCE(U.xp_points, 0) + COALESCE(U.xp_referrer_points, 0)) ${direction}`;
 
     default:
       return `last_active ${direction}`;
