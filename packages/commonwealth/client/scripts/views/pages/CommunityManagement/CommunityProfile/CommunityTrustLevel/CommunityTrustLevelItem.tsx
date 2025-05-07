@@ -1,3 +1,4 @@
+import { CommunityVerificationItem } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
@@ -23,20 +24,21 @@ interface LevelBoxProps {
   status: Status;
   isLocked: boolean;
   icon?: ComponentIcon;
-  items?: Array<{ label: string }>;
+  items?: CommunityVerificationItem[];
   showArrow?: boolean;
   onClick?: () => void;
   showButton?: boolean;
   buttonLabel?: string;
   buttonType?: ButtonType;
   onButtonClick?: () => void;
+  onItemClick?: (item: CommunityVerificationItem) => void;
 }
 
 const getTagType = (status: Status): 'passed' | 'proposal' => {
   return status === 'Done' ? 'passed' : 'proposal';
 };
 
-const LevelBox = ({
+const CommunityTrustLevelItem = ({
   level,
   title,
   description,
@@ -51,6 +53,7 @@ const LevelBox = ({
   buttonLabel,
   buttonType = 'primary',
   onButtonClick,
+  onItemClick,
 }: LevelBoxProps) => {
   return (
     <div
@@ -97,6 +100,9 @@ const LevelBox = ({
                   if (!isLocked && onClick) {
                     onClick();
                   }
+                  if (onItemClick) {
+                    onItemClick(item);
+                  }
                 }}
               >
                 <div className="level-item-content">
@@ -119,4 +125,4 @@ const LevelBox = ({
   );
 };
 
-export default LevelBox;
+export default CommunityTrustLevelItem;
