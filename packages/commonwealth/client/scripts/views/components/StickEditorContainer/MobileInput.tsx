@@ -5,6 +5,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -54,6 +55,12 @@ export const MobileInput = (props: MobileInputProps) => {
     communityId,
   });
   const navigate = useCommonNavigate();
+
+  // Fetch community details
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const { data: fetchedTopics = [] } = useFetchTopicsQuery({
     communityId,
@@ -183,10 +190,18 @@ export const MobileInput = (props: MobileInputProps) => {
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
-          const context = `
-          Thread: ${originalThread?.title || ''}
-          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-          `;
+          // Construct extended context with community details
+          const communityName = community?.name || 'this community';
+          const communityDescription =
+            community?.description || 'No specific description provided.';
+          const extendedCommunityContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
+
+          const originalRequestContext = `Thread: ${originalThread?.title || ''}
+${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
+
+          const context = `${extendedCommunityContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalRequestContext.trim()}`;
 
           const prompt = generateCommentPrompt(context);
 

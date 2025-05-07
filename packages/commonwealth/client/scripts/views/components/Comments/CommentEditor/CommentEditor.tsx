@@ -9,6 +9,7 @@ import type { DeltaStatic } from 'quill';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
@@ -101,15 +102,29 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       action: 'create-comment',
     });
 
+    // Fetch community details
+    const { data: community } = useGetCommunityByIdQuery({
+      id: thread?.communityId || '',
+      enabled: !!thread?.communityId,
+    });
+
     const handleCommentWithAI = () => {
       setIsSubmitDisabled(true);
       let text = '';
       setContentDelta(text);
 
-      const context = `
-      Thread Title: ${thread?.title || ''}
-      ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-      `;
+      // Construct extended context with community details
+      const communityName = community?.name || 'this community';
+      const communityDescription =
+        community?.description || 'No specific description provided.';
+      const extendedContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
+
+      const originalContext = `Thread Title: ${thread?.title || ''}
+${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
+
+      const context = `${extendedContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalContext.trim()}`;
 
       const prompt = generateCommentPrompt(context);
 
