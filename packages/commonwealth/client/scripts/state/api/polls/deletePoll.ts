@@ -7,7 +7,7 @@ interface UseDeletePollMutationProps {
 const useDeletePollMutation = ({ threadId }: UseDeletePollMutationProps) => {
   const utils = trpc.useUtils();
   return trpc.poll.deletePoll.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       utils.poll.getPolls
         .invalidate({ thread_id: threadId })
         .catch(console.error);
