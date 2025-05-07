@@ -13,7 +13,7 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
     ...schemas.CreatePoll,
     auth: [authThread({ author: true })],
     body: async ({ actor, payload, context }) => {
-      const { community_id, thread, address } = await mustBeAuthorizedThread(
+      const { community_id, thread, address } = mustBeAuthorizedThread(
         actor,
         context,
       );

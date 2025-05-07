@@ -12,7 +12,7 @@ export function DeletePoll(): Command<typeof schemas.DeletePoll> {
     ...schemas.DeletePoll,
     auth: [authThread({ author: true })],
     body: async ({ actor, payload, context }) => {
-      const { thread } = await mustBeAuthorizedThread(actor, context);
+      const { thread } = mustBeAuthorizedThread(actor, context);
       const { poll_id } = payload;
 
       const poll = await models.Poll.findByPk(poll_id);
