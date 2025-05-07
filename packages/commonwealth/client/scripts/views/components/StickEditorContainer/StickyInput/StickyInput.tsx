@@ -44,7 +44,7 @@ interface StickyInputProps extends CommentEditorProps {
 
 const StickyInput = (props: StickyInputProps) => {
   const {
-    isMobile = false,
+    isMobile,
     handleSubmitComment,
     isReplying,
     replyingToAuthor,
@@ -419,6 +419,88 @@ const StickyInput = (props: StickyInputProps) => {
   };
 
   const renderStickyInput = () => {
+    const buttonGroup = (
+      <div className="button-group">
+        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+          <CWTooltip
+            content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
+        AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
+            placement="top"
+            renderTrigger={(handleInteraction, isOpen) => (
+              <button
+                className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
+                onClick={handleToggleAiAutoReply}
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+                data-tooltip-open={isOpen}
+              >
+                <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+              </button>
+            )}
+          />
+        )}
+
+        <CWTooltip
+          content="Add or generate image"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="image-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleImageClick();
+              }}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon iconName="image" iconSize="small" weight="bold" />
+            </button>
+          )}
+        />
+
+        <CWTooltip
+          content="Expand editor"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="expand-button"
+              onClick={handleFocused}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon
+                iconName="arrowsOutSimple"
+                iconSize="small"
+                weight="bold"
+              />
+            </button>
+          )}
+        />
+
+        <CWTooltip
+          content={`Submit ${mode === 'thread' ? 'thread' : isReplying ? 'reply' : 'comment'}`}
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="send-button"
+              onClick={() => customHandleSubmitComment()}
+              disabled={
+                !inputValue.trim() || (isTurnstileEnabled && !turnstileToken)
+              }
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon
+                iconName="paperPlaneTilt"
+                iconSize="small"
+                weight="bold"
+              />
+            </button>
+          )}
+        />
+      </div>
+    );
+
     const inputContent = (
       <div
         className={`StickyInput ${expanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
@@ -479,6 +561,7 @@ const StickyInput = (props: StickyInputProps) => {
                     onClick={isGenerating ? undefined : handleGenerateAIContent}
                   />
                 )}
+                {isMobile && buttonGroup}
               </div>
             </div>
 
@@ -503,91 +586,7 @@ const StickyInput = (props: StickyInputProps) => {
                   }
                 />
               </div>
-
-              <div className="button-group">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWTooltip
-                    content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
-                    AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
-                    placement="top"
-                    renderTrigger={(handleInteraction, isOpen) => (
-                      <button
-                        className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
-                        onClick={handleToggleAiAutoReply}
-                        onMouseEnter={handleInteraction}
-                        onMouseLeave={handleInteraction}
-                        data-tooltip-open={isOpen}
-                      >
-                        <CWIcon
-                          iconName="sparkle"
-                          iconSize="small"
-                          weight="bold"
-                        />
-                      </button>
-                    )}
-                  />
-                )}
-
-                <CWTooltip
-                  content="Add or generate image"
-                  placement="top"
-                  renderTrigger={(handleInteraction) => (
-                    <button
-                      className="image-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleImageClick();
-                      }}
-                      onMouseEnter={handleInteraction}
-                      onMouseLeave={handleInteraction}
-                    >
-                      <CWIcon iconName="image" iconSize="small" weight="bold" />
-                    </button>
-                  )}
-                />
-
-                <CWTooltip
-                  content="Expand editor"
-                  placement="top"
-                  renderTrigger={(handleInteraction) => (
-                    <button
-                      className="expand-button"
-                      onClick={handleFocused}
-                      onMouseEnter={handleInteraction}
-                      onMouseLeave={handleInteraction}
-                    >
-                      <CWIcon
-                        iconName="arrowsOutSimple"
-                        iconSize="small"
-                        weight="bold"
-                      />
-                    </button>
-                  )}
-                />
-
-                <CWTooltip
-                  content={`Submit ${mode === 'thread' ? 'thread' : isReplying ? 'reply' : 'comment'}`}
-                  placement="top"
-                  renderTrigger={(handleInteraction) => (
-                    <button
-                      className="send-button"
-                      onClick={() => customHandleSubmitComment()}
-                      disabled={
-                        !inputValue.trim() ||
-                        (isTurnstileEnabled && !turnstileToken)
-                      }
-                      onMouseEnter={handleInteraction}
-                      onMouseLeave={handleInteraction}
-                    >
-                      <CWIcon
-                        iconName="paperPlaneTilt"
-                        iconSize="small"
-                        weight="bold"
-                      />
-                    </button>
-                  )}
-                />
-              </div>
+              {!isMobile && buttonGroup}
             </div>
 
             {isTurnstileEnabled && (
