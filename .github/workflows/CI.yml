@@ -104,6 +104,15 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
 
+      - name: bundle
+        run: pnpm -F commonwealth bundle
+
+      - name: Upload profile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vite-cpu-profile
+          path: /home/runner/work/commonwealth/commonwealth/packages/commonwealth/vite-profile-0.cpuprofile
+
       - name: Run linter
         run: pnpm lint-branch-warnings
 
