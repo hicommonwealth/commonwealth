@@ -25,7 +25,6 @@ interface ImageActionModalProps {
   applyButtonLabel?: string;
   initialReferenceText?: string;
   initialReferenceImageUrls?: string[];
-  contextSource?: 'comment' | 'thread' | 'community';
 }
 
 export const ImageActionModal = ({
@@ -35,7 +34,6 @@ export const ImageActionModal = ({
   applyButtonLabel = 'Add to Thread',
   initialReferenceText,
   initialReferenceImageUrls,
-  contextSource,
 }: ImageActionModalProps) => {
   const [imageUrlToApply, setImageUrlToApply] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -63,26 +61,10 @@ export const ImageActionModal = ({
     });
   }, []);
 
-  // TODO: Replace with actual import once useImageModalContext is available
-  // const useImageModalContext = ({ isOpen, contextSource, initialReferenceText, initialReferenceImageUrls, onAddReferenceTexts, onAddReferenceImages } : any) => {
-  //   // Placeholder implementation
-  //   useEffect(() => {
-  //     if (isOpen) {
-  //       if (initialReferenceText) {
-  //         onAddReferenceTexts(initialReferenceText.split('\n'));
-  //       }
-  //       if (initialReferenceImageUrls) {
-  //         onAddReferenceImages(initialReferenceImageUrls);
-  //       }
-  //     }
-  //   }, [isOpen, initialReferenceText, initialReferenceImageUrls, onAddReferenceTexts, onAddReferenceImages, contextSource]);
-  //   return { gatherContext: () => {} }; // Placeholder
-  // };
-
   // Use the context hook
-  const { gatherContext } = useImageModalContext({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { gatherContext: _gatherContext } = useImageModalContext({
     isOpen,
-    contextSource,
     initialReferenceText,
     initialReferenceImageUrls,
     onAddReferenceTexts: handleAddReferenceTexts,

@@ -267,13 +267,17 @@ Community Description: ${communityDescription}`;
           .filter(Boolean)
           .join('\n\n'); // Separator between thread context and parent comment context
 
-        const contextText = `${extendedCommunityContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalContext.trim()}`;
+        const contextText =
+          `${extendedCommunityContext}\n\n` +
+          `Original Context (Thread and Parent Comment):\n` +
+          `${originalContext.trim()}`;
 
-        const prompt = generateCommentPrompt(contextText);
+        const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
 
         setStreamingText(''); // Clear previous streaming text
 
-        await generateCompletion(prompt, {
+        await generateCompletion(userPrompt, {
+          systemPrompt: systemPrompt,
           model: 'gpt-4o-mini',
           stream: true,
           onChunk: (chunk) => {

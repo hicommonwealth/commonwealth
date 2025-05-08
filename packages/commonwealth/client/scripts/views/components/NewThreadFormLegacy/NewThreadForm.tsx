@@ -524,7 +524,10 @@ export const NewThreadForm = forwardRef<
 
     const recentThreadsContext = recentThreads
       ?.map((thread) => {
-        return `Title: ${thread.title}\nBody: ${thread.body}\nTopic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`;
+        return (
+          `Title: ${thread.title}\nBody: ${thread.body}\n` +
+          `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`
+        );
       })
       .join('\n\n');
 

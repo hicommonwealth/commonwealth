@@ -200,12 +200,13 @@ Community Description: ${communityDescription}`;
 
           const originalRequestContext = `Thread: ${originalThread?.title || ''}
 ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
+          // eslint-disable-next-line max-len
+          const context: string = `${extendedCommunityContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalRequestContext.trim()}`;
 
-          const context = `${extendedCommunityContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalRequestContext.trim()}`;
+          const { userPrompt, systemPrompt } = generateCommentPrompt(context);
 
-          const prompt = generateCommentPrompt(context);
-
-          aiPromise = generateCompletion(prompt, {
+          aiPromise = generateCompletion(userPrompt, {
+            systemPrompt: systemPrompt,
             stream: false,
             model: 'gpt-4o-mini',
           });

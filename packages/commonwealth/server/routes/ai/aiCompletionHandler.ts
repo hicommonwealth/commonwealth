@@ -55,21 +55,17 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       }
     } else {
       console.error('Invalid initialPrompt structure received:', initialPrompt);
-      return res
-        .status(400)
-        .json({
-          error:
-            'Invalid prompt format. Prompt must be a string or a structured object.',
-        });
+      return res.status(400).json({
+        error:
+          'Invalid prompt format. Prompt must be a string or a structured object.',
+      });
     }
 
     // Validate inputs (now using finalUserPrompt)
     if (!finalUserPrompt) {
-      return res
-        .status(400)
-        .json({
-          error: 'User prompt content is required and could not be determined.',
-        });
+      return res.status(400).json({
+        error: 'User prompt content is required and could not be determined.',
+      });
     }
 
     // Log the received prompt - now logging the determined final prompts
