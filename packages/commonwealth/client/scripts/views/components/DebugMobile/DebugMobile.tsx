@@ -86,7 +86,7 @@ export const DebugMobile = memo(function DebugMobile() {
 
         <div style={{ margin: '8px' }}>
           <button onClick={handleRequestNotificationsPermissions}>
-            Get Notification Permissions
+            Request Notification Permissions
           </button>
         </div>
 
