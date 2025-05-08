@@ -89,7 +89,17 @@ const generateImageWithOpenAI = async (
     log.info('[generateImageWithOpenAI] OpenAI API response received.');
 
     // GPT-Image-1 always returns b64_json, so return that directly.
-    return { b64_json: imageResponse.data[0].b64_json || '' };
+    if (
+      imageResponse.data &&
+      imageResponse.data[0] &&
+      imageResponse.data[0].b64_json
+    ) {
+      return { b64_json: imageResponse.data[0].b64_json };
+    }
+    log.error(
+      `[generateImageWithOpenAI] No image data found in OpenAI response. Response: ${JSON.stringify(imageResponse)}`,
+    );
+    throw new Error(ImageGenerationErrors.ImageGenerationFailure);
   } catch (error) {
     if (error instanceof Error) {
       log.error('[generateImageWithOpenAI] OpenAI API call failed:', error);
@@ -163,7 +173,17 @@ const editImageWithOpenAI = async (
     const imageResponse = await openai.images.edit(payload);
     log.info('[editImageWithOpenAI] OpenAI API response received.');
 
-    return { b64_json: imageResponse.data[0].b64_json || '' };
+    if (
+      imageResponse.data &&
+      imageResponse.data[0] &&
+      imageResponse.data[0].b64_json
+    ) {
+      return { b64_json: imageResponse.data[0].b64_json };
+    }
+    log.error(
+      `[editImageWithOpenAI] No image data found in OpenAI response. Response: ${JSON.stringify(imageResponse)}`,
+    );
+    throw new Error(ImageGenerationErrors.ImageEditFailure);
   } catch (error) {
     // Convert to standard Error object
     const errorObj = error instanceof Error ? error : new Error(String(error));
