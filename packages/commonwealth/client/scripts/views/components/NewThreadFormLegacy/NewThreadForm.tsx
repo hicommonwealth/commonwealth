@@ -138,7 +138,6 @@ export const NewThreadForm = forwardRef<
   const [imageModalContext, setImageModalContext] = useState<{
     initialReferenceText?: string;
     initialReferenceImageUrls?: string[];
-    contextSource?: 'thread';
   } | null>(null);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
@@ -696,28 +695,25 @@ export const NewThreadForm = forwardRef<
   }, [onContentAppended, handleAppendContent]);
 
   const handleOpenImageModal = useCallback(() => {
-    // Gather context from the form
-    const title = threadTitle.trim();
-    const bodyText = getTextFromDelta(threadContentDelta).trim();
-    // TODO: Extract image URLs from threadContentDelta if needed
-    const imageUrls: string[] = getImageUrlsFromDelta(threadContentDelta);
+    const currentContent = getTextFromDelta(threadContentDelta, false);
+    const imageUrls = getImageUrlsFromDelta(threadContentDelta);
+    const communityName = community?.name;
+    const topicName = threadTopic?.name;
 
-    let combinedContextText = '';
-    if (title) {
-      combinedContextText += `Title: ${title}\n\n`;
+    let combinedContextText = currentContent;
+    if (communityName) {
+      combinedContextText = `Community: ${communityName}\n${combinedContextText}`;
     }
-    if (bodyText) {
-      combinedContextText += `Body: ${bodyText}`;
+    if (topicName) {
+      combinedContextText = `Topic: ${topicName}\n${combinedContextText}`;
     }
 
     setImageModalContext({
       initialReferenceText: combinedContextText || undefined,
       initialReferenceImageUrls: imageUrls.length > 0 ? imageUrls : undefined,
-      contextSource: 'thread',
     });
-
     setIsImageModalOpen(true);
-  }, [threadTitle, threadContentDelta]);
+  }, [threadContentDelta, community, threadTopic]);
 
   const handleCloseImageModal = useCallback(() => {
     setIsImageModalOpen(false);
@@ -1260,7 +1256,6 @@ export const NewThreadForm = forwardRef<
         onApply={handleApplyImage}
         initialReferenceText={imageModalContext?.initialReferenceText}
         initialReferenceImageUrls={imageModalContext?.initialReferenceImageUrls}
-        contextSource={imageModalContext?.contextSource}
       />
       {JoinCommunityModals}
     </>
