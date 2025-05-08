@@ -24,7 +24,7 @@ if (process.env.GITHUB_ACTIONS === 'true') {
   }
 } else {
   // For local development, compare with main branch
-  process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/main...';
+  process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/master';
 }
 
 const ENABLE_ESLINT_DIFF_PLUGIN =
