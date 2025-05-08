@@ -5,6 +5,7 @@ type EvenSubscribeMessage = {
   $id: string;
   type: string;
   variant: 'event-subscribe';
+  eventName: string;
 };
 
 type EventUpdateMessage<EventData> = {
@@ -18,12 +19,13 @@ export function useMobileRPCEventReceiver<EventData>(type: string) {
   const reactNativeWebView = useReactNativeWebView();
 
   return useCallback(
-    (listener: (update: EventData) => void) => {
+    (eventName: string, listener: (update: EventData) => void) => {
       const $id = '' + Math.random() * 100000;
 
       const subscription: EvenSubscribeMessage = {
         $id,
         type: type,
+        eventName,
         variant: 'event-subscribe',
       };
 
