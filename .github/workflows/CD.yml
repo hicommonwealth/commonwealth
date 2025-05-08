@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - frick
-      - frack
       - beta
       - demo
       - production
@@ -33,7 +32,7 @@ jobs:
             frick)
               APP_NAME="commonwealth-frick"
               ;;
-            frack)
+            master)
               APP_NAME="commonwealth-frack"
               ;;
             beta)
@@ -41,9 +40,6 @@ jobs:
               ;;
             demo)
               APP_NAME="commonwealth-demo"
-              ;;
-            master)
-              APP_NAME="commonwealth-frick"
               ;;
             production)
               APP_NAME="commonwealthapp"
