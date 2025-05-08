@@ -103,7 +103,7 @@ jobs:
       - name: Run linter
         run: pnpm lint-branch-warnings
 
-  # Lint and Typecheck
+  # Build and Typecheck
   commonwealth-code-quality:
     name: Code Quality checks
     runs-on: ubuntu-latest
@@ -133,6 +133,32 @@ jobs:
 
       - name: check-types
         run: pnpm -r check-types
+
+
+  # Lint Diff
+  commonwealth-lint-diff:
+    name: Lint Diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Assert pnpm-lock.yaml is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
+            exit 1
+          fi
 
       # To disable eslint-diff just comment the following two lines
       - name: Run eslint-diff
