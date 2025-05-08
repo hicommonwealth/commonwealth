@@ -105,8 +105,8 @@ export async function getErc20TokenInfo({
     }),
   ]);
   return {
-    name: name as string,
-    symbol: symbol as string,
-    totalSupply: totalSupply as bigint,
+    name,
+    symbol,
+    totalSupply,
   };
 }
