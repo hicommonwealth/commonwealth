@@ -12,7 +12,20 @@ const path = require('path');
  * git push origin my_branch
  *
  */
-ESLINT_PLUGIN_DIFF_COMMIT = 'origin/${{ github.base_ref }}';
+// Check if running in GitHub Actions
+if (process.env.GITHUB_ACTIONS === 'true') {
+  // In GitHub Actions, use the PR's base branch
+  // This value will be set by the GitHub Actions workflow
+  // Don't override it if already set
+  if (!process.env.ESLINT_PLUGIN_DIFF_COMMIT) {
+    console.warn(
+      'ESLINT_PLUGIN_DIFF_COMMIT not set in GitHub Actions environment',
+    );
+  }
+} else {
+  // For local development, compare with main branch
+  process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/main...';
+}
 
 const ENABLE_ESLINT_DIFF_PLUGIN =
   process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true';
