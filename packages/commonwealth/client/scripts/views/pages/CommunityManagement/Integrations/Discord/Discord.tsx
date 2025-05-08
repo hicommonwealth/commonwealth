@@ -1,4 +1,8 @@
-import { DOCS_SUBDOMAIN, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import {
+  canIntegrateDiscord,
+  DOCS_SUBDOMAIN,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
@@ -189,6 +193,9 @@ const Discord = () => {
           <p>
             You can merge content from Discord directly into your community by
             connecting the Commonbot.{' '}
+            {community !== undefined && !canIntegrateDiscord(community)
+              ? 'Contact support to access this premium feature.'
+              : ''}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -264,7 +271,12 @@ const Discord = () => {
             ? 'Disconnecting Discord...'
             : CTA_TEXT[connectionStatus]
         }
-        disabled={connectionStatus === 'connecting'}
+        disabled={(() => {
+          if (connectionStatus === 'connecting') return true;
+          if (connectionStatus === 'connected') return false;
+          if (community === undefined) return true;
+          return !canIntegrateDiscord(community);
+        })()}
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>

@@ -9,6 +9,7 @@ import { mustExist } from '../../middleware/guards';
 export type VerifiedAddress = {
   base: ChainBase;
   encodedAddress: string;
+  eth_chain_id?: number | null;
   ss58Prefix?: number | null;
   hex?: string;
   existingHexUserId?: number | null;
@@ -36,13 +37,18 @@ export async function verifyAddress(
 
   const community = await models.Community.findOne({
     where: { id: community_id },
+    include: [{ model: models.ChainNode }],
   });
   mustExist('Community', community);
 
   try {
     if (community.base === ChainBase.Ethereum) {
       if (!isEvmAddress(address)) throw new InvalidAddress(address, 'Not Eth');
-      return { base: community.base, encodedAddress: address };
+      return {
+        base: community.base,
+        encodedAddress: address,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
+      };
     }
 
     if (community.base === ChainBase.Substrate) {
@@ -55,6 +61,7 @@ export async function verifyAddress(
           address,
           currentPrefix: community.ss58_prefix!,
         }),
+        eth_chain_id: community.ChainNode?.eth_chain_id,
         ss58Prefix: community.ss58_prefix!,
       };
     }
@@ -67,7 +74,26 @@ export async function verifyAddress(
       const key = new PublicKey(address);
       if (key.toBase58() !== address)
         throw new InvalidAddress(address, `Base58 ${key.toBase58()}`);
-      return { base: community.base, encodedAddress: address };
+      return {
+        base: community.base,
+        encodedAddress: address,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
+      };
+    }
+
+    if (community.base === ChainBase.Sui) {
+      // Sui address format validation - typically a 64-character hex string with 0x prefix
+      const suiAddressPattern = /^0x[a-fA-F0-9]{64}$/;
+
+      if (!suiAddressPattern.test(address)) {
+        throw new InvalidAddress(address, 'Invalid Sui address format');
+      }
+
+      return {
+        base: community.base,
+        encodedAddress: address,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
+      };
     }
 
     // cosmos or injective
@@ -87,6 +113,7 @@ export async function verifyAddress(
       return {
         base: community.base,
         encodedAddress,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
         hex: addressHex,
         existingHexUserId: existingHexesSorted.at(0)?.user_id,
       };

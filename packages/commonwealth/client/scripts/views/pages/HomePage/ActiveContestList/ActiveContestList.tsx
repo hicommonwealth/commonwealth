@@ -1,12 +1,15 @@
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { useFlag } from 'hooks/useFlag';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { trpc } from 'utils/trpcClient';
-import ContestCard from 'views/components/ContestCard';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
+import ContestCard from 'views/components/ContestCard';
+import { PotentialContestCard } from 'views/components/PotentialContestCard/PotentialContestCard';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
+import { Skeleton } from 'views/components/Skeleton';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
 import './ActiveContestList.scss';
@@ -14,6 +17,26 @@ import './ActiveContestList.scss';
 interface ActiveContestListProps {
   isCommunityHomePage?: boolean;
 }
+
+const useConditionalTokenData = (isCommunityHomePage: boolean) => {
+  const { communityToken, isLoadingToken, isPinnedToken } =
+    useTokenTradeWidget();
+  const { isLoading: isLoadingPricing } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
+  });
+
+  if (!isCommunityHomePage) {
+    return {
+      communityToken: null,
+      isLoadingToken: false,
+      isPinnedToken: false,
+      isLoadingPricing: false,
+    };
+  }
+
+  // Return actual hook results when on community page
+  return { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing };
+};
 
 const ActiveContestList = ({
   isCommunityHomePage = false,
@@ -27,7 +50,23 @@ const ActiveContestList = ({
     isCommunityHomePage,
   });
 
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing } =
+    useConditionalTokenData(isCommunityHomePage);
+
+  const isLoading = isContestDataLoading || isLoadingToken || isLoadingPricing;
+
+  const isLaunchpadToken = communityToken && !isPinnedToken;
+  const launchpadToken = communityToken as LaunchpadToken;
+  const isGraduated = launchpadToken?.liquidity_transferred;
+  const hasActiveContests = activeContests.length > 0;
+
+  const showPotentialCardCase1 =
+    isLaunchpadToken && !isGraduated && !hasActiveContests;
+  const showPotentialCardCase2 =
+    isLaunchpadToken && !isGraduated && hasActiveContests;
+
+  const shouldRenderPotentialCard =
+    showPotentialCardCase1 || showPotentialCardCase2;
 
   const activeContestsLimited = isCommunityHomePage
     ? activeContests.length > 0
@@ -63,21 +102,27 @@ const ActiveContestList = ({
     <div className="ActiveContestList">
       <div className="heading-container">
         <CWText type="h2">Contests</CWText>
-        <Link to="/explore">
+        <Link to="/explore?tab=contests">
           <div className="link-right">
             <CWText className="link">See all contests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
         </Link>
       </div>
-      {isSuggestedMode && <CWText type="h5">Suggested</CWText>}
+      {isSuggestedMode && !shouldRenderPotentialCard && (
+        <CWText type="h5">Suggested</CWText>
+      )}
       <>
-        {!isContestDataLoading && activeContestsLimited.length === 0 && (
-          <CWText type="h2" className="empty-contests">
-            No active contests found
-          </CWText>
-        )}
-        {isContestDataLoading ? (
+        {shouldRenderPotentialCard && <PotentialContestCard />}
+        {!isLoading &&
+          !shouldRenderPotentialCard &&
+          !isCommunityHomePage &&
+          !hasActiveContests && (
+            <CWText type="h2" className="empty-contests">
+              No active contests found
+            </CWText>
+          )}
+        {isLoading ? (
           <div className="content">
             <>
               <Skeleton height="300px" />
@@ -109,9 +154,7 @@ const ActiveContestList = ({
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
                   score={score || []}
-                  isFarcaster={
-                    farcasterContestEnabled && contest.is_farcaster_contest
-                  }
+                  isFarcaster={contest.is_farcaster_contest}
                   community={community[contest.community_id as string]}
                 />
               );

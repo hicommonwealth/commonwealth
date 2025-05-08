@@ -10,6 +10,7 @@ export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
 export const SKALE_ID = '974399131';
+export const SONIEUM_ID = '1868';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
@@ -32,10 +33,11 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
     nodeInfo.balanceType === 'solana' &&
     nodeInfo.name.toLowerCase().includes('mainnet');
   const isPolygon = nodeInfo.ethChainId === POLYGON_ETH_CHAIN_ID;
+  const isSui = nodeInfo.balanceType === 'sui';
 
   return (
     removeTestCosmosNodes(nodeInfo) &&
-    (isEth || isCosmos || isSolana || isPolygon)
+    (isEth || isCosmos || isSolana || isPolygon || isSui)
   );
 };
 
@@ -56,7 +58,9 @@ export const chainTypes =
         ? 'ethereum'
         : chain.cosmosChainId
           ? 'cosmos'
-          : 'solana',
+          : chain.balanceType === 'sui'
+            ? 'sui'
+            : 'solana',
       altWalletUrl: chain.altWalletUrl,
       nodeUrl: chain.url,
       value: chain.ethChainId || chain.cosmosChainId || 'solana',

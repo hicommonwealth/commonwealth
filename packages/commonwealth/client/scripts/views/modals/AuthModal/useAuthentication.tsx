@@ -8,6 +8,7 @@ import {
   verifySession,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -35,13 +36,19 @@ import {
 } from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { EIP1193Provider } from 'viem';
+import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import { usePrivyAuthWithEmail } from 'views/components/Privy/usePrivyAuthWithEmail';
+import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
+import { usePrivyAuthWithPhone } from 'views/components/Privy/usePrivyAuthWithPhone';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -55,6 +62,7 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
+import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -85,8 +93,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+  const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { setState: setSMSDialogState } = usePrivySMSDialogStore();
+  const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
 
   const user = useUserStore();
 
@@ -107,6 +118,30 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { mutateAsync: updateUser } = useUpdateUserMutation();
   const { signIn } = useSignIn();
 
+  const handlePrivySuccess = useCallback(() => {
+    const landingURL = new URL(
+      '/dashboard/for-you',
+      window.location.href,
+    ).toString();
+    document.location.href = landingURL;
+  }, []);
+
+  const handlePrivyError = useCallback((err: Error) => {
+    console.log('privy error: ', err);
+    setIsMagicLoading(false);
+  }, []);
+
+  const privyCallbacks = useMemo(() => {
+    return {
+      onSuccess: handlePrivySuccess,
+      onError: handlePrivyError,
+    };
+  }, [handlePrivyError, handlePrivySuccess]);
+
+  const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
+  const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
+  const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
+
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
@@ -116,7 +151,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
             `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
-          );
+          ) as unknown as EIP1193Provider;
         })
         .catch(console.error);
     }
@@ -131,6 +166,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ChainBase.Ethereum,
         ChainBase.Substrate,
         ChainBase.Solana,
+        ChainBase.Sui,
       ];
       setWallets(
         _.flatten(
@@ -165,7 +201,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
-  const onSMSLogin = async (phoneNumber = '') => {
+  const onSMSLoginMagic = async (phoneNumber = '') => {
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
 
@@ -198,7 +234,26 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onEmailLogin = async (emailToUse = '') => {
+  const onSMSLoginPrivy = async (phoneNumber) => {
+    setIsMagicLoading(true);
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+    // this will bring the SMS dialog up so that the user can enter the code we
+    // are about to send
+    setSMSDialogState({
+      active: true,
+      onCancel: () => {
+        setSMS(undefined);
+        setIsMagicLoading(false);
+      },
+      onError: privyCallbacks.onError,
+    });
+    await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
+  };
+
+  const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
+
+  const onEmailLoginMagic = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
 
@@ -231,8 +286,43 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const onEmailLoginPrivy = async (emailToUse = '') => {
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
+    setIsMagicLoading(true);
+
+    if (!tempEmailToUse) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      setEmailDialogState({
+        active: true,
+        onCancel: () => {
+          setEmail(undefined);
+          setIsMagicLoading(false);
+        },
+        onError: privyCallbacks.onError,
+      });
+      await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
+
+      // TODO: I need to handle these now...
+      // setIsMagicLoading(false);
+      // TODO: trackLoginEvent('email', true);
+    } catch (e) {
+      notifyError(`Error authenticating with email`);
+      console.error(`Error authenticating with email: ${e}`);
+      setIsMagicLoading(false);
+    }
+  };
+
+  const onEmailLogin = privyEnabled ? onEmailLoginPrivy : onEmailLoginMagic;
+
   // New callback for handling social login
-  const onSocialLogin = async (provider: WalletSsoSource) => {
+  const onSocialLoginMagic = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
@@ -255,6 +345,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
+    setIsMagicLoading(true);
+    console.log('onSocialLoginPrivy: ' + provider);
+    privyAuthWithOAuth.onInitOAuth(provider);
+  };
+
+  const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;
 
   // Performs Login on the client
   const onLogInWithAccount = async (
@@ -424,6 +523,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
           new Date(currentUserAddress.lastActive),
+          0,
         );
       }
     } catch (e) {
@@ -512,42 +612,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
-    setSelectedWallet(wallet);
-
-    if (user.isLoggedIn) {
-      try {
-        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: address,
-                  currentPrefix: parseInt(
-                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
-                    10,
-                  ),
-                })
-              : address,
-          community_id: app.activeChainId() ?? wallet.chain,
-          jwt: user.jwt,
-        });
-
-        if (res.data.result.exists && res.data.result.belongsToUser) {
-          notifyInfo('This address is already linked to your current account.');
-          return;
-        }
-
-        if (res.data.result.exists) {
-          notifyInfo(
-            'This address is already linked to another account. Signing will transfer ownership to your account.',
-          );
-        }
-      } catch (err) {
-        notifyError(`Error getting address status`);
-        console.error(`Error getting address status: ${err}`);
-      }
-    }
-
+  const handleWalletTransfer = async (wallet: Wallet, address: string) => {
     try {
       const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
@@ -589,6 +654,69 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       notifyError(`Error authenticating with wallet`);
       console.error(`Error authenticating with wallet: ${err}`);
     }
+  };
+  const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
+    setSelectedWallet(wallet);
+
+    if (user.isLoggedIn) {
+      try {
+        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
+          address:
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address: address,
+                  currentPrefix: parseInt(
+                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+                    10,
+                  ),
+                })
+              : address,
+          community_id: app.activeChainId() ?? wallet.chain,
+          jwt: user.jwt,
+        });
+
+        if (res.data.result.exists && res.data.result.belongsToUser) {
+          notifyInfo('This address is already linked to your current account.');
+          return;
+        }
+
+        if (res.data.result.exists) {
+          openConfirmation({
+            title: 'Wallet Transfer Confirmation',
+            description: `
+            The wallet you want to link is owned by account Y. 
+            Do you want to transfer it? Your thread history will
+            now be associated with account X.
+            `,
+            buttons: [
+              {
+                label: 'Confirm Transfer',
+                buttonType: 'destructive',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  void handleWalletTransfer(wallet, address);
+                },
+              },
+              {
+                label: 'Cancel',
+                buttonType: 'secondary',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  void props.onSuccess?.(null, false).catch(console.error);
+                  return;
+                },
+              },
+            ],
+          });
+
+          return;
+        }
+      } catch (err) {
+        notifyError(`Error getting address status`);
+        console.error(`Error getting address status: ${err}`);
+      }
+    }
+    await handleWalletTransfer(wallet, address);
   };
 
   const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {

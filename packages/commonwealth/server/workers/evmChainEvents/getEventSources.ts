@@ -11,6 +11,7 @@ import {
   buildChainNodeUrl,
   models,
 } from '@hicommonwealth/model';
+import { config } from '../../config';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
 
@@ -51,19 +52,10 @@ export async function getXpSources(
       const existingSource = chainSource.contracts[
         source.contract_address
       ].find((s) => s.event_signature === source.event_signature);
-      if (existingSource) {
-        log.error(`Event signature already exists in evm sources!`, undefined, {
-          existing_source: {
-            contract_address: existingSource.contract_address,
-            event_signature: existingSource.event_signature,
-            eth_chain_id: existingSource.eth_chain_id,
-          },
-          xp_source: {
-            contract_address: source.contract_address,
-            event_signature: source.event_signature,
-            eth_chain_id: source.ChainNode!.eth_chain_id!,
-          },
-        });
+      if (existingSource && 'quest_action_meta_ids' in existingSource.meta) {
+        existingSource.meta.quest_action_meta_ids?.push(
+          source.quest_action_meta_id,
+        );
         continue;
       }
     }
@@ -74,7 +66,7 @@ export async function getXpSources(
       event_signature: source.event_signature,
       meta: {
         events_migrated: true,
-        quest_action_meta_id: source.quest_action_meta_id,
+        quest_action_meta_ids: [source.quest_action_meta_id],
         event_name: 'XpChainEventCreated',
       },
     });
@@ -83,12 +75,26 @@ export async function getXpSources(
   return evmSources;
 }
 
+let logWarning = true;
+
 export async function getEventSources(): Promise<EvmSources> {
   const evmSources: EvmSources = {};
 
+  let ethChainIds: string[] | number[] = Object.keys(EventRegistry);
+  if (
+    Array.isArray(config.EVM_CE.ETH_CHAIN_ID_OVERRIDE) &&
+    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0
+  ) {
+    ethChainIds = config.EVM_CE.ETH_CHAIN_ID_OVERRIDE;
+    if (logWarning) {
+      log.warn(`Polling the following chain ids: ${ethChainIds.join(', ')}`);
+      logWarning = false;
+    }
+  }
+
   const chainNodes = await models.ChainNode.scope('withPrivateData').findAll({
     where: {
-      eth_chain_id: Object.keys(EventRegistry),
+      eth_chain_id: ethChainIds,
     },
   });
   const dbEvmSources = await models.EvmEventSource.findAll();

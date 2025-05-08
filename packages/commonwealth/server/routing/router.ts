@@ -7,6 +7,7 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
 import {
+  aiTieredMiddleware,
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
@@ -26,25 +27,21 @@ import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 
 import setDefaultRole from '../routes/setDefaultRole';
-import upgradeMember, {
-  upgradeMemberValidation,
-} from '../routes/upgradeMember';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
 import logout from '../routes/logout';
 import writeUserSetting from '../routes/writeUserSetting';
 
-import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 
 import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
-import { generateCommentText, generateTokenIdea } from '@hicommonwealth/model';
+import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import generateImage from '../routes/generateImage';
+import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -56,17 +53,15 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerPollsController } from '../controllers/server_polls_controller';
-import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
-import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
+import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
@@ -76,29 +71,21 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
-import { deletePollHandler } from '../routes/polls/delete_poll_handler';
-import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
-import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
+import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  threads: ServerThreadsController;
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  polls: ServerPollsController;
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
-  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -110,15 +97,12 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models),
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    polls: new ServerPollsController(models),
     groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models),
   };
 
   // ---
@@ -240,36 +224,6 @@ function setupRouter(
     getTopUsersHandler.bind(this, serverControllers),
   );
 
-  // polls
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/polls',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadPollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/threads/:id/polls',
-    getThreadPollsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/polls/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deletePollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/polls/:id/votes',
-    getPollVotesHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'get',
@@ -326,14 +280,6 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models),
   );
 
-  // tags
-  registerRoute(
-    router,
-    'get',
-    '/tags',
-    getTagsHandler.bind(this, serverControllers),
-  );
-
   // roles
   registerRoute(
     router,
@@ -341,16 +287,6 @@ function setupRouter(
     '/roles',
     databaseValidationService.validateCommunity,
     controllers.listRoles.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/upgradeMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    upgradeMemberValidation,
-    upgradeMember.bind(this, models),
   );
 
   // user model update
@@ -405,15 +341,6 @@ function setupRouter(
     setAddressWallet.bind(this, models),
   );
 
-  // community categories
-  registerRoute(
-    router,
-    'post',
-    '/updateCommunityCategory',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityCategory.bind(this, models),
-  );
-
   // settings
   registerRoute(
     router,
@@ -447,7 +374,8 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
-    generateImage.bind(this, models),
+    aiTieredMiddleware({ images: true }),
+    generateImageHandler.bind(this, models),
   );
 
   registerRoute(
@@ -459,6 +387,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true, text: true }),
     async (req, res) => {
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
@@ -471,40 +400,6 @@ function setupRouter(
       const ideaGenerator = generateTokenIdea({ ideaPrompt });
 
       for await (const chunk of ideaGenerator) {
-        if ((chunk as { error?: string }).error) {
-          return res.end(
-            JSON.stringify({
-              status: 'failure',
-              message: (chunk as { error?: string }).error,
-            }) + '\n',
-          );
-        }
-
-        res.write(chunk);
-        res.flush();
-      }
-
-      return res.end();
-    },
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/generateCommentText',
-    rateLimiterMiddleware({
-      routerNamespace: 'generateCommentText',
-      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
-    }),
-    passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Transfer-Encoding', 'chunked');
-      const userText =
-        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
-      const commentGenerator = generateCommentText({ userText });
-
-      for await (const chunk of commentGenerator) {
         if ((chunk as { error?: string }).error) {
           return res.end(
             JSON.stringify({
@@ -567,21 +462,10 @@ function setupRouter(
     communityStats.bind(this, models),
   );
 
-  // Group routes
-  registerRoute(
-    router,
-    'put',
-    '/refresh-membership',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    refreshMembershipHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'get',
     '/groups',
-    databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
   );
 
@@ -594,9 +478,19 @@ function setupRouter(
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));
 
+  registerRoute(
+    router,
+    'post',
+    '/aicompletion',
+    passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ text: true }),
+    aiCompletionHandler,
+  );
+
   // proxies
   setupCosmosProxy(router, cacheDecorator);
   setupIpfsProxy(router, cacheDecorator);
+  setupUniswapProxy(router, cacheDecorator);
 
   app.use(endpoint, router);
 

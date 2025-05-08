@@ -1,5 +1,5 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
@@ -17,6 +17,7 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
 import passport from 'passport';
 import path, { dirname } from 'path';
+import pino from 'pino';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
@@ -33,6 +34,9 @@ import setupServer from './server/scripts/setupServer';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
+
+const latencyInfo: Record<string, { invocationCount: number; total: number }> =
+  {};
 
 /**
  * Bootstraps express app
@@ -117,20 +121,83 @@ export async function main(
       next();
     });
 
+    // Report stats for all routes
+    app.use((req, res, next) => {
+      try {
+        const routePattern = `${req.method.toUpperCase()} ${req.path}`;
+        stats().increment('cw.path.called', {
+          path: routePattern,
+        });
+        const start = Date.now();
+        if (!latencyInfo[routePattern])
+          latencyInfo[routePattern] = { invocationCount: 0, total: 0 };
+
+        res.on('finish', () => {
+          const latency = Date.now() - start;
+          latencyInfo[routePattern].invocationCount += 1;
+          latencyInfo[routePattern].total += latency;
+          if (latencyInfo[routePattern].invocationCount >= 3) {
+            stats().histogram(
+              `cw.path.latency`,
+              Math.round(latencyInfo[routePattern].total / 3),
+              {
+                path: routePattern,
+                statusCode: `${res.statusCode}`,
+              },
+            );
+            latencyInfo[routePattern].invocationCount = 0;
+            latencyInfo[routePattern].total = 0;
+          }
+        });
+      } catch (e) {
+        log.error('Failed to record stats', e, {
+          method: req.method,
+          path: req.path,
+          statusCode: res.statusCode,
+        });
+      }
+      next();
+    });
+
     withLoggingMiddleware &&
       app.use(
         pinoHttp({
+          ...(config.APP_ENV === 'production'
+            ? {
+                logger: pino({
+                  formatters: {
+                    level: (label: string) => {
+                      return { level: label.toUpperCase() };
+                    },
+                  },
+                }),
+              }
+            : {}),
           quietReqLogger: false,
-          transport: {
-            target: 'pino-http-print',
-            options: {
-              destination: 1,
-              all: false,
-              colorize: true,
-              relativeUrl: true,
-              translateTime: 'HH:MM:ss.l',
-            },
+          customLogLevel: function (_, res, err) {
+            if (res.statusCode >= 400 && res.statusCode < 500) {
+              return 'warn';
+            } else if (res.statusCode >= 500 || err) {
+              return 'error';
+            }
+
+            if (config.APP_ENV === 'production') return 'silent';
+            else return 'info';
           },
+          ...(config.APP_ENV !== 'production'
+            ? {
+                transport: {
+                  target: 'pino-http-print',
+                  options: {
+                    destination: 1,
+                    all: false,
+                    colorize: true,
+                    relativeUrl: true,
+                    translateTime: 'HH:MM:ss.l',
+                  },
+                },
+              }
+            : {}),
         }),
       );
 

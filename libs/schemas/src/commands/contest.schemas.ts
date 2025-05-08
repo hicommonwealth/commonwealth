@@ -52,6 +52,7 @@ export const UpdateContestManagerMetadata = {
     description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
+    namespace_judge_token_id: PG_INT.optional(),
   }),
   output: z.object({
     contest_managers: z.array(
@@ -188,6 +189,7 @@ export const SetContestEnding = {
 
 export const SetContestEnded = {
   input: z.object({
+    eth_chain_id: z.number(),
     contest_address: z.string(),
     contest_id: PG_INT,
     prize_percentage: z.number(),
@@ -207,4 +209,15 @@ export const UpdateContestManagerFrameHashes = {
     webhooks_only: z.boolean().optional(),
   }),
   output: z.object({}),
+};
+
+export const DeleteContestManagerMetadata = {
+  input: z.object({
+    community_id: z.string(),
+    contest_address: z.string(),
+  }),
+  output: z.object({
+    contest_managers: z.array(ContestManager),
+  }),
+  context: AuthContext,
 };

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DiscordMetaSchema, linksSchema, PG_INT } from '../utils';
 import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
-import { Address } from './user.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 export const ThreadVersionHistory = z.object({
   id: PG_INT.optional(),
@@ -29,14 +29,10 @@ export const Thread = z.object({
   view_count: PG_INT.optional(),
   links: z.object(linksSchema).array().nullish(),
   content_url: z.string().nullish(),
-
   read_only: z.boolean().nullish(),
-
   has_poll: z.boolean().nullish(),
-
   canvas_signed_data: z.string().nullish(),
   canvas_msg_id: z.string().nullish(),
-
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   last_edited: z.coerce.date().nullish(),
@@ -46,6 +42,7 @@ export const Thread = z.object({
   archived_at: z.coerce.date().nullish(),
   locked_at: z.coerce.date().nullish(),
   discord_meta: DiscordMetaSchema.nullish(),
+  user_tier_at_creation: USER_TIER.nullish(),
 
   //counts
   reaction_count: PG_INT.optional(),
@@ -62,7 +59,9 @@ export const Thread = z.object({
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
 
-  search: z.union([z.string(), z.record(z.any())]),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  is_linking_token: z.boolean().optional(),
+  launchpad_token_address: z.string().nullable().optional(),
 
   // associations
   Address: Address.nullish(),
@@ -71,4 +70,14 @@ export const Thread = z.object({
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),
   ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
+});
+
+export const ThreadRank = z.object({
+  thread_id: PG_INT,
+  community_rank: z.bigint(),
+  global_rank: z.bigint(),
+  updated_at: z.coerce.date().optional(),
+
+  // associations
+  Thread: Thread.optional(),
 });

@@ -12,10 +12,13 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
+import {
+  getPreviewImageUrl,
+  getRenderedTitle,
+} from '../../aggregates/webhook/util';
 import { config } from '../../config';
 import { models } from '../../database';
 import { CommentInstance, WebhookInstance } from '../../models';
-import { getPreviewImageUrl, getRenderedTitle } from '../../webhook/util';
 import { getCommentUrl, getProfileUrl } from '../utils/utils';
 
 const log = logger(import.meta);
@@ -96,20 +99,21 @@ export const notifyCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
-        author: author.User?.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
-      },
-      actor: {
-        id: String(author.user_id),
-        profile_name:
-          author.User?.profile.name || author.address.substring(0, 8),
-        profile_url: getProfileUrl(author.user_id, community.custom_domain),
-        email: author.User?.profile.email ?? undefined,
-        profile_avatar_url: author.User?.profile.avatar_url ?? undefined,
+        author: author.User?.profile.name || author.address.substring(0, 8),
+        author_address_id: author.id!,
+        author_address: author.address,
+        author_user_id: String(author.user_id),
+        author_profile_url: getProfileUrl(
+          author.user_id,
+          community.custom_domain,
+        ),
+        author_email: author.User?.profile.email ?? undefined,
+        author_avatar_url: author.User?.profile.avatar_url ?? undefined,
       },
     });
   }

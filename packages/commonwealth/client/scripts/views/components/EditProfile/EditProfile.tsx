@@ -32,6 +32,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
 import ProfileSection from './Section';
+import UserTrustLevel from './UserTrustLevel/UserTrustLevel';
 import { editProfileValidation } from './validation';
 
 export type Image = {
@@ -42,6 +43,8 @@ export type Image = {
 const EditProfile = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState<string>();
@@ -62,7 +65,6 @@ const EditProfile = () => {
     linkValidation: linkValidationSchema.optional,
   });
 
-  const enableApiKeyManagement = useFlag('manageApiKeys');
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
     useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
@@ -107,6 +109,7 @@ const EditProfile = () => {
           ...data.profile,
           userId: data.userId,
           isOwner: data.userId === user.id,
+          tier: data.tier,
         }),
       );
       // @ts-expect-error <StrictNullChecks/>
@@ -169,7 +172,18 @@ const EditProfile = () => {
 
   if (!error && profile) {
     const handleSubmit = (values: z.infer<typeof editProfileValidation>) => {
-      if (links.filter((x) => x.value).length > 0 ? !areLinksValid() : false) {
+      const filledLinks = links.filter((x) => x.value);
+      if (filledLinks.length > 0 && !areLinksValid()) {
+        // Find the invalid links to show informative error message
+        const invalidLinks = filledLinks.filter(
+          (link) => link.error || !isLinkValid(link.value),
+        );
+        console.log('Invalid links found:', invalidLinks);
+        if (invalidLinks.length > 0) {
+          notifyError(
+            'Some social links are invalid. Please update them to include "https://" at the beginning.',
+          );
+        }
         return;
       }
 
@@ -336,6 +350,20 @@ const EditProfile = () => {
                 canAddLinks={links.length <= 5}
               />
             </ProfileSection>
+            {trustLevelEnabled && (
+              <ProfileSection
+                title="User Verification"
+                description="Verification helps build a trusted
+              ecosystem where members can interact with confidence.
+              As you progress throught verification levels,
+              you'll gain increased capabilities and recognition
+              within the community.
+              "
+              >
+                <UserTrustLevel />
+              </ProfileSection>
+            )}
+
             <ProfileSection
               title="Personalize Your Profile"
               description="Express yourself through imagery."
@@ -416,7 +444,6 @@ const EditProfile = () => {
                           )
                         }
                         icon="sparkle"
-                        size="xs"
                         iconColor="#757575"
                       />
                     </div>
@@ -436,7 +463,7 @@ const EditProfile = () => {
                 </div>
               )}
             </ProfileSection>
-            {enableApiKeyManagement ? <ManageApiKey /> : null}
+            <ManageApiKey />
             {actionButtons}
           </CWForm>
         </div>

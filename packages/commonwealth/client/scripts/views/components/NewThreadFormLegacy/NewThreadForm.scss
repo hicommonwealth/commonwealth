@@ -1,148 +1,236 @@
 @import '../../../styles/shared';
 
 .NewThreadForm {
+  flex-direction: row;
+  width: 100%;
   display: flex;
-  flex: 1;
-  flex-direction: column;
+  gap: 56px;
+  justify-content: space-between;
   width: 100%;
 
-  .no-pad {
-    padding: 0 !important;
-  }
-
-  & > .header {
-    padding-bottom: 24px;
-  }
-
-  @include mediumSmallInclusive {
-    width: 100%;
-  }
-
-  .topic-select {
-    .cwsl__option {
-      justify-content: start !important;
-      gap: 4px;
-    }
-    .trophy-icon {
-      margin-bottom: -2px;
-      margin-right: 4px;
-    }
-  }
-
-  .new-thread-header {
+  .form-view {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-
-  .new-thread-body {
-    display: flex;
-    gap: 16px;
-    justify-content: space-between;
-    width: 100%;
-
-    @include smallInclusive {
-      flex-direction: column;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 768px;
+    width: 768px;
+    .no-pad {
+      padding: 0 !important;
     }
 
-    .new-thread-form-inputs {
+    & > .header {
+      padding-bottom: 24px;
+    }
+
+    @include mediumSmallInclusive {
+      width: 100%;
+    }
+
+    .topic-select {
+      .cwsl__option {
+        justify-content: start !important;
+        gap: 4px;
+      }
+      .trophy-icon {
+        margin-bottom: -2px;
+        margin-right: 4px;
+      }
+    }
+
+    .new-thread-header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .new-thread-body {
+      display: flex;
       gap: 16px;
+      justify-content: space-between;
       width: 100%;
 
-      .set-display-name-callout {
-        background-color: $purple-50;
-        border-radius: $border-radius-corners;
+      @include smallInclusive {
+        flex-direction: column;
+      }
+
+      .thread-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 16px;
+
+        .thread-title-row-left {
+          flex: 1;
+        }
+      }
+
+      .new-thread-form-inputs {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin-bottom: 16px;
-        padding: 16px;
-        width: fit-content;
-      }
+        gap: 16px;
+        width: 100%;
 
-      .draft-text.Text {
-        background-color: $rorange-50;
-        border-radius: $border-radius-rounded-corners;
-        color: $rorange-500;
-        margin-bottom: 16px;
-        padding: 4px 16px;
-        width: fit-content;
-      }
+        .set-display-name-callout {
+          background-color: $purple-50;
+          border-radius: $border-radius-corners;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-bottom: 16px;
+          padding: 16px;
+          width: fit-content;
+        }
 
-      .topics-and-title-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        .draft-text.Text {
+          background-color: $rorange-50;
+          border-radius: $border-radius-rounded-corners;
+          color: $rorange-500;
+          margin-bottom: 16px;
+          padding: 4px 16px;
+          width: fit-content;
+        }
 
-        @include mediumInclusive {
-          .Button {
-            flex: 1;
+        .topics-and-title-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          @include mediumInclusive {
+            .Button {
+              flex: 1;
+            }
+          }
+
+          .TextInput {
+            flex: 2;
           }
         }
 
-        .TextInput {
-          flex: 2;
+        .buttons-row {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          width: 100%;
+          gap: 16px;
+
+          .ai-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          }
+
+          .ai-toggle {
+            display: flex;
+          }
+
+          .toggle-label {
+            color: $neutral-500;
+          }
+
+          @include smallInclusive {
+            flex-wrap: wrap;
+
+            .ai-toggle-wrapper {
+              order: 1;
+            }
+            .ThreadAction {
+              order: 2;
+            }
+            .cancel-button {
+              order: 3;
+            }
+            .create-button {
+              order: 4;
+            }
+          }
         }
       }
-
-      .buttons-row {
-        display: flex;
-        gap: 8px;
-        justify-content: end;
-      }
-    }
-  }
-
-  .drafts-list-container {
-    display: flex;
-    flex-direction: column;
-
-    .drafts-list-title-text.Text {
-      border-bottom: 2px solid $primary-500;
-      margin: 0 0 8px 16px;
-      width: fit-content;
     }
 
-    .drafts-list {
+    .drafts-list-container {
       display: flex;
       flex-direction: column;
-      height: 360px;
-      overflow-y: auto;
-      width: 200px;
 
-      @include visibleScrollbar(light);
+      .drafts-list-title-text.Text {
+        border-bottom: 2px solid $primary-500;
+        margin: 0 0 8px 16px;
+        width: fit-content;
+      }
 
-      .draft-item {
-        cursor: pointer;
+      .drafts-list {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        padding: 8px 16px;
+        height: 360px;
+        overflow-y: auto;
+        width: 200px;
 
-        &:hover {
-          background-color: $neutral-50;
-        }
+        @include visibleScrollbar(light);
 
-        .draft-title {
-          align-items: center;
+        .draft-item {
+          cursor: pointer;
           display: flex;
+          flex-direction: column;
           gap: 4px;
-        }
+          padding: 8px 16px;
 
-        .draft-delete-text {
-          color: $rorange-500;
+          &:hover {
+            background-color: $neutral-50;
+          }
+
+          .draft-title {
+            align-items: center;
+            display: flex;
+            gap: 4px;
+          }
+
+          .draft-delete-text {
+            color: $rorange-500;
+          }
         }
       }
     }
+
+    .JoinCommunityBanner,
+    .spam-trust-banner {
+      margin-top: 8px;
+    }
+
+    .help-text-container {
+      margin-left: auto;
+    }
+
+    .ai-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 300px;
+    max-width: 300px;
+  }
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    max-width: 300px;
+    width: 248px;
+
+    .left-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
-  .JoinCommunityBanner {
-    margin-top: 8px;
-  }
-
-  .help-text-container {
-    margin-left: auto;
+  .turnstile-container {
+    display: flex;
+    justify-content: right;
   }
 }

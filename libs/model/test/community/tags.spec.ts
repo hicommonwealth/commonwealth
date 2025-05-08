@@ -1,6 +1,7 @@
 import { dispose, query } from '@hicommonwealth/core';
-import { GetCommunities, GetCommunity } from 'model/src/community';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { GetCommunities, GetCommunity } from '../../src/aggregates/community';
 import { systemActor } from '../../src/middleware';
 import { seed } from '../../src/tester';
 
@@ -14,12 +15,14 @@ describe('Tags', () => {
     const [tag1] = await seed('Tags', { name: 'tag1' });
     const [tag2] = await seed('Tags', { name: 'tag2' });
     await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node!.id!,
       active: true,
       lifetime_thread_count: 0,
       profile_count: 0,
     });
     const [community1Tag1Only] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node!.id!,
       active: true,
       lifetime_thread_count: 0,
@@ -30,6 +33,7 @@ describe('Tags', () => {
       tag_id: tag1!.id!,
     });
     const [community2Tag1And2] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node!.id!,
       active: true,
       lifetime_thread_count: 0,

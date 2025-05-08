@@ -1,0 +1,26 @@
+@import '../../../../../styles/shared';
+
+.ReferralCard {
+  width: 100%;
+
+  .referral-card-body {
+    margin-block: 16px;
+
+    .xp-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      margin-bottom: 10px;
+
+      .Text {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .total-body {
+      word-break: break-all;
+    }
+  }
+}

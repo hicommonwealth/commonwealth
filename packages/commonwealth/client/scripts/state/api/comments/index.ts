@@ -3,7 +3,6 @@ import useCreateCommentMutation from './createComment';
 import useDeleteCommentMutation from './deleteComment';
 import useEditCommentMutation from './editComment';
 import useFetchCommentsQuery from './fetchComments';
-import { useGenerateCommentText } from './generateCommentText';
 import useSearchCommentsQuery from './searchComments';
 import useToggleCommentSpamStatusMutation from './toggleCommentSpamStatus';
 // comment reactions
@@ -17,7 +16,6 @@ export {
   useDeleteCommentReactionMutation,
   useEditCommentMutation,
   useFetchCommentsQuery,
-  useGenerateCommentText,
   useSearchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 };

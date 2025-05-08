@@ -1,5 +1,7 @@
+import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import {
+  CountAggregatorKeys,
   MAX_TRUNCATED_CONTENT_LENGTH,
   getDecodedString,
 } from '@hicommonwealth/shared';
@@ -76,6 +78,7 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
 
       //counts
       reaction_count: {
@@ -100,9 +103,15 @@ export default (
       },
       search: {
         type: Sequelize.TSVECTOR,
-        allowNull: false,
+        allowNull: true,
       },
       content_url: { type: Sequelize.STRING, allowNull: true },
+      is_linking_token: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      launchpad_token_address: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -129,13 +138,13 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Community, Outbox, Address } = sequelize.models;
+          const { Outbox, Address } = sequelize.models;
 
-          await Community.increment('lifetime_thread_count', {
-            by: 1,
-            where: { id: thread.community_id },
-            transaction: options.transaction,
-          });
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            CountAggregatorKeys.CommunityThreadCount,
+            thread.community_id,
+          );
 
           const { topic_id, community_id } = thread.get({
             plain: true,
@@ -148,31 +157,29 @@ export default (
             thread.address_id,
           )) as AddressAttributes | null;
 
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: 'ThreadCreated',
-                event_payload: {
-                  ...thread.get({ plain: true }),
-                  address: address!.address,
-                  contestManagers,
+          if (!thread.marked_as_spam_at) {
+            await emitEvent(
+              Outbox,
+              [
+                {
+                  event_name: 'ThreadCreated',
+                  event_payload: {
+                    ...thread.get({ plain: true }),
+                    address: address!.address,
+                    contestManagers,
+                  },
                 },
-              },
-            ],
-            options.transaction,
-          );
+              ],
+              options.transaction,
+            );
+          }
         },
-        afterDestroy: async (
-          thread: ThreadInstance,
-          options: Sequelize.InstanceDestroyOptions,
-        ) => {
-          const { Community } = sequelize.models;
-          await Community.decrement('lifetime_thread_count', {
-            by: 1,
-            where: { id: thread.community_id },
-            transaction: options.transaction,
-          });
+        afterDestroy: async (thread: ThreadInstance) => {
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            CountAggregatorKeys.CommunityThreadCount,
+            thread.community_id,
+          );
         },
       },
     },

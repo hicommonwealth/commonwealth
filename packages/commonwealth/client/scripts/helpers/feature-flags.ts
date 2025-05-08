@@ -22,24 +22,24 @@ const buildFlag = (env: string | undefined) => {
 // vite.config.ts (locally) or in Unleash (remote apps) or they won't be passed to the frontend.
 const featureFlags = {
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
-  knockPushNotifications: buildFlag(
-    process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
-  ),
-  farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
-  uniswapTrade: buildFlag(process.env.FLAG_UNISWAP_TRADE),
   newContestPage: buildFlag(process.env.FLAG_NEW_CONTEST_PAGE),
-  manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
+  mobileDownload: buildFlag(process.env.FLAG_MOBILE_DOWNLOAD),
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
-  stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
   xp: buildFlag(process.env.FLAG_XP),
   growl: buildFlag(process.env.FLAG_GROWL),
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
+  governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
+  privy: buildFlag(process.env.FLAG_PRIVY),
+  judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
+  trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
+  tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
+  partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

@@ -20,6 +20,7 @@ interface APIResponseFormat {
         | 'cw721';
       evm_chain_id?: number;
       cosmos_chain_id?: number;
+      solana_network?: string;
       contract_address?: string;
       token_symbol?: string;
       token_id?: string;

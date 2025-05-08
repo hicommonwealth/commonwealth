@@ -1,15 +1,18 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { getUniqueUserAddresses } from 'helpers/user';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { useEffect, useState } from 'react';
 import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
-import { AuthTypes } from '../../components/AuthButton/types';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { AuthTypes } from 'views/components/AuthButton/types';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import './AuthModal.scss';
 import { CreateAccountModal } from './CreateAccountModal';
 import { RevalidateSessionModal } from './RevalidateSessionModal';
 import { SignInModal } from './SignInModal';
-import { AuthModalProps, AuthModalType } from './types';
+import { AuthModalProps, AuthModalType, AuthOptionTypes } from './types';
+
+const mobileApp = isMobileApp();
 
 const AuthModal = ({
   type = AuthModalType.SignIn,
@@ -18,6 +21,8 @@ const AuthModal = ({
   onClose,
   onSuccess,
   showWalletsFor,
+  showAuthOptionFor,
+  showAuthOptionTypesFor,
   isUserFromWebView,
 }: AuthModalProps) => {
   const [modalType, setModalType] = useState(type);
@@ -54,6 +59,12 @@ const AuthModal = ({
       onClose,
       onSuccess: handleSuccess,
       showWalletsFor,
+      showAuthOptionFor,
+      showAuthOptionTypesFor: (showAuthOptionTypesFor
+        ? showAuthOptionTypesFor
+        : mobileApp
+          ? ['sso']
+          : ['wallets', 'sso']) as AuthOptionTypes[],
       onSignInClick: handleOnSignInClick,
       triggerOpenEVMWalletsSubModal,
       isUserFromWebView,
@@ -72,6 +83,7 @@ const AuthModal = ({
             {...commonVariantProps}
             // TODO: session keys should support all wallet types, atm they only work with sso
             // this is broken in master branch, create a ticket for fix
+            // This is also intentionally meant to override the custom `showAuthOptionFor` value if provided
             {...(sessionKeyValidationError?.ssoSource &&
               sessionKeyValidationError?.ssoSource !==
                 WalletSsoSource.Unknown && {

@@ -1,150 +1,228 @@
-import { QuestActionMeta } from '@hicommonwealth/schemas';
-import { roundDecimalsOrReturnWhole } from 'helpers/number';
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import clsx from 'clsx';
+import {
+  getTotalRepititionCountsForQuestAction,
+  QuestAction,
+} from 'helpers/quest';
 import React from 'react';
+import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { z } from 'zod';
-import { QuestAction } from '../../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
-} from '../../CreateQuest/QuestForm/QuestActionSubForm/helpers';
+import { actionCopies } from './helpers';
 import './QuestActionCard.scss';
-
-// TODO: fix types with schemas.Events keys
-const actionCopies = {
-  title: {
-    ['CommunityCreated']: 'Create a community',
-    ['CommunityJoined']: 'Join a community',
-    ['ThreadCreated']: 'Create a thread',
-    ['ThreadUpvoted']: 'Upvote a thread',
-    ['CommentCreated']: 'Create a comment',
-    ['CommentUpvoted']: 'Upvote a comment',
-    ['WalletLinked']: 'Link a Web3 wallet with your account',
-    ['SSOLinked']: 'Link an SSO method with your account',
-  },
-  shares: {
-    ['CommunityCreated']: 'referrer',
-    ['CommunityJoined']: 'referrer',
-    ['ThreadCreated']: '',
-    ['ThreadUpvoted']: '',
-    ['CommentCreated']: '',
-    ['CommentUpvoted']: 'comment creator',
-    ['UserMentioned']: '',
-  },
-};
+import QuestActionXpShares from './QuestActionXPShares';
+import TotalQuestActionXPTag from './TotalQuestActionXPTag';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (actionType: QuestAction, actionContentId?: string) => void;
+  onActionStart: (action: QuestAction) => void;
   actionNumber: number;
-  questAction: z.infer<typeof QuestActionMeta>;
+  questAction: QuestAction;
   isActionInEligible?: boolean;
+  xpLogsForActions?: { id: number; createdAt: Date }[];
   inEligibilityReason?: string;
   canStartAction?: boolean;
   actionStartBlockedReason?: string;
+  questStartDate: Date;
+  questEndDate: Date;
 };
 
 const QuestActionCard = ({
   actionNumber,
   isActionInEligible,
   isActionCompleted,
+  xpLogsForActions,
   onActionStart,
   actionStartBlockedReason,
   canStartAction,
   inEligibilityReason,
   questAction,
+  questStartDate,
+  questEndDate,
 }: QuestActionCardProps) => {
-  const creatorXP = {
-    percentage: roundDecimalsOrReturnWhole(
-      questAction.creator_reward_weight * 100,
-      2,
-    ),
-    value: questAction.creator_reward_weight * questAction.reward_amount,
+  const user = useUserStore();
+
+  // Function to determine the button label based on quest action type
+  const getButtonLabel = () => {
+    const hasDiscordLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'discord',
+    );
+
+    const hasTwitterLinked = user.addresses?.some(
+      (address) => address.walletSsoSource === 'twitter',
+    );
+
+    if (questAction.event_name === 'DiscordServerJoined' && !hasDiscordLinked) {
+      return 'Connect Discord & Start';
+    }
+
+    if (questAction.event_name === 'TweetEngagement' && !hasTwitterLinked) {
+      return 'Connect Twitter & Start';
+    }
+
+    return 'Start';
   };
 
-  const user = useUserStore();
-  const isUserReferred = !!user.referredByAddress;
-  const hideShareSplit =
-    doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
+  const isRepeatableQuest =
+    questAction?.participation_limit === QuestParticipationLimit.OncePerPeriod;
+  const questRepeatitionCycle = questAction?.participation_period;
+  const questParticipationLimitPerCycle =
+    questAction?.participation_times_per_period || 0;
+  const totalActionRepititions = getTotalRepititionCountsForQuestAction(
+    questStartDate,
+    questEndDate,
+    questAction,
+  ).totalRepititions;
+  const attemptsLeft = totalActionRepititions - (xpLogsForActions || []).length;
 
   return (
     <div className="QuestActionCard">
-      <div className="counter">
-        <CWText type="b1" fontWeight="semiBold">
-          #{actionNumber}
-        </CWText>
-      </div>
-      <div className="content">
-        <div className="left">
-          <CWText type="b1" fontWeight="semiBold">
-            {actionCopies.title[questAction.event_name]}
+      {isRepeatableQuest && (
+        <div className="header">
+          <CWText type="monospace2">
+            - Repeats
+            {questParticipationLimitPerCycle === 1
+              ? ` `
+              : ` ${questParticipationLimitPerCycle} time${questParticipationLimitPerCycle > 1 ? 's ' : ''}`}
+            {questRepeatitionCycle} -
           </CWText>
-          {!hideShareSplit &&
-            doesActionRequireRewardShare(questAction.event_name) &&
-            creatorXP.percentage > 0 && (
-              <CWText type="caption" className="xp-shares">
-                <span className="creator-share">
-                  {creatorXP.percentage}% (
-                  {roundDecimalsOrReturnWhole(creatorXP.value, 2)} XP)
-                </span>
-                &nbsp; shared with {actionCopies.shares[questAction.event_name]}
-                . Your share ={' '}
-                {Math.abs(questAction.reward_amount - creatorXP.value)} XP
-              </CWText>
+        </div>
+      )}
+      <div
+        className={clsx(
+          'content-container',
+          isRepeatableQuest && 'isRepeatableQuest',
+        )}
+      >
+        <div className="counter">
+          <CWText type="b1" fontWeight="semiBold">
+            #{actionNumber}
+          </CWText>
+        </div>
+        <div className="content">
+          <div className="left">
+            <CWText type="b1" fontWeight="semiBold">
+              {actionCopies.title[questAction.event_name]}
+            </CWText>
+            {[
+              'TweetEngagement',
+              'DiscordServerJoined',
+              'CommunityCreated',
+              'LaunchpadTokenTraded',
+              'XpChainEventCreated',
+            ].includes(questAction.event_name) && (
+              <>
+                {questAction.event_name === 'CommunityCreated' &&
+                !questAction.content_id ? (
+                  <></>
+                ) : (
+                  <CWDivider />
+                )}
+                {actionCopies.pre_reqs[questAction.event_name]() && (
+                  <CWText type="caption" fontWeight="semiBold">
+                    {actionCopies.pre_reqs[questAction.event_name]()}
+                  </CWText>
+                )}
+                {questAction.event_name === 'TweetEngagement' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.QuestTweet?.like_cap || 0,
+                      questAction?.QuestTweet?.retweet_cap || 0,
+                      questAction?.QuestTweet?.replies_cap || 0,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'CommunityCreated' &&
+                  questAction.content_id && (
+                    <CWText type="caption">
+                      {actionCopies.explainer[questAction.event_name](
+                        fetchCachedNodes()?.find?.(
+                          (node) =>
+                            `${questAction.content_id?.split(`:`)?.at(-1)}` ===
+                            `${node.id}`,
+                        )?.name,
+                      )}
+                    </CWText>
+                  )}
+                {questAction.event_name === 'LaunchpadTokenTraded' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.amount_multiplier || 0,
+                      `${questAction?.content_id?.split(':').at(-1) || ''}`,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'XpChainEventCreated' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.ChainEventXpSource?.contract_address || '',
+                      questAction?.ChainEventXpSource?.ChainNode
+                        ?.eth_chain_id || '',
+                    )}
+                  </CWText>
+                )}
+              </>
             )}
-          <div className="points-row">
-            <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {questAction.instructions_link && (
-              <a
-                target="_blank"
-                href={questAction.instructions_link}
-                rel="noreferrer"
-                className="action-link"
-              >
-                Instructions{' '}
-                <CWIcon
-                  iconName="externalLink"
-                  iconSize="small"
-                  weight="bold"
-                />
-              </a>
+            <QuestActionXpShares questAction={questAction} />
+            <div className="points-row">
+              <TotalQuestActionXPTag questAction={questAction} />
+              {isRepeatableQuest &&
+                attemptsLeft !== 0 &&
+                attemptsLeft !== totalActionRepititions && (
+                  <CWTag
+                    type="group"
+                    label={`${attemptsLeft}x attempt${attemptsLeft > 1 ? 's' : ''} left`}
+                  />
+                )}
+              {questAction.instructions_link && (
+                <a
+                  target="_blank"
+                  href={questAction.instructions_link}
+                  rel="noreferrer"
+                  className="action-link"
+                >
+                  Instructions{' '}
+                  <CWIcon
+                    iconName="externalLink"
+                    iconSize="small"
+                    weight="bold"
+                  />
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="right">
+            {isActionInEligible ? (
+              withTooltip(
+                <CWTag label="Not eligible" type="address" />,
+                inEligibilityReason || '',
+                isActionInEligible,
+              )
+            ) : isActionCompleted ? (
+              <CWTag label="Completed" type="address" />
+            ) : (
+              withTooltip(
+                <CWButton
+                  buttonType="secondary"
+                  buttonAlt="green"
+                  label={getButtonLabel()}
+                  buttonHeight="sm"
+                  buttonWidth="narrow"
+                  iconRight="arrowRightPhosphor"
+                  onClick={() => onActionStart(questAction)}
+                  disabled={!canStartAction}
+                />,
+                actionStartBlockedReason || '',
+                !canStartAction,
+              )
             )}
           </div>
         </div>
-        {isActionInEligible ? (
-          withTooltip(
-            <CWTag label="Not eligible" type="address" />,
-            inEligibilityReason || '',
-            isActionInEligible,
-          )
-        ) : isActionCompleted ? (
-          <CWTag label="Completed" type="address" />
-        ) : (
-          withTooltip(
-            <CWButton
-              buttonType="secondary"
-              buttonAlt="green"
-              label="Start"
-              buttonHeight="sm"
-              buttonWidth="narrow"
-              iconRight="arrowRightPhosphor"
-              onClick={() =>
-                onActionStart(
-                  questAction.event_name,
-                  questAction?.content_id || undefined,
-                )
-              }
-              disabled={!canStartAction}
-            />,
-            actionStartBlockedReason || '',
-            !canStartAction,
-          )
-        )}
       </div>
     </div>
   );

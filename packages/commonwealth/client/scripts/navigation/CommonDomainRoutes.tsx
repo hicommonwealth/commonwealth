@@ -1,7 +1,9 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
+import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -48,7 +50,6 @@ const NotificationSettings = lazy(
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
@@ -57,7 +58,11 @@ const DiscussionsPage = lazy(
 const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
 );
+const TopicRedirectPage = lazy(() => import('views/pages/topic_redirect'));
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const GroupRedirectPage = lazy(
+  () => import('views/pages/Redirects/GroupRedirect'),
+);
 const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -88,6 +93,10 @@ const CommunityStakeIntegration = lazy(
 const CommunityTokenIntegration = lazy(
   () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
+const CommunityOnchainVerificationIntegration = lazy(
+  () =>
+    import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -109,9 +118,7 @@ const SnapshotProposalPage = lazy(
 const ViewMultipleSnapshotsPage = lazy(
   () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
-const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
-);
+
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
@@ -125,18 +132,29 @@ const CommunityNotFoundPage = lazy(
 );
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
+const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
 const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
+
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
+);
 
 const CommonDomainRoutes = () => [
   <Route
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
     element={<MobileAppRedirect />}
+  />,
+
+  <Route
+    key="sign-in"
+    path="/sign-in"
+    element={withLayout(SignIn, { type: 'common' })}
   />,
 
   <Route
@@ -173,6 +191,13 @@ const CommonDomainRoutes = () => [
     path="/home"
     element={withLayout(HomePage, { type: 'common' })}
   />,
+
+  <Route
+    key="/mobile-signin"
+    path="/mobile-signin"
+    element={withLayout(MobileSignIn, { type: 'common' })}
+  />,
+
   <Route
     key="/createCommunity"
     path="/createCommunity"
@@ -241,9 +266,9 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
-    key="/rewards"
-    path="/rewards"
-    element={withLayout(RewardsPage, { type: 'common' })}
+    key="/wallet"
+    path="/wallet"
+    element={withLayout(WalletPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -340,16 +365,26 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/proposal/:type/:identifier"
     path="/:scope/proposal/:type/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
+
   <Route
     key="/:scope/proposal/:identifier"
     path="/:scope/proposal/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      // redirect to proposal detail page
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/proposal/:type"
@@ -371,6 +406,20 @@ const CommonDomainRoutes = () => [
     element={
       <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
     }
+  />,
+  <Route
+    key="/:scope/proposal-details/:identifier"
+    path="/:scope/proposal-details/:identifier"
+    element={withLayout(newProposalViewPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/governance"
+    path="/:scope/governance"
+    element={withLayout(GovernancePage, {
+      scoped: true,
+    })}
   />,
   // GOVERNANCE END
 
@@ -405,9 +454,23 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
+    key="/discussion/topic/:id"
+    path="/discussion/topic/:id"
+    element={withLayout(TopicRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
+    key="/group/:id"
+    path="/group/:id"
+    element={withLayout(GroupRedirectPage, {
       scoped: false,
     })}
   />,
@@ -486,6 +549,14 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/onchain-verification"
+    path="/:scope/manage/integrations/onchain-verification"
+    element={withLayout(CommunityOnchainVerificationIntegration, {
       scoped: true,
     })}
   />,
@@ -577,9 +648,15 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/snapshot/:snapshotId/:identifier"
     path="/:scope/snapshot/:snapshotId/:identifier"
-    element={withLayout(ViewSnapshotsProposalPage, {
-      scoped: true,
-    })}
+    // redirect to proposal detail page
+    element={
+      <Navigate
+        to={(parameters) =>
+          // eslint-disable-next-line max-len
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?snapshotId=${parameters.snapshotId}&type=snapshot`
+        }
+      />
+    }
   />,
   <Route
     key="/:scope/new/snapshot/:snapshotId"
@@ -711,6 +788,7 @@ const CommonDomainRoutes = () => [
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
+  <Route key="/rewards" path="/rewards" element={<Navigate to="/wallet" />} />,
   // LEGACY REDIRECTS END
 
   // Community not found page - This should be at the end

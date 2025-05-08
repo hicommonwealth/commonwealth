@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
@@ -20,6 +20,7 @@ const MobileNavigation = () => {
   const rewardsEnabled = useFlag('rewardsPage');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigationRef = useRef<HTMLDivElement>(null);
 
   const matchesDashboard = matchRoutes([{ path: '/dashboard/*' }], location);
   const matchesExplore = matchRoutes([{ path: '/explore' }], location);
@@ -60,20 +61,40 @@ const MobileNavigation = () => {
     ...(user.isLoggedIn && rewardsEnabled
       ? [
           {
-            type: 'rewards' as const,
-            onClick: () => navigate('/rewards', {}, null),
-            selected: !!matchRoutes([{ path: '/rewards' }], location),
+            type: 'wallet' as const,
+            onClick: () => navigate('/wallet', {}, null),
+            selected: !!matchRoutes([{ path: '/wallet' }], location),
           },
         ]
       : []),
   ];
-  const isNewThreadPage = ['/new/discussion', '/profile'].some((path) =>
-    window.location?.pathname?.includes(path),
-  );
+
+  const isNewThreadPage =
+    ['/new/discussion', '/profile', ''].some((path) =>
+      window.location?.pathname?.includes(path),
+    ) || /^\/[^/]+\/discussion\/[^/]+$/.test(window.location?.pathname);
+  const isDiscussionsPage = window.location?.pathname?.includes('/discussion');
+  const shouldHideQuickPost = isNewThreadPage || isDiscussionsPage;
+
+  useEffect(() => {
+    const node = navigationRef.current;
+    if (!node) return;
+
+    const preventScroll = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+
+    node.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      node.removeEventListener('touchmove', preventScroll);
+    };
+  }, []);
+
   return (
     <>
-      {newMobileNav && !isNewThreadPage && <QuickPostButton />}
-      <div className="MobileNavigation">
+      {newMobileNav && !shouldHideQuickPost && <QuickPostButton />}
+      <div className="MobileNavigation" ref={navigationRef}>
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}
           {/*into the bottom nav.*/}

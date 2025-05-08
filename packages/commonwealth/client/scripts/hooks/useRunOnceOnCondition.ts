@@ -6,6 +6,9 @@ type UseRunOnceOnConditionProps = {
   shouldRun: boolean;
 };
 
+/**
+ * @deprecated Avoid using as this encourage incorrect hook usage/memoization.
+ */
 const useRunOnceOnCondition = ({
   callback,
   shouldRun,

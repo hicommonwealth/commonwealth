@@ -1,10 +1,10 @@
 import { command } from '@hicommonwealth/core';
 import { CreateSnapshotProposal as CreateSnapshotProposalSchema } from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { models, tester } from '../../src';
-import { CreateSnapshotProposal } from '../../src/snapshot';
+import { CreateSnapshotProposal } from '../../src/aggregates/snapshot';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {
@@ -20,6 +20,7 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     );
 
     await tester.seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 0,

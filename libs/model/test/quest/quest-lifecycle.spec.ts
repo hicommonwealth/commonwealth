@@ -1,12 +1,11 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import {
   QuestActionMeta,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
@@ -16,7 +15,9 @@ import {
   GetQuest,
   GetQuests,
   UpdateQuest,
-} from '../../src/quest';
+} from '../../src/aggregates/quest';
+import { models } from '../../src/database';
+import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
@@ -24,6 +25,7 @@ const chance = new Chance();
 describe('Quest lifecycle', () => {
   let superadmin: Actor;
   let community_id: string;
+  let thread_id: number;
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
@@ -31,6 +33,17 @@ describe('Quest lifecycle', () => {
     });
     superadmin = actors.superadmin;
     community_id = community!.id;
+
+    // to vote on comments
+    const [thread] = await seed('Thread', {
+      community_id,
+      address_id: community!.Addresses!.at(0)!.id!,
+      topic_id: community!.topics!.at(0)!.id,
+      pinned: false,
+      read_only: false,
+      reaction_weights_sum: '0',
+    });
+    thread_id = thread!.id!;
   });
 
   afterAll(async () => {
@@ -52,6 +65,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       expect(quest?.name).toBe('test quest');
@@ -67,6 +81,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       expect(quest?.name).toBe('test quest global');
@@ -86,6 +101,7 @@ describe('Quest lifecycle', () => {
             ),
             end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 5),
             max_xp_to_end: 100,
+            quest_type: 'common',
           },
         }),
       ).rejects.toThrowError(
@@ -106,6 +122,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
@@ -125,6 +142,7 @@ describe('Quest lifecycle', () => {
             participation_period: QuestParticipationPeriod.Monthly,
             participation_times_per_period: 3,
             creator_reward_weight: 0.1,
+            content_id: `thread:${thread_id}`,
           },
         ];
       const patch = {
@@ -162,6 +180,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       await expect(
@@ -190,6 +209,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // hack to update the start_date
@@ -208,7 +228,7 @@ describe('Quest lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(
-        `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
+        `Start date ${dayjs(now).format('YYYY-MM-DD')} already passed`,
       );
     });
 
@@ -223,29 +243,29 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
-      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
-        [
-          {
-            event_name: 'CommentUpvoted',
-            reward_amount: 200,
-            participation_limit: QuestParticipationLimit.OncePerPeriod,
-            participation_period: QuestParticipationPeriod.Monthly,
-            participation_times_per_period: 3,
-            creator_reward_weight: 0.1,
-            content_id: 'comment:1000',
-          },
-        ];
+
       await expect(
         command(UpdateQuest(), {
           actor: superadmin,
           payload: {
             quest_id: quest!.id!,
-            action_metas,
+            action_metas: [
+              {
+                event_name: 'CommentUpvoted',
+                reward_amount: 200,
+                participation_limit: QuestParticipationLimit.OncePerPeriod,
+                participation_period: QuestParticipationPeriod.Monthly,
+                participation_times_per_period: 3,
+                creator_reward_weight: 0.1,
+                content_id: 'thread:12345678',
+              },
+            ],
           },
         }),
-      ).rejects.toThrowError(`Comment with id "1000" must exist`);
+      ).rejects.toThrowError(`Thread with id "12345678" must exist`);
     });
   });
 
@@ -261,6 +281,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const retrieved = await query(GetQuest(), {
@@ -289,6 +310,7 @@ describe('Quest lifecycle', () => {
             participation_period: QuestParticipationPeriod.Monthly,
             participation_times_per_period: 3,
             creator_reward_weight: 0.1,
+            content_id: `thread:${thread_id}`,
           },
         ];
       const quests = await Promise.all(
@@ -303,6 +325,7 @@ describe('Quest lifecycle', () => {
               start_date,
               end_date,
               max_xp_to_end: 100,
+              quest_type: 'common',
             },
           }),
         ),
@@ -339,6 +362,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const deleted = await command(DeleteQuest(), {
@@ -365,6 +389,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       // hack to update the start_date
@@ -391,6 +416,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
@@ -451,6 +477,7 @@ describe('Quest lifecycle', () => {
           start_date,
           end_date,
           max_xp_to_end: 100,
+          quest_type: 'common',
         },
       });
       const cancelled = await command(CancelQuest(), {

@@ -1,10 +1,18 @@
 import { Actor, Policy, command } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
+import {
+  DISCORD_BOT_ADDRESS,
+  DISCORD_BOT_EMAIL,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { CreateComment, DeleteComment, UpdateComment } from '../comment';
+import {
+  CreateComment,
+  DeleteComment,
+  UpdateComment,
+} from '../aggregates/comment';
+import { CreateThread, DeleteThread, UpdateThread } from '../aggregates/thread';
 import { models } from '../database';
-import { CreateThread, DeleteThread, UpdateThread } from '../thread';
 
 const ThreadEventInputs = {
   DiscordThreadBodyUpdated: events.DiscordThreadBodyUpdated,
@@ -30,7 +38,7 @@ async function getActor() {
   if (actor) return actor;
 
   const userInstance = await models.User.findOne({
-    where: { email: DISCORD_BOT_EMAIL },
+    where: { email: DISCORD_BOT_EMAIL, tier: UserTierMap.SystemUser },
   });
   if (!userInstance) throw new Error('DiscordBot user not found!');
 

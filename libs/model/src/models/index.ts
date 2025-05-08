@@ -15,6 +15,13 @@ export const syncDb = async (db: DB, log = false) => {
   await db.sequelize.query(fks.map(dropFk).join('\n'));
   await db.sequelize.sync({ force: true, logging: log ? console.log : false });
   await db.sequelize.query(fks.map(createFk).join('\n'));
+
+  // Custom constraints not supported by Sequelize
+  await db.sequelize.query(`
+    ALTER TABLE "XpLogs"
+      ADD CONSTRAINT xp_logs_user_id_action_meta_id_event_created_at_name
+        UNIQUE NULLS NOT DISTINCT (user_id, action_meta_id, event_created_at, name);
+  `);
 };
 
 /**
@@ -47,6 +54,7 @@ export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
+export * from './community_directory_tags';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
@@ -71,6 +79,7 @@ export * from './starred_community';
 export * from './subscription_preference';
 export * from './tags';
 export * from './thread';
+export * from './thread_rank';
 export * from './thread_version_history';
 export * from './topic';
 export * from './twitter_cursor';

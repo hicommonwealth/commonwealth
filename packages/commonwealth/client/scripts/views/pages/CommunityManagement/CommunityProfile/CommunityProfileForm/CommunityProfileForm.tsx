@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { useUpdateCommunityTags } from 'client/scripts/state/api/communities/editCommunityTags';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -9,7 +10,6 @@ import { slugifyPreserveDashes } from 'shared/utils';
 import app from 'state';
 import {
   useEditCommunityBannerMutation,
-  useEditCommunityTagsMutation,
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
@@ -33,6 +33,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import ErrorPage from '../../../error';
+import CommunityTrustLevel from '../CommunityTrustLevel/CommunityTrustLevel';
 import './CommunityProfileForm.scss';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
@@ -66,7 +67,7 @@ const CommunityProfileForm = () => {
     });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
-  const { mutateAsync: editTags } = useEditCommunityTagsMutation();
+  const { mutateAsync: updateTags } = useUpdateCommunityTags();
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
   });
@@ -140,9 +141,9 @@ const CommunityProfileForm = () => {
     try {
       setIsSubmitting(true);
 
-      await editTags({
-        communityId: community.id,
-        tagIds: preferenceTags
+      await updateTags({
+        community_id: community.id,
+        tag_ids: preferenceTags
           .filter((pt) => pt.isSelected)
           .map((pt) => pt.item.id),
       });
@@ -299,6 +300,18 @@ const CommunityProfileForm = () => {
               }
               label="Community Profile Image (Accepts JPG and PNG files)"
             />
+          </section>
+
+          <section className="trust-level-section">
+            <div className="header">
+              <CWText type="h4">Verification Status</CWText>
+              <CWText type="b1">
+                Build trust through verification. Each completed level below
+                enhances your community’s credibility and provides members with
+                greater confidence.
+              </CWText>
+            </div>
+            <CommunityTrustLevel />
           </section>
 
           <section className="links-section">

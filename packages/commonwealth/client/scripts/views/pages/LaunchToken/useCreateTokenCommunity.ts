@@ -1,4 +1,3 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import AddressInfo from 'models/AddressInfo';
 import NodeInfo from 'models/NodeInfo';
 import { useState } from 'react';
@@ -8,7 +7,7 @@ const useCreateTokenCommunity = () => {
   // get base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
+    (n) => n.ethChainId === parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
   ) as NodeInfo; // this is expected to exist
 
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();

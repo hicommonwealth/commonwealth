@@ -27,10 +27,11 @@ export default (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      readable_signature: { type: Sequelize.STRING, allowNull: false },
+      transaction_hash: { type: Sequelize.STRING, allowNull: false },
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        references: { model: 'QuestionActionMetas', key: 'id' },
       },
       active: { type: Sequelize.BOOLEAN, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },

@@ -1,10 +1,10 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { GetStakeHistoricalPrice } from '../../src/community/GetStakeHistoricalPrice.query';
+import { GetStakeHistoricalPrice } from '../../src/aggregates/community/GetStakeHistoricalPrice.query';
 
 chai.use(chaiAsPromised);
 
@@ -24,6 +24,7 @@ describe('Stake Historical Price', () => {
       isAdmin: true,
     });
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,

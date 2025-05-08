@@ -1,6 +1,24 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
+
+export const ChannelQuestEvents = {
+  DiscordServerJoined: events.DiscordServerJoined,
+  XpChainEventCreated: events.XpChainEventCreated,
+  TwitterCommonMentioned: events.TwitterCommonMentioned,
+} as const;
+// Channel quest action types that are not event related
+export const ChannelBatchActions = ['TweetEngagement'] as const;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const AllChannelQuestActionNames = [
+  ...(Object.keys(ChannelQuestEvents) as [
+    keyof typeof ChannelQuestEvents,
+    ...Array<keyof typeof ChannelQuestEvents>,
+  ]),
+  ...ChannelBatchActions,
+] as const;
 
 export const QuestEvents = {
   SignUpFlowCompleted: events.SignUpFlowCompleted,
@@ -13,14 +31,24 @@ export const QuestEvents = {
   UserMentioned: events.UserMentioned,
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  ContestEnded: events.ContestEnded,
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
-  XpChainEventCreated: events.XpChainEventCreated,
-  TwitterCommonMentioned: events.TwitterCommonMentioned,
+  NamespaceLinked: events.NamespaceLinked,
+  CommunityGoalReached: events.CommunityGoalReached,
+  MembershipsRefreshed: events.MembershipsRefreshed,
+  ...ChannelQuestEvents,
 } as const;
+
+export const QuestActionNames = [
+  ...(Object.keys(QuestEvents) as [
+    keyof typeof QuestEvents,
+    ...Array<keyof typeof QuestEvents>,
+  ]),
+  ...ChannelBatchActions,
+];
 
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
@@ -33,31 +61,57 @@ export enum QuestParticipationPeriod {
   Monthly = 'monthly',
 }
 
-export const QuestActionMeta = z
+export const QuestTweet = z
   .object({
-    id: PG_INT.nullish(),
-    quest_id: PG_INT,
-    //event names instead of enums for flexibility when adding new events
-    event_name: z.enum(
-      Object.keys(QuestEvents) as [
-        keyof typeof QuestEvents,
-        ...Array<keyof typeof QuestEvents>,
-      ],
-    ),
-    reward_amount: z.number(),
-    creator_reward_weight: z.number().min(0).max(1).default(0),
-    amount_multiplier: z.number().min(0).optional(),
-    participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
-    participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
-    instructions_link: z.string().url().optional().nullish(),
-    participation_times_per_period: z.number().optional(),
-    content_id: z
-      .string()
-      .regex(/(thread:\d+)|(comment:\d+)/)
-      .optional()
-      .nullish(),
+    tweet_id: z.string(),
+    tweet_url: z.string(),
+    quest_action_meta_id: z.number().optional(),
+    retweet_cap: z.number().optional(),
+    like_cap: z.number().optional(),
+    replies_cap: z.number().optional(),
+    num_likes: z.number().default(0).optional(),
+    num_retweets: z.number().default(0).optional(),
+    num_replies: z.number().default(0).optional(),
+    like_xp_awarded: z.boolean().default(false).optional(),
+    reply_xp_awarded: z.boolean().default(false).optional(),
+    retweet_xp_awarded: z.boolean().default(false).optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
+  })
+  .describe('A tweet associated to a quest from which XP can be earned');
+
+export const QuestActionMeta = z
+  .object({
+    id: z.number().nullish(),
+    quest_id: z.number(),
+    //event names instead of enums for flexibility when adding new events
+    event_name: z.enum([
+      ...(Object.keys(QuestEvents) as [
+        keyof typeof QuestEvents,
+        ...Array<keyof typeof QuestEvents>,
+      ]),
+      ...ChannelBatchActions,
+    ]),
+    reward_amount: z.number(),
+    creator_reward_weight: z.number().min(0).max(1).default(0),
+    amount_multiplier: z.number().min(0).nullish(),
+    participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
+    participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
+    instructions_link: z.string().url().optional().nullish(),
+    participation_times_per_period: z.number().nullish(),
+    content_id: z
+      .string()
+      .regex(
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
+      )
+      .nullish(),
+    start_link: z.string().url().nullish(),
+    created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
+
+    // associations
+    QuestTweet: QuestTweet.nullish(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
@@ -71,7 +125,7 @@ export const QuestScore = z
 
 export const Quest = z
   .object({
-    id: PG_INT.nullish(),
+    id: z.number().nullish(),
     name: z.string().max(255),
     description: z.string().max(1000),
     image_url: z.string(),
@@ -85,6 +139,8 @@ export const Quest = z
       .string()
       .nullish()
       .describe('Links the quest to a single community'),
+    quest_type: z.enum(['channel', 'common']),
+    scheduled_job_id: z.string().nullish(),
 
     // associations
     action_metas: z.array(QuestActionMeta).optional(),
@@ -92,21 +148,3 @@ export const Quest = z
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
   );
-
-export const QuestTweet = z
-  .object({
-    tweet_id: z.string(),
-    quest_action_meta_id: z.number().optional(),
-    retweet_cap: z.number().optional(),
-    like_cap: z.number().optional(),
-    replies_cap: z.number().optional(),
-    num_likes: z.number().optional().default(0),
-    num_retweets: z.number().optional().default(0),
-    num_replies: z.number().optional().default(0),
-    ended_at: z.coerce.date().nullish(),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
-
-    QuestActionMeta: QuestActionMeta.optional(),
-  })
-  .describe('A tweet associated to a quest from which XP can be earned');

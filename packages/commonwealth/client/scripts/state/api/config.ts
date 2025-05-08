@@ -21,18 +21,14 @@ export const ApiEndpoints = {
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
-  REFRESH_MEMBERSHIP: '/refresh-membership',
-  FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
-  fetchThreadPolls: (threadId: number) => `/threads/${threadId}/polls`,
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
-  GENERATE_COMMENT: '/generateCommentText',
   UPLOAD_FILE: '/getUploadSignature',
 };
 

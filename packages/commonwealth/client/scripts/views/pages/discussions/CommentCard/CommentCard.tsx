@@ -6,22 +6,25 @@ import {
   CanvasSignedData,
   DEFAULT_NAME,
   deserializeCanvas,
+  UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
+import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
+import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
-import { SharePopover } from 'views/components/SharePopover';
+import ShareButton from 'views/components/ShareButton';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
@@ -76,13 +79,17 @@ type CommentCardProps = {
   className?: string;
   shareURL: string;
   weightType?: TopicWeightedVoting | null;
-  onAIReply?: () => Promise<void>;
+  onAIReply?: (commentText?: string) => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
   // voting
   tokenNumDecimals?: number;
+  // Add props for root-level comment generation
+  isRootComment?: boolean;
+  threadContext?: string;
+  threadTitle?: string;
 };
 
 export const CommentCard = ({
@@ -124,11 +131,21 @@ export const CommentCard = ({
   parentCommentText,
   onStreamingComplete,
   tokenNumDecimals,
+  isRootComment,
+  threadContext,
+  threadTitle,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const { generateComment } = useGenerateCommentText();
+  const { generateCompletion } = useAiCompletion();
+
+  // Fetch community details
+  const { data: community } = useGetCommunityByIdQuery({
+    id: comment?.community_id || '',
+    enabled: !!comment?.community_id,
+  });
+
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
@@ -210,11 +227,6 @@ export const CommentCard = ({
     createCommentRef.current = createComment;
   }, [createComment]);
 
-  const generateCommentRef = useRef(generateComment);
-  useEffect(() => {
-    generateCommentRef.current = generateComment;
-  }, [generateComment]);
-
   const onStreamingCompleteRef = useRef(onStreamingComplete);
   useEffect(() => {
     onStreamingCompleteRef.current = onStreamingComplete;
@@ -223,7 +235,7 @@ export const CommentCard = ({
   const activeUserAddress = user.activeAccount?.address;
 
   useEffect(() => {
-    if (!isStreamingAIReply || !parentCommentText) return;
+    if (!isStreamingAIReply) return;
 
     let mounted = true;
     let finalText = '';
@@ -231,26 +243,54 @@ export const CommentCard = ({
 
     const generateAIReply = async () => {
       try {
-        const actualParentId = Number(comment.id);
-        if (actualParentId <= 0) {
-          console.error('Invalid parent ID:', actualParentId);
-          throw new Error('Invalid parent comment ID');
-        }
+        // Build context by combining thread context with parent comment if available
 
-        await generateCommentRef.current(parentCommentText, (text) => {
-          if (mounted) {
-            // Append incoming chunks so the full comment is built up
-            accumulatedText += text;
-            setStreamingText(accumulatedText);
-            finalText = accumulatedText;
-          }
+        // Construct extended context with community details
+        const communityName = community?.name || 'this community';
+        const communityDescription =
+          community?.description || 'No specific description provided.';
+        const extendedCommunityContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
+
+        const originalThreadPart = [
+          threadTitle ? `Thread Title: ${threadTitle}` : '',
+          threadContext ? `Thread Body: ${threadContext}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n');
+        const originalParentPart = parentCommentText
+          ? `Parent Comment: ${parentCommentText}`
+          : '';
+
+        const originalContext = [originalThreadPart, originalParentPart]
+          .filter(Boolean)
+          .join('\n\n'); // Separator between thread context and parent comment context
+
+        const contextText =
+          `${extendedCommunityContext}\n\n` +
+          `Original Context (Thread and Parent Comment):\n` +
+          `${originalContext.trim()}`;
+
+        const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
+
+        setStreamingText(''); // Clear previous streaming text
+
+        await generateCompletion(userPrompt, {
+          systemPrompt: systemPrompt,
+          model: 'gpt-4o-mini',
+          stream: true,
+          onChunk: (chunk) => {
+            if (mounted) {
+              accumulatedText += chunk;
+              setStreamingText(accumulatedText);
+              finalText = accumulatedText;
+            }
+          },
         });
 
         if (mounted && finalText) {
           if (!activeUserAddress) {
-            console.error(
-              'No active account found: activeUserAddress is undefined',
-            );
             throw new Error('No active account found');
           }
 
@@ -258,9 +298,9 @@ export const CommentCard = ({
             communityId: comment.community_id,
             address: activeUserAddress,
             threadId: comment.thread_id,
+            parentCommentId: isRootComment ? null : comment.id,
             threadMsgId: null,
             unescapedText: finalText,
-            parentCommentId: actualParentId,
             parentCommentMsgId: null,
             existingNumberOfComments: 0,
           });
@@ -269,7 +309,6 @@ export const CommentCard = ({
           onStreamingCompleteRef.current?.();
         }
       } catch (error) {
-        console.error('Failed to generate AI reply:', error);
         if (mounted) {
           onStreamingCompleteRef.current?.();
         }
@@ -282,11 +321,16 @@ export const CommentCard = ({
     };
   }, [
     isStreamingAIReply,
+    isRootComment,
+    threadContext,
+    threadTitle,
     parentCommentText,
     comment.id,
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
+    generateCompletion,
+    community,
   ]);
 
   useEffect(() => {
@@ -351,6 +395,7 @@ export const CommentCard = ({
                 name: comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
+                tier: comment.user_tier || UserTierMap.IncompleteUser,
               }}
               versionHistory={(comment.CommentVersionHistories || []).map(
                 (cvh) => ({
@@ -362,6 +407,7 @@ export const CommentCard = ({
                   content_url: cvh.content_url || '',
                 }),
               )}
+              shouldShowRole
               onChangeVersionHistoryNumber={handleVersionHistoryChange}
             />
           )}
@@ -448,7 +494,13 @@ export const CommentCard = ({
                   </>
                 )}
 
-                <SharePopover linkToShare={shareURL} buttonLabel="Share" />
+                <ShareButton
+                  url={shareURL}
+                  title={undefined}
+                  text="See my comment and join me on Common"
+                  shareType="comment"
+                  buttonLabel="Share"
+                />
 
                 {!isThreadArchived && replyBtnVisible && (
                   <>
@@ -487,7 +539,7 @@ export const CommentCard = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            void onAIReply?.();
+                            void onAIReply?.(comment.body);
                           }}
                         />
                       )}

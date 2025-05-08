@@ -30,6 +30,7 @@ const deploySingleERC20ContestOnchain = async ({
     '',
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
+    ethChainId,
   );
 
   return await contest.newSingleERC20Contest(

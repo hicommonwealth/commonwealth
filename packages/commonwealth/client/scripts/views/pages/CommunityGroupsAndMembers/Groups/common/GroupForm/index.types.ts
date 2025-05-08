@@ -9,6 +9,7 @@ export enum GroupTopicPermissionEnum {
   UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
   UPVOTE_AND_POST = 'UPVOTE_AND_POST',
   UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
+  NONE = 'NONE',
 }
 
 export type RequirementSubFormsState = {
@@ -24,6 +25,7 @@ export type RequirementSubType = {
   requirementCondition?: string;
   requirementAmount?: string;
   requirementTokenId?: string;
+  requirementCoinType?: string;
 };
 
 export type TopicPermissions =
@@ -69,6 +71,7 @@ export type LabelType = {
 };
 
 export type RequirementSubTypeWithLabel = {
+  requirementCoinType?: string;
   requirementType?: LabelType;
   requirementContractAddress?: string;
   requirementChain?: LabelType;

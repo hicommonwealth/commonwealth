@@ -1,44 +1,55 @@
-import { useFlag } from 'hooks/useFlag';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user';
-import { CommentEditor } from 'views/components/Comments/CommentEditor';
-import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import CommentEditor, {
+  CommentEditorProps,
+} from 'views/components/Comments/CommentEditor/CommentEditor';
+import {
+  NewThreadForm,
+  NewThreadFormHandles,
+} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import './DesktopStickyInput.scss';
+import { useStickComment } from './context/StickCommentProvider';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
-  const [focused, setFocused] = useState(false);
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const {
-    aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
-    aiInteractionsToggleEnabled,
-  } = useLocalAISettingsStore();
+  const { mode, isExpanded, setIsExpanded } = useStickComment();
+  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
+  const newThreadFormRef = useRef<NewThreadFormHandles>(null);
 
   const handleFocused = useCallback(() => {
-    setFocused(true);
-  }, []);
+    setIsExpanded(true);
+  }, [setIsExpanded]);
 
   const handleCancel = useCallback(
-    (event: React.MouseEvent) => {
-      setFocused(false);
-      onCancel(event);
+    (event: React.MouseEvent | undefined) => {
+      setIsExpanded(false);
+      setOpenModalOnExpand(false);
+      onCancel?.(event);
     },
-    [onCancel],
+    [onCancel, setIsExpanded],
   );
 
-  const handleAiToggle = useCallback(() => {
-    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-  }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
+  useEffect(() => {
+    if (isExpanded && openModalOnExpand) {
+      if (mode === 'thread') {
+        setTimeout(() => {
+          newThreadFormRef.current?.openImageModal();
+        }, 0);
+        setOpenModalOnExpand(false);
+      } else if (mode === 'comment') {
+        setOpenModalOnExpand(false);
+      }
+    }
+  }, [isExpanded, openModalOnExpand, mode]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
-      console.log('DesktopStickyInput - Starting AI reply for:', commentId);
       if (streamingReplyIds.includes(commentId)) {
-        console.log('Already streaming for this comment');
         return;
       }
       setStreamingReplyIds((prev) => [...prev, commentId]);
@@ -46,102 +57,128 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     [streamingReplyIds],
   );
 
-  const handleEnhancedSubmit = useCallback(async () => {
-    console.log(
-      'DesktopStickyInput - Submitting comment with AI mode:',
+  const handleEnhancedSubmit = useCallback(
+    async (turnstileToken?: string | null): Promise<number> => {
+      setIsExpanded(false);
+      setOpenModalOnExpand(false);
+
+      const commentId = await handleSubmitComment(turnstileToken);
+
+      if (typeof commentId !== 'number' || isNaN(commentId)) {
+        console.error('DesktopStickyInput - Invalid comment ID:', commentId);
+        throw new Error('Invalid comment ID');
+      }
+
+      if (aiCommentsToggleEnabled) {
+        handleAiReply(commentId);
+      }
+
+      const attemptJump = () => {
+        const commentElement = document.querySelector(`.comment-${commentId}`);
+        if (commentElement) {
+          jumpHighlightComment(commentId);
+          return true;
+        }
+        return false;
+      };
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      attemptJump();
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      attemptJump();
+
+      setTimeout(() => {
+        if (!attemptJump()) {
+          console.error(
+            `DesktopStickyInput - Comment element for ID ${commentId} not found in DOM after all attempts`,
+          );
+        }
+      }, 2000);
+
+      return commentId;
+    },
+    [
+      handleSubmitComment,
       aiCommentsToggleEnabled,
-    );
+      handleAiReply,
+      setIsExpanded,
+    ],
+  );
 
-    // Post the comment and get its ID
-    const commentId = await handleSubmitComment();
+  const useExpandedEditor = isExpanded || isReplying;
 
-    if (typeof commentId !== 'number' || isNaN(commentId)) {
-      console.error('DesktopStickyInput - Invalid comment ID:', commentId);
-      throw new Error('Invalid comment ID');
-    }
-
-    // If AI mode is enabled, trigger the streaming reply
-    if (aiCommentsToggleEnabled) {
-      handleAiReply(commentId);
-    }
-
-    const attemptJump = () => {
-      const commentElement = document.querySelector(`.comment-${commentId}`);
-      if (commentElement) {
-        console.log(
-          `DesktopStickyInput - Found comment element for ID ${commentId}, scrolling...`,
-        );
-        jumpHighlightComment(commentId);
-        return true;
-      }
-      return false;
-    };
-
-    // Attempt jump after delays to allow the DOM to update
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    attemptJump();
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    attemptJump();
-
-    setTimeout(() => {
-      if (!attemptJump()) {
-        console.error(
-          `DesktopStickyInput - Comment element for ID ${commentId} not found in DOM after all attempts`,
-        );
-      }
-    }, 2000);
-
-    return commentId;
-  }, [handleSubmitComment, aiCommentsToggleEnabled, handleAiReply]);
-
-  const useExpandedEditor = focused || isReplying;
-
-  // Create a new props object with our local state
-  const editorProps = {
+  const editorProps: CommentEditorProps = {
     ...props,
     shouldFocus: true,
     onCancel: handleCancel,
     aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
     handleSubmitComment: handleEnhancedSubmit,
     onAiReply: handleAiReply,
     streamingReplyIds,
+    onCommentCreated: (commentId: number, hasAI: boolean) => {
+      if (hasAI) {
+        handleAiReply(commentId);
+      }
+    },
   };
+
+  const newThreadFormProps = {
+    ref: newThreadFormRef,
+    onCancel: handleCancel,
+  };
+
+  const shouldOpenImageModalInEditor = mode === 'comment' && openModalOnExpand;
 
   return (
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
         <div className="DesktopStickyInputCollapsed">
-          <div className="container">
+          <div className="container" onClick={handleFocused}>
             <input
               type="text"
               className="form-control"
               placeholder={
-                replyingToAuthor
-                  ? `Reply to ${replyingToAuthor}...`
-                  : 'Write a comment...'
+                mode === 'thread'
+                  ? 'Create a thread...'
+                  : replyingToAuthor
+                    ? `Reply to ${replyingToAuthor}...`
+                    : 'Write a comment...'
               }
-              onClick={handleFocused}
+              readOnly
             />
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-              <div className="ai-comments-toggle-container">
-                <CWToggle
-                  className="ai-toggle"
-                  checked={aiCommentsToggleEnabled}
-                  onChange={handleAiToggle}
-                  icon="sparkle"
-                  size="xs"
-                  iconColor="#757575"
+            <CWTooltip
+              content="Add or Generate Image"
+              placement="top"
+              renderTrigger={(handleInteraction, isOpen) => (
+                <CWIconButton
+                  iconName="image"
+                  buttonSize="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenModalOnExpand(true);
+                    handleFocused();
+                  }}
+                  aria-label="Add or Generate Image"
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                  data-tooltip-open={isOpen}
+                  className="collapsed-image-button"
                 />
-                <span className="label">AI</span>
-              </div>
-            )}
+              )}
+            />
           </div>
         </div>
       ) : (
         <div className="DesktopStickyInputExpanded">
-          <CommentEditor {...editorProps} />
+          {mode === 'thread' ? (
+            <NewThreadForm {...newThreadFormProps} />
+          ) : (
+            <CommentEditor
+              {...editorProps}
+              triggerImageModalOpen={shouldOpenImageModalInEditor}
+            />
+          )}
         </div>
       )}
     </div>

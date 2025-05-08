@@ -1,47 +1,49 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { splitCamelOrPascalCase } from 'helpers/string';
 import React from 'react';
+import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { actionCopies } from '../../../QuestDetails/QuestActionCard/helpers';
 import './QuestActionSubForm.scss';
-import { doesActionRewardShareForReferrer } from './helpers';
+import ActionContentIdScopeSelector from './SpecialCaseDynamicFields/ActionContentIdScopeSelector';
+import AmountMultipler from './SpecialCaseDynamicFields/AmountMultipler';
+import BasicPointsInput from './SpecialCaseDynamicFields/BasicPointsInput';
+import ChainEventFields from './SpecialCaseDynamicFields/ChainEventFields';
+import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
+import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
+import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
+import TwitterFields from './SpecialCaseDynamicFields/TwitterFields';
 import { QuestAction, QuestActionSubFormProps } from './types';
+import useQuestActionSubForm from './useQuestActionSubForm';
 
-const QuestActionSubForm = ({
-  isRemoveable = true,
-  onRemove,
-  errors,
-  defaultValues,
-  config,
-  onChange,
-  hiddenActions,
-}: QuestActionSubFormProps) => {
-  const actionOptions = [
-    'CommunityCreated',
-    'CommunityJoined',
-    'ThreadCreated',
-    'ThreadUpvoted',
-    'CommentCreated',
-    'CommentUpvoted',
-    'WalletLinked',
-    'SSOLinked',
-  ]
-    .map((event) => ({
-      value: event as QuestAction,
-      label: splitCamelOrPascalCase(event),
-    }))
-    .filter(
-      (action) =>
-        !(hiddenActions || []).includes(action.value) &&
-        action.value !== 'UserMentioned',
-    );
+const QuestActionSubForm = (props: QuestActionSubFormProps) => {
+  const {
+    config,
+    defaultValues,
+    errors,
+    isRemoveable = true,
+    onChange,
+    onRemove,
+  } = props;
 
-  const placeholders = {
-    sampleThreadLink: `https://${PRODUCTION_DOMAIN}/discussion/25730`,
-    sampleCommentLink: `https://${PRODUCTION_DOMAIN}/discussion/25730?comment=89775`,
-  };
+  const {
+    doesActionPreventRepetition,
+    repetitionCycleRadio,
+    actionOptions,
+    hasContentIdField,
+  } = useQuestActionSubForm(props);
+
+  const instructionsLinkSpan = (() => {
+    if (config?.requires_amount_multipler && !config?.requires_creator_points)
+      return `span-6`;
+    return hasContentIdField ? 'span-3' : 'span-6';
+  })();
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
@@ -49,18 +51,65 @@ const QuestActionSubForm = ({
         <CWIconButton
           iconName="close"
           onClick={onRemove}
-          className="ml-auto cursor-pointer remove-btn"
+          className="ml-auto cursor-pointer remove-btn span-6"
         />
       )}
+
+      <div className="repeatition-selector span-6">
+        <CWText type="caption" fontWeight="semiBold">
+          Action Schedule
+        </CWText>
+        {withTooltip(
+          <CWRepetitionCycleRadioButton
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
+            className="radio-btn mt-8"
+            value={QuestParticipationLimit.OncePerPeriod}
+            groupName={`participationLimit-${defaultValues?.action}`}
+            {...(defaultValues?.participationLimit ===
+              QuestParticipationLimit.OncePerPeriod && {
+              checked: true,
+            })}
+            onChange={(e) =>
+              e.target.checked &&
+              onChange?.({
+                participationLimit: QuestParticipationLimit.OncePerPeriod,
+              })
+            }
+            disabled={doesActionPreventRepetition}
+          />,
+          `Selected action does not allow repetition`,
+          doesActionPreventRepetition,
+          'w-fit',
+        )}
+        <CWRadioButton
+          className="radio-btn"
+          value={QuestParticipationLimit.OncePerQuest}
+          label="One time only"
+          groupName={`participationLimit-${defaultValues?.action}`}
+          {...(defaultValues?.participationLimit ===
+            QuestParticipationLimit.OncePerQuest && {
+            checked: true,
+          })}
+          onChange={(e) =>
+            e.target.checked &&
+            onChange?.({
+              participationLimit: QuestParticipationLimit.OncePerQuest,
+            })
+          }
+        />
+      </div>
 
       <CWSelectList
         isClearable={false}
         label="Action"
         placeholder="Select an action"
         name="action"
+        containerClassname="span-6"
         options={actionOptions}
         onChange={(newValue) =>
-          newValue && onChange?.({ action: newValue.value })
+          newValue &&
+          onChange?.({ action: newValue.value, contentIdentifier: '' })
         }
         {...(defaultValues?.action && {
           value: {
@@ -69,102 +118,87 @@ const QuestActionSubForm = ({
           },
         })}
         customError={errors?.action}
+        instructionalMessage={
+          ((defaultValues?.action === 'TweetEngagement' ||
+            defaultValues?.action === 'DiscordServerJoined') &&
+            actionCopies.pre_reqs[defaultValues?.action as QuestAction](
+              'admin',
+            )) ||
+          ''
+        }
       />
 
-      <div
-        className={clsx(
-          'grid-row',
-          config?.requires_creator_points ? 'cols-2' : 'cols-1',
-        )}
-      >
-        <CWTextInput
-          label="Total Reward Points"
-          placeholder="Points Earned"
-          fullWidth
-          {...(defaultValues?.rewardAmount && {
-            defaultValue: defaultValues?.rewardAmount,
-          })}
-          onInput={(e) =>
-            onChange?.({ rewardAmount: e?.target?.value?.trim() })
-          }
-          name="rewardAmount"
-          customError={errors?.rewardAmount}
-        />
-
-        {config?.requires_creator_points && (
-          <CWTextInput
-            label={`${
-              doesActionRewardShareForReferrer(
-                defaultValues?.action as QuestAction,
-              )
-                ? 'Referrer'
-                : 'Creater'
-            } Reward Share`}
-            placeholder="Points Earned"
-            fullWidth
-            {...(defaultValues?.creatorRewardAmount && {
-              defaultValue: defaultValues?.creatorRewardAmount,
-            })}
-            onInput={(e) =>
-              onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
-            }
-            name="creatorRewardAmount"
-            customError={errors?.creatorRewardAmount}
-            // eslint-disable-next-line max-len
-            instructionalMessage={`Deducted from total reward points. ${
-              doesActionRewardShareForReferrer(
-                defaultValues?.action as QuestAction,
-              )
-                ? 'Only applied for referred user.'
-                : ''
-            }`}
+      {
+        <>
+          {/* Dynamic fields below:
+            1. Each field/group is rendered independently if current config allows
+            2. Rendering logic is validated by their internal state
+          */}
+          <BasicPointsInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
           />
-        )}
-      </div>
-
-      <div
-        className={clsx(
-          'grid-row',
-          config?.with_optional_comment_id || config?.with_optional_thread_id
-            ? 'cols-2'
-            : 'cols-1',
-        )}
-      >
-        {(config?.with_optional_comment_id ||
-          config?.with_optional_thread_id) && (
-          <CWTextInput
-            label={`${config?.with_optional_thread_id ? 'Thread' : 'Comment'} link`}
-            name="contentLink"
-            placeholder={
-              config?.with_optional_thread_id
-                ? placeholders.sampleThreadLink
-                : placeholders.sampleCommentLink
-            }
-            fullWidth
-            {...(defaultValues?.contentLink && {
-              defaultValue: defaultValues?.contentLink,
-            })}
-            onInput={(e) =>
-              onChange?.({ contentLink: e?.target?.value?.trim() })
-            }
-            customError={errors?.contentLink}
+          <CreatorPointsInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
           />
-        )}
+          <AmountMultipler
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <TwitterFields
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ChainEventFields
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <StartLinkInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ActionContentIdScopeSelector
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <ContentIdInput
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+        </>
+      }
 
-        <CWTextInput
-          label="Instructions Link (optional)"
-          name="instructionsLink"
-          placeholder="https://example.com"
-          fullWidth
-          {...(defaultValues?.instructionsLink && {
-            defaultValue: defaultValues?.instructionsLink,
-          })}
-          onInput={(e) =>
-            onChange?.({ instructionsLink: e?.target?.value?.trim() })
-          }
-          customError={errors?.instructionsLink}
-        />
-      </div>
+      <CWTextInput
+        label="Instructions Link (optional)"
+        name="instructionsLink"
+        placeholder="https://example.com"
+        containerClassName={instructionsLinkSpan}
+        fullWidth
+        {...(defaultValues?.instructionsLink && {
+          defaultValue: defaultValues?.instructionsLink,
+        })}
+        onInput={(e) =>
+          onChange?.({ instructionsLink: e?.target?.value?.trim() })
+        }
+        customError={errors?.instructionsLink}
+      />
     </div>
   );
 };

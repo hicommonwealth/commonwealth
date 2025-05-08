@@ -1,21 +1,12 @@
 import { command, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import {
-  buildFarcasterContestFrameUrl,
-  getBaseUrl,
-} from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { config, models } from '..';
-import { CreateBotContest } from '../bot/CreateBotContest.command';
-import { UpdateContestManagerFrameHashes } from '../contest/UpdateContestManagerFrameHashes.command';
+import { models } from '..';
+import { CreateBotContest } from '../aggregates/bot/CreateBotContest.command';
+import { UpdateContestManagerFrameHashes } from '../aggregates/contest/UpdateContestManagerFrameHashes.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
-import {
-  buildFarcasterContentUrl,
-  getChainNodeUrl,
-  publishCast,
-} from '../utils';
+import { buildFarcasterContentUrl, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -104,6 +95,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         const contestManagers = [
           {
             url: getChainNodeUrl(community.ChainNode!),
+            eth_chain_id: community.ChainNode!.eth_chain_id!,
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -201,6 +193,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         const contestManagers = contestActions.map((ca) => ({
           url: getChainNodeUrl(community.ChainNode!),
+          eth_chain_id: community.ChainNode!.eth_chain_id!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));
@@ -212,30 +205,13 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
       },
       FarcasterContestBotMentioned: async ({ payload }) => {
-        const contestAddress = await command(CreateBotContest(), {
+        await command(CreateBotContest(), {
           actor: systemActor({}),
           payload: {
             castHash: payload.hash!,
             prompt: payload.text,
           },
         });
-        if (contestAddress) {
-          await publishCast(
-            payload.hash,
-            ({ username }) => {
-              const {
-                payoutStructure: [winner1, winner2, winner3],
-                voterShare,
-              } = DEFAULT_CONTEST_BOT_PARAMS;
-              // eslint-disable-next-line max-len
-              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
-            },
-            {
-              // eslint-disable-next-line max-len
-              embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(contestAddress)}`,
-            },
-          );
-        }
       },
     },
   };

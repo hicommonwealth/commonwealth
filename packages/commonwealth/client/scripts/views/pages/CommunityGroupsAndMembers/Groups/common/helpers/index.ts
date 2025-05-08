@@ -3,6 +3,7 @@ import { userStore } from 'state/ui/user';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,
+  SOL_NFT_SPECIFICATION,
   SPL_SPECIFICATION,
   TOKENS,
 } from '../../../common/constants';
@@ -49,8 +50,7 @@ export const makeGroupDataBaseAPIPayload = (
       x.requirementType === ERC_SPECIFICATIONS.ERC_20 ||
       x.requirementType === ERC_SPECIFICATIONS.ERC_721 ||
       x.requirementType === ERC_SPECIFICATIONS.ERC_1155 ||
-      x.requirementType === TOKENS.EVM_TOKEN ||
-      x.requirementType === SPL_SPECIFICATION
+      x.requirementType === TOKENS.EVM_TOKEN
     ) {
       // @ts-expect-error StrictNullChecks
       payload.requirements.push({
@@ -73,6 +73,79 @@ export const makeGroupDataBaseAPIPayload = (
               // @ts-expect-error StrictNullChecks
               token_id: x.requirementTokenId.trim(),
             }),
+          },
+        },
+      });
+      return;
+    }
+
+    // for spl base
+    if (
+      x.requirementType === SPL_SPECIFICATION ||
+      x.requirementType === SOL_NFT_SPECIFICATION
+    ) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            x.requirementType,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            solana_network: x.requirementChain,
+            is_nft: x.requirementType === SOL_NFT_SPECIFICATION,
+            // @ts-expect-error StrictNullChecks
+            contract_address: x.requirementContractAddress.trim(),
+          },
+        },
+      });
+      return;
+    }
+
+    // for sui base
+    if (x.requirementType === TOKENS.SUI_TOKEN) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            ...(x.requirementContractAddress && {
+              object_id: x.requirementContractAddress.trim(),
+            }),
+          },
+        },
+      });
+      return;
+    }
+
+    // for sui token with custom coinType
+    if (x.requirementType === TOKENS.SUI_TOKEN_TYPE) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            // @ts-expect-error StrictNullChecks
+            coin_type: x.requirementCoinType.trim(),
           },
         },
       });

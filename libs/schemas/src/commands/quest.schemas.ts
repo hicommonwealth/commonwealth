@@ -1,7 +1,12 @@
+import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
-import { PG_INT } from '../utils';
+
+const QuestView = Quest.omit({ scheduled_job_id: true });
 
 export const CreateQuest = {
   input: z.object({
@@ -12,35 +17,62 @@ export const CreateQuest = {
     end_date: z.coerce.date(),
     max_xp_to_end: z.number().default(0),
     community_id: z.string().nullish(),
+    quest_type: z.enum(['channel', 'common']),
   }),
-  output: Quest,
+  output: QuestView,
   context: AuthContext,
 };
 
+export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true })
+  .extend({
+    tweet_engagement_caps: z
+      .object({
+        likes: z.number().gte(0).max(100),
+        retweets: z.number().gte(0).max(100),
+        replies: z.number().gte(0).max(100),
+      })
+      .optional()
+      .refine(
+        (data) => !(data && !data.likes && !data.retweets && !data.replies),
+      ),
+    chain_event: z
+      .object({
+        eth_chain_id: z.number(),
+        contract_address: EVM_ADDRESS_STRICT,
+        event_signature: z.string(),
+        tx_hash: EVM_EVENT_SIGNATURE_STRICT,
+      })
+      .optional(),
+  })
+  .refine(
+    (data) =>
+      !(data.content_id?.includes('discord_server_id') && !data.start_link),
+  );
+
 export const UpdateQuest = {
   input: z.object({
-    quest_id: PG_INT,
+    quest_id: z.number(),
     name: z.string().optional(),
     description: z.string().optional(),
-    community_id: z.string().optional(),
+    community_id: z.string().optional().nullable(),
     image_url: z.string().optional(),
     start_date: z.coerce.date().optional(),
     end_date: z.coerce.date().optional(),
     max_xp_to_end: z.number().optional(),
-    action_metas: z.array(QuestActionMeta.omit({ quest_id: true })).optional(),
+    action_metas: z.array(ActionMetaInput).optional(),
   }),
-  output: Quest,
+  output: QuestView,
   context: AuthContext,
 };
 
 export const DeleteQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };
 
 export const CancelQuest = {
-  input: z.object({ quest_id: PG_INT }),
+  input: z.object({ quest_id: z.number() }),
   output: z.boolean(),
   context: AuthContext,
 };

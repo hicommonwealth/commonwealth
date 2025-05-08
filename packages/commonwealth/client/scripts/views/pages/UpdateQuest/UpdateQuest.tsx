@@ -8,6 +8,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -18,7 +19,11 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
-import { buildURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import {
+  buildRedirectURLFromContentId,
+  inferContentIdTypeFromContentId,
+} from '../CreateQuest/QuestForm/helpers';
+import { QuestTypes } from '../CreateQuest/QuestForm/types';
 import './UpdateQuest.scss';
 
 const UpdateQuest = ({ id }: { id: number }) => {
@@ -81,8 +86,6 @@ const UpdateQuest = ({ id }: { id: number }) => {
   const isStarted = moment().isSameOrAfter(moment(quest.start_date));
   const isEnded = moment().isSameOrAfter(moment(quest.end_date));
 
-  const actionMeta = quest.action_metas?.[0];
-
   return (
     <CWPageLayout>
       <div className="UpdateQuest">
@@ -102,19 +105,13 @@ const UpdateQuest = ({ id }: { id: number }) => {
             mode="update"
             questId={quest.id}
             initialValues={{
-              participation_limit:
-                actionMeta?.participation_limit ||
-                QuestParticipationLimit.OncePerQuest,
-              participation_period:
-                actionMeta?.participation_period ||
-                QuestParticipationPeriod.Daily,
-              participation_times_per_period:
-                actionMeta?.participation_times_per_period || 1,
               description: quest.description || '',
               end_date: quest.end_date,
               image: quest.image_url,
               name: quest.name,
               start_date: quest.start_date,
+              max_xp_to_end: `${quest.max_xp_to_end}`,
+              quest_type: quest.quest_type as QuestTypes,
               ...(quest.community_id &&
                 community && {
                   community: {
@@ -126,17 +123,42 @@ const UpdateQuest = ({ id }: { id: number }) => {
                   },
                 }),
               subForms: (quest.action_metas || [])?.map((action) => ({
+                participationLimit:
+                  action.participation_limit ||
+                  QuestParticipationLimit.OncePerQuest,
+                participationPeriod:
+                  action.participation_period || QuestParticipationPeriod.Daily,
+                participationTimesPerPeriod:
+                  action.participation_times_per_period || 1,
                 action: action.event_name as QuestAction,
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
-                rewardAmount: `${action.reward_amount}`,
-                instructionsLink: action.instructions_link,
-                contentLink: action.content_id
-                  ? buildURLFromContentId(
-                      action.content_id.split(':')[1],
-                      action.content_id.split(':')[0] as 'thread' | 'comment',
-                    )
-                  : action.content_id,
+                rewardAmount: `${action.reward_amount || 0}`,
+                instructionsLink: action.instructions_link || '',
+                amountMultipler: `${action.amount_multiplier || 0}`,
+                contentIdScope: inferContentIdTypeFromContentId(
+                  action.event_name as QuestAction,
+                  action.content_id || undefined,
+                ),
+                startLink: action.start_link || '',
+                contentIdentifier: buildRedirectURLFromContentId(
+                  action.content_id || '',
+                ),
+                noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
+                noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
+                noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
+                contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
+                ethChainId: action.ChainEventXpSource?.chain_node_id
+                  ? `${
+                      fetchCachedNodes()?.find(
+                        (x) =>
+                          x.id === action.ChainEventXpSource?.chain_node_id,
+                      )?.ethChainId || ''
+                    }`
+                  : ``,
+                // important to use readable signature instead of event signature here
+                eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
+                transactionHash: `${action.ChainEventXpSource?.transaction_hash || ''}`,
               })),
             }}
           />

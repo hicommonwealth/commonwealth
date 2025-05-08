@@ -5,7 +5,11 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityTierMap,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -49,6 +53,7 @@ describe('userMentioned Event Handler', () => {
     [user] = await tester.seed('User', {});
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 2,
@@ -125,21 +130,20 @@ describe('userMentioned Event Handler', () => {
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
-        author_address_id: community!.Addresses![0].id,
-        author_user_id: author!.id,
-        author_address: community!.Addresses![0].address,
         community_id: community!.id,
         community_name: community!.name,
         author: author?.profile.name,
+        author_address_id: community!.Addresses![0].id,
+        author_address: community!.Addresses![0].address,
+        author_user_id: author!.id?.toString(),
+        author_profile_url: getProfileUrl(
+          author!.id!,
+          community!.custom_domain,
+        ),
+        author_email: author!.profile.email,
+        author_avatar_url: author!.profile.avatar_url,
         object_body: safeTruncateBody(thread!.body!, 255),
         object_url: getThreadUrl(community!.id!, thread!.id!),
-      },
-      actor: {
-        id: String(author!.id),
-        profile_name: author!.profile.name,
-        profile_url: getProfileUrl(author!.id!, community!.custom_domain),
-        email: author!.profile.email,
-        profile_avatar_url: author!.profile.avatar_url,
       },
     });
   });

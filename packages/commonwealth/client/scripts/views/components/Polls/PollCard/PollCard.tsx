@@ -43,6 +43,7 @@ export const PollCard = ({
   voteInformation,
   hasVoted,
   totalVoteCount,
+  totalVoteWeight,
 }: PollCardProps) => {
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -125,6 +126,7 @@ export const PollCard = ({
         voteInformation={voteInformation}
         pollEnded={pollEnded}
         totalVoteCount={totalVoteCount}
+        totalVoteWeight={totalVoteWeight}
         votedFor={votedFor}
         isPreview={isPreview}
       />

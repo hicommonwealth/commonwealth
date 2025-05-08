@@ -27,6 +27,7 @@ export function mapProfileThread(thread): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
+      allow_tokenized_threads: thread?.topic?.allow_tokenized_threads,
     },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
@@ -52,6 +53,9 @@ export function mapProfileThread(thread): Thread {
     search: '',
     ContestActions: thread.associatedContests ?? [],
     numberOfComments: thread.numberOfComments,
+    is_linking_token: thread.isLinkingToken,
+    launchpad_token_address: thread.tokenAddress,
+    user_tier: thread.user_tier,
     recentComments:
       thread.recentComments?.map((c) => ({
         id: c.id ?? 0,

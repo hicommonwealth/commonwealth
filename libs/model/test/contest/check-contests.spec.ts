@@ -1,9 +1,10 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
-import { Contests } from 'model/src/contest';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import { Contests } from '../../src/aggregates/contest';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 
@@ -28,6 +29,7 @@ describe.skip('Check Contests', () => {
       //{ mock: true, log: true },
     );
     await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,

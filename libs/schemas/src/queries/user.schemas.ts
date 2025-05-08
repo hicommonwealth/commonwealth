@@ -2,7 +2,7 @@ import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
-import { UserProfile } from '../entities/user.schemas';
+import { USER_TIER, UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
 import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
@@ -28,6 +28,7 @@ type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
 
 export const UserProfileView = z.object({
   userId: PG_INT,
+  tier: USER_TIER,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView) as ZodType<
@@ -42,6 +43,7 @@ export const UserProfileView = z.object({
   referral_count: PG_INT.default(0),
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0),
+  xp_referrer_points: PG_INT.default(0),
 });
 
 type UserProfileView = z.infer<typeof UserProfileView>;
@@ -100,6 +102,7 @@ export const GetUserAddresses = {
       address: z.string(),
       lastActive: z.date().or(z.string()),
       avatarUrl: z.string().nullish(),
+      tier: z.number().nullish(),
     }),
   ),
 };
@@ -141,8 +144,8 @@ export const GetUserReferralFees = {
 
 export const XpLogView = XpLog.extend({
   user_profile: UserProfile,
-  quest_id: PG_INT,
-  quest_action_meta_id: PG_INT,
+  quest_id: z.number(),
+  quest_action_meta_id: z.number(),
   event_name: z.string(),
   creator_profile: UserProfile.nullish(),
 });
@@ -150,6 +153,9 @@ export const XpLogView = XpLog.extend({
 export const GetXps = {
   input: z.object({
     user_id: PG_INT.optional().describe('Filters events by user id'),
+    user_or_creator_id: PG_INT.optional().describe(
+      'Filters events by user or creator id',
+    ),
     community_id: z
       .string()
       .optional()
@@ -171,17 +177,27 @@ export const GetXps = {
   output: z.array(XpLogView),
 };
 
+export const XpRankedUser = z.object({
+  user_id: PG_INT,
+  xp_points: z.number(),
+  tier: z.number(),
+  user_name: z.string().nullish(),
+  avatar_url: z.string().nullish(),
+});
+
+export const GetXpsRanked = {
+  input: z.object({
+    top: z.number(),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
+  }),
+  output: z.array(XpRankedUser),
+};
+
 export const RandomResourceIdsView = z.object({
   community_id: z.string(),
   thread_id: z.number(),
   comment_id: z.number(),
 });
-
-export const GetRandomResourceIds = {
-  input: PaginationParamsSchema.extend({
-    exclude_joined_communities: z.boolean().optional(),
-  }),
-  output: PaginatedResultSchema.extend({
-    results: z.array(RandomResourceIdsView),
-  }),
-};

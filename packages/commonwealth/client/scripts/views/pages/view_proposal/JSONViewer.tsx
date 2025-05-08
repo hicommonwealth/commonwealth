@@ -15,7 +15,7 @@ const JSONViewer = (data) => {
         enableClipboard={false}
         displayObjectSize={false}
         quotesOnKeys={false}
-        collapsed={true}
+        collapsed={false}
       />
     </div>
   );

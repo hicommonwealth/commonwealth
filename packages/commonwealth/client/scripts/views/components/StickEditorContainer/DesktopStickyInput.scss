@@ -2,11 +2,15 @@
 
 .DesktopStickyInput {
   position: sticky;
-  bottom: 0;
+  bottom: 12px;
   display: flex;
+  border-radius: 8px;
   z-index: 70;
   background: $white;
   width: 100%;
+  padding: 0px;
+  margin-top: auto;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
 
   .DesktopStickyInputPending {
     flex-grow: 1;
@@ -19,7 +23,7 @@
 
   .DesktopStickyInputCollapsed {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 0;
 
     .container {
       display: flex;
@@ -59,5 +63,13 @@
     border-radius: 8px;
     border: 1px solid #e5e5e5;
     padding: 16px;
+
+    .PageLayout {
+      padding: 0;
+
+      .layout-container {
+        padding: 0;
+      }
+    }
   }
 }

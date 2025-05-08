@@ -10,6 +10,7 @@
   }
 
   .quest-period-section,
+  .xp-configuration-section,
   .basic-information-section,
   .actions-section {
     display: flex;
@@ -26,19 +27,36 @@
     }
   }
 
-  .quest-period-section {
-    .repeatition-selector {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
+  .quest-type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    border-radius: 6px;
 
-      .b1 {
-        color: $neutral-600 !important;
-      }
+    .caption .Text {
+      color: $neutral-600 !important;
+    }
 
-      .radio-btn .Text {
-        color: $neutral-800 !important;
+    .b1 {
+      color: $neutral-600 !important;
+    }
+
+    .radio-btn .Text {
+      color: $neutral-800 !important;
+    }
+
+    .mt-8 {
+      margin-top: 8px;
+    }
+
+    &.update-mode {
+      padding: 8px 0px;
+
+      &:hover {
+        background-color: $neutral-100;
+        transition: 0.2s ease;
+        cursor: not-allowed;
       }
     }
   }
@@ -95,5 +113,9 @@
         }
       }
     }
+  }
+
+  .radio-btn {
+    z-index: 0 !important;
   }
 }

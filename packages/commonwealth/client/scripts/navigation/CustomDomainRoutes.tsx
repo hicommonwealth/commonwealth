@@ -2,9 +2,11 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
+const GovernancePage = lazy(() => import('views/pages/GovernancePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -76,6 +78,10 @@ const CommunityStakeIntegration = lazy(
 const CommunityTokenIntegration = lazy(
   () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
+const CommunityOnchainVerificationIntegration = lazy(
+  () =>
+    import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -96,9 +102,7 @@ const SnapshotProposalPage = lazy(
 const ViewMultipleSnapshotsPage = lazy(
   () => import('views/pages/Snapshots/MultipleSnapshots'),
 );
-const ViewSnapshotsProposalPage = lazy(
-  () => import('views/pages/Snapshots/ViewSnapshotProposal'),
-);
+
 const NewSnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/NewSnapshotProposal'),
 );
@@ -108,9 +112,13 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
+
+const newProposalViewPage = lazy(
+  () => import('../views/pages/NewProposalViewPage'),
 );
 
 const CustomDomainRoutes = () => {
@@ -179,6 +187,11 @@ const CustomDomainRoutes = () => {
       element={withLayout(HomePage, { type: 'common' })}
     />,
     <Route
+      key="/mobile-signin"
+      path="/mobile-signin"
+      element={withLayout(MobileSignIn, { type: 'common' })}
+    />,
+    <Route
       key="/search"
       path="/search"
       element={withLayout(SearchPage, { type: 'common' })}
@@ -227,9 +240,9 @@ const CustomDomainRoutes = () => {
       element={withLayout(MyTransactions, { type: 'common' })}
     />,
     <Route
-      key="/rewards"
-      path="/rewards"
-      element={withLayout(RewardsPage, { type: 'common' })}
+      key="/wallet"
+      path="/wallet"
+      element={withLayout(WalletPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -282,6 +295,20 @@ const CustomDomainRoutes = () => {
       key="/new/proposal"
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/:scope/proposal-details/:identifier"
+      path="/:scope/proposal-details/:identifier"
+      element={withLayout(newProposalViewPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/governance"
+      path="/governance"
+      element={withLayout(GovernancePage, {
         scoped: true,
       })}
     />,
@@ -359,6 +386,13 @@ const CustomDomainRoutes = () => {
       key="/manage/integrations/stake"
       path="/manage/integrations/stake"
       element={withLayout(CommunityStakeIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/integrations/onchain-verification"
+      path="/manage/integrations/onchain-verification"
+      element={withLayout(CommunityOnchainVerificationIntegration, {
         scoped: true,
       })}
     />,
@@ -449,9 +483,15 @@ const CustomDomainRoutes = () => {
     <Route
       key="/snapshot/:snapshotId/:identifier"
       path="/snapshot/:snapshotId/:identifier"
-      element={withLayout(ViewSnapshotsProposalPage, {
-        scoped: true,
-      })}
+      // redirect to proposal detail page
+      element={
+        <Navigate
+          to={(parameters) =>
+            // eslint-disable-next-line max-len
+            `/${parameters.scope}/proposal-details/${parameters.identifier}?snapshotId=${parameters.snapshotId}&type=snapshot`
+          }
+        />
+      }
     />,
     <Route
       key="/new/snapshot/:snapshotId"
@@ -563,7 +603,11 @@ const CustomDomainRoutes = () => {
       key="/:scope/proposal/:identifier"
       path="/:scope/proposal/:identifier"
       element={
-        <Navigate to={(parameters) => `/proposal/${parameters.identifier}`} />
+        <Navigate
+          to={(parameters) =>
+            `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+          }
+        />
       }
     />,
     <Route
@@ -693,7 +737,7 @@ const CustomDomainRoutes = () => {
       element={<Navigate to="/profile/edit" />}
     />,
 
-    // LEGACY LINKING REDIRECTS
+    // LEGACY LINKING REDIRECTS!
     // These redirects exist so we can land on a properly identified page
     // without loading additional metadata on the view thread page to construct
     // a proper link. Each of these routes will:
@@ -706,6 +750,11 @@ const CustomDomainRoutes = () => {
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,
       })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={<Navigate to="/wallet" />}
     />,
   ];
 };

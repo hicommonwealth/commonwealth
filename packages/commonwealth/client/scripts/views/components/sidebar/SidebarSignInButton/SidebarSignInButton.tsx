@@ -21,8 +21,11 @@ const SidebarSignInButton = ({
         isInsideCommunity ? 'isInsideCommunity' : '',
       )}
     >
-      <CWText type="b2">Sign in to see your communities on Common.</CWText>
+      <CWText type="b2" className="sign-in-text">
+        Sign in to see your communities on Common
+      </CWText>
       <CWButton
+        className="sign-in-button"
         buttonType="primary"
         label="Sign in"
         buttonWidth="full"

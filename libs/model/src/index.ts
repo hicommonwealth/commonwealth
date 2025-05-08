@@ -1,24 +1,25 @@
 // Core Domain
-export * as Bot from './bot';
-export * as ChainEvents from './chain-events';
-export * as Comment from './comment';
-export * as Community from './community';
-export * as Contest from './contest';
-export * as DiscordBot from './discordBot';
-export * as Email from './emails';
-export * as Feed from './feed';
-export * as LoadTest from './load-testing';
-export * as Poll from './poll';
-export * as Quest from './quest';
-export * as Reaction from './reaction';
-export * as Snapshot from './snapshot';
-export * as Subscription from './subscription';
-export * as SuperAdmin from './super-admin';
-export * as Thread from './thread';
-export * as Token from './token';
-export * as User from './user';
-export * as Wallet from './wallet';
-export * as Webhook from './webhook';
+export * as Bot from './aggregates/bot';
+export * as ChainEvents from './aggregates/chain-events';
+export * as Comment from './aggregates/comment';
+export * as Community from './aggregates/community';
+export * as Contest from './aggregates/contest';
+export * as DiscordBot from './aggregates/discordBot';
+export * as Email from './aggregates/emails';
+export * as Feed from './aggregates/feed';
+export * as LoadTest from './aggregates/load-testing';
+export * as Poll from './aggregates/poll';
+export * as Quest from './aggregates/quest';
+export * as Reaction from './aggregates/reaction';
+export * as Snapshot from './aggregates/snapshot';
+export * as Subscription from './aggregates/subscription';
+export * as SuperAdmin from './aggregates/super-admin';
+export * as Tag from './aggregates/tag';
+export * as Thread from './aggregates/thread';
+export * as Token from './aggregates/token';
+export * as User from './aggregates/user';
+export * as Wallet from './aggregates/wallet';
+export * as Webhook from './aggregates/webhook';
 
 // Core Services
 export * from './services';

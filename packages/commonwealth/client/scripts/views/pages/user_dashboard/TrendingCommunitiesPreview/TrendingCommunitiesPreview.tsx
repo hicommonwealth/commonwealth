@@ -1,9 +1,11 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useGetNewContent } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
@@ -48,9 +50,15 @@ export const TrendingCommunitiesPreview = () => {
 
   return (
     <div className="TrendingCommunitiesPreview">
-      <CWText type="h4" className="header">
-        Trending Communities
-      </CWText>
+      <div className="heading-container">
+        <CWText type="h2">Trending Communities</CWText>
+        <Link to="/explore?tab=communities">
+          <div className="link-right">
+            <CWText className="link">See all</CWText>
+            <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
+          </div>
+        </Link>
+      </div>
       <div className="community-preview-cards-collection">
         {trendingCommunities.map((sortedCommunity) => (
           <CommunityPreviewCard
@@ -60,6 +68,7 @@ export const TrendingCommunitiesPreview = () => {
               icon_url: sortedCommunity.community.icon_url || '',
               id: sortedCommunity.community.id || '',
               base: sortedCommunity.community.base || '',
+              tier: sortedCommunity.community.tier,
             }}
             monthlyThreadCount={
               sortedCommunity.community.last_30_day_thread_count || 0
@@ -71,8 +80,9 @@ export const TrendingCommunitiesPreview = () => {
         ))}
         <CommunityPreviewCard
           isExploreMode
+          customExploreText="Create Your Community"
           onClick={() => {
-            navigate('/explore');
+            navigate('/createCommunity');
           }}
         />
       </div>

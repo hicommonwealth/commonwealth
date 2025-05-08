@@ -7,6 +7,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -14,7 +15,7 @@ import {
   GetCommunities,
   GetCommunityStake,
   SetCommunityStake,
-} from '../../src/community';
+} from '../../src/aggregates/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
 
@@ -37,6 +38,7 @@ describe('Stake lifecycle', () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
+      tier: CommunityTierMap.ManuallyVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test1',
@@ -60,6 +62,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake_to_set] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
@@ -75,6 +78,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,

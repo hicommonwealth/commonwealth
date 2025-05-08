@@ -200,6 +200,7 @@ export const ThreadCard = ({
               hideSpamTag={hideSpamTag}
               hideTrendingTag={hideTrendingTag}
               communityHomeLayout={communityHomeLayout}
+              shouldShowRole
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

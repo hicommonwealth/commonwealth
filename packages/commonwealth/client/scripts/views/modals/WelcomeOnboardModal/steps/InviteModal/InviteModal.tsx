@@ -35,7 +35,7 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     saveToClipboard(inviteLink, true).catch(console.error);
   };
   const generatePermalink = (link: string) => {
-    const message = 'Hey, check out Common!';
+    const message = 'Join me on Common using my link!';
     return `${message} \n${link}`;
   };
 
@@ -75,9 +75,13 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
 
   return (
     <section className="InviteModal">
-      <img src={referralImage} className="referral_logo" />
+      <img
+        src={referralImage}
+        className="referral_logo"
+        style={{ width: '200px', height: 'auto' }}
+      />
 
-      <CWText type="h2" className="title" isCentered>
+      <CWText type="h3" className="title" isCentered>
         Get a referral bonus for inviting friends to common!{' '}
       </CWText>
 

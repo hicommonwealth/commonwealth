@@ -28,6 +28,13 @@ type GetCosmosBalancesBase = {
   };
 } & TbcConfigOptions;
 
+type GetSuiBalancesBase = {
+  addresses: string[];
+  sourceOptions: {
+    suiNetwork: string;
+  };
+} & TbcConfigOptions;
+
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
   sourceOptions: {
@@ -73,10 +80,25 @@ export type GetCw721BalanceOptions = GetCosmosBalancesBase & {
 };
 
 export type GetSPLBalancesOptions = {
-  balanceSourceType: BalanceSourceType.SPL;
+  balanceSourceType: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
   addresses: string[];
   mintAddress: string;
+  solanaNetwork?: string;
 } & TbcConfigOptions;
+
+export type GetSuiNativeBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiNative;
+  sourceOptions: {
+    objectId?: string;
+  };
+};
+
+export type GetSuiTokenBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiToken;
+  sourceOptions: {
+    coinType: string;
+  };
+};
 
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
@@ -96,10 +118,15 @@ export type GetCwBalancesOptions =
   | GetCw20BalanceOptions
   | GetCw721BalanceOptions;
 
+export type GetSuiBalancesOptions =
+  | GetSuiNativeBalanceOptions
+  | GetSuiTokenBalanceOptions;
+
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
   | GetCosmosBalancesOptions
-  | GetSPLBalancesOptions;
+  | GetSPLBalancesOptions
+  | GetSuiBalancesOptions;
 
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;

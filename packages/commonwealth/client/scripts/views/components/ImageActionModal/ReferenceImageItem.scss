@@ -1,0 +1,84 @@
+@import '../../../styles/shared.scss';
+
+.ReferenceImageItem {
+  align-items: center;
+  background-color: $neutral-200; // Lighter background for empty state
+  border-radius: 50%; // Perfect circle
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin: 4px;
+
+  // Add a dashed border for the empty state
+  &:not(:has(img)) {
+    border: 1px dashed $neutral-400;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  .icon-button-container {
+    background-color: $white;
+    border-radius: 50%;
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    z-index: 2;
+    height: 16px;
+    width: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Styles for the X button
+    &.with-image {
+      background-color: $neutral-100;
+
+      .IconButton {
+        color: $neutral-600;
+
+        &:hover {
+          color: $neutral-800;
+        }
+      }
+    }
+
+    // Styles for the + button
+    &.empty {
+      background-color: $primary-500;
+
+      .IconButton {
+        color: $white;
+
+        &:hover {
+          color: $white;
+        }
+      }
+    }
+  }
+
+  .content-container {
+    border-radius: 50%;
+    display: flex;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .empty-state {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

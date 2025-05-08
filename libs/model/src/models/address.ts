@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { Address } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
@@ -7,6 +8,8 @@ import { MembershipAttributes } from './membership';
 import type { SsoTokenInstance } from './sso_token';
 import type { ModelInstance } from './types';
 import type { UserInstance } from './user';
+
+const log = logger(import.meta);
 
 export type AddressAttributes = z.infer<typeof Address> & {
   // associations
@@ -95,6 +98,22 @@ export default (
         { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
       ],
+      hooks: {
+        beforeCreate(instance: AddressInstance) {
+          if (
+            instance.wallet_id === WalletId.Magic &&
+            !instance.oauth_provider
+          ) {
+            const e = new Error('Missing oauth provider');
+            log.error(`Stack trace: ${e.stack}`, e, {
+              user_id: instance.user_id,
+              community_id: instance.community_id,
+              address: instance.address,
+              stack: e.stack,
+            });
+          }
+        },
+      },
       defaultScope: {
         attributes: {
           exclude: [
@@ -103,7 +122,6 @@ export default (
             'block_info',
             'created_at',
             'updated_at',
-            'oauth_provider',
             'oauth_email',
             'oauth_username',
             'oauth_phone_number',
