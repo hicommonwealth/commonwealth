@@ -101,6 +101,8 @@ function _thresholdCheck(
     let contractAddress: string;
     let chainId: string;
     let tokenId: string;
+    let objectId: string;
+
     switch (thresholdData.source.source_type) {
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
@@ -112,6 +114,18 @@ function _thresholdCheck(
         balanceSourceType = BalanceSourceType.SOLNFT;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
+      case 'sui_native': {
+        balanceSourceType = BalanceSourceType.SuiNative;
+        chainId = thresholdData.source.sui_network.toString();
+        objectId = thresholdData.source.object_id!;
+        break;
+      }
+      case 'sui_token': {
+        balanceSourceType = BalanceSourceType.SuiToken;
+        chainId = thresholdData.source.sui_network.toString();
+        contractAddress = thresholdData.source.coin_type;
         break;
       }
       case 'erc20': {
@@ -190,6 +204,19 @@ function _thresholdCheck(
           case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL:
             return b.options.mintAddress == contractAddress;
+          case BalanceSourceType.SuiNative:
+            if (objectId) {
+              return (
+                b.options.sourceOptions.suiNetwork === chainId &&
+                b.options.sourceOptions.objectId === objectId
+              );
+            }
+            return b.options.sourceOptions.suiNetwork === chainId;
+          case BalanceSourceType.SuiToken:
+            return (
+              b.options.sourceOptions.suiNetwork === chainId &&
+              b.options.sourceOptions.coinType === contractAddress
+            );
           default:
             return null;
         }

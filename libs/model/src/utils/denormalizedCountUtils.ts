@@ -37,7 +37,8 @@ export function debounceRefresh(
     timeouts.set(
       key,
       setTimeout(() => {
-        void fn(args).then(() => {
+        // Spread the args when calling the function instead of passing as a single array
+        void fn(...args).then(() => {
           // clean up after execution
           timeouts.delete(key);
           timestamps.delete(key);

@@ -53,8 +53,6 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerPollsController } from '../controllers/server_polls_controller';
-import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
@@ -74,11 +72,7 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { deletePollHandler } from '../routes/polls/delete_poll_handler';
-import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
@@ -88,11 +82,9 @@ import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  threads: ServerThreadsController;
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  polls: ServerPollsController;
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
@@ -108,11 +100,9 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models),
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    polls: new ServerPollsController(models),
     groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
@@ -236,36 +226,6 @@ function setupRouter(
     '/admin/top-users',
     passport.authenticate('jwt', { session: false }),
     getTopUsersHandler.bind(this, serverControllers),
-  );
-
-  // polls
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/polls',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadPollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/threads/:id/polls',
-    getThreadPollsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/polls/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deletePollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/polls/:id/votes',
-    getPollVotesHandler.bind(this, serverControllers),
   );
 
   registerRoute(
