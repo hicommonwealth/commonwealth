@@ -1,6 +1,5 @@
 import { notifyError } from 'controllers/app/notifications';
 import { useFlag } from 'hooks/useFlag';
-import useResetStickyInputOnRouteChange from 'hooks/useResetStickyInputOnRouteChange';
 import React, {
   useCallback,
   useContext,
@@ -15,7 +14,6 @@ import {
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
-import useStickyInputStore, { StickyInputMode } from 'state/ui/stickyInput';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -50,16 +48,14 @@ const StickyInput = (props: StickyInputProps) => {
     handleSubmitComment,
     isReplying,
     replyingToAuthor,
-    onCancel,
     setContentDelta,
+    contentDelta,
     thread: originalThread,
     parentCommentText,
   } = props;
 
-  useResetStickyInputOnRouteChange(setContentDelta);
-
   const { menuVisible } = useSidebarStore();
-  const { mode: contextMode } = useContext(StickCommentContext);
+  const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
   const {
     aiCommentsToggleEnabled,
     aiInteractionsToggleEnabled,
@@ -69,21 +65,6 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  const {
-    inputValue,
-    expanded,
-    mode,
-    setInputValue,
-    setExpanded,
-    resetContent,
-    setMode,
-    resetState,
-  } = useStickyInputStore();
-
-  useEffect(() => {
-    setMode(contextMode as StickyInputMode);
-  }, [contextMode, setMode]);
-
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -91,11 +72,6 @@ const StickyInput = (props: StickyInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
-
-  // Add this ref for tracking the previous expanded state
-  const prevExpandedRef = useRef(false);
-  // Add a flag to control whether to sync content when expanding
-  const shouldSyncOnExpandRef = useRef(true);
 
   const {
     turnstileToken,
@@ -106,121 +82,24 @@ const StickyInput = (props: StickyInputProps) => {
     action: mode === 'thread' ? 'create-thread' : 'create-comment',
   });
 
-  // Sync from input value to delta - only when input is the source
-  useEffect(() => {
-    if (inputValue && !expanded) {
-      setContentDelta(createDeltaFromText(inputValue));
-    }
-  }, [inputValue, setContentDelta, expanded]);
-
-  // Handle content initialization when expanding
-  useEffect(() => {
-    // Only sync content when expanding (not when already expanded)
-    if (
-      expanded &&
-      !prevExpandedRef.current &&
-      inputValue &&
-      shouldSyncOnExpandRef.current
-    ) {
-      if (mode === 'thread' && newThreadFormRef.current?.appendContent) {
-        // Use a timeout to ensure the NewThreadForm is fully rendered
-        setTimeout(() => {
-          newThreadFormRef.current?.appendContent(inputValue);
-        }, 0);
-      } else if (mode === 'comment') {
-        setContentDelta(createDeltaFromText(inputValue));
-      }
-    }
-
-    // Update the ref with current value for next render
-    prevExpandedRef.current = expanded;
-  }, [expanded, mode, setContentDelta, inputValue]);
-
-  // Sync from contentDelta to input value - only for compact view or comment mode
-  useEffect(() => {
-    if (props.contentDelta?.ops) {
-      try {
-        const text = props.contentDelta.ops.reduce((acc, op) => {
-          if (typeof op.insert === 'string') {
-            return acc + op.insert;
-          }
-          return acc;
-        }, '');
-
-        if (text && text !== inputValue) {
-          // In thread mode, only update input from delta when in compact view
-          if (!expanded || mode === 'comment') {
-            setInputValue(text, 'editor');
-          }
-        }
-      } catch (error) {
-        console.error('Error extracting text from props.contentDelta:', error);
-      }
-    }
-  }, [props.contentDelta, inputValue, setInputValue, expanded, mode]);
-
-  // Add this new useEffect to reset content upon cancellation
-  useEffect(() => {
-    // If transitioning from expanded to collapsed without submission
-    if (prevExpandedRef.current && !expanded) {
-      // Reset content when collapsing (canceling)
-      resetContent();
-      setContentDelta(createDeltaFromText(''));
-    }
-  }, [expanded, resetContent, setContentDelta]);
-
-  // Make the sync ref available to the useResetStickyInputOnRouteChange hook
-  useEffect(() => {
-    (window as any).__stickyInputSyncRef = shouldSyncOnExpandRef;
-    return () => {
-      (window as any).__stickyInputSyncRef = undefined;
-    };
-  }, []);
-
   const handleThreadContentAppended = useCallback(
     (markdown: string) => {
-      if (markdown !== inputValue) {
-        // Temporarily disable syncing from input to NewThreadForm
-        shouldSyncOnExpandRef.current = false;
-        setInputValue(markdown, 'editor');
-        // Re-enable syncing after the update has been processed
-        setTimeout(() => {
-          shouldSyncOnExpandRef.current = true;
-        }, 100);
+      if (markdown !== contentDelta) {
+        setContentDelta(createDeltaFromText(markdown));
       }
     },
-    [inputValue, setInputValue],
+    [contentDelta, setContentDelta],
   );
 
-  const handleFocused = () => {
-    setExpanded(true);
-  };
+  const handleCancel = useCallback(() => {
+    setIsExpanded(false);
+    setOpenModalOnExpand(false);
+    stickyCommentReset();
 
-  const handleCancel = useCallback(
-    (e: React.MouseEvent | undefined) => {
-      // Temporarily disable syncing to prevent unwanted updates
-      shouldSyncOnExpandRef.current = false;
-      setExpanded(false);
-      setOpenModalOnExpand(false);
-      stickyCommentReset();
-      if (isTurnstileEnabled) {
-        resetTurnstile();
-      }
-      onCancel?.(e);
-
-      // Re-enable syncing after a short delay
-      setTimeout(() => {
-        shouldSyncOnExpandRef.current = true;
-      }, 100);
-    },
-    [
-      onCancel,
-      stickyCommentReset,
-      isTurnstileEnabled,
-      resetTurnstile,
-      setExpanded,
-    ],
-  );
+    if (isTurnstileEnabled) {
+      resetTurnstile();
+    }
+  }, [stickyCommentReset, isTurnstileEnabled, resetTurnstile, setIsExpanded]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -234,8 +113,8 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleImageClick = useCallback(() => {
     setOpenModalOnExpand(true);
-    handleFocused();
-  }, []);
+    setIsExpanded(true);
+  }, [setOpenModalOnExpand, setIsExpanded]);
 
   const handleGenerateAIContent = useCallback(async () => {
     if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
@@ -255,7 +134,6 @@ const StickyInput = (props: StickyInputProps) => {
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
-            setInputValue(bodyAccumulatedRef.current, 'input');
             setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
           },
         });
@@ -275,7 +153,6 @@ const StickyInput = (props: StickyInputProps) => {
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
-            setInputValue(bodyAccumulatedRef.current, 'input');
             setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
           },
         });
@@ -293,7 +170,6 @@ const StickyInput = (props: StickyInputProps) => {
     originalThread,
     parentCommentText,
     setContentDelta,
-    setInputValue,
   ]);
 
   const getActionPillLabel = () => {
@@ -312,9 +188,6 @@ const StickyInput = (props: StickyInputProps) => {
       return Promise.reject(new Error('Turnstile verification required'));
     }
 
-    // Temporarily disable syncing to prevent unwanted updates
-    shouldSyncOnExpandRef.current = false;
-    setExpanded(false);
     setOpenModalOnExpand(false);
     stickyCommentReset();
 
@@ -326,10 +199,6 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
-      // Use the resetState function to fully reset all state in one call
-      resetState();
-      resetContent();
-      setInputValue('', 'input');
       // Also reset the editor content since it's separate from the store
       setContentDelta(createDeltaFromText(''));
 
@@ -347,21 +216,12 @@ const StickyInput = (props: StickyInputProps) => {
         console.warn('StickyInput - Failed to jump to comment:', error);
       }
 
-      // Re-enable syncing after a short delay
-      setTimeout(() => {
-        shouldSyncOnExpandRef.current = true;
-      }, 100);
-
       return commentId;
     } catch (error) {
       console.error('StickyInput - Failed to submit comment:', error);
       if (isTurnstileEnabled) {
         resetTurnstile();
       }
-      // Re-enable syncing in case of error
-      setTimeout(() => {
-        shouldSyncOnExpandRef.current = true;
-      }, 100);
       throw error;
     }
   }, [
@@ -369,21 +229,17 @@ const StickyInput = (props: StickyInputProps) => {
     aiCommentsToggleEnabled,
     handleAiReply,
     turnstileToken,
-    resetContent,
-    setInputValue,
     setContentDelta,
     stickyCommentReset,
     isTurnstileEnabled,
     resetTurnstile,
-    setExpanded,
-    resetState,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (
       event.key === 'Enter' &&
-      !expanded &&
-      inputValue.trim() !== '' &&
+      !isExpanded &&
+      contentDelta?.ops?.length > 0 &&
       (!isTurnstileEnabled || turnstileToken)
     ) {
       event.preventDefault();
@@ -392,7 +248,7 @@ const StickyInput = (props: StickyInputProps) => {
   };
 
   useEffect(() => {
-    if (expanded && openModalOnExpand) {
+    if (isExpanded && openModalOnExpand) {
       if (mode === 'thread') {
         setTimeout(() => {
           newThreadFormRef.current?.openImageModal();
@@ -402,7 +258,7 @@ const StickyInput = (props: StickyInputProps) => {
         setOpenModalOnExpand(false);
       }
     }
-  }, [expanded, openModalOnExpand, mode]);
+  }, [isExpanded, openModalOnExpand, mode]);
 
   // Add toggle handler for the AI auto reply feature
   const handleToggleAiAutoReply = (e: React.MouseEvent) => {
@@ -418,13 +274,12 @@ const StickyInput = (props: StickyInputProps) => {
             content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
         AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
             placement="top"
-            renderTrigger={(handleInteraction, isOpen) => (
+            renderTrigger={(handleInteraction) => (
               <button
                 className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
                 onClick={handleToggleAiAutoReply}
                 onMouseEnter={handleInteraction}
                 onMouseLeave={handleInteraction}
-                data-tooltip-open={isOpen}
               >
                 <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
               </button>
@@ -456,7 +311,7 @@ const StickyInput = (props: StickyInputProps) => {
           renderTrigger={(handleInteraction) => (
             <button
               className="expand-button"
-              onClick={handleFocused}
+              onClick={() => setIsExpanded(true)}
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
             >
@@ -477,7 +332,8 @@ const StickyInput = (props: StickyInputProps) => {
               className="send-button"
               onClick={() => customHandleSubmitComment()}
               disabled={
-                !inputValue.trim() || (isTurnstileEnabled && !turnstileToken)
+                !contentDelta?.ops?.length ||
+                (isTurnstileEnabled && !turnstileToken)
               }
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
@@ -495,11 +351,11 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
-        className={`StickyInput ${expanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
+        className={`StickyInput ${isExpanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
-        {expanded ? (
+        {isExpanded ? (
           <div
             className={`${isMobile ? 'MobileStickyInputFocused' : 'DesktopStickyInputExpanded'}`}
           >
@@ -520,9 +376,8 @@ const StickyInput = (props: StickyInputProps) => {
                 ref={newThreadFormRef}
                 onCancel={handleCancel}
                 onContentAppended={handleThreadContentAppended}
-                onContentDeltaChange={(markdown: string) => {
-                  setInputValue(markdown, 'editor');
-                }}
+                contentDelta={contentDelta}
+                setContentDelta={setContentDelta}
               />
             ) : (
               <CommentEditor
@@ -534,7 +389,8 @@ const StickyInput = (props: StickyInputProps) => {
                 onAiReply={handleAiReply}
                 streamingReplyIds={streamingReplyIds}
                 triggerImageModalOpen={openModalOnExpand && mode === 'comment'}
-                editorValue={inputValue}
+                contentDelta={contentDelta}
+                setContentDelta={setContentDelta}
               />
             )}
           </div>
