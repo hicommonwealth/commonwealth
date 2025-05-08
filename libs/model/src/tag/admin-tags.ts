@@ -1,14 +1,6 @@
-import { Router } from 'express';
-import {
-  AdminTagResponse,
-  TagUsageResponse,
-} from '../controllers/server_tags_methods/admin_tags';
-import Permissions from '../middleware/permissions';
-import { AppRequest, AppResponse } from '../types';
+/*
 
-/**
- * Admin routes for tag management. All routes require site admin permissions.
- */
+ 
 const router = Router();
 
 // Tag management routes
@@ -124,3 +116,4 @@ router.get(
 );
 
 export default router;
+*/
