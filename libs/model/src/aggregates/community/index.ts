@@ -37,3 +37,5 @@ export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
 export * from './UpdateRole.command';
 export * from './UpdateTopic.command';
+export * from './UpdateTopicChannel.command';
+export * from './UpdateTopicsOrder.command';
