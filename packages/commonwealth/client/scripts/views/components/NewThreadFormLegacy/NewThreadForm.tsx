@@ -551,26 +551,40 @@ export const NewThreadForm = forwardRef<
             createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
           );
         },
-        onComplete: async (generatedBody) => {
+        onComplete: (generatedBody) => {
           const {
             systemPrompt: titleSystemPrompt,
             userPrompt: titleUserPrompt,
           } = generateThreadTitlePrompt(generatedBody.trim() || 'New Thread');
 
-          await generateCompletion(titleUserPrompt, {
-            model: 'gpt-4o-mini',
-            stream: false,
-            systemPrompt: titleSystemPrompt,
-            onComplete(fullTitle) {
-              setThreadTitle(fullTitle.trim());
+          void (async () => {
+            try {
+              await generateCompletion(titleUserPrompt, {
+                model: 'gpt-4o-mini',
+                stream: false,
+                systemPrompt: titleSystemPrompt,
+                onComplete(fullTitle) {
+                  setThreadTitle(fullTitle.trim());
+                  setIsGenerating(false);
+                },
+                onError: (titleError) => {
+                  console.error(
+                    'Error generating AI thread title:',
+                    titleError,
+                  );
+                  notifyError('Failed to generate AI thread title');
+                  setIsGenerating(false);
+                },
+              });
+            } catch (error) {
+              console.error(
+                'Error awaiting title generation in AI thread:',
+                error,
+              );
+              notifyError('Failed to initiate AI thread title generation');
               setIsGenerating(false);
-            },
-            onError: (titleError) => {
-              console.error('Error generating AI thread title:', titleError);
-              notifyError('Failed to generate AI thread title');
-              setIsGenerating(false);
-            },
-          });
+            }
+          })();
         },
       });
     } catch (error) {
