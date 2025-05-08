@@ -8,6 +8,7 @@ import {
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -156,6 +157,9 @@ const useQuestActionMultiFormsState = ({
       const requiresGroupId = doesActionRequireGroupId(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
+      const requiresKYOFinanceSwapMetadata =
+        doesActionRequireKYOFinanceSwapMetadata(chosenAction);
+      const requiresKYOFinanceMetadata = requiresKYOFinanceSwapMetadata;
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -173,6 +177,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
+        requires_kyo_finance_swap_metadata: requiresKYOFinanceSwapMetadata,
       };
 
       // set fixed action repitition per certain actions
@@ -196,6 +201,20 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdentifier: undefined,
+        };
+      }
+
+      // set fixed metadata for non kyo finance actions
+      if (!requiresKYOFinanceMetadata) {
+        updatedSubForms[index].values.metadata = null;
+      }
+
+      // reset errors/values if action doesn't require kyo finance metadata
+      if (!requiresKYOFinanceMetadata) {
+        updatedSubForms[index].values.metadata = null;
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          metadata: undefined,
         };
       }
 

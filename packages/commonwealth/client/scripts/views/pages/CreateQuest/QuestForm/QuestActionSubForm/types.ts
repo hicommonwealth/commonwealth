@@ -1,9 +1,11 @@
 import {
   ChannelBatchActions,
+  KyoFinanceChainIds,
   QuestActionNames,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 export type QuestAction =
   | (typeof QuestActionNames)[number]
@@ -16,6 +18,8 @@ export enum QuestActionContentIdScope {
   Chain = 'chain',
   Group = 'group',
 }
+
+export type KyoFinanceChainIdsType = z.infer<typeof KyoFinanceChainIds>;
 
 export type QuestActionSubFormErrors = {
   action?: string;
@@ -31,6 +35,17 @@ export type QuestActionSubFormErrors = {
   noOfLikes?: string;
   noOfRetweets?: string;
   noOfReplies?: string;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: string;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+  };
 };
 
 export type QuestActionSubFormFields = {
@@ -52,6 +67,17 @@ export type QuestActionSubFormFields = {
   noOfLikes?: string | number;
   noOfRetweets?: string | number;
   noOfReplies?: string | number;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: KyoFinanceChainIdsType;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+  } | null;
 };
 
 export type QuestActionSubFormConfig = {
@@ -65,6 +91,7 @@ export type QuestActionSubFormConfig = {
   with_optional_chain_id: boolean;
   requires_group_id: boolean;
   requires_start_link: boolean;
+  requires_kyo_finance_swap_metadata: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

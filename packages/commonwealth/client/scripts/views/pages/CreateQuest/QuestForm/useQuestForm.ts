@@ -1,4 +1,5 @@
 import {
+  KyoFinanceSwapQuestRequestParams,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -15,6 +16,7 @@ import {
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -54,6 +56,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'DiscordServerJoined',
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
+      'KyoFinanceSwapQuestVerified',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };
@@ -106,6 +109,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
                     subForm.participationTimesPerPeriod,
+                  metadata: subForm.metadata || null,
                 },
                 errors: {},
                 config: {
@@ -129,6 +133,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_group_id:
                     allowsContentId && doesActionRequireGroupId(chosenAction),
                   requires_start_link: doesActionRequireStartLink(chosenAction),
+                  requires_kyo_finance_swap_metadata:
+                    doesActionRequireKYOFinanceSwapMetadata(chosenAction),
                 },
               };
             }),
@@ -161,7 +167,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
         questActions: [...questActionSubForms].map(({ values }) => ({
           creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
-          event_name: values.action as QuestAction,
+          event_name: values.action as QuestAction as any, // TODO: tim - fix type in API
           quest_id: Math.random(),
           reward_amount: parseInt(`${values.rewardAmount || 0}`),
           participation_times_per_period: parseInt(
@@ -237,8 +243,28 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         return 'thread';
       })();
 
+      const metadata = (() => {
+        if (!subForm.values?.metadata?.chainId) return null;
+
+        switch (subForm.values.action) {
+          case 'KyoFinanceSwapQuestVerified': {
+            return {
+              chainId: subForm.values.metadata.chainId,
+              inputToken: subForm.values.metadata.inputToken || '',
+              outputToken: subForm.values.metadata.outputToken || '',
+              minOutputAmount: subForm.values.metadata.minOutputAmount || '',
+              minTimestamp: subForm.values.metadata.outputToken || '',
+              minVolumeUSD: subForm.values.metadata.minVolumeUSD || '',
+            } as z.infer<typeof KyoFinanceSwapQuestRequestParams>;
+          }
+          default: {
+            return null;
+          }
+        }
+      })();
+
       return {
-        event_name: subForm.values.action as QuestAction,
+        event_name: subForm.values.action as QuestAction as any, // TODO: tim - fix type in API
         reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
@@ -281,6 +307,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           instructions_link: subForm.values.instructionsLink.trim(),
         }),
         amount_multiplier: 0,
+        metadata,
       };
     });
   };

@@ -26,6 +26,7 @@ const questSubFormValidationSchema = z.object({
   // internal state validation, that is handled by a custom function
   participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
+  metadata: z.null(),
 });
 
 export const buildQuestSubFormValidationSchema = (
@@ -42,13 +43,15 @@ export const buildQuestSubFormValidationSchema = (
   const requiresStartLink = config?.requires_start_link;
   const requiresCreatorPoints = config?.requires_creator_points;
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
+  const requiresKYOFinanceMetadata = config?.requires_kyo_finance_swap_metadata;
 
   const needsExtension =
     requiresCreatorPoints ||
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
     requiresDiscordServerId ||
-    requiresGroupId;
+    requiresGroupId ||
+    requiresKYOFinanceMetadata;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -179,6 +182,50 @@ export const buildQuestSubFormValidationSchema = (
     baseSchema = baseSchema.extend({
       contentIdentifier: stringHasNumbersOnlyValidationSchema,
     }) as unknown as typeof baseSchema;
+  }
+  if (requiresKYOFinanceMetadata) {
+    const KYOFinanceChainIdVaidationSchema = z.union(
+      [
+        z
+          .literal(1868, {
+            invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          })
+          .describe('Soneium Mainnet'),
+        z
+          .literal(1946, {
+            invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          })
+          .describe('Soneium Testnet'),
+      ],
+      { invalid_type_error: VALIDATION_MESSAGES.NO_INPUT },
+    );
+    if (config.requires_kyo_finance_swap_metadata) {
+      baseSchema = baseSchema.extend({
+        metadata: z.object({
+          chainId: KYOFinanceChainIdVaidationSchema,
+          // TODO: malik - format?
+          minTimestamp: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - address validation
+          outputToken: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - address validation
+          inputToken: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - amount unit? + validation
+          minOutputAmount: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - unit/ranges?  + validation
+          minVolumeUSD: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+        }),
+      }) as unknown as typeof baseSchema;
+    }
   }
 
   return baseSchema;

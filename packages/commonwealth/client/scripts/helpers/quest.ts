@@ -81,6 +81,12 @@ export const doesActionRequireStartLink = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
 };
 
+export const doesActionRequireKYOFinanceSwapMetadata = (
+  action: QuestActionType,
+) => {
+  return action === 'KyoFinanceSwapQuestVerified';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,

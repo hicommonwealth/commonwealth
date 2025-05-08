@@ -92,7 +92,7 @@ export const QuestTweet = z
   })
   .describe('A tweet associated to a quest from which XP can be earned');
 
-const KyoFinanceChainIds = z.union([
+export const KyoFinanceChainIds = z.union([
   z.literal(1868).describe('Soneium Mainnet'),
   z.literal(1946).describe('Soneium Testnet'),
 ]);
