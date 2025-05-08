@@ -3,10 +3,12 @@ import {
   ContestGovernorSingleAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { createPublicClient, http } from 'viem';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { erc20Abi } from '../../abis/erc20Abi';
-import { Denominations, WeiDecimals } from '../utils';
+import { isValidChain } from '../chainConfig';
+import { Denominations, ViemChains, WeiDecimals } from '../utils';
 
 /**
  * Gets token ticker and decimal places to wei
@@ -70,22 +72,41 @@ export const getTokenAttributes = async (
 };
 
 export async function getErc20TokenInfo({
+  eth_chain_id,
   rpc,
   tokenAddress,
 }: {
+  eth_chain_id: number;
   rpc: string;
   tokenAddress: string;
 }): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
-  const web3 = new Web3(rpc);
-  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+  if (!isValidChain(eth_chain_id)) {
+    throw new Error(`Invalid eth_chain_id: ${eth_chain_id}`);
+  }
+  const client = createPublicClient({
+    chain: ViemChains[eth_chain_id],
+    transport: http(rpc),
+  });
   const [name, symbol, totalSupply] = await Promise.all([
-    erc20Contract.methods.name().call(),
-    erc20Contract.methods.symbol().call(),
-    erc20Contract.methods.totalSupply().call(),
+    client.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: 'name',
+    }),
+    client.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: 'symbol',
+    }),
+    client.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: 'totalSupply',
+    }),
   ]);
   return {
-    name,
-    symbol,
+    name: name as string,
+    symbol: symbol as string,
     totalSupply: totalSupply as bigint,
   };
 }
