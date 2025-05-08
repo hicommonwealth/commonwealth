@@ -159,6 +159,7 @@ export enum ChainNetwork {
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
+  Sui = 'sui',
 }
 
 /**
