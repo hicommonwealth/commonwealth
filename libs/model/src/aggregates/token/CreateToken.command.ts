@@ -1,4 +1,4 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidState, logger, type Command } from '@hicommonwealth/core';
 import {
   commonProtocol,
   getErc20TokenInfo,
@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+
+const log = logger(import.meta);
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
@@ -47,6 +49,13 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           tokenAddress: tokenData.parsedArgs.tokenAddress,
         });
       } catch (e) {
+        log.error(
+          `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+          e instanceof Error ? e : undefined,
+          {
+            e,
+          },
+        );
         throw new Error(
           `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
         );
@@ -109,8 +118,10 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         if (Number(tokenInfo.name))
           await models.sequelize.query(
             `UPDATE "Threads"
-              SET launchpad_token_address = :launchpadTokenAddress, is_linking_token = false
-              WHERE id = :threadId AND is_linking_token = false;`,
+             SET launchpad_token_address = :launchpadTokenAddress,
+                 is_linking_token = false
+             WHERE id = :threadId
+               AND is_linking_token = false;`,
             {
               replacements: {
                 launchpadTokenAddress:
