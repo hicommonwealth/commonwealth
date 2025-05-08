@@ -8,6 +8,7 @@ on:
       - beta
       - demo
       - production
+      - master
 
   workflow_run:
     workflows:
@@ -40,6 +41,9 @@ jobs:
               ;;
             demo)
               APP_NAME="commonwealth-demo"
+              ;;
+            master)
+              APP_NAME="commonwealth-frick"
               ;;
             production)
               APP_NAME="commonwealthapp"
