@@ -45,10 +45,12 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         throw new AppError('Token already exists, choose another name');
       }
 
-      const chainNode = await models.ChainNode.findOne({
-        where: { eth_chain_id },
-        attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
-      });
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: { eth_chain_id },
+          attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
+        },
+      );
 
       mustExist('Chain Node', chainNode);
 

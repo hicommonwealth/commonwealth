@@ -24,10 +24,12 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         icon_url,
       } = payload;
 
-      const chainNode = await models.ChainNode.findOne({
-        where: { id: chain_node_id },
-        attributes: ['eth_chain_id', 'url', 'private_url'],
-      });
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: { id: chain_node_id },
+          attributes: ['eth_chain_id', 'url', 'private_url'],
+        },
+      );
       mustExist('Chain Node', chainNode);
 
       const tokenData = await getLaunchpadTokenCreatedTransaction({
