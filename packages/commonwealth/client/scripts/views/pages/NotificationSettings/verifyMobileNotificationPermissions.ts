@@ -1,6 +1,9 @@
 import { isMobileApp } from 'hooks/useReactNativeWebView';
 import { MobileNotifications } from 'utils/MobileNotifications';
 
+/**
+ * @deprecated Not used any longer.  We should remove.
+ */
 export async function verifyMobileNotificationPermissions(): Promise<boolean> {
   if (isMobileApp()) {
     const existingPermissions = await MobileNotifications.getPermissionsAsync();
