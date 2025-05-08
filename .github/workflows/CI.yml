@@ -100,10 +100,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: bundle
         run: pnpm -F commonwealth bundle
 
