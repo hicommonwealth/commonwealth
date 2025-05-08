@@ -1,10 +1,10 @@
 import React, { memo, useState } from 'react';
 import { DebugPostMessage } from 'views/components/PrivyMobile/DebugPostMessage';
-import { useNotificationsGetPermissionsAsyncReceiver } from 'views/components/PrivyMobile/useNotificationsGetPermissionsAsyncReceiver';
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import usePrivyMobileAuthStatusStore from 'views/components/PrivyMobile/usePrivyMobileAuthStatusStore';
 import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
+import { useNotificationsRequestPermissionsAsyncReceiver } from '../PrivyMobile/useNotificationsRequestPermissionsAsyncReceiver';
 
 /**
  * component to help debug mobile usage.
@@ -23,8 +23,8 @@ export const DebugMobile = memo(function DebugMobile() {
   const logout = usePrivyMobileLogout();
   const ethereumWalletRequest = usePrivyEthereumWalletRequest();
 
-  const getNotificationsPermissions =
-    useNotificationsGetPermissionsAsyncReceiver();
+  const requestNotificationsPermissions =
+    useNotificationsRequestPermissionsAsyncReceiver();
 
   const handleSignMessage = () => {
     async function doAsync() {
@@ -54,9 +54,9 @@ export const DebugMobile = memo(function DebugMobile() {
     doAsync().catch(console.error);
   };
 
-  const handleGetNotificationsPermissions = () => {
+  const handleRequestNotificationsPermissions = () => {
     async function doAsync() {
-      const { status } = await getNotificationsPermissions({});
+      const { status } = await requestNotificationsPermissions({});
       setNotificationPermissions(status);
     }
 
@@ -85,7 +85,7 @@ export const DebugMobile = memo(function DebugMobile() {
         </div>
 
         <div style={{ margin: '8px' }}>
-          <button onClick={handleGetNotificationsPermissions}>
+          <button onClick={handleRequestNotificationsPermissions}>
             Get Notification Permissions
           </button>
         </div>
