@@ -55,6 +55,7 @@ export type ImageGenerationModel = 'gpt-image-1' | 'runware:100@1';
 
 export interface CompletionOptions {
   prompt: string;
+  systemPrompt?: string;
   model?: CompletionModel;
   temperature?: number;
   maxTokens?: number;
