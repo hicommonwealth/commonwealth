@@ -91,6 +91,13 @@
     padding: 12px;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
+    .CWEditor {
+      .ql-container {
+        min-height: unset !important;
+        max-height: 76px !important;
+      }
+    }
+
     &.expanded {
       height: 100%;
       padding: 0;
@@ -180,6 +187,39 @@
       input {
         min-width: 240px;
         transition: all 0.2s ease;
+      }
+
+      .CWEditor {
+        .CWTabsRow,
+        .CustomQuillToolbar,
+        .CustomQuillFooter {
+          display: none;
+        }
+
+        .QuillEditorWrapper {
+          min-height: unset !important;
+
+          &.isFocused {
+            border-radius: 6px;
+          }
+
+          .ql-container {
+            min-height: unset !important;
+            max-height: 76px !important;
+            font-family: $font-family-neue-haas-unica;
+
+            .ql-editor {
+              min-height: unset !important;
+              max-height: unset !important;
+              padding: 8px !important;
+              font-size: 14px !important;
+
+              &.ql-blank::before {
+                left: 8px !important;
+              }
+            }
+          }
+        }
       }
     }
   }

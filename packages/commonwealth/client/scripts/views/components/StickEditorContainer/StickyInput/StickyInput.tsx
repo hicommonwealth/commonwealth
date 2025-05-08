@@ -22,13 +22,15 @@ import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import CWTextInput from 'views/components/component_kit/new_designs/CWTextInput/CWTextInput';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   NewThreadForm,
   NewThreadFormHandles,
 } from 'views/components/NewThreadFormLegacy/NewThreadForm';
-import { createDeltaFromText } from 'views/components/react_quill_editor';
+import {
+  createDeltaFromText,
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
@@ -86,7 +88,6 @@ const StickyInput = (props: StickyInputProps) => {
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
@@ -176,11 +177,6 @@ const StickyInput = (props: StickyInputProps) => {
     };
   }, []);
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value, 'input');
-  };
-
   const handleThreadContentAppended = useCallback(
     (markdown: string) => {
       if (markdown !== inputValue) {
@@ -198,10 +194,6 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleFocused = () => {
     setExpanded(true);
-  };
-
-  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.stopPropagation();
   };
 
   const handleCancel = useCallback(
@@ -567,14 +559,11 @@ const StickyInput = (props: StickyInputProps) => {
 
             <div className="input-row">
               <div className="text-input-container">
-                <CWTextInput
-                  inputRef={inputRef}
-                  fullWidth
-                  isCompact
-                  value={inputValue}
-                  onInput={handleInputChange}
+                <ReactQuillEditor
+                  className="sticky-editor"
+                  contentDelta={props.contentDelta}
+                  setContentDelta={setContentDelta}
                   onKeyDown={handleKeyDown}
-                  onFocus={handleInputFocus}
                   placeholder={
                     mode === 'thread'
                       ? 'Create a thread...'
