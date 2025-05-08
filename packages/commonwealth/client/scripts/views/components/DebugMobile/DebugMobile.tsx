@@ -5,7 +5,10 @@ import usePrivyMobileAuthStatusStore from 'views/components/PrivyMobile/usePrivy
 import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
 
-export const DebugPrivyMobile = memo(function DebugPrivyMobile() {
+/**
+ * component to help debug mobile usage.
+ */
+export const DebugMobile = memo(function DebugMobile() {
   const { status: privyMobileAuthStatus } = usePrivyMobileAuthStatusStore();
 
   const [signature, setSignature] = useState<string | undefined>();
