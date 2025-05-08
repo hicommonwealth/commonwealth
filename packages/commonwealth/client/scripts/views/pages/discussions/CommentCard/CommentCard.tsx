@@ -18,6 +18,7 @@ import moment from 'moment';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
@@ -88,6 +89,7 @@ type CommentCardProps = {
   // Add props for root-level comment generation
   isRootComment?: boolean;
   threadContext?: string;
+  threadTitle?: string;
 };
 
 export const CommentCard = ({
@@ -131,11 +133,18 @@ export const CommentCard = ({
   tokenNumDecimals,
   isRootComment,
   threadContext,
+  threadTitle,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateCompletion } = useAiCompletion();
+
+  // Fetch community details
+  const { data: community } = useGetCommunityByIdQuery({
+    id: comment?.community_id || '',
+    enabled: !!comment?.community_id,
+  });
 
   const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
@@ -235,20 +244,40 @@ export const CommentCard = ({
     const generateAIReply = async () => {
       try {
         // Build context by combining thread context with parent comment if available
-        const threadPart = threadContext
-          ? `This is the thread body: ${threadContext}`
-          : '';
-        const parentPart = parentCommentText
-          ? `This is the parent comment: ${parentCommentText}`
-          : '';
 
-        const contextText = [threadPart, parentPart]
+        // Construct extended context with community details
+        const communityName = community?.name || 'this community';
+        const communityDescription =
+          community?.description || 'No specific description provided.';
+        const extendedCommunityContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
+
+        const originalThreadPart = [
+          threadTitle ? `Thread Title: ${threadTitle}` : '',
+          threadContext ? `Thread Body: ${threadContext}` : '',
+        ]
           .filter(Boolean)
-          .join('\n\n');
+          .join('\n');
+        const originalParentPart = parentCommentText
+          ? `Parent Comment: ${parentCommentText}`
+          : '';
 
-        const prompt = generateCommentPrompt(contextText);
+        const originalContext = [originalThreadPart, originalParentPart]
+          .filter(Boolean)
+          .join('\n\n'); // Separator between thread context and parent comment context
 
-        await generateCompletion(prompt, {
+        const contextText =
+          `${extendedCommunityContext}\n\n` +
+          `Original Context (Thread and Parent Comment):\n` +
+          `${originalContext.trim()}`;
+
+        const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
+
+        setStreamingText(''); // Clear previous streaming text
+
+        await generateCompletion(userPrompt, {
+          systemPrompt: systemPrompt,
           model: 'gpt-4o-mini',
           stream: true,
           onChunk: (chunk) => {
@@ -294,12 +323,14 @@ export const CommentCard = ({
     isStreamingAIReply,
     isRootComment,
     threadContext,
+    threadTitle,
     parentCommentText,
     comment.id,
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
     generateCompletion,
+    community,
   ]);
 
   useEffect(() => {
