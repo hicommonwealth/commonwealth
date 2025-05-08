@@ -41,12 +41,14 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
 
           if (protoResponse?.$id === $id) {
             console.log('Got proto response: ', protoResponse);
-            if (protoResponse.data) {
-              resolve(protoResponse.data);
-            }
 
             if (protoResponse.error) {
               reject(protoResponse.error);
+            }
+
+            // FIXME: this is the bug because some function can return null...
+            if (protoResponse.data) {
+              resolve(protoResponse.data);
             }
           }
         }
