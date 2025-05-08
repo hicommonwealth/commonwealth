@@ -9,11 +9,16 @@ const usePreferenceTags = () => {
   const [preferenceTags, setPreferenceTags] = useState<SelectedTag[]>([]);
 
   useEffect(() => {
-    if (!isLoadingTags && tags?.length >= 0 && !isInitialTagsSet.current) {
+    if (
+      !isLoadingTags &&
+      tags &&
+      tags.length >= 0 &&
+      !isInitialTagsSet.current
+    ) {
       setPreferenceTags(
         [...tags].map((item) => ({
           item: {
-            id: item.id,
+            id: item.id!,
             tag: item.name,
           },
           isSelected: false,
