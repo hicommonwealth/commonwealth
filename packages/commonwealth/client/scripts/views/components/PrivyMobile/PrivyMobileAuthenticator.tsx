@@ -62,12 +62,18 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         return;
       }
 
+      console.log('FIXME: Privy mobile is authenticated so trying to sign in ');
+
       const webWallet = new PrivyEthereumWebWalletController(
         ethereumProvider,
         signMessageProvider,
       );
 
+      console.log('FIXME enable web wallet... ;');
+
       await webWallet.enable();
+
+      console.log('FIXME getting session now.;');
       const session = await getSessionFromWallet(webWallet, {
         newSession: true,
       });
