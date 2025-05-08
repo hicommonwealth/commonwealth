@@ -231,6 +231,9 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
+    // FIXME: we don't have the 'on' event handler...
+    console.log('FIXME: within enable... 7');
+
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
