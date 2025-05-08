@@ -237,6 +237,10 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
+        console.log(
+          'FIXME: initAccounts got some accounts: ',
+          JSON.stringify(accounts, null, 2),
+        );
         const updatedAddress = userStore
           .getState()
           .accounts.find((addr) => addr.address === accounts[0]);

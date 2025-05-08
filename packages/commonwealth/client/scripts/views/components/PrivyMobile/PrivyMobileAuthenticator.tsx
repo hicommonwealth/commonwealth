@@ -4,6 +4,7 @@ import { getSessionFromWallet } from 'controllers/server/sessions';
 import { ReactNode, useCallback, useEffect } from 'react';
 import { useSignIn } from 'state/api/user';
 import { toSignInProvider } from 'views/components/Privy/helpers';
+import { usePrivyEthereumWalletOn } from 'views/components/PrivyMobile/usePrivyEthereumWalletOn';
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import { usePrivyMobileAuthStatus } from 'views/components/PrivyMobile/usePrivyMobileAuthStatus';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
@@ -26,12 +27,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   const getPrivyMobileAuthStatus = usePrivyMobileAuthStatus();
   const { signIn } = useSignIn();
 
-  const request = usePrivyEthereumWalletRequest();
+  const walletRequest = usePrivyEthereumWalletRequest();
+  const walletOn = usePrivyEthereumWalletOn();
   const signMessage = usePrivyMobileSignMessage();
 
   const ethereumProvider = useCallback(async () => {
-    return { request };
-  }, [request]);
+    return { request: walletRequest, on: walletOn };
+  }, [walletOn, walletRequest]);
 
   const signMessageProvider = useCallback(
     async (message: string): Promise<string> => {
