@@ -15,6 +15,26 @@
   min-width: 280px;
   position: relative;
 
+  @include extraSmall {
+    .input-row {
+      gap: 6px;
+
+      .action-button,
+      .send-button,
+      .image-button,
+      .expand-button,
+      .ai-toggle-button {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+
+        svg {
+          transform: scale(0.8);
+        }
+      }
+    }
+  }
+
   // Action buttons container
   .button-group {
     display: flex;
@@ -141,6 +161,7 @@
     margin: 0 auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
+
     &.expanded {
       padding: 0;
     }
@@ -182,12 +203,6 @@
       flex-grow: 1;
       min-width: 240px;
       flex-basis: 240px;
-
-      // Style the actual input
-      input {
-        min-width: 240px;
-        transition: all 0.2s ease;
-      }
 
       .CWEditor {
         .CWTabsRow,
@@ -247,6 +262,7 @@
 /* Expanded view styles - common for both desktop and mobile */
 .DesktopStickyInputExpanded {
   padding: 0 !important;
+
   .NewThreadForm,
   .CommentEditor {
     width: 100%;
@@ -256,59 +272,5 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     margin: 0;
     padding: 16px;
-  }
-}
-
-/* Responsive styles for smaller screens */
-@media (max-width: 480px) {
-  .StickyInput {
-    .input-row {
-      .text-input-container {
-        min-width: 100%;
-        flex-basis: 100%;
-        margin-bottom: 8px;
-      }
-
-      .button-group {
-        width: 100%;
-        justify-content: flex-end;
-      }
-
-      .action-button,
-      .send-button,
-      .image-button,
-      .expand-button,
-      .ai-toggle-button {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-
-        svg {
-          transform: scale(0.9);
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 360px) {
-  .StickyInput {
-    .input-row {
-      gap: 6px;
-
-      .action-button,
-      .send-button,
-      .image-button,
-      .expand-button,
-      .ai-toggle-button {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-
-        svg {
-          transform: scale(0.8);
-        }
-      }
-    }
   }
 }
