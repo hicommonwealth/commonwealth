@@ -178,6 +178,9 @@ export default defineConfig(({ mode }) => {
         'firebase/app',
         'firebase/messaging',
         'eventsource-client',
+        'react-turnstile',
+        'react-dom',
+        'moment/moment',
       ],
     },
     build: {
