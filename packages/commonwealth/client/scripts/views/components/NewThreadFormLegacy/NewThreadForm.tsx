@@ -522,45 +522,58 @@ export const NewThreadForm = forwardRef<
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
 
-    const context = recentThreads
+    const recentThreadsContext = recentThreads
       ?.map((thread) => {
-        return `Title: ${thread.title}
-              \n Body: ${thread.body}
-              \n Topic: ${thread.topic?.name || 'N/A'}
-              \n Community: ${thread.communityName || 'N/A'}`;
+        return `Title: ${thread.title}\nBody: ${thread.body}\nTopic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`;
       })
       .join('\n\n');
 
     try {
-      const prompt = generateThreadPrompt(context);
+      const { systemPrompt: bodySystemPrompt, userPrompt: bodyUserPrompt } =
+        generateThreadPrompt(
+          recentThreadsContext || 'Suggest a new discussion topic.',
+        );
 
-      const threadContent = await generateCompletion(prompt, {
+      await generateCompletion(bodyUserPrompt, {
         model: 'gpt-4o-mini',
         stream: true,
+        systemPrompt: bodySystemPrompt,
         onError: (error) => {
-          console.error('Error generating AI thread:', error);
+          console.error('Error generating AI thread body:', error);
           notifyError('Failed to generate AI thread content');
+          setIsGenerating(false);
         },
         onChunk: (chunk) => {
           bodyAccumulatedRef.current += chunk;
           setThreadContentDelta(
-            createDeltaFromText(bodyAccumulatedRef.current),
+            createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
           );
         },
-      });
+        onComplete: async (generatedBody) => {
+          const {
+            systemPrompt: titleSystemPrompt,
+            userPrompt: titleUserPrompt,
+          } = generateThreadTitlePrompt(generatedBody.trim() || 'New Thread');
 
-      const titlePrompt = generateThreadTitlePrompt(threadContent);
-
-      await generateCompletion(titlePrompt, {
-        stream: false,
-        onComplete(fullText) {
-          setThreadTitle(fullText);
+          await generateCompletion(titleUserPrompt, {
+            model: 'gpt-4o-mini',
+            stream: false,
+            systemPrompt: titleSystemPrompt,
+            onComplete(fullTitle) {
+              setThreadTitle(fullTitle.trim());
+              setIsGenerating(false);
+            },
+            onError: (titleError) => {
+              console.error('Error generating AI thread title:', titleError);
+              notifyError('Failed to generate AI thread title');
+              setIsGenerating(false);
+            },
+          });
         },
       });
     } catch (error) {
-      console.error('Error generating AI thread:', error);
-      notifyError('Failed to generate AI thread');
-    } finally {
+      console.error('Error in AI thread generation process:', error);
+      notifyError('Failed to generate AI thread content or title');
       setIsGenerating(false);
     }
   };

@@ -126,11 +126,12 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
 
       const context = `${extendedContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalContext.trim()}`;
 
-      const prompt = generateCommentPrompt(context);
+      const { systemPrompt, userPrompt } = generateCommentPrompt(context);
 
-      generateCompletion(prompt, {
+      generateCompletion(userPrompt, {
         model: 'gpt-4o-mini',
         stream: true,
+        systemPrompt,
         onError: (error) => {
           console.error('Error generating AI comment:', error);
           notifyError('Failed to generate AI comment');

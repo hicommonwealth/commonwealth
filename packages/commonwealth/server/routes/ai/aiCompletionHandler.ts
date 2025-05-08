@@ -7,7 +7,8 @@ import { extractOpenRouterError } from './utils';
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   try {
     const {
-      prompt,
+      prompt: initialPrompt,
+      systemPrompt: initialSystemPrompt,
       model = 'gpt-4o',
       temperature = 0.7,
       maxTokens = 1000,
@@ -16,13 +17,66 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       useWebSearch = false,
     } = req.body as CompletionOptions;
 
-    // Validate inputs
-    if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' });
+    let finalUserPrompt: string;
+    let finalSystemPrompt: string | undefined;
+
+    // Check if initialPrompt is an object with userPrompt and systemPrompt properties
+    if (
+      typeof initialPrompt === 'object' &&
+      initialPrompt !== null &&
+      typeof (initialPrompt as any).userPrompt === 'string'
+    ) {
+      finalUserPrompt = (initialPrompt as any).userPrompt;
+      // Use systemPrompt from the object if available, otherwise fallback to initialSystemPrompt (top-level)
+      finalSystemPrompt =
+        (initialPrompt as any).systemPrompt || initialSystemPrompt;
+      console.log('Interpreting structured prompt from initialPrompt field:');
+      console.log('  User Prompt (from object): ', finalUserPrompt);
+      if ((initialPrompt as any).systemPrompt) {
+        console.log(
+          '  System Prompt (from object): ',
+          (initialPrompt as any).systemPrompt,
+        );
+      }
+      if (initialSystemPrompt && !(initialPrompt as any).systemPrompt) {
+        console.log(
+          '  System Prompt (from top-level, as object did not have one): ',
+          initialSystemPrompt,
+        );
+      }
+    } else if (typeof initialPrompt === 'string') {
+      // This is the originally expected correct case
+      finalUserPrompt = initialPrompt;
+      finalSystemPrompt = initialSystemPrompt;
+      console.log('Interpreting flat prompt fields:');
+      console.log('  User Prompt: ', finalUserPrompt);
+      if (finalSystemPrompt) {
+        console.log('  System Prompt: ', finalSystemPrompt);
+      }
+    } else {
+      console.error('Invalid initialPrompt structure received:', initialPrompt);
+      return res
+        .status(400)
+        .json({
+          error:
+            'Invalid prompt format. Prompt must be a string or a structured object.',
+        });
     }
 
-    // Log the received prompt
-    console.log('Received prompt:', prompt);
+    // Validate inputs (now using finalUserPrompt)
+    if (!finalUserPrompt) {
+      return res
+        .status(400)
+        .json({
+          error: 'User prompt content is required and could not be determined.',
+        });
+    }
+
+    // Log the received prompt - now logging the determined final prompts
+    console.log('Final User Prompt for AI:', finalUserPrompt);
+    if (finalSystemPrompt) {
+      console.log('Final System Prompt for AI:', finalSystemPrompt);
+    }
 
     // Choose between OpenAI and OpenRouter
     const useOR = useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
@@ -101,9 +155,18 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const messages: any[] = [];
+        if (finalSystemPrompt) {
+          messages.push({ role: 'system', content: finalSystemPrompt });
+        }
+        messages.push({ role: 'user', content: finalUserPrompt });
+
+        console.log('Constructed messages for AI:', messages);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamConfig: any = {
           model: modelId as any,
-          messages: [{ role: 'user', content: prompt }],
+          messages,
           temperature,
           max_tokens: maxTokens,
           stream: true,
@@ -124,13 +187,59 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           await openai.chat.completions.create(streamConfig);
 
         for await (const chunk of streamResponse) {
-          const content = chunk.choices[0]?.delta?.content || '';
-          if (content) {
-            res.write(content);
-            // Force flush the response to prevent buffering
-            if (res.flush) res.flush();
+          // Log the entire raw chunk from the AI
+          console.log('Raw AI stream chunk:', JSON.stringify(chunk, null, 2));
+
+          const choice = chunk.choices?.[0];
+          if (choice) {
+            let annotationsFoundInChunk = false;
+            // Check for annotations on delta (OpenRouter might put them here)
+            if (choice.delta && (choice.delta as any).annotations) {
+              console.log(
+                'Annotations in chunk (from delta.annotations):',
+                JSON.stringify((choice.delta as any).annotations, null, 2),
+              );
+              annotationsFoundInChunk = true;
+            }
+            // Check for annotations directly on the choice object (less common for streaming delta but good to cover)
+            if ((choice as any).annotations) {
+              console.log(
+                'Annotations in chunk (from choice.annotations):',
+                JSON.stringify((choice as any).annotations, null, 2),
+              );
+              annotationsFoundInChunk = true;
+            }
+            // If OpenRouter nests a full message object within delta, check there too
+            if (
+              choice.delta &&
+              (choice.delta as any).message &&
+              (choice.delta as any).message.annotations
+            ) {
+              console.log(
+                'Annotations in chunk (from delta.message.annotations):',
+                JSON.stringify(
+                  (choice.delta as any).message.annotations,
+                  null,
+                  2,
+                ),
+              );
+              annotationsFoundInChunk = true;
+            }
+
+            if (annotationsFoundInChunk) {
+              // If annotations are found, you might want to handle them or store them
+              // For now, we are just logging them per chunk.
+            }
+          }
+
+          const contentToStream = choice?.delta?.content || '';
+          if (contentToStream) {
+            res.write(contentToStream);
+            if (res.flush) res.flush(); // Force flush for immediate client update
           }
         }
+
+        res.end();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (streamError: any) {
         console.error('Streaming error:', streamError);
@@ -162,15 +271,21 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         res.write('\nError during streaming');
         res.end();
       }
-
-      res.end();
     } else {
       // Handle regular response
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const completionConfig: any = {
+        const messages: any[] = [];
+        if (finalSystemPrompt) {
+          messages.push({ role: 'system', content: finalSystemPrompt });
+        }
+        messages.push({ role: 'user', content: finalUserPrompt });
+
+        console.log('Constructed messages for AI (non-streaming):', messages);
+
+        const completion = await openai.chat.completions.create({
           model: modelId as any,
-          messages: [{ role: 'user', content: prompt }],
+          messages,
           temperature,
           max_tokens: maxTokens,
           ...(useOR && {
@@ -181,12 +296,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           }),
           ...(!useOR &&
             addOpenAiWebSearchOptions && { web_search_options: {} }),
-        };
-
-        console.log('Completion request messages:', completionConfig.messages); // Log the messages for non-streaming
-
-        const completion =
-          await openai.chat.completions.create(completionConfig);
+        });
 
         // Log the entire first choice message object from the AI
         if (
@@ -215,7 +325,16 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         }
 
         const responseText = completion.choices[0]?.message?.content || '';
-        res.json({ completion: responseText });
+        const messageForResponse = completion.choices[0]?.message as any;
+        const annotations = messageForResponse?.annotations;
+
+        const responsePayload: { completion: string; annotations?: any } = {
+          completion: responseText,
+        };
+        if (annotations) {
+          responsePayload.annotations = annotations;
+        }
+        res.json(responsePayload);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (completionError: any) {
         console.error('Completion error:', completionError);
