@@ -45,6 +45,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
       try {
         tokenInfo = await getErc20TokenInfo({
+          eth_chain_id: chainNode.eth_chain_id!,
           rpc: chainNode.private_url || chainNode.url,
           tokenAddress: tokenData.parsedArgs.tokenAddress,
         });
