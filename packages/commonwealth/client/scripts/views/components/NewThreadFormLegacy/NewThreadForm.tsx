@@ -29,6 +29,7 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import useGetTokenizedThreadsAllowedQuery from 'state/api/tokens/getTokenizedThreadsAllowed';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -114,6 +115,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
+  const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -373,6 +375,25 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       });
 
       const thread = await createThread(input);
+
+      if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
+        await createThreadToken({
+          name: effectiveTitle,
+          symbol: effectiveTitle.substring(0, 4).toUpperCase(),
+          threadId: thread.id!,
+          ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
+          initPurchaseAmount: 0.1,
+          chainId: community.ChainNode?.eth_chain_id?.toString() || '',
+          walletAddress: userSelectedAddress,
+          authorAddress: userSelectedAddress,
+          communityTreasuryAddress:
+            (app.chain?.meta as any)?.communityTreasuryAddress || '',
+          chainRpc: community.ChainNode?.url || '',
+          paymentTokenAddress:
+            (app.chain?.meta as any)?.paymentTokenAddress || '',
+        });
+      }
+
       if (thread && linkedProposals) {
         addThreadLinks({
           communityId: app.activeChainId() || '',
@@ -475,6 +496,8 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     linkedProposals,
     createPoll,
     pollsData,
+    createThreadToken,
+    tokenizedThreadsAllowed,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
