@@ -11,16 +11,28 @@ type ProtoRequestObject<Request> = {
   data: Request;
 };
 
-/**
- * Wraps a response so that it includes the error OR data.
- */
-type ProtoResponseObject<Response> = {
+type ProtoResponseObjectSuccess<Response> = {
   $id: string;
   type: string;
   variant: 'response';
-  data: Response | null;
-  error: ProtoError | null;
+  data: Response;
+  error: null;
 };
+
+/**
+ * Wraps a response so that it includes the error OR data.
+ */
+type ProtoResponseObjectFailure = {
+  $id: string;
+  type: string;
+  variant: 'response';
+  data: null;
+  error: ProtoError;
+};
+
+type ProtoResponseObject<Response> =
+  | ProtoResponseObjectSuccess<Response>
+  | ProtoResponseObjectFailure;
 
 type Opts = {
   type: string;
@@ -44,10 +56,7 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
 
             if (protoResponse.error) {
               reject(protoResponse.error);
-            }
-
-            // FIXME: this is the bug because some function can return null...
-            if (protoResponse.data) {
+            } else {
               resolve(protoResponse.data);
             }
           }
