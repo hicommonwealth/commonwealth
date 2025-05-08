@@ -1,22 +1,22 @@
 import axios from 'axios';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWIcon } from 'views/components/component_kit/new_designs/CWIcon';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-type Tag = {
-  id: number;
+interface Tag {
+  id: string;
   name: string;
   community_count: number;
   created_at: string;
-};
+  is_featured?: boolean;
+}
 
 // API functions
 const getTags = async (): Promise<Tag[]> => {
@@ -29,24 +29,23 @@ const createTag = async (name: string): Promise<Tag> => {
   return response.data;
 };
 
-const updateTag = async (id: number, name: string): Promise<Tag> => {
+const updateTag = async (id: string, name: string): Promise<Tag> => {
   const response = await axios.put(`/api/v1/admin/tags/${id}`, { name });
   return response.data;
 };
 
-const deleteTag = async (id: number): Promise<void> => {
+const deleteTag = async (id: string): Promise<void> => {
   await axios.delete(`/api/v1/admin/tags/${id}`);
 };
 
 const getTagUsage = async (
-  id: number,
+  id: string,
 ): Promise<{ communities: { id: string; name: string }[] }> => {
   const response = await axios.get(`/api/v1/admin/tags/${id}/usage`);
   return response.data;
 };
 
 const CommunityTagsManagementTask = () => {
-  const queryClient = useQueryClient();
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newTagName, setNewTagName] = useState('');
@@ -198,62 +197,33 @@ const CommunityTagsManagementTask = () => {
   const columns = [
     {
       id: 'name',
-      header: (
-        <div
-          className="sortable-header"
-          onClick={() => handleSort('name')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        >
-          <span>Tag Name</span>
-          {sortColumn === 'name' && (
-            <CWIcon
-              iconName={sortDirection === 'asc' ? 'arrowUp' : 'arrowDown'}
-              iconSize="sm"
-            />
-          )}
-        </div>
-      ),
-      accessorKey: 'name',
-      cell: ({ row }: any) => {
+      header: 'Name',
+      key: 'name',
+      numeric: false,
+      sortable: true,
+      cell: ({ row }: { row: { original: Tag } }) => {
         const tag = row.original;
-        return editingTag?.id === tag.id ? (
-          <CWTextInput
-            value={editingTag.name}
-            onInput={(e) =>
-              setEditingTag({ ...editingTag, name: e.target.value })
-            }
-            autoFocus
-          />
-        ) : (
-          <span>{tag.name}</span>
+        return (
+          <div>
+            <span>{tag.name}</span>
+            {tag.is_featured && <CWIcon iconName="star" iconSize="small" />}
+          </div>
         );
       },
     },
     {
       id: 'community_count',
-      header: (
-        <div
-          className="sortable-header"
-          onClick={() => handleSort('community_count')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        >
-          <span>Communities</span>
-          {sortColumn === 'community_count' && (
-            <CWIcon
-              iconName={sortDirection === 'asc' ? 'arrowUp' : 'arrowDown'}
-              iconSize="sm"
-            />
-          )}
-        </div>
-      ),
-      accessorKey: 'community_count',
-      cell: ({ row }: any) => (
+      header: 'Community Count',
+      key: 'community_count',
+      numeric: true,
+      sortable: true,
+      cell: ({ row }: { row: { original: Tag } }) => (
         <div>
           <span>{row.original.community_count}</span>
           {row.original.community_count > 0 && (
             <CWButton
               label="View"
-              buttonHeight="xs"
+              buttonHeight="sm"
               buttonType="tertiary"
               onClick={() => handleViewTagUsage(row.original)}
             />
@@ -263,23 +233,11 @@ const CommunityTagsManagementTask = () => {
     },
     {
       id: 'created_at',
-      header: (
-        <div
-          className="sortable-header"
-          onClick={() => handleSort('created_at')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        >
-          <span>Created</span>
-          {sortColumn === 'created_at' && (
-            <CWIcon
-              iconName={sortDirection === 'asc' ? 'arrowUp' : 'arrowDown'}
-              iconSize="sm"
-            />
-          )}
-        </div>
-      ),
-      accessorKey: 'created_at',
-      cell: ({ row }: any) => {
+      header: 'Created At',
+      key: 'created_at',
+      numeric: false,
+      sortable: true,
+      cell: ({ row }: { row: { original: Tag } }) => {
         const date = new Date(row.original.created_at);
         return <span>{date.toLocaleDateString()}</span>;
       },
@@ -287,33 +245,22 @@ const CommunityTagsManagementTask = () => {
     {
       id: 'actions',
       header: 'Actions',
-      cell: ({ row }: any) => {
+      key: 'actions',
+      numeric: false,
+      sortable: false,
+      cell: ({ row }: { row: { original: Tag } }) => {
         const tag = row.original;
-        return editingTag?.id === tag.id ? (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <CWButton
-              label="Save"
-              buttonHeight="xs"
-              onClick={handleUpdateTag}
-            />
-            <CWButton
-              label="Cancel"
-              buttonHeight="xs"
-              buttonType="secondary"
-              onClick={() => setEditingTag(null)}
-            />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: '8px' }}>
+        return (
+          <div className="actions-column">
             <CWButton
               label="Edit"
-              buttonHeight="xs"
+              buttonHeight="sm"
               buttonType="secondary"
               onClick={() => setEditingTag(tag)}
             />
             <CWButton
               label="Delete"
-              buttonHeight="xs"
+              buttonHeight="sm"
               buttonType="tertiary"
               onClick={() => handleDeleteTag(tag)}
             />
@@ -356,7 +303,7 @@ const CommunityTagsManagementTask = () => {
             value={searchTerm}
             onInput={(e) => setSearchTerm(e.target.value)}
             placeholder="Search tags"
-            iconLeft="search"
+            // iconLeft="search"
           />
           <div>
             <CWText type="caption">{filteredTags.length} tags found</CWText>
@@ -364,21 +311,17 @@ const CommunityTagsManagementTask = () => {
         </div>
 
         <CWTable
-          columns={columns}
-          data={sortedTags}
-          isLoading={isLoading}
-          empty={
-            !isLoading && filteredTags.length === 0
-              ? 'No tags found'
-              : undefined
-          }
+          columnInfo={columns}
+          rowData={sortedTags}
+          isLoadingMoreRows={isLoading}
         />
       </div>
 
       {/* Tag Usage Modal */}
       {showUsageModal && (
         <CWModal
-          title={`Communities using this tag`}
+          // title="Communities using this tag"
+          open={showUsageModal}
           onClose={() => setShowUsageModal(false)}
           content={
             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
