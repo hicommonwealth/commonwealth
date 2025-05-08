@@ -32,26 +32,28 @@ const App = () => {
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
             <DisableMavaOnMobile />
+            <ReactNativeLogForwarder />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
               <OpenFeatureProvider client={undefined}>
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <PrivyMobileAuthStatusProvider>
-                    <PrivyMobileAuthenticator>
-                      <DefaultPrivyProvider>
-                        {/*<ForceMobileAuth>*/}
-                        <OnBoardingWrapperForMobile>
-                          <ReactNativeBridgeUser />
-                          <ReactNativeLogForwarder />
-                          <ReactNativeScrollToTopListener />
-                          <RouterProvider router={router()} />
-                        </OnBoardingWrapperForMobile>
-                        {/*</ForceMobileAuth>*/}
-                      </DefaultPrivyProvider>
-                    </PrivyMobileAuthenticator>
-                  </PrivyMobileAuthStatusProvider>
+                  <>
+                    <PrivyMobileAuthStatusProvider>
+                      <PrivyMobileAuthenticator>
+                        <DefaultPrivyProvider>
+                          {/*<ForceMobileAuth>*/}
+                          <OnBoardingWrapperForMobile>
+                            <ReactNativeBridgeUser />
+                            <ReactNativeScrollToTopListener />
+                            <RouterProvider router={router()} />
+                          </OnBoardingWrapperForMobile>
+                          {/*</ForceMobileAuth>*/}
+                        </DefaultPrivyProvider>
+                      </PrivyMobileAuthenticator>
+                    </PrivyMobileAuthStatusProvider>
+                  </>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && <ReactQueryDevtools />}

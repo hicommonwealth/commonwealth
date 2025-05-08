@@ -69,8 +69,9 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         signMessageProvider,
       );
 
-      console.log('FIXME enable web wallet... ;');
+      console.log('FIXME enable web wallet... ');
 
+      // FIXME this is the bug now - it's not logging though
       await webWallet.enable();
 
       console.log('FIXME getting session now.;');
