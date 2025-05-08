@@ -3,47 +3,44 @@
 .RequirementCard {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  background-color: $neutral-25;
-  border: 1px solid $neutral-200;
-  border-radius: 6px;
-  gap: 16px;
   width: 100%;
-
-  .row-1,
-  .row-2 {
-    align-items: flex-start;
-    gap: 12px;
-    width: 100%;
-  }
+  gap: 16px;
+  background-color: $neutral-50;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 16px;
 
   .row-1 {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    .w-350 {
-      min-width: 350px;
-    }
+  .chain-badge {
+    margin-left: auto;
   }
 
   .row-2 {
     display: grid;
-  }
-
-  .cols-4 {
-    grid-template-columns: 1fr 2fr 1fr 1fr;
-
-    @include mediumSmallInclusive {
-      grid-template-columns: initial;
-      grid-template-rows: 1fr 1fr 1fr 1fr;
-    }
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
   }
 
   .cols-3 {
-    grid-template-columns: 3fr 1fr 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
 
-    @include mediumSmallInclusive {
-      grid-template-columns: initial;
-      grid-template-rows: 1fr 1fr 1fr;
-    }
+  .cols-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .cols-5 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 16px;
   }
 }

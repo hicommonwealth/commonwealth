@@ -1,0 +1,35 @@
+@import '../../../../../styles/shared';
+
+.GroupsFeatureCard {
+  margin-bottom: 24px;
+
+  .card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: $neutral-50;
+    border-radius: 8px;
+    border: 1px solid $neutral-200;
+
+    .text-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .Icon {
+      color: $primary-500;
+    }
+
+    @include smallInclusive {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .Button {
+        width: 100%;
+      }
+    }
+  }
+}

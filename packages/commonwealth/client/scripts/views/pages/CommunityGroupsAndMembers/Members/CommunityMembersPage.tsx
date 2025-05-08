@@ -38,15 +38,16 @@ import {
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import './CommunityMembersPage.scss';
+import GroupsFeatureCard from './GroupsFeatureCard';
 import GroupsSection from './GroupsSection';
-import LeaderboardSection from './LeaderboardSection';
-import MembersSection from './MembersSection';
-import { Member } from './MembersSection/MembersSection';
 import {
   BaseGroupFilter,
   MemberResultsOrderBy,
   SearchFilters,
 } from './index.types';
+import LeaderboardSection from './LeaderboardSection';
+import MembersSection from './MembersSection';
+import { Member } from './MembersSection/MembersSection';
 
 const client = OpenFeature.getClient();
 const referralsEnabled = client.getBooleanValue('referrals', false);
@@ -59,10 +60,10 @@ enum TabValues {
 
 const TABS = [
   { value: TabValues.AllMembers, label: 'All members' },
+  { value: TabValues.Groups, label: 'Groups' },
   ...(referralsEnabled
     ? [{ value: TabValues.Leaderboard, label: 'Leaderboard' }]
     : []),
-  { value: TabValues.Groups, label: 'Groups' },
 ];
 
 const GROUP_AND_MEMBER_FILTERS: { label: string; value: BaseGroupFilter }[] = [
@@ -82,6 +83,11 @@ const CommunityMembersPage = () => {
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
   });
+
+  // Add state for groups info banner visibility
+  const [showGroupsInfoBanner, setShowGroupsInfoBanner] = useState<boolean>(
+    localStorage.getItem('groupsInfoSeen') !== 'true',
+  );
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -370,6 +376,33 @@ const CommunityMembersPage = () => {
           ))}
         </CWTabsRow>
 
+        {/* Groups information banner for first-time visitors */}
+        {showGroupsInfoBanner &&
+          (selectedTab === TabValues.AllMembers ||
+            selectedTab === TabValues.Groups) && (
+            <section>
+              <CWBanner
+                type="info"
+                title="Create and join groups with your tokens"
+                body={`Groups allow you to organize members and set permissions based on token holdings. You can use Ethereum tokens (ERC20, native ETH), Base tokens, and tokens from other supported chains.`}
+                onClose={() => {
+                  setShowGroupsInfoBanner(false);
+                  localStorage.setItem('groupsInfoSeen', 'true');
+                }}
+                buttons={
+                  selectedTab === TabValues.AllMembers
+                    ? [
+                        {
+                          label: 'Explore Groups',
+                          onClick: () => updateActiveTab(TabValues.Groups),
+                        },
+                      ]
+                    : undefined
+                }
+              />
+            </section>
+          )}
+
         {/* Gating group post-mutation banner */}
         {shouldShowGroupMutationBannerForCommunities.includes(communityId) &&
           selectedTab === TabValues.AllMembers && (
@@ -468,21 +501,34 @@ const CommunityMembersPage = () => {
         ) : selectedTab === TabValues.Leaderboard ? (
           <LeaderboardSection />
         ) : (
-          <MembersSection
-            // @ts-expect-error <StrictNullChecks/>
-            filteredMembers={formattedMembers}
-            onLoadMoreMembers={() => {
+          <>
+            {/* Feature card to promote Groups */}
+            {!localStorage.getItem('groupsFeatureCardDismissed') && (
+              <GroupsFeatureCard
+                onExploreGroupsClick={() => {
+                  updateActiveTab(TabValues.Groups);
+                  localStorage.setItem('groupsFeatureCardDismissed', 'true');
+                }}
+              />
+            )}
+            <MembersSection
               // @ts-expect-error <StrictNullChecks/>
-              if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
-                fetchNextPage?.().catch(console.error);
-              }
-            }}
-            isLoadingMoreMembers={isLoadingMembers}
-            tableState={tableState}
-            extraColumns={extraColumns}
-            refetch={() => void refetchMembers()}
-            canManagePermissions={isAdmin}
-          />
+              filteredMembers={formattedMembers}
+              onLoadMoreMembers={() => {
+                // @ts-expect-error <StrictNullChecks/>
+                if (
+                  members?.pages?.[0]?.totalResults > formattedMembers.length
+                ) {
+                  fetchNextPage?.().catch(console.error);
+                }
+              }}
+              isLoadingMoreMembers={isLoadingMembers}
+              tableState={tableState}
+              extraColumns={extraColumns}
+              refetch={() => void refetchMembers()}
+              canManagePermissions={isAdmin}
+            />
+          </>
         )}
       </section>
     </CWPageLayout>

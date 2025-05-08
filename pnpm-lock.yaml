@@ -16,6 +16,9 @@ importers:
       '@commonxyz/common-protocol-abis':
         specifier: 1.4.11
         version: 1.4.11
+      '@mysten/wallet-standard':
+        specifier: ^0.14.7
+        version: 0.14.7(typescript@5.8.2)
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -4747,6 +4750,7 @@ packages:
   '@lens-protocol/client@2.3.1':
     resolution: {integrity: sha512-Ey1yg8N2lp51wyWXKacOs36aOHlmCsF4ysCBJH4C85wwxIFBKbN5jXZX9Zxd1Gfe658SxKU2zGjBsg3X6LikiA==}
     engines: {node: '>=18 <21'}
+    deprecated: 2.x is no longer supported, see @canary for 3.x
     peerDependencies:
       '@lens-protocol/metadata': ^1.0.0
     peerDependenciesMeta:

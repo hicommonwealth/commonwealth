@@ -1,5 +1,6 @@
 import React from 'react';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { ERC_SPECIFICATIONS, TOKENS } from '../../../../common/constants';
 import { InfoBlock } from './InfoBlock';
 import './RequirementCard.scss';
@@ -13,6 +14,13 @@ type RequirementCardProps = {
   requirementTokenId?: string;
 };
 
+// Helper function to get chain icon name
+const getChainIconName = (chainName: string) => {
+  const normalizedChainName = chainName.toLowerCase();
+  if (normalizedChainName.includes('ethereum')) return 'ethereum';
+  return undefined; // Default to no icon if not recognized
+};
+
 const RequirementCard = ({
   requirementType,
   requirementChain,
@@ -23,11 +31,19 @@ const RequirementCard = ({
 }: RequirementCardProps) => {
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const chainIconName = getChainIconName(requirementChain);
 
   return (
     <div className="RequirementCard">
       <div className="row-1">
         <InfoBlock label="Requirement type" value={requirementType} />
+        <div className="chain-badge">
+          <CWTag
+            label={requirementChain}
+            type="referendum"
+            iconName={chainIconName}
+          />
+        </div>
       </div>
 
       {requirementType && (
@@ -46,7 +62,6 @@ const RequirementCard = ({
             'row-2': !(!isTokenRequirement && is1155Requirement),
           })}
         >
-          <InfoBlock label="Chain" value={requirementChain} />
           {!!requirementContractAddress && (
             <InfoBlock
               label="Contract address"
