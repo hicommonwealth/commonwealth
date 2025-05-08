@@ -695,7 +695,7 @@ export const NewThreadForm = forwardRef<
   }, [onContentAppended, handleAppendContent]);
 
   const handleOpenImageModal = useCallback(() => {
-    const currentContent = getTextFromDelta(threadContentDelta, false);
+    const currentContent = getTextFromDelta(threadContentDelta);
     const imageUrls = getImageUrlsFromDelta(threadContentDelta);
     const communityName = community?.name;
     const topicName = threadTopic?.name;
