@@ -14,6 +14,7 @@ import { CWResponsiveDialog } from '../component_kit/new_designs/CWResponsiveDia
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import './ImageActionModal.scss';
 import { ReferenceImageItem } from './ReferenceImageItem';
+import { useImageModalContext } from './useImageModalContext';
 
 const MAX_REFERENCE_IMAGES = 4;
 
@@ -24,7 +25,6 @@ interface ImageActionModalProps {
   applyButtonLabel?: string;
   initialReferenceText?: string;
   initialReferenceImageUrls?: string[];
-  contextSource?: 'comment' | 'thread' | 'community';
 }
 
 export const ImageActionModal = ({
@@ -37,24 +37,51 @@ export const ImageActionModal = ({
 }: ImageActionModalProps) => {
   const [imageUrlToApply, setImageUrlToApply] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [referenceImageUrls, setReferenceImageUrls] = useState<string[]>(
-    initialReferenceImageUrls || [],
-  );
-  const [referenceTexts, setReferenceTexts] = useState<string[]>(
-    initialReferenceText ? initialReferenceText.split('\n') : [],
-  );
+  const [referenceImageUrls, setReferenceImageUrls] = useState<string[]>([]);
+  const [referenceTexts, setReferenceTexts] = useState<string[]>([]);
   const [isUploadingReferenceImage, setIsUploadingReferenceImage] =
     useState(false);
 
-  useEffect(() => {
-    setReferenceImageUrls(initialReferenceImageUrls || []);
-  }, [initialReferenceImageUrls]);
+  // Callbacks for modifying reference texts and images
+  const handleAddReferenceTexts = useCallback((newTexts: string[]) => {
+    setReferenceTexts((prevTexts) => {
+      const uniqueNewTexts = newTexts.filter(
+        (text) => !prevTexts.includes(text),
+      );
+      return [...prevTexts, ...uniqueNewTexts];
+    });
+  }, []);
 
+  const handleAddReferenceImages = useCallback((newUrls: string[]) => {
+    setReferenceImageUrls((prevUrls) => {
+      const uniqueNewUrls = newUrls.filter((url) => !prevUrls.includes(url));
+      // Add only enough new URLs to not exceed the max limit
+      const combined = [...prevUrls, ...uniqueNewUrls];
+      return combined.slice(0, MAX_REFERENCE_IMAGES);
+    });
+  }, []);
+
+  // Use the context hook
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { gatherContext: _gatherContext } = useImageModalContext({
+    isOpen,
+    initialReferenceText,
+    initialReferenceImageUrls,
+    onAddReferenceTexts: handleAddReferenceTexts,
+    onAddReferenceImages: handleAddReferenceImages,
+  });
+
+  // Initialize state from props when they change - This might be handled by the hook now.
+  // Consider if these are still needed or if the hook manages this initialization.
   useEffect(() => {
-    setReferenceTexts(
-      initialReferenceText ? initialReferenceText.split('\n') : [],
-    );
-  }, [initialReferenceText]);
+    if (!isOpen) {
+      // Reset when modal is closed or if props change while closed
+      setReferenceImageUrls(initialReferenceImageUrls || []);
+      setReferenceTexts(
+        initialReferenceText ? initialReferenceText.split('\n') : [],
+      );
+    }
+  }, [isOpen, initialReferenceImageUrls, initialReferenceText]);
 
   // File input ref for reference image uploads
   const fileInputRef = useRef<HTMLInputElement>(null);
