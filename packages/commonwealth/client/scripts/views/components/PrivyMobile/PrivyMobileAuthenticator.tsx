@@ -112,6 +112,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   console.log('FIXME: Privy mobile is ENABLED.');
 
   // FIXME: do not return until we've finished authenticating...
+  // FIXME: can I use useUeerStore here ?
 
   return children;
 };
