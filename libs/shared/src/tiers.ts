@@ -1,5 +1,10 @@
+export type UserVerificationItem = {
+  label: string;
+  type: string;
+};
+
 type TierClientInfo = {
-  trustLevel: 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
   icon: string;
   componentIcon:
     | 'stopSymbol'
@@ -9,6 +14,7 @@ type TierClientInfo = {
     | 'pins'
     | 'whiteCheck'
     | 'starGolden';
+  verificationItems?: Record<string, UserVerificationItem>;
 };
 
 type TierRateLimits = {
@@ -67,6 +73,11 @@ export const USER_TIERS = {
         text: 0,
       },
     },
+    clientInfo: {
+      icon: '🚫',
+      trustLevel: 0,
+      componentIcon: 'stopSymbol',
+    },
   },
   [UserTierMap.NewlyVerifiedWallet]: {
     name: 'New Verified Wallet',
@@ -109,6 +120,12 @@ export const USER_TIERS = {
       trustLevel: 3,
       icon: '🌐',
       componentIcon: 'globe',
+      verificationItems: {
+        VERIFY_SOCIAL: {
+          label: 'Verify Social Accounts',
+          type: 'VERIFY_SOCIAL',
+        },
+      },
     },
     hourlyRateLimits: {
       create: 5,
@@ -126,6 +143,20 @@ export const USER_TIERS = {
       trustLevel: 4,
       icon: '🔗',
       componentIcon: 'pins',
+      verificationItems: {
+        LAUNCH_COIN: {
+          label: 'Launch a Coin',
+          type: 'LAUNCH_COIN',
+        },
+        VERIFY_COMMUNITY: {
+          label: 'Verify Community',
+          type: 'VERIFY_COMMUNITY',
+        },
+        COMPLETE_CONTEST: {
+          label: 'Complete a Contest',
+          type: 'COMPLETE_CONTEST',
+        },
+      },
     },
   },
   [UserTierMap.ManuallyVerified]: {
@@ -147,7 +178,7 @@ export enum CommunityTierMap {
   SpamCommunity = 0,
   Unverified = 1,
   SocialVerified = 2,
-  CommunityVerified = 3,
+  ChainVerified = 3,
   ManuallyVerified = 4,
   PremiumVerification = 5,
 }
@@ -175,7 +206,7 @@ export const COMMUNITY_TIERS = {
       componentIcon: 'globe',
     },
   },
-  [CommunityTierMap.CommunityVerified]: {
+  [CommunityTierMap.ChainVerified]: {
     name: 'Community Verified',
     description: 'Ownership of verified community or domain',
     clientInfo: {
@@ -257,4 +288,57 @@ export function hasCommunityTierClientInfo(
   tier: CommunityTierLevels,
 ): tier is CommunityTierWithClientInfo {
   return 'clientInfo' in COMMUNITY_TIERS[tier];
+}
+
+export type UserVerificationItemType =
+  | keyof (typeof USER_TIERS)[UserTierMap.SocialVerified]['clientInfo']['verificationItems']
+  | keyof (typeof USER_TIERS)[UserTierMap.ChainVerified]['clientInfo']['verificationItems'];
+
+/**
+ * Used to bump a user tier to a higher tier. Will never bump a user who is
+ * already banned. [SIDE EFFECT] The targetObject is modified with the new tier.
+ */
+export function bumpUserTier<
+  T extends { tier?: UserTierMap | null | undefined },
+>({
+  oldTier,
+  newTier,
+  targetObject,
+}: {
+  newTier: UserTierMap;
+  targetObject: T;
+  oldTier?: UserTierMap;
+}) {
+  // Prevent bumping banned users
+  if (
+    (oldTier && oldTier === UserTierMap.BannedUser) ||
+    targetObject.tier === UserTierMap.BannedUser
+  ) {
+    return;
+  }
+
+  if (oldTier && oldTier < newTier) {
+    targetObject.tier = newTier;
+    return;
+  }
+
+  if (
+    targetObject.tier === undefined ||
+    targetObject.tier === null ||
+    targetObject.tier < newTier
+  ) {
+    targetObject.tier = newTier;
+  }
+}
+
+export function bumpCommunityTier(
+  tier: CommunityTierMap,
+  object: { tier: CommunityTierMap | null },
+) {
+  if (
+    object.tier === null ||
+    (object.tier !== CommunityTierMap.SpamCommunity && object.tier < tier)
+  ) {
+    object.tier = tier;
+  }
 }

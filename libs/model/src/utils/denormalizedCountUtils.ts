@@ -37,7 +37,8 @@ export function debounceRefresh(
     timeouts.set(
       key,
       setTimeout(() => {
-        void fn(args).then(() => {
+        // Spread the args when calling the function instead of passing as a single array
+        void fn(...args).then(() => {
           // clean up after execution
           timeouts.delete(key);
           timestamps.delete(key);
@@ -50,7 +51,7 @@ export function debounceRefresh(
 }
 
 export const refreshProfileCount = debounceRefresh(
-  async (community_id: string) => {
+  async ([community_id]: [string]) => {
     await models.sequelize.query(
       `
 UPDATE "Communities" C
@@ -68,7 +69,7 @@ WHERE C.id = :community_id;
 );
 
 export const refreshMemberships = debounceRefresh(
-  async (community_id: string, group_id?: number) => {
+  async ([community_id, group_id]: [string, undefined] | [string, number]) => {
     await command(RefreshCommunityMemberships(), {
       actor: systemActor({}),
       payload: { community_id, group_id },

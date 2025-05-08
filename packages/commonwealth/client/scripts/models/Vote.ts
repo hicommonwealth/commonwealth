@@ -1,4 +1,6 @@
-import type moment from 'moment';
+import * as schemas from '@hicommonwealth/schemas';
+import moment from 'moment';
+import { z } from 'zod';
 
 class Vote {
   public readonly id: number;
@@ -8,6 +10,7 @@ class Vote {
   public readonly address: string;
   public readonly createdAt: moment.Moment;
   public option: string;
+  public readonly calculatedVotingWeight: string | undefined | null;
 
   constructor({
     id,
@@ -17,14 +20,16 @@ class Vote {
     author_community_id,
     option,
     created_at,
-  }) {
-    this.id = id;
+    calculated_voting_weight,
+  }: z.infer<typeof schemas.VoteView>) {
+    this.id = id!;
     this.pollId = poll_id;
     this.communityId = community_id;
     this.address = address;
     this.authorCommunityId = author_community_id;
     this.option = option;
-    this.createdAt = created_at;
+    this.createdAt = moment(created_at!);
+    this.calculatedVotingWeight = calculated_voting_weight;
   }
 }
 
