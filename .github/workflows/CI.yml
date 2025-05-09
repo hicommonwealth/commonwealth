@@ -137,6 +137,9 @@ jobs:
           ESLINT_PLUGIN_DIFF_COMMIT: "origin/${{ github.base_ref }}"
         run: pnpm lint-diff
 
+      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
+        run: pnpm -F commonwealth run lint-diff-canary
+
 
   detect-broken-ts-expect-error:
     name: Detect Broken TS expect errors
