@@ -6,8 +6,8 @@ on:
       - frick
       - frack
       - beta
-      - demo
       - production
+      - master
 
   workflow_run:
     workflows:
@@ -38,7 +38,7 @@ jobs:
             beta)
               APP_NAME="commonwealth-beta"
               ;;
-            demo)
+            master)
               APP_NAME="commonwealth-demo"
               ;;
             production)
