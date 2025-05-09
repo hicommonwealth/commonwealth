@@ -56,7 +56,6 @@ import { ServerGroupsController } from '../controllers/server_groups_controller'
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
-import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -72,7 +71,6 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
@@ -88,7 +86,6 @@ export type ServerControllers = {
   groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
-  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -106,7 +103,6 @@ function setupRouter(
     groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models),
   };
 
   // ---
@@ -282,14 +278,6 @@ function setupRouter(
     'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models),
-  );
-
-  // tags
-  registerRoute(
-    router,
-    'get',
-    '/tags',
-    getTagsHandler.bind(this, serverControllers),
   );
 
   // roles
