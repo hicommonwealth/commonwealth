@@ -37,7 +37,7 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   const { data: uniswapResponse } = useGetTokenInfoAlchemy({
     token_address: token?.token_address,
     eth_chain_id: communityNode?.ethChainId,
-    enabled: uniswapPricingEnabled,
+    enabled: uniswapPricingEnabled && !!communityNode?.ethChainId,
   });
 
   const uniswapData = uniswapResponse?.data;

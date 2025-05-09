@@ -2,8 +2,6 @@ import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 
 export enum CommunitySortOptions {
   MostRecent = 'Most Recent',
-  MarketCap = 'Market Cap',
-  Price = 'Price',
   MemberCount = 'Number of Members',
   ThreadCount = 'Number of Threads',
 }
