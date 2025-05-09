@@ -5,6 +5,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -14,6 +15,7 @@ import type { CommentEditorProps } from 'views/components/Comments/CommentEditor
 import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -24,6 +26,7 @@ export type MobileInputProps = CommentEditorProps & {
   replyingToAuthor?: string;
   aiCommentsToggleEnabled: boolean;
   parentCommentText?: string;
+  onImageClick?: () => void;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -38,6 +41,7 @@ export const MobileInput = (props: MobileInputProps) => {
     aiCommentsToggleEnabled,
     parentCommentText,
     thread: originalThread,
+    onImageClick,
   } = props;
 
   const { mode } = useContext(StickCommentContext);
@@ -51,6 +55,12 @@ export const MobileInput = (props: MobileInputProps) => {
     communityId,
   });
   const navigate = useCommonNavigate();
+
+  // Fetch community details
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const { data: fetchedTopics = [] } = useFetchTopicsQuery({
     communityId,
@@ -180,14 +190,23 @@ export const MobileInput = (props: MobileInputProps) => {
       try {
         let aiPromise;
         if (aiCommentsToggleEnabled && onAiReply) {
-          const context = `
-          Thread: ${originalThread?.title || ''}
-          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-          `;
+          // Construct extended context with community details
+          const communityName = community?.name || 'this community';
+          const communityDescription =
+            community?.description || 'No specific description provided.';
+          const extendedCommunityContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
 
-          const prompt = generateCommentPrompt(context);
+          const originalRequestContext = `Thread: ${originalThread?.title || ''}
+${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
+          // eslint-disable-next-line max-len
+          const context: string = `${extendedCommunityContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalRequestContext.trim()}`;
 
-          aiPromise = generateCompletion(prompt, {
+          const { userPrompt, systemPrompt } = generateCommentPrompt(context);
+
+          aiPromise = generateCompletion(userPrompt, {
+            systemPrompt: systemPrompt,
             stream: false,
             model: 'gpt-4o-mini',
           });
@@ -250,12 +269,31 @@ export const MobileInput = (props: MobileInputProps) => {
             onChange={handleChange}
             value={value}
             className="input"
+            onFocus={onFocus}
           />
           <div className="ai-toggle-row">
             <div className="RightButton">
               {isReplying && (
                 <CWIconButton iconName="close" onClick={handleClose} />
               )}
+              <CWTooltip
+                content="Add or Generate Image"
+                placement="top"
+                disablePortal
+                renderTrigger={(handleInteraction, isOpen) => (
+                  <CWIconButton
+                    iconName="image"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onImageClick?.();
+                    }}
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                    data-tooltip-open={isOpen}
+                    aria-label="Add or Generate Image"
+                  />
+                )}
+              />
               <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
               <CWIconButton
                 iconName="paperPlaneTilt"
@@ -264,6 +302,7 @@ export const MobileInput = (props: MobileInputProps) => {
                     console.error('Error submitting comment:', error);
                   });
                 }}
+                disabled={value.trim() === '' && !aiCommentsToggleEnabled}
               />
             </div>
           </div>

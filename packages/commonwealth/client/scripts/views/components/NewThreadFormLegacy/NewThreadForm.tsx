@@ -11,7 +11,13 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useAiCompletion } from 'state/api/ai';
@@ -69,6 +75,8 @@ import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotPro
 import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
 import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
+import { ImageActionCard } from '../ImageActionCard/ImageActionCard';
+import { ImageActionModal } from '../ImageActionModal/ImageActionModal';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -85,6 +93,7 @@ import { VotingResults } from '../proposals/voting_results';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
+  getImageUrlsFromDelta,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
@@ -96,20 +105,40 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
+  onContentAppended?: (markdown: string) => void;
 }
+
+export interface NewThreadFormHandles {
+  openImageModal: () => void;
+  appendContent: (markdown: string) => void;
+}
+
 export interface ExtendedPoll extends Poll {
   customDuration?: string;
 }
-export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
+
+// eslint-disable-next-line react/display-name
+export const NewThreadForm = forwardRef<
+  NewThreadFormHandles,
+  NewThreadFormProps
+>(({ onCancel, onContentAppended }, ref) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+  const forceRerender = useForceRerender();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [showVotesDrawer, setShowVotesDrawer] = useState(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [linkedProposals, setLinkedProposals] =
     useState<ProposalState | null>();
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+
+  // --- State for Image Modal Context ---
+  const [imageModalContext, setImageModalContext] = useState<{
+    initialReferenceText?: string;
+    initialReferenceImageUrls?: string[];
+  } | null>(null);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
 
@@ -379,13 +408,16 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       }
 
       if (thread && pollsData && pollsData?.length) {
+        const custom_duration = pollsData[0]?.customDuration
+          ? pollsData[0]?.customDuration === 'Infinite'
+            ? null
+            : parseInt(pollsData[0]?.customDuration)
+          : 5;
         await createPoll({
-          threadId: thread.id,
+          thread_id: thread.id!,
           prompt: pollsData[0]?.prompt,
           options: pollsData[0]?.options,
-          customDuration: pollsData[0]?.customDuration || undefined,
-          authorCommunity: user.activeAccount?.community?.id || '',
-          address: user.activeAccount?.address || '',
+          custom_duration,
         });
       }
 
@@ -492,45 +524,75 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
 
-    const context = recentThreads
+    const recentThreadsContext = recentThreads
       ?.map((thread) => {
-        return `Title: ${thread.title}
-              \n Body: ${thread.body}
-              \n Topic: ${thread.topic?.name || 'N/A'}
-              \n Community: ${thread.communityName || 'N/A'}`;
+        return (
+          `Title: ${thread.title}\nBody: ${thread.body}\n` +
+          `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`
+        );
       })
       .join('\n\n');
 
     try {
-      const prompt = generateThreadPrompt(context);
+      const { systemPrompt: bodySystemPrompt, userPrompt: bodyUserPrompt } =
+        generateThreadPrompt(
+          recentThreadsContext || 'Suggest a new discussion topic.',
+        );
 
-      const threadContent = await generateCompletion(prompt, {
+      await generateCompletion(bodyUserPrompt, {
         model: 'gpt-4o-mini',
         stream: true,
+        systemPrompt: bodySystemPrompt,
         onError: (error) => {
-          console.error('Error generating AI thread:', error);
+          console.error('Error generating AI thread body:', error);
           notifyError('Failed to generate AI thread content');
+          setIsGenerating(false);
         },
         onChunk: (chunk) => {
           bodyAccumulatedRef.current += chunk;
           setThreadContentDelta(
-            createDeltaFromText(bodyAccumulatedRef.current),
+            createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
           );
         },
-      });
+        onComplete: (generatedBody) => {
+          const {
+            systemPrompt: titleSystemPrompt,
+            userPrompt: titleUserPrompt,
+          } = generateThreadTitlePrompt(generatedBody.trim() || 'New Thread');
 
-      const titlePrompt = generateThreadTitlePrompt(threadContent);
-
-      await generateCompletion(titlePrompt, {
-        stream: false,
-        onComplete(fullText) {
-          setThreadTitle(fullText);
+          void (async () => {
+            try {
+              await generateCompletion(titleUserPrompt, {
+                model: 'gpt-4o-mini',
+                stream: false,
+                systemPrompt: titleSystemPrompt,
+                onComplete(fullTitle) {
+                  setThreadTitle(fullTitle.trim());
+                  setIsGenerating(false);
+                },
+                onError: (titleError) => {
+                  console.error(
+                    'Error generating AI thread title:',
+                    titleError,
+                  );
+                  notifyError('Failed to generate AI thread title');
+                  setIsGenerating(false);
+                },
+              });
+            } catch (error) {
+              console.error(
+                'Error awaiting title generation in AI thread:',
+                error,
+              );
+              notifyError('Failed to initiate AI thread title generation');
+              setIsGenerating(false);
+            }
+          })();
         },
       });
     } catch (error) {
-      console.error('Error generating AI thread:', error);
-      notifyError('Failed to generate AI thread');
-    } finally {
+      console.error('Error in AI thread generation process:', error);
+      notifyError('Failed to generate AI thread content or title');
       setIsGenerating(false);
     }
   };
@@ -548,7 +610,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     },
     [handleNewThreadCreation],
   );
-  const forceRerender = useForceRerender();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -628,6 +689,66 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
+  const handleAppendContent = useCallback(
+    (markdown: string) => {
+      const currentText = getTextFromDelta(threadContentDelta);
+      const combinedText = currentText
+        ? `${currentText}\n\n${markdown}`
+        : markdown;
+      const newDelta = createDeltaFromText(combinedText, true);
+      setThreadContentDelta(newDelta);
+      forceRerender();
+    },
+    [threadContentDelta, setThreadContentDelta, forceRerender],
+  );
+
+  useEffect(() => {
+    if (onContentAppended) {
+      // This effect ensures that if the prop function changes, we are aware,
+      // but the actual appending happens via handleAppendContent.
+      // The parent will call handleAppendContent via a ref method.
+    }
+  }, [onContentAppended, handleAppendContent]);
+
+  const handleOpenImageModal = useCallback(() => {
+    const currentContent = getTextFromDelta(threadContentDelta);
+    const imageUrls = getImageUrlsFromDelta(threadContentDelta);
+    const communityName = community?.name;
+    const topicName = threadTopic?.name;
+
+    let combinedContextText = currentContent;
+    if (communityName) {
+      combinedContextText = `Community: ${communityName}\n${combinedContextText}`;
+    }
+    if (topicName) {
+      combinedContextText = `Topic: ${topicName}\n${combinedContextText}`;
+    }
+
+    setImageModalContext({
+      initialReferenceText: combinedContextText || undefined,
+      initialReferenceImageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+    });
+    setIsImageModalOpen(true);
+  }, [threadContentDelta, community, threadTopic]);
+
+  const handleCloseImageModal = useCallback(() => {
+    setIsImageModalOpen(false);
+  }, []);
+
+  const handleApplyImage = useCallback(
+    (imageUrl: string) => {
+      const currentText = getTextFromDelta(threadContentDelta);
+      const imageMarkdown = `![Generated image](${imageUrl})`;
+      const combinedText = currentText + imageMarkdown;
+      const newDelta = createDeltaFromText(combinedText, true);
+      setThreadContentDelta(newDelta);
+
+      handleCloseImageModal();
+    },
+    [threadContentDelta, setThreadContentDelta, handleCloseImageModal],
+  );
+
   const sidebarComponent = [
     {
       label: 'Links',
@@ -681,6 +802,14 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           },
         ]
       : []),
+    {
+      label: 'Image',
+      item: (
+        <div className="cards-column">
+          <ImageActionCard onClick={handleOpenImageModal} />
+        </div>
+      ),
+    },
   ];
 
   const proposalDetailSidebar = [
@@ -727,6 +856,11 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
         ]
       : []),
   ];
+
+  React.useImperativeHandle(ref, () => ({
+    openImageModal: handleOpenImageModal,
+    appendContent: handleAppendContent,
+  }));
 
   return (
     <>
@@ -1133,9 +1267,16 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           )}
         </div>
       </CWPageLayout>
+      <ImageActionModal
+        isOpen={isImageModalOpen}
+        onClose={handleCloseImageModal}
+        onApply={handleApplyImage}
+        initialReferenceText={imageModalContext?.initialReferenceText}
+        initialReferenceImageUrls={imageModalContext?.initialReferenceImageUrls}
+      />
       {JoinCommunityModals}
     </>
   );
-};
+});
 
 export default NewThreadForm;

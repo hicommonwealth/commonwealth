@@ -1,4 +1,9 @@
-import { Command, InvalidInput, logger } from '@hicommonwealth/core';
+import {
+  Command,
+  InvalidInput,
+  InvalidState,
+  logger,
+} from '@hicommonwealth/core';
 import { verifyEventSource } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
@@ -131,6 +136,14 @@ async function updateChannelQuest(
             transaction,
           });
         }
+      }
+      const duplicateCheck = await models.QuestTweets.findOne({
+        where: {
+          tweet_id: tweetId,
+        },
+      });
+      if (duplicateCheck) {
+        throw new InvalidState('This Tweet URL is already part of a quest');
       }
       const actionMetaInstance = await models.QuestActionMeta.create(
         {
