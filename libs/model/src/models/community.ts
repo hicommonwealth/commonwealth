@@ -5,7 +5,7 @@ import type { AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
-import { CommunityTagsAttributes } from './community_tags';
+import type { CommunityTagsAttributes } from './community_tags';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
