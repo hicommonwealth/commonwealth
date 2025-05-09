@@ -1,12 +1,13 @@
 import { useFlag } from 'hooks/useFlag';
+import { DeltaStatic } from 'quill';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import { NewThreadForm as NewThreadFormLegacy } from '../NewThreadFormLegacy';
 import { NewThreadForm as NewThreadFormModern } from '../NewThreadFormModern';
 
 export interface NewThreadFormProps {
-  contentDelta?: any;
-  setContentDelta?: (delta: any) => void;
+  contentDelta?: DeltaStatic;
+  setContentDelta?: (delta: DeltaStatic) => void;
 }
 
 export const NewThreadForm = ({

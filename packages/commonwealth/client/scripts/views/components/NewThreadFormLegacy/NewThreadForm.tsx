@@ -67,6 +67,7 @@ import useForceRerender from 'client/scripts/hooks/useForceRerender';
 
 import Poll from 'client/scripts/models/Poll';
 // eslint-disable-next-line max-len
+import { DeltaStatic } from 'quill';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -107,8 +108,8 @@ interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
   onContentAppended?: (markdown: string) => void;
   onContentDeltaChange?: (markdown: string) => void;
-  contentDelta?: any;
-  setContentDelta?: (delta: any) => void;
+  contentDelta?: DeltaStatic;
+  setContentDelta?: (delta: DeltaStatic) => void;
 }
 
 export interface NewThreadFormHandles {

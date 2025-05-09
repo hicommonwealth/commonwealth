@@ -128,6 +128,7 @@ const StickyInput = (props: StickyInputProps) => {
     try {
       if (mode === 'thread') {
         const { systemPrompt, userPrompt } = generateThreadPrompt('');
+        let lastUpdateTime = Date.now();
 
         await generateCompletion(userPrompt, {
           model: 'gpt-4o-mini',
@@ -138,9 +139,16 @@ const StickyInput = (props: StickyInputProps) => {
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
-            setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+
+            const currentTime = Date.now();
+            if (currentTime - lastUpdateTime >= 500) {
+              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+              lastUpdateTime = currentTime;
+            }
           },
         });
+
+        setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
       } else {
         const context = `
           Thread: ${originalThread?.title || ''}
@@ -335,7 +343,9 @@ const StickyInput = (props: StickyInputProps) => {
           renderTrigger={(handleInteraction) => (
             <button
               className="send-button"
-              onClick={() => customHandleSubmitComment()}
+              onClick={() => {
+                customHandleSubmitComment().catch(console.error);
+              }}
               disabled={
                 !contentDelta?.ops?.length ||
                 (isTurnstileEnabled && !turnstileToken)
@@ -423,7 +433,7 @@ const StickyInput = (props: StickyInputProps) => {
                 <ReactQuillEditor
                   className="sticky-editor"
                   contentDelta={props.contentDelta}
-                  setContentDelta={setContentDelta}
+                  setContentDelta={props.setContentDelta}
                   onKeyDown={handleKeyDown}
                   placeholder={
                     mode === 'thread'
