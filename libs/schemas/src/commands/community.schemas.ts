@@ -360,6 +360,7 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     address: z.string().optional(),
     group_id: PG_INT.optional(),
+    refresh_all: z.boolean().optional(),
   }),
   output: z.object({
     community_id: z.string(),
