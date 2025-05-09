@@ -21,6 +21,7 @@
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
+    "lint-diff": "./scripts/lint-diff-branch.sh",
     "load-db": "pnpm -F commonwealth load-db",
     "migrate-db": "pnpm -F commonwealth migrate-db",
     "prepare": "husky install",
