@@ -111,10 +111,12 @@
     padding: 12px;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
-    .CWEditor {
-      .ql-container {
-        min-height: unset !important;
-        max-height: 76px !important;
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          min-height: unset !important;
+          max-height: 76px !important;
+        }
       }
     }
 

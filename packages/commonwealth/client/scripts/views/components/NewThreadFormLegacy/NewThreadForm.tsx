@@ -66,8 +66,8 @@ import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 
 import Poll from 'client/scripts/models/Poll';
-// eslint-disable-next-line max-len
 import { DeltaStatic } from 'quill';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -1082,8 +1082,8 @@ export const NewThreadForm = forwardRef<
                           ? disabledActionsTooltipText?.('submit')
                           : disabledActionsTooltipText,
                     })}
-                    placeholder={`Enter text or drag images and media here. 
-                      Use the tab button to see your formatted post.`}
+                    // eslint-disable-next-line max-len
+                    placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                   />
 
                   <MessageRow

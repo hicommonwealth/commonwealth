@@ -366,7 +366,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
-        className={`StickyInput ${isExpanded ? 'expanded' : ''} ${isMobile ? 'mobile' : 'desktop'}`}
+        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
