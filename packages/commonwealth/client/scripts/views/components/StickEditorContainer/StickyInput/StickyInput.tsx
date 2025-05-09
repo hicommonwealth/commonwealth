@@ -1,5 +1,9 @@
+import { ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
+import { Thread } from 'models/Thread';
+import type { Topic } from 'models/Topic';
 import React, {
   useCallback,
   useContext,
@@ -36,15 +40,14 @@ import { useActiveStickCommentReset } from '../context/UseActiveStickCommentRese
 
 import './StickyInput.scss';
 
-export type ThreadMentionTagType = 'threadMention' | 'modelMention';
-
 interface StickyInputProps extends CommentEditorProps {
-  isMobile?: boolean;
+  topic?: Topic;
+  parentType: ContentType;
+  thread?: Thread;
 }
 
 const StickyInput = (props: StickyInputProps) => {
   const {
-    isMobile,
     handleSubmitComment,
     isReplying,
     replyingToAuthor,
@@ -53,7 +56,7 @@ const StickyInput = (props: StickyInputProps) => {
     thread: originalThread,
     parentCommentText,
   } = props;
-
+  const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
   const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
   const {

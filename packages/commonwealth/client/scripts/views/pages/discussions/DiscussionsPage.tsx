@@ -43,7 +43,7 @@ import useCreateThreadMutation, {
 } from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
@@ -516,7 +516,7 @@ const DiscussionsPage = () => {
 
         <WithDefaultStickyComment>
           {user.isLoggedIn && user.activeAccount && (
-            <StickyEditorContainer
+            <StickyInput
               parentType={ContentType.Thread}
               canComment={true}
               handleSubmitComment={handleSubmitThread}
