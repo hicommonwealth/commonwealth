@@ -1081,7 +1081,8 @@ export const NewThreadForm = forwardRef<
                           ? disabledActionsTooltipText?.('submit')
                           : disabledActionsTooltipText,
                     })}
-                    placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
+                    placeholder={`Enter text or drag images and media here. 
+                      Use the tab button to see your formatted post.`}
                   />
 
                   <MessageRow
