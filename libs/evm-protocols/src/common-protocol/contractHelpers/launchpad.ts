@@ -236,6 +236,10 @@ export async function getLaunchpadTokenCreatedTransaction({
     deployedNamespaceLog.data!.toString(),
   );
 
+  async function test() {
+    return 10;
+  }
+
   const tokenRegisteredLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
       return (
