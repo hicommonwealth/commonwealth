@@ -11,7 +11,6 @@ class TokenLaunchpad extends ContractBase {
   private paymentTokenContract: any;
   launchpadFactoryAddress: string;
   paymentTokenAddress: string;
-  launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
 
   constructor(
@@ -65,7 +64,7 @@ class TokenLaunchpad extends ContractBase {
         symbol,
         [8250, 1550, 100, 100],
         [authorAddress, communityTreasuryAddress],
-        this.web3.utils.toWei('1e9', 'ether'), // Default 1B tokens
+        this.web3.utils.toWei('1000000000', 'ether'), // Default 1B tokens
         walletAddress,
         830000,
         threadId,
