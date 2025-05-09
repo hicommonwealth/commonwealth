@@ -6,7 +6,7 @@ import {
   logger,
   Policy,
 } from '@hicommonwealth/core';
-import { getLaunchpadTokenCreatedTransaction } from '@hicommonwealth/evm-protocols';
+import * as evm from '@hicommonwealth/evm-protocols';
 import {
   Community,
   ContestManager,
@@ -33,35 +33,35 @@ export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
 const EventStreamSchemas = {
   ContestStarted: {
     input: events.ContestStarted,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   ContestEnding: {
     input: events.ContestEnding,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   ContestEnded: {
     input: events.ContestEnded,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   CommunityCreated: {
     input: events.CommunityCreated,
-    output: Community.extend({}),
+    output: Community,
   },
   ThreadCreated: {
     input: events.ThreadCreated,
-    output: Thread.extend({}),
+    output: Thread,
   },
   LaunchpadTokenCreated: {
     input: events.LaunchpadTokenCreated,
-    output: LaunchpadToken.extend({}),
+    output: LaunchpadToken,
   },
   LaunchpadTokenTraded: {
     input: events.LaunchpadTokenTraded,
-    output: LaunchpadToken.extend({}),
+    output: LaunchpadToken,
   },
   LaunchpadTokenGraduated: {
     input: events.LaunchpadTokenGraduated,
-    output: LaunchpadToken.extend({}),
+    output: LaunchpadToken,
   },
 } as const;
 
@@ -152,12 +152,12 @@ const eventStreamMappers: EventStreamMappers = {
   },
   LaunchpadTokenCreated: async (payload) => {
     const { eth_chain_id, transaction_hash } = payload;
-    const chainNode = await models.ChainNode.scope('withPrivateUrl').findOne({
+    const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
       where: { eth_chain_id },
       attributes: ['eth_chain_id', 'url', 'private_url'],
     });
     mustExist('Chain Node', chainNode);
-    const tokenData = await getLaunchpadTokenCreatedTransaction({
+    const tokenData = await evm.getLaunchpadTokenCreatedTransaction({
       rpc: chainNode.private_url! || chainNode.url!,
       transactionHash: transaction_hash,
     });
@@ -166,12 +166,6 @@ const eventStreamMappers: EventStreamMappers = {
     }
     const launchpadToken = await models.LaunchpadToken.findOne({
       where: { token_address: tokenData.parsedArgs.tokenAddress },
-      include: [
-        {
-          model: models.Community,
-          attributes: ['id'],
-        },
-      ],
     });
     mustExist('LaunchpadToken', launchpadToken);
     const community = await models.Community.findOne({
