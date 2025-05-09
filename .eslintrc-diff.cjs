@@ -4,13 +4,7 @@ const path = require('path');
  * Needed for the diff plugin. Note that if you change this variable you MUST
  * invalidate the eslint cache.
  *
- * Now that this has to run over a BRANCH not a tag!
- *
- * To create a branch just run:
- *
- * git checkout -b my_branch {checksum_id}
- * git push origin my_branch
- *
+ * Note that this has to run over a BRANCH not a tag!
  */
 // Check if running in GitHub Actions
 if (process.env.GITHUB_ACTIONS === 'true') {
@@ -23,7 +17,7 @@ if (process.env.GITHUB_ACTIONS === 'true') {
     );
   }
 } else {
-  // For local development, compare with main branch
+  // For local development, compare with master branch
   process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/master';
 }
 
