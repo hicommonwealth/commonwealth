@@ -171,17 +171,20 @@ export const CommunitySection = ({
         {launchpadEnabled && <TokenTradeWidget />}
 
         <CWDivider />
-        <DiscussionSection
-          // @ts-expect-error <StrictNullChecks/>
-          topicIdsIncludedInContest={topicIdsIncludedInContest}
-        />
-        <CWDivider />
+
         {isAdmin && (
           <>
             <AdminSection />
             <CWDivider />
           </>
         )}
+
+        <DiscussionSection
+          // @ts-expect-error <StrictNullChecks/>
+          topicIdsIncludedInContest={topicIdsIncludedInContest}
+        />
+        <CWDivider />
+
         <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />
