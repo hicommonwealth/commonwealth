@@ -83,8 +83,8 @@ jobs:
           path: coverage
 
   # Build and Typecheck
-  commonwealth-code-quality:
-    name: Code Quality checks
+  commonwealth-build-type-checks:
+    name: Build & Type Checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -116,7 +116,7 @@ jobs:
 
   # Lint Diff
   commonwealth-lint-diff:
-    name: Lint Diff
+    name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
