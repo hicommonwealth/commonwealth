@@ -107,6 +107,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'DiscordServerJoined',
     'MembershipsRefreshed',
     'LaunchpadTokenCreated',
+    'ContestEnded',
   ];
   const channelQuest: QuestActionType[] = [
     'TweetEngagement',
