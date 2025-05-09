@@ -1,6 +1,8 @@
+import * as schemas from '@hicommonwealth/schemas';
 import axios from 'axios';
+import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -8,46 +10,18 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { z } from 'zod';
 
-interface Tag {
-  id: string;
-  name: string;
-  community_count: number;
-  created_at: string;
-  is_featured?: boolean;
-}
-
-// API functions
-const getTags = async (): Promise<Tag[]> => {
-  const response = await axios.get('/api/v1/admin/tags');
-  return response.data;
-};
-
-const createTag = async (name: string): Promise<Tag> => {
-  const response = await axios.post('/api/v1/admin/tags', { name });
-  return response.data;
-};
-
-const updateTag = async (id: string, name: string): Promise<Tag> => {
-  const response = await axios.put(`/api/v1/admin/tags/${id}`, { name });
-  return response.data;
-};
-
-const deleteTag = async (id: string): Promise<void> => {
-  await axios.delete(`/api/v1/admin/tags/${id}`);
-};
+type Tag = z.infer<typeof schemas.TagView>;
 
 const getTagUsage = async (
-  id: string,
+  id: number,
 ): Promise<{ communities: { id: string; name: string }[] }> => {
   const response = await axios.get(`/api/v1/admin/tags/${id}/usage`);
   return response.data;
 };
 
 const CommunityTagsManagementTask = () => {
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [newTagName, setNewTagName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -60,27 +34,13 @@ const CommunityTagsManagementTask = () => {
     'name' | 'community_count' | 'created_at'
   >('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-  // Load tags on initial render
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedTags = await getTags();
-        setTags(fetchedTags);
-      } catch (error) {
-        console.error('Error fetching tags:', error);
-        notifyError('Failed to load community tags');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTags();
-  }, []);
+  const { data: tags } = useFetchTagsQuery({
+    enabled: true,
+    with_community_count: true,
+  });
 
   // Filter tags based on search term
-  const filteredTags = tags.filter((tag) =>
+  const filteredTags = (tags || []).filter((tag) =>
     tag.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
   );
 
@@ -90,19 +50,15 @@ const CommunityTagsManagementTask = () => {
       return sortDirection === 'asc'
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name);
-    } else if (sortColumn === 'community_count') {
-      return sortDirection === 'asc'
-        ? a.community_count - b.community_count
-        : b.community_count - a.community_count;
     } else {
       return sortDirection === 'asc'
-        ? new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-        : new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        ? a.community_count! - b.community_count!
+        : b.community_count! - a.community_count!;
     }
   });
 
   // Handler to toggle sort direction or change sort column
-  const handleSort = (column: 'name' | 'community_count' | 'created_at') => {
+  const handleSort = (column: 'name' | 'community_count') => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -119,8 +75,7 @@ const CommunityTagsManagementTask = () => {
     }
 
     try {
-      const createdTag = await createTag(newTagName.trim());
-      setTags([...tags, createdTag]);
+      // await createTag(newTagName.trim());
       setNewTagName('');
       notifySuccess('Tag created successfully');
     } catch (error) {
@@ -137,8 +92,7 @@ const CommunityTagsManagementTask = () => {
     }
 
     try {
-      const updatedTag = await updateTag(editingTag.id, editingTag.name.trim());
-      setTags(tags.map((tag) => (tag.id === updatedTag.id ? updatedTag : tag)));
+      // await updateTag(editingTag.id, editingTag.name.trim());
       setEditingTag(null);
       notifySuccess('Tag updated successfully');
     } catch (error) {
@@ -152,7 +106,7 @@ const CommunityTagsManagementTask = () => {
     openConfirmation({
       title: 'Delete Tag',
       description: `Are you sure you want to delete the tag "${tag.name}"? ${
-        tag.community_count > 0
+        tag.community_count! > 0
           ? `This tag is currently used by ${tag.community_count} communities.`
           : ''
       }`,
@@ -163,8 +117,7 @@ const CommunityTagsManagementTask = () => {
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteTag(tag.id);
-              setTags(tags.filter((t) => t.id !== tag.id));
+              //await deleteTag(tag.id);
               notifySuccess('Tag deleted successfully');
             } catch (error) {
               console.error('Error deleting tag:', error);
@@ -184,7 +137,7 @@ const CommunityTagsManagementTask = () => {
   // View communities using a tag
   const handleViewTagUsage = async (tag: Tag) => {
     try {
-      const usage = await getTagUsage(tag.id);
+      const usage = await getTagUsage(tag.id!);
       setTagUsage(usage);
       setShowUsageModal(true);
     } catch (error) {
@@ -206,7 +159,6 @@ const CommunityTagsManagementTask = () => {
         return (
           <div>
             <span>{tag.name}</span>
-            {tag.is_featured && <CWIcon iconName="star" iconSize="small" />}
           </div>
         );
       },
@@ -220,7 +172,7 @@ const CommunityTagsManagementTask = () => {
       cell: ({ row }: { row: { original: Tag } }) => (
         <div>
           <span>{row.original.community_count}</span>
-          {row.original.community_count > 0 && (
+          {row.original.community_count! > 0 && (
             <CWButton
               label="View"
               buttonHeight="sm"
@@ -238,8 +190,8 @@ const CommunityTagsManagementTask = () => {
       numeric: false,
       sortable: true,
       cell: ({ row }: { row: { original: Tag } }) => {
-        const date = new Date(row.original.created_at);
-        return <span>{date.toLocaleDateString()}</span>;
+        const date = row.original.created_at!;
+        return <span>{date.toLocaleString()}</span>;
       },
     },
     {
@@ -310,11 +262,7 @@ const CommunityTagsManagementTask = () => {
           </div>
         </div>
 
-        <CWTable
-          columnInfo={columns}
-          rowData={sortedTags}
-          isLoadingMoreRows={isLoading}
-        />
+        <CWTable columnInfo={columns} rowData={sortedTags} />
       </div>
 
       {/* Tag Usage Modal */}

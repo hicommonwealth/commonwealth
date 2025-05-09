@@ -90,7 +90,9 @@ const CommunitiesPage = () => {
 
   const oneDayAgo = useRef(new Date().getTime() - 24 * 60 * 60 * 1000);
 
-  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
+  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery({
+    enabled: true,
+  });
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
 

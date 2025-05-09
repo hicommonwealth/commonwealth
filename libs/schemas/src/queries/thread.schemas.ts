@@ -50,7 +50,7 @@ export const ContestActionView = ContestAction.pick({
   Contest: ContestView,
 });
 
-export const ProfileTagsView = ProfileTags.extend({
+export const ProfileTagsView = ProfileTags.omit({ Tag: true }).extend({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
 });
