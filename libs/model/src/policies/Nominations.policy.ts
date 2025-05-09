@@ -17,7 +17,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
     inputs,
     body: {
       NominatorSettled: async ({ payload }) => {
-        // on configure verification, update community verification status
+        // on configure verification (ID 3 created), update community verification status
 
         const community = await models.Community.findOne({
           where: {

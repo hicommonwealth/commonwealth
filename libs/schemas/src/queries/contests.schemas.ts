@@ -120,3 +120,12 @@ export const GetFarcasterContestCasts = {
   }),
   output: z.array(z.any()),
 };
+
+export const GetJudgeStatus = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    current_judge_id: z.number().int().nullish(),
+  }),
+};

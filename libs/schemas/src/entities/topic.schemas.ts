@@ -4,6 +4,7 @@ import { PG_INT } from '../utils';
 export enum TopicWeightedVoting {
   Stake = 'stake',
   ERC20 = 'erc20',
+  ERC1155ID = 'erc1155id',
 }
 
 export const Topic = z.object({
