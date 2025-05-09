@@ -1,6 +1,11 @@
 import axios from 'axios';
 import Tag from 'client/scripts/models/Tag';
 import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
+import {
+  useCreateTagMutation,
+  useDeleteTagMutation,
+  useUpdateTagMutation,
+} from 'client/scripts/state/api/tags/mutations';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { useDebounce } from 'usehooks-ts';
@@ -35,6 +40,9 @@ const CommunityTagsManagementTask = () => {
     enabled: true,
     with_community_count: true,
   });
+  const { mutateAsync: createTag } = useCreateTagMutation();
+  const { mutateAsync: updateTag } = useUpdateTagMutation();
+  const { mutateAsync: deleteTag } = useDeleteTagMutation();
 
   // Filter tags based on search term
   const filteredTags = (tags || []).filter((tag) =>
@@ -72,7 +80,7 @@ const CommunityTagsManagementTask = () => {
     }
 
     try {
-      // await createTag(newTagName.trim());
+      await createTag({ name: newTagName.trim() });
       setNewTagName('');
       notifySuccess('Tag created successfully');
     } catch (error) {
@@ -89,7 +97,7 @@ const CommunityTagsManagementTask = () => {
     }
 
     try {
-      // await updateTag(editingTag.id, editingTag.name.trim());
+      await updateTag({ id: editingTag.id, name: editingTag.name.trim() });
       setEditingTag(null);
       notifySuccess('Tag updated successfully');
     } catch (error) {
@@ -114,7 +122,7 @@ const CommunityTagsManagementTask = () => {
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              //await deleteTag(tag.id);
+              await deleteTag({ id: tag.id });
               notifySuccess('Tag deleted successfully');
             } catch (error) {
               console.error('Error deleting tag:', error);
