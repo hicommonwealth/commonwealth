@@ -9,6 +9,7 @@ import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
   TradingConfig,
@@ -17,11 +18,12 @@ import TradeTokenModal, {
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
-import {
-  CommunityFilters,
-  CommunitySortOptions,
-  communitySortOptionsLabelToKeysMap,
-} from '../FiltersDrawer';
+import FiltersDrawer, {
+  TokenFilters,
+  TokenSortDirections,
+  TokenSortOptions,
+  tokenSortOptionsLabelToKeysMap,
+} from './FiltersDrawer';
 import './TokensList.scss';
 
 const TokenWithCommunity = TokenView.extend({
@@ -29,11 +31,10 @@ const TokenWithCommunity = TokenView.extend({
 });
 
 type TokensListProps = {
-  filters: CommunityFilters;
   hideHeader?: boolean;
 };
 
-const TokensList = ({ filters, hideHeader }: TokensListProps) => {
+const TokensList = ({ hideHeader }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -43,6 +44,13 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  const [filters, setFilters] = useState<TokenFilters>({
+    withTokenSortBy: TokenSortOptions.Price,
+    withTokenSortOrder: TokenSortDirections.Descending,
+  });
 
   const {
     data: tokensList,
@@ -56,13 +64,13 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     with_stats: true,
     order_by: (() => {
       if (
-        filters.withCommunitySortBy &&
-        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
-          filters.withCommunitySortBy,
+        filters?.withTokenSortBy &&
+        [TokenSortOptions.MarketCap, TokenSortOptions.Price].includes(
+          filters?.withTokenSortBy,
         )
       ) {
-        return communitySortOptionsLabelToKeysMap[
-          filters.withCommunitySortBy
+        return tokenSortOptionsLabelToKeysMap[
+          filters?.withTokenSortBy
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] as any;
       }
@@ -77,6 +85,14 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
     }
+  };
+
+  const removeCommunitySortByFilter = () => {
+    setFilters({
+      ...filters,
+      withTokenSortBy: undefined,
+      withTokenSortOrder: undefined,
+    });
   };
 
   const handleCTAClick = (
@@ -98,6 +114,40 @@ const TokensList = ({ filters, hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
+      <div
+        className={clsx('filters', {
+          hasAppliedFilter:
+            Object.values(filters).filter(Boolean).length === 1
+              ? !filters.withTokenSortOrder
+              : Object.values(filters).filter(Boolean).length > 0,
+        })}
+      >
+        <CWButton
+          label="Filters"
+          iconRight="funnelSimple"
+          buttonType="secondary"
+          onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+        />
+        {filters.withTokenSortBy && (
+          <CWTag
+            label={`${filters.withTokenSortBy}${
+              filters.withTokenSortOrder &&
+              filters.withTokenSortBy !== TokenSortOptions.MostRecent
+                ? ` : ${filters.withTokenSortOrder}`
+                : ''
+            }
+                        `}
+            type="filter"
+            onCloseClick={removeCommunitySortByFilter}
+          />
+        )}
+        <FiltersDrawer
+          isOpen={isFilterDrawerOpen}
+          onClose={() => setIsFilterDrawerOpen(false)}
+          filters={filters}
+          onFiltersChange={(newFilters) => setFilters(newFilters)}
+        />
+      </div>
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
