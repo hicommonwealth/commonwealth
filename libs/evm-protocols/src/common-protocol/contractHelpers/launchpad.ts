@@ -277,6 +277,16 @@ export async function getLaunchpadTokenCreatedTransaction({
   };
 }
 
+type LaunchpadTokenOnChainData = {
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+};
+
 export async function getLaunchpadToken({
   rpc,
   lpBondingCurveAddress,
@@ -285,15 +295,7 @@ export async function getLaunchpadToken({
   rpc: string;
   lpBondingCurveAddress: string;
   tokenAddress: string;
-}): Promise<{
-  launchpadLiquidity: bigint;
-  poolLiquidity: bigint;
-  curveId: bigint;
-  scalar: bigint;
-  reserveRation: bigint;
-  LPhook: string;
-  funded: boolean;
-}> {
+}): Promise<LaunchpadTokenOnChainData> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
     LPBondingCurveAbi,

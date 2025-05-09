@@ -54,6 +54,7 @@ export const outboxEvents: Events[] = [
   'NamespaceDeployedWithReferral',
   'LaunchpadTokenCreated',
   'LaunchpadTokenTraded',
+  'LaunchpadTokenGraduated',
   'ReferralFeeDistributed',
   'WalletLinked',
   'SSOLinked',

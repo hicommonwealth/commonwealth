@@ -39,6 +39,41 @@ export async function testExpiry(test_namespace: CacheNamespaces) {
   expect(result).to.equal(null);
 }
 
+export async function testLpushAndGetList(test_namespace: CacheNamespaces) {
+  const random = Math.random();
+  const key = `testListKey${random}`;
+  const items = [`item1-${random}`, `item2-${random}`, `item3-${random}`];
+
+  await cache().lpushAndTrim(test_namespace, key, items[0], 5);
+  let result = await cache().getList(test_namespace, key);
+  expect(result).to.deep.equal([items[0]]);
+
+  await cache().lpushAndTrim(test_namespace, key, items[1], 5);
+  result = await cache().getList(test_namespace, key);
+  expect(result).to.deep.equal([items[1], items[0]]);
+
+  await cache().lpushAndTrim(test_namespace, key, items[2], 5);
+  result = await cache().getList(test_namespace, key);
+  expect(result).to.deep.equal([items[2], items[1], items[0]]);
+}
+
+export async function testLpushAndTrim(test_namespace: CacheNamespaces) {
+  const random = Math.random();
+  const key = `testTrimKey${random}`;
+
+  for (let i = 0; i < 5; i++) {
+    await cache().lpushAndTrim(test_namespace, key, `item${i}-${random}`, 3);
+  }
+
+  const result = await cache().getList(test_namespace, key);
+  expect(result).to.have.length(3);
+  expect(result).to.deep.equal([
+    `item4-${random}`,
+    `item3-${random}`,
+    `item2-${random}`,
+  ]);
+}
+
 describe('RedisCache', () => {
   const test_namespace: CacheNamespaces = CacheNamespaces.Test_Redis;
 
@@ -69,6 +104,14 @@ describe('RedisCache', () => {
 
   test('test key expiry', { timeout: 5_000 }, async () => {
     await testExpiry(test_namespace);
+  });
+
+  test('should be able to lpush to a list and get the list', async () => {
+    await testLpushAndGetList(test_namespace);
+  });
+
+  test('should trim list when it exceeds max length', async () => {
+    await testLpushAndTrim(test_namespace);
   });
 
   test('should get multiple keys with namespace', async () => {

@@ -161,6 +161,20 @@ export interface Cache extends Disposable {
     ttlInSeconds: number,
   ): Promise<boolean>;
 
+  lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false>;
+
+  getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    stop?: number,
+  ): Promise<string[]>;
+
   // Hash methods
   /**
    * Increments the numeric value of a given field within a hash (object) in the specified namespace + key.
