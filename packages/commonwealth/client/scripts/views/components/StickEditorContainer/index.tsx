@@ -1,1 +1,1 @@
-export * from './StickyEditorContainer';
+export { StickyInput } from './StickyInput';
