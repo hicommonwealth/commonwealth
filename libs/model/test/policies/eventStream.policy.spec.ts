@@ -2,7 +2,7 @@ import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
 import { models, tester } from '@hicommonwealth/model';
-import { ContestManager, events } from '@hicommonwealth/schemas';
+import { ContestManager, Events, events } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import {
   afterAll,
@@ -283,6 +283,35 @@ describe('EventStream Policy Integration Tests', () => {
   test('should process multiple events of different types through the outbox', async () => {
     const outboxEvents = [
       {
+        event_name: 'ContestStarted',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          start_time: new Date(),
+          end_time: new Date(),
+          is_one_off: true,
+        } satisfies z.infer<typeof events.ContestStarted>,
+      },
+      {
+        event_name: 'ContestEnded',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          is_one_off: true,
+          winners: [],
+          created_at: new Date(),
+        } satisfies z.infer<typeof events.ContestEnded>,
+      },
+      {
+        event_name: 'ContestEnding',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          is_one_off: true,
+          created_at: new Date(),
+        } satisfies z.infer<typeof events.ContestEnding>,
+      },
+      {
         event_name: 'CommunityCreated',
         event_payload: {
           created_at: new Date(),
@@ -301,16 +330,6 @@ describe('EventStream Policy Integration Tests', () => {
           body: 'Test Body',
           topic_id: 1,
         } satisfies z.infer<typeof events.ThreadCreated>,
-      },
-      {
-        event_name: 'ContestStarted',
-        event_payload: {
-          contest_address: contestManagers[0].contest_address,
-          contest_id: 1,
-          start_time: new Date(),
-          end_time: new Date(),
-          is_one_off: true,
-        } satisfies z.infer<typeof events.ContestStarted>,
       },
       {
         event_name: 'LaunchpadTokenCreated',
@@ -360,33 +379,29 @@ describe('EventStream Policy Integration Tests', () => {
 
     await models.Outbox.bulkCreate(outboxEvents);
 
-    await drainOutbox(
-      [
-        'CommunityCreated',
-        'ThreadCreated',
-        'ContestStarted',
-        'LaunchpadTokenCreated',
-        'LaunchpadTokenTraded',
-        'LaunchpadTokenGraduated',
-      ],
-      EventStreamPolicy,
-    );
+    const eventNames = [
+      'ContestStarted',
+      'ContestEnded',
+      'ContestEnding',
+      'CommunityCreated',
+      'ThreadCreated',
+      'LaunchpadTokenCreated',
+      'LaunchpadTokenTraded',
+      'LaunchpadTokenGraduated',
+    ] satisfies Events[];
+
+    await drainOutbox(eventNames, EventStreamPolicy);
 
     const eventStreamItems = await getEventStream();
 
-    expect(eventStreamItems).toHaveLength(6);
-    expect(eventStreamItems[0].type).toBe(outboxEvents[5].event_name);
-    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
-    expect(eventStreamItems[1].type).toBe(outboxEvents[4].event_name);
-    expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
-    expect(eventStreamItems[2].type).toBe(outboxEvents[3].event_name);
-    expect(isValidUrl(eventStreamItems[2].url)).toBe(true);
-    expect(eventStreamItems[3].type).toBe(outboxEvents[2].event_name);
-    expect(isValidUrl(eventStreamItems[3].url)).toBe(true);
-    expect(eventStreamItems[4].type).toBe(outboxEvents[1].event_name);
-    expect(isValidUrl(eventStreamItems[4].url)).toBe(true);
-    expect(eventStreamItems[5].type).toBe(outboxEvents[0].event_name);
-    expect(isValidUrl(eventStreamItems[5].url)).toBe(true);
+    expect(eventStreamItems).toHaveLength(eventNames.length);
+    for (let i = 0; i < eventNames.length; i++) {
+      // events are drained from the outbox in reverse order
+      expect(eventStreamItems[i].type).toBe(
+        outboxEvents[eventNames.length - i - 1].event_name,
+      );
+      expect(isValidUrl(eventStreamItems[i].url)).toBe(true);
+    }
   });
 
   test('should only keep the most recent events when exceeding the window size', async () => {
