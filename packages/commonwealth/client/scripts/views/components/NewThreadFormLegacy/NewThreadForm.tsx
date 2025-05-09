@@ -35,7 +35,9 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
+import useGetTokenizedThreadsAllowedQuery from 'state/api/tokens/getTokenizedThreadsAllowed';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
@@ -99,6 +101,7 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
+import { TokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -141,6 +144,7 @@ export const NewThreadForm = forwardRef<
   } | null>(null);
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
+  const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -158,6 +162,8 @@ export const NewThreadForm = forwardRef<
   useAppStatus();
 
   const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [selectedCommunityId, setSelectedCommunityId] = useState(
     app.activeChainId() || '',
@@ -324,6 +330,11 @@ export const NewThreadForm = forwardRef<
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
+  const { data: tokenizedThreadsAllowed } = useGetTokenizedThreadsAllowedQuery({
+    community_id: selectedCommunityId,
+    topic_id: threadTopic?.id || 0,
+  });
+
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
@@ -393,6 +404,25 @@ export const NewThreadForm = forwardRef<
       });
 
       const thread = await createThread(input);
+
+      if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
+        await createThreadToken({
+          name: effectiveTitle,
+          symbol: effectiveTitle.substring(0, 4).toUpperCase(),
+          threadId: thread.id!,
+          ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
+          initPurchaseAmount: 0.1,
+          chainId: community.ChainNode?.eth_chain_id?.toString() || '',
+          walletAddress: userSelectedAddress,
+          authorAddress: userSelectedAddress,
+          communityTreasuryAddress:
+            (app.chain?.meta as any)?.communityTreasuryAddress || '',
+          chainRpc: community.ChainNode?.url || '',
+          paymentTokenAddress:
+            (app.chain?.meta as any)?.paymentTokenAddress || '',
+        });
+      }
+
       if (thread && linkedProposals) {
         addThreadLinks({
           communityId: app.activeChainId() || '',
@@ -498,6 +528,8 @@ export const NewThreadForm = forwardRef<
     linkedProposals,
     createPoll,
     pollsData,
+    createThreadToken,
+    tokenizedThreadsAllowed,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -610,8 +642,6 @@ export const NewThreadForm = forwardRef<
     },
     [handleNewThreadCreation],
   );
-
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const snapshotLink = linkedProposals?.source === 'snapshot';
   const cosmosLink = linkedProposals?.source === 'proposal';
@@ -750,6 +780,14 @@ export const NewThreadForm = forwardRef<
   );
 
   const sidebarComponent = [
+    {
+      label: 'Links',
+      item: (
+        <div className="cards-colum">
+          <TokenWidget />
+        </div>
+      ),
+    },
     {
       label: 'Links',
       item: (
@@ -1004,6 +1042,23 @@ export const NewThreadForm = forwardRef<
                       }
                     }}
                   />
+                )}
+
+                {tokenizedThreadsAllowed && (
+                  <div className="tokenized-status">
+                    <CWText
+                      type="caption"
+                      className={
+                        tokenizedThreadsAllowed.tokenized_threads_enabled
+                          ? 'tokenized-enabled'
+                          : 'tokenized-disabled'
+                      }
+                    >
+                      {tokenizedThreadsAllowed.tokenized_threads_enabled
+                        ? 'This topic allows tokenized threads'
+                        : 'This topic does not allow tokenized threads'}
+                    </CWText>
+                  </div>
                 )}
 
                 {!!contestTopicAffordanceVisible && (
