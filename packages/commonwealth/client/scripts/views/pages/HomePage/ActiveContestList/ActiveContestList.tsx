@@ -149,6 +149,7 @@ const ActiveContestList = ({
                   topics={contest.topics || []}
                   decimals={contest.decimals}
                   ticker={contest.ticker}
+                  prizePercentage={contest.prize_percentage || undefined}
                   finishDate={end_time ? moment(end_time).toISOString() : ''}
                   isCancelled={contest.cancelled}
                   isRecurring={!contest.funding_token_address}
