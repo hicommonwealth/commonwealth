@@ -52,7 +52,6 @@ import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerGroupsController } from '../controllers/server_groups_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
@@ -70,7 +69,6 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
@@ -83,7 +81,6 @@ export type ServerControllers = {
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
 };
@@ -100,7 +97,6 @@ function setupRouter(
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
   };
@@ -460,13 +456,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/groups',
-    getGroupsHandler.bind(this, serverControllers),
   );
 
   registerRoute(

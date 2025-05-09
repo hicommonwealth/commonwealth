@@ -16,7 +16,6 @@ import {
   useGetCommunityByIdQuery,
   useGetMembersQuery,
 } from 'state/api/communities';
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
@@ -316,10 +315,8 @@ const CommunityMembersPage = () => {
   };
 
   useEffect(() => {
-    // Invalidate group memberships cache
-    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
     refetch().catch((e) => console.log(e));
-  }, [refetch]);
+  }, [refetch, communityId]);
 
   useEffect(() => {
     // Set the active tab based on URL
