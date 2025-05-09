@@ -33,7 +33,7 @@ const ENABLE_ESLINT_DIFF_PLUGIN =
 module.exports = {
   settings: {
     react: {
-      version: 'detect',
+      version: '18.3.1',
     },
   },
   plugins: ['@tanstack/query'],

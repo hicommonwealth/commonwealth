@@ -153,23 +153,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      # To disable eslint-diff just comment the following two lines
-#      - name: Run eslint-diff
-#        env:
-#          ESLINT_PLUGIN_DIFF_COMMIT: "origin/${{ github.base_ref }}"
-#        run: pnpm -r run lint-diff
-#
-#      - name: Run eslint-diff-canary to make sure eslint-diff is functioning properly
-#        env:
-#          ESLINT_PLUGIN_DIFF_COMMIT: "origin/${{ github.base_ref }}"
-#        run: pnpm -F commonwealth run lint-diff-canary
-
-      # fun the *old* linter last because I want to try to migrate away from
-      # this and JUST to eslint-diff but if this fails we still might be able
-      # to salvage the branch
-#      - name: Run linter
-#        run: pnpm lint-branch
       - name: Lint Diff Files
+        env:
+          ESLINT_PLUGIN_DIFF_COMMIT: "origin/${{ github.base_ref }}"
         run: pnpm lint-diff
 
 
