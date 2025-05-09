@@ -1,5 +1,5 @@
-import * as schemas from '@hicommonwealth/schemas';
 import axios from 'axios';
+import Tag from 'client/scripts/models/Tag';
 import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
@@ -10,9 +10,6 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { z } from 'zod';
-
-type Tag = z.infer<typeof schemas.TagView>;
 
 const getTagUsage = async (
   id: number,
@@ -190,8 +187,7 @@ const CommunityTagsManagementTask = () => {
       numeric: false,
       sortable: true,
       cell: ({ row }: { row: { original: Tag } }) => {
-        const date = row.original.created_at!;
-        return <span>{date.toLocaleString()}</span>;
+        return <span>{row.original.created_at}</span>;
       },
     },
     {

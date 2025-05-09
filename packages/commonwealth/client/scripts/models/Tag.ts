@@ -16,7 +16,7 @@ class Tag {
     this.id = id!;
     this.name = name;
     this.community_count = community_count;
-    this.created_at = created_at?.toLocaleString() ?? '';
+    this.created_at = new Date(created_at!).toLocaleDateString();
   }
 }
 
