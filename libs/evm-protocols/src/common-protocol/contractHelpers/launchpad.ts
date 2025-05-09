@@ -277,10 +277,6 @@ export async function getLaunchpadTokenCreatedTransaction({
   };
 }
 
-async function test() {
-  return 10;
-}
-
 export async function getLaunchpadToken({
   rpc,
   lpBondingCurveAddress,
