@@ -60,7 +60,9 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
 
-  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
+  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery({
+    enabled: true,
+  });
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const [filters, setFilters] = useState<CommunityFilters>({

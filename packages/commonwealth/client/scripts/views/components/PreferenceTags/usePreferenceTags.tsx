@@ -4,7 +4,9 @@ import { SelectedTag, Tag } from './types';
 
 const usePreferenceTags = () => {
   const isInitialTagsSet = useRef(false);
-  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
+  const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery({
+    enabled: true,
+  });
 
   const [preferenceTags, setPreferenceTags] = useState<SelectedTag[]>([]);
 

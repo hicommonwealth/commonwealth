@@ -33,6 +33,7 @@ const Backdrop = React.forwardRef<
   return <div ref={ref} {...other} />;
 });
 
+// eslint-disable-next-line react/no-multi-comp
 const CWModal: FC<CWModalProps> = ({
   content,
   isFullScreen,
