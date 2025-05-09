@@ -21,7 +21,6 @@ import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
-import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
@@ -316,9 +315,6 @@ const CommunityMembersPage = () => {
   };
 
   useEffect(() => {
-    // Invalidate group memberships cache
-    const utils = trpc.useUtils();
-    utils.community.getGroups.invalidate({ community_id: communityId });
     refetch().catch((e) => console.log(e));
   }, [refetch, communityId]);
 
