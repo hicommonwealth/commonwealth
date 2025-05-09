@@ -127,11 +127,12 @@ const StickyInput = (props: StickyInputProps) => {
 
     try {
       if (mode === 'thread') {
-        const threadPrompt = generateThreadPrompt('');
+        const { systemPrompt, userPrompt } = generateThreadPrompt('');
 
-        await generateCompletion(threadPrompt, {
+        await generateCompletion(userPrompt, {
           model: 'gpt-4o-mini',
           stream: true,
+          systemPrompt,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
           },
@@ -146,11 +147,12 @@ const StickyInput = (props: StickyInputProps) => {
           ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
         `;
 
-        const commentPrompt = generateCommentPrompt(context);
+        const { systemPrompt, userPrompt } = generateCommentPrompt(context);
 
-        await generateCompletion(commentPrompt, {
+        await generateCompletion(userPrompt, {
           model: 'gpt-4o-mini',
           stream: true,
+          systemPrompt,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },

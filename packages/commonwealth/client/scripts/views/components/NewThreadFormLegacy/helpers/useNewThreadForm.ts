@@ -126,7 +126,14 @@ const useNewThreadForm = (
     if (!threadTopic && defaultTopic) {
       setThreadTopic(defaultTopic);
     }
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
+  }, [
+    saveDraft,
+    threadTopic,
+    threadTitle,
+    threadContentDelta,
+    defaultTopic,
+    setThreadContentDelta,
+  ]);
 
   return {
     threadKind,
