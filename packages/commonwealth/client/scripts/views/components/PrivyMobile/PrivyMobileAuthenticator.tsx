@@ -103,6 +103,12 @@ export const PrivyMobileAuthenticator = (props: Props) => {
       const auth = await signIn(session, signInOpts);
 
       console.log('FIXME signIn result: ' + JSON.stringify(auth, null, 2));
+
+      const landingURL = new URL(
+        '/dashboard/for-you',
+        window.location.href,
+      ).toString();
+      document.location.href = landingURL;
     }
 
     doAsync().catch(console.error);
