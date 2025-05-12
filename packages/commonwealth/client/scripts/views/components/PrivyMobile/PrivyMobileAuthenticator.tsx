@@ -104,8 +104,6 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         },
       };
 
-      console.log('FIXME: Trying to auth ');
-      console.log('FIXME: session: ' + session);
       console.log('FIXME: signInOpts: ' + JSON.stringify(signInOpts, null, 2));
 
       const auth = await signIn(session, signInOpts);
@@ -127,15 +125,6 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     signIn,
     signMessageProvider,
   ]);
-
-  if (!window.PRIVY_MOBILE_ENABLED) {
-    console.log('FIXME: Privy mobile is not enabled.');
-    return children;
-  }
-  console.log('FIXME: Privy mobile is ENABLED.');
-
-  // FIXME: do not return until we've finished authenticating...
-  // FIXME: can I use useUeerStore here ?
 
   return children;
 };

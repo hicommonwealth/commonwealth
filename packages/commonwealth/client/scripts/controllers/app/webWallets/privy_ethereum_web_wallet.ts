@@ -98,8 +98,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   public async enable(forceChainId?: string) {
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
-    console.log('FIXME: within enable... 1');
-    console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
       // default to ETH
@@ -109,8 +107,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
 
       const Web3 = (await import('web3')).default;
 
-      console.log('FIXME: within enable... 2');
-
       let ethereum = await this.etheriumProvider();
 
       if (ethereum.providers?.length) {
@@ -119,8 +115,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
           if (p.isMetaMask) ethereum = p;
         });
       }
-
-      console.log('FIXME: within enable... 3');
 
       this._web3 =
         process.env.ETH_RPC !== 'e2e-test'
@@ -144,8 +138,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       if (!this._web3.givenProvider.request)
         throw new Error('No web3.givenProvider.request');
 
-      console.log('FIXME: within enable... 4');
-
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
@@ -160,8 +152,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
           });
         }
       } catch (switchError) {
-        console.log('FIXME: within enable... 5');
-
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
           const wsRpcUrl = app.chain?.meta?.ChainNode?.url ?? '';
@@ -198,8 +188,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
         }
       }
 
-      console.log('FIXME: within enable... 6');
-
       // fetch active accounts
       this._accounts = (
         await this._web3.givenProvider.request({
@@ -212,8 +200,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       if (this._accounts.length === 0) {
         throw new Error('Metamask fetched no accounts');
       }
-
-      console.log('FIXME: within enable... 7');
 
       await this.initAccountsChanged();
       this._enabled = true;
@@ -231,16 +217,9 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
-    // FIXME: we don't have the 'on' event handler...
-    console.log('FIXME: within enable... 7');
-
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        console.log(
-          'FIXME: initAccounts got some accounts: ',
-          JSON.stringify(accounts, null, 2),
-        );
         const updatedAddress = userStore
           .getState()
           .accounts.find((addr) => addr.address === accounts[0]);
