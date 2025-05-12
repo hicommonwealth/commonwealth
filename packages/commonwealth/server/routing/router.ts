@@ -50,7 +50,6 @@ import getLinks from '../routes/linking/getLinks';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
@@ -63,7 +62,6 @@ import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
@@ -80,7 +78,6 @@ import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
   groups: ServerGroupsController;
@@ -97,7 +94,6 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
     groups: new ServerGroupsController(models),
@@ -238,15 +234,6 @@ function setupRouter(
     '/feed',
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models, serverControllers),
-  );
-
-  // comments
-  registerRoute(
-    router,
-    'get',
-    '/comments',
-    databaseValidationService.validateCommunity,
-    searchCommentsHandler.bind(this, serverControllers),
   );
 
   // topics

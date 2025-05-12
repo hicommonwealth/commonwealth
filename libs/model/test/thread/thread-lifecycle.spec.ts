@@ -39,6 +39,7 @@ import {
   CreateCommentReaction,
   DeleteComment,
   GetComments,
+  SearchComments,
   UpdateComment,
 } from '../../src/aggregates/comment';
 import { DeleteReaction } from '../../src/aggregates/reaction';
@@ -1311,6 +1312,27 @@ describe('Thread lifecycle', () => {
 
       // console.log(response);
       expect(response!.threads.length).to.equal(7);
+    });
+
+    test('should search comments', async () => {
+      const comments = await query(SearchComments(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          search: 'hello',
+          limit: 5,
+          cursor: 1,
+          order_by: 'created_at',
+          order_direction: 'DESC',
+        },
+      });
+      expect(comments!.results).to.have.length(5);
+      expect(comments!.results[0].id).to.equal(1);
+      expect(comments!.results[1].id).to.equal(2);
+      expect(comments!.limit).to.equal(5);
+      expect(comments!.page).to.equal(2);
+      expect(comments!.totalPages).to.equal(3);
+      expect(comments!.totalResults).to.equal(11);
     });
   });
 });
