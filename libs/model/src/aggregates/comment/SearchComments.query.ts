@@ -1,5 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 
@@ -43,7 +44,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
         searchTerm: search,
         ...paginationBind,
       };
-      if (community_id) {
+      if (community_id && community_id !== ALL_COMMUNITIES) {
         bind.community = community_id;
       }
 
@@ -56,7 +57,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       "Comments".id,
       "Threads".title,
       "Comments".body,
-      "Comments".thread_id as proposalId,
+      "Comments".thread_id,
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,

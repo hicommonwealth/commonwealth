@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
-import { CommentView, SearchUserProfilesView } from '@hicommonwealth/schemas';
+import {
+  CommentSearchView,
+  SearchUserProfilesView,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
@@ -15,7 +18,7 @@ import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
 
 export type SearchResults = {
   [SearchScope.Threads]: SearchThreadsResponse['results'];
-  [SearchScope.Replies]: z.infer<typeof CommentView>[];
+  [SearchScope.Replies]: z.infer<typeof CommentSearchView>[];
   [SearchScope.Communities]: SearchChainsResponse['results'];
   [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
 };
