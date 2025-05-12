@@ -13,7 +13,16 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
+interface UseNewThreadFormOptions {
+  contentDelta?: DeltaStatic;
+  setContentDelta?: (delta: DeltaStatic) => void;
+}
+
+const useNewThreadForm = (
+  communityId: string,
+  topicsForSelector: Topic[],
+  options: UseNewThreadFormOptions = {},
+) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
@@ -53,9 +62,19 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   // @ts-expect-error StrictNullChecks
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
-  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    restoredDraft?.body,
-  );
+
+  // Use internal state if external state is not provided
+  const [internalThreadContentDelta, setInternalThreadContentDelta] =
+    useState<DeltaStatic>(restoredDraft?.body);
+
+  // Use external contentDelta and setContentDelta if provided
+  const threadContentDelta =
+    options.contentDelta !== undefined
+      ? options.contentDelta
+      : internalThreadContentDelta;
+  const setThreadContentDelta =
+    options.setContentDelta || setInternalThreadContentDelta;
+
   const [isSaving, setIsSaving] = useState(false);
 
   const editorText = getTextFromDelta(threadContentDelta);
@@ -107,7 +126,14 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (!threadTopic && defaultTopic) {
       setThreadTopic(defaultTopic);
     }
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
+  }, [
+    saveDraft,
+    threadTopic,
+    threadTitle,
+    threadContentDelta,
+    defaultTopic,
+    setThreadContentDelta,
+  ]);
 
   return {
     threadKind,

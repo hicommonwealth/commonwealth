@@ -33,11 +33,16 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   const uniswapPricingEnabled =
     token?.liquidity_transferred && !!communityNode?.ethChainId;
 
+  const enabled =
+    uniswapPricingEnabled &&
+    !!communityNode?.ethChainId &&
+    !!token?.token_address;
+
   // Get MCAP/pricing from uniswap only when token liquidity transferred to uniswap
   const { data: uniswapResponse } = useGetTokenInfoAlchemy({
     token_address: token?.token_address,
     eth_chain_id: communityNode?.ethChainId,
-    enabled: uniswapPricingEnabled && !!communityNode?.ethChainId,
+    enabled: !!enabled,
   });
 
   const uniswapData = uniswapResponse?.data;
