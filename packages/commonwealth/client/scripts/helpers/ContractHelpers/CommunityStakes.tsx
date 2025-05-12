@@ -1,4 +1,5 @@
 import { CommunityStakeAbi } from '@commonxyz/common-protocol-abis';
+import Web3 from 'web3';
 import { toBigInt } from 'web3-utils';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -132,9 +133,24 @@ class CommunityStakes extends ContractBase {
     }
 
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = await this.contract.methods
-      .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
-      .call();
+
+    // Create a specific Web3 instance just for this call
+    const specificWeb3 = new Web3(this.rpc);
+
+    const calldata = `0xf1220bbf${specificWeb3.eth.abi
+      .encodeParameters(
+        ['address', 'uint256', 'uint256'],
+        [namespaceAddress, id.toString(), amount.toString()],
+      )
+      .substring(2)}`;
+    const result = await specificWeb3.eth.call({
+      to: this.contractAddress,
+      data: calldata,
+    });
+    const totalPrice = specificWeb3.eth.abi
+      .decodeParameter('uint256', result)
+      .toString();
+
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {
