@@ -13,8 +13,8 @@ export interface UserAuth {
   id: string;
   address: string;
   identityToken: string;
-  ssoOAuthToken: string;
-  ssoProvider: WalletSsoSource;
+  ssoOAuthToken?: string;
+  ssoProvider?: WalletSsoSource;
 }
 
 export interface IPrivyMobileAuthStatus {
