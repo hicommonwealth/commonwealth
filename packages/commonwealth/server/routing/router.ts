@@ -44,12 +44,10 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
-import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 
@@ -76,7 +74,6 @@ import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
   comments: ServerCommentsController;
-  analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
   admin: ServerAdminController;
 };
@@ -91,7 +88,6 @@ function setupRouter(
   // controllers
   const serverControllers: ServerControllers = {
     comments: new ServerCommentsController(models),
-    analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
     admin: new ServerAdminController(models),
   };
@@ -392,13 +388,6 @@ function setupRouter(
   );
 
   // linking
-  registerRoute(
-    router,
-    'post',
-    '/linking/addThreadLinks',
-    passport.authenticate('jwt', { session: false }),
-    addThreadLink.bind(this, models),
-  );
   registerRoute(
     router,
     'delete',
