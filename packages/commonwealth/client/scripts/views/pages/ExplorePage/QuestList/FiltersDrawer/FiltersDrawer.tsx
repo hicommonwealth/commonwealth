@@ -34,6 +34,7 @@ export const FiltersDrawer = ({
                 date && onFiltersChange({ ...filters, endingAfter: date })
               }
               fullWidth
+              showTimeSelect
             />
             <CWDateTimeInput
               label="Starting Before"
@@ -42,6 +43,7 @@ export const FiltersDrawer = ({
                 date && onFiltersChange({ ...filters, startingBefore: date })
               }
               fullWidth
+              showTimeSelect
             />
           </div>
         </div>
