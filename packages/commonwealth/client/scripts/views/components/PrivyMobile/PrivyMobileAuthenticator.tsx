@@ -47,7 +47,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
   useEffect(() => {
     async function doAsync() {
-      if (user) {
+      if (user && user.isLoggedIn) {
         // we're already authenticated so there's nothing to do...
         return;
       }
