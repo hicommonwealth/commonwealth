@@ -17,7 +17,7 @@ export function CreateThreadReaction(): Command<
     ...schemas.CreateThreadReaction,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
+        action: schemas.GatedActionEnum.CREATE_THREAD_REACTION,
       }),
       verifyReactionSignature,
       tiered({ upvotes: true }),

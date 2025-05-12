@@ -4,7 +4,7 @@ import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
+import { ActivityThread, GatedActionEnum } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
@@ -90,7 +90,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+        GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
       )
         ? foundTopicPermissions?.permissions
         : undefined,

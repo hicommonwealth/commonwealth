@@ -23,7 +23,7 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
         where: { community_id },
         include: [
           {
-            model: models.GroupPermission,
+            model: models.GroupGatedAction,
             attributes: ['topic_id', 'allowed_actions'],
             where: topic_id ? { topic_id } : undefined,
           },

@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -14,7 +14,7 @@ import CWBanner from '../new_designs/CWBanner';
 
 interface CWGatedTopicPermissionLevelBannerProps {
   onClose: () => void;
-  topicPermissions: PermissionEnum[];
+  topicPermissions: GatedActionEnum[];
 }
 
 const CWGatedTopicPermissionLevelBanner = ({

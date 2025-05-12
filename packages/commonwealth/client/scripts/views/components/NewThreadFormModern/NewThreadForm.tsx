@@ -1,4 +1,4 @@
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { GatedActionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
@@ -238,7 +238,7 @@ export const NewThreadForm = () => {
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_THREAD,
       )
         ? foundTopicPermissions?.permissions
         : undefined,
@@ -611,11 +611,11 @@ export const NewThreadForm = () => {
                   foundTopicPermissions &&
                   !isAdmin &&
                   !foundTopicPermissions?.permissions?.includes(
-                    PermissionEnum.CREATE_THREAD,
+                    GatedActionEnum.CREATE_THREAD,
                   ) && (
                     <CWGatedTopicPermissionLevelBanner
                       topicPermissions={
-                        foundTopicPermissions?.permissions as PermissionEnum[]
+                        foundTopicPermissions?.permissions as GatedActionEnum[]
                       }
                       onClose={() => setCanShowTopicPermissionBanner(false)}
                     />

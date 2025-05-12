@@ -90,7 +90,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
+      authTopic({ action: schemas.GatedActionEnum.CREATE_THREAD }),
       verifyThreadSignature,
       tiered({ creates: true }),
       turnstile({ widgetName: 'create-thread' }),

@@ -252,7 +252,7 @@ async function checkGatedActions(
   const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
 
-  // If no groups allow all actions
+  // If no groups/actions, allow all actions
   if (topic.group_ids?.length === 0) return;
 
   // Get the groups and gated actions
@@ -292,8 +292,10 @@ async function checkGatedActions(
       group_id: { [Op.in]: groups.map((g) => g.id!) },
     },
   });
+  // if not a member in any group then this is not a member
   if (!memberships.length) throw new NonMember(actor, topic.name, action);
 
+  // if all memberships are rejected, return reject reasons
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
     throw new RejectedMember(
@@ -302,6 +304,7 @@ async function checkGatedActions(
         reject.reject_reason!.map((reason) => reason.message),
       ),
     );
+  // a membership in one of the groups was found so the user has required permissions
 }
 
 /**

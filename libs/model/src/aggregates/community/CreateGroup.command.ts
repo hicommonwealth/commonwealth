@@ -80,10 +80,10 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
                     `ARRAY[${permissions
                       .map((p) => `'${p}'`)
                       .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
-                  ) as unknown as schemas.PermissionEnum[],
+                  ) as unknown as schemas.GatedActionEnum[],
                 };
               });
-              await models.GroupPermission.bulkCreate(groupPermissions, {
+              await models.GroupGatedAction.bulkCreate(groupPermissions, {
                 transaction,
               });
             }

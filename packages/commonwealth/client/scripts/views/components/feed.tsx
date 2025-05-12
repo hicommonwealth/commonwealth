@@ -6,7 +6,7 @@ import './feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
+import { ActivityThread, GatedActionEnum } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'helpers/threads';
@@ -82,7 +82,7 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+        GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
       )
         ? foundTopicPermissions?.permissions
         : undefined,

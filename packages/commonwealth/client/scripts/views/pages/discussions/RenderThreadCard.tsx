@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
@@ -13,7 +13,7 @@ import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { checkIsTopicInContest } from '../../components/NewThreadFormLegacy/helpers';
 import { ThreadCard } from './ThreadCard';
 
-type TopicPermission = { id: number; permissions: PermissionEnum[] };
+type TopicPermission = { id: number; permissions: GatedActionEnum[] };
 
 type contestsData = {
   all: Contest[];
@@ -85,7 +85,7 @@ export const RenderThreadCard = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_THREAD_REACTION,
       )
         ? foundTopicPermissions?.permissions
         : undefined,
@@ -96,7 +96,7 @@ export const RenderThreadCard = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
+        GatedActionEnum.CREATE_COMMENT,
       )
         ? foundTopicPermissions?.permissions
         : undefined,

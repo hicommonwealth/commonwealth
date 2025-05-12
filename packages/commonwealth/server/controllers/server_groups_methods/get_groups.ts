@@ -5,7 +5,7 @@ import {
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { Op, WhereOptions } from 'sequelize';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -29,7 +29,7 @@ const Errors = {
 };
 
 export type TopicAttributesWithPermission = TopicAttributes & {
-  permissions: PermissionEnum[];
+  permissions: GatedActionEnum[];
 };
 
 type GroupWithExtras = GroupAttributes & {
@@ -41,7 +41,7 @@ export type GetGroupsResult = GroupWithExtras[];
 export type GroupInstanceWithTopicPermissions = GroupInstance & {
   GroupPermissions: {
     topic_id: number;
-    allowed_actions: PermissionEnum[];
+    allowed_actions: GatedActionEnum[];
   }[];
 };
 
@@ -69,7 +69,7 @@ export async function __getGroups(
     },
     include: [
       {
-        model: this.models.GroupPermission,
+        model: this.models.GroupGatedAction,
         attributes: ['topic_id', 'allowed_actions'],
       },
     ],
@@ -125,7 +125,7 @@ export async function __getGroups(
           temp.permissions = (
             (group as GroupInstanceWithTopicPermissions).GroupPermissions || []
           ).find((gtp) => gtp.topic_id === t.id)
-            ?.allowed_actions as PermissionEnum[];
+            ?.allowed_actions as GatedActionEnum[];
           return temp;
         }),
     }));

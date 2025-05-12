@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
@@ -30,7 +30,7 @@ import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
 import { Link } from 'react-router-dom';
 import './ThreadCell.scss';
 
-type TopicPermission = { id: number; permissions: PermissionEnum[] };
+type TopicPermission = { id: number; permissions: GatedActionEnum[] };
 
 export type RenderThreadCellProps = {
   thread: Thread;
@@ -77,7 +77,7 @@ const ThreadCell = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_THREAD_REACTION,
       )
         ? foundTopicPermissions?.permissions
         : undefined,
@@ -88,7 +88,7 @@ const ThreadCell = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
+        GatedActionEnum.CREATE_COMMENT,
       )
         ? foundTopicPermissions?.permissions
         : undefined,

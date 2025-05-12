@@ -35,7 +35,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
     ...schemas.CreateComment,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_COMMENT,
+        action: schemas.GatedActionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
       tiered({ creates: true }),

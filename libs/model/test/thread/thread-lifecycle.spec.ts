@@ -151,21 +151,21 @@ describe('Thread lifecycle', () => {
       ],
       custom_stages: ['one', 'two'],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: threadGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
       allowed_actions: [
-        schemas.PermissionEnum.CREATE_THREAD,
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
-        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+        schemas.GatedActionEnum.CREATE_THREAD,
+        schemas.GatedActionEnum.CREATE_THREAD_REACTION,
+        schemas.GatedActionEnum.CREATE_COMMENT_REACTION,
       ],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: commentGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
+      allowed_actions: [schemas.GatedActionEnum.CREATE_COMMENT],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: emptyGroupId,
       topic_id: _community?.topics?.[1]?.id || 0,
       allowed_actions: [],

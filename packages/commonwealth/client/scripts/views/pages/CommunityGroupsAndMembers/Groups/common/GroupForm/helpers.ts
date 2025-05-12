@@ -1,25 +1,25 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { TOPIC_PERMISSIONS, TopicPermissions } from './constants';
 import { GroupTopicPermissionEnum } from './index.types';
 
 export const convertAccumulatedPermissionsToGranularPermissions = (
   permission: GroupTopicPermissionEnum,
-): PermissionEnum[] => {
+): GatedActionEnum[] => {
   const basePermissions = [
-    PermissionEnum.CREATE_COMMENT_REACTION,
-    PermissionEnum.CREATE_THREAD_REACTION,
+    GatedActionEnum.CREATE_COMMENT_REACTION,
+    GatedActionEnum.CREATE_THREAD_REACTION,
   ];
 
   switch (permission) {
     case GroupTopicPermissionEnum.UPVOTE:
       return basePermissions;
     case GroupTopicPermissionEnum.UPVOTE_AND_COMMENT:
-      return [...basePermissions, PermissionEnum.CREATE_COMMENT];
+      return [...basePermissions, GatedActionEnum.CREATE_COMMENT];
     case GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST:
       return [
         ...basePermissions,
-        PermissionEnum.CREATE_COMMENT,
-        PermissionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_COMMENT,
+        GatedActionEnum.CREATE_THREAD,
       ];
     default:
       return [];
@@ -27,15 +27,15 @@ export const convertAccumulatedPermissionsToGranularPermissions = (
 };
 
 export const convertGranularPermissionsToAccumulatedPermissions = (
-  permissions: PermissionEnum[],
+  permissions: GatedActionEnum[],
 ): TopicPermissions => {
-  const hasThread = permissions.includes(PermissionEnum.CREATE_THREAD);
-  const hasComment = permissions.includes(PermissionEnum.CREATE_COMMENT);
+  const hasThread = permissions.includes(GatedActionEnum.CREATE_THREAD);
+  const hasComment = permissions.includes(GatedActionEnum.CREATE_COMMENT);
   const hasThreadReaction = permissions.includes(
-    PermissionEnum.CREATE_THREAD_REACTION,
+    GatedActionEnum.CREATE_THREAD_REACTION,
   );
   const hasCommentReaction = permissions.includes(
-    PermissionEnum.CREATE_COMMENT_REACTION,
+    GatedActionEnum.CREATE_COMMENT_REACTION,
   );
 
   const hasUpvote = hasThreadReaction || hasCommentReaction;
@@ -62,13 +62,13 @@ export const convertGranularPermissionsToAccumulatedPermissions = (
 };
 
 export const isPermissionGuard = (
-  value: PermissionEnum,
-): value is PermissionEnum => {
+  value: GatedActionEnum,
+): value is GatedActionEnum => {
   return [
-    PermissionEnum.CREATE_COMMENT_REACTION,
-    PermissionEnum.CREATE_THREAD_REACTION,
-    PermissionEnum.CREATE_COMMENT,
-    PermissionEnum.CREATE_THREAD,
-    PermissionEnum.UPDATE_POLL,
+    GatedActionEnum.CREATE_COMMENT_REACTION,
+    GatedActionEnum.CREATE_THREAD_REACTION,
+    GatedActionEnum.CREATE_COMMENT,
+    GatedActionEnum.CREATE_THREAD,
+    GatedActionEnum.UPDATE_POLL,
   ].includes(value);
 };

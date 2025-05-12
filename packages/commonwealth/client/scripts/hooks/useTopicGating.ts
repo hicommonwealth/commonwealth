@@ -1,8 +1,8 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { useGetMembershipsQuery } from '../state/api/groups/getMemberships';
 import Permissions from '../utils/Permissions';
 
-type TopicPermission = { id: number; permissions: PermissionEnum[] };
+type TopicPermission = { id: number; permissions: GatedActionEnum[] };
 
 type UseTopicGatingProps = {
   communityId: string;

@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { GroupTopicPermissionEnum, PermissionLabelType } from './index.types';
 
 export const REQUIREMENTS_TO_FULFILL = {
@@ -30,7 +30,7 @@ export const REVERSED_TOPIC_PERMISSIONS: ReversedTopicPermissions =
     Object.entries(TOPIC_PERMISSIONS).map(([key, value]) => [value, key]),
   ) as ReversedTopicPermissions;
 
-export const Permissions = PermissionEnum;
+export const Permissions = GatedActionEnum;
 
 export const PermissionLabel = [
   'Create threads',
@@ -41,13 +41,13 @@ export const PermissionLabel = [
 
 export const togglePermissionMap: Record<
   PermissionLabelType,
-  PermissionEnum[]
+  GatedActionEnum[]
 > = {
-  'Create threads': [PermissionEnum.CREATE_THREAD],
-  'Create Comments': [PermissionEnum.CREATE_COMMENT],
+  'Create threads': [GatedActionEnum.CREATE_THREAD],
+  'Create Comments': [GatedActionEnum.CREATE_COMMENT],
   'Can react': [
-    PermissionEnum.CREATE_COMMENT_REACTION,
-    PermissionEnum.CREATE_THREAD_REACTION,
+    GatedActionEnum.CREATE_COMMENT_REACTION,
+    GatedActionEnum.CREATE_THREAD_REACTION,
   ],
-  'Use poll': [PermissionEnum.UPDATE_POLL],
+  'Use poll': [GatedActionEnum.UPDATE_POLL],
 };

@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -121,7 +121,7 @@ export const TopicSummaryRow = ({
             threadTopicInteractionRestrictions:
               !isAdmin &&
               !foundTopicPermissions?.permissions?.includes(
-                PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+                GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
               )
                 ? foundTopicPermissions?.permissions
                 : undefined,

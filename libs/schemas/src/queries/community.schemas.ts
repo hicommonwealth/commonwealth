@@ -13,8 +13,8 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  GatedActionEnum,
   MembershipRejectReason,
-  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -110,7 +110,7 @@ export const GetMemberships = {
       topics: z
         .object({
           id: z.number(),
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
+          permissions: z.array(z.nativeEnum(GatedActionEnum)),
         })
         .array(),
       isAllowed: z.boolean(),

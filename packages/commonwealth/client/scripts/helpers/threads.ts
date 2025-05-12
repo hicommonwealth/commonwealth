@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
 // eslint-disable-next-line max-len
@@ -64,7 +64,7 @@ export const getThreadActionTooltipText = ({
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
   isThreadTopicGated?: boolean;
-  threadTopicInteractionRestrictions?: PermissionEnum[];
+  threadTopicInteractionRestrictions?: GatedActionEnum[];
 }): GetThreadActionTooltipTextResponse => {
   if (!isCommunityMember) {
     return getActionTooltipForNonCommunityMember;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { ThreadCard } from 'client/scripts/views/pages/discussions/ThreadCard';
 import { getThreadActionTooltipText } from 'helpers/threads';
@@ -65,7 +65,7 @@ export const ProfileThread = ({ thread }: ProfileThreadProps) => {
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+        GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
       )
         ? foundTopicPermissions?.permissions
         : undefined,

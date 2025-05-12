@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import {
   ContentType,
   MIN_CHARS_TO_SHOW_MORE,
@@ -505,7 +505,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
+        GatedActionEnum.CREATE_COMMENT,
       )
         ? foundTopicPermissions?.permissions
         : undefined,

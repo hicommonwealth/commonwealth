@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
 
 export enum GroupTopicPermissionEnum {
@@ -42,7 +42,7 @@ export type TopicPermissionsSubFormType = {
   onPermissionChange: (permission: string) => void;
 };
 
-export const Permissions = PermissionEnum;
+export const Permissions = GatedActionEnum;
 
 export type Permission = (typeof Permissions)[keyof typeof Permissions];
 

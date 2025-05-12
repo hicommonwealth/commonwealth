@@ -13,7 +13,7 @@ export function CreateCommentReaction(): Command<
     ...schemas.CreateCommentReaction,
     auth: [
       authComment({
-        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+        action: schemas.GatedActionEnum.CREATE_COMMENT_REACTION,
       }),
       verifyReactionSignature,
       tiered({ upvotes: true }),

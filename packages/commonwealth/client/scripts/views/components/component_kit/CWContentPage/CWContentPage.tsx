@@ -1,4 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
@@ -234,10 +234,10 @@ export const CWContentPage = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.CREATE_COMMENT_REACTION,
       ) &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_THREAD_REACTION,
       )
         ? foundTopicPermissions?.permissions
         : undefined,
@@ -248,7 +248,7 @@ export const CWContentPage = ({
     threadTopicInteractionRestrictions:
       !isAdmin &&
       !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
+        GatedActionEnum.CREATE_COMMENT,
       )
         ? foundTopicPermissions?.permissions
         : undefined,

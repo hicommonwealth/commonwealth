@@ -8,7 +8,7 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { GatedActionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
   ChainType,
@@ -51,7 +51,7 @@ const chance = Chance();
 
 function buildCreateGroupPayload(
   community_id: string,
-  topics: { id: number; permissions: PermissionEnum[] }[] = [],
+  topics: { id: number; permissions: GatedActionEnum[] }[] = [],
 ) {
   return {
     community_id,
@@ -394,28 +394,28 @@ describe('Community lifecycle', () => {
             {
               id: 1,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
             {
               id: 2,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
             {
               id: 3,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
           ]),
