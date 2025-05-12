@@ -29,7 +29,7 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      allowed_actions: {
+      gated_actions: {
         // This needs to be a string[] because enum[] will break sequelize.sync and fail tests
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,

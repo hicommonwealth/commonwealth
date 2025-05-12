@@ -239,7 +239,7 @@ async function findAddress(
 /**
  * Checks if actor address passes a set of requirements and grants access for all groups of the given topic
  */
-async function hasTopicPermissions(
+async function checkGatedActions(
   actor: Actor,
   address_id: number,
   action: GroupPermissionAction,
@@ -248,25 +248,27 @@ async function hasTopicPermissions(
   if (!topic_id)
     throw new InvalidInput('Must provide a valid topic id to authorize');
 
+  // TODO: we can probably cache this
   const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
 
+  // If no groups allow all actions
   if (topic.group_ids?.length === 0) return;
 
-  // check if user has permission to perform "action" in 'topic_id'
-  // the 'topic_id' can belong to any group where user has membership
-  // the group with 'topic_id' having higher permissions will take precedence
+  // Get the groups and gated actions
+  // TODO: we can probably cache this
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
-      allowed_actions?: GroupPermissionAction[];
+      gated_actions?: GroupPermissionAction[];
     }
   >(
     `
-        SELECT g.*, gp.topic_id, gp.allowed_actions
-        FROM "Groups" as g
-                 JOIN "GroupPermissions" gp ON g.id = gp.group_id
-        WHERE g.community_id = :community_id
-          AND gp.topic_id = :topic_id
+      SELECT g.*, gp.topic_id, gp.gated_actions
+      FROM "Groups" as g
+             JOIN "GroupPermissions" gp ON g.id = gp.group_id
+      WHERE g.community_id = :community_id
+        AND gp.topic_id = :topic_id
+        AND :action = ANY(gp.allowed_actions)
     `,
     {
       type: QueryTypes.SELECT,
@@ -274,33 +276,23 @@ async function hasTopicPermissions(
       replacements: {
         community_id: topic.community_id,
         topic_id: topic.id,
+        action,
       },
+      logging: console.log,
     },
   );
 
-  // There are 2 cases here. We either have the old group permission system where the group doesn't have
-  // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in
-  // the group_allowed_actions list.
-  const allowedActions = groups.filter(
-    (g) => !g.allowed_actions || g.allowed_actions.includes(action),
-  );
-  if (allowedActions.length === 0)
-    throw new NonMember(actor, topic.name, action);
+  // if the action is not gated by any group then allow
+  if (!groups.length) return;
 
-  // check membership for all groups of topic
+  // if action is gated by 1 or more groups search for membership in those groups
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowedActions.map((g) => g.id!) },
       address_id,
+      group_id: { [Op.in]: groups.map((g) => g.id!) },
     },
-    include: [
-      {
-        model: models.Group,
-        as: 'group',
-      },
-    ],
   });
-  if (memberships.length === 0) throw new NonMember(actor, topic.name, action);
+  if (!memberships.length) throw new NonMember(actor, topic.name, action);
 
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
@@ -347,7 +339,7 @@ async function mustBeAuthorized(
 
   // Allows when actor has group permissions in topic
   if (check.permissions)
-    return await hasTopicPermissions(
+    return await checkGatedActions(
       actor,
       context.address!.id!,
       check.permissions.action,
