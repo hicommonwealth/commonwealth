@@ -18,6 +18,7 @@ import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
   useDeleteQuestMutation,
+  useVerifyQuestActionMutation,
 } from 'state/api/quests';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
@@ -75,8 +76,11 @@ const QuestDetails = ({ id }: { id: number }) => {
     useDeleteQuestMutation();
   const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
     useCancelQuestMutation();
+  const { mutateAsync: verifyQuestAction, isLoading: isVerifyingQuestAction } =
+    useVerifyQuestActionMutation();
 
-  const isPendingAction = isDeletingQuest || isCancelingQuest;
+  const isPendingAction =
+    isDeletingQuest || isCancelingQuest || isVerifyingQuestAction;
 
   useRunOnceOnCondition({
     callback: () => {
@@ -299,6 +303,29 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }
+      case 'KyoFinanceSwapQuestVerified': {
+        if (!action.id) {
+          notifyError(`Failed to start quest`);
+          return;
+        }
+        try {
+          verifyQuestAction({
+            quest_action_meta_id: action.id,
+            // TODO: malik - allow user to select a specific address?
+            address: user.addresses[0].address,
+          })
+            .then(() => {
+              notifySuccess(`Completed!`);
+            })
+            .catch(() => {
+              notifyError(`Failed to start quest`);
+            });
+        } catch (error) {
+          console.error(error);
+          notifyError(`Failed to start quest`);
+        }
+        break;
+      }
       default:
         return;
     }
@@ -375,6 +402,7 @@ const QuestDetails = ({ id }: { id: number }) => {
   const isCompleted = gainedXP === totalUserXP && isStarted;
 
   const getQuestActionBlockedReason = () => {
+    if (isPendingAction) return `Another action is being proceessed`;
     if ((isSystemQuest && user.isLoggedIn) || !isStarted || isEnded) {
       if (isSystemQuest && user.isLoggedIn)
         return 'Only available for new users';
@@ -541,9 +569,9 @@ const QuestDetails = ({ id }: { id: number }) => {
                     action as QuestActionType,
                   )}
                   canStartAction={
-                    isSystemQuest
+                    (isSystemQuest
                       ? !user.isLoggedIn && isStarted && !isEnded
-                      : isStarted && !isEnded
+                      : isStarted && !isEnded) && !isPendingAction
                   }
                   actionStartBlockedReason={getQuestActionBlockedReason()}
                 />
