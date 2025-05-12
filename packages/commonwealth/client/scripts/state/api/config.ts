@@ -20,7 +20,6 @@ export const ApiEndpoints = {
   FETCH_DOMAIN: '/domain',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
-  FETCH_GROUPS: '/groups',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,

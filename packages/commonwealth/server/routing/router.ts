@@ -51,8 +51,6 @@ import getLinks from '../routes/linking/getLinks';
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
@@ -68,10 +66,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
@@ -80,8 +75,6 @@ import setupUniswapProxy from '../util/uniswapProxy';
 export type ServerControllers = {
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  groups: ServerGroupsController;
-  topics: ServerTopicsController;
   admin: ServerAdminController;
 };
 
@@ -96,8 +89,6 @@ function setupRouter(
   const serverControllers: ServerControllers = {
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    groups: new ServerGroupsController(models),
-    topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
   };
 
@@ -234,23 +225,6 @@ function setupRouter(
     '/feed',
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models, serverControllers),
-  );
-
-  // topics
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicChannelHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/topics-order' /* OLD: /orderTopics */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateTopicsOrderHandler.bind(this, serverControllers),
   );
 
   // reactions
@@ -447,13 +421,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/groups',
-    getGroupsHandler.bind(this, serverControllers),
   );
 
   registerRoute(
