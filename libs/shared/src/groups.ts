@@ -14,7 +14,7 @@ export function getUngatedActions(gatedActions: GatedActionEnum[]) {
   return Array.from(AllGatedActionSet.difference(gatedActionsSet));
 }
 
-const userFriendlyActionMap: Record<GatedActionEnum, string> = {
+export const UserFriendlyActionMap: Record<GatedActionEnum, string> = {
   [GatedActionEnum.CREATE_THREAD]: 'Post',
   [GatedActionEnum.CREATE_COMMENT]: 'Comment',
   [GatedActionEnum.CREATE_THREAD_REACTION]: 'Upvote Threads',
@@ -40,15 +40,18 @@ export function getReadableActions({
   actions: GatedActionEnum[];
   invert?: boolean;
 }) {
-  if (!actions.length) return 'None';
-
   if (!invert) {
-    return actions.map((action) => userFriendlyActionMap[action]).join('&');
+    if (!actions.length) return 'None';
+
+    return actions.map((action) => UserFriendlyActionMap[action]).join(' & ');
   }
 
-  return getUngatedActions(actions)
-    .map((action) => userFriendlyActionMap[action])
-    .join(', ');
+  const ungatedActions = getUngatedActions(actions);
+  if (!ungatedActions.length) return 'None';
+
+  return ungatedActions
+    .map((action) => UserFriendlyActionMap[action])
+    .join(' & ');
 }
 
 export type GroupPermissionAction = keyof typeof GatedActionEnum;

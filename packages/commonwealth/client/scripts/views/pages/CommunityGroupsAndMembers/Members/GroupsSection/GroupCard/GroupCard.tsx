@@ -1,3 +1,4 @@
+import { getReadableActions } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
@@ -10,7 +11,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { SharePopover } from 'views/components/SharePopover';
 import { formatAddressShort } from '../../../../../../helpers';
 import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
-import { convertGranularPermissionsToAccumulatedPermissions } from '../../../Groups/common/GroupForm/helpers';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 import { GroupCardProps } from './types';
@@ -157,18 +157,18 @@ const GroupCard = ({
           <div className="gating-topics">
             <div className="row">
               <CWText type="b2">Topic</CWText>
-              <CWText type="b2">Permission</CWText>
+              <CWText type="b2">Gated Actions</CWText>
             </div>
             {topics.map((t, index) => (
               <div key={index}>
                 <CWDivider className="divider-spacing" />
                 <div className="row">
                   <CWText type="b2">{t.name}</CWText>
-
                   <CWTag
-                    label={convertGranularPermissionsToAccumulatedPermissions(
-                      t.permissions || [],
-                    )}
+                    label={getReadableActions({
+                      actions: t.permissions || [],
+                      invert: true,
+                    })}
                     type="referendum"
                   />
                 </div>
