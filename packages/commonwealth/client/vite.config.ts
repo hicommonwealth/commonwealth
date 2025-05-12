@@ -178,6 +178,8 @@ export default defineConfig(({ mode }) => {
         'firebase/app',
         'firebase/messaging',
         'eventsource-client',
+        'react-datepicker',
+        'moment/moment',
       ],
     },
     build: {
