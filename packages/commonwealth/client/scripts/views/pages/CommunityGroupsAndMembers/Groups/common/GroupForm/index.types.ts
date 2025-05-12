@@ -1,17 +1,4 @@
 import { GatedActionEnum } from '@hicommonwealth/shared';
-import { TOPIC_PERMISSIONS } from './constants';
-
-// TODO: remove and use the backend enum
-export enum GroupTopicPermissionEnum {
-  UPVOTE = 'UPVOTE',
-  COMMENT = 'COMMENT',
-  POST = 'POST',
-  POST_AND_COMMENT = 'POST_AND_COMMENT',
-  UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
-  UPVOTE_AND_POST = 'UPVOTE_AND_POST',
-  UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
-  NONE = 'NONE',
-}
 
 export type RequirementSubFormsState = {
   defaultValues?: RequirementSubTypeWithLabel;
@@ -27,20 +14,6 @@ export type RequirementSubType = {
   requirementAmount?: string;
   requirementTokenId?: string;
   requirementCoinType?: string;
-};
-
-export type TopicPermissions =
-  (typeof TOPIC_PERMISSIONS)[keyof typeof TOPIC_PERMISSIONS];
-
-export type TopicPermissionsSubFormsState = {
-  topic: TopicPermissionsSubFormType['topic'];
-  permission: TopicPermissions;
-};
-
-export type TopicPermissionsSubFormType = {
-  topic: { id: number; name: string };
-  defaultPermission?: TopicPermissions;
-  onPermissionChange: (permission: string) => void;
 };
 
 export const Permissions = GatedActionEnum;
@@ -108,7 +81,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupImageUrl?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
-  topics: (LabelType & { permission: TopicPermissions })[];
+  topics: (LabelType & { permission: GatedActionEnum })[];
 };
 
 export type FormSubmitValues = {

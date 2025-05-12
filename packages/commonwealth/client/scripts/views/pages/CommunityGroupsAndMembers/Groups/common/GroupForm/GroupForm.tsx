@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isGatedAction } from '@hicommonwealth/shared';
 import {
   CWImageInput,
   ImageBehavior,
@@ -32,7 +33,6 @@ import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import TopicPermissionToggleGroupSubForm from './TopicPermissionToggleGroupSubForm';
 import { REQUIREMENTS_TO_FULFILL } from './constants';
-import { isPermissionGuard } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
@@ -224,7 +224,7 @@ const GroupForm = ({
             name: label,
           },
           permission: (Array.isArray(permission)
-            ? permission.filter(isPermissionGuard)
+            ? permission.filter(isGatedAction)
             : []) as Permission[],
         }));
       setTopicPermissionsToggleGroupSubForms(updatedInitialValues);

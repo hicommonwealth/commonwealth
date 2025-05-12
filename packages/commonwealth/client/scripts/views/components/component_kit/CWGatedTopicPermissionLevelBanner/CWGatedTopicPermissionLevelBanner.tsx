@@ -1,9 +1,11 @@
-import { GatedActionEnum, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import {
+  GatedActionEnum,
+  getReadableActions,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-// eslint-disable-next-line max-len
-import { convertGranularPermissionsToAccumulatedPermissions } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -32,7 +34,7 @@ const CWGatedTopicPermissionLevelBanner = ({
   return (
     <CWBanner
       title="This topic has granular permissioning enabled"
-      body={`Topic members are only allowed to ${convertGranularPermissionsToAccumulatedPermissions(topicPermissions)}`}
+      body={`Only group members can ${getReadableActions({ actions: topicPermissions, separatorType: ',&' })}`}
       type="info"
       buttons={[
         {

@@ -1,8 +1,7 @@
-import { GatedActionEnum } from '@hicommonwealth/shared';
+import { GatedActionEnum, getReadableActions } from '@hicommonwealth/shared';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
 // eslint-disable-next-line max-len
-import { convertGranularPermissionsToAccumulatedPermissions } from '../views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 
 export function detectURL(str: string) {
   if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
@@ -73,9 +72,11 @@ export const getThreadActionTooltipText = ({
   if (isThreadLocked) return 'Thread is locked';
   if (isThreadTopicGated) return 'Topic is gated';
   if (threadTopicInteractionRestrictions) {
-    return `Topic members are only allowed to ${convertGranularPermissionsToAccumulatedPermissions(
-      threadTopicInteractionRestrictions,
-    )}`;
+    // TODO: update to reflect all groups
+    return `Only group members can ${getReadableActions({
+      actions: threadTopicInteractionRestrictions,
+      separatorType: ',&',
+    })}`;
   }
   return '';
 };

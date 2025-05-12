@@ -22,6 +22,28 @@ export const UserFriendlyActionMap = {
   [GatedActionEnum.UPDATE_POLL]: 'Vote in Polls',
 } as const satisfies Record<GatedActionEnum, string>;
 
+export function joinStringsWithSeparator(
+  strings: string[],
+  separatorType: ',' | '&' | ',&',
+): string {
+  if (strings.length === 0) return '';
+  if (strings.length === 1) return strings[0];
+
+  switch (separatorType) {
+    case ',':
+      return strings.join(', ');
+    case '&':
+      return strings.join(' & ');
+    case ',&':
+      const allButLast = strings.slice(0, -1);
+      const last = strings[strings.length - 1];
+      return `${allButLast.join(', ')} and ${last}`;
+    default:
+      // This should never happen due to the type constraint, but TypeScript may require it
+      return strings.join(' ');
+  }
+}
+
 /**
  * Converts a gating actions array into a user-friendly string. Pass `invert: true`
  * to get the user-friendly string from the set difference between AllGatedActionSet
@@ -36,24 +58,36 @@ export const UserFriendlyActionMap = {
 export function getReadableActions({
   actions,
   invert,
+  separatorType,
 }: {
   actions: GatedActionEnum[];
   invert?: boolean;
+  separatorType?: ',' | '&' | ',&';
 }) {
   if (!invert) {
     if (!actions.length) return 'None';
 
-    return actions.map((action) => UserFriendlyActionMap[action]).join(' & ');
+    return joinStringsWithSeparator(
+      actions.map((action) => UserFriendlyActionMap[action]),
+      separatorType || '&',
+    );
   }
 
   const ungatedActions = getUngatedActions(actions);
   if (!ungatedActions.length) return 'None';
 
-  return ungatedActions
-    .map((action) => UserFriendlyActionMap[action])
-    .join(' & ');
+  return joinStringsWithSeparator(
+    ungatedActions.map((action) => UserFriendlyActionMap[action]),
+    separatorType || '&',
+  );
 }
 
 export type GroupGatedActionKey = keyof typeof GatedActionEnum;
 
 export type GatedActionValue = (typeof GatedActionEnum)[GroupGatedActionKey];
+
+export const isGatedAction = (
+  value: GatedActionEnum,
+): value is GatedActionEnum => {
+  return Object.values(GatedActionEnum).includes(value);
+};
