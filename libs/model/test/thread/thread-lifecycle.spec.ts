@@ -27,6 +27,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CommunityTierMap,
+  GatedActionEnum,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
   UserTierMap,
@@ -155,15 +156,15 @@ describe('Thread lifecycle', () => {
       group_id: threadGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
       gated_actions: [
-        schemas.GatedActionEnum.CREATE_THREAD,
-        schemas.GatedActionEnum.CREATE_THREAD_REACTION,
-        schemas.GatedActionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_COMMENT_REACTION,
       ],
     });
     await seed('GroupGatedAction', {
       group_id: commentGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
-      gated_actions: [schemas.GatedActionEnum.CREATE_COMMENT],
+      gated_actions: [GatedActionEnum.CREATE_COMMENT],
     });
     await seed('GroupGatedAction', {
       group_id: emptyGroupId,

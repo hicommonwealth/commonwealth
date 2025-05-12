@@ -12,7 +12,6 @@ import {
   CommentContext,
   CommentContextInput,
   Group,
-  GroupPermissionAction,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -24,7 +23,7 @@ import {
   VerifiedContext,
   VerifiedContextInput,
 } from '@hicommonwealth/schemas';
-import { Role } from '@hicommonwealth/shared';
+import { GroupPermissionAction, Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';

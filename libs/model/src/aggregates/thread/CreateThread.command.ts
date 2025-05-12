@@ -6,7 +6,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, GatedActionEnum } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -90,7 +90,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      authTopic({ action: schemas.GatedActionEnum.CREATE_THREAD }),
+      authTopic({ action: GatedActionEnum.CREATE_THREAD }),
       verifyThreadSignature,
       tiered({ creates: true }),
       turnstile({ widgetName: 'create-thread' }),

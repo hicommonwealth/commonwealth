@@ -1,5 +1,8 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
-import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
+import {
+  GatedActionEnum,
+  MIN_CHARS_TO_SHOW_MORE,
+  slugify,
+} from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';

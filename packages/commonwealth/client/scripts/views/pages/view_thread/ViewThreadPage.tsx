@@ -1,6 +1,6 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
 import {
   ContentType,
+  GatedActionEnum,
   MIN_CHARS_TO_SHOW_MORE,
   getThreadUrl,
 } from '@hicommonwealth/shared';

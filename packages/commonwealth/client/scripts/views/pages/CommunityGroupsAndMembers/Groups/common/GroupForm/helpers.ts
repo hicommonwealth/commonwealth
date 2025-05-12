@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { TOPIC_PERMISSIONS, TopicPermissions } from './constants';
 import { GroupTopicPermissionEnum } from './index.types';
 

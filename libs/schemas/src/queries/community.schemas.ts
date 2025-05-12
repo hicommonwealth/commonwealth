@@ -2,6 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityType,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -13,7 +14,6 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
-  GatedActionEnum,
   MembershipRejectReason,
   PinnedTokenWithPrices,
   Topic,

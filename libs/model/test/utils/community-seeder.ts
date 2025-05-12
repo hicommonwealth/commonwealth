@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
@@ -20,7 +21,7 @@ export type CommunitySeedOptions = {
   ss58_prefix?: number;
   groups?: {
     id: number;
-    permissions: schemas.GatedActionEnum[];
+    permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
   namespace_address?: string;

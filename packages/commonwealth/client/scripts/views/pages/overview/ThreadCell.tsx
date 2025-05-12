@@ -1,5 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { GatedActionEnum, slugify } from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';

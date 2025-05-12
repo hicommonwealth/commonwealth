@@ -5,6 +5,7 @@ import {
   ChainBase,
   ChainType,
   CommunityGoalTypes,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   Roles,
@@ -13,7 +14,6 @@ import {
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { Community } from '../entities/community.schemas';
-import { GatedActionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';

@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
 
 // TODO: remove and use the backend enum

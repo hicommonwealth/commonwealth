@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
 // eslint-disable-next-line max-len

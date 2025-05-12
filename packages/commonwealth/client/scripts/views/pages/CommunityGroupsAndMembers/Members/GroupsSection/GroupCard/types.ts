@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import MinimumProfile from 'models/MinimumProfile';
 
 export type RequirementCardProps = {

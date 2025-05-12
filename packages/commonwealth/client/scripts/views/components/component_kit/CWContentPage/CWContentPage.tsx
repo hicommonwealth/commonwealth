@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';

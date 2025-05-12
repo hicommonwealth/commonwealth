@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { GroupTopicPermissionEnum, PermissionLabelType } from './index.types';
 
 export const REQUIREMENTS_TO_FULFILL = {

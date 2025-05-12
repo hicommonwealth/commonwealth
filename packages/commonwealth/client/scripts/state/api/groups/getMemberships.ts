@@ -1,7 +1,5 @@
-import {
-  GatedActionEnum,
-  MembershipRejectReason,
-} from '@hicommonwealth/schemas';
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { z } from 'node_modules/zod';
 

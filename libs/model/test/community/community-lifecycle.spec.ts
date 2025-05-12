@@ -8,11 +8,12 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
-import { GatedActionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
   ChainType,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';

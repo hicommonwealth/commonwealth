@@ -1,4 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { useGetMembershipsQuery } from '../state/api/groups/getMemberships';
 import Permissions from '../utils/Permissions';
 

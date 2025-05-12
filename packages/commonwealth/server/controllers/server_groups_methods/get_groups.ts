@@ -4,7 +4,7 @@ import {
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
-import { GatedActionEnum } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { Op, WhereOptions } from 'sequelize';
 import { ServerGroupsController } from '../server_groups_controller';
 

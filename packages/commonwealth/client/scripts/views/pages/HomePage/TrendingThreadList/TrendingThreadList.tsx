@@ -4,8 +4,12 @@ import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import { ActivityThread, GatedActionEnum } from '@hicommonwealth/schemas';
-import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
+import { ActivityThread } from '@hicommonwealth/schemas';
+import {
+  GatedActionEnum,
+  MIN_CHARS_TO_SHOW_MORE,
+  slugify,
+} from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';

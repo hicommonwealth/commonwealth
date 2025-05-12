@@ -1,5 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { GatedActionEnum, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';

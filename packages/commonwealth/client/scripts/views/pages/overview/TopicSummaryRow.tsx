@@ -1,5 +1,4 @@
-import { GatedActionEnum } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { GatedActionEnum, slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { GatedActionEnum } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { GatedActionEnum, slugify } from '@hicommonwealth/shared';
 import { ThreadCard } from 'client/scripts/views/pages/discussions/ThreadCard';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';

@@ -1,4 +1,5 @@
-import { GatedActionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';

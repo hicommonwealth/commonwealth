@@ -1,5 +1,6 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../../database';
 import { authRoles } from '../../middleware';
@@ -78,7 +79,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
                   `ARRAY[${t.permissions
                     .map((p) => `'${p}'`)
                     .join(', ')}]::"enum_GroupGatedActions_gated_actions"[]`,
-                ) as unknown as schemas.GatedActionEnum[],
+                ) as unknown as GatedActionEnum[],
               }));
               await models.GroupGatedAction.bulkCreate(groupGatedActions, {
                 transaction,
