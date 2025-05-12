@@ -3,7 +3,9 @@ import React from 'react';
 import './../Profile.scss';
 
 import Thread from 'models/Thread';
+import useUserStore from 'state/ui/user';
 import { CWText } from '../../component_kit/cw_text';
+import { CWTable } from '../../component_kit/new_designs/CWTable/CWTable';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
 import { ProfileThread } from './ProfileThread/ProfileThread';
@@ -30,6 +32,8 @@ const ProfileActivityContent = ({
   threads,
   mapProfileThread,
 }: ProfileActivityContentProps) => {
+  const user = useUserStore();
+
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
       return (
@@ -59,6 +63,44 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.MyTokens) {
     return <TransactionsTab transactionsType="tokens" />;
+  }
+
+  if (option === ProfileActivityType.Communities) {
+    const columns = [
+      {
+        key: 'name',
+        header: 'Community',
+        numeric: false,
+        sortable: true,
+      },
+      {
+        key: 'members',
+        header: 'Members',
+        numeric: true,
+        sortable: true,
+      },
+    ];
+
+    const rowData = user.communities.map((community) => ({
+      name: community.name,
+      members: '0',
+      avatars: {
+        name: {
+          avatarUrl: community.iconUrl,
+          address: null,
+        },
+      },
+    }));
+
+    return (
+      <div className="communities-table">
+        {user.communities.length > 0 ? (
+          <CWTable columnInfo={columns} rowData={rowData} />
+        ) : (
+          <CWText>No communities found</CWText>
+        )}
+      </div>
+    );
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [
