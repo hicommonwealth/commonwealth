@@ -1,9 +1,11 @@
 import {
+  config,
   HotShotsStats,
+  RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { cache, logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
@@ -13,6 +15,11 @@ import { fileURLToPath } from 'url';
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
+
+config.CACHE.REDIS_URL &&
+  cache({
+    adapter: new RedisCache(config.CACHE.REDIS_URL),
+  });
 
 let isServiceHealthy = false;
 
