@@ -23,7 +23,7 @@ import {
   VerifiedContext,
   VerifiedContextInput,
 } from '@hicommonwealth/schemas';
-import { GroupPermissionAction, Role } from '@hicommonwealth/shared';
+import { GroupGatedActionKey, Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';
@@ -241,7 +241,7 @@ async function findAddress(
 async function checkGatedActions(
   actor: Actor,
   address_id: number,
-  action: GroupPermissionAction,
+  action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
   if (!topic_id)
@@ -258,7 +258,7 @@ async function checkGatedActions(
   // TODO: we can probably cache this
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
-      gated_actions?: GroupPermissionAction[];
+      gated_actions?: GroupGatedActionKey[];
     }
   >(
     `
@@ -314,7 +314,7 @@ async function mustBeAuthorized(
   check: {
     permissions?: {
       topic_id: number;
-      action: GroupPermissionAction;
+      action: GroupGatedActionKey;
     };
     author?: boolean;
     collaborators?: z.infer<typeof Address>[];
@@ -436,7 +436,7 @@ export function authRoles(...roles: Role[]) {
 
 type AggregateAuthOptions = {
   roles?: Role[];
-  action?: GroupPermissionAction;
+  action?: GroupGatedActionKey;
   author?: boolean;
   collaborators?: boolean;
 };

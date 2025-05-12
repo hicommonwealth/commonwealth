@@ -1,5 +1,5 @@
 import { GatedActionEnum } from '@hicommonwealth/shared';
-import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
+import { TOPIC_PERMISSIONS } from './constants';
 
 // TODO: remove and use the backend enum
 export enum GroupTopicPermissionEnum {
@@ -53,7 +53,7 @@ export type Topic = {
 };
 
 export type TopicPermissionToggleGroupSubFormsState = {
-  permission: Permission[];
+  permission: GatedActionEnum[];
   topic: Topic;
 };
 
@@ -63,8 +63,6 @@ export type TopicPermissionFormToggleGroupSubFormProps = {
     updatedPermissions: TopicPermissionToggleGroupSubFormsState[],
   ) => void;
 };
-
-export type PermissionLabelType = (typeof PermissionLabel)[number];
 
 export type LabelType = {
   label: string;

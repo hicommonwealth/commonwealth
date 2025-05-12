@@ -167,7 +167,6 @@ const GroupCard = ({
                   <CWTag
                     label={getReadableActions({
                       actions: t.permissions || [],
-                      invert: true,
                     })}
                     type="referendum"
                   />

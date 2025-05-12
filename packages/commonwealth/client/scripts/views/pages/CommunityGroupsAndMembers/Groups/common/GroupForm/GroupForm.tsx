@@ -649,11 +649,18 @@ const GroupForm = ({
                       fontWeight="semiBold"
                       className="header-text"
                     >
-                      Topic Permissions
+                      Topic Gated Actions
                     </CWText>
                     <CWText type="b2">
-                      Select which topics this group can create threads and
-                      within.
+                      Select the actions that members of this group can perform
+                      in each topic. Non-members of this group can perform the
+                      disabled actions unless they are gated by another group.
+                    </CWText>
+                    <CWText type="b2">
+                      For example, if you enable the 'Create threads' option for
+                      a topic called 'General', only users in this group can
+                      create threads in 'General', but all users can comment,
+                      upvote, and vote in polls.
                     </CWText>
                   </div>
                   {topicPermissionsToggleGroupSubForms && (

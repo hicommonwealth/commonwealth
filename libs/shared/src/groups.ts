@@ -14,13 +14,13 @@ export function getUngatedActions(gatedActions: GatedActionEnum[]) {
   return Array.from(AllGatedActionSet.difference(gatedActionsSet));
 }
 
-export const UserFriendlyActionMap: Record<GatedActionEnum, string> = {
-  [GatedActionEnum.CREATE_THREAD]: 'Post',
-  [GatedActionEnum.CREATE_COMMENT]: 'Comment',
+export const UserFriendlyActionMap = {
+  [GatedActionEnum.CREATE_THREAD]: 'Create Threads',
+  [GatedActionEnum.CREATE_COMMENT]: 'Create Comments',
   [GatedActionEnum.CREATE_THREAD_REACTION]: 'Upvote Threads',
   [GatedActionEnum.CREATE_COMMENT_REACTION]: 'Upvote Comments',
   [GatedActionEnum.UPDATE_POLL]: 'Vote in Polls',
-};
+} as const satisfies Record<GatedActionEnum, string>;
 
 /**
  * Converts a gating actions array into a user-friendly string. Pass `invert: true`
@@ -54,4 +54,6 @@ export function getReadableActions({
     .join(' & ');
 }
 
-export type GroupPermissionAction = keyof typeof GatedActionEnum;
+export type GroupGatedActionKey = keyof typeof GatedActionEnum;
+
+export type GatedActionValue = (typeof GatedActionEnum)[GroupGatedActionKey];
