@@ -49,7 +49,7 @@ const {
   createThreadReaction,
   deleteReaction,
   deleteThread,
-  addLinks: addThreadLinks,
+  addLinks,
 } = thread.trpcRouter;
 const {
   createComment,
@@ -112,7 +112,7 @@ const api = {
   createThread,
   updateThread,
   deleteThread,
-  addThreadLinks,
+  addLinks,
   createComment,
   updateComment,
   deleteComment,

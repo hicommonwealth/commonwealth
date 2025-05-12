@@ -386,7 +386,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .post('/api/v1/AddThreadLinks')
+      .post('/api/v1/addLinks')
       .set('Accept', 'application/json')
       .set('address', args.address)
       .send(args);

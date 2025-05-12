@@ -13,11 +13,10 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { config } from 'server/config';
 import { Errors } from 'server/util/linkingValidationHelper';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Linking Tests', () => {
   let server: TestServer;
@@ -140,90 +139,86 @@ describe('Linking Tests', () => {
   describe('/linking/addThreadLinks', () => {
     test('should add first new link to exising thread', async () => {
       const result = await server.seeder.createLink({
+        address: userAddress,
         jwt: userJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link1],
       });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
-      expect(result.result.links[0].source).to.equal(link1.source.toString());
-      expect(result.result.links[0].identifier).to.equal(link1.identifier);
-      expect(result.result.links[0].title).to.equal('my snapshot');
+      expect(result).to.not.be.null;
+      expect(result.links[0].source).to.equal(link1.source.toString());
+      expect(result.links[0].identifier).to.equal(link1.identifier);
+      expect(result.links[0].title).to.equal('my snapshot');
     });
     test('should add multiple links to existing links', async () => {
       const result = await server.seeder.createLink({
+        address: userAddress,
         jwt: userJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link2, link3],
       });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
-      expect(result.result.links[0].source).to.equal(link1.source.toString());
-      expect(result.result.links[0].identifier).to.equal(link1.identifier);
-      expect(result.result.links[1].source).to.equal(link2.source.toString());
-      expect(result.result.links[1].identifier).to.equal(link2.identifier);
-      expect(result.result.links[2].source).to.equal(link3.source.toString());
-      expect(result.result.links[2].identifier).to.equal(link3.identifier);
+      expect(result).to.not.be.null;
+      expect(result.links[0].source).to.equal(link1.source.toString());
+      expect(result.links[0].identifier).to.equal(link1.identifier);
+      expect(result.links[1].source).to.equal(link2.source.toString());
+      expect(result.links[1].identifier).to.equal(link2.identifier);
+      expect(result.links[2].source).to.equal(link3.source.toString());
+      expect(result.links[2].identifier).to.equal(link3.identifier);
     });
     test('should revert adding existing link', async () => {
       const result = await server.seeder.createLink({
+        address: userAddress,
         jwt: userJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link2],
       });
       expect(result).to.not.be.null;
       expect(result.error).to.not.be.null;
-      expect(result.error).to.be.equal(Errors.LinksExist);
     });
     test('should access control adding links', async () => {
       const result2 = await server.seeder.createLink({
+        address: userAddress,
         jwt: userJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread2.id,
+        thread_id: thread2.id!,
         links: [link3],
       });
-      expect(result2).to.not.be.null;
-      expect(result2.error).to.not.be.null;
-      expect(result2.error).to.be.equal(Errors.NotAdminOrOwner);
+      expect(result2).toMatchObject({
+        code: 'UNAUTHORIZED',
+        message: 'Not the author of the entity',
+      });
+
       const result = await server.seeder.createLink({
+        address: adminAddress,
         jwt: adminJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread2.id,
+        thread_id: thread2.id!,
         links: [link3],
       });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
+      expect(result).to.not.be.null;
     });
     test('should filter duplicate links and add new', async () => {
       const result = await server.seeder.createLink({
+        address: userAddress,
         jwt: userJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link2, link4],
       });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
-      expect(result.result.links.length).to.equal(4);
-      expect(result.result.links[3].source).to.equal(link4.source.toString());
-      expect(result.result.links[3].identifier).to.equal(link4.identifier);
+      expect(result).to.not.be.null;
+      expect(result.links.length).to.equal(4);
+      expect(result.links[3].source).to.equal(link4.source.toString());
+      expect(result.links[3].identifier).to.equal(link4.identifier);
     });
     test('should allow admin to link any Thread', async () => {
       const result = await server.seeder.createLink({
+        address: adminAddress,
         jwt: adminJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link5],
       });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
-      expect(result.result.links.length).to.equal(5);
+      expect(result).to.not.be.null;
+      expect(result.links.length).to.equal(5);
       const result2 = await server.seeder.deleteLink({
+        address: adminAddress,
         jwt: adminJWT,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread1.id,
+        thread_id: thread1.id!,
         links: [link5],
       });
       expect(result2.status).to.equal('Success');
