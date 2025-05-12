@@ -160,7 +160,7 @@ export const trpcRouter = trpc.router({
     }),
   ]),
   addLinks: trpc.command(Thread.AddLinks, trpc.Tag.Thread, [
-    trpc.trackAnalytics(async (_, { community_id, new_links }) => {
+    trpc.trackAnalytics((_, { community_id, new_links }) => {
       if (new_links.length > 0) {
         const source = new_links.at(-1)!.source;
         const event =
@@ -173,10 +173,13 @@ export const trpcRouter = trpc.router({
                 : source === LinkSource.Template
                   ? MixpanelCommunityInteractionEvent.LINKED_TEMPLATE
                   : undefined;
-        return event
-          ? [event, { event, community: community_id, proposalType: source }]
-          : undefined;
+        if (event)
+          return Promise.resolve([
+            event,
+            { event, community: community_id, proposalType: source },
+          ]);
       }
+      return Promise.resolve(undefined);
     }),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),

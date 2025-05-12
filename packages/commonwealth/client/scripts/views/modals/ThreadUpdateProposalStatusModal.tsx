@@ -196,6 +196,7 @@ export const ThreadUpdateProposalStatusModal = ({
                   title: title,
                 })),
               }).then((updatedThread) => {
+                // eslint-disable-next-line no-param-reassign
                 links = updatedThread.links || [];
                 return { toDelete, links };
               });
