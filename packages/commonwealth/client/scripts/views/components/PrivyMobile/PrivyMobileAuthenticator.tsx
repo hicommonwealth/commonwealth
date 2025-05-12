@@ -81,6 +81,10 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         newSession: true,
       });
 
+      const ssoProvider = privyMobileAuthStatus.userAuth.ssoProvider
+        ? toSignInProvider(privyMobileAuthStatus.userAuth.ssoProvider)
+        : undefined;
+
       const signInOpts = {
         address: privyMobileAuthStatus.userAuth.address,
         community_id: ChainBase.Ethereum,
@@ -88,9 +92,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         privy: {
           identityToken: privyMobileAuthStatus.userAuth.identityToken,
           ssoOAuthToken: privyMobileAuthStatus.userAuth.ssoOAuthToken,
-          ssoProvider: toSignInProvider(
-            privyMobileAuthStatus.userAuth.ssoProvider,
-          ),
+          ssoProvider,
         },
       };
 
