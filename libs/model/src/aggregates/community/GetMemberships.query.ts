@@ -24,7 +24,7 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
         include: [
           {
             model: models.GroupGatedAction,
-            attributes: ['topic_id', 'allowed_actions'],
+            attributes: ['topic_id', 'gated_actions'],
             where: topic_id ? { topic_id } : undefined,
           },
         ],
@@ -59,8 +59,8 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
             permissions:
               groups
                 .find((g) => g.id === group_id)
-                ?.GroupPermissions?.find((gtp) => gtp.topic_id === t.id)
-                ?.allowed_actions || [],
+                ?.GroupGatedActions?.find((gtp) => gtp.topic_id === t.id)
+                ?.gated_actions || [],
           })),
         isAllowed: !reject_reason,
         rejectReason: reject_reason || undefined,

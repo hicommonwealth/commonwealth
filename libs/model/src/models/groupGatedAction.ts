@@ -5,18 +5,19 @@ import { GroupAttributes } from './group';
 import { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
-export type GroupPermissionAttributes = z.infer<typeof GroupGatedAction> & {
+export type GroupGatedActionsAttributes = z.infer<typeof GroupGatedAction> & {
   // associations
   Group?: GroupAttributes;
   Topic?: TopicAttributes;
 };
 
-export type GroupPermissionInstance = ModelInstance<GroupPermissionAttributes>;
+export type GroupGatedActionsInstance =
+  ModelInstance<GroupGatedActionsAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-): Sequelize.ModelStatic<GroupPermissionInstance> =>
-  sequelize.define<GroupPermissionInstance>(
+): Sequelize.ModelStatic<GroupGatedActionsInstance> =>
+  sequelize.define<GroupGatedActionsInstance>(
     'GroupGatedAction',
     {
       group_id: {

@@ -99,7 +99,7 @@ export const Group = z.object({
   is_system_managed: z.boolean().optional(),
 
   // associations
-  GroupPermissions: z.array(GroupGatedAction).optional(),
+  GroupGatedActions: z.array(GroupGatedAction).optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

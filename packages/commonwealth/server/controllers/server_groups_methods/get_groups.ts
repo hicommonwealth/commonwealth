@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import {
   GroupAttributes,
-  GroupInstance,
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
@@ -38,13 +37,6 @@ type GroupWithExtras = GroupAttributes & {
 };
 export type GetGroupsResult = GroupWithExtras[];
 
-export type GroupInstanceWithTopicPermissions = GroupInstance & {
-  GroupPermissions: {
-    topic_id: number;
-    allowed_actions: GatedActionEnum[];
-  }[];
-};
-
 export async function __getGroups(
   this: ServerGroupsController,
   { communityId, groupId, includeMembers, includeTopics }: GetGroupsOptions,
@@ -70,12 +62,12 @@ export async function __getGroups(
     include: [
       {
         model: this.models.GroupGatedAction,
-        attributes: ['topic_id', 'allowed_actions'],
+        attributes: ['topic_id', 'gated_actions'],
       },
     ],
   });
 
-  let groupsResult = groups.map((group) => group.toJSON() as GroupWithExtras);
+  let groupsResult = groups.map((group) => group.toJSON());
 
   if (includeMembers) {
     // optionally include members with groups
@@ -122,10 +114,9 @@ export async function __getGroups(
         .filter((t) => t.group_ids!.includes(group.id!))
         .map((t) => {
           const temp: TopicAttributesWithPermission = { ...t.toJSON() };
-          temp.permissions = (
-            (group as GroupInstanceWithTopicPermissions).GroupPermissions || []
-          ).find((gtp) => gtp.topic_id === t.id)
-            ?.allowed_actions as GatedActionEnum[];
+          temp.permissions = (group.GroupGatedActions || []).find(
+            (gtp) => gtp.topic_id === t.id,
+          )?.gated_actions as GatedActionEnum[];
           return temp;
         }),
     }));

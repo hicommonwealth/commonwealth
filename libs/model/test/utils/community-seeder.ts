@@ -123,7 +123,7 @@ export async function seedCommunity({
       seed('GroupGatedAction', {
         group_id: g.id,
         topic_id: community?.topics?.[0]?.id || 0,
-        allowed_actions: g.permissions,
+        gated_actions: g.permissions,
       }),
     ),
   );

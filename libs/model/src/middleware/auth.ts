@@ -265,10 +265,10 @@ async function checkGatedActions(
     `
       SELECT g.*, gp.topic_id, gp.gated_actions
       FROM "Groups" as g
-             JOIN "GroupPermissions" gp ON g.id = gp.group_id
+             JOIN "GroupGatedActions" gp ON g.id = gp.group_id
       WHERE g.community_id = :community_id
         AND gp.topic_id = :topic_id
-        AND :action = ANY(gp.allowed_actions)
+        AND :action = ANY(gp.gated_actions)
     `,
     {
       type: QueryTypes.SELECT,

@@ -1,6 +1,7 @@
 import { GatedActionEnum } from '@hicommonwealth/schemas';
 import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
 
+// TODO: remove and use the backend enum
 export enum GroupTopicPermissionEnum {
   UPVOTE = 'UPVOTE',
   COMMENT = 'COMMENT',

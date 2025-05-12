@@ -71,19 +71,16 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
 
             if (group.id) {
               // add topic level interaction permissions for current group
-              const groupPermissions = (payload.topics || []).map((t) => {
-                const permissions = t.permissions;
-                return {
-                  group_id: group.id!,
-                  topic_id: t.id,
-                  allowed_actions: sequelize.literal(
-                    `ARRAY[${permissions
-                      .map((p) => `'${p}'`)
-                      .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
-                  ) as unknown as schemas.GatedActionEnum[],
-                };
-              });
-              await models.GroupGatedAction.bulkCreate(groupPermissions, {
+              const groupGatedActions = (payload.topics || []).map((t) => ({
+                group_id: group.id!,
+                topic_id: t.id,
+                gated_actions: sequelize.literal(
+                  `ARRAY[${t.permissions
+                    .map((p) => `'${p}'`)
+                    .join(', ')}]::"enum_GroupGatedActions_gated_actions"[]`,
+                ) as unknown as schemas.GatedActionEnum[],
+              }));
+              await models.GroupGatedAction.bulkCreate(groupGatedActions, {
                 transaction,
               });
             }
