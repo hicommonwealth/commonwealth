@@ -111,12 +111,9 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         })}
         customError={errors?.action}
         instructionalMessage={
-          ((defaultValues?.action === 'TweetEngagement' ||
-            defaultValues?.action === 'DiscordServerJoined') &&
-            actionCopies.pre_reqs[defaultValues?.action as QuestAction](
-              'admin',
-            )) ||
-          ''
+          actionCopies.pre_reqs[defaultValues?.action as QuestAction](
+            'admin',
+          ) || ''
         }
       />
 

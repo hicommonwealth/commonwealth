@@ -128,6 +128,7 @@ const QuestActionCard = ({
               'TweetEngagement',
               'DiscordServerJoined',
               'CommunityCreated',
+              'KyoFinanceSwapQuestVerified',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -162,6 +163,16 @@ const QuestActionCard = ({
                       )}
                     </CWText>
                   )}
+                {questAction.event_name === 'KyoFinanceSwapQuestVerified' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.metadata.chainId,
+                      // Should make input/output tokens optional? else display here?
+                      questAction.metadata.minOutputAmount || '',
+                      questAction.metadata.minVolumeUSD || '',
+                    )}
+                  </CWText>
+                )}
               </>
             )}
             {!hideShareSplit &&

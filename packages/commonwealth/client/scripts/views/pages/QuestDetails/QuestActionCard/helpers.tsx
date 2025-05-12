@@ -16,6 +16,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['KyoFinanceSwapQuestVerified']: 'Complete a token swap on Kyo Finance',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -33,6 +34,8 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
+    ['KyoFinanceSwapQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
   },
   explainer: {
     ['SignUpFlowCompleted']: '',
@@ -85,6 +88,26 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['KyoFinanceSwapQuestVerified']: (
+      chainId?: number,
+      minOutputAmount?: string,
+      minVolumeUSD?: string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Must be completed on{' '}
+            {chainId === 1868 ? 'Soneium Mainnet' : 'Soneium Testnet'}.
+          </li>
+          {minOutputAmount && (
+            <li>● Minimum output amount: {minOutputAmount} tokens.</li>
+          )}
+          {minVolumeUSD && <li>● Minimum swap volume: ${minVolumeUSD} USD.</li>}
+          <li>● Aura is awarded once the swap is verified on-chain.</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -101,5 +124,6 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
+    ['KyoFinanceSwapQuestVerified']: '',
   },
 };
