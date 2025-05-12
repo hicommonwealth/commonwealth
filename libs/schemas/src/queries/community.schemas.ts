@@ -13,6 +13,8 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  Group,
+  Membership,
   MembershipRejectReason,
   PermissionEnum,
   PinnedTokenWithPrices,
@@ -212,10 +214,10 @@ export const ConstestManagerView = ContestManager.extend({
 });
 
 export const TopicView = Topic.extend({
-  created_at: z.string().nullish(),
-  updated_at: z.string().nullish(),
-  deleted_at: z.string().nullish(),
-  archived_at: z.string().nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  deleted_at: z.date().or(z.string()).nullish(),
+  archived_at: z.date().or(z.string()).nullish(),
   contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
@@ -295,4 +297,55 @@ export const UpdateCommunityDirectoryTags = {
     community_id: z.string(),
   }),
   context: AuthContext,
+};
+
+export const HolderView = z.object({
+  user_id: z.number(),
+  address: z.string(),
+  name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  tokens: z.number(),
+  role: z.string(),
+  tier: z.number(),
+});
+
+export const GetTopHolders = {
+  input: z.object({
+    community_id: z.string(),
+    limit: z.number().optional(),
+    cursor: z.number().optional(),
+  }),
+  output: z.object({
+    results: z.array(HolderView),
+    limit: z.number(),
+    page: z.number(),
+  }),
+};
+
+export const GroupView = Group.omit({ GroupPermissions: true }).extend({
+  id: PG_INT,
+  name: z.string(),
+  created_at: z.coerce.date().or(z.string()).optional(),
+  updated_at: z.coerce.date().or(z.string()).optional(),
+  memberships: z.array(
+    Membership.omit({ address: true, group: true }).extend({
+      last_checked: z.coerce.date().or(z.string()),
+    }),
+  ),
+  topics: z.array(
+    TopicView.omit({ total_threads: true }).extend({
+      permissions: z.array(z.nativeEnum(PermissionEnum)),
+    }),
+  ),
+});
+
+export const GetGroups = {
+  input: z.object({
+    community_id: z.string().optional(),
+    group_id: z.coerce.number().optional(),
+    address_id: z.coerce.number().optional(),
+    include_members: z.coerce.boolean().optional(),
+    include_topics: z.coerce.boolean().optional(),
+  }),
+  output: z.array(GroupView),
 };

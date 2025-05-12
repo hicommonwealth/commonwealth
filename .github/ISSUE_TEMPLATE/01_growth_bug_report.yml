@@ -1,23 +1,13 @@
 name: Growth Bug Report
 description: Use this template for reporting bugs.
-title: "[Bug]: "
 labels: ["bug", "needs estimate", "tow", "external"]
+type: "Bug"
 projects: ["hicommonwealth/47"]
-assignees: []
 body:
-- type: dropdown
-  id: priority
+- type: markdown
   attributes:
-    label: Priority
-    description: Priority of the bug. P0 is the highest priority.
-    options:
-      - P0
-      - P1
-      - P2
-      - P3
-      - P4
-  validations:
-    required: true
+    value: |
+      ## General
 
 - type: textarea
   id: description
@@ -35,10 +25,24 @@ body:
   validations:
     required: false
 
+- type: dropdown
+  id: priority
+  attributes:
+    label: Priority
+    description: Priority of the bug. P0 is the highest priority.
+    options:
+      - P0
+      - P1
+      - P2
+      - P3
+      - P4
+  validations:
+    required: true
+
 - type: markdown
   attributes:
     value: |
-      ### Initial conditions
+      ## Initial conditions
       What was the state of the system before the bug was encountered?
 
 - type: dropdown
@@ -107,6 +111,12 @@ body:
   validations:
     required: false
 
+- type: markdown
+  attributes:
+    value: |
+      ## Detailed Information
+      You may omit this section if you provided a Jam link in the General section.
+
 - type: textarea
   id: reproduction-steps
   attributes:
@@ -118,7 +128,7 @@ body:
       3. Scroll down to '....'
       4. See error
   validations:
-    required: true
+    required: false
 
 - type: textarea
   id: expected-behavior
@@ -126,7 +136,7 @@ body:
     label: Expected behavior
     description: A clear and concise description of what you expected to happen.
   validations:
-    required: true
+    required: false
 
 - type: textarea
   id: screenshots
@@ -135,12 +145,6 @@ body:
     description: If applicable, add screenshots or video to help explain your problem. If on a browser include a screenshot of the console.
   validations:
     required: false
-
-- type: markdown
-  attributes:
-    value: |
-      ## Reporter
-      Growth Team
 
 - type: textarea
   id: additional-context

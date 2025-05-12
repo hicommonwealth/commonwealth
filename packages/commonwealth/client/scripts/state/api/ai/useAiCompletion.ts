@@ -25,7 +25,7 @@ export const useAiCompletion = () => {
   const [completion, setCompletion] = useState<string>('');
 
   const generateCompletion = useCallback(
-    async (prompt: string, options?: AiCompletionOptions) => {
+    async (userPrompt: string, options?: AiCompletionOptions) => {
       setIsLoading(true);
       setError(null);
       setCompletion('');
@@ -34,20 +34,29 @@ export const useAiCompletion = () => {
       const streamMode = options?.stream !== false; // Default to true
 
       try {
+        const requestBody: Partial<CompletionOptions> & {
+          jwt?: string | null;
+          prompt: string;
+        } = {
+          prompt: userPrompt,
+          model: options?.model || 'gpt-4o',
+          temperature: options?.temperature,
+          maxTokens: options?.maxTokens,
+          stream: streamMode,
+          useOpenRouter: options?.useOpenRouter,
+          jwt: userStore.getState().jwt,
+        };
+
+        if (options?.systemPrompt) {
+          requestBody.systemPrompt = options.systemPrompt;
+        }
+
         const response = await fetch('/api/aicompletion', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            prompt,
-            model: options?.model || 'gpt-4o',
-            temperature: options?.temperature,
-            maxTokens: options?.maxTokens,
-            stream: streamMode,
-            useOpenRouter: options?.useOpenRouter,
-            jwt: userStore.getState().jwt,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {

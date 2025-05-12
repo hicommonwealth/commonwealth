@@ -20,6 +20,7 @@ import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
 import TriggerNotificationsWorkflow from './TriggerNotificationsWorkflow';
+import UserTier from './UserTier';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -46,6 +47,7 @@ const AdminPanelPage = () => {
         <CWDivider />
         <CWText type="h2">Spam Tools</CWText>
         <CommunityTier />
+        <UserTier />
         <CWDivider />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />

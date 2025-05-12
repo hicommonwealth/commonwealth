@@ -3,7 +3,10 @@ import { calculateTokenPricing } from 'helpers/launchpad';
 import NodeInfo from 'models/NodeInfo';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
-import { useEthPerTokenQuery } from 'state/api/launchPad';
+import {
+  useEthPerTokenQuery,
+  useGetTokenInfoAlchemy,
+} from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
@@ -27,6 +30,18 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
     enabled: !!tokenCommunity,
   });
 
+  const uniswapPricingEnabled =
+    token?.liquidity_transferred && !!communityNode?.ethChainId;
+
+  // Get MCAP/pricing from uniswap only when token liquidity transferred to uniswap
+  const { data: uniswapResponse } = useGetTokenInfoAlchemy({
+    token_address: token?.token_address,
+    eth_chain_id: communityNode?.ethChainId,
+    enabled: uniswapPricingEnabled && !!communityNode?.ethChainId,
+  });
+
+  const uniswapData = uniswapResponse?.data;
+
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
       tokenSymbol: 'ETH',
@@ -35,11 +50,39 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
 
-  const pricing = calculateTokenPricing(
+  let pricing = calculateTokenPricing(
     token as z.infer<typeof TokenView>,
     ethToUsdRate,
     ethPerToken,
   );
+
+  // only replace pricing with uniswap pricing if exists
+  if (uniswapData && uniswapData?.length > 0) {
+    const todaysPricing = uniswapData.length - 1;
+    const yesterdaysPricing = uniswapData.length - 1;
+
+    const currentPrice = parseFloat(uniswapData[todaysPricing].value);
+    const yesterdaysPrice =
+      parseFloat(uniswapData[yesterdaysPricing].value) ||
+      token?.old_price ||
+      currentPrice;
+
+    const priceChange = currentPrice - yesterdaysPrice / yesterdaysPrice;
+    pricing = {
+      currentPrice: parseFloat(
+        parseFloat(uniswapData[todaysPricing].value).toFixed(2),
+      ),
+      pricePercentage24HourChange: parseFloat(priceChange.toFixed(2)),
+      marketCapCurrent: parseFloat(
+        parseFloat(uniswapData[todaysPricing].marketCap).toFixed(2),
+      ),
+      marketCapGoal: pricing.marketCapGoal,
+      isMarketCapGoalReached: true,
+    };
+    pricing.currentPrice =
+      parseFloat(uniswapData[todaysPricing].value) / ethToUsdRate;
+    pricing.marketCapCurrent = parseFloat(uniswapData[todaysPricing].marketCap);
+  }
 
   return { pricing, ethToUsdRate, isLoading: isLoadingETHToCurrencyRate };
 };

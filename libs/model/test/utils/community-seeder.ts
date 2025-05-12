@@ -89,7 +89,7 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
-    tier: CommunityTierMap.CommunityVerified,
+    tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     bech32_prefix,

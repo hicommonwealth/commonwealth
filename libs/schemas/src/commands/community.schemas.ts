@@ -151,6 +151,7 @@ export const UpdateCommunity = {
       featuredTopics: z.array(z.string()).optional(),
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
+      launchpad_weighted_voting: z.boolean().optional(),
     }),
   output: Community,
   context: AuthContext,
@@ -359,6 +360,7 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     address: z.string().optional(),
     group_id: PG_INT.optional(),
+    refresh_all: z.boolean().optional(),
   }),
   output: z.object({
     community_id: z.string(),

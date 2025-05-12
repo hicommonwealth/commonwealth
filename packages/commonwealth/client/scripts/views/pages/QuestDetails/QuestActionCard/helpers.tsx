@@ -15,11 +15,13 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
+    ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
     ['OneOffContestManagerDeployed']: 'Create a 1-time contest',
   },
   pre_reqs: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -33,11 +35,13 @@ export const actionCopies = {
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: () => '',
+    ['LaunchpadTokenTraded']: () => '',
     ['LaunchpadTokenCreated']: '',
     ['OneOffContestManagerDeployed']: '',
   },
   explainer: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -86,7 +90,50 @@ export const actionCopies = {
     ),
     ['DiscordServerJoined']: () => '',
     ['MembershipsRefreshed']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['XpChainEventCreated']: (
+      contractAddress: string,
+      ethChainId: number | string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Any user address who&apos;s transaction emits the event on the
+            ethereum chain: {ethChainId} and contract: {contractAddress}, will
+            receive Aura.
+          </li>
+          <li>
+            ● Aura goes to the initiator of the transaction, and not the
+            receiver/target of it.
+          </li>
+        </ul>
+      </div>
+    ),
     ['LaunchpadTokenCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['LaunchpadTokenTraded']: (
+      amountMultipler: string | number,
+      ethAmount?: string | number,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● This action rewards aura based on your trade volume ex: You trade
+            1 ETH tokens worth, you get 1 Aura.
+          </li>
+          <li>
+            ● This action has an aura multipler of {amountMultipler}x. You trade
+            1 ETH tokens worth, you get {amountMultipler} Aura.
+          </li>
+          {ethAmount && (
+            <li>
+              ● Aura is only awarded after a miminum {ethAmount} ETH worth of
+              launchpad token is traded.
+            </li>
+          )}
+        </ul>
+      </div>
+    ),
     // eslint-disable-next-line react/no-multi-comp
     ['OneOffContestManagerDeployed']: () => (
       <div>
@@ -112,7 +159,9 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
+    ['XpChainEventCreated']: '',
     ['LaunchpadTokenCreated']: '',
+    ['LaunchpadTokenTraded']: '',
     ['OneOffContestManagerDeployed']: '',
   },
 };

@@ -17,30 +17,25 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issue = context.payload.issue;
+            const body = context.payload.issue.body;
             
-            // Get the issue body as an object (for issue forms)
-            let issueBody;
-            try {
-              issueBody = JSON.parse(issue.body);
-            } catch (e) {
-              console.log('Not a JSON formatted issue body');
+            const priorityMatch = body.match(/### Priority\s*\n\s*(.*?)(?:\n|$)/);
+            let priority;
+            if (priorityMatch && priorityMatch[1]) {
+              priority = priorityMatch[1].trim();
+              console.log(`Priority selected: ${priority}`);
+            }
+            
+            if (!priority) return;
+            
+            if (!['P0', 'P1', 'P2', 'P3', 'P4'].includes(priority)) {
+              console.error(`Unknown priority: ${priority}`);
               return;
             }
             
-            // Check if the issue has the dropdown field and get its value
-            if (issueBody && issueBody.priority) {
-              const priority = issueBody.priority;
-              console.log(`Priority selected: ${priority}`);
-            
-              if (!['P0', 'P1', 'P2', 'P3', 'P4'].includes(priority)) {
-                console.error(`Unknown priority: ${priority}`);
-                return;
-              }
-              
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: [priority]
-              });
-            }
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [priority]
+            });

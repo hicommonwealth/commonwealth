@@ -7,6 +7,7 @@ import { createCommunityStakeHandler } from '../routes/communities/create_commun
 import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
 import {
+  aiTieredMiddleware,
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
@@ -51,13 +52,9 @@ import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerPollsController } from '../controllers/server_polls_controller';
-import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
-import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -72,12 +69,6 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { deletePollHandler } from '../routes/polls/delete_poll_handler';
-import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
-import { getTagsHandler } from '../routes/tags/get_tags_handler';
-import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
@@ -87,15 +78,11 @@ import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  threads: ServerThreadsController;
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  polls: ServerPollsController;
-  groups: ServerGroupsController;
   topics: ServerTopicsController;
   admin: ServerAdminController;
-  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -107,15 +94,11 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models),
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    polls: new ServerPollsController(models),
-    groups: new ServerGroupsController(models),
     topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models),
   };
 
   // ---
@@ -237,36 +220,6 @@ function setupRouter(
     getTopUsersHandler.bind(this, serverControllers),
   );
 
-  // polls
-  registerRoute(
-    router,
-    'post',
-    '/threads/:id/polls',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    createThreadPollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/threads/:id/polls',
-    getThreadPollsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/polls/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deletePollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/polls/:id/votes',
-    getPollVotesHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'get',
@@ -321,14 +274,6 @@ function setupRouter(
     'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models),
-  );
-
-  // tags
-  registerRoute(
-    router,
-    'get',
-    '/tags',
-    getTagsHandler.bind(this, serverControllers),
   );
 
   // roles
@@ -425,6 +370,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true }),
     generateImageHandler.bind(this, models),
   );
 
@@ -437,6 +383,7 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ images: true, text: true }),
     async (req, res) => {
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
@@ -514,13 +461,6 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/groups',
-    getGroupsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
     '/getCanvasClock',
     getCanvasClockHandler.bind(this, serverControllers),
   );
@@ -532,6 +472,7 @@ function setupRouter(
     'post',
     '/aicompletion',
     passport.authenticate('jwt', { session: false }),
+    aiTieredMiddleware({ text: true }),
     aiCompletionHandler,
   );
 

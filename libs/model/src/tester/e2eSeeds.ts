@@ -1,3 +1,4 @@
+import { config } from '@hicommonwealth/core';
 import {
   ChainBase,
   ChainNetwork,
@@ -143,6 +144,7 @@ export const e2eTestEntities = async function (
           collapsed_on_homepage: false,
           directory_page_enabled: false,
           namespace_verified: false,
+          environment: config.APP_ENV,
         })),
       )),
     );

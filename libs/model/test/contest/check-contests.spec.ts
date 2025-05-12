@@ -29,7 +29,7 @@ describe.skip('Check Contests', () => {
       //{ mock: true, log: true },
     );
     await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,
