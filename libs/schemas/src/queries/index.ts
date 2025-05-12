@@ -7,6 +7,8 @@ export * from './pagination';
 export * from './poll.schemas';
 export * from './quest.schemas';
 export * from './subscription.schemas';
+export * from './tag.schemas';
 export * from './thread.schemas';
 export * from './token.schemas';
 export * from './user.schemas';
+export * from './webhook.schemas';

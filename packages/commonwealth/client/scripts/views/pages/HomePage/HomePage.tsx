@@ -8,7 +8,7 @@ import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
-import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
+import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
 import './HomePage.scss';
@@ -34,7 +34,7 @@ const HomePage = () => {
   }
 
   return (
-    <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
+    <CWPageLayout ref={containerRef} className="ExplorePageLayout">
       <div className="HomePage">
         <div className="header-section">
           <div className="description">

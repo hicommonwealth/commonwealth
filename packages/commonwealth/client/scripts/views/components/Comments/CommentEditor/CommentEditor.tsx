@@ -9,6 +9,7 @@ import type { DeltaStatic } from 'quill';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
@@ -17,7 +18,6 @@ import { ImageActionModal } from '../../ImageActionModal/ImageActionModal';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
@@ -101,21 +101,36 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       action: 'create-comment',
     });
 
+    // Fetch community details
+    const { data: community } = useGetCommunityByIdQuery({
+      id: thread?.communityId || '',
+      enabled: !!thread?.communityId,
+    });
+
     const handleCommentWithAI = () => {
       setIsSubmitDisabled(true);
       let text = '';
       setContentDelta(text);
 
-      const context = `
-    Thread: ${thread?.title || ''}
-    ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-    `;
+      // Construct extended context with community details
+      const communityName = community?.name || 'this community';
+      const communityDescription =
+        community?.description || 'No specific description provided.';
+      const extendedContext = `Extended Community Context:
+Community Name: ${communityName}
+Community Description: ${communityDescription}`;
 
-      const prompt = generateCommentPrompt(context);
+      const originalContext = `Thread Title: ${thread?.title || ''}
+${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
 
-      generateCompletion(prompt, {
+      const context = `${extendedContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalContext.trim()}`;
+
+      const { systemPrompt, userPrompt } = generateCommentPrompt(context);
+
+      generateCompletion(userPrompt, {
         model: 'gpt-4o-mini',
         stream: true,
+        systemPrompt,
         onError: (error) => {
           console.error('Error generating AI comment:', error);
           notifyError('Failed to generate AI comment');
@@ -293,22 +308,6 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
 
         <div className="form-bottom">
           <div className="form-buttons">
-            <CWTooltip
-              content="Add or Generate Image"
-              placement="top"
-              renderTrigger={(handleInteraction, isOpen) => (
-                <CWIconButton
-                  iconName="image"
-                  buttonSize="sm"
-                  onClick={handleOpenImageModal}
-                  aria-label="Add or Generate Image"
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                  data-tooltip-open={isOpen}
-                  className="comment-image-button"
-                />
-              )}
-            />
             <CWButton
               buttonType="tertiary"
               containerClassName="cancel-button"
@@ -316,32 +315,43 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
               label="Cancel"
             />
             <div className="attribution-right-content">
-              <div className="ml-auto">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-                  <CWThreadAction
-                    action="ai-reply"
-                    label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
-                    disabled={isSubmitDisabled}
-                    onClick={handleCommentWithAI}
-                  />
-                )}
-              </div>
+              <CWThreadAction
+                action="image"
+                label="Add or Generate Image"
+                onClick={handleOpenImageModal}
+              />
+              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                <CWThreadAction
+                  action="ai-reply"
+                  label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
+                  disabled={isSubmitDisabled}
+                  onClick={handleCommentWithAI}
+                />
+              )}
             </div>
 
-            <div className="ai-toggle-wrapper">
-              <CWToggle
-                className="ai-toggle"
-                icon="sparkle"
-                iconColor="#757575"
-                checked={aiCommentsToggleEnabled}
-                onChange={() => {
-                  setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
-                }}
-              />
-              <CWText type="caption" className="toggle-label">
-                AI auto reply
-              </CWText>
-            </div>
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+              <div className="ai-toggle-wrapper">
+                <CWTooltip
+                  content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} AI auto reply`}
+                  placement="top"
+                  renderTrigger={() => (
+                    <CWToggle
+                      className="ai-toggle"
+                      icon="sparkle"
+                      iconColor="#757575"
+                      checked={aiCommentsToggleEnabled}
+                      onChange={() => {
+                        setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+                      }}
+                    />
+                  )}
+                />
+                <CWText type="caption" className="toggle-label">
+                  AI auto reply
+                </CWText>
+              </div>
+            )}
             <CWButton
               containerClassName="post-button"
               buttonWidth="narrow"
