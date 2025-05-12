@@ -5,6 +5,7 @@
     { "path": "../chains/tsconfig.build.json" },
     { "path": "../schemas/tsconfig.build.json" },
     { "path": "../shared/tsconfig.build.json" },
-    { "path": "../evm-protocols/tsconfig.build.json" }
+    { "path": "../evm-protocols/tsconfig.build.json" },
+    { "path": "../adapters/tsconfig.build.json" }
   ]
 }
