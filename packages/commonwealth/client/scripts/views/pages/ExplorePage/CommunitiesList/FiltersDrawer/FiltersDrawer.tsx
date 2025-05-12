@@ -216,12 +216,12 @@ export const FiltersDrawer = ({
               header="Community Preferences"
               content={
                 <div className="options-list">
-                  {(tags || [])?.map((t) => (
+                  {(tags || []).map((t) => (
                     <CWCheckbox
                       key={t.id}
                       label={t.name}
-                      checked={(filters.withTagsIds || []).includes(t.id)}
-                      onChange={() => onTagOptionChange(t.id)}
+                      checked={(filters.withTagsIds || []).includes(t.id!)}
+                      onChange={() => onTagOptionChange(t.id!)}
                     />
                   ))}
                 </div>
