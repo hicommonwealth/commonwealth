@@ -377,7 +377,14 @@ export class RedisCache implements Cache {
         keys.push(key);
       }
       for (const key of keys) {
-        data[key] = await this._client.get(key);
+        const keyType = await this._client.type(key);
+        if (keyType === 'string') {
+          data[key] = await this._client.get(key);
+        } else {
+          this._log.warn(
+            `Skipping key with non-string type: ${key} (type: ${keyType})`,
+          );
+        }
       }
       return data;
     } catch (e) {
