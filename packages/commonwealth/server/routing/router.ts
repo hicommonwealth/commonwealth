@@ -52,7 +52,6 @@ import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
@@ -70,8 +69,6 @@ import { updateCommunityIdHandler } from '../routes/communities/update_community
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
@@ -81,7 +78,6 @@ export type ServerControllers = {
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  topics: ServerTopicsController;
   admin: ServerAdminController;
 };
 
@@ -97,7 +93,6 @@ function setupRouter(
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
   };
 
@@ -243,23 +238,6 @@ function setupRouter(
     '/comments',
     databaseValidationService.validateCommunity,
     searchCommentsHandler.bind(this, serverControllers),
-  );
-
-  // topics
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicChannelHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/topics-order' /* OLD: /orderTopics */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateTopicsOrderHandler.bind(this, serverControllers),
   );
 
   // reactions
