@@ -120,7 +120,7 @@ const CommunityHome = () => {
 
   return (
     <StickCommentProvider mode="thread">
-      <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
+      <CWPageLayout ref={containerRef} className="ExplorePageLayout">
         <div className="CommunityHome">
           <div className="header-section">
             <div className="description">

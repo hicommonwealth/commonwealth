@@ -21,7 +21,6 @@ export const ApiEndpoints = {
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
-  FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
