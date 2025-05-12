@@ -98,6 +98,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  getGroups: trpc.query(Community.GetGroups, trpc.Tag.Community),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
