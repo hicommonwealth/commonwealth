@@ -52,11 +52,8 @@ import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
-import { ServerTagsController } from 'server/controllers/server_tags_controller';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -71,11 +68,7 @@ import { getCommunitiesHandler } from '../routes/communities/get_communities_han
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { getGroupsHandler } from '../routes/groups/get_groups_handler';
-import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
@@ -85,10 +78,7 @@ export type ServerControllers = {
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  groups: ServerGroupsController;
-  topics: ServerTopicsController;
   admin: ServerAdminController;
-  tags: ServerTagsController;
 };
 
 function setupRouter(
@@ -103,10 +93,7 @@ function setupRouter(
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    groups: new ServerGroupsController(models),
-    topics: new ServerTopicsController(models),
     admin: new ServerAdminController(models),
-    tags: new ServerTagsController(models),
   };
 
   // ---
@@ -253,23 +240,6 @@ function setupRouter(
     searchCommentsHandler.bind(this, serverControllers),
   );
 
-  // topics
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicChannelHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/topics-order' /* OLD: /orderTopics */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateTopicsOrderHandler.bind(this, serverControllers),
-  );
-
   // reactions
   registerRoute(
     router,
@@ -282,14 +252,6 @@ function setupRouter(
     'post',
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models),
-  );
-
-  // tags
-  registerRoute(
-    router,
-    'get',
-    '/tags',
-    getTagsHandler.bind(this, serverControllers),
   );
 
   // roles
@@ -472,13 +434,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/groups',
-    getGroupsHandler.bind(this, serverControllers),
   );
 
   registerRoute(

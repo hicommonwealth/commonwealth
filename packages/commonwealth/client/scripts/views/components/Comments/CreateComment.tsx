@@ -10,11 +10,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { StickyInput } from '../StickEditorContainer';
 import { ArchiveMsg } from './ArchiveMsg';
 
 type CreateCommentProps = {
@@ -173,7 +173,7 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return rootThread.archivedAt === null ? (
-    <StickyEditorContainer
+    <StickyInput
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
