@@ -81,14 +81,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         newSession: true,
       });
 
-      console.log(
-        'FIXME: Going to sign in now with privy mobile.  session: ',
-        session,
-      );
-
-      console.log('FIXME: trying to sign in now... ');
-
-      const auth = await signIn(session, {
+      const signInOpts = {
         address: privyMobileAuthStatus.userAuth.address,
         community_id: ChainBase.Ethereum,
         wallet_id: WalletId.Privy,
@@ -99,7 +92,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
             privyMobileAuthStatus.userAuth.ssoProvider,
           ),
         },
-      });
+      };
+
+      console.log('FIXME: Trying to auth ');
+      console.log('FIXME: session: ' + session);
+      console.log('FIXME: signInOpts: ' + JSON.stringify(signInOpts, null, 2));
+
+      const auth = await signIn(session, signInOpts);
 
       console.log('FIXME signIn result: ' + JSON.stringify(auth, null, 2));
     }
