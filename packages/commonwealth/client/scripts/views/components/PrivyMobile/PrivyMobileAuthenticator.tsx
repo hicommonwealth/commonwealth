@@ -3,6 +3,7 @@ import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/pri
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { ReactNode, useCallback, useEffect } from 'react';
 import { useSignIn } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { toSignInProvider } from 'views/components/Privy/helpers';
 import { usePrivyEthereumWalletOn } from 'views/components/PrivyMobile/usePrivyEthereumWalletOn';
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
@@ -27,6 +28,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   const getPrivyMobileAuthStatus = usePrivyMobileAuthStatus();
   const { signIn } = useSignIn();
 
+  const user = useUserStore();
+
   const walletRequest = usePrivyEthereumWalletRequest();
   const walletOn = usePrivyEthereumWalletOn();
   const signMessage = usePrivyMobileSignMessage();
@@ -44,6 +47,11 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
   useEffect(() => {
     async function doAsync() {
+      if (user) {
+        // we're already authenticated so there's nothing to do...
+        return;
+      }
+
       const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
       console.log(
@@ -112,7 +120,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     }
 
     doAsync().catch(console.error);
-  }, [ethereumProvider, getPrivyMobileAuthStatus, signIn, signMessageProvider]);
+  }, [
+    user,
+    ethereumProvider,
+    getPrivyMobileAuthStatus,
+    signIn,
+    signMessageProvider,
+  ]);
 
   if (!window.PRIVY_MOBILE_ENABLED) {
     console.log('FIXME: Privy mobile is not enabled.');
