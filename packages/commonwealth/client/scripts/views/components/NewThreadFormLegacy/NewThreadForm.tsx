@@ -247,12 +247,13 @@ export const NewThreadForm = forwardRef<
     includeTopics: true,
     enabled: !!selectedCommunityId,
   });
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
-    communityId: selectedCommunityId,
-    userAddress: userSelectedAddress || '',
-    apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
-    topicId: threadTopic?.id || 0,
-  });
+  const { isRestrictedMembership, foundTopicPermissions, memberships } =
+    useTopicGating({
+      communityId: selectedCommunityId,
+      userAddress: userSelectedAddress || '',
+      apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
+      topicId: threadTopic?.id || 0,
+    });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -272,12 +273,6 @@ export const NewThreadForm = forwardRef<
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
-
-  const gatedGroupNames = groups
-    .filter((group) =>
-      group.topics.find((topic) => topic.id === threadTopic?.id),
-    )
-    .map((group) => group.name);
 
   const bodyAccumulatedRef = useRef('');
 
@@ -1132,7 +1127,10 @@ export const NewThreadForm = forwardRef<
                 {isRestrictedMembership && canShowGatingBanner && (
                   <div>
                     <CWGatedTopicBanner
-                      groupNames={gatedGroupNames}
+                      actions={[GatedActionEnum.CREATE_THREAD]}
+                      groups={groups}
+                      memberships={memberships}
+                      topicId={threadTopic?.id}
                       onClose={() => setCanShowGatingBanner(false)}
                     />
                   </div>
