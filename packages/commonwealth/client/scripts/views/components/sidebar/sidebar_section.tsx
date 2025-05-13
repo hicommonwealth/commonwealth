@@ -7,6 +7,7 @@ import { isNotUndefined } from 'helpers/typeGuards';
 import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 import type {
   SectionGroupAttrs,
   SidebarSectionAttrs,
@@ -14,8 +15,16 @@ import type {
 } from './types';
 
 const SubSection = (props: SubSectionAttrs) => {
-  const { isActive, isUpdated, isVisible, onClick, leftIcon, rowIcon, title } =
-    props;
+  const {
+    isActive,
+    isUpdated,
+    isVisible,
+    onClick,
+    leftIcon,
+    rowIcon,
+    title,
+    isNew,
+  } = props;
 
   if (!isVisible) {
     return;
@@ -35,12 +44,20 @@ const SubSection = (props: SubSectionAttrs) => {
 
   return (
     <div
-      className={`SubSection${isActive ? ' active' : ''}`}
+      className={clsx('SubSection', isActive && 'active')}
       onClick={(e) => clickHandler(e)}
     >
       {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
-      <div className={titleTextClass} title={title}>
-        {title}
+      <div className={clsx('title-container', titleTextClass)} title={title}>
+        <span className="title-text">{title}</span>
+        {isNew && (
+          <CWTag
+            label="New"
+            type="new"
+            iconName="newStar"
+            classNames={clsx('sidebar-section-new-tag', 'cw-tag--sidebar-new')}
+          />
+        )}
       </div>
       {isNotUndefined(leftIcon) && <div className="left-icon">{leftIcon}</div>}
     </div>
@@ -60,6 +77,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
     leftIcon,
     title,
     className,
+    isNew,
   } = props;
 
   const { setMenu, menuName, menuVisible } = useSidebarStore();
@@ -136,9 +154,17 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
           <div className="no-carat" />
         )}
         <div className="left-icon">{leftIcon}</div>
-        <CWText type="b2" className={`title-text ${titleTextClass}`}>
+        <CWText type="b2" className={clsx('title-text', titleTextClass)}>
           {title}
         </CWText>
+        {isNew && (
+          <CWTag
+            label="New"
+            type="new"
+            iconName="newStar"
+            classNames={clsx('sidebar-section-new-tag', 'cw-tag--sidebar-new')}
+          />
+        )}
       </div>
       {containsChildren && toggled && (
         <div className="subsections">
@@ -161,6 +187,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
     onClick,
     title,
     toggleDisabled,
+    isNew,
   } = props;
 
   const [toggled, setToggled] = React.useState<boolean>(
@@ -214,6 +241,14 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       >
         {carat}
         <CWText>{title}</CWText>
+        {isNew && (
+          <CWTag
+            label="New"
+            type="new"
+            iconName="newStar"
+            classNames={clsx('sidebar-section-new-tag', 'cw-tag--sidebar-new')}
+          />
+        )}
       </div>
       {toggled && (
         <div className="sections-container">
