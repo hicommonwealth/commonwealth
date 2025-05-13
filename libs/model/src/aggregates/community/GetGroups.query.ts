@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
+import { buildPermissionsMap } from './GetMemberships.query';
 
 export function GetGroups(): Query<typeof schemas.GetGroups> {
   return {
@@ -49,25 +50,37 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
       }
 
       if (include_topics) {
+        const topic_ids = groups
+          .map((g) => g.GroupPermissions || [])
+          .flat()
+          .map((p) => p.topic_id);
         const topics = await models.Topic.findAll({
           where: {
             ...(community_id && { community_id }),
-            group_ids: { [Op.overlap]: ids },
+            id: topic_ids,
           },
         });
+        const topicmap = new Map<number, z.infer<typeof schemas.Topic>>();
+        topics.forEach((t) => topicmap.set(t.id!, t.toJSON()));
+        const permissions = buildPermissionsMap(groups);
+
         groups.forEach((g) => {
           const group = map.get(g.id!);
-          group &&
-            group.topics.concat(
-              topics
-                .filter((t) => t.group_ids.includes(group.id))
-                .map((t) => ({
-                  ...t.toJSON(),
-                  permissions: (g.GroupPermissions || []).find(
-                    (gtp) => gtp.topic_id === t.id,
-                  )?.allowed_actions as schemas.PermissionEnum[],
-                })),
-            );
+          const perm = permissions.get(g.id!);
+          if (group && perm) {
+            // TODO: map topic permissions
+            // group.topics = perm.map((p) => ({
+            //   const topic = topicmap.get(p.id);
+            //   all_topics
+            //     .filter((t) => t..includes(group.id))
+            //     .map((t) => ({
+            //       ...t.toJSON(),
+            //       permissions: (g.GroupPermissions || []).find(
+            //         (gtp) => gtp.topic_id === t.id,
+            //       )?.allowed_actions as schemas.PermissionEnum[],
+            //     })),
+            // );
+          }
         });
       }
 

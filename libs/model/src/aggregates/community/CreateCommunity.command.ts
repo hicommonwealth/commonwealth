@@ -170,7 +170,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             description: 'General discussions',
             featured_in_sidebar: true,
             featured_in_new_post: false,
-            group_ids: [],
             allow_tokenized_threads: false,
           },
           { transaction },

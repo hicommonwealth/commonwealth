@@ -1,10 +1,36 @@
 import { command, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { GroupAttributes } from '../../models';
 import { RefreshCommunityMemberships } from './RefreshCommunityMemberships.command';
+
+/**
+ * Builds a map index by group id of the topics and their permissions
+ */
+export function buildPermissionsMap(groups: GroupAttributes[]) {
+  const permissions = groups.map((g) => g.GroupPermissions || []).flat();
+  const map = new Map<number, z.infer<typeof schemas.MembershipTopicView>[]>();
+  permissions.forEach((p) => {
+    const entry = map.get(p.group_id);
+    if (entry)
+      entry.push({
+        id: p.topic_id,
+        permissions: p.allowed_actions,
+      });
+    else
+      map.set(p.group_id, [
+        {
+          id: p.topic_id,
+          permissions: p.allowed_actions,
+        },
+      ]);
+  });
+  return map;
+}
 
 export function GetMemberships(): Query<typeof schemas.GetMemberships> {
   return {
@@ -44,24 +70,12 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
         include: [{ model: models.Group, as: 'group' }],
       });
 
-      const topics = await models.Topic.findAll({
-        where: { group_ids: { [Op.overlap]: groups.map((g) => g.id!) } },
-        attributes: ['id', 'group_ids'],
-      });
+      const permissions = buildPermissionsMap(groups);
 
       // transform memberships to result shape
       return memberships.map(({ group_id, reject_reason }) => ({
         groupId: group_id,
-        topics: topics
-          .filter((t) => t.group_ids!.includes(group_id))
-          .map((t) => ({
-            id: t.id!,
-            permissions:
-              groups
-                .find((g) => g.id === group_id)
-                ?.GroupPermissions?.find((gtp) => gtp.topic_id === t.id)
-                ?.allowed_actions || [],
-          })),
+        topics: permissions.get(group_id)!,
         isAllowed: !reject_reason,
         rejectReason: reject_reason || undefined,
       }));

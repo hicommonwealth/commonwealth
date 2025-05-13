@@ -100,25 +100,25 @@ export const GetCommunity = {
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
+export const MembershipTopicView = z.object({
+  id: z.number(),
+  permissions: z.array(z.nativeEnum(PermissionEnum)),
+});
+
+export const MembershipView = z.object({
+  groupId: z.number(),
+  topics: MembershipTopicView.array(),
+  isAllowed: z.boolean(),
+  rejectReason: MembershipRejectReason,
+});
+
 export const GetMemberships = {
   input: z.object({
     community_id: z.string(),
     address: z.string(),
     topic_id: z.number().optional(),
   }),
-  output: z
-    .object({
-      groupId: z.number(),
-      topics: z
-        .object({
-          id: z.number(),
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
-        })
-        .array(),
-      isAllowed: z.boolean(),
-      rejectReason: MembershipRejectReason,
-    })
-    .array(),
+  output: MembershipView.array(),
 };
 
 export const GetCommunityStake = {

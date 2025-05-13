@@ -251,8 +251,6 @@ async function hasTopicPermissions(
   const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
 
-  if (topic.group_ids?.length === 0) return;
-
   // check if user has permission to perform "action" in 'topic_id'
   // the 'topic_id' can belong to any group where user has membership
   // the group with 'topic_id' having higher permissions will take precedence
