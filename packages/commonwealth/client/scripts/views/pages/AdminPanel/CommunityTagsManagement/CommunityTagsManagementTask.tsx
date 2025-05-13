@@ -16,7 +16,7 @@ import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CW
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import TagUsageDialog from './TagUsageDialog/index';
+import TagUsageDialog from './TagUsageDialog';
 
 const columns: CWTableColumnInfo[] = [
   {
