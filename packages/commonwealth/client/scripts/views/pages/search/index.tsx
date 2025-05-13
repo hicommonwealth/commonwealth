@@ -16,7 +16,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -309,7 +309,7 @@ const SearchPage = () => {
             {sharedQueryOptions?.searchTerm?.length > 0 && (
               <>
                 {isLoading ? (
-                  <PageLoading />
+                  <LoadingIndicator />
                 ) : (
                   <>
                     <CWText className="search-results-caption">

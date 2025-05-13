@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { CosmosProposalForm } from './cosmos_proposal_form';
@@ -34,7 +34,7 @@ const NewProposalPage = () => {
   }
 
   if (!app.chain || !isLoaded || !app.chain.meta) {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   }
 
   // special case for initializing cosmos governance
@@ -48,7 +48,7 @@ const NewProposalPage = () => {
           app.chainModuleReady.emit('ready');
         });
       }
-      return <PageLoading />;
+      return <LoadingIndicator />;
     }
   } else {
     return <PageNotFound />;

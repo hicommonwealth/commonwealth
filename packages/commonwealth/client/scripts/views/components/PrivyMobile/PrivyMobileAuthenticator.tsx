@@ -4,12 +4,12 @@ import { getSessionFromWallet } from 'controllers/server/sessions';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 import { useSignIn } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { toSignInProvider } from 'views/components/Privy/helpers';
 import { usePrivyEthereumWalletOn } from 'views/components/PrivyMobile/usePrivyEthereumWalletOn';
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import { usePrivyMobileAuthStatus } from 'views/components/PrivyMobile/usePrivyMobileAuthStatus';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
-import { PageLoading } from 'views/pages/loading';
 
 declare global {
   interface Window {
@@ -117,7 +117,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   ]);
 
   if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   }
 
   return children;

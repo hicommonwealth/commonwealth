@@ -5,8 +5,8 @@ import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore, { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import ErrorPage from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageNotFound } from './404';
 import './stats.scss';
@@ -155,7 +155,7 @@ const StatsPage = () => {
   }
 
   if (!batchedData) {
-    return <PageLoading message="Loading analytics" />;
+    return <LoadingIndicator message="Loading analytics" />;
   } else if (error) {
     return <ErrorPage message={error} />;
   }
