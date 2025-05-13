@@ -70,6 +70,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           namespace_judge_token_id: number | null;
           namespace_judges: string[] | null;
           content_id: number;
+          creator_address: string;
         }>(
           `
               SELECT
@@ -79,7 +80,8 @@ export function ContestWorker(): Policy<typeof inputs> {
                 cm.contest_address,
                 cm.namespace_judge_token_id,
                 cm.namespace_judges,
-                added.content_id
+                added.content_id,
+                cm.creator_address
               FROM "Communities" c
                        JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                        JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -138,6 +140,7 @@ export function ContestWorker(): Policy<typeof inputs> {
             eth_chain_id,
             namespace_judge_token_id,
             namespace_judges,
+            creator_address,
           }) => ({
             url: chainNodeUrl,
             contest_address,
@@ -145,15 +148,20 @@ export function ContestWorker(): Policy<typeof inputs> {
             eth_chain_id,
             namespace_judge_token_id,
             namespace_judges,
+            creator_address,
           }),
         );
 
         const allowedContestManagers = contestManagers.filter(
           (contestManager) => {
-            // if judged contest, only allow judge to vote
+            // if judged contest, only allow judge or contest creator to vote
             if (contestManager.namespace_judge_token_id) {
-              const isJudge = contestManager.namespace_judges
-                ?.map((addr) => addr.toLowerCase())
+              const validAddresses = [
+                ...(contestManager.namespace_judges || []),
+                contestManager.creator_address,
+              ];
+              const isJudge = validAddresses
+                .map((addr) => addr.toLowerCase())
                 .includes(payload.address!.toLowerCase());
               if (!isJudge) {
                 log.warn(
