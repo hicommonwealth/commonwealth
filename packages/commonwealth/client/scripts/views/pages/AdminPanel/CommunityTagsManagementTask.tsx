@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Tag from 'client/scripts/models/Tag';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { APIOrderDirection } from 'helpers/constants';
@@ -12,14 +11,12 @@ import {
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import {
-  CWTable,
-  CWTableColumnInfo,
-} from 'views/components/component_kit/new_designs/CWTable';
+import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import TagUsageDialog from './TagUsageDialog/index';
 
 const columns: CWTableColumnInfo[] = [
   {
@@ -48,22 +45,12 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
-const getTagUsage = async (
-  id: number,
-): Promise<{ communities: { id: string; name: string }[] }> => {
-  const response = await axios.get(`/api/v1/admin/tags/${id}/usage`);
-  return response.data;
-};
-
 const CommunityTagsManagementTask = () => {
   const [newTagName, setNewTagName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
-  const [showUsageModal, setShowUsageModal] = useState(false);
-  const [tagUsage, setTagUsage] = useState<{
-    communities: { id: string; name: string }[];
-  }>({ communities: [] });
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { data: tags } = useFetchTagsQuery({
     enabled: true,
     with_community_count: true,
@@ -95,7 +82,7 @@ const CommunityTagsManagementTask = () => {
       customElement: (
         <div>
           <span>{tag.community_count}</span>
-          {tag.community_count > 0 && (
+          {(tag.community_count || 0) > 0 && (
             <CWButton
               label="View"
               buttonHeight="sm"
@@ -192,15 +179,8 @@ const CommunityTagsManagementTask = () => {
     });
   }
 
-  async function handleViewTagUsage(tag: Tag) {
-    try {
-      const usage = await getTagUsage(tag.id!);
-      setTagUsage(usage);
-      setShowUsageModal(true);
-    } catch (error) {
-      console.error('Error fetching tag usage:', error);
-      notifyError('Failed to load tag usage information');
-    }
+  function handleViewTagUsage(tag: Tag) {
+    setSelectedTag(tag);
   }
 
   return (
@@ -244,34 +224,13 @@ const CommunityTagsManagementTask = () => {
         />
       </div>
 
-      {/* Tag Usage Modal */}
-      {showUsageModal && (
-        <CWModal
-          open={showUsageModal}
-          onClose={() => setShowUsageModal(false)}
-          content={
-            <div className="modal-content">
-              {tagUsage.communities.length === 0 ? (
-                <CWText>No communities are using this tag.</CWText>
-              ) : (
-                <ul>
-                  {tagUsage.communities.map((community) => (
-                    <li key={community.id}>
-                      <a
-                        href={`/${community.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {community.name} ({community.id})
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          }
-        />
-      )}
+      {/* Tag Usage Dialog */}
+      <TagUsageDialog
+        tagId={selectedTag?.id || null}
+        tagName={selectedTag?.name || ''}
+        isOpen={!!selectedTag}
+        onClose={() => setSelectedTag(null)}
+      />
     </>
   );
 };

@@ -6,4 +6,5 @@ export const trpcRouter = trpc.router({
   updateTag: trpc.command(Tag.UpdateTag, trpc.Tag.Tag),
   deleteTag: trpc.command(Tag.DeleteTag, trpc.Tag.Tag),
   getTags: trpc.query(Tag.GetTags, trpc.Tag.Tag),
+  getTagUsage: trpc.query(Tag.GetTagUsage, trpc.Tag.Tag),
 });

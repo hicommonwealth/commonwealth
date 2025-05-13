@@ -15,3 +15,18 @@ export const GetTags = {
   output: z.array(TagView),
   context: AuthContext,
 };
+
+export const CommunityTagView = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+export const GetTagUsage = {
+  input: z.object({
+    id: z.number(),
+  }),
+  output: z.object({
+    communities: z.array(CommunityTagView),
+  }),
+  context: AuthContext,
+};
