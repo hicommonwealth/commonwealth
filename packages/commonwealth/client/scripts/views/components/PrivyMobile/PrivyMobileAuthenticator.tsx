@@ -1,7 +1,7 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/privy_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
-import { ReactNode, useCallback, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 import { useSignIn } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { toSignInProvider } from 'views/components/Privy/helpers';
@@ -9,6 +9,7 @@ import { usePrivyEthereumWalletOn } from 'views/components/PrivyMobile/usePrivyE
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import { usePrivyMobileAuthStatus } from 'views/components/PrivyMobile/usePrivyMobileAuthStatus';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
+import { PageLoading } from 'views/pages/loading';
 
 declare global {
   interface Window {
@@ -47,20 +48,20 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
   useEffect(() => {
     async function doAsync() {
-      if (user && user.isLoggedIn) {
+      if (!window.PRIVY_MOBILE_ENABLED) {
+        // only attempt to authenticate when running in the mobile app and
+        // privy is enabled.
+        return;
+      }
+
+      if (user.isLoggedIn) {
         // we're already authenticated so there's nothing to do...
         return;
       }
 
       const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
-      console.log(
-        'FIXME: privyMobileAuthStatus',
-        JSON.stringify(privyMobileAuthStatus, null, 2),
-      );
-
       if (!privyMobileAuthStatus.enabled) {
-        console.log('FIXME: Privy mobile auth is not enabled');
         return;
       }
 
@@ -68,23 +69,16 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         !privyMobileAuthStatus.authenticated ||
         !privyMobileAuthStatus.userAuth
       ) {
-        console.log('FIXME: Privy mobile not authenticated.');
         return;
       }
-
-      console.log('FIXME: Privy mobile is authenticated so trying to sign in ');
 
       const webWallet = new PrivyEthereumWebWalletController(
         ethereumProvider,
         signMessageProvider,
       );
 
-      console.log('FIXME enable web wallet... ');
-
-      // FIXME this is the bug now - it's not logging though
       await webWallet.enable();
 
-      console.log('FIXME getting session now.;');
       const session = await getSessionFromWallet(webWallet, {
         newSession: true,
       });
@@ -104,11 +98,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         },
       };
 
-      console.log('FIXME: signInOpts: ' + JSON.stringify(signInOpts, null, 2));
-
-      const auth = await signIn(session, signInOpts);
-
-      console.log('FIXME signIn result: ' + JSON.stringify(auth, null, 2));
+      await signIn(session, signInOpts);
 
       const landingURL = new URL(
         '/dashboard/for-you',
@@ -125,6 +115,10 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     signIn,
     signMessageProvider,
   ]);
+
+  if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
+    return <PageLoading />;
+  }
 
   return children;
 };
