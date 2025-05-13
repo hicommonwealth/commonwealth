@@ -112,7 +112,6 @@ export async function handleCapReached(
 
     await models.sequelize.transaction(async (transaction) => {
       if (token.liquidity_transferred) {
-        console.log({ onChainTokenData });
         await emitEvent(
           models.Outbox,
           [
