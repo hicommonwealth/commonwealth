@@ -135,7 +135,12 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 8px;
+      justify-content: flex-start;
+      gap: 16px;
+
+      span {
+        min-width: 24px;
+      }
     }
 
     .actions-cell {
@@ -143,6 +148,10 @@
       flex-direction: row;
       align-items: center;
       gap: 8px;
+    }
+
+    .data-container {
+      vertical-align: middle;
     }
   }
 

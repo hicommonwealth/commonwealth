@@ -24,18 +24,21 @@ const columns: CWTableColumnInfo[] = [
     header: 'Name',
     numeric: false,
     sortable: true,
+    hasCustomSortValue: true,
   },
   {
     key: 'community_count',
     header: 'Community Count',
     numeric: true,
     sortable: true,
+    hasCustomSortValue: true,
   },
   {
     key: 'created_at',
     header: 'Created At',
     numeric: false,
     sortable: true,
+    hasCustomSortValue: true,
   },
   {
     key: 'actions',
@@ -78,7 +81,7 @@ const CommunityTagsManagementTask = () => {
       customElement: <span>{tag.name}</span>,
     },
     community_count: {
-      sortValue: tag.community_count,
+      sortValue: tag.community_count || 0, // Ensure we have a number for sorting
       customElement: (
         <div className="community-count-cell">
           <span>{tag.community_count}</span>
@@ -94,7 +97,7 @@ const CommunityTagsManagementTask = () => {
       ),
     },
     created_at: {
-      sortValue: tag.created_at,
+      sortValue: new Date(tag.created_at).getTime(), // Convert date to timestamp for proper sorting
       customElement: <span>{tag.created_at}</span>,
     },
     actions: {
