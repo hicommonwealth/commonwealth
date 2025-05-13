@@ -1,4 +1,4 @@
-import { getReadableActions } from '@hicommonwealth/shared';
+import { UserFriendlyActionMap } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
@@ -155,21 +155,31 @@ const GroupCard = ({
         <>
           <CWText type="h5">Gated Topics</CWText>
           <div className="gating-topics">
-            <div className="row">
-              <CWText type="b2">Topic</CWText>
-              <CWText type="b2">Gated Actions</CWText>
+            <div className="row header-row">
+              <CWText type="b2" className="topic-name-header">
+                Topic
+              </CWText>
+              <CWText type="b2" className="actions-header">
+                Gated Actions
+              </CWText>
             </div>
             {topics.map((t, index) => (
               <div key={index}>
                 <CWDivider className="divider-spacing" />
-                <div className="row">
-                  <CWText type="b2">{t.name}</CWText>
-                  <CWTag
-                    label={getReadableActions({
-                      actions: t.permissions || [],
-                    })}
-                    type="referendum"
-                  />
+                <div className="row topic-row">
+                  <CWText type="b2" className="topic-name">
+                    {t.name}
+                  </CWText>
+                  <div className="actions-container">
+                    {(t.permissions || ['None']).map((p, idx) => (
+                      <span key={idx} className="action-tag">
+                        <CWTag
+                          label={UserFriendlyActionMap[p]}
+                          type="referendum"
+                        />
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <CWDivider className="divider-spacing" />
               </div>
