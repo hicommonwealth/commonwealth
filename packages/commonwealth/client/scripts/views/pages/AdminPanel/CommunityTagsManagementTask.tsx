@@ -1,13 +1,13 @@
 import axios from 'axios';
 import Tag from 'client/scripts/models/Tag';
-import { useFetchTagsQuery } from 'client/scripts/state/api/tags';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import React, { useState } from 'react';
 import {
   useCreateTagMutation,
   useDeleteTagMutation,
+  useFetchTagsQuery,
   useUpdateTagMutation,
-} from 'client/scripts/state/api/tags/mutations';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useState } from 'react';
+} from 'state/api/tags';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
