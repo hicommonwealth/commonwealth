@@ -33,7 +33,7 @@ export const DiscordMetaSchema = z.object({
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
-export const PG_ETH = z.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
+export const PG_ETH = z.coerce.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
 
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 

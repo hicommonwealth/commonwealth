@@ -48,7 +48,6 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
-import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
@@ -59,7 +58,6 @@ import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
@@ -73,7 +71,6 @@ import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  comments: ServerCommentsController;
   communities: ServerCommunitiesController;
   admin: ServerAdminController;
 };
@@ -87,7 +84,6 @@ function setupRouter(
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    comments: new ServerCommentsController(models),
     communities: new ServerCommunitiesController(models),
     admin: new ServerAdminController(models),
   };
@@ -225,15 +221,6 @@ function setupRouter(
     '/feed',
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models, serverControllers),
-  );
-
-  // comments
-  registerRoute(
-    router,
-    'get',
-    '/comments',
-    databaseValidationService.validateCommunity,
-    searchCommentsHandler.bind(this, serverControllers),
   );
 
   // reactions
