@@ -5,6 +5,7 @@ import { CWText } from '../../../component_kit/cw_text';
 import { CWTable } from '../../../component_kit/new_designs/CWTable';
 import { CommunityStake } from './CommunityStake/CommunityStake';
 import './CommunityTab.scss';
+import { LastActive } from './LastActive/LastActive';
 
 export const CommunityTab = () => {
   const user = useUserStore();
@@ -22,6 +23,12 @@ export const CommunityTab = () => {
       numeric: true,
       sortable: true,
     },
+    {
+      key: 'lastActive',
+      header: 'Last Active',
+      numeric: false,
+      sortable: true,
+    },
   ];
 
   const rowData = user.communities.map((community) => ({
@@ -33,6 +40,7 @@ export const CommunityTab = () => {
         address: null,
       },
     },
+    lastActive: <LastActive communityId={community.id} />,
   }));
 
   return (
