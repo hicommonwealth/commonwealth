@@ -1,7 +1,7 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
 import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
-import { CountAggregatorKeys } from '@hicommonwealth/shared';
+import { CountAggregatorKeys, LinkSource } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
 import {
@@ -157,6 +157,29 @@ export const trpcRouter = trpc.router({
           });
         }
       }
+    }),
+  ]),
+  addLinks: trpc.command(Thread.AddLinks, trpc.Tag.Thread, [
+    trpc.trackAnalytics((_, { community_id, new_links }) => {
+      if (new_links.length > 0) {
+        const source = new_links.at(-1)!.source;
+        const event =
+          source === LinkSource.Snapshot || source === LinkSource.Proposal
+            ? MixpanelCommunityInteractionEvent.LINKED_PROPOSAL
+            : source === LinkSource.Thread
+              ? MixpanelCommunityInteractionEvent.LINKED_THREAD
+              : source === LinkSource.Web
+                ? MixpanelCommunityInteractionEvent.LINKED_URL
+                : source === LinkSource.Template
+                  ? MixpanelCommunityInteractionEvent.LINKED_TEMPLATE
+                  : undefined;
+        if (event)
+          return Promise.resolve([
+            event,
+            { event, community: community_id, proposalType: source },
+          ]);
+      }
+      return Promise.resolve(undefined);
     }),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),

@@ -90,6 +90,7 @@ export interface ThreadArgs {
 }
 
 type createDeleteLinkArgs = {
+  address: string;
   thread_id: number;
   links: Link[];
   jwt: any;
@@ -385,8 +386,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .post('/api/linking/addThreadLinks')
+      .post('/api/v1/addLinks')
       .set('Accept', 'application/json')
+      .set('address', args.address)
       .send(args);
     return res.body;
   },

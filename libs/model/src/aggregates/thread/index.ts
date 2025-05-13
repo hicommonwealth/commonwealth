@@ -1,3 +1,4 @@
+export * from './AddLinks.command';
 export * from './CreateThread.command';
 export * from './CreateThreadReaction.command';
 export * from './DeleteThread.command';
