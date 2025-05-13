@@ -1,16 +1,13 @@
 import React from 'react';
 
-import { useCommonNavigate } from 'navigation/helpers';
-import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../../component_kit/cw_text';
 import { CWTable } from '../../../component_kit/new_designs/CWTable';
+import { CommunityStake } from './CommunityStake/CommunityStake';
 import './CommunityTab.scss';
 
 export const CommunityTab = () => {
-  const navigate = useCommonNavigate();
   const user = useUserStore();
-  const { data: domain } = useFetchCustomDomainQuery();
 
   const columns = [
     {
@@ -20,8 +17,8 @@ export const CommunityTab = () => {
       sortable: true,
     },
     {
-      key: 'members',
-      header: 'Members',
+      key: 'stake',
+      header: 'Stake',
       numeric: true,
       sortable: true,
     },
@@ -29,7 +26,7 @@ export const CommunityTab = () => {
 
   const rowData = user.communities.map((community) => ({
     name: community.name,
-    members: '0',
+    stake: <CommunityStake communityId={community.id} />,
     avatars: {
       name: {
         avatarUrl: community.iconUrl,
