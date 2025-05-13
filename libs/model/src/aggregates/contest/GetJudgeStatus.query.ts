@@ -2,8 +2,6 @@ import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 
-// const Errors = {};
-
 export function GetJudgeStatus(): Query<typeof schemas.GetJudgeStatus> {
   return {
     ...schemas.GetJudgeStatus,
@@ -14,6 +12,7 @@ export function GetJudgeStatus(): Query<typeof schemas.GetJudgeStatus> {
         where: {
           community_id: payload.community_id,
         },
+        paranoid: false, // also include deleted contest managers
         order: [['namespace_judge_token_id', 'DESC']],
       });
 
