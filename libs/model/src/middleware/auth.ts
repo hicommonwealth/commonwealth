@@ -260,11 +260,16 @@ async function hasTopicPermissions(
     }
   >(
     `
-        SELECT g.*, gp.topic_id, gp.allowed_actions
-        FROM "Groups" as g
-                 JOIN "GroupPermissions" gp ON g.id = gp.group_id
-        WHERE g.community_id = :community_id
-          AND gp.topic_id = :topic_id
+    SELECT
+      g.*,
+      gp.topic_id,
+      gp.allowed_actions
+    FROM
+      "Groups" as g
+      JOIN "GroupPermissions" gp ON g.id = gp.group_id
+    WHERE
+      g.community_id = :community_id
+      AND gp.topic_id = :topic_id
     `,
     {
       type: QueryTypes.SELECT,
@@ -275,6 +280,7 @@ async function hasTopicPermissions(
       },
     },
   );
+  if (!groups || groups.length === 0) return;
 
   // There are 2 cases here. We either have the old group permission system where the group doesn't have
   // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in

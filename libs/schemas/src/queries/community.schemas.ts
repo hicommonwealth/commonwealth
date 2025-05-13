@@ -100,14 +100,14 @@ export const GetCommunity = {
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
-export const MembershipTopicView = z.object({
+export const TopicPermissionsView = z.object({
   id: z.number(),
   permissions: z.array(z.nativeEnum(PermissionEnum)),
 });
 
 export const MembershipView = z.object({
   groupId: z.number(),
-  topics: MembershipTopicView.array(),
+  topics: TopicPermissionsView.array(),
   isAllowed: z.boolean(),
   rejectReason: MembershipRejectReason,
 });

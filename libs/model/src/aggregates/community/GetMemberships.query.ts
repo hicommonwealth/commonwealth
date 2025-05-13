@@ -9,11 +9,11 @@ import { GroupAttributes } from '../../models';
 import { RefreshCommunityMemberships } from './RefreshCommunityMemberships.command';
 
 /**
- * Builds a map index by group id of the topics and their permissions
+ * Builds a map of topic permissions indexed by group id
  */
-export function buildPermissionsMap(groups: GroupAttributes[]) {
+export function buildTopicPermissionsMap(groups: GroupAttributes[]) {
   const permissions = groups.map((g) => g.GroupPermissions || []).flat();
-  const map = new Map<number, z.infer<typeof schemas.MembershipTopicView>[]>();
+  const map = new Map<number, z.infer<typeof schemas.TopicPermissionsView>[]>();
   permissions.forEach((p) => {
     const entry = map.get(p.group_id);
     if (entry)
@@ -47,6 +47,7 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
 
       const groups = await models.Group.findAll({
         where: { community_id },
+        attributes: ['id'],
         include: [
           {
             model: models.GroupPermission,
@@ -55,6 +56,7 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
           },
         ],
       });
+      const ids = groups.map((g) => g.id!);
 
       // TODO: resolve stale community memberships in a separate job
       await command(RefreshCommunityMemberships(), {
@@ -63,19 +65,15 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
       });
 
       const memberships = await models.Membership.findAll({
-        where: {
-          group_id: { [Op.in]: groups.map((g) => g.id!) },
-          address_id: addr.id!,
-        },
-        include: [{ model: models.Group, as: 'group' }],
+        where: { group_id: { [Op.in]: ids }, address_id: addr.id! },
       });
 
-      const permissions = buildPermissionsMap(groups);
+      const topic_permissions = buildTopicPermissionsMap(groups);
 
       // transform memberships to result shape
       return memberships.map(({ group_id, reject_reason }) => ({
         groupId: group_id,
-        topics: permissions.get(group_id)!,
+        topics: topic_permissions.get(group_id) || [],
         isAllowed: !reject_reason,
         rejectReason: reject_reason || undefined,
       }));
