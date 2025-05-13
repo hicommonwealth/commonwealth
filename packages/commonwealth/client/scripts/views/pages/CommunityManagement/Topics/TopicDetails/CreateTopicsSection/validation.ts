@@ -7,13 +7,13 @@ export const topicCreationValidationSchema = z.object({
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .min(1, { message: VALIDATION_MESSAGES.NO_INPUT })
     .superRefine((value, ctx) => {
-      const disallowedCharMatches = value.match(/["<>%{}|\\/^`]/g);
+      const disallowedCharMatches = value.match(/["<>%{}|\\/^`?]/g);
 
       if (disallowedCharMatches) {
-        const errMsg = `The ${pluralizeWithoutNumberPrefix(
+        const errMsg = `These ${pluralizeWithoutNumberPrefix(
           disallowedCharMatches.length,
           'char',
-        )} ${disallowedCharMatches.join(', ')} are not permitted`;
+        )} are not permitted: ${disallowedCharMatches.join(', ')}`;
 
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
