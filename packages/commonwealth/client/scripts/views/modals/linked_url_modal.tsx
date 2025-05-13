@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { notifyError } from 'controllers/app/notifications';
 import { getAddedAndDeleted } from 'helpers/threads';
 import { Link, LinkSource } from 'models/Thread';
-import app from 'state';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
@@ -39,13 +38,8 @@ export const LinkedUrlModal = ({
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
 
-  const communityId = app.activeChainId() || '';
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
-
-  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId,
-    threadId: thread.id,
-  });
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation();
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
@@ -70,15 +64,14 @@ export const LinkedUrlModal = ({
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          communityId,
-          threadId: thread.id,
+          thread_id: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Web,
             identifier: String(el.identifier),
           })),
         });
 
-        links = updatedThread.links;
+        links = updatedThread.links || [];
       }
 
       onModalClose();

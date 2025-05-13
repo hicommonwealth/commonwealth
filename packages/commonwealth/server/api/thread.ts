@@ -182,6 +182,8 @@ export const trpcRouter = trpc.router({
       return Promise.resolve(undefined);
     }),
   ]),
+  deleteLinks: trpc.command(Thread.DeleteLinks, trpc.Tag.Thread),
+  getLinks: trpc.query(Thread.GetLinks, trpc.Tag.Thread),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,

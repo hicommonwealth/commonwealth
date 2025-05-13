@@ -106,3 +106,12 @@ export const AddLinks = {
   }),
   context: ThreadContext,
 };
+
+export const DeleteLinks = {
+  input: z.object({
+    thread_id: PG_INT,
+    links: z.array(Link),
+  }),
+  output: Thread,
+  context: ThreadContext,
+};

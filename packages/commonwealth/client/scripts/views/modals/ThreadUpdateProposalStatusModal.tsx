@@ -72,11 +72,7 @@ export const ThreadUpdateProposalStatusModal = ({
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
-
-  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId: app.activeChainId() || '',
-    threadId: thread.id,
-  });
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation();
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelCommunityInteractionEventPayload>({
@@ -158,15 +154,14 @@ export const ThreadUpdateProposalStatusModal = ({
           .then(({ toDelete, links }) => {
             if (toDelete.length > 0) {
               return deleteThreadLinks({
-                communityId: app.activeChainId() || '',
-                threadId: thread.id,
+                thread_id: thread.id,
                 links: toDelete.map((sn) => ({
                   source: LinkSource.Snapshot,
                   identifier: String(sn.id),
                 })),
               }).then((updatedThread) => {
                 // eslint-disable-next-line no-param-reassign
-                links = updatedThread.links;
+                links = updatedThread.links || [];
                 return links;
               });
             } else {
@@ -207,15 +202,14 @@ export const ThreadUpdateProposalStatusModal = ({
           .then(({ toDelete, links }) => {
             if (toDelete.length > 0) {
               return deleteThreadLinks({
-                communityId: app.activeChainId() || '',
-                threadId: thread.id,
+                thread_id: thread.id,
                 links: toDelete.map(({ identifier }) => ({
                   source: LinkSource.Proposal,
                   identifier: String(identifier),
                 })),
               }).then((updatedThread) => {
                 // eslint-disable-next-line no-param-reassign
-                links = updatedThread.links;
+                links = updatedThread.links || [];
                 return links;
               });
             } else {
@@ -251,8 +245,7 @@ export const ThreadUpdateProposalStatusModal = ({
   const handleRemoveProposal = () => {
     try {
       deleteThreadLinks({
-        communityId: app.activeChainId() || '',
-        threadId: thread.id,
+        thread_id: thread.id,
         links: [
           {
             source: LinkSource.Snapshot,

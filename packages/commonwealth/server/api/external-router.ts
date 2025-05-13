@@ -50,6 +50,8 @@ const {
   deleteReaction,
   deleteThread,
   addLinks,
+  deleteLinks,
+  getLinks,
 } = thread.trpcRouter;
 const {
   createComment,
@@ -95,7 +97,13 @@ const api = {
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
+  getLinks: trpc.query(Thread.GetLinks, trpc.Tag.Thread, {
+    forceSecure: true,
+  }),
   getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Contest, {
+    forceSecure: true,
+  }),
+  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
     forceSecure: true,
   }),
   createContestMetadata,
@@ -113,6 +121,7 @@ const api = {
   updateThread,
   deleteThread,
   addLinks,
+  deleteLinks,
   createComment,
   updateComment,
   deleteComment,
@@ -126,9 +135,6 @@ const api = {
   createToken,
   createTrade,
   getTokenInfoAlchemy,
-  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
-    forceSecure: true,
-  }),
   getLaunchpadTrades,
   launchTokenBot,
 };
