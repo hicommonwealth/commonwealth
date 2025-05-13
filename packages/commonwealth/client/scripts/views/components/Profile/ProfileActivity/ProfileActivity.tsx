@@ -84,6 +84,9 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             selectedActivity === ProfileActivityType.Threads
             ? 'removePadding'
             : '',
+          selectedActivity === ProfileActivityType.Communities
+            ? 'communityPadding'
+            : '',
         )}
       >
         <ProfileActivityContent
