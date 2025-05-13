@@ -1,8 +1,8 @@
 import {
   ContentType,
   GatedActionEnum,
-  MIN_CHARS_TO_SHOW_MORE,
   getThreadUrl,
+  MIN_CHARS_TO_SHOW_MORE,
 } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
@@ -298,12 +298,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
-    communityId,
-    apiEnabled: !!user?.activeAccount?.address && !!communityId,
-    userAddress: user?.activeAccount?.address || '',
-    topicId: thread?.topic?.id || 0,
-  });
+  const { isRestrictedMembership, foundTopicPermissions, memberships } =
+    useTopicGating({
+      communityId,
+      apiEnabled: !!user?.activeAccount?.address && !!communityId,
+      userAddress: user?.activeAccount?.address || '',
+      topicId: thread?.topic?.id || 0,
+    });
 
   const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
@@ -492,10 +493,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadAuthor(thread) ||
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
-
-  const gatedGroupsMatchingTopic = groups?.filter((x) =>
-    x?.topics?.find((y) => y?.id === thread?.topic?.id),
-  );
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
@@ -936,9 +933,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         !hideGatingBanner &&
                         isRestrictedMembership && (
                           <CWGatedTopicBanner
-                            groupNames={gatedGroupsMatchingTopic.map(
-                              (g) => g.name,
-                            )}
+                            actions={[
+                              GatedActionEnum.CREATE_COMMENT,
+                              GatedActionEnum.CREATE_COMMENT_REACTION,
+                              GatedActionEnum.CREATE_THREAD_REACTION,
+                              GatedActionEnum.UPDATE_POLL,
+                            ]}
+                            memberships={memberships}
+                            groups={groups}
+                            topicId={thread?.topic?.id}
                             onClose={() => setHideGatingBanner(true)}
                           />
                         )}

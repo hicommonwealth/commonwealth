@@ -13,6 +13,7 @@ import {
 import useAppStatus from '../../../../hooks/useAppStatus';
 import CWBanner from '../new_designs/CWBanner';
 import { CWTag } from '../new_designs/CWTag';
+import './CWGatedTopicBanner.scss';
 
 interface Group {
   id: number;
@@ -89,11 +90,7 @@ const CWGatedTopicBanner = ({
     }
   }
 
-  console.log('group entries', Object.entries(actionGroups));
   if (!Object.keys(actionGroups).length) return null;
-
-  const isSingleGroup = topicGroupSet.size === 1;
-  const groupWord = isSingleGroup ? 'group' : 'group(s)';
 
   const buttons = [
     {
@@ -115,7 +112,7 @@ const CWGatedTopicBanner = ({
     },
   ];
 
-  if (isSingleGroup) {
+  if (topicGroupSet.size === 1) {
     const groupId = Array.from(topicGroupSet)[0];
     const groupName = groups.find((g) => g.id === groupId)?.name;
     // Collect all actions gated by this group (from actionGroups)
@@ -124,26 +121,62 @@ const CWGatedTopicBanner = ({
       .map(([action]) => action as GatedActionEnum);
 
     return (
+      <div className="GatedTopicBanner">
+        <CWBanner
+          title="This topic is gated"
+          body={
+            <div>
+              <div className="description">
+                Join the <b>{groupName}</b> group to perform the following
+                action
+                {gatedActions.length > 1 ? 's' : ''}:
+              </div>
+              <ul>
+                {gatedActions.map((action) => (
+                  <li key={action}>
+                    <span className="action-list">•</span>
+                    <span>{UserFriendlyActionMap[action]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          }
+          type="info"
+          buttons={buttons}
+          onClose={onClose}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="GatedTopicBanner">
       <CWBanner
         title="This topic is gated"
         body={
           <div>
-            <div style={{ marginBottom: 10 }}>
-              Join the <b>{groupName}</b> group to perform the following action
-              {gatedActions.length > 1 ? 's' : ''}:
+            <div>
+              To perform certain actions in this topic, you must join one of the
+              following groups:
             </div>
             <ul>
-              {gatedActions.map((action) => (
-                <li key={action}>
-                  <span
-                    style={{
-                      color: '#1a1a1a',
-                      marginRight: 8,
-                    }}
-                  >
-                    •
-                  </span>
-                  <span>{UserFriendlyActionMap[action]}</span>
+              {(
+                Object.entries(actionGroups) as [
+                  GatedActionEnum,
+                  Record<number, string>,
+                ][]
+              ).map(([action, groups]) => (
+                <li key={action} style={{ marginTop: 12 }}>
+                  <div className="multi-action-list">
+                    <strong className="action-name">
+                      {UserFriendlyActionMap[action]}:
+                    </strong>
+                    {Object.entries(groups).map(([groupId, groupName]) => (
+                      <span key={groupId} className="group-list">
+                        <CWTag label={groupName} type="referendum" />
+                      </span>
+                    ))}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -153,41 +186,7 @@ const CWGatedTopicBanner = ({
         buttons={buttons}
         onClose={onClose}
       />
-    );
-  }
-
-  return (
-    <CWBanner
-      title="This topic is gated"
-      body={
-        <div>
-          <div>
-            To perform certain actions in this topic, you must join one of the
-            following groups:
-          </div>
-          <ul className="gating-actions-list">
-            {(
-              Object.entries(actionGroups) as [
-                GatedActionEnum,
-                Record<number, string>,
-              ][]
-            ).map(([action, groups]) => (
-              <li key={action} style={{ marginTop: 8 }}>
-                <strong>{UserFriendlyActionMap[action]}</strong>:
-                {Object.entries(groups).map(([groupId, groupName]) => (
-                  <span key={groupId}>
-                    <CWTag label={groupName} type="referendum" />
-                  </span>
-                ))}
-              </li>
-            ))}
-          </ul>
-        </div>
-      }
-      type="info"
-      buttons={buttons}
-      onClose={onClose}
-    />
+    </div>
   );
 };
 

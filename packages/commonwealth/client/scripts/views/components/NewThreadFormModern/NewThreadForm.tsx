@@ -136,12 +136,13 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
-    communityId,
-    userAddress: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address && !!communityId,
-    topicId: threadTopic?.id || 0,
-  });
+  const { isRestrictedMembership, foundTopicPermissions, memberships } =
+    useTopicGating({
+      communityId,
+      userAddress: user.activeAccount?.address || '',
+      apiEnabled: !!user.activeAccount?.address && !!communityId,
+      topicId: threadTopic?.id || 0,
+    });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -164,12 +165,6 @@ export const NewThreadForm = () => {
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
-
-  const gatedGroupNames = groups
-    .filter((group) =>
-      group.topics.find((topic) => topic.id === threadTopic?.id),
-    )
-    .map((group) => group.name);
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const handleNewThreadCreation = async () => {
@@ -602,7 +597,10 @@ export const NewThreadForm = () => {
                 {isRestrictedMembership && canShowGatingBanner && (
                   <div>
                     <CWGatedTopicBanner
-                      groupNames={gatedGroupNames}
+                      actions={[GatedActionEnum.CREATE_THREAD]}
+                      memberships={memberships}
+                      groups={groups}
+                      topicId={threadTopic?.id}
                       onClose={() => setCanShowGatingBanner(false)}
                     />
                   </div>
