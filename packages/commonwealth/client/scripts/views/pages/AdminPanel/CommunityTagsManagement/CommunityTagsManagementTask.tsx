@@ -16,6 +16,7 @@ import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CW
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import TagEditDialog from './TagEditDialog';
 import TagUsageDialog from './TagUsageDialog';
 
 const columns: CWTableColumnInfo[] = [
@@ -68,12 +69,10 @@ const CommunityTagsManagementTask = () => {
     initialSortDirection: APIOrderDirection.Asc,
   });
 
-  // Filter tags based on search term
   const filteredTags = (tags || []).filter((tag) =>
     tag.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
   );
 
-  // Prepare rowData with custom cell content
   const rowData = filteredTags.map((tag) => ({
     ...tag,
     name: {
@@ -84,20 +83,24 @@ const CommunityTagsManagementTask = () => {
       sortValue: tag.community_count || 0, // Ensure we have a number for sorting
       customElement: (
         <div className="community-count-cell">
-          <span>{tag.community_count}</span>
-          {(tag.community_count || 0) > 0 && (
+          <span>{tag.community_count || 0}</span>
+          {(tag.community_count || 0) > 0 ? (
             <CWButton
               label="View"
               buttonHeight="sm"
               buttonType="tertiary"
               onClick={() => handleViewTagUsage(tag)}
             />
+          ) : (
+            <CWText type="caption" className="empty-state">
+              No communities
+            </CWText>
           )}
         </div>
       ),
     },
     created_at: {
-      sortValue: new Date(tag.created_at).getTime(), // Convert date to timestamp for proper sorting
+      sortValue: new Date(tag.created_at).getTime(),
       customElement: <span>{tag.created_at}</span>,
     },
     actions: {
@@ -107,7 +110,7 @@ const CommunityTagsManagementTask = () => {
             label="Edit"
             buttonHeight="sm"
             buttonType="secondary"
-            onClick={() => setEditingTag(tag)}
+            onClick={() => handleEditTag(tag)}
           />
           <CWButton
             label="Delete"
@@ -131,23 +134,36 @@ const CommunityTagsManagementTask = () => {
       notifySuccess('Tag created successfully');
     } catch (error) {
       console.error('Error creating tag:', error);
-      notifyError('Failed to create tag');
+      if (error?.message?.includes('must not exist')) {
+        notifyError('Tag already exists');
+      } else {
+        notifyError('Failed to create tag');
+      }
     }
   }
 
-  async function handleUpdateTag() {
-    if (!editingTag || !editingTag.name.trim()) {
+  async function handleUpdateTagSubmit(id: number, name: string) {
+    if (!name.trim()) {
       notifyError('Tag name cannot be empty');
       return;
     }
     try {
-      await updateTag({ id: editingTag.id, name: editingTag.name.trim() });
-      setEditingTag(null);
+      await updateTag({ id, name: name.trim() });
       notifySuccess('Tag updated successfully');
     } catch (error) {
       console.error('Error updating tag:', error);
-      notifyError('Failed to update tag');
+      if (error?.message?.includes('must not exist')) {
+        notifyError('Tag already exists');
+        throw error;
+      } else {
+        notifyError('Failed to update tag');
+        throw error;
+      }
     }
+  }
+
+  function handleEditTag(tag: Tag) {
+    setEditingTag(tag);
   }
 
   function handleDeleteTag(tag: Tag) {
@@ -227,12 +243,19 @@ const CommunityTagsManagementTask = () => {
         />
       </div>
 
-      {/* Tag Usage Dialog */}
       <TagUsageDialog
         tagId={selectedTag?.id || null}
         tagName={selectedTag?.name || ''}
         isOpen={!!selectedTag}
         onClose={() => setSelectedTag(null)}
+      />
+
+      <TagEditDialog
+        tagId={editingTag?.id || null}
+        tagName={editingTag?.name || ''}
+        isOpen={!!editingTag}
+        onClose={() => setEditingTag(null)}
+        onSave={handleUpdateTagSubmit}
       />
     </>
   );

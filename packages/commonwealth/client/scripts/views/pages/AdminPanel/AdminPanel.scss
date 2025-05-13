@@ -141,6 +141,15 @@
       span {
         min-width: 24px;
       }
+
+      .empty-state {
+        color: $neutral-400;
+        font-style: italic;
+      }
+    }
+
+    .data-container {
+      vertical-align: middle;
     }
 
     .actions-cell {
@@ -148,10 +157,6 @@
       flex-direction: row;
       align-items: center;
       gap: 8px;
-    }
-
-    .data-container {
-      vertical-align: middle;
     }
   }
 
