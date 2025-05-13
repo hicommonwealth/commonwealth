@@ -80,7 +80,7 @@ const CommunityTagsManagementTask = () => {
     community_count: {
       sortValue: tag.community_count,
       customElement: (
-        <div>
+        <div className="community-count-cell">
           <span>{tag.community_count}</span>
           {(tag.community_count || 0) > 0 && (
             <CWButton
@@ -99,7 +99,7 @@ const CommunityTagsManagementTask = () => {
     },
     actions: {
       customElement: (
-        <div className="actions-column">
+        <div className="actions-cell">
           <CWButton
             label="Edit"
             buttonHeight="sm"
@@ -109,7 +109,7 @@ const CommunityTagsManagementTask = () => {
           <CWButton
             label="Delete"
             buttonHeight="sm"
-            buttonType="tertiary"
+            buttonType="destructive"
             onClick={() => handleDeleteTag(tag)}
           />
         </div>
