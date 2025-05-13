@@ -32,10 +32,10 @@ const KYOFinanceSwapFields = ({
         onChange={(value) =>
           onChange?.({
             metadata: {
+              ...(defaultValues?.metadata || {}),
               chainId: defaultValues?.metadata
                 ?.chainId as KyoFinanceChainIdsType,
               minTimestamp: value?.toISOString(),
-              ...(defaultValues?.metadata || {}),
             },
           })
         }
@@ -54,10 +54,10 @@ const KYOFinanceSwapFields = ({
         onInput={(e) =>
           onChange?.({
             metadata: {
+              ...(defaultValues?.metadata || {}),
               chainId: defaultValues?.metadata
                 ?.chainId as KyoFinanceChainIdsType,
               outputToken: e?.target?.value?.trim(),
-              ...(defaultValues?.metadata || {}),
             },
           })
         }
@@ -76,10 +76,10 @@ const KYOFinanceSwapFields = ({
         onInput={(e) =>
           onChange?.({
             metadata: {
+              ...(defaultValues?.metadata || {}),
               chainId: defaultValues?.metadata
                 ?.chainId as KyoFinanceChainIdsType,
               inputToken: e?.target?.value?.trim(),
-              ...(defaultValues?.metadata || {}),
             },
           })
         }
@@ -98,10 +98,10 @@ const KYOFinanceSwapFields = ({
         onInput={(e) =>
           onChange?.({
             metadata: {
+              ...(defaultValues?.metadata || {}),
               chainId: defaultValues?.metadata
                 ?.chainId as KyoFinanceChainIdsType,
               minOutputAmount: e?.target?.value?.trim(),
-              ...(defaultValues?.metadata || {}),
             },
           })
         }
@@ -120,10 +120,10 @@ const KYOFinanceSwapFields = ({
         onInput={(e) =>
           onChange?.({
             metadata: {
+              ...(defaultValues?.metadata || {}),
               chainId: defaultValues?.metadata
                 ?.chainId as KyoFinanceChainIdsType,
               minVolumeUSD: e?.target?.value?.trim(),
-              ...(defaultValues?.metadata || {}),
             },
           })
         }

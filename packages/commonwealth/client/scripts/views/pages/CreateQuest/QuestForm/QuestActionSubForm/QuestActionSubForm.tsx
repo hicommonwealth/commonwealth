@@ -111,7 +111,7 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         })}
         customError={errors?.action}
         instructionalMessage={
-          actionCopies.pre_reqs[defaultValues?.action as QuestAction](
+          actionCopies?.pre_reqs?.[defaultValues?.action as QuestAction]?.(
             'admin',
           ) || ''
         }

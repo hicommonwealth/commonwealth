@@ -145,6 +145,21 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
+                metadata: action.metadata
+                  ? {
+                      ...action.metadata,
+                      ...((action.metadata as any).poolAddresses && {
+                        poolAddresses: (
+                          action.metadata as any
+                        ).poolAddresses.join(', '),
+                      }),
+                      ...((action.metadata as any).minUSDValues && {
+                        minUSDValues: (
+                          action.metadata as any
+                        ).minUSDValues.join(', '),
+                      }),
+                    }
+                  : undefined,
               })),
             }}
           />

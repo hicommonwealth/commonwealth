@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import './cw_text_area.scss';
 
+import clsx from 'clsx';
 import { useFormContext } from 'react-hook-form';
 import { CWLabel } from './cw_label';
 import type { BaseTextInputProps } from './cw_text_input';
@@ -16,12 +17,14 @@ type TextAreaStyleProps = {
   validationStatus?: ValidationStatus;
   instructionalMessage?: string;
   resizeWithText?: boolean;
+  containerClassName?: string;
 };
 
 type TextAreaFormValidationProps = {
   name?: string;
   hookToForm?: boolean;
   charCount?: number;
+  customError?: string;
 };
 
 type TextAreaProps = BaseTextInputProps &
@@ -48,6 +51,8 @@ export const CWTextArea = (props: TextAreaProps) => {
     resizeWithText = false,
     hookToForm,
     instructionalMessage,
+    customError,
+    containerClassName,
   } = props;
 
   const formContext = useFormContext();
@@ -82,7 +87,7 @@ export const CWTextArea = (props: TextAreaProps) => {
   }, [value, resizeWithText]);
 
   return (
-    <div className={ComponentType.TextArea}>
+    <div className={clsx(ComponentType.TextArea, containerClassName)}>
       {label && (
         <MessageRow
           hasFeedback={!!inputValidationFn}
@@ -161,14 +166,20 @@ export const CWTextArea = (props: TextAreaProps) => {
           validationStatus={validationProps.validationStatus}
         />
       )}
-      {label && (
+      {(label || customError) && (
         <NewMessageRow
-          hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
-          // @ts-expect-error <StrictNullChecks/>
-          statusMessage={validationProps.statusMessage || formFieldErrorMessage}
+          hasFeedback={
+            !!inputValidationFn || !!formFieldErrorMessage || !!customError
+          }
+          statusMessage={
+            validationProps.statusMessage ||
+            formFieldErrorMessage ||
+            customError
+          }
           validationStatus={
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined)
+            (formFieldErrorMessage ? 'failure' : undefined) ||
+            'failure'
           }
         />
       )}

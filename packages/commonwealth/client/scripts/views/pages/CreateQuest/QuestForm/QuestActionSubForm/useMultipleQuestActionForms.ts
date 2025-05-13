@@ -8,6 +8,7 @@ import {
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceLpMetadata,
   doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -87,7 +88,7 @@ const useQuestActionMultiFormsState = ({
     refs?: QuestActionSubFormInternalRefs,
     config?: QuestActionSubFormConfig,
   ) => {
-    let errors: QuestActionSubFormErrors = {};
+    const errors: QuestActionSubFormErrors = {};
 
     // validate via zod
     try {
@@ -95,11 +96,16 @@ const useQuestActionMultiFormsState = ({
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
-      zodError.errors.map((error) => {
-        errors = {
-          ...errors,
-          [error.path[0] as keyof QuestActionSubFormErrors]: error.message,
-        };
+      zodError.errors.forEach((error) => {
+        // correctly displays nested paths
+        let current = errors;
+        for (let i = 0; i < error.path.length - 1; i++) {
+          const key = error.path[i];
+          current[key] = current[key] || {};
+          current = current[key];
+        }
+        const lastKey = error.path[error.path.length - 1];
+        current[lastKey] = error.message;
       });
     }
 
@@ -159,7 +165,10 @@ const useQuestActionMultiFormsState = ({
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
       const requiresKYOFinanceSwapMetadata =
         doesActionRequireKYOFinanceSwapMetadata(chosenAction);
-      const requiresKYOFinanceMetadata = requiresKYOFinanceSwapMetadata;
+      const requiresKYOFinanceLpMetadata =
+        doesActionRequireKYOFinanceLpMetadata(chosenAction);
+      const requiresKYOFinanceMetadata =
+        requiresKYOFinanceSwapMetadata || requiresKYOFinanceLpMetadata;
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -178,6 +187,7 @@ const useQuestActionMultiFormsState = ({
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
         requires_kyo_finance_swap_metadata: requiresKYOFinanceSwapMetadata,
+        requires_kyo_finance_lp_metadata: requiresKYOFinanceLpMetadata,
       };
 
       // set fixed action repitition per certain actions

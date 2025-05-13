@@ -17,6 +17,7 @@ export const actionCopies = {
     ['MembershipsRefreshed']: 'Join a Group',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
     ['KyoFinanceSwapQuestVerified']: 'Complete a token swap on Kyo Finance',
+    ['KyoFinanceLpQuestVerified']: 'Provide liquidity to a Kyo Finance pool',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: '',
@@ -35,6 +36,8 @@ export const actionCopies = {
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
     ['KyoFinanceSwapQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
+    ['KyoFinanceLpQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
   },
   explainer: {
@@ -108,6 +111,40 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['KyoFinanceLpQuestVerified']: (
+      chainId?: number,
+      poolAddresses?: string[],
+      minUSDValues?: string[],
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Must be completed on{' '}
+            {chainId === 1868 ? 'Soneium Mainnet' : 'Soneium Testnet'}.
+          </li>
+          {/* eslint-disable-next-line react/destructuring-assignment */}
+          {poolAddresses &&
+            minUSDValues &&
+            // eslint-disable-next-line react/destructuring-assignment
+            poolAddresses.length > 0 &&
+            minUSDValues.length > 0 && (
+              <li>
+                {/* eslint-disable-next-line react/destructuring-assignment */}●
+                Minimum liquidity required:{' '}
+                {/* eslint-disable-next-line react/destructuring-assignment */}
+                {poolAddresses
+                  .map((a, i) => `${a} = ${minUSDValues[i]} USD`)
+                  .join(', ')}
+                .
+              </li>
+            )}
+          <li>
+            ● Aura is awarded once the liquidity provision is verified on-chain.
+          </li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -125,5 +162,6 @@ export const actionCopies = {
     ['MembershipsRefreshed']: '',
     ['LaunchpadTokenCreated']: '',
     ['KyoFinanceSwapQuestVerified']: '',
+    ['KyoFinanceLpQuestVerified']: '',
   },
 };

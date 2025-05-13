@@ -87,6 +87,12 @@ export const doesActionRequireKYOFinanceSwapMetadata = (
   return action === 'KyoFinanceSwapQuestVerified';
 };
 
+export const doesActionRequireKYOFinanceLpMetadata = (
+  action: QuestActionType,
+) => {
+  return action === 'KyoFinanceLpQuestVerified';
+};
+
 const convertTimeRemainingToLabel = ({
   days,
   hours,

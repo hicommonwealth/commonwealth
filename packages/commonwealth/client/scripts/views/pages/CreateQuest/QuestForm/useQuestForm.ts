@@ -1,4 +1,5 @@
 import {
+  KyoFinanceLpQuestRequestParams,
   KyoFinanceSwapQuestRequestParams,
   QuestParticipationLimit,
   QuestParticipationPeriod,
@@ -16,6 +17,7 @@ import {
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceLpMetadata,
   doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -57,6 +59,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
       'KyoFinanceSwapQuestVerified',
+      'KyoFinanceLpQuestVerified',
     ] as QuestAction[],
     channel: ['TweetEngagement'] as QuestAction[],
   };
@@ -135,6 +138,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_start_link: doesActionRequireStartLink(chosenAction),
                   requires_kyo_finance_swap_metadata:
                     doesActionRequireKYOFinanceSwapMetadata(chosenAction),
+                  requires_kyo_finance_lp_metadata:
+                    doesActionRequireKYOFinanceLpMetadata(chosenAction),
                 },
               };
             }),
@@ -247,6 +252,17 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (!subForm.values?.metadata?.chainId) return null;
 
         switch (subForm.values.action) {
+          case 'KyoFinanceLpQuestVerified': {
+            return {
+              chainId: subForm.values.metadata.chainId,
+              poolAddresses: subForm.values.metadata.poolAddresses
+                ?.split(',')
+                .map((x) => x.trim()),
+              minUSDValues: subForm.values.metadata.minUSDValues
+                ?.split(',')
+                .map((x) => x.trim()),
+            } as z.infer<typeof KyoFinanceLpQuestRequestParams>;
+          }
           case 'KyoFinanceSwapQuestVerified': {
             return {
               chainId: subForm.values.metadata.chainId,

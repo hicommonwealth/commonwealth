@@ -2,6 +2,7 @@ import React from 'react';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { KyoFinanceChainIdsType } from '../../types';
 import { SpecialCaseDynamicFieldsProps } from '../types';
+import KYOFinanceLpFields from './KYOFinanceLpFields';
 import KYOFinanceSwapFields from './KYOFinanceSwapFields';
 
 const KYOFinanceFields = ({
@@ -34,7 +35,9 @@ const KYOFinanceFields = ({
         name="metadata-chainId"
         label="KYO Chain Node"
         placeholder="Select a KYO supported chain node"
-        containerClassname="span-3"
+        containerClassname={
+          config?.requires_kyo_finance_lp_metadata ? 'span-6' : 'span-3'
+        }
         options={communityChainNodeSelectInputOptions}
         onChange={(newValue) =>
           onChange?.({
@@ -58,6 +61,12 @@ const KYOFinanceFields = ({
         customError={errors?.metadata?.chainId}
       />
       <KYOFinanceSwapFields
+        defaultValues={defaultValues}
+        errors={errors}
+        onChange={onChange}
+        config={config}
+      />
+      <KYOFinanceLpFields
         defaultValues={defaultValues}
         errors={errors}
         onChange={onChange}

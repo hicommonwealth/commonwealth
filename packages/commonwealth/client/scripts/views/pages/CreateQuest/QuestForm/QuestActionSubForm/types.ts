@@ -45,6 +45,9 @@ export type QuestActionSubFormErrors = {
     minOutputAmount?: string;
     minTimestamp?: string;
     minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
   };
 };
 
@@ -77,6 +80,9 @@ export type QuestActionSubFormFields = {
     minOutputAmount?: string;
     minTimestamp?: string;
     minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
   } | null;
 };
 
@@ -92,6 +98,7 @@ export type QuestActionSubFormConfig = {
   requires_group_id: boolean;
   requires_start_link: boolean;
   requires_kyo_finance_swap_metadata: boolean;
+  requires_kyo_finance_lp_metadata: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {
