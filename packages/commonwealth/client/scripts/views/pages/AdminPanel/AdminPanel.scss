@@ -110,6 +110,28 @@
     gap: 12px !important;
   }
 
+  .CommunityTagsManagementTask {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    .top-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .search-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-content {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  }
+
   .danger {
     color: $rorange-600;
   }

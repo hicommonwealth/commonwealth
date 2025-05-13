@@ -72,7 +72,6 @@ const CommunityTagsManagementTask = () => {
     }
   };
 
-  // Create a new tag
   const handleCreateTag = async () => {
     if (!newTagName.trim()) {
       notifyError('Tag name cannot be empty');
@@ -89,7 +88,6 @@ const CommunityTagsManagementTask = () => {
     }
   };
 
-  // Update an existing tag
   const handleUpdateTag = async () => {
     if (!editingTag || !editingTag.name.trim()) {
       notifyError('Tag name cannot be empty');
@@ -106,7 +104,6 @@ const CommunityTagsManagementTask = () => {
     }
   };
 
-  // Delete a tag with confirmation
   const handleDeleteTag = (tag: Tag) => {
     openConfirmation({
       title: 'Delete Tag',
@@ -139,7 +136,6 @@ const CommunityTagsManagementTask = () => {
     });
   };
 
-  // View communities using a tag
   const handleViewTagUsage = async (tag: Tag) => {
     try {
       const usage = await getTagUsage(tag.id!);
@@ -151,7 +147,6 @@ const CommunityTagsManagementTask = () => {
     }
   };
 
-  // Table columns configuration
   const columns = [
     {
       id: 'name',
@@ -227,15 +222,15 @@ const CommunityTagsManagementTask = () => {
   ];
 
   return (
-    <div className="TaskGroup">
-      <CWText type="h4">Community Tags Management</CWText>
-      <CWText type="caption">
-        Create, edit, and manage tags that can be applied to communities for
-        better categorization and discoverability.
-      </CWText>
+    <>
+      <div className="TaskGroup CommunityTagsManagementTask">
+        <CWText type="h4">Community Tags Management</CWText>
+        <CWText type="caption">
+          Create, edit, and manage tags that can be applied to communities for
+          better categorization and discoverability.
+        </CWText>
 
-      <div style={{ marginTop: '16px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+        <div className="top-row">
           <CWTextInput
             value={newTagName}
             onInput={(e) => setNewTagName(e.target.value)}
@@ -248,13 +243,7 @@ const CommunityTagsManagementTask = () => {
           />
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: '16px',
-          }}
-        >
+        <div className="search-row">
           <CWTextInput
             value={searchTerm}
             onInput={(e) => setSearchTerm(e.target.value)}
@@ -276,7 +265,7 @@ const CommunityTagsManagementTask = () => {
           open={showUsageModal}
           onClose={() => setShowUsageModal(false)}
           content={
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <div className="modal-content">
               {tagUsage.communities.length === 0 ? (
                 <CWText>No communities are using this tag.</CWText>
               ) : (
@@ -298,7 +287,7 @@ const CommunityTagsManagementTask = () => {
           }
         />
       )}
-    </div>
+    </>
   );
 };
 
