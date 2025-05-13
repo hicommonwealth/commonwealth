@@ -23,6 +23,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
   ContentType,
+  GatedActionEnum,
   ZERO_ADDRESS,
   formatDecimalToWei,
   generateTopicIdentifiersFromUrl,
@@ -41,9 +42,11 @@ import { saveToClipboard } from 'utils/clipboard';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
+import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
@@ -86,6 +89,7 @@ const DiscussionsPage = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -126,6 +130,12 @@ const DiscussionsPage = () => {
   const topicId = topicObj?.id;
 
   const user = useUserStore();
+
+  const { data: groups = [] } = useFetchGroupsQuery({
+    communityId,
+    includeTopics: true,
+    enabled: !!communityId,
+  });
 
   const { memberships, topicPermissions } = useTopicGating({
     communityId: communityId,
@@ -327,6 +337,16 @@ const DiscussionsPage = () => {
                 </>
               ),
             }}
+          />
+        )}
+
+        {canShowGatingBanner && (
+          <CWGatedTopicBanner
+            actions={Object.values(GatedActionEnum)}
+            groups={groups}
+            memberships={memberships}
+            topicId={topicId}
+            onClose={() => setCanShowGatingBanner(false)}
           />
         )}
 

@@ -32,7 +32,6 @@ import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProp
 import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import ContestThreadBanner from './ContestThreadBanner';
 
@@ -594,7 +593,7 @@ export const NewThreadForm = () => {
                   />
                 )}
 
-                {isRestrictedMembership && canShowGatingBanner && (
+                {canShowGatingBanner && (
                   <div>
                     <CWGatedTopicBanner
                       actions={[GatedActionEnum.CREATE_THREAD]}
@@ -605,20 +604,6 @@ export const NewThreadForm = () => {
                     />
                   </div>
                 )}
-
-                {canShowTopicPermissionBanner &&
-                  foundTopicPermissions &&
-                  !isAdmin &&
-                  !foundTopicPermissions?.permissions?.includes(
-                    GatedActionEnum.CREATE_THREAD,
-                  ) && (
-                    <CWGatedTopicPermissionLevelBanner
-                      topicPermissions={
-                        foundTopicPermissions?.permissions as GatedActionEnum[]
-                      }
-                      onClose={() => setCanShowTopicPermissionBanner(false)}
-                    />
-                  )}
               </div>
             </div>
             <>

@@ -80,7 +80,6 @@ import { ImageActionCard } from '../ImageActionCard/ImageActionCard';
 import { ImageActionModal } from '../ImageActionModal/ImageActionModal';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
 import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -1124,7 +1123,7 @@ export const NewThreadForm = forwardRef<
                   />
                 )}
 
-                {isRestrictedMembership && canShowGatingBanner && (
+                {canShowGatingBanner && (
                   <div>
                     <CWGatedTopicBanner
                       actions={[GatedActionEnum.CREATE_THREAD]}
@@ -1135,20 +1134,6 @@ export const NewThreadForm = forwardRef<
                     />
                   </div>
                 )}
-
-                {canShowTopicPermissionBanner &&
-                  foundTopicPermissions &&
-                  !isAdmin &&
-                  !foundTopicPermissions?.permissions?.includes(
-                    GatedActionEnum.CREATE_THREAD,
-                  ) && (
-                    <CWGatedTopicPermissionLevelBanner
-                      topicPermissions={
-                        foundTopicPermissions?.permissions as GatedActionEnum[]
-                      }
-                      onClose={() => setCanShowTopicPermissionBanner(false)}
-                    />
-                  )}
               </div>
             </div>
             <>
