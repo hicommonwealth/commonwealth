@@ -142,7 +142,14 @@ const SearchPage = () => {
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
-    ...sharedQueryOptions,
+    ...{
+      community_id: sharedQueryOptions.communityId,
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: sharedQueryOptions.orderBy,
+      order_direction: sharedQueryOptions.orderDirection,
+    },
     enabled:
       activeTab === SearchScope.Replies &&
       sharedQueryOptions?.searchTerm?.length > 3,
