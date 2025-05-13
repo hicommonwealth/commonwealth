@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import './ProfileActivity.scss';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
@@ -23,6 +24,8 @@ type ProfileActivityProps = {
 };
 
 const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
+  const newProfilePageEnabled = useFlag('newProfilePage');
+
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
   );
@@ -58,18 +61,20 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
-          <CWTab
-            label={
-              <div className="tab-header">
-                Communities
-                <div className="count">{user.communities.length}</div>
-              </div>
-            }
-            onClick={() => {
-              setSelectedActivity(ProfileActivityType.Communities);
-            }}
-            isSelected={selectedActivity === ProfileActivityType.Communities}
-          />
+          {newProfilePageEnabled && (
+            <CWTab
+              label={
+                <div className="tab-header">
+                  Communities
+                  <div className="count">{user.communities.length}</div>
+                </div>
+              }
+              onClick={() => {
+                setSelectedActivity(ProfileActivityType.Communities);
+              }}
+              isSelected={selectedActivity === ProfileActivityType.Communities}
+            />
+          )}
         </CWTabsRow>
       </div>
       <div
