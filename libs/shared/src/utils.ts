@@ -77,6 +77,8 @@ export const generateTopicIdentifiersFromUrl = (url: string) => {
   return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
 };
 
+export const DISALLOWED_TOPIC_NAMES_REGEX = /["<>%{}|\\/^`?]/g;
+
 export const sanitizeTopicName = (name: string) => {
   return name.replaceAll(`?`, '');
 };

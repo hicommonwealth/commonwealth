@@ -1,3 +1,4 @@
+import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
@@ -15,7 +16,7 @@ export const Topic = z.object({
     .max(255)
     .default('General')
     .refine(
-      (v) => !v.match(/["<>%{}|\\/^`]/g),
+      (v) => !v.match(DISALLOWED_TOPIC_NAMES_REGEX),
       'Name must not contain special characters',
     ),
   community_id: z.string().max(255),
