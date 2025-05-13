@@ -99,9 +99,12 @@ export const getCSVContent = async ({ id }: { id: string }) => {
 };
 
 export const getTopUsersList = async () => {
-  const res = await axios.get(`${SERVER_URL}/admin/top-users`, {
+  const res = await axios.get(`${SERVER_URL}/internal/GetTopUsers`, {
     params: {
       jwt: userStore.getState().jwt,
+    },
+    headers: {
+      address: userStore.getState().activeAccount?.address || '',
     },
   });
   return res.data.result;
