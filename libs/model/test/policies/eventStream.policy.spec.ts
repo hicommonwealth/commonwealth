@@ -366,13 +366,6 @@ describe('EventStream Policy Integration Tests', () => {
             launchpad_liquidity: 1n,
             eth_market_cap_target: 1000,
           },
-          launchpadLiquidity: 1n,
-          poolLiquidity: 1n,
-          curveId: 1n,
-          scalar: 1n,
-          reserveRation: 1n,
-          LPhook: '0x123',
-          funded: true,
         } satisfies z.infer<typeof events.LaunchpadTokenGraduated>),
       },
     ];
