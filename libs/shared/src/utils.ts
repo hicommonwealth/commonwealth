@@ -77,11 +77,16 @@ export const generateTopicIdentifiersFromUrl = (url: string) => {
   return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
 };
 
+export const sanitizeTopicName = (name: string) => {
+  return name.replaceAll(`?`, '');
+};
+
 export const generateUrlPartForTopicIdentifiers = (
   topicId: string | number | undefined,
   topicName: string,
 ) => {
-  return topicId ? `${topicId}-${topicName}` : `${topicName}`;
+  const _topicName = sanitizeTopicName(topicName);
+  return topicId ? `${topicId}-${_topicName}` : `${_topicName}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
