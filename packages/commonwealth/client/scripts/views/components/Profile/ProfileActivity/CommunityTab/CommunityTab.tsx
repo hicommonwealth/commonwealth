@@ -6,6 +6,7 @@ import { CWTable } from '../../../component_kit/new_designs/CWTable';
 import { CommunityStake } from './CommunityStake/CommunityStake';
 import './CommunityTab.scss';
 import { LastActive } from './LastActive/LastActive';
+import { Role } from './Role/Role';
 
 export const CommunityTab = () => {
   const user = useUserStore();
@@ -14,6 +15,12 @@ export const CommunityTab = () => {
     {
       key: 'name',
       header: 'Community',
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'role',
+      header: 'Role',
       numeric: false,
       sortable: true,
     },
@@ -34,13 +41,14 @@ export const CommunityTab = () => {
   const rowData = user.communities.map((community) => ({
     name: community.name,
     stake: <CommunityStake communityId={community.id} />,
+    role: <Role communityId={community.id} />,
+    lastActive: <LastActive communityId={community.id} />,
     avatars: {
       name: {
         avatarUrl: community.iconUrl,
         address: null,
       },
     },
-    lastActive: <LastActive communityId={community.id} />,
   }));
 
   return (
