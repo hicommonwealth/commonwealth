@@ -9,7 +9,7 @@ import {
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config, models } from '@hicommonwealth/model';
+import { config, emitEvent, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { mustExist } from '../../middleware';
 
@@ -110,6 +110,23 @@ export async function handleCapReached(
       log.debug(`Liquidity transferred to ${token_address}`);
     }
 
-    await token.save();
+    await models.sequelize.transaction(async (transaction) => {
+      if (token.liquidity_transferred) {
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: 'LaunchpadTokenGraduated',
+              event_payload: {
+                token: token.toJSON(),
+                ...onChainTokenData,
+              },
+            },
+          ],
+          transaction,
+        );
+      }
+      await token.save({ transaction });
+    });
   }
 }
