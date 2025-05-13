@@ -148,7 +148,7 @@ class CommunityStakes extends ContractBase {
       data: calldata,
     });
     const totalPrice = specificWeb3.eth.abi
-      .decodeParameter('uint256', result)
+      .decodeParameter('uint256', result as string)
       .toString();
 
     const maxFeePerGasEst = await this.estimateGas();
