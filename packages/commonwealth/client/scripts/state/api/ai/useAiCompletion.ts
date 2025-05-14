@@ -40,12 +40,15 @@ export const useAiCompletion = () => {
         } = {
           prompt: userPrompt,
           model: options?.model || 'gpt-4o',
-          temperature: options?.temperature,
           maxTokens: options?.maxTokens,
           stream: streamMode,
           useOpenRouter: options?.useOpenRouter,
           jwt: userStore.getState().jwt,
         };
+
+        if (typeof options?.temperature === 'number') {
+          requestBody.temperature = options.temperature;
+        }
 
         if (options?.systemPrompt) {
           requestBody.systemPrompt = options.systemPrompt;

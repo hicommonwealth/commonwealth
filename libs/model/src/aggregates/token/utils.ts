@@ -95,6 +95,9 @@ export async function handleCapReached(
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
 
+      token.liquidity_transferred = true;
+      log.debug(`Liquidity transferred to ${token_address}`);
+
       if (notifyUsers.length > 0) {
         await provider.triggerWorkflow({
           key: WorkflowKeys.LaunchpadCapReached,
@@ -105,9 +108,6 @@ export async function handleCapReached(
           },
         });
       }
-
-      token.liquidity_transferred = true;
-      log.debug(`Liquidity transferred to ${token_address}`);
     }
 
     await models.sequelize.transaction(async (transaction) => {
@@ -119,7 +119,6 @@ export async function handleCapReached(
               event_name: 'LaunchpadTokenGraduated',
               event_payload: {
                 token: token.toJSON(),
-                ...onChainTokenData,
               },
             },
           ],
