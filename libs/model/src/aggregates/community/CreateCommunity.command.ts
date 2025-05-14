@@ -16,7 +16,6 @@ import {
   mustBeSuperAdmin,
   mustExist,
   tiered,
-  turnstile,
 } from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
@@ -58,7 +57,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
     auth: [
       authVerified(),
       tiered({ creates: true }),
-      turnstile({ widgetName: 'create-community' }),
+      // turnstile({ widgetName: 'create-community' }),
     ],
     body: async ({ actor, payload }) => {
       const {
