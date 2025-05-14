@@ -60,6 +60,7 @@ export function CreateContestManagerMetadata(): Command<
               image_url: rest.image_url || getDefaultContestImage(),
               environment: config.APP_ENV,
               farcaster_author_cast_hash: undefined,
+              namespace_judges: [actor.address!],
             },
             { transaction },
           );

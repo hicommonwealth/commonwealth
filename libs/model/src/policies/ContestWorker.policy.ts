@@ -154,13 +154,9 @@ export function ContestWorker(): Policy<typeof inputs> {
 
         const allowedContestManagers = contestManagers.filter(
           (contestManager) => {
-            // if judged contest, only allow judge or contest creator to vote
+            // if judged contest, only allow judge
             if (contestManager.namespace_judge_token_id) {
-              const validAddresses = [
-                ...(contestManager.namespace_judges || []),
-                contestManager.creator_address,
-              ];
-              const isJudge = validAddresses
+              const isJudge = (contestManager.namespace_judges || [])
                 .map((addr) => addr.toLowerCase())
                 .includes(payload.address!.toLowerCase());
               if (!isJudge) {
