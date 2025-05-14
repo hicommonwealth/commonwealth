@@ -10,17 +10,22 @@ import {
 } from 'client/scripts/state/api/communities';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import { CWRadioButton } from 'client/scripts/views/components/component_kit/new_designs/cw_radio_button';
-import React, { useState } from 'react';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
+import {
+  CWTab,
+  CWTabsRow,
+} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
+import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { AddressItem, RadioOption } from './AddressItem';
 import './ManageOnchainModal.scss';
 import { AddressInfo } from './MembersSection';
 
@@ -33,6 +38,11 @@ type ManageOnchainModalProps = {
   ethChainId: number;
   chainId: string;
   communityNamespace: boolean;
+};
+
+type ContestOption = {
+  label: string;
+  value: string;
 };
 
 export const ManageOnchainModal = ({
@@ -48,16 +58,46 @@ export const ManageOnchainModal = ({
   const [userRole, setUserRole] = useState(Addresses);
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [activeTab, setActiveTab] = useState('adminId');
+  const [selectedContest, setSelectedContest] = useState<ContestOption | null>(
+    null,
+  );
   const { mutateAsync: updateRole } = useUpdateRoleMutation();
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
 
-  // Get community data to determine chain base
+  const { contestsData, isContestDataLoading } = useCommunityContests({
+    shouldPolling: false,
+    fetchAll: false,
+  });
+
   const { data: community } = useGetCommunityByIdQuery({
     id: chainId,
     enabled: !!chainId,
   });
+
+  const contestOptions = useMemo<ContestOption[]>(() => {
+    const allOptions: ContestOption[] = [];
+
+    if (contestsData?.active && contestsData.active.length > 0) {
+      contestsData.active.forEach((contest) => {
+        console.log(contest);
+        if (contest.contests) {
+          contest.contests.forEach(() => {
+            allOptions.push({
+              label: contest.name || '',
+              value: contest.contest_address || '',
+            });
+          });
+        }
+      });
+    }
+
+    return allOptions;
+  }, [contestsData]);
+
+  const hasActiveContests = contestOptions.length > 0;
 
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
@@ -148,6 +188,18 @@ export const ManageOnchainModal = ({
     }
   };
 
+  const handleContestSelect = (option: ContestOption) => {
+    setSelectedContest(option);
+    setHasChanges(true);
+  };
+
+  const getRadioOptions = (address: AddressInfo): RadioOption[] => {
+    return [
+      { label: 'Admin', value: 'admin', checked: address.role === 'admin' },
+      { label: 'Member', value: 'member', checked: address.role === 'member' },
+    ];
+  };
+
   return (
     <div className="ManageOnchainModal">
       <CWModalHeader
@@ -156,35 +208,50 @@ export const ManageOnchainModal = ({
         onModalClose={onClose}
       />
       <CWModalBody>
-        <div className="address-list">
-          {userRole?.map((address) => (
-            <div key={address.id} className="address-item">
-              <div className="address-info">
-                <CWTag
-                  label={formatAddressShort(address.address)}
-                  type="address"
-                  iconName={getChainIcon(address, community?.base)}
-                />
-              </div>
-              <div className="role-selection">
-                <CWRadioButton
-                  label="Admin"
-                  name={`role-${address.id}`}
-                  value="admin"
-                  checked={address.role === 'admin'}
-                  onChange={() => handleRoleChange(address.id, 'admin')}
-                />
-                <CWRadioButton
-                  label="Member"
-                  name={`role-${address.id}`}
-                  value="member"
-                  checked={address.role === 'member'}
-                  onChange={() => handleRoleChange(address.id, 'member')}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+        <CWTabsRow>
+          <CWTab
+            label="Admin ID"
+            isSelected={activeTab === 'adminId'}
+            onClick={() => setActiveTab('adminId')}
+          />
+          <CWTab
+            label="Judged Contest"
+            isSelected={activeTab === 'judgedContest'}
+            onClick={() => setActiveTab('judgedContest')}
+          />
+        </CWTabsRow>
+
+        {activeTab === 'adminId' && (
+          <div className="address-list">
+            {userRole?.map((address) => (
+              <AddressItem
+                key={address.id}
+                address={address}
+                communityBase={community?.base}
+                radioOptions={getRadioOptions(address)}
+                onRoleChange={handleRoleChange}
+              />
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'judgedContest' && (
+          <div className="judged-contest-content">
+            {isContestDataLoading ? (
+              <CWText type="b1">Loading contests...</CWText>
+            ) : hasActiveContests ? (
+              <CWSelectList
+                label="Select Contest to Judge"
+                options={contestOptions}
+                value={selectedContest}
+                onChange={handleContestSelect}
+                placeholder="Select a contest..."
+              />
+            ) : (
+              <CWText type="b1">No active contests available.</CWText>
+            )}
+          </div>
+        )}
       </CWModalBody>
       <CWModalFooter>
         <CWButton
