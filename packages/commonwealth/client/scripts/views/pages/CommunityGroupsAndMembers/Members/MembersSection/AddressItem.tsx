@@ -1,5 +1,6 @@
 import { formatAddressShort } from 'client/scripts/helpers';
 import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { CWRadioButton } from 'client/scripts/views/components/component_kit/new_designs/cw_radio_button';
 import React from 'react';
@@ -10,23 +11,30 @@ export type RadioOption = {
   label: string;
   value: string;
   checked: boolean;
+  disabled?: boolean;
+};
+
+export type CheckboxOption = {
+  label: string;
+  value: string;
+  checked: boolean;
+  disabled?: boolean;
 };
 
 interface AddressItemProps {
   address: AddressInfo;
   communityBase?: string;
   radioOptions?: RadioOption[];
-  onRoleChange: (id: number, role: string) => void;
+  checkboxOptions?: CheckboxOption[];
+  onChange: (id: number, value: string) => void;
 }
 
 export const AddressItem: React.FC<AddressItemProps> = ({
   address,
   communityBase,
-  radioOptions = [
-    { label: 'Admin', value: 'admin', checked: address.role === 'admin' },
-    { label: 'Member', value: 'member', checked: address.role === 'member' },
-  ],
-  onRoleChange,
+  radioOptions = [],
+  checkboxOptions = [],
+  onChange,
 }) => {
   return (
     <div className="AddressItemRow">
@@ -45,7 +53,18 @@ export const AddressItem: React.FC<AddressItemProps> = ({
             name={`role-${address.id}`}
             value={option.value}
             checked={option.checked}
-            onChange={() => onRoleChange(address.id, option.value)}
+            disabled={option.disabled}
+            onChange={() => onChange(address.id, option.value)}
+          />
+        ))}
+        {checkboxOptions.map((option) => (
+          <CWCheckbox
+            key={option.value}
+            label={option.label}
+            value={option.value}
+            checked={option.checked}
+            disabled={option.disabled}
+            onChange={() => onChange(address.id, option.value)}
           />
         ))}
       </div>

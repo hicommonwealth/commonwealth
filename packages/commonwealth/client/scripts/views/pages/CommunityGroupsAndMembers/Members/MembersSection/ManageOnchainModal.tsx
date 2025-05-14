@@ -25,7 +25,7 @@ import {
 import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
-import { AddressItem, RadioOption } from './AddressItem';
+import { AddressItem, CheckboxOption, RadioOption } from './AddressItem';
 import './ManageOnchainModal.scss';
 import { AddressInfo } from './MembersSection';
 
@@ -56,6 +56,7 @@ export const ManageOnchainModal = ({
   communityNamespace,
 }: ManageOnchainModalProps) => {
   const [userRole, setUserRole] = useState(Addresses);
+  const [judgeRoles, setJudgeRoles] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('adminId');
@@ -97,6 +98,14 @@ export const ManageOnchainModal = ({
     return allOptions;
   }, [contestsData]);
 
+  const selectedContestData = useMemo(() => {
+    if (!selectedContest?.value || !contestsData?.active) return null;
+
+    return contestsData.active.find(
+      (contest) => contest.contest_address === selectedContest.value,
+    );
+  }, [selectedContest, contestsData]);
+
   const hasActiveContests = contestOptions.length > 0;
 
   const handleRoleChange = (id: number, newRole: string) => {
@@ -109,6 +118,15 @@ export const ManageOnchainModal = ({
         return user;
       }),
     );
+  };
+
+  const handleJudgeRoleChange = (id: number, address: string) => {
+    setJudgeRoles((prev) => {
+      const isCurrentlyChecked = prev[address];
+      const newState = { ...prev, [address]: !isCurrentlyChecked };
+      setHasChanges(true);
+      return newState;
+    });
   };
 
   const updateRolesOnServer = async () => {
@@ -180,6 +198,12 @@ export const ManageOnchainModal = ({
     try {
       if (communityNamespace) await mintPermission();
       await updateRolesOnServer();
+
+      // Here you would add logic to update judges for the selected contest
+      if (selectedContest && Object.keys(judgeRoles).length > 0) {
+        // API call to update judges would go here
+        console.log('Updating judges:', judgeRoles);
+      }
     } catch (err) {
       console.error(err);
       notifyError('Minting failed, permissions were not updated.');
@@ -197,6 +221,21 @@ export const ManageOnchainModal = ({
     return [
       { label: 'Admin', value: 'admin', checked: address.role === 'admin' },
       { label: 'Member', value: 'member', checked: address.role === 'member' },
+    ];
+  };
+
+  const getJudgeCheckboxOptions = (address: AddressInfo): CheckboxOption[] => {
+    const isAlreadyJudge = !!selectedContestData?.namespace_judges?.includes(
+      address.address,
+    );
+
+    return [
+      {
+        label: 'Judge',
+        value: 'judge',
+        checked: isAlreadyJudge || !!judgeRoles[address.address],
+        disabled: isAlreadyJudge,
+      },
     ];
   };
 
@@ -229,7 +268,7 @@ export const ManageOnchainModal = ({
                 address={address}
                 communityBase={community?.base}
                 radioOptions={getRadioOptions(address)}
-                onRoleChange={handleRoleChange}
+                onChange={handleRoleChange}
               />
             ))}
           </div>
@@ -240,13 +279,31 @@ export const ManageOnchainModal = ({
             {isContestDataLoading ? (
               <CWText type="b1">Loading contests...</CWText>
             ) : hasActiveContests ? (
-              <CWSelectList
-                label="Select Contest to Judge"
-                options={contestOptions}
-                value={selectedContest}
-                onChange={handleContestSelect}
-                placeholder="Select a contest..."
-              />
+              <>
+                <CWSelectList
+                  label="Select Contest to Judge"
+                  options={contestOptions}
+                  value={selectedContest}
+                  onChange={handleContestSelect}
+                  placeholder="Select a contest..."
+                />
+
+                {selectedContest && (
+                  <div className="address-list" style={{ marginTop: '16px' }}>
+                    {userRole?.map((address) => (
+                      <AddressItem
+                        key={address.id}
+                        address={address}
+                        communityBase={community?.base}
+                        checkboxOptions={getJudgeCheckboxOptions(address)}
+                        onChange={(id) =>
+                          handleJudgeRoleChange(id, address.address)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <CWText type="b1">No active contests available.</CWText>
             )}
