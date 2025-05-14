@@ -183,6 +183,10 @@ const eventStreamMappers: EventStreamMappers = {
     };
   },
   LaunchpadTokenTraded: async (payload) => {
+    // TODO: the LaunchpadToken usually hasn't been projected by this point,
+    // so only the transaction data is available. Refactor to use tokenData
+    // and make sure bigint is serialized correctly, then re-enable in policy.
+
     const launchpadToken = await models.LaunchpadToken.findOne({
       where: { token_address: payload.token_address },
     });
@@ -266,9 +270,9 @@ export function EventStreamPolicy(): Policy<{
         );
       },
       LaunchpadTokenTraded: async ({ payload }) => {
-        await pushToEventStream(
-          await eventStreamMappers.LaunchpadTokenTraded(payload),
-        );
+        // await pushToEventStream(
+        //   await eventStreamMappers.LaunchpadTokenTraded(payload),
+        // );
       },
       LaunchpadTokenGraduated: async ({ payload }) => {
         await pushToEventStream(
