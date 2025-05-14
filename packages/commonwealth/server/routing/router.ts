@@ -47,15 +47,12 @@ import * as controllers from '../controller';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 
-import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
-import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
-import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
@@ -72,7 +69,6 @@ import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
   communities: ServerCommunitiesController;
-  admin: ServerAdminController;
 };
 
 function setupRouter(
@@ -82,13 +78,9 @@ function setupRouter(
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
-  // controllers
   const serverControllers: ServerControllers = {
     communities: new ServerCommunitiesController(models),
-    admin: new ServerAdminController(models),
   };
-
-  // ---
 
   const router = express.Router();
   router.use(useragent.express());
@@ -189,22 +181,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     starCommunity.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/admin/analytics',
-    passport.authenticate('jwt', { session: false }),
-    getStatsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/admin/top-users',
-    passport.authenticate('jwt', { session: false }),
-    getTopUsersHandler.bind(this, serverControllers),
   );
 
   registerRoute(

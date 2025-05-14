@@ -1,86 +1,25 @@
-import axios from 'axios';
-import { notifyError } from 'controllers/app/notifications';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
+import useGetStatsQuery from 'client/scripts/state/api/superAdmin/getStats';
 import React, { useState } from 'react';
-import { SERVER_URL } from 'state/api/config';
-import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
 
-type Stats = {
-  numCommentsLastMonth: number;
-  numThreadsLastMonth: number;
-  numPollsLastMonth: number;
-  numReactionsLastMonth: number;
-  numProposalVotesLastMonth: number;
-  numMembersLastMonth: number;
-  numGroupsLastMonth: number;
-  averageAddressesPerCommunity: number;
-  populatedCommunities: number;
-};
-
 const Analytics = () => {
-  const [initialized, setInitialized] = useState<boolean>(false);
-  const [lastMonthNewCommunties, setLastMonthNewCommunities] = useState<
-    { id: string; created_at: string }[]
-  >([]);
-  const [globalStats, setGlobalStats] = useState<Stats>();
-  const [communityLookupCompleted, setCommunityLookupCompleted] =
-    useState<boolean>(false);
-  const [communityAnalytics, setCommunityAnalytics] = useState<Stats>();
-  const user = useUserStore();
+  const { data: globalStats, isLoading: globalStatsLoading } =
+    useGetStatsQuery(ALL_COMMUNITIES);
+  const [selectedCommunityId, setSelectedCommunityId] = useState('');
+  const { data: communityAnalytics, isLoading: communityAnalyticsLoading } =
+    useGetStatsQuery(selectedCommunityId);
 
-  const getCommunityAnalytics = (communityId: string) => {
-    axios
-      .get(`${SERVER_URL}/admin/analytics?community_id=${communityId}`, {
-        params: {
-          auth: true,
-          jwt: user.jwt,
-        },
-      })
-      .then((response) => {
-        setCommunityLookupCompleted(true);
-        setCommunityAnalytics(response.data.result.totalStats);
-      })
-      .catch((error) => {
-        console.log(error);
-        notifyError('Error fetching community analytics');
-      });
-  };
-
-  useNecessaryEffect(() => {
-    // Fetch global analytics on load
-    const fetchAnalytics = async () => {
-      axios
-        .get(`${SERVER_URL}/admin/analytics`, {
-          params: {
-            auth: true,
-            jwt: user.jwt,
-          },
-        })
-        .then((response) => {
-          setLastMonthNewCommunities(
-            response.data.result.lastMonthNewCommunities,
-          );
-          setGlobalStats(response.data.result.totalStats);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-
-    if (!initialized) {
-      fetchAnalytics().then(() => {
-        setInitialized(true);
-      });
-    }
-  }, [initialized]);
+  function getCommunityAnalytics(community_id: string) {
+    setSelectedCommunityId(community_id);
+  }
 
   return (
     <div className="Analytics">
-      {!initialized ? (
+      {globalStatsLoading ? (
         <CWCircleMultiplySpinner />
       ) : (
         <>
@@ -94,43 +33,43 @@ const Analytics = () => {
               <div className="Stat">
                 <CWText fontWeight="medium">Total Threads</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numThreadsLastMonth}
+                  {globalStats?.totalStats.numThreadsLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total Comments</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numCommentsLastMonth}
+                  {globalStats?.totalStats.numCommentsLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total Reactions</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numReactionsLastMonth}
+                  {globalStats?.totalStats.numReactionsLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total Polls</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numPollsLastMonth}
+                  {globalStats?.totalStats.numPollsLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total Votes</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numProposalVotesLastMonth}
+                  {globalStats?.totalStats.numProposalVotesLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total New Addresses</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numMembersLastMonth}
+                  {globalStats?.totalStats.numMembersLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
                 <CWText fontWeight="medium">Total New Groups</CWText>
                 <CWText className="StatValue">
-                  {globalStats?.numGroupsLastMonth}
+                  {globalStats?.totalStats.numGroupsLastMonth}
                 </CWText>
               </div>
               <div className="Stat">
@@ -138,8 +77,9 @@ const Analytics = () => {
                   Average Addresses Per Community
                 </CWText>
                 <CWText className="StatValue">
-                  {/*@ts-expect-error StrictNullChecks*/}
-                  {Math.round(globalStats?.averageAddressesPerCommunity)}
+                  {Math.round(
+                    globalStats?.totalStats?.averageAddressesPerCommunity || 0,
+                  )}
                 </CWText>
               </div>
               <div className="Stat">
@@ -147,8 +87,9 @@ const Analytics = () => {
                   {'Total Communities with > 2 addresses'}
                 </CWText>
                 <CWText className="StatValue">
-                  {/* @ts-expect-error StrictNullChecks*/}
-                  {Math.round(globalStats?.populatedCommunities)}
+                  {Math.round(
+                    globalStats?.totalStats?.populatedCommunities || 0,
+                  )}
                 </CWText>
               </div>
             </div>
@@ -162,48 +103,48 @@ const Analytics = () => {
               ctaLabel="Search"
               onAction={getCommunityAnalytics}
             />
-            {communityAnalytics && communityLookupCompleted && (
+            {communityAnalytics && !communityAnalyticsLoading && (
               <div className="Stats">
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Threads</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numThreadsLastMonth}
+                    {communityAnalytics?.totalStats.numThreadsLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Comments</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numCommentsLastMonth}
+                    {communityAnalytics?.totalStats.numCommentsLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Reactions</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numReactionsLastMonth}
+                    {communityAnalytics?.totalStats.numReactionsLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Polls</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numPollsLastMonth}
+                    {communityAnalytics?.totalStats.numPollsLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Votes</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numProposalVotesLastMonth}
+                    {communityAnalytics?.totalStats.numProposalVotesLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total New Addresses</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numMembersLastMonth}
+                    {communityAnalytics?.totalStats.numMembersLastMonth}
                   </CWText>
                 </div>
                 <div className="Stat">
                   <CWText fontWeight="medium">Total New Groups</CWText>
                   <CWText className="StatValue">
-                    {communityAnalytics?.numGroupsLastMonth}
+                    {communityAnalytics?.totalStats.numGroupsLastMonth}
                   </CWText>
                 </div>
               </div>
@@ -219,8 +160,8 @@ const Analytics = () => {
                 <CWText className="CommunityName no-hover">Name</CWText>
                 <CWText className="RightSide no-hover">Created At</CWText>
               </CWText>
-              {lastMonthNewCommunties &&
-                lastMonthNewCommunties?.map((community) => {
+              {globalStats?.lastMonthNewCommunities &&
+                globalStats?.lastMonthNewCommunities?.map((community) => {
                   return (
                     <CWText
                       onClick={() => {
