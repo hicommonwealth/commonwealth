@@ -1,4 +1,6 @@
+import * as schemas from '@hicommonwealth/schemas';
 import moment from 'moment';
+import { z } from 'zod';
 import Vote from './Vote';
 
 class Poll {
@@ -13,31 +15,22 @@ class Poll {
 
   constructor({
     id,
-    threadId,
-    communityId,
-    createdAt,
-    endsAt,
+    thread_id,
+    community_id,
+    created_at,
+    ends_at,
     prompt,
     options,
     votes,
-  }: {
-    id: number;
-    threadId: number;
-    communityId: string;
-    createdAt: moment.Moment;
-    endsAt: moment.Moment;
-    prompt: string;
-    options: string[];
-    votes: Vote[];
-  }) {
-    this.id = id;
-    this.threadId = threadId;
-    this.communityId = communityId;
-    this.createdAt = createdAt;
-    this.endsAt = endsAt;
+  }: z.infer<typeof schemas.PollView>) {
+    this.id = id!;
+    this.threadId = thread_id;
+    this.communityId = community_id;
+    this.createdAt = moment(created_at!);
+    this.endsAt = moment(ends_at!);
     this.prompt = prompt;
-    this.options = options;
-    this._votes = votes;
+    this.options = JSON.parse(options);
+    this._votes = votes?.map((vote) => new Vote(vote)) ?? [];
   }
 
   public get votes() {
@@ -72,13 +65,13 @@ class Poll {
 
     return new Poll({
       id,
-      threadId: thread_id,
-      communityId: community_id,
+      thread_id,
+      community_id,
       prompt,
       options: pollOptions,
-      endsAt: moment(ends_at),
-      votes: votes.map((v) => new Vote(v)),
-      createdAt: moment(created_at),
+      ends_at,
+      votes,
+      created_at,
     });
   }
 }

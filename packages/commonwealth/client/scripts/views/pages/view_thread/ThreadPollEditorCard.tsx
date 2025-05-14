@@ -61,11 +61,12 @@ export const ThreadPollEditorCard = ({
     `;
 
     setPollData(text);
-    const prompt = generatePollPrompt(context);
+    const { systemPrompt, userPrompt } = generatePollPrompt(context);
 
-    generateCompletion(prompt, {
+    generateCompletion(userPrompt, {
       model: 'gpt-4o-mini',
       stream: true,
+      systemPrompt,
       onError: (error) => {
         console.error('Error generating Poll:', error);
         notifyError('Failed to generate  Poll');

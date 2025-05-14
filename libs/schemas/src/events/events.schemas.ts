@@ -9,6 +9,7 @@ import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -396,6 +397,10 @@ export const events = {
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
     eth_chain_id: z.number(),
+  }),
+
+  LaunchpadTokenGraduated: z.object({
+    token: LaunchpadToken,
   }),
 
   LaunchpadTokenTraded: z.object({

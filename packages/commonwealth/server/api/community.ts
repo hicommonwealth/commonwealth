@@ -98,6 +98,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  getGroups: trpc.query(Community.GetGroups, trpc.Tag.Community),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
@@ -115,6 +116,10 @@ export const trpcRouter = trpc.router({
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
   getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
+  updateTopicsOrder: trpc.command(
+    Community.UpdateTopicsOrder,
+    trpc.Tag.Community,
+  ),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,
@@ -133,6 +138,10 @@ export const trpcRouter = trpc.router({
       }),
     ]),
   ]),
+  updateTopicChannel: trpc.command(
+    Community.UpdateTopicChannel,
+    trpc.Tag.Community,
+  ),
   toggleArchiveTopic: trpc.command(
     Community.ToggleArchiveTopic,
     trpc.Tag.Community,

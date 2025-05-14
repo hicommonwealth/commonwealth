@@ -3,6 +3,11 @@ export type UserVerificationItem = {
   type: string;
 };
 
+export type CommunityVerificationItem = {
+  label: string;
+  type: string;
+};
+
 type TierClientInfo = {
   trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
   icon: string;
@@ -204,6 +209,12 @@ export const COMMUNITY_TIERS = {
       trustLevel: 2,
       icon: '🌐',
       componentIcon: 'globe',
+      verificationItems: {
+        VERIFY_SOCIAL: {
+          label: 'Verify Social Accounts',
+          type: 'VERIFY_SOCIAL',
+        },
+      },
     },
   },
   [CommunityTierMap.ChainVerified]: {
@@ -213,6 +224,12 @@ export const COMMUNITY_TIERS = {
       trustLevel: 3,
       icon: '🔗',
       componentIcon: 'pins',
+      verificationItems: {
+        LAUNCH_COIN: {
+          label: 'Launch a Coin',
+          type: 'LAUNCH_COIN',
+        },
+      },
     },
   },
   [CommunityTierMap.ManuallyVerified]: {
@@ -293,6 +310,10 @@ export function hasCommunityTierClientInfo(
 export type UserVerificationItemType =
   | keyof (typeof USER_TIERS)[UserTierMap.SocialVerified]['clientInfo']['verificationItems']
   | keyof (typeof USER_TIERS)[UserTierMap.ChainVerified]['clientInfo']['verificationItems'];
+
+export type CommunityVerificationItemType =
+  | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.SocialVerified]['clientInfo']['verificationItems']
+  | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.ChainVerified]['clientInfo']['verificationItems'];
 
 /**
  * Used to bump a user tier to a higher tier. Will never bump a user who is
