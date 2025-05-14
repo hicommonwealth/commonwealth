@@ -349,3 +349,39 @@ export const GetGroups = {
   }),
   output: z.array(GroupView),
 };
+
+export const RelatedCommunityView = z.object({
+  id: z.string(),
+  community: z.string(),
+  icon_url: z.string().nullish(),
+  lifetime_thread_count: z.number(),
+  profile_count: z.number(),
+  description: z.string().nullish(),
+  namespace: z.string().nullish(),
+  chain_node_id: z.number(),
+  tag_ids: z.array(z.string()),
+});
+
+export const GetRelatedCommunities = {
+  input: z.object({ chain_node_id: z.number() }),
+  output: z.array(RelatedCommunityView),
+};
+
+export const SearchCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  default_symbol: z.string().nullish(),
+  type: z.nativeEnum(CommunityType),
+  icon_url: z.string().nullish(),
+  created_at: z.coerce.date().or(z.string()),
+});
+
+export const SearchCommunities = {
+  input: PaginationParamsSchema.extend({
+    search: z.string(),
+    order_by: z.enum(['name', 'default_symbol', 'created_at']).optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(SearchCommunityView),
+  }),
+};

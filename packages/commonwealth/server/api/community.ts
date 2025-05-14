@@ -80,11 +80,6 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
-  createCommunityStake: trpc.command(
-    Community.CreateCommunityStake,
-    trpc.Tag.Community,
-  ),
-
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
     (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([

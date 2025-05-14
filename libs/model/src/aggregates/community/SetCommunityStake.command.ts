@@ -9,7 +9,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
     ...schemas.SetCommunityStake,
     auth: [authRoles('admin')],
-    body: async ({ payload }) => {
+    body: async ({ actor, payload }) => {
       const { community_id, ...rest } = payload;
 
       // !load
@@ -21,9 +21,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
               model: models.ChainNode,
               attributes: ['eth_chain_id', 'url'],
             },
-            {
-              model: models.CommunityStake,
-            },
+            { model: models.CommunityStake },
           ],
           attributes: ['namespace'],
         })
@@ -50,6 +48,13 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
         ...rest,
         community_id,
       });
+
+      // // since the stake is already created, generate group in background
+      // // so this request doesn't fail
+      // await command(GenerateStakeholderGroups(), {
+      //   actor,
+      //   payload: { id: community.id! },
+      // });
 
       return {
         ...community,

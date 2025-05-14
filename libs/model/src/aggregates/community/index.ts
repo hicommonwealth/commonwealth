@@ -1,6 +1,5 @@
 export * from './BanAddress.command';
 export * from './CreateCommunity.command';
-export * from './CreateCommunityStake.command';
 export * from './CreateGroup.command';
 export * from './CreateStakeTransaction.command';
 export * from './CreateTopic.command';
