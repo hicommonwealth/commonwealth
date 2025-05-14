@@ -58,7 +58,6 @@ export const ManageOnchainModal = ({
   const [userRole, setUserRole] = useState(Addresses);
   const [judgeRoles, setJudgeRoles] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('adminId');
   const [selectedContest, setSelectedContest] = useState<ContestOption | null>(
     null,
@@ -108,11 +107,27 @@ export const ManageOnchainModal = ({
 
   const hasActiveContests = contestOptions.length > 0;
 
+  const hasRoleChanges = useMemo(() => {
+    if (!userRole || !Addresses) return false;
+
+    return userRole.some((user, index) => user.role !== Addresses[index]?.role);
+  }, [userRole, Addresses]);
+
+  const hasJudgeChanges = useMemo(() => {
+    if (!selectedContestData || Object.keys(judgeRoles).length === 0)
+      return false;
+
+    return Object.entries(judgeRoles).some(([address, isJudge]) => {
+      const isAlreadyJudge =
+        selectedContestData.namespace_judges?.includes(address) || false;
+      return isJudge !== isAlreadyJudge;
+    });
+  }, [judgeRoles, selectedContestData]);
+
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
       (prevData || []).map((user) => {
         if (user.id === id && user.role !== newRole) {
-          setHasChanges(true);
           return { ...user, role: newRole };
         }
         return user;
@@ -124,13 +139,12 @@ export const ManageOnchainModal = ({
     setJudgeRoles((prev) => {
       const isCurrentlyChecked = prev[address];
       const newState = { ...prev, [address]: !isCurrentlyChecked };
-      setHasChanges(true);
       return newState;
     });
   };
 
   const updateRolesOnServer = async () => {
-    if (!hasChanges) return;
+    if (!hasRoleChanges) return;
     try {
       setLoading(true);
       if (!userRole || !Addresses) return;
@@ -212,9 +226,26 @@ export const ManageOnchainModal = ({
     }
   };
 
+  const handleNominateJudge = async () => {
+    try {
+      setLoading(true);
+      console.log('Nominating judges for contest:', selectedContest);
+      console.log('Judge roles:', judgeRoles);
+
+      // API call would go here
+
+      notifySuccess('Judges nominated successfully');
+    } catch (err) {
+      console.error(err);
+      notifyError('Failed to nominate judges');
+    } finally {
+      setLoading(false);
+      onClose();
+    }
+  };
+
   const handleContestSelect = (option: ContestOption) => {
     setSelectedContest(option);
-    setHasChanges(true);
   };
 
   const getRadioOptions = (address: AddressInfo): RadioOption[] => {
@@ -237,6 +268,38 @@ export const ManageOnchainModal = ({
         disabled: isAlreadyJudge,
       },
     ];
+  };
+
+  const renderFooterButtons = () => {
+    if (activeTab === 'adminId') {
+      return (
+        <>
+          <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
+          <CWButton
+            label={communityNamespace ? 'Confirm & Mint' : 'Confirm'}
+            buttonType="secondary"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={handleUpdate}
+            buttonHeight="sm"
+            disabled={loading || !hasRoleChanges}
+          />
+        </>
+      );
+    } else if (activeTab === 'judgedContest') {
+      return (
+        <>
+          <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
+          <CWButton
+            label="Nominate Judge"
+            buttonType="secondary"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={handleNominateJudge}
+            buttonHeight="sm"
+            disabled={loading || !hasJudgeChanges || !selectedContest}
+          />
+        </>
+      );
+    }
   };
 
   return (
@@ -310,17 +373,7 @@ export const ManageOnchainModal = ({
           </div>
         )}
       </CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label={communityNamespace ? 'Confirm & Mint' : 'Confirm'}
-          buttonType="secondary"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={handleUpdate}
-          buttonHeight="sm"
-          disabled={loading || !hasChanges}
-        />
-        <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
-      </CWModalFooter>
+      <CWModalFooter>{renderFooterButtons()}</CWModalFooter>
     </div>
   );
 };
