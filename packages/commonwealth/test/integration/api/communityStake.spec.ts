@@ -52,7 +52,14 @@ describe('POST communityStakes Tests', () => {
         tier: UserTierMap.ManuallyVerified,
       },
     }) as UserInstance;
-    const actor = { user: { id: 1, email: '' } };
+    const actor = {
+      address: server.e2eTestEntities.testAddresses[0].address,
+      user: {
+        id: server.e2eTestEntities.testAddresses[0].user_id!,
+        email: '',
+        isAdmin: true,
+      },
+    };
 
     const community = await command(Community.SetCommunityStake(), {
       actor,
@@ -90,11 +97,11 @@ describe('POST communityStakes Tests', () => {
       },
     });
 
-    assert.equal(found!.community_id, expectedCreateResp.community_id);
-    assert.equal(found!.stake_id, expectedCreateResp.stake_id);
-    assert.equal(found!.stake_token, expectedCreateResp.stake_token);
-    assert.equal(found!.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(found!.stake_enabled, expectedCreateResp.stake_enabled);
+    assert.equal(found!.stake!.community_id, expectedCreateResp.community_id);
+    assert.equal(found!.stake!.stake_id, expectedCreateResp.stake_id);
+    assert.equal(found!.stake!.stake_token, expectedCreateResp.stake_token);
+    assert.equal(found!.stake!.vote_weight, expectedCreateResp.vote_weight);
+    assert.equal(found!.stake!.stake_enabled, expectedCreateResp.stake_enabled);
   });
 
   test('The integration with protocol works', async () => {

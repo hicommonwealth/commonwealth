@@ -32,12 +32,12 @@ describe('ChainNode Tests', () => {
         tier: UserTierMap.ManuallyVerified,
       },
     }) as UserInstance;
-    const actor = { user: { id: 1, email: '' } };
+    const actor = { user: { id: 1, email: '', isAdmin: true } };
 
     const resp = await command(SuperAdmin.CreateChainNode(), {
       actor,
       payload: {
-        url: 'wss://',
+        url: 'wss://abc.com',
         name: 'asd',
         balance_type: BalanceType.Ethereum,
         eth_chain_id: 123,
@@ -47,7 +47,7 @@ describe('ChainNode Tests', () => {
     const createdNode = await models.ChainNode.findOne({
       where: { id: resp!.node_id },
     });
-    assert.equal(createdNode!.url, 'wss://');
+    assert.equal(createdNode!.url, 'wss://abc.com');
     assert.equal(createdNode!.name, 'asd');
     assert.equal(createdNode!.balance_type, 'ethereum');
     assert.equal(createdNode!.eth_chain_id, 123);
