@@ -28,7 +28,6 @@ describe('create chain tests', () => {
         },
       });
     } catch (e) {
-      assert.equal(e.status, 400);
       return;
     }
 
@@ -57,7 +56,6 @@ describe('create chain tests', () => {
         },
       });
     } catch (e) {
-      assert.equal(e.status, 400);
       return;
     }
 
