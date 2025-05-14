@@ -1,25 +1,34 @@
+/*
+import {
+  GetRelatedCommunitiesQuery,
+  GetRelatedCommunitiesResult
+} from '../../controllers/server_communities_methods/get_related_communities';
+import { ServerControllers } from '../../routing/router';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
+
+type GetRelatedCommunitiesParams = GetRelatedCommunitiesQuery;
+type GetRelatedCommunitiesResponse = GetRelatedCommunitiesResult;
+
+export const getRelatedCommunitiesHandler = async (
+  controllers: ServerControllers,
+  req: TypedRequestQuery<GetRelatedCommunitiesParams>,
+  res: TypedResponse<GetRelatedCommunitiesResponse>
+) => {
+  const { chainNodeId } = req.query;
+  const results = await controllers.communities.getRelatedCommunities({ chainNodeId });
+  return success(res, results);
+};
+*/
+
+/*
 import { sequelize } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
-/**
- * Options for the getRelatedCommunities function.
- *
- * @typedef {Object} GetRelatedCommunitiesQuery
- * @property {string} chainNodeId - The id of the ChainNode variable for filtering.
- */
+ 
 export type GetRelatedCommunitiesQuery = { chainNodeId: number };
 
-/**
- * Response for the getRelatedCommunities function.
- *
- * @typedef {Object} GetRelatedCommunitiesResult
- * @property {string} id - The id of the community
- * @property {string} community - The name of the community
- * @property {string} icon_url - The icon url of the community
- * @property {number} lifetime_thread_count - The Number of threads associated with the community
- * @property {number} profile_count - The Number of profiles with an address belonging to the community
- */
+ 
 export type GetRelatedCommunitiesResult = {
   id: string;
   community: string;
@@ -68,3 +77,5 @@ export async function __getRelatedCommunities(
     },
   );
 }
+
+*/
