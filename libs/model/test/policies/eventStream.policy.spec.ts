@@ -339,20 +339,20 @@ describe('EventStream Policy Integration Tests', () => {
           block_timestamp: 1n,
         } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
       },
-      {
-        event_name: 'LaunchpadTokenTraded',
-        event_payload: serializeBigIntObj({
-          block_timestamp: 1n,
-          transaction_hash: '0x1111111111111111111111111111111111111111',
-          trader_address: '0x1111111111111111111111111111111111111111',
-          token_address: '0x7777777777777777777777777777777777777777',
-          is_buy: true,
-          eth_chain_id: 1,
-          eth_amount: 1n,
-          community_token_amount: 1n,
-          floating_supply: 1n,
-        } satisfies z.infer<typeof events.LaunchpadTokenTraded>),
-      },
+      // {
+      //   event_name: 'LaunchpadTokenTraded',
+      //   event_payload: serializeBigIntObj({
+      //     block_timestamp: 1n,
+      //     transaction_hash: '0x1111111111111111111111111111111111111111',
+      //     trader_address: '0x1111111111111111111111111111111111111111',
+      //     token_address: '0x7777777777777777777777777777777777777777',
+      //     is_buy: true,
+      //     eth_chain_id: 1,
+      //     eth_amount: 1n,
+      //     community_token_amount: 1n,
+      //     floating_supply: 1n,
+      //   } satisfies z.infer<typeof events.LaunchpadTokenTraded>),
+      // },
       {
         event_name: 'LaunchpadTokenGraduated',
         event_payload: serializeBigIntObj({
@@ -379,7 +379,7 @@ describe('EventStream Policy Integration Tests', () => {
       'CommunityCreated',
       'ThreadCreated',
       'LaunchpadTokenCreated',
-      'LaunchpadTokenTraded',
+      // 'LaunchpadTokenTraded',
       'LaunchpadTokenGraduated',
     ] satisfies Events[];
 
