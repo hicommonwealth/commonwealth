@@ -98,18 +98,6 @@ export const getCSVContent = async ({ id }: { id: string }) => {
   return res.data.result.data[0];
 };
 
-export const getTopUsersList = async () => {
-  const res = await axios.get(`${SERVER_URL}/internal/GetTopUsers`, {
-    params: {
-      jwt: userStore.getState().jwt,
-    },
-    headers: {
-      address: userStore.getState().activeAccount?.address || '',
-    },
-  });
-  return res.data.result;
-};
-
 type CSVRow = Record<string, string | number | string[] | number[]>;
 
 export function downloadCSV(rows: CSVRow[], filename: string) {
