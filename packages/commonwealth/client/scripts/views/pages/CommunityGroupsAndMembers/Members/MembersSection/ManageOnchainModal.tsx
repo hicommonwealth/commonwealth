@@ -8,6 +8,7 @@ import {
   useGetCommunityByIdQuery,
   useUpdateRoleMutation,
 } from 'client/scripts/state/api/communities';
+import useNominateJudgesMutation from 'client/scripts/state/api/contests/nominateJudges';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
@@ -23,6 +24,7 @@ import {
   CWTabsRow,
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
+import { useFlag } from 'hooks/useFlag';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { AddressItem, CheckboxOption, RadioOption } from './AddressItem';
@@ -55,6 +57,8 @@ export const ManageOnchainModal = ({
   chainId,
   communityNamespace,
 }: ManageOnchainModalProps) => {
+  const judgeContestEnabled = useFlag('judgeContest');
+
   const [userRole, setUserRole] = useState(Addresses);
   const [judgeRoles, setJudgeRoles] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
@@ -63,6 +67,7 @@ export const ManageOnchainModal = ({
     null,
   );
   const { mutateAsync: updateRole } = useUpdateRoleMutation();
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
@@ -82,8 +87,8 @@ export const ManageOnchainModal = ({
 
     if (contestsData?.active && contestsData.active.length > 0) {
       contestsData.active.forEach((contest) => {
-        console.log(contest);
-        if (contest.contests) {
+        // Check if the contest is judged
+        if (contest.contests && contest.namespace_judge_token_id) {
           contest.contests.forEach(() => {
             allOptions.push({
               label: contest.name || '',
@@ -161,7 +166,8 @@ export const ManageOnchainModal = ({
           }),
         ),
       );
-      if (refetch) refetch();
+
+      refetch?.();
     } catch (error) {
       console.error('Error upgrading members:', error);
       notifyError(error?.response?.data?.error || error.message);
@@ -229,15 +235,48 @@ export const ManageOnchainModal = ({
   const handleNominateJudge = async () => {
     try {
       setLoading(true);
-      console.log('Nominating judges for contest:', selectedContest);
-      console.log('Judge roles:', judgeRoles);
 
-      // API call would go here
+      if (!selectedContest || !selectedContestData) {
+        throw new Error('No contest selected');
+      }
+
+      const walletAddress = userData.activeAccount?.address;
+      if (!walletAddress) {
+        throw new Error('Wallet Address Not Found');
+      }
+
+      const judgeTokenId = selectedContestData.namespace_judge_token_id;
+      if (!judgeTokenId) {
+        throw new Error('Judge token ID not found for this contest');
+      }
+
+      const selectedJudges = Object.entries(judgeRoles)
+        .filter(([address, isSelected]) => {
+          const isAlreadyJudge =
+            selectedContestData.namespace_judges?.includes(address) || false;
+          return isSelected && !isAlreadyJudge;
+        })
+        .map(([address]) => address);
+
+      if (selectedJudges.length === 0) {
+        throw new Error('No new judges selected');
+      }
+
+      await nominateJudges({
+        namespace,
+        judges: selectedJudges,
+        judgeId: judgeTokenId,
+        walletAddress,
+        ethChainId,
+        chainRpc,
+      });
 
       notifySuccess('Judges nominated successfully');
+
+      refetch?.();
     } catch (err) {
       console.error(err);
-      notifyError('Failed to nominate judges');
+      notifyError(err.message || 'Failed to nominate judges');
     } finally {
       setLoading(false);
       onClose();
@@ -262,7 +301,7 @@ export const ManageOnchainModal = ({
 
     return [
       {
-        label: 'Judge',
+        label: isAlreadyJudge ? 'Active Judge' : 'Judge',
         value: 'judge',
         checked: isAlreadyJudge || !!judgeRoles[address.address],
         disabled: isAlreadyJudge,
@@ -316,11 +355,13 @@ export const ManageOnchainModal = ({
             isSelected={activeTab === 'adminId'}
             onClick={() => setActiveTab('adminId')}
           />
-          <CWTab
-            label="Judged Contest"
-            isSelected={activeTab === 'judgedContest'}
-            onClick={() => setActiveTab('judgedContest')}
-          />
+          {judgeContestEnabled && (
+            <CWTab
+              label="Judged Contest"
+              isSelected={activeTab === 'judgedContest'}
+              onClick={() => setActiveTab('judgedContest')}
+            />
+          )}
         </CWTabsRow>
 
         {activeTab === 'adminId' && (
@@ -337,7 +378,7 @@ export const ManageOnchainModal = ({
           </div>
         )}
 
-        {activeTab === 'judgedContest' && (
+        {activeTab === 'judgedContest' && judgeContestEnabled && (
           <div className="judged-contest-content">
             {isContestDataLoading ? (
               <CWText type="b1">Loading contests...</CWText>
@@ -368,7 +409,9 @@ export const ManageOnchainModal = ({
                 )}
               </>
             ) : (
-              <CWText type="b1">No active contests available.</CWText>
+              <CWText type="b1">
+                No active contests available in this community.
+              </CWText>
             )}
           </div>
         )}
