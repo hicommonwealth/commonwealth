@@ -2,24 +2,20 @@ import useGetTopUsersQuery from 'client/scripts/state/api/superAdmin/getTopUsers
 import React from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import CWCircleRingSpinner from '../../components/component_kit/new_designs/CWCircleRingSpinner';
 import './AdminPanel.scss';
 import { downloadCSV as downloadAsCSV } from './utils';
 
 const TopUsers = () => {
-  const [trigger, setTrigger] = React.useState(false);
-  const { data: topUsers, isLoading: isLoadingTopUsers } =
-    useGetTopUsersQuery(trigger);
+  const {
+    data: topUsers,
+    isFetching: isFetchingTopUsers,
+    refetch: refetchTopUsers,
+  } = useGetTopUsersQuery(false);
 
   React.useEffect(() => {
-    if (trigger && topUsers && !isLoadingTopUsers) {
-      downloadAsCSV(topUsers, 'top_users.csv');
-      setTrigger(false); // reset after download
-    }
-  }, [trigger, topUsers, isLoadingTopUsers]);
-
-  const generateAndDownload = () => {
-    setTrigger(true);
-  };
+    !isFetchingTopUsers && topUsers && downloadAsCSV(topUsers, 'top_users.csv');
+  }, [topUsers, isFetchingTopUsers]);
 
   return (
     <div className="TaskGroup">
@@ -29,12 +25,18 @@ const TopUsers = () => {
         activity (threads and comments created).
       </CWText>
       <div className="TaskRow">
-        <CWButton
-          label="Generate and Download"
-          className="TaskButton"
-          onClick={generateAndDownload}
-          disabled={trigger}
-        />
+        {isFetchingTopUsers ? (
+          <>
+            <CWCircleRingSpinner />
+            <CWText type="caption">Fetching top users, please wait...</CWText>
+          </>
+        ) : (
+          <CWButton
+            label="Generate and Download"
+            className="TaskButton"
+            onClick={() => refetchTopUsers()}
+          />
+        )}
       </div>
     </div>
   );
