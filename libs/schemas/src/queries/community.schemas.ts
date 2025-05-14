@@ -132,9 +132,11 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.extend({
-    Community: z.object({ namespace: z.string().nullish() }).optional(),
-  }).optional(),
+  output: z.object({
+    stake: CommunityStake.extend({
+      Community: z.object({ namespace: z.string().nullish() }).optional(),
+    }).nullish(),
+  }),
 };
 
 export const GetCommunityMembers = {
@@ -373,7 +375,7 @@ export const SearchCommunityView = z.object({
   id: z.string(),
   name: z.string(),
   default_symbol: z.string().nullish(),
-  type: z.nativeEnum(CommunityType),
+  type: z.string(),
   icon_url: z.string().nullish(),
   created_at: z.coerce.date().or(z.string()),
 });

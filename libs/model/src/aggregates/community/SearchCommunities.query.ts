@@ -12,7 +12,7 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
     body: async ({ payload }) => {
       const { search, limit, cursor, order_by, order_direction } = payload;
 
-      const orderBy = ['name', 'rank', 'created_at', 'default_symbol'].includes(
+      const orderBy = ['name', 'created_at', 'default_symbol'].includes(
         order_by || '',
       )
         ? order_by

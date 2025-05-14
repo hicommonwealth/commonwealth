@@ -52,7 +52,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     apiEnabled: !!activeCommunityId,
   });
 
-  const stakeEnabled = stakeData?.stake_enabled;
+  const stakeEnabled = stakeData?.stake?.stake_enabled;
   const apiEnabled = Boolean(
     stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
@@ -89,7 +89,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
     // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
-    stakeData?.vote_weight,
+    stakeData?.stake?.vote_weight,
   );
   const stakeBalance = Number(userStakeBalanceData);
   const stakeValue = Number(buyPriceData?.price);

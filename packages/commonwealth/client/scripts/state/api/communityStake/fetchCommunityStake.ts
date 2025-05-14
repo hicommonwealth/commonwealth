@@ -20,7 +20,7 @@ const useFetchCommunityStakeQuery = ({
     },
     {
       staleTime: COMMUNITY_STAKE_STALE_TIME,
-      enabled: apiEnabled,
+      enabled: apiEnabled && !!communityId && !!stakeId,
     },
   );
 };
