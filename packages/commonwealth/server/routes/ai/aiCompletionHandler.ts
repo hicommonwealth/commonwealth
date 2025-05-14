@@ -21,7 +21,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       prompt: initialPrompt,
       systemPrompt: initialSystemPrompt,
       model = 'gpt-4o',
-      temperature = 0.7,
+      temperature,
       maxTokens = 1000,
       stream = true,
       useOpenRouter = false,
