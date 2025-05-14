@@ -101,6 +101,10 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         },
       };
 
+      console.log(
+        'Going to authenticate with signInOpts: ' +
+          JSON.stringify(signInOpts, null, 2),
+      );
       await signIn(session, signInOpts);
 
       const landingURL = new URL(
@@ -111,7 +115,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     }
 
     doAsync().catch((err) => {
-      console.error('Could not perform authentication: ', err);
+      console.error('Could not perform authentication: ' + err.message, err);
       privyMobileLogout({}).catch(console.error);
     });
   }, [
