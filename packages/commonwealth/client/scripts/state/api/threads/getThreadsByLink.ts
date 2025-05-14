@@ -13,19 +13,6 @@ const useGetThreadsByLinkQuery = ({ link, enabled }: GetThreadsByLinkProps) => {
   return trpc.thread.getLinks.useQuery(
     { link_source: link.source, link_identifier: link.identifier },
     {
-      // TODO: we are not updating cache here, because the response looks like this
-      // {
-      //     "status": "Success",
-      //     "result": {
-      //         "threads": [
-      //             {
-      //                 "id": 7872,
-      //                 "title": "DRC%20-%20Remove%20stkDYDX%20from%20LP%20Rewards%20Formulas"
-      //             }
-      //         ]
-      //     }
-      // }
-      // decide if we need to cache this?? -- atm it looks like we dont have to
       staleTime: THREAD_STALE_TIME,
       enabled: enabled,
     },

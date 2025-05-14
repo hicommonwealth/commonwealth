@@ -51,7 +51,6 @@ const {
   deleteThread,
   addLinks,
   deleteLinks,
-  getLinks,
 } = thread.trpcRouter;
 const {
   createComment,

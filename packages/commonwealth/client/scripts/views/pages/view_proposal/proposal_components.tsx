@@ -13,13 +13,6 @@ type ProposalSubheaderProps = {
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { proposal } = props;
-  // const { data: linkedThreads } = useGetThreadsByLinkQuery({
-  //   link: {
-  //     source: LinkSource.Proposal,
-  //     identifier: proposal.identifier,
-  //   },
-  //   enabled: !!proposal.identifier,
-  // });
 
   return (
     <div className="ProposalSubheader">
