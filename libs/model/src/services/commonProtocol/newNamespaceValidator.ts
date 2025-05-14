@@ -91,8 +91,6 @@ export const validateNamespace = async (
   const chain_id = chainNode.eth_chain_id;
   mustBeProtocolChainId(chain_id);
 
-  console.log('AAA');
-
   //tx data validation
   const { txReceipt } = await getTransactionReceiptWithRetry({
     rpc: chainNode.private_url,
@@ -100,15 +98,12 @@ export const validateNamespace = async (
     maxRetries: 5,
     initialDelay: 1000,
   });
-  console.log('BBB');
   if (!txReceipt.status) {
     throw new AppError('tx failed');
   }
-  console.log('CCC');
   if (txReceipt.from.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Attested sender did not tx sender');
   }
-  console.log('DDD');
 
   //validate contract data
   const activeNamespace = await getNamespace(

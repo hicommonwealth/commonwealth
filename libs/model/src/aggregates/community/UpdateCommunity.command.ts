@@ -95,8 +95,6 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         if (!transactionHash)
           throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
 
-        console.log({ transactionHash });
-
         community.namespace = namespace;
         community.namespace_address =
           await commonProtocol.newNamespaceValidator.validateNamespace(
