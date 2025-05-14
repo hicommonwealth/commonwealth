@@ -80,6 +80,11 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
+  createCommunityStake: trpc.command(
+    Community.CreateCommunityStake,
+    trpc.Tag.Community,
+  ),
+
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
     (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([
@@ -180,4 +185,16 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
+  updateCommunityId: trpc.command(
+    Community.UpdateCommunityId,
+    trpc.Tag.Community,
+  ),
+  getRelatedCommunities: trpc.query(
+    Community.GetRelatedCommunities,
+    trpc.Tag.Community,
+  ),
+  searchCommunities: trpc.query(
+    Community.SearchCommunities,
+    trpc.Tag.Community,
+  ),
 });

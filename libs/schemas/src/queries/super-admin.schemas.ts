@@ -1,4 +1,10 @@
 import { z } from 'zod';
+import { ChainNode } from '../entities';
+
+export const GetChainNodes = {
+  input: z.object({}),
+  output: z.array(ChainNode),
+};
 
 export const TotalStats = z.object({
   numCommentsLastMonth: z.number(),

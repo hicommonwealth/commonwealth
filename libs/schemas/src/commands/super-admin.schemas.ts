@@ -1,5 +1,21 @@
-import { CommunityTierMap, UserTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityTierMap,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
+
+export const CreateChainNode = {
+  input: z.object({
+    url: z.string().url(),
+    name: z.string(),
+    balance_type: z.literal(BalanceType.Ethereum),
+    eth_chain_id: z.number(),
+  }),
+  output: z.object({
+    node_id: z.number(),
+  }),
+};
 
 export const TriggerNotificationsWorkflow = {
   input: z.object({

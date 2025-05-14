@@ -1,4 +1,6 @@
+export * from './CreateChainNode.command';
 export * from './EnableDigestEmail';
+export * from './GetChainNodes.query';
 export * from './GetStats.query';
 export * from './GetTopUsers.query';
 export * from './SetCommunityTier.command';

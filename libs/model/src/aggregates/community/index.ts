@@ -1,5 +1,4 @@
 export * from './BanAddress.command';
-export * from './CreateChainNode.command';
 export * from './CreateCommunity.command';
 export * from './CreateCommunityStake.command';
 export * from './CreateGroup.command';
@@ -10,7 +9,6 @@ export * from './DeleteAllAddresses.command';
 export * from './DeleteCommunity.command';
 export * from './DeleteGroup.command';
 export * from './GenerateStakeholderGroups.command';
-export * from './GetChainNodes.query';
 export * from './GetCommunities.query';
 export * from './GetCommunity.query';
 export * from './GetCommunitySelectedTagsAndCommunities.query';
