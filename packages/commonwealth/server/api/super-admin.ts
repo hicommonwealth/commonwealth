@@ -6,6 +6,10 @@ export const trpcRouter = trpc.router({
     SuperAdmin.CreateChainNode,
     trpc.Tag.SuperAdmin,
   ),
+  updateCommunityId: trpc.command(
+    SuperAdmin.UpdateCommunityId,
+    trpc.Tag.SuperAdmin,
+  ),
   getChainNodes: trpc.query(SuperAdmin.GetChainNodes, trpc.Tag.SuperAdmin),
   triggerNotificationsWorkflow: trpc.command(
     SuperAdmin.TriggerNotificationsWorkflow,

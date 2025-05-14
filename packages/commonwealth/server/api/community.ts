@@ -185,10 +185,6 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
-  updateCommunityId: trpc.command(
-    Community.UpdateCommunityId,
-    trpc.Tag.Community,
-  ),
   getRelatedCommunities: trpc.query(
     Community.GetRelatedCommunities,
     trpc.Tag.Community,

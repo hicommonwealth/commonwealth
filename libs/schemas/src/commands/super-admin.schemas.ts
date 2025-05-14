@@ -4,6 +4,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { Community } from '../entities';
 
 export const CreateChainNode = {
   input: z.object({
@@ -15,6 +16,15 @@ export const CreateChainNode = {
   output: z.object({
     node_id: z.number(),
   }),
+};
+
+export const UpdateCommunityId = {
+  input: z.object({
+    community_id: z.string(),
+    new_community_id: z.string(),
+    redirect: z.boolean().optional(),
+  }),
+  output: Community,
 };
 
 export const TriggerNotificationsWorkflow = {

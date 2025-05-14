@@ -36,7 +36,6 @@ export * from './ToggleArchiveTopic.command';
 export * from './UnpinToken.command';
 export * from './UpdateCommunity.command';
 export * from './UpdateCommunityDirectoryTags.command';
-export * from './UpdateCommunityId.command';
 export * from './UpdateCommunityTags.command';
 export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
