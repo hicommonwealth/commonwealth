@@ -1,3 +1,17 @@
+import { Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function CreateChainNode(): Command<typeof schemas.CreateChainNode> {
+  return {
+    ...schemas.CreateChainNode,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import { CreateChainNodeResult } from '../../controllers/server_communities_methods/create_chain_node';
 import { ServerControllers } from '../../routing/router';

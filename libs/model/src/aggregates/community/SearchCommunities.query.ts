@@ -1,3 +1,17 @@
+import { Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
+  return {
+    ...schemas.SearchCommunities,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import { AppError } from '@hicommonwealth/core';
 import {

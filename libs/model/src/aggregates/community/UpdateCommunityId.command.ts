@@ -1,3 +1,17 @@
+import { Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function UpdateCommunityId(): Command<typeof schemas.UpdateCommunityId> {
+  return {
+    ...schemas.UpdateCommunityId,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import { AppError } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';

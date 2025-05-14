@@ -1,3 +1,19 @@
+import { Command } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function CreateCommunityStake(): Command<
+  typeof schemas.CreateCommunityStake
+> {
+  return {
+    ...schemas.CreateCommunityStake,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import { AppError, command } from '@hicommonwealth/core';
 import {

@@ -1,3 +1,19 @@
+import { Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function GetRelatedCommunities(): Query<
+  typeof schemas.GetRelatedCommunities
+> {
+  return {
+    ...schemas.GetRelatedCommunities,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import {
   GetRelatedCommunitiesQuery,

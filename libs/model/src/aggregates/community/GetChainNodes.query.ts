@@ -1,3 +1,17 @@
+import { Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+
+export function GetChainNodes(): Query<typeof schemas.GetChainNodes> {
+  return {
+    ...schemas.GetChainNodes,
+    auth: [],
+    secure: true,
+    body: async ({ payload }) => {
+      const { search, limit, page, orderBy, orderDirection } = payload;
+    },
+  };
+}
+
 /*
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
