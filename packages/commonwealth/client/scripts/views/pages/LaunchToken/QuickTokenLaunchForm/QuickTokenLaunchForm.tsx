@@ -23,7 +23,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
-import { useTurnstile } from 'views/components/useTurnstile';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
@@ -51,15 +50,6 @@ export const QuickTokenLaunchForm = ({
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
-
-  const {
-    turnstileToken,
-    isTurnstileEnabled,
-    TurnstileWidget,
-    resetTurnstile,
-  } = useTurnstile({
-    action: 'create-community',
-  });
 
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
@@ -216,7 +206,6 @@ export const QuickTokenLaunchForm = ({
               socialLinks: [],
               chainNodeId: baseNode.id,
               tokenizeCommunity: tokenizedThreadsEnabled ? true : false,
-              turnstileToken: turnstileToken || undefined,
             });
 
             let response;
@@ -305,9 +294,6 @@ export const QuickTokenLaunchForm = ({
         setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
       } catch (e) {
-        if (isTurnstileEnabled) {
-          resetTurnstile();
-        }
         console.error(`Error creating token: `, e, e.name);
 
         if (e?.name === 'TransactionBlockTimeoutError') {
@@ -415,8 +401,6 @@ export const QuickTokenLaunchForm = ({
           {isCreatingQuickToken ? 'Launching your idea' : 'Launch an idea'}
         </CWText>
       )}
-
-      {isTurnstileEnabled && <TurnstileWidget />}
 
       {isCreatingQuickToken && <CWCircleMultiplySpinner />}
 
