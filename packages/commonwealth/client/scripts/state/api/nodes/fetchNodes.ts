@@ -8,23 +8,20 @@ const NODES_CACHE_TIME = Infinity;
 
 // this is a default query that should be used to get list of nodes
 const useFetchNodesQuery = () => {
-  return trpc.superAdmin.getChainNodes.useQuery(
-    {},
-    {
-      staleTime: NODES_STALE_TIME,
-      cacheTime: NODES_CACHE_TIME,
-      select: (data) => data.map((node) => new NodeInfo(node)),
-    },
-  );
+  return trpc.superAdmin.getChainNodes.useQuery(undefined, {
+    staleTime: NODES_STALE_TIME,
+    cacheTime: NODES_CACHE_TIME,
+    select: (data) => data.map((node) => new NodeInfo(node)),
+  });
 };
 
 export const fetchCachedNodes = (): NodeInfo[] | undefined => {
-  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey({});
+  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey();
   return queryClient.getQueryData<NodeInfo[]>(queryKey);
 };
 
 export const fetchNodes = async (): Promise<NodeInfo[]> => {
-  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey({});
+  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey();
   const cache = queryClient.getQueryData<NodeInfo[]>(queryKey);
   if (cache) return cache;
 

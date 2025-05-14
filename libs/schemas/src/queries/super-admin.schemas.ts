@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ChainNode } from '../entities';
 
 export const GetChainNodes = {
-  input: z.object({}),
+  input: z.void(),
   output: z.array(
     ChainNode.extend({
       created_at: z.date().or(z.string()).optional(),

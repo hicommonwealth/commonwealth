@@ -37,7 +37,7 @@ export const CWDropdown = ({
       <CWTextInput
         containerClassName={containerClassName}
         iconRight="chevronDown"
-        placeholder={selectedValue.label}
+        placeholder={selectedValue?.label}
         displayOnly
         iconRightonClick={() => {
           // Only here because it makes TextInput display correctly
