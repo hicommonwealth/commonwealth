@@ -13,6 +13,39 @@ import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
 
 /**
+ * Helper function to implement retry logic for getTransactionReceipt with exponential backoff
+ */
+const getTransactionReceiptWithRetry = async (params: {
+  rpc: string;
+  txHash: string;
+  maxRetries?: number;
+  initialDelay?: number;
+}) => {
+  const { rpc, txHash, maxRetries = 3, initialDelay = 1000 } = params;
+  let retries = 0;
+
+  while (retries <= maxRetries) {
+    try {
+      return await getTransactionReceipt({ rpc, txHash });
+    } catch (error) {
+      console.log('getTransactionReceiptWithRetry ERR: ', error);
+      if (retries < maxRetries) {
+        retries++;
+        // Exponential backoff with base 2: 1s, 2s, 4s, 8s, etc
+        const backoffDelay = initialDelay * Math.pow(2, retries - 1);
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay));
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  // This should never be reached due to the logic in the catch block,
+  // but TypeScript requires a return value for all code paths
+  throw new Error('Maximum retries reached');
+};
+
+/**
  * Validate if an attested new namespace is valid on-chain Checks:
  * 1. Tx success
  * 2. sender validity
@@ -58,17 +91,24 @@ export const validateNamespace = async (
   const chain_id = chainNode.eth_chain_id;
   mustBeProtocolChainId(chain_id);
 
+  console.log('AAA');
+
   //tx data validation
-  const { txReceipt } = await getTransactionReceipt({
+  const { txReceipt } = await getTransactionReceiptWithRetry({
     rpc: chainNode.private_url,
     txHash,
+    maxRetries: 5,
+    initialDelay: 1000,
   });
+  console.log('BBB');
   if (!txReceipt.status) {
     throw new AppError('tx failed');
   }
+  console.log('CCC');
   if (txReceipt.from.toLowerCase() !== address.toLowerCase()) {
     throw new AppError('Attested sender did not tx sender');
   }
+  console.log('DDD');
 
   //validate contract data
   const activeNamespace = await getNamespace(
