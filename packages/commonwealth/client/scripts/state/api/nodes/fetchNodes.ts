@@ -1,5 +1,5 @@
 import axios from 'axios';
-import NodeInfo from 'models/NodeInfo';
+import NodeInfo, { ChainNode } from 'models/NodeInfo';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { queryClient } from '../config';
 
@@ -11,7 +11,7 @@ const useFetchNodesQuery = () => {
   return trpc.superAdmin.getChainNodes.useQuery(undefined, {
     staleTime: NODES_STALE_TIME,
     cacheTime: NODES_CACHE_TIME,
-    select: (data) => data.map((node) => new NodeInfo(node)),
+    select: (data) => data.map((node) => new NodeInfo(node as ChainNode)),
   });
 };
 

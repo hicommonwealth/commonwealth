@@ -1,6 +1,11 @@
 import * as schemas from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
+export type ChainNode = Omit<
+  z.infer<typeof schemas.ChainNode>,
+  'created_at' | 'updated_at'
+>;
+
 class NodeInfo {
   public readonly id: number;
   public readonly name: string;
@@ -28,7 +33,7 @@ class NodeInfo {
     block_explorer,
     slip44,
     alchemy_metadata,
-  }: Omit<z.infer<typeof schemas.ChainNode>, 'created_at' | 'updated_at'>) {
+  }: ChainNode) {
     this.id = id!;
     this.name = name;
     this.url = url;
