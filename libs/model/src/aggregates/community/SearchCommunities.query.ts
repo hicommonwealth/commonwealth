@@ -12,11 +12,16 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
     body: async ({ payload }) => {
       const { search, limit, cursor, order_by, order_direction } = payload;
 
+      const orderBy = ['name', 'rank', 'created_at', 'default_symbol'].includes(
+        order_by || '',
+      )
+        ? order_by
+        : 'created_at';
       const { sql: paginationSort, bind: paginationBind } =
         schemas.buildPaginationSql({
           limit: Math.min(limit || 10, 100),
           page: cursor || 1,
-          orderBy: `C.${order_by || 'created_at'}`,
+          orderBy: `C.${orderBy}`,
           orderDirection: order_direction || 'ASC',
         });
       const bind = { searchTerm: search, ...paginationBind };

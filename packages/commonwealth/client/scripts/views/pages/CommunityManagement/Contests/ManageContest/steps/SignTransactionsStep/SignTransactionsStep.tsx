@@ -105,10 +105,10 @@ const SignTransactionsStep = ({
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration || 0;
 
-    const stakeId = stakeData?.stake_id;
+    const stakeId = stakeData?.stake_id || 0;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = stakeData?.vote_weight;
+    const weight = stakeData?.vote_weight || 0;
     const contestInterval = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;

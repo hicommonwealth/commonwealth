@@ -44,7 +44,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const {
     isInitialLoading: communityStakeLoading,
-    data: stakeResponse,
+    data: stakeData,
     refetch: refetchStakeQuery,
   } = useFetchCommunityStakeQuery({
     communityId: activeCommunityId,
@@ -52,7 +52,6 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     apiEnabled: !!activeCommunityId,
   });
 
-  const stakeData = stakeResponse?.data?.result;
   const stakeEnabled = stakeData?.stake_enabled;
   const apiEnabled = Boolean(
     stakeEnabled &&

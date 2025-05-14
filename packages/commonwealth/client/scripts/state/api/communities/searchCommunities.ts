@@ -4,7 +4,7 @@ import z from 'zod';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
-const useSearchChainsQuery = ({
+const useSearchCommunitiesQuery = ({
   search,
   limit,
   order_by,
@@ -32,4 +32,4 @@ const useSearchChainsQuery = ({
   );
 };
 
-export default useSearchChainsQuery;
+export default useSearchCommunitiesQuery;

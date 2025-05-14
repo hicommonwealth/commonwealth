@@ -132,7 +132,9 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.optional(),
+  output: CommunityStake.extend({
+    Community: z.object({ namespace: z.string().nullish() }).optional(),
+  }).optional(),
 };
 
 export const GetCommunityMembers = {
@@ -379,7 +381,6 @@ export const SearchCommunityView = z.object({
 export const SearchCommunities = {
   input: PaginationParamsSchema.extend({
     search: z.string(),
-    order_by: z.enum(['name', 'default_symbol', 'created_at']).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(SearchCommunityView),
