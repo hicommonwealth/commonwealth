@@ -44,8 +44,6 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
-import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
-import getLinks from '../routes/linking/getLinks';
 
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 
@@ -348,21 +346,6 @@ function setupRouter(
 
       return res.end();
     },
-  );
-
-  // linking
-  registerRoute(
-    router,
-    'delete',
-    '/linking/deleteLinks',
-    passport.authenticate('jwt', { session: false }),
-    deleteThreadLinks.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/linking/getLinks',
-    getLinks.bind(this, models),
   );
 
   // login
