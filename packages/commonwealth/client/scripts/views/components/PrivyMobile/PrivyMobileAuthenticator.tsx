@@ -9,6 +9,7 @@ import { toSignInProvider } from 'views/components/Privy/helpers';
 import { usePrivyEthereumWalletOn } from 'views/components/PrivyMobile/usePrivyEthereumWalletOn';
 import { usePrivyEthereumWalletRequest } from 'views/components/PrivyMobile/usePrivyEthereumWalletRequest';
 import { usePrivyMobileAuthStatus } from 'views/components/PrivyMobile/usePrivyMobileAuthStatus';
+import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import { usePrivyMobileSignMessage } from 'views/components/PrivyMobile/usePrivyMobileSignMessage';
 
 declare global {
@@ -27,6 +28,8 @@ type Props = {
 export const PrivyMobileAuthenticator = (props: Props) => {
   const { children } = props;
   const getPrivyMobileAuthStatus = usePrivyMobileAuthStatus();
+  const privyMobileLogout = usePrivyMobileLogout();
+
   const { signIn } = useSignIn();
 
   const user = useUserStore();
@@ -107,13 +110,17 @@ export const PrivyMobileAuthenticator = (props: Props) => {
       document.location.href = landingURL;
     }
 
-    doAsync().catch(console.error);
+    doAsync().catch((err) => {
+      console.error('Could not perform authentication: ', err);
+      privyMobileLogout({}).catch(console.error);
+    });
   }, [
     user,
     ethereumProvider,
     getPrivyMobileAuthStatus,
     signIn,
     signMessageProvider,
+    privyMobileLogout,
   ]);
 
   if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
