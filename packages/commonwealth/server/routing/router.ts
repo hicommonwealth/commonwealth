@@ -97,13 +97,6 @@ function setupRouter(
     getAddressStatus.bind(this, models),
   );
 
-  // communities
-  //  '/communities/update_id',
-  //  '/communities',
-  // '/nodes'
-  //  '/relatedCommunities',
-  // '/communityStakes/:community_id/:stake_id',
-
   registerRoute(
     router,
     'get',

@@ -9,7 +9,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
     ...schemas.SetCommunityStake,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload }) => {
+    body: async ({ payload }) => {
       const { community_id, ...rest } = payload;
 
       // !load
@@ -48,13 +48,6 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
         ...rest,
         community_id,
       });
-
-      // // since the stake is already created, generate group in background
-      // // so this request doesn't fail
-      // await command(GenerateStakeholderGroups(), {
-      //   actor,
-      //   payload: { id: community.id! },
-      // });
 
       return {
         ...community,

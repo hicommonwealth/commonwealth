@@ -3,7 +3,12 @@ import { ChainNode } from '../entities';
 
 export const GetChainNodes = {
   input: z.object({}),
-  output: z.array(ChainNode),
+  output: z.array(
+    ChainNode.extend({
+      created_at: z.date().or(z.string()).optional(),
+      updated_at: z.date().or(z.string()).optional(),
+    }),
+  ),
 };
 
 export const TotalStats = z.object({

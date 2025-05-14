@@ -1,84 +1,23 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import { CommunityResult } from 'views/pages/search/helpers';
-import { ApiEndpoints, SERVER_URL } from '../config';
+import { SearchCommunities } from '@hicommonwealth/schemas';
+import { trpc } from 'utils/trpcClient';
+import z from 'zod';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
-export type SearchChainsResponse = {
-  results: CommunityResult[];
-  limit: number;
-  page: number;
-  totalPages: number;
-  totalResults: number;
-};
-
-interface SearchChainsProps {
-  communityId: string;
-  searchTerm: string;
-  limit: number;
-  orderBy: APIOrderBy;
-  orderDirection: APIOrderDirection;
-  enabled?: boolean;
-}
-
-const searchChains = async ({
-  pageParam = 1,
-  communityId,
-  searchTerm,
-  limit,
-  orderBy,
-  orderDirection,
-}: SearchChainsProps & { pageParam: number }) => {
-  const {
-    data: { result },
-  } = await axios.get<{ result: SearchChainsResponse }>(
-    `${SERVER_URL}/communities`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      params: {
-        community_id: communityId,
-        search: searchTerm,
-        limit: limit.toString(),
-        page: pageParam.toString(),
-        order_by: orderBy,
-        order_direction: orderDirection,
-      },
-    },
-  );
-  return result;
-};
-
 const useSearchChainsQuery = ({
-  communityId,
-  searchTerm,
+  search,
   limit,
-  orderBy,
-  orderDirection,
+  order_by,
+  order_direction,
   enabled = true,
-}: SearchChainsProps) => {
-  const key = [
-    ApiEndpoints.searchChains(searchTerm),
+}: z.infer<(typeof SearchCommunities)['input']> & { enabled?: boolean }) => {
+  return trpc.community.searchCommunities.useInfiniteQuery(
     {
-      communityId,
-      orderBy,
-      orderDirection,
+      search,
+      limit,
+      order_by,
+      order_direction,
     },
-  ];
-  return useInfiniteQuery(
-    key,
-    ({ pageParam }) =>
-      searchChains({
-        pageParam,
-        communityId,
-        searchTerm,
-        limit,
-        orderBy,
-        orderDirection,
-      }),
     {
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;
