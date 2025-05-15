@@ -126,7 +126,9 @@ export const PrivyMobileAuthenticator = (props: Props) => {
     doAsync().catch((err) => {
       console.error('Could not perform authentication: ' + err.message, err);
       // FIXME enable this again once we have reliable authentication working...
-      //privyMobileLogout({}).catch(console.error);
+      privyMobileLogout({
+        error: err.message ?? undefined,
+      }).catch(console.error);
     });
   }, [
     user,
