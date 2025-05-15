@@ -5,6 +5,7 @@ import { TokenView } from '../queries';
 
 export const CreateToken = {
   input: z.object({
+    creator_address: z.string(),
     community_id: z.string(),
     transaction_hash: z.string().length(66),
     chain_node_id: z.number(),

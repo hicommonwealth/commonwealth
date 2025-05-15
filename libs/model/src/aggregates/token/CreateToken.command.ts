@@ -17,8 +17,9 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload }) => {
+    body: async ({ payload }) => {
       const {
+        creator_address,
         chain_node_id,
         community_id,
         transaction_hash,
@@ -78,7 +79,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
             eth_market_cap_target: commonProtocol.getTargetMarketCap(),
             description: description ?? null,
             icon_url: icon_url ?? null,
-            creator_address: actor.address,
+            creator_address,
           },
           transaction,
         });

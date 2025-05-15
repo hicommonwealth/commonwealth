@@ -495,12 +495,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
       },
       LaunchpadTokenCreated: async ({ payload }) => {
+        const user_id = await getUserByAddress(payload.creator_address);
+        if (!user_id) return;
+
         const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
           { created_at },
           'LaunchpadTokenCreated',
         );
-        const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       LaunchpadTokenTraded: async ({ payload }) => {

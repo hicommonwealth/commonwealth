@@ -397,6 +397,7 @@ export const events = {
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
     eth_chain_id: z.number(),
+    creator_address: EVM_ADDRESS_STRICT,
   }),
 
   LaunchpadTokenGraduated: z.object({

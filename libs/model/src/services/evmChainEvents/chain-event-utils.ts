@@ -78,6 +78,7 @@ const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
       block_timestamp: event.block.timestamp,
       transaction_hash: event.rawLog.transactionHash,
       eth_chain_id: event.eventSource.ethChainId,
+      creator_address: event.rawLog.address as `0x${string}`,
     },
   };
 };

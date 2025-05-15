@@ -54,6 +54,7 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
         await command(CreateToken(), {
           actor: systemActor({}),
           payload: {
+            creator_address: payload.creator_address,
             chain_node_id: chainNode!.id!,
             community_id: '', // not required for system actors
             transaction_hash: payload.transaction_hash,
