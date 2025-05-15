@@ -1,5 +1,9 @@
 # Plan for Enhanced Contextual Mentions and AI Interaction
 
+### Overview
+
+This plan outlines the steps to implement an enhanced contextual mention system. The goal is to allow users to mention various platform entities (Users, Topics, Threads, Communities, Proposals) within text editors. The `@` symbol will trigger a global multi-entity search, while `#`, `!`, and `~` will allow for specific entity type searches. This contextual information will be dynamically fetched (primarily server-side) and provided to the AI to generate more relevant and informed responses. The implementation involves client-side UI changes for mentions, new backend logic for context aggregation, and modifications to the AI prompting mechanism.
+
 ## I. Extend Mention System (`use_mention.tsx` and related Quill configuration)
 
 **Tasks:**
