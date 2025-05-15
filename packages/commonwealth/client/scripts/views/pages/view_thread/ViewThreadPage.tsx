@@ -1,4 +1,5 @@
 import {
+  canUserPerformGatedAction,
   ContentType,
   GatedActionEnum,
   getThreadUrl,
@@ -14,7 +15,7 @@ import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
-import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
+import { filterLinks, getThreadActionToolTips } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -298,7 +299,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { isRestrictedMembership, foundTopicPermissions, memberships } =
+  const { actionGroups, bypassGating, memberships, isTopicGated } =
     useTopicGating({
       communityId,
       apiEnabled: !!user?.activeAccount?.address && !!communityId,
@@ -329,16 +330,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // Note: Disabling lint rule since we only want to run it once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // find if the current topic is gated
-  const foundGatedTopic = groups.find((x) => {
-    if (thread?.topic) {
-      return (
-        Array.isArray(x.topics) &&
-        x?.topics?.find((y) => y.id === thread.topic!.id)
-      );
-    }
-  });
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -494,24 +485,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
-  const disabledActionsTooltipText = getThreadActionTooltipText({
+  const disabledThreadActionToolTips = getThreadActionToolTips({
     isCommunityMember: !!user.activeAccount,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        GatedActionEnum.CREATE_COMMENT,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+    actionGroups,
+    bypassGating,
   });
 
   const canComment =
     !!user.activeAccount &&
-    !isRestrictedMembership &&
-    !disabledActionsTooltipText;
+    !canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_COMMENT) &&
+    !disabledThreadActionToolTips.disabledCommentTooltipText;
 
   const handleVersionHistoryChange = (versionId: number) => {
     const foundVersion = (thread?.versionHistory || []).find(
@@ -634,9 +619,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 ].map((poll: Poll) => {
                   return (
                     <ThreadPollCard
+                      thread={thread}
                       poll={poll}
                       key={poll.id}
-                      isTopicMembershipRestricted={isRestrictedMembership}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       showDeleteButton={isAuthor || isAdmin}
                     />
                   );
@@ -929,22 +916,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      {foundGatedTopic &&
-                        !hideGatingBanner &&
-                        isRestrictedMembership && (
-                          <CWGatedTopicBanner
-                            actions={[
-                              GatedActionEnum.CREATE_COMMENT,
-                              GatedActionEnum.CREATE_COMMENT_REACTION,
-                              GatedActionEnum.CREATE_THREAD_REACTION,
-                              GatedActionEnum.UPDATE_POLL,
-                            ]}
-                            memberships={memberships}
-                            groups={groups}
-                            topicId={thread?.topic?.id}
-                            onClose={() => setHideGatingBanner(true)}
-                          />
-                        )}
+                      {isTopicGated && !hideGatingBanner && (
+                        <CWGatedTopicBanner
+                          actions={[
+                            GatedActionEnum.CREATE_COMMENT,
+                            GatedActionEnum.CREATE_COMMENT_REACTION,
+                            GatedActionEnum.CREATE_THREAD_REACTION,
+                            GatedActionEnum.UPDATE_POLL,
+                          ]}
+                          memberships={memberships}
+                          groups={groups}
+                          topicId={thread?.topic?.id}
+                          onClose={() => setHideGatingBanner(true)}
+                        />
+                      )}
                       {showBanner && (
                         <JoinCommunityBanner
                           onClose={handleCloseBanner}
@@ -1070,10 +1055,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
                 canComment={canComment}
-                canReact={!isRestrictedMembership}
-                canReply={!isRestrictedMembership}
+                canReact={canUserPerformGatedAction(
+                  actionGroups,
+                  GatedActionEnum.CREATE_COMMENT_REACTION,
+                )}
+                canReply={canUserPerformGatedAction(
+                  actionGroups,
+                  GatedActionEnum.CREATE_COMMENT,
+                )}
                 fromDiscordBot={fromDiscordBot}
-                disabledActionsTooltipText={disabledActionsTooltipText}
+                disabledThreadActionToolTips={disabledThreadActionToolTips}
                 onThreadCreated={handleGenerateAIComment}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
                 streamingReplyIds={streamingReplyIds}
@@ -1097,9 +1088,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 canComment={canComment}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
                 tooltipText={
-                  typeof disabledActionsTooltipText === 'function'
-                    ? disabledActionsTooltipText?.('comment')
-                    : disabledActionsTooltipText
+                  disabledThreadActionToolTips.disabledCommentTooltipText
                 }
               />
             )}

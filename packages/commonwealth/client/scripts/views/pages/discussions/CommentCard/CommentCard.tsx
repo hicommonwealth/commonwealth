@@ -11,7 +11,7 @@ import {
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { DisabledThreadActionToolTips } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -46,7 +46,6 @@ import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
 export type CommentViewParams = z.infer<typeof CommentsView>;
 
 type CommentCardProps = {
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -90,10 +89,10 @@ type CommentCardProps = {
   isRootComment?: boolean;
   threadContext?: string;
   threadTitle?: string;
+  disabledThreadActionToolTips: DisabledThreadActionToolTips;
 };
 
 export const CommentCard = ({
-  disabledActionsTooltipText = '',
   // edit
   editDraft,
   canEdit,
@@ -134,6 +133,7 @@ export const CommentCard = ({
   isRootComment,
   threadContext,
   threadTitle,
+  disabledThreadActionToolTips,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -466,9 +466,7 @@ Community Description: ${communityDescription}`;
                     comment={comment}
                     disabled={!canReact}
                     tooltipText={
-                      typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('upvote')
-                        : disabledActionsTooltipText
+                      disabledThreadActionToolTips.disabledCommentReactionTooltipText
                     }
                     onReaction={handleReaction}
                     weightType={weightType}
@@ -509,9 +507,7 @@ Community Description: ${communityDescription}`;
                       label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
                       disabled={maxReplyLimitReached || !canReply}
                       tooltipText={
-                        (typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('reply')
-                          : disabledActionsTooltipText) ||
+                        disabledThreadActionToolTips.disabledCommentTooltipText ||
                         (canReply && maxReplyLimitReached
                           ? 'Further replies not allowed'
                           : '')
@@ -529,9 +525,7 @@ Community Description: ${communityDescription}`;
                           label="AI Reply"
                           disabled={maxReplyLimitReached || !canReply}
                           tooltipText={
-                            (typeof disabledActionsTooltipText === 'function'
-                              ? disabledActionsTooltipText?.('reply')
-                              : disabledActionsTooltipText) ||
+                            disabledThreadActionToolTips.disabledCommentTooltipText ||
                             (canReply && maxReplyLimitReached
                               ? 'Further replies not allowed'
                               : '')

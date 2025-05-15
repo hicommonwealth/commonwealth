@@ -1,8 +1,11 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  canUserPerformGatedAction,
+  GatedActionEnum,
+} from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { detectURL, getThreadActionToolTips } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import React, { useEffect, useRef, useState } from 'react';
@@ -135,13 +138,12 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { isRestrictedMembership, foundTopicPermissions, memberships } =
-    useTopicGating({
-      communityId,
-      userAddress: user.activeAccount?.address || '',
-      apiEnabled: !!user.activeAccount?.address && !!communityId,
-      topicId: threadTopic?.id || 0,
-    });
+  const { actionGroups, bypassGating, memberships } = useTopicGating({
+    communityId,
+    userAddress: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId: threadTopic?.id || 0,
+  });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -169,7 +171,9 @@ export const NewThreadForm = () => {
   const handleNewThreadCreation = async () => {
     const body = markdownEditorMethodsRef.current!.getMarkdown();
 
-    if (isRestrictedMembership) {
+    if (
+      canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_THREAD)
+    ) {
       notifyError('Topic is gated!');
       return;
     }
@@ -227,16 +231,11 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
-  const disabledActionsTooltipText = getThreadActionTooltipText({
+
+  const disabledThreadActionToolTips = getThreadActionToolTips({
     isCommunityMember: !!user.activeAccount,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        GatedActionEnum.CREATE_THREAD,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+    actionGroups,
+    bypassGating,
   });
 
   const contestThreadBannerVisible =
@@ -370,7 +369,8 @@ export const NewThreadForm = () => {
                     <ThreadPollCard
                       poll={poll}
                       key={poll.id}
-                      isTopicMembershipRestricted={isRestrictedMembership}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       showDeleteButton={true}
                       isCreateThreadPage={true}
                       setLocalPoll={setPollData}
@@ -549,14 +549,13 @@ export const NewThreadForm = () => {
                   }
                   onChange={(markdown) => setEditorText(markdown)}
                   disabled={
-                    isRestrictedMembership ||
-                    !!disabledActionsTooltipText ||
-                    !user.activeAccount
+                    !canUserPerformGatedAction(
+                      actionGroups,
+                      GatedActionEnum.CREATE_THREAD,
+                    ) || !user.activeAccount
                   }
                   tooltip={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText
+                    disabledThreadActionToolTips.disabledThreadCreateTooltipText
                   }
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                   SubmitButton={() => (
@@ -565,7 +564,10 @@ export const NewThreadForm = () => {
                       disabled={
                         isDisabled ||
                         !user.activeAccount ||
-                        !!disabledActionsTooltipText ||
+                        !canUserPerformGatedAction(
+                          actionGroups,
+                          GatedActionEnum.CREATE_THREAD,
+                        ) ||
                         walletBalanceError ||
                         contestTopicError
                       }

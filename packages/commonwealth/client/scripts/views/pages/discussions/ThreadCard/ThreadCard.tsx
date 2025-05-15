@@ -1,10 +1,7 @@
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
-import {
-  GetThreadActionTooltipTextResponse,
-  filterLinks,
-} from 'helpers/threads';
+import { DisabledThreadActionToolTips, filterLinks } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -43,7 +40,7 @@ type CardProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   canUpdateThread?: boolean;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
+  disabledThreadActionToolTips: DisabledThreadActionToolTips;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
   hideReactionButton?: boolean;
@@ -85,10 +82,8 @@ export const ThreadCard = ({
   onStageTagClick,
   threadHref,
   showSkeleton,
-  canReact = true,
-  canComment = true,
   canUpdateThread = true,
-  disabledActionsTooltipText = '',
+  disabledThreadActionToolTips,
   onCommentBtnClick = () => null,
   hideRecentComments = false,
   hideReactionButton = false,
@@ -164,12 +159,12 @@ export const ThreadCard = ({
           <ReactionButton
             thread={thread}
             size="big"
-            disabled={!canReact}
+            disabled={
+              !!disabledThreadActionToolTips.disabledThreadReactionTooltipText
+            }
             undoUpvoteDisabled={editingDisabled}
             tooltipText={
-              typeof disabledActionsTooltipText === 'function'
-                ? disabledActionsTooltipText?.('upvote')
-                : disabledActionsTooltipText
+              disabledThreadActionToolTips.disabledThreadReactionTooltipText
             }
           />
         )}
@@ -324,8 +319,6 @@ export const ThreadCard = ({
                       isThreadCollaborator ||
                       hasAdminPermissions)
                   }
-                  canReact={canReact}
-                  canComment={canComment}
                   onDelete={onDelete}
                   onSpamToggle={onSpamToggle}
                   onLockToggle={onLockToggle}
@@ -338,7 +331,6 @@ export const ThreadCard = ({
                   onEditConfirm={onEditConfirm}
                   hasPendingEdits={hasPendingEdits}
                   onCommentBtnClick={onCommentBtnClick}
-                  disabledActionsTooltipText={disabledActionsTooltipText}
                   setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
                   hideUpvoteDrawerButton={hideUpvotesDrawer}
                   editingDisabled={editingDisabled}
@@ -346,6 +338,7 @@ export const ThreadCard = ({
                   showCommentVisible={showCommentVisible}
                   toggleShowComments={toggleShowComments}
                   showOnlyThreadActionIcons={showOnlyThreadActionIcons}
+                  disabledThreadActionTooltips={disabledThreadActionToolTips}
                 />
               )}
             </div>
@@ -370,8 +363,10 @@ export const ThreadCard = ({
                 onClick={() => onBodyClick && onBodyClick()}
               >
                 <CommentCard
-                  disabledActionsTooltipText={disabledActionsTooltipText}
-                  canReply={!disabledActionsTooltipText}
+                  disabledThreadActionToolTips={disabledThreadActionToolTips}
+                  canReply={
+                    !disabledThreadActionToolTips.disabledCommentTooltipText
+                  }
                   replyBtnVisible
                   hideReactButton
                   comment={{

@@ -8,7 +8,7 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { DisabledThreadActionToolTips } from 'helpers/threads';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -31,7 +31,7 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
+  disabledThreadActionTooltips: DisabledThreadActionToolTips;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
@@ -50,8 +50,6 @@ export const ThreadOptions = ({
   commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
-  canReact = true,
-  canComment = true,
   totalComments,
   onLockToggle,
   onCollaboratorsEdit,
@@ -64,7 +62,6 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
@@ -75,6 +72,7 @@ export const ThreadOptions = ({
   showCommentVisible,
   toggleShowComments,
   showOnlyThreadActionIcons = false,
+  disabledThreadActionTooltips,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -119,12 +117,12 @@ export const ThreadOptions = ({
             <ReactionButton
               thread={thread}
               size="small"
-              disabled={!canReact}
+              disabled={
+                !!disabledThreadActionTooltips.disabledThreadReactionTooltipText
+              }
               undoUpvoteDisabled={editingDisabled}
               tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('upvote')
-                  : disabledActionsTooltipText
+                disabledThreadActionTooltips.disabledThreadReactionTooltipText
               }
             />
           )}
@@ -139,16 +137,16 @@ export const ThreadOptions = ({
                     pluralize(totalComments, 'Comment')
               }
               action="comment"
-              disabled={!canComment}
+              disabled={
+                !!disabledThreadActionTooltips.disabledCommentTooltipText
+              }
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
                 onCommentClick && onCommentClick();
               }}
               tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('comment')
-                  : disabledActionsTooltipText
+                disabledThreadActionTooltips.disabledCommentTooltipText
               }
             />
           )}

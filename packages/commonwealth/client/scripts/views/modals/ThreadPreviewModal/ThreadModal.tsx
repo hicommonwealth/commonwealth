@@ -1,5 +1,5 @@
-import { GatedActionEnum, slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
+import { slugify } from '@hicommonwealth/shared';
+import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
@@ -37,51 +37,37 @@ export const ThreadModal = ({ thread }: ThreadModalProps) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: thread.communityId,
     userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
     topicId: thread?.topic?.id || 0,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin({
-      id: community?.id || '',
-      adminsAndMods: community?.adminsAndMods || [],
-    });
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
+  const disabledThreadActionToolTips = getThreadActionToolTips({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledCommentActionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+    actionGroups,
+    bypassGating,
   });
 
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
-      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+      <ThreadCard
+        thread={thread}
+        layoutType="community-first"
+        showSkeleton
+        disabledThreadActionToolTips={disabledThreadActionToolTips}
+      />
     );
   }
 
   return (
     <ThreadCard
       thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledCommentActionTooltipText}
-      canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
+      canUpdateThread={false} // we don't want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
           `${
@@ -91,11 +77,7 @@ export const ThreadModal = ({ thread }: ThreadModalProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentActionTooltipText
-          ? disabledCommentActionTooltipText
-          : disabledActionsTooltipText
-      }
+      disabledThreadActionToolTips={disabledThreadActionToolTips}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer

@@ -17,7 +17,18 @@ export const EmptyThreadsPlaceholder = ({
       {Array(3)
         .fill({})
         .map((x, i) => (
-          <ThreadCard key={i} showSkeleton thread={{} as any} />
+          <ThreadCard
+            key={i}
+            showSkeleton
+            thread={{} as any}
+            disabledThreadActionToolTips={{
+              disabledCommentTooltipText: '',
+              disabledPollVoteTooltipText: '',
+              disabledThreadReactionTooltipText: '',
+              disabledThreadCreateTooltipText: '',
+              disabledCommentReactionTooltipText: '',
+            }}
+          />
         ))}
     </div>
   ) : (

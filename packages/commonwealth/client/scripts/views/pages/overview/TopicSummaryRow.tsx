@@ -1,5 +1,5 @@
-import { GatedActionEnum, slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'helpers/threads';
+import { slugify } from '@hicommonwealth/shared';
+import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -32,15 +32,13 @@ export const TopicSummaryRow = ({
 
   const communityId = app.activeChainId() || '';
 
-  const { memberships, topicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 
   if (isLoading) return <TopicSummaryRowSkeleton />;
-
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
@@ -90,48 +88,20 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const isTopicGated = !!(memberships || []).find(
-            (membership) =>
-              thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic!.id),
-          );
-
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic!.id) &&
-              membership.isAllowed,
-          );
-
-          const isRestrictedMembership =
-            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-          const foundTopicPermissions = topicPermissions.find(
-            (tp) => tp.id === thread.topic!.id,
-          );
-
-          const disabledActionsTooltipText = getThreadActionTooltipText({
+          const disabledThreadActionToolTips = getThreadActionToolTips({
             isCommunityMember: Permissions.isCommunityMember(
               thread.communityId,
             ),
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isRestrictedMembership,
-            threadTopicInteractionRestrictions:
-              !isAdmin &&
-              !foundTopicPermissions?.permissions?.includes(
-                GatedActionEnum.CREATE_COMMENT, // on this page we only show comment option
-              )
-                ? foundTopicPermissions?.permissions
-                : undefined,
+            actionGroups,
+            bypassGating,
           });
 
           return (
             <ThreadCard
               key={thread.id}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
               canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -140,7 +110,7 @@ export const TopicSummaryRow = ({
               onCommentBtnClick={() =>
                 navigate(`${discussionLinkWithoutChain}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
+              disabledThreadActionToolTips={disabledThreadActionToolTips}
               hideReactionButton
               hideUpvotesDrawer
               expandCommentBtnVisible

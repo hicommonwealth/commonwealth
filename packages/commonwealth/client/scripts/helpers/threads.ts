@@ -1,6 +1,12 @@
-import { GatedActionEnum, getReadableActions } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  getMustJoinGroupNames,
+  UserFriendlyActionMap,
+} from '@hicommonwealth/shared';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
+
 // eslint-disable-next-line max-len
 
 export function detectURL(str: string) {
@@ -40,43 +46,118 @@ export const getAddedAndDeleted = <T>(
   return { toAdd, toDelete };
 };
 
-type ThreadTooltipTextActions = 'upvote' | 'comment' | 'reply' | 'submit';
-
-export type GetThreadActionTooltipTextResponse =
-  | string
-  | ((action: ThreadTooltipTextActions) => string);
-
-const getActionTooltipForNonCommunityMember = (
-  action: ThreadTooltipTextActions,
-) => {
-  return `Join community to ${action}`;
-};
-
-export const getThreadActionTooltipText = ({
+const getThreadActionTooltipText = ({
+  action,
   isCommunityMember = false,
   isThreadArchived = false,
   isThreadLocked = false,
-  isThreadTopicGated = false,
-  threadTopicInteractionRestrictions,
+  gatingGroupNames,
+  bypassGating,
+}: {
+  action: GatedActionEnum;
+  isCommunityMember?: boolean;
+  isThreadArchived?: boolean;
+  isThreadLocked?: boolean;
+  gatingGroupNames?: string[];
+  bypassGating?: boolean;
+}): string => {
+  if (!isCommunityMember)
+    return `Join community to ${UserFriendlyActionMap[action]}`;
+  if (isThreadArchived) return 'Thread is archived';
+  if (isThreadLocked) return 'Thread is locked';
+  if (gatingGroupNames && !bypassGating) {
+    if (!gatingGroupNames.length) return '';
+    if (gatingGroupNames.length === 1) {
+      return `Join ${gatingGroupNames[0]} to ${UserFriendlyActionMap[action]}`;
+    } else if (gatingGroupNames.length === 2) {
+      return `Join ${gatingGroupNames[0]} or ${gatingGroupNames[1]} to ${UserFriendlyActionMap[action]}`;
+    } else {
+      return `Join a group to unlock gated actions`;
+    }
+  }
+  return '';
+};
+
+export type DisabledThreadActionToolTips = {
+  disabledThreadReactionTooltipText: string;
+  disabledCommentReactionTooltipText: string;
+  disabledCommentTooltipText: string;
+  disabledThreadCreateTooltipText: string;
+  disabledPollVoteTooltipText: string;
+};
+
+export function getThreadActionToolTips({
+  isCommunityMember = false,
+  isThreadArchived = false,
+  isThreadLocked = false,
+  actionGroups,
+  bypassGating,
 }: {
   isCommunityMember?: boolean;
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
-  isThreadTopicGated?: boolean;
-  threadTopicInteractionRestrictions?: GatedActionEnum[];
-}): GetThreadActionTooltipTextResponse => {
-  if (!isCommunityMember) {
-    return getActionTooltipForNonCommunityMember;
-  }
-  if (isThreadArchived) return 'Thread is archived';
-  if (isThreadLocked) return 'Thread is locked';
-  if (isThreadTopicGated) return 'Topic is gated';
-  if (threadTopicInteractionRestrictions) {
-    // TODO: update to reflect all groups
-    return `Only group members can ${getReadableActions({
-      actions: threadTopicInteractionRestrictions,
-      separatorType: ',&',
-    })}`;
-  }
-  return '';
-};
+  actionGroups: ActionGroups;
+  bypassGating?: boolean;
+}): DisabledThreadActionToolTips {
+  const disabledThreadReactionTooltipText = getThreadActionTooltipText({
+    action: GatedActionEnum.CREATE_THREAD_REACTION,
+    isCommunityMember,
+    isThreadArchived,
+    isThreadLocked,
+    gatingGroupNames: getMustJoinGroupNames(
+      actionGroups,
+      GatedActionEnum.CREATE_THREAD_REACTION,
+    ),
+    bypassGating,
+  });
+  const disabledCommentReactionTooltipText = getThreadActionTooltipText({
+    action: GatedActionEnum.CREATE_COMMENT_REACTION,
+    isCommunityMember,
+    isThreadArchived,
+    isThreadLocked,
+    gatingGroupNames: getMustJoinGroupNames(
+      actionGroups,
+      GatedActionEnum.CREATE_COMMENT_REACTION,
+    ),
+    bypassGating,
+  });
+  const disabledCommentTooltipText = getThreadActionTooltipText({
+    action: GatedActionEnum.CREATE_COMMENT,
+    isCommunityMember,
+    isThreadArchived,
+    isThreadLocked,
+    gatingGroupNames: getMustJoinGroupNames(
+      actionGroups,
+      GatedActionEnum.CREATE_COMMENT,
+    ),
+    bypassGating,
+  });
+  const disabledThreadCreateTooltipText = getThreadActionTooltipText({
+    action: GatedActionEnum.CREATE_THREAD,
+    isCommunityMember,
+    gatingGroupNames: getMustJoinGroupNames(
+      actionGroups,
+      GatedActionEnum.CREATE_THREAD,
+    ),
+    bypassGating,
+  });
+  const disabledPollVoteTooltipText = getThreadActionTooltipText({
+    action: GatedActionEnum.UPDATE_POLL,
+    isCommunityMember,
+    isThreadArchived,
+    isThreadLocked,
+    gatingGroupNames: getMustJoinGroupNames(
+      actionGroups,
+      GatedActionEnum.UPDATE_POLL,
+    ),
+    bypassGating,
+  });
+
+  return {
+    disabledThreadReactionTooltipText,
+    disabledCommentReactionTooltipText,
+    disabledCommentTooltipText,
+    disabledThreadCreateTooltipText,
+    disabledPollVoteTooltipText,
+  };
+}

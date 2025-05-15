@@ -1,12 +1,23 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  canUserPerformGatedAction,
+  DisabledCommunitySpamTier,
+  GatedActionEnum,
+  LinkSource,
+} from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  SessionKeyError,
   getEthChainIdOrBech32Prefix,
+  SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { detectURL, getThreadActionToolTips } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -57,14 +68,6 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
-
-import { DisabledCommunitySpamTier, LinkSource } from '@hicommonwealth/shared';
-import {
-  SnapshotProposal,
-  SnapshotSpace,
-} from 'client/scripts/helpers/snapshot_utils';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import useForceRerender from 'client/scripts/hooks/useForceRerender';
 
 import Poll from 'client/scripts/models/Poll';
 // eslint-disable-next-line max-len
@@ -246,13 +249,12 @@ export const NewThreadForm = forwardRef<
     includeTopics: true,
     enabled: !!selectedCommunityId,
   });
-  const { isRestrictedMembership, foundTopicPermissions, memberships } =
-    useTopicGating({
-      communityId: selectedCommunityId,
-      userAddress: userSelectedAddress || '',
-      apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
-      topicId: threadTopic?.id || 0,
-    });
+  const { memberships, actionGroups, bypassGating } = useTopicGating({
+    communityId: selectedCommunityId,
+    userAddress: userSelectedAddress || '',
+    apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
+    topicId: threadTopic?.id || 0,
+  });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
@@ -282,16 +284,10 @@ export const NewThreadForm = forwardRef<
     isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
-  const disabledActionsTooltipText = getThreadActionTooltipText({
+  const disabledThreadActionsTooltips = getThreadActionToolTips({
     isCommunityMember: !!userSelectedAddress,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        GatedActionEnum.CREATE_THREAD,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+    actionGroups,
+    bypassGating,
   });
 
   const {
@@ -308,7 +304,11 @@ export const NewThreadForm = forwardRef<
     !userSelectedAddress ||
     walletBalanceError ||
     contestTopicError ||
-    (selectedCommunityId && !!disabledActionsTooltipText) ||
+    (selectedCommunityId &&
+      !canUserPerformGatedAction(
+        actionGroups,
+        GatedActionEnum.CREATE_THREAD,
+      )) ||
     isLoadingCommunity ||
     (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
     isDisabled ||
@@ -330,7 +330,9 @@ export const NewThreadForm = forwardRef<
       return;
     }
 
-    if (isRestrictedMembership) {
+    if (
+      !canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_THREAD)
+    ) {
       notifyError('Topic is gated!');
       return;
     }
@@ -469,7 +471,6 @@ export const NewThreadForm = forwardRef<
     community,
     createThread,
     isInsideCommunity,
-    isRestrictedMembership,
     isDiscussion,
     threadUrl,
     threadTopic,
@@ -776,7 +777,8 @@ export const NewThreadForm = forwardRef<
                     <ThreadPollCard
                       poll={poll}
                       key={poll.id}
-                      isTopicMembershipRestricted={isRestrictedMembership}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       showDeleteButton={true}
                       isCreateThreadPage={true}
                       setLocalPoll={setPollData}
@@ -1032,13 +1034,12 @@ export const NewThreadForm = forwardRef<
                   setContentDelta={setThreadContentDelta}
                   {...(selectedCommunityId && {
                     isDisabled:
-                      isRestrictedMembership ||
-                      !!disabledActionsTooltipText ||
-                      !userSelectedAddress,
+                      !canUserPerformGatedAction(
+                        actionGroups,
+                        GatedActionEnum.CREATE_THREAD,
+                      ) || !userSelectedAddress,
                     tooltipLabel:
-                      typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('submit')
-                        : disabledActionsTooltipText,
+                      disabledThreadActionsTooltips.disabledThreadCreateTooltipText,
                   })}
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                 />

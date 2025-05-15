@@ -22,12 +22,13 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
+  canUserPerformGatedAction,
   ContentType,
-  GatedActionEnum,
-  ZERO_ADDRESS,
   formatDecimalToWei,
+  GatedActionEnum,
   generateTopicIdentifiersFromUrl,
   generateUrlPartForTopicIdentifiers,
+  ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -42,7 +43,6 @@ import { saveToClipboard } from 'utils/clipboard';
 import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
-import { useFetchGroupsQuery } from 'state/api/groups';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
@@ -65,12 +65,6 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-export type DiscussionsPageProps = {
-  tabs?: { value: string; label: string };
-  selectedView?: string;
-  topicName?: string;
-  updateSelectedView?: (tabValue: string) => void;
-};
 export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
@@ -131,16 +125,16 @@ const DiscussionsPage = () => {
 
   const user = useUserStore();
 
-  const { data: groups = [] } = useFetchGroupsQuery({
-    communityId,
-    includeTopics: true,
-    enabled: !!communityId,
-  });
-
-  const { memberships, topicPermissions } = useTopicGating({
+  const {
+    groups = [],
+    memberships,
+    actionGroups,
+    bypassGating,
+  } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -383,8 +377,8 @@ const DiscussionsPage = () => {
                 <RenderThreadCard
                   thread={thread}
                   communityId={communityId}
-                  memberships={memberships}
-                  topicPermissions={topicPermissions}
+                  actionGroups={actionGroups}
+                  bypassGating={bypassGating}
                   contestsData={contestsData}
                 />
               )}
@@ -449,8 +443,8 @@ const DiscussionsPage = () => {
                 hideTrendingTag={true}
                 hideSpamTag={true}
                 communityId={communityId}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
+                actionGroups={actionGroups}
+                bypassGating={bypassGating}
                 contestsData={contestsData}
               />
             )}
@@ -465,7 +459,10 @@ const DiscussionsPage = () => {
           {user.isLoggedIn && user.activeAccount && (
             <StickyEditorContainer
               parentType={ContentType.Thread}
-              canComment={true}
+              canComment={canUserPerformGatedAction(
+                actionGroups,
+                GatedActionEnum.CREATE_COMMENT,
+              )}
               handleSubmitComment={() => {
                 // This isn't used for creating threads
                 console.error('Not implemented');

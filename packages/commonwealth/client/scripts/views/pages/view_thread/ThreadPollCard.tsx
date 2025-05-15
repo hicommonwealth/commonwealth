@@ -1,4 +1,11 @@
+import {
+  ActionGroups,
+  canUserPerformGatedAction,
+  GatedActionEnum,
+} from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { getThreadActionToolTips } from 'helpers/threads';
+import type Thread from 'models/Thread';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
@@ -12,19 +19,23 @@ import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {
+  thread?: Thread;
   poll: Poll;
   showDeleteButton?: boolean;
-  isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
   setLocalPoll?: (params) => void;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadPollCard = ({
+  thread,
   poll,
   showDeleteButton,
-  isTopicMembershipRestricted = false,
   isCreateThreadPage = false,
   setLocalPoll,
+  actionGroups,
+  bypassGating,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,12 +49,13 @@ export const ThreadPollCard = ({
     threadId: poll.threadId,
   });
 
-  const getTooltipErrorMessage = () => {
-    if (!user.activeAccount)
-      return 'Error: You must join this community to vote.';
-    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
-    return '';
-  };
+  const disabledThreadActionToolTips = getThreadActionToolTips({
+    isCommunityMember: !user.activeAccount,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    actionGroups,
+    bypassGating,
+  });
 
   const handleDeletePoll = async () => {
     try {
@@ -131,8 +143,11 @@ export const ThreadPollCard = ({
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
         disableVoteButton={
+          !canUserPerformGatedAction(
+            actionGroups,
+            GatedActionEnum.UPDATE_POLL,
+          ) ||
           !user.activeAccount ||
-          isTopicMembershipRestricted ||
           isCreateThreadPage
         }
         votedFor={userVote?.option || ''}
@@ -146,7 +161,9 @@ export const ThreadPollCard = ({
         voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={getTooltipErrorMessage()}
+        tooltipErrorMessage={
+          disabledThreadActionToolTips.disabledPollVoteTooltipText
+        }
         onVoteCast={(option, isSelected) => {
           // @ts-expect-error <StrictNullChecks/>
           handlePollVote(poll, option, isSelected);

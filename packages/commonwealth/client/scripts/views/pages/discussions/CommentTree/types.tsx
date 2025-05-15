@@ -1,4 +1,4 @@
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { DisabledThreadActionToolTips } from 'helpers/threads';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
@@ -15,11 +15,11 @@ export type CommentsTreeProps = {
   canReact?: boolean;
   canReply?: boolean;
   canComment: boolean;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
   streamingReplyIds: number[];
   setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
+  disabledThreadActionToolTips: DisabledThreadActionToolTips;
 };
 
 export type UseCommentsTreeProps = Pick<
@@ -41,7 +41,7 @@ export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
   | 'pageRef'
   | 'thread'
-  | 'disabledActionsTooltipText'
+  | 'disabledThreadActionToolTips'
   | 'streamingReplyIds'
   | 'setStreamingReplyIds'
 > & {

@@ -32,7 +32,7 @@ export const TreeHierarchy = ({
   isThreadArchived,
   isReplyingToCommentId,
   isReplyButtonVisible,
-  disabledActionsTooltipText,
+  disabledThreadActionToolTips,
   canReply,
   canReact,
   canComment,
@@ -164,6 +164,7 @@ export const TreeHierarchy = ({
           shareURL=""
           maxReplyLimitReached={false}
           isThreadArchived={false}
+          disabledThreadActionToolTips={disabledThreadActionToolTips}
         />
       </div>
     );
@@ -199,7 +200,7 @@ export const TreeHierarchy = ({
                 <div className={`Comment comment-${comment.id}`}>
                   <CommentCard
                     key={`${comment.id}-${comment.body}`}
-                    disabledActionsTooltipText={disabledActionsTooltipText}
+                    disabledThreadActionToolTips={disabledThreadActionToolTips}
                     isThreadArchived={isThreadArchived}
                     canReply={canReply}
                     maxReplyLimitReached={
@@ -265,7 +266,7 @@ export const TreeHierarchy = ({
                     commentEdits={commentEdits}
                     canComment={canComment}
                     thread={thread}
-                    disabledActionsTooltipText={disabledActionsTooltipText}
+                    disabledThreadActionToolTips={disabledThreadActionToolTips}
                     canReact={canReact}
                     canReply={canReply}
                     parentCommentId={comment.id}
@@ -277,7 +278,9 @@ export const TreeHierarchy = ({
                   <div className="replies-container">
                     <CommentCard
                       key={`streaming-${comment.id}`}
-                      disabledActionsTooltipText={disabledActionsTooltipText}
+                      disabledThreadActionToolTips={
+                        disabledThreadActionToolTips
+                      }
                       isThreadArchived={isThreadArchived}
                       maxReplyLimitReached={true}
                       replyBtnVisible={false}
@@ -337,8 +340,8 @@ export const TreeHierarchy = ({
                       }}
                       tooltipText={
                         !canComment &&
-                        typeof disabledActionsTooltipText === 'string'
-                          ? disabledActionsTooltipText
+                        disabledThreadActionToolTips.disabledCommentTooltipText
+                          ? disabledThreadActionToolTips.disabledCommentTooltipText
                           : ''
                       }
                     />

@@ -15,11 +15,11 @@ export const CommentTree = ({
   canReact = true,
   canReply = true,
   canComment,
-  disabledActionsTooltipText,
   onThreadCreated,
   aiCommentsToggleEnabled,
   streamingReplyIds,
   setStreamingReplyIds,
+  disabledThreadActionToolTips,
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
@@ -103,7 +103,7 @@ export const CommentTree = ({
         onCommentReplyEnd={handleIsReplying}
         commentEdits={edits}
         canComment={canComment}
-        disabledActionsTooltipText={disabledActionsTooltipText}
+        disabledThreadActionToolTips={disabledThreadActionToolTips}
         canReact={
           !thread.archivedAt && (!!user.activeAccount || isAdmin) && canReact
         }
