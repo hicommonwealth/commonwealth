@@ -75,6 +75,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   };
 
   const isJudgedContest = !!contest?.namespace_judge_token_id;
+  const judgeAddresses = contest?.namespace_judges || [];
 
   return (
     <CWPageLayout>
@@ -173,7 +174,10 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             <EntriesTab {...entriesTabProps} />
           )}
           {selectedMobileTab === MobileTabType.Judges && isJudgedContest && (
-            <JudgesTab contestAddress={contestAddress} />
+            <JudgesTab
+              contestAddress={contestAddress}
+              judges={judgeAddresses}
+            />
           )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
@@ -183,7 +187,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           <CWGrid>
             <div className="thread-list-container">
               <EntriesTab {...entriesTabProps} />
-              {isJudgedContest && <JudgesTab contestAddress={contestAddress} />}
+              {isJudgedContest && (
+                <JudgesTab
+                  contestAddress={contestAddress}
+                  judges={judgeAddresses}
+                />
+              )}
             </div>
             {address ? (
               <div>
