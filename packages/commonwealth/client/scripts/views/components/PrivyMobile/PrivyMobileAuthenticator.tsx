@@ -90,6 +90,15 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         ? toSignInProvider(privyMobileAuthStatus.userAuth.ssoProvider)
         : undefined;
 
+      // FIXME: the bug is that userAuth , computed in the mobile app, doesn't include the ssoProvider...
+
+      if (!ssoProvider) {
+        console.warn(
+          'Unable to compute the sign in ssoProvider for ' +
+            privyMobileAuthStatus.userAuth.ssoProvider,
+        );
+      }
+
       const signInOpts = {
         address: privyMobileAuthStatus.userAuth.address,
         community_id: ChainBase.Ethereum,

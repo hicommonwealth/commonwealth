@@ -52,7 +52,10 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
           );
 
           if (protoResponse?.$id === $id) {
-            console.log('Got proto response: ', protoResponse);
+            console.log(
+              'Got proto response: ',
+              JSON.stringify(protoResponse, null, 2),
+            );
 
             if (protoResponse.error) {
               reject(protoResponse.error);
