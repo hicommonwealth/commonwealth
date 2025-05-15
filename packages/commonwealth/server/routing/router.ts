@@ -44,48 +44,29 @@ import type DatabaseValidationService from '../middleware/databaseValidationServ
 import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
-import addThreadLink from '../routes/linking/addThreadLinks';
-import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
-import getLinks from '../routes/linking/getLinks';
 
-import { ServerAdminController } from '../controllers/server_admin_controller';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import { ServerCommentsController } from '../controllers/server_comments_controller';
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-import { ServerGroupsController } from '../controllers/server_groups_controller';
-import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
-import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
-import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
 export type ServerControllers = {
-  comments: ServerCommentsController;
-  analytics: ServerAnalyticsController;
   communities: ServerCommunitiesController;
-  groups: ServerGroupsController;
-  topics: ServerTopicsController;
-  admin: ServerAdminController;
 };
 
 function setupRouter(
@@ -95,17 +76,9 @@ function setupRouter(
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
-  // controllers
   const serverControllers: ServerControllers = {
-    comments: new ServerCommentsController(models),
-    analytics: new ServerAnalyticsController(),
     communities: new ServerCommunitiesController(models),
-    groups: new ServerGroupsController(models),
-    topics: new ServerTopicsController(models),
-    admin: new ServerAdminController(models),
   };
-
-  // ---
 
   const router = express.Router();
   router.use(useragent.express());
@@ -211,22 +184,6 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/admin/analytics',
-    passport.authenticate('jwt', { session: false }),
-    getStatsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/admin/top-users',
-    passport.authenticate('jwt', { session: false }),
-    getTopUsersHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
     '/threads',
     databaseValidationService.validateCommunity,
     getThreadsHandler.bind(this, serverControllers),
@@ -238,32 +195,6 @@ function setupRouter(
     '/feed',
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models, serverControllers),
-  );
-
-  // comments
-  registerRoute(
-    router,
-    'get',
-    '/comments',
-    databaseValidationService.validateCommunity,
-    searchCommentsHandler.bind(this, serverControllers),
-  );
-
-  // topics
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicChannelHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/topics-order' /* OLD: /orderTopics */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateTopicsOrderHandler.bind(this, serverControllers),
   );
 
   // reactions
@@ -417,28 +348,6 @@ function setupRouter(
     },
   );
 
-  // linking
-  registerRoute(
-    router,
-    'post',
-    '/linking/addThreadLinks',
-    passport.authenticate('jwt', { session: false }),
-    addThreadLink.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/linking/deleteLinks',
-    passport.authenticate('jwt', { session: false }),
-    deleteThreadLinks.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/linking/getLinks',
-    getLinks.bind(this, models),
-  );
-
   // login
   registerRoute(
     router,
@@ -460,13 +369,6 @@ function setupRouter(
     '/communityStats',
     databaseValidationService.validateCommunity,
     communityStats.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/groups',
-    getGroupsHandler.bind(this, serverControllers),
   );
 
   registerRoute(

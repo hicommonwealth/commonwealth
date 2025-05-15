@@ -89,6 +89,7 @@ export const GroupMetadata = z.object({
   description: z.string(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: z.number().nullish(), // NOT USED
+  groupImageUrl: z.string().nullish(),
 });
 
 export const Group = z.object({

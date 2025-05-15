@@ -1,20 +1,30 @@
 import z from 'zod';
-import { Comment } from '../entities';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { CommentView, ReactionView } from './thread.schemas';
 
+export const CommentSearchView = z.object({
+  type: z.literal('comment'),
+  id: PG_INT,
+  community_id: z.string(),
+  thread_id: PG_INT,
+  address_id: PG_INT,
+  address: z.string(),
+  address_community_id: z.string(),
+  title: z.string(),
+  body: z.string(),
+  rank: z.number(),
+  created_at: z.date().or(z.string()).nullish(),
+});
+
 export const SearchComments = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     community_id: z.string(),
     search: z.string(),
-    limit: PG_INT.optional().default(20),
-    page: PG_INT.int().optional().default(1),
-    orderBy: z.string().optional().default('created_at'),
-    orderDirection: z.enum(['ASC', 'DESC']).default('DESC'),
+    order_by: z.string().optional().default('created_at'),
   }),
   output: PaginatedResultSchema.extend({
-    results: Comment.array(),
+    results: z.array(CommentSearchView),
   }),
 };
 
@@ -22,9 +32,7 @@ export const CommentsView = CommentView.extend({
   reactions: z.array(ReactionView).nullish(),
   user_tier: z.number().nullish(),
 });
-
 export const GetCommentsOrderBy = z.enum(['newest', 'oldest', 'mostLikes']);
-
 export const GetComments = {
   input: PaginationParamsSchema.extend({
     thread_id: PG_INT.optional(),

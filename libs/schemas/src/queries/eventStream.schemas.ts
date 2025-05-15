@@ -98,3 +98,16 @@ export const ChainFeed = {
   input: z.object({}),
   output: z.array(ChainFeedRecord),
 };
+
+export const EventStreamItemSchema = z.object({
+  type: z.string(),
+  data: z.any(),
+  url: z.string(),
+});
+
+export const EventStream = {
+  input: z.object({}),
+  output: z.object({
+    items: z.array(EventStreamItemSchema),
+  }),
+};

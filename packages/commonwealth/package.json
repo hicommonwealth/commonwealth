@@ -51,7 +51,8 @@
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "resize-large-images": "tsx ./scripts/resizeImages.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
-    "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'pnpm run vite'",
+    "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host'",
+    "start-frontend": "vite -c ./client/vite.config.ts --host",
     "start-api": "tsx watch --max-old-space-size=4096 server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 tsx server.ts",
     "start-consumer": "tsx server/workers/commonwealthConsumer/commonwealthConsumer.ts",
@@ -76,7 +77,6 @@
     "test-select:watch": "NODE_ENV=test vitest --config ../../vite.config.ts",
     "ts-exec": "tsx ",
     "validate-external-api-version": "pnpm -F commonwealth ts-exec server/scripts/validate-external-api-versioning.ts $(pnpm info @commonxyz/api-client version)",
-    "vite": "wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "dependencies": {

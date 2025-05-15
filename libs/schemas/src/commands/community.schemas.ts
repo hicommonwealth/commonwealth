@@ -169,6 +169,15 @@ export const GenerateStakeholderGroups = {
     .partial(),
 };
 
+export const UpdateTopicsOrder = {
+  input: z.object({
+    community_id: z.string(),
+    ordered_ids: z.array(PG_INT),
+  }),
+  output: z.array(Topic),
+  context: AuthContext,
+};
+
 export const CreateTopic = {
   input: z
     .object({
@@ -219,6 +228,15 @@ export const UpdateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  context: TopicContext,
+};
+
+export const UpdateTopicChannel = {
+  input: z.object({
+    topic_id: z.number(),
+    channel_id: z.string().optional(),
+  }),
+  output: Topic,
   context: TopicContext,
 };
 

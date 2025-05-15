@@ -19,4 +19,6 @@ export const trpcRouter = trpc.router({
     trpc.Tag.SuperAdmin,
   ),
   setUserTier: trpc.command(SuperAdmin.SetUserTier, trpc.Tag.SuperAdmin),
+  getStats: trpc.query(SuperAdmin.GetStats, trpc.Tag.SuperAdmin),
+  getTopUsers: trpc.query(SuperAdmin.GetTopUsers, trpc.Tag.SuperAdmin),
 });

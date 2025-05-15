@@ -1,31 +1,20 @@
-import { AppError } from '@hicommonwealth/core';
-import { UserInstance } from '@hicommonwealth/model';
+import { Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { ServerAdminController } from '../server_admin_controller';
+import { models } from '../../database';
+import { isSuperAdmin } from '../../middleware';
 
-export const Errors = {
-  NotAdmin: 'Must be a site admin',
-};
-
-export type GetTopUsersOptions = {
-  user: UserInstance;
-};
-
-export type GetTopUsersResult = any[];
-
-export async function __getTopUsers(
-  this: ServerAdminController,
-  { user }: GetTopUsersOptions,
-): Promise<GetTopUsersResult> {
-  if (!user.isAdmin) {
-    throw new AppError(Errors.NotAdmin);
-  }
-
-  const sql = `
+export function GetTopUsers(): Query<typeof schemas.GetTopUsers> {
+  return {
+    ...schemas.GetTopUsers,
+    auth: [isSuperAdmin],
+    secure: true,
+    body: async () => {
+      const sql = `
   WITH Stats as (
     SELECT
       u.profile->>'name' AS profile_name,
-      p.user_id as user_id,
+      u.id as user_id,
       COUNT(DISTINCT t.id) AS thread_count,
       COUNT(DISTINCT c.id) AS comment_count,
       COUNT(DISTINCT c.id) + COUNT(DISTINCT t.id) AS total_activity,
@@ -40,7 +29,7 @@ export async function __getTopUsers(
       LEFT JOIN "Threads" AS t ON a.id = t.address_id
       LEFT JOIN "Comments" AS c ON a.id = c.address_id
     WHERE u."isAdmin" = FALSE
-    GROUP BY p.id
+    GROUP BY u.id
     ORDER BY total_activity DESC
     LIMIT 150
   )
@@ -57,9 +46,9 @@ export async function __getTopUsers(
   FROM Stats
   `;
 
-  const result = await this.models.sequelize.query<GetTopUsersResult[0]>(sql, {
-    type: QueryTypes.SELECT,
-  });
-
-  return result;
+      return await models.sequelize.query(sql, {
+        type: QueryTypes.SELECT,
+      });
+    },
+  };
 }
