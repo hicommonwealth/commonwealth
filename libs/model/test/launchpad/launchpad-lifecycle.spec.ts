@@ -130,10 +130,10 @@ describe('Launchpad Lifecycle', () => {
         namespace: 'DogeMoonLanding',
         symbol: 'DMLND',
         name: 'DogeMoonLanding',
-        total_supply: 1000n,
+        total_supply: '1000',
         token_address: TOKEN_ADDRESS,
         creator_address: actor.address as `0x${string}`,
-        launchpad_liquidity: 594115082271506067334n,
+        launchpad_liquidity: '594115082271506067334',
       },
     });
 

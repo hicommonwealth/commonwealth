@@ -275,8 +275,8 @@ export const QuickTokenLaunchForm = ({
           token_address: selectedAddress.address, // TODO: set token address
           creator_address: selectedAddress.address, // TODO: set creator address
           namespace: '', // TODO: set namespace
-          total_supply: 0n, // TODO: set total supply
-          launchpad_liquidity: 0n, // TODO: set launchpad liquidity
+          total_supply: '0', // TODO: set total supply
+          launchpad_liquidity: '0', // TODO: set launchpad liquidity
         });
 
         // 4. update community to reference the created token
