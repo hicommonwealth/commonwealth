@@ -500,7 +500,24 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenCreated',
         );
-        const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
+
+        // Find the launchpad token that was created with this transaction
+        const token = await models.LaunchpadToken.findOne({
+          where: {
+            token_address: {
+              [Op.like]: `%${payload.transaction_hash.slice(-40)}%`,
+            },
+          },
+          order: [['created_at', 'DESC']],
+        });
+
+        // Get user ID from creator_address
+        let user_id;
+        if (token?.creator_address) {
+          user_id = await getUserByAddress(token.creator_address);
+        }
+
+        if (!user_id) return;
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       LaunchpadTokenTraded: async ({ payload }) => {
