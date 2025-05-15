@@ -8,7 +8,7 @@ export const CreateToken = {
     creator_address: z.string(),
     token_address: z.string(),
     namespace: z.string(),
-    launchpad_liquidity: z.coerce.bigint(),
+    launchpad_liquidity: z.string(),
     community_id: z.string(),
     transaction_hash: z.string().length(66),
     chain_node_id: z.number(),
@@ -17,7 +17,7 @@ export const CreateToken = {
     icon_url: z.string().nullish(),
     name: z.string(),
     symbol: z.string(),
-    total_supply: z.coerce.bigint(),
+    total_supply: z.string(),
   }),
   output: TokenView.extend({
     community_id: z.string().nullish(),
