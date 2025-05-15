@@ -66,11 +66,10 @@ const WVMethodSelection = ({
 
   const chainNodeBalanceType = app?.chain?.meta?.ChainNode?.balance_type;
 
-  // Determine if Solana is supported for this community
-  const canEnableSPL = chainNodeBalanceType === 'solana';
-
-  // Determine if Sui is supported for this community
-  const canEnableSui = chainNodeBalanceType === 'sui';
+  // Determine chain types
+  const isEVMChain = chainNodeBalanceType === 'ethereum';
+  const isSolanaChain = chainNodeBalanceType === 'solana';
+  const isSuiChain = chainNodeBalanceType === 'sui';
 
   return (
     <div className="WVMethodSelection">
@@ -85,25 +84,27 @@ const WVMethodSelection = ({
         <CWText type="h4">Choose weight voting method</CWText>
 
         <CWRadioPanelGroup>
-          <CWRadioPanel
-            value={WVMethod.ERC20}
-            onSelect={setSelectedWVMethod}
-            label="Connect ERC20/ETH"
-            description="ERC20 Token or Native ETH"
-            popover={{
-              title: 'ERC20',
-              body: (
-                <CWText type="b2">
-                  Use any ERC 20 token that is on the same chain as your
-                  community. ERC20s can be used for weighted voting and running
-                  contests
-                </CWText>
-              ),
-            }}
-            isSelected={selectedWVMethod === WVMethod.ERC20}
-          />
+          {(isEVMChain || !chainNodeBalanceType) && (
+            <CWRadioPanel
+              value={WVMethod.ERC20}
+              onSelect={setSelectedWVMethod}
+              label="Connect ERC20/ETH"
+              description="ERC20 Token or Native ETH"
+              popover={{
+                title: 'ERC20',
+                body: (
+                  <CWText type="b2">
+                    Use any ERC 20 token that is on the same chain as your
+                    community. ERC20s can be used for weighted voting and
+                    running contests
+                  </CWText>
+                ),
+              }}
+              isSelected={selectedWVMethod === WVMethod.ERC20}
+            />
+          )}
 
-          {canEnableSPL && (
+          {isSolanaChain && (
             <CWRadioPanel
               value={WVMethod.SPL}
               onSelect={setSelectedWVMethod}
@@ -122,7 +123,7 @@ const WVMethodSelection = ({
             />
           )}
 
-          {canEnableSui && (
+          {isSuiChain && (
             <>
               <CWRadioPanel
                 value={WVMethod.SuiNative}
@@ -159,31 +160,33 @@ const WVMethodSelection = ({
             </>
           )}
 
-          <CWRadioPanel
-            value={WVMethod.Stake}
-            onSelect={setSelectedWVMethod}
-            label="Use Community stake"
-            description="Use non-transferable tokens"
-            popover={
-              canEnableStake
-                ? {
-                    title: 'Stake',
-                    body: (
-                      <CWText type="b2">
-                        Community Stake lets you buy a stake in your community
-                        using a fungible non transferable token. This token can
-                        be used for weighted voting and running contests
-                      </CWText>
-                    ),
-                  }
-                : {
-                    title: 'Disabled',
-                    body: 'Stake is not supported on your network',
-                  }
-            }
-            isSelected={selectedWVMethod === WVMethod.Stake}
-            disabled={!canEnableStake}
-          />
+          {(isEVMChain || !chainNodeBalanceType) && (
+            <CWRadioPanel
+              value={WVMethod.Stake}
+              onSelect={setSelectedWVMethod}
+              label="Use Community stake"
+              description="Use non-transferable tokens"
+              popover={
+                canEnableStake
+                  ? {
+                      title: 'Stake',
+                      body: (
+                        <CWText type="b2">
+                          Community Stake lets you buy a stake in your community
+                          using a fungible non transferable token. This token
+                          can be used for weighted voting and running contests
+                        </CWText>
+                      ),
+                    }
+                  : {
+                      title: 'Disabled',
+                      body: 'Stake is not supported on your network',
+                    }
+              }
+              isSelected={selectedWVMethod === WVMethod.Stake}
+              disabled={!canEnableStake}
+            />
+          )}
         </CWRadioPanelGroup>
 
         <CWDivider />
