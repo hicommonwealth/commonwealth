@@ -30,7 +30,7 @@ export const fetchNodes = async (): Promise<NodeInfo[]> => {
   // to @trpc/react-query v11.x
   const { data } = await axios.get(`${BASE_API_PATH}/superAdmin.getChainNodes`);
   const nodes = (data?.result?.data || []).map(
-    (node: any) => new NodeInfo(node),
+    (node: ChainNode) => new NodeInfo(node),
   );
 
   // add response in cache
