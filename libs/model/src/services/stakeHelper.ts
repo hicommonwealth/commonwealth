@@ -86,10 +86,14 @@ export async function getVotingWeight(
   } else if (topic.weighted_voting === TopicWeightedVoting.SPL) {
     // SPL Token support
     mustExist('Topic Token Address', topic.token_address);
+    const chainNode = topic.ChainNode || community.ChainNode!;
+    mustExist('Chain Node', chainNode);
+    mustExist('Chain Node Name', chainNode.name);
 
     const numTokens = await getWeightedSPLTokens(
       address,
       topic.token_address,
+      chainNode.name!,
       topic.vote_weight_multiplier!,
     );
     if (numTokens === BigInt(0)) {
@@ -179,12 +183,14 @@ export async function getWeightedNumTokens(
 export async function getWeightedSPLTokens(
   address: string,
   mintAddress: string,
+  solanaNetworkName: string,
   voteWeightMultiplier: number,
 ): Promise<bigint> {
   const balanceOptions: GetBalancesOptions = {
     balanceSourceType: BalanceSourceType.SPL,
     addresses: [address],
     mintAddress,
+    solanaNetwork: solanaNetworkName,
     cacheRefresh: true,
   };
 
@@ -215,7 +221,7 @@ export async function getWeightedSuiNativeTokens(
     addresses: [address],
     sourceOptions: {
       // Use the network from the chain node's identifier for the network
-      suiNetwork: chainNode.url.split(',')[0].trim(),
+      suiNetwork: chainNode.name,
     },
     cacheRefresh: true,
   };
@@ -248,7 +254,7 @@ export async function getWeightedSuiTokens(
     addresses: [address],
     sourceOptions: {
       // Use the network from the chain node's identifier for the network
-      suiNetwork: chainNode.url.split(',')[0].trim(),
+      suiNetwork: chainNode.name,
       coinType: tokenAddress,
     },
     cacheRefresh: true,
