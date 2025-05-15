@@ -10,8 +10,12 @@ import {
 import {
   EvmEventSignatures,
   decodeLog,
+  getErc20TokenInfo,
   getEvmAddress,
+  getLaunchpadTokenCreatedTransaction,
+  getTransactionSender,
 } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
 import { Events } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
 
@@ -24,13 +28,13 @@ const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'CommunityStakeTrade',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
@@ -42,13 +46,13 @@ const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'NamespaceDeployed',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 const referralNamespaceDeployedMapper: EvmMapper<
@@ -60,25 +64,65 @@ const referralNamespaceDeployedMapper: EvmMapper<
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'NamespaceDeployedWithReferral',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
-const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
+const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = async (
   event: EvmEvent,
 ) => {
+  const chainNode = await models.ChainNode.findOne({
+    where: { eth_chain_id: event.eventSource.ethChainId },
+  });
+  if (!chainNode) throw Error('Chain node not found', { cause: event });
+
+  const tokenData = await getLaunchpadTokenCreatedTransaction({
+    rpc: chainNode.private_url! || chainNode.url!,
+    transactionHash: event.rawLog.transactionHash,
+  });
+  if (!tokenData) throw Error('Token data not found', { cause: event });
+
+  let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
+  try {
+    tokenInfo = await getErc20TokenInfo({
+      rpc: chainNode.private_url || chainNode.url,
+      tokenAddress: tokenData.parsedArgs.tokenAddress,
+    });
+  } catch (e) {
+    throw Error(
+      `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+    );
+  }
+
+  const sender = await getTransactionSender(
+    chainNode.private_url || chainNode.url,
+    event.rawLog.transactionHash,
+  );
+  if (!sender)
+    throw Error('Failed to get transaction sender', { cause: event });
+
   return {
     event_name: 'LaunchpadTokenCreated',
     event_payload: {
       block_timestamp: event.block.timestamp,
       transaction_hash: event.rawLog.transactionHash,
       eth_chain_id: event.eventSource.ethChainId,
-      creator_address: event.rawLog.address as `0x${string}`,
+      creator_address: sender as `0x${string}`,
+      token_address: tokenData.parsedArgs.tokenAddress as `0x${string}`,
+      namespace: tokenData.parsedArgs.namespace,
+      curve_id: tokenData.parsedArgs.curveId,
+      total_supply: tokenData.parsedArgs.totalSupply,
+      launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+      reserve_ration: tokenData.parsedArgs.reserveRation,
+      initial_purchase_eth_amount:
+        tokenData.parsedArgs.initialPurchaseEthAmount,
+      name: tokenInfo.name,
+      symbol: tokenInfo.symbol,
     },
   };
 };
@@ -92,7 +136,7 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'LaunchpadTokenTraded',
     event_payload: {
       block_timestamp: event.block.timestamp,
@@ -105,7 +149,7 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
       community_token_amount: decoded.args.tokenAmount,
       floating_supply: decoded.args.floatingSupply,
     },
-  };
+  });
 };
 
 const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
@@ -117,13 +161,13 @@ const referralFeeDistributed: EvmMapper<'ReferralFeeDistributed'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'ReferralFeeDistributed',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 const contestManagerDeployedMapper: EvmMapper<
@@ -143,23 +187,24 @@ const contestManagerDeployedMapper: EvmMapper<
     transaction_hash: event.rawLog.transactionHash,
     eth_chain_id: event.eventSource.ethChainId,
   };
-  if (decoded.args.oneOff) {
-    return {
-      event_name: 'OneOffContestManagerDeployed',
-      event_payload: {
-        ...event_payload,
-        length: Number(interval),
-      },
-    };
-  }
 
-  return {
-    event_name: 'RecurringContestManagerDeployed',
-    event_payload: {
-      ...event_payload,
-      interval: Number(interval),
-    },
-  };
+  return Promise.resolve(
+    decoded.args.oneOff
+      ? {
+          event_name: 'OneOffContestManagerDeployed',
+          event_payload: {
+            ...event_payload,
+            length: Number(interval),
+          },
+        }
+      : {
+          event_name: 'RecurringContestManagerDeployed',
+          event_payload: {
+            ...event_payload,
+            interval: Number(interval),
+          },
+        },
+  );
 };
 
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
@@ -171,7 +216,7 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'ContestStarted',
     event_payload: {
       contest_address: getEvmAddress(event.rawLog.address),
@@ -180,7 +225,7 @@ const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
       end_time: new Date(Number(decoded.args.endTime) * 1000),
       is_one_off: false,
     },
-  };
+  });
 };
 
 const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
@@ -192,7 +237,7 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'ContestStarted',
     event_payload: {
       contest_address: getEvmAddress(event.rawLog.address),
@@ -201,7 +246,7 @@ const singleContestStartedMapper: EvmMapper<'ContestStarted'> = (
       end_time: new Date(Number(decoded.args.endTime) * 1000),
       is_one_off: true,
     },
-  };
+  });
 };
 
 const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
@@ -213,7 +258,7 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'ContestContentAdded',
     event_payload: {
       contest_address: getEvmAddress(event.rawLog.address),
@@ -221,7 +266,7 @@ const contestContentAddedMapper: EvmMapper<'ContestContentAdded'> = (
       creator_address: decoded.args.creator,
       content_url: decoded.args.url,
     },
-  };
+  });
 };
 
 const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
@@ -239,7 +284,7 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
     voter: voter_address,
     votingPower,
   } = decoded.args;
-  return {
+  return Promise.resolve({
     event_name: 'ContestContentUpvoted',
     event_payload: {
       contest_address: getEvmAddress(event.rawLog.address),
@@ -248,7 +293,7 @@ const recurringContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
       voter_address,
       voting_power: votingPower.toString(),
     },
-  };
+  });
 };
 
 const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
@@ -261,7 +306,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
     topics: event.rawLog.topics,
   });
   const { contentId, voter: voter_address, votingPower } = decoded.args;
-  return {
+  return Promise.resolve({
     event_name: 'ContestContentUpvoted',
     event_payload: {
       contest_address: getEvmAddress(event.rawLog.address),
@@ -270,7 +315,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
       voter_address,
       voting_power: votingPower.toString(),
     },
-  };
+  });
 };
 
 const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
@@ -283,7 +328,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
     throw new Error('Custom XP chain event is missing quest action meta id');
   }
 
-  return {
+  return Promise.resolve({
     event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
@@ -291,7 +336,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
       transaction_hash: event.rawLog.transactionHash,
       created_at: new Date(Number(event.block.timestamp) * 1_000),
     },
-  };
+  });
 };
 
 const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
@@ -303,13 +348,13 @@ const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'NominatorSettled',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
@@ -321,13 +366,13 @@ const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'NominatorNominated',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
@@ -337,13 +382,13 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
-  return {
+  return Promise.resolve({
     event_name: 'JudgeNominated',
     event_payload: {
       ...event,
       parsedArgs: decoded.args,
     },
-  };
+  });
 };
 
 // TODO: type should match EventRegistry event signatures

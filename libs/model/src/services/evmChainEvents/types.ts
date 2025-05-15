@@ -48,7 +48,9 @@ export type EvmEvent = {
   meta: EvmEventMeta;
 };
 
-export type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
+export type EvmMapper<E extends Events> = (
+  evmEvent: EvmEvent,
+) => Promise<EventPair<E>>;
 
 export type EvmEventSource = {
   eth_chain_id: number;

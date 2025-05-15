@@ -1,8 +1,12 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
-import * as evm from '@hicommonwealth/evm-protocols';
 import { models, tester } from '@hicommonwealth/model';
-import { ContestManager, Events, events } from '@hicommonwealth/schemas';
+import {
+  ContestManager,
+  Events,
+  events,
+  LaunchpadToken,
+} from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import {
   afterAll,
@@ -40,6 +44,16 @@ describe('EventStream Policy Integration Tests', () => {
   const communityId = 'test-community';
   const threadId = 123;
   let contestManagers: z.infer<typeof ContestManager>[];
+  const launchpad_token: z.infer<typeof LaunchpadToken> = {
+    token_address: '0x7777777777777777777777777777777777777777',
+    namespace: 'test',
+    name: 'Test Token',
+    symbol: 'TEST',
+    initial_supply: 1000,
+    liquidity_transferred: false,
+    launchpad_liquidity: 1n,
+    eth_market_cap_target: 1000,
+  };
 
   beforeAll(async () => {
     cache({
@@ -101,30 +115,7 @@ describe('EventStream Policy Integration Tests', () => {
       topic_id: community!.topics![0].id,
     });
 
-    const [launchpadToken] = await tester.seed('LaunchpadToken', {
-      token_address: '0x7777777777777777777777777777777777777777',
-      namespace: community!.namespace!,
-      name: 'Test Token',
-      symbol: 'TEST',
-      initial_supply: 1000,
-      liquidity_transferred: false,
-      launchpad_liquidity: 1n,
-      eth_market_cap_target: 1000,
-    });
-
-    vi.spyOn(evm, 'getLaunchpadTokenCreatedTransaction').mockResolvedValue({
-      txReceipt: {} as any,
-      block: {} as any,
-      parsedArgs: {
-        namespace: community!.namespace!,
-        tokenAddress: launchpadToken!.token_address!,
-        curveId: 1n,
-        totalSupply: 1n,
-        launchpadLiquidity: 1n,
-        reserveRation: 1n,
-        initialPurchaseEthAmount: 1n,
-      },
-    });
+    await tester.seed('LaunchpadToken', launchpad_token);
   });
 
   afterEach(async () => {
@@ -337,7 +328,13 @@ describe('EventStream Policy Integration Tests', () => {
           transaction_hash: '0x7777777777777777777777777777777777777777',
           eth_chain_id: 1,
           block_timestamp: 1n,
-        } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
+          curve_id: 1n,
+          total_supply: 1n,
+          reserve_ration: 1n,
+          initial_purchase_eth_amount: 1n,
+          creator_address: '0x1111111111111111111111111111111111111111',
+          ...launchpad_token,
+        } as z.infer<typeof events.LaunchpadTokenCreated>),
       },
       // {
       //   event_name: 'LaunchpadTokenTraded',

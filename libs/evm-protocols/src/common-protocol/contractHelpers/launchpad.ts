@@ -339,3 +339,20 @@ export async function transferLaunchpadLiquidityToUniswap({
     maxFeePerGas,
   );
 }
+
+// Function to get the transaction sender
+export async function getTransactionSender(
+  rpc: string,
+  transactionHash: string,
+) {
+  try {
+    const web3 = new Web3(rpc);
+    // Fetch the transaction using transactionHash
+    const transaction = await web3.eth.getTransaction(transactionHash);
+    // The 'from' field contains the sender's address
+    return transaction.from;
+  } catch (error) {
+    console.error('Error fetching transaction:', error);
+    return null;
+  }
+}
