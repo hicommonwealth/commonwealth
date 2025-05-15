@@ -32,10 +32,22 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+
+    .add-judge-button {
+      width: auto;
+    }
   }
 
-  .add-judge-button {
-    width: auto;
+  .add-judge-section {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+
+    .add-judge-button,
+    .add-judges-modal-button {
+      width: auto;
+    }
   }
 
   .add-judge-dialog {
@@ -57,7 +69,7 @@
 
   // Search section styles
   .search-section {
-    margin-top: 36px;
+    margin-top: 16px;
     margin-bottom: 24px;
 
     .search-title {
@@ -76,45 +88,6 @@
     .search-results {
       margin-top: 8px;
 
-      .users-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        max-height: 320px;
-        overflow-y: auto;
-      }
-
-      .user-item {
-        display: flex;
-        align-items: center;
-        padding: 12px;
-        border-radius: 8px;
-        background-color: #f5f5f5;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #eaeaea;
-        }
-
-        .user-avatar {
-          margin-right: 12px;
-        }
-
-        .user-info {
-          flex: 1;
-
-          .user-name {
-            font-weight: 500;
-            margin-bottom: 4px;
-          }
-
-          .user-address {
-            font-size: 14px;
-            color: #666;
-          }
-        }
-      }
-
       .no-results {
         padding: 12px;
         text-align: center;
@@ -123,6 +96,8 @@
 
       .loading-container {
         padding: 24px;
+        display: flex;
+        justify-content: center;
       }
     }
   }
