@@ -140,7 +140,9 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   ]);
 
   if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
-    return <LoadingIndicatorScreen />;
+    return (
+      <LoadingIndicatorScreen message="FIXME: Waiting for privy auth... " />
+    );
   }
 
   return children;
