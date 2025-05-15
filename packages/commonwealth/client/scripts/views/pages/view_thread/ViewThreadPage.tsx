@@ -146,7 +146,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
-    communityId,
     apiCallEnabled: !!threadId && !!communityId,
   });
 
@@ -294,10 +293,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [isEdit, thread, isAdmin]);
 
-  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId,
-    threadId: parseInt(threadId),
-  });
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
   const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
@@ -450,8 +446,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread && toAdd.length > 0) {
       try {
         await addThreadLinks({
-          communityId,
-          threadId: thread.id,
+          thread_id: thread.id,
           links: toAdd,
         });
       } catch {

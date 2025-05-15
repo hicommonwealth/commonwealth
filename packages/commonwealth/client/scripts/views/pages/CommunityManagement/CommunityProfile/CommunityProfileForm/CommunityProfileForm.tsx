@@ -33,6 +33,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import ErrorPage from '../../../error';
+import CommunityTrustLevel from '../CommunityTrustLevel/CommunityTrustLevel';
 import './CommunityProfileForm.scss';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
@@ -299,6 +300,18 @@ const CommunityProfileForm = () => {
               }
               label="Community Profile Image (Accepts JPG and PNG files)"
             />
+          </section>
+
+          <section className="trust-level-section">
+            <div className="header">
+              <CWText type="h4">Verification Status</CWText>
+              <CWText type="b1">
+                Build trust through verification. Each completed level below
+                enhances your community’s credibility and provides members with
+                greater confidence.
+              </CWText>
+            </div>
+            <CommunityTrustLevel />
           </section>
 
           <section className="links-section">

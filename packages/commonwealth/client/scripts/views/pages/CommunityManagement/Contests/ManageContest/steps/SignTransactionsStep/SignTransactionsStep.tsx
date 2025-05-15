@@ -137,7 +137,6 @@ const SignTransactionsStep = ({
     } as DeploySingleERC20ContestOnchainProps;
 
     const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
-    console.log({ judgeId });
 
     const singleJudged = {
       ethChainId,
@@ -182,8 +181,6 @@ const SignTransactionsStep = ({
         contestAddress =
           await deploySingleERC20ContestOnchainMutation(singleERC20);
       }
-
-      console.log({ judgedContest, singleJudged });
 
       await createContestMutation({
         contest_address: contestAddress,
@@ -230,7 +227,6 @@ const SignTransactionsStep = ({
       }));
 
       const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
-      console.log({ judgeId });
 
       await configureNominationsMutation({
         namespaceName,

@@ -93,10 +93,12 @@ class SuiWebWalletController implements IWebWallet<string> {
 
     // Prioritize known wallet names if multiple are available
     const walletPriority = [
+      'Slush',
+      'Phantom',
+      'Suiet',
       'Sui Wallet',
       'Ethos Wallet',
       'Martian Wallet',
-      'Suiet',
     ];
 
     for (const priorityName of walletPriority) {
