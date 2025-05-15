@@ -28,11 +28,14 @@ export const fetchNodes = async (): Promise<NodeInfo[]> => {
   // HACK: with @trpc/react-query v10.x, we can't directly call an endpoint outside of 'react-context'
   // with this way the api can be used in non-react files. This should be cleaned up when we migrate
   // to @trpc/react-query v11.x
-  const response = await axios.get(`${BASE_API_PATH}/superAdmin.getChainNodes`);
-  const data = response?.data[0]?.result?.data as NodeInfo[];
+  const { data } = await axios.get(`${BASE_API_PATH}/superAdmin.getChainNodes`);
+  const nodes = (data?.result?.data || []).map(
+    (node: any) => new NodeInfo(node),
+  );
+
   // add response in cache
-  queryClient.setQueryData(queryKey, data);
-  return data;
+  nodes && queryClient.setQueryData(queryKey, nodes);
+  return nodes;
 };
 
 export default useFetchNodesQuery;
