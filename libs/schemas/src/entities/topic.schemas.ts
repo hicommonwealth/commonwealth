@@ -4,6 +4,9 @@ import { PG_INT } from '../utils';
 export enum TopicWeightedVoting {
   Stake = 'stake',
   ERC20 = 'erc20',
+  SPL = 'spl',
+  SuiNative = 'sui_native',
+  SuiToken = 'sui_token',
 }
 
 export const Topic = z.object({
@@ -37,21 +40,23 @@ export const Topic = z.object({
   token_address: z
     .string()
     .nullish()
-    .describe('token address, used for ERC20 topics'),
+    .describe(
+      'token address, used for ERC20/SPL/SuiToken topics (for SuiToken, this stores the coin type)',
+    ),
   token_symbol: z
     .string()
     .nullish()
-    .describe('token symbol, used for ERC20 topics'),
+    .describe('token symbol, used for token-based topics'),
   vote_weight_multiplier: z
     .number()
     .gt(0)
     .nullish()
-    .describe('vote weight multiplier, used for ERC20 topics'),
+    .describe('vote weight multiplier, used for token weighted topics'),
   token_decimals: z
     .number()
     .gte(0)
     .nullish()
-    .describe('number of decimals of ERC20 token'),
+    .describe('number of decimals of token'),
   allow_tokenized_threads: z
     .boolean()
     .optional()

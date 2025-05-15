@@ -20,6 +20,9 @@ interface WVMethodSelectionProps {
 
 enum WVMethod {
   ERC20 = 'ERC20',
+  SPL = 'SPL',
+  SuiNative = 'SuiNative',
+  SuiToken = 'SuiToken',
   Stake = 'Stake',
 }
 
@@ -36,6 +39,19 @@ const WVMethodSelection = ({
       return onStepChange(CreateTopicStep.WVStake);
     }
 
+    // Handle non-EVM token methods
+    if (selectedWVMethod === WVMethod.SPL) {
+      return onStepChange(CreateTopicStep.WVSPLDetails);
+    }
+
+    if (selectedWVMethod === WVMethod.SuiNative) {
+      return onStepChange(CreateTopicStep.WVSuiNativeDetails);
+    }
+
+    if (selectedWVMethod === WVMethod.SuiToken) {
+      return onStepChange(CreateTopicStep.WVSuiTokenDetails);
+    }
+
     onStepChange(
       hasNamespace
         ? CreateTopicStep.WVERC20Details
@@ -47,6 +63,14 @@ const WVMethodSelection = ({
     // @ts-expect-error StrictNullChecks
     app?.chain?.meta?.ChainNode?.eth_chain_id,
   );
+
+  const chainNodeBalanceType = app?.chain?.meta?.ChainNode?.balance_type;
+
+  // Determine if Solana is supported for this community
+  const canEnableSPL = chainNodeBalanceType === 'solana';
+
+  // Determine if Sui is supported for this community
+  const canEnableSui = chainNodeBalanceType === 'sui';
 
   return (
     <div className="WVMethodSelection">
@@ -78,6 +102,62 @@ const WVMethodSelection = ({
             }}
             isSelected={selectedWVMethod === WVMethod.ERC20}
           />
+
+          {canEnableSPL && (
+            <CWRadioPanel
+              value={WVMethod.SPL}
+              onSelect={setSelectedWVMethod}
+              label="Connect SPL Token"
+              description="Solana Program Library Token"
+              popover={{
+                title: 'SPL',
+                body: (
+                  <CWText type="b2">
+                    Use any SPL token from the Solana blockchain. SPL tokens can
+                    be used for weighted voting and running contests
+                  </CWText>
+                ),
+              }}
+              isSelected={selectedWVMethod === WVMethod.SPL}
+            />
+          )}
+
+          {canEnableSui && (
+            <>
+              <CWRadioPanel
+                value={WVMethod.SuiNative}
+                onSelect={setSelectedWVMethod}
+                label="Connect Sui Native"
+                description="Sui Native Object"
+                popover={{
+                  title: 'Sui Native',
+                  body: (
+                    <CWText type="b2">
+                      Use Sui Native objects for weighted voting and running
+                      contests
+                    </CWText>
+                  ),
+                }}
+                isSelected={selectedWVMethod === WVMethod.SuiNative}
+              />
+
+              <CWRadioPanel
+                value={WVMethod.SuiToken}
+                onSelect={setSelectedWVMethod}
+                label="Connect Sui Token"
+                description="Sui Coin Type"
+                popover={{
+                  title: 'Sui Token',
+                  body: (
+                    <CWText type="b2">
+                      Use Sui tokens for weighted voting and running contests
+                    </CWText>
+                  ),
+                }}
+                isSelected={selectedWVMethod === WVMethod.SuiToken}
+              />
+            </>
+          )}
 
           <CWRadioPanel
             value={WVMethod.Stake}
