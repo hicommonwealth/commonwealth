@@ -27,6 +27,21 @@
     cursor: pointer;
   }
 
+  .filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .add-judge-button {
+    width: auto;
+  }
+
+  .add-judge-dialog {
+    padding: 24px;
+  }
+
   .judges-list {
     margin-top: 16px;
     display: flex;
@@ -38,5 +53,77 @@
     padding: 12px 16px;
     background-color: #f5f5f5;
     border-radius: 8px;
+  }
+
+  // Search section styles
+  .search-section {
+    margin-top: 36px;
+    margin-bottom: 24px;
+
+    .search-title {
+      margin-bottom: 16px;
+    }
+
+    .search-container {
+      margin-bottom: 16px;
+    }
+
+    .results-title {
+      margin-bottom: 12px;
+      margin-top: 16px;
+    }
+
+    .search-results {
+      margin-top: 8px;
+
+      .users-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+
+      .user-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #eaeaea;
+        }
+
+        .user-avatar {
+          margin-right: 12px;
+        }
+
+        .user-info {
+          flex: 1;
+
+          .user-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+          }
+
+          .user-address {
+            font-size: 14px;
+            color: #666;
+          }
+        }
+      }
+
+      .no-results {
+        padding: 12px;
+        text-align: center;
+        color: #666;
+      }
+
+      .loading-container {
+        padding: 24px;
+      }
+    }
   }
 }
