@@ -1,7 +1,11 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  ZERO_ADDRESS,
+} from '@hicommonwealth/shared';
 import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -62,7 +66,7 @@ export async function getVotingWeight(
     );
     const stakeBalance = stakeBalances[address];
     if (BigInt(stakeBalance) === BigInt(0)) {
-      throw new InvalidState('Must have stake to upvote');
+      throw new InvalidState('Must have stake to vote');
     }
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
@@ -134,6 +138,23 @@ export async function getVotingWeight(
       throw new InvalidState('Insufficient Sui token balance');
     }
     return numTokens;
+  } else if (topic.weighted_voting === TopicWeightedVoting.ERC1155ID) {
+    // similar to stake voting, but for community nomination token on namespace
+    mustExist('Chain Node Eth Chain Id', namespaceChainNode?.eth_chain_id);
+    mustExist('Community Namespace Address', community.namespace_address);
+
+    const namespaceBalances = await contractHelpers.getNamespaceBalance(
+      community.namespace_address,
+      NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+      namespaceChainNode.eth_chain_id,
+      [address],
+    );
+    const tokenBalance = namespaceBalances[address];
+    if (BigInt(tokenBalance) === BigInt(0)) {
+      throw new InvalidState('Must have community nomination token to vote');
+    }
+
+    return commonProtocol.calculateVoteWeight(tokenBalance, 1);
   }
 
   // no weighted voting
