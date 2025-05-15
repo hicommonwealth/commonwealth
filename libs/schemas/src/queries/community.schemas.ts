@@ -322,7 +322,7 @@ export const GetTopHolders = {
   }),
 };
 
-export const GroupView = Group.omit({ GroupPermissions: true }).extend({
+export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   id: PG_INT,
   name: z.string(),
   created_at: z.coerce.date().or(z.string()).optional(),
@@ -334,7 +334,7 @@ export const GroupView = Group.omit({ GroupPermissions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
-      permissions: z.array(z.nativeEnum(PermissionEnum)),
+      permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
 });
