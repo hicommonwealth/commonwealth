@@ -30,7 +30,7 @@ const useTopicGating = ({
     useGetMembershipsQuery({
       community_id: communityId,
       address: userAddress,
-      enabled: apiEnabled,
+      enabled: apiEnabled && !!userAddress,
     });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
