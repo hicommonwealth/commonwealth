@@ -23,19 +23,17 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
             },
             { model: models.CommunityStake },
           ],
-          attributes: ['namespace'],
+          attributes: ['chain_node_id', 'namespace', 'namespace_address'],
         })
       )?.toJSON();
+      mustExist('Community', community);
 
       // !domain logic - invariants on loaded state & payload
-      mustExist('Community', community);
       if (
         community.CommunityStakes &&
         community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)
       )
-        throw new InvalidState(
-          `Stake ${rest.stake_id} already configured in community ${community_id}`,
-        );
+        throw new InvalidState('Community stake already configured');
 
       // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
       await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(

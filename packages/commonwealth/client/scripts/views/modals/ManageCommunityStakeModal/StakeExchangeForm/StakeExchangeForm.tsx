@@ -119,7 +119,7 @@ const StakeExchangeForm = ({
 
   const expectedVoteWeight = commonProtocol.calculateVoteWeight(
     numberOfStakeToExchange ? String(numberOfStakeToExchange) : '0',
-    stakeData?.vote_weight,
+    stakeData?.stake?.vote_weight,
   );
 
   const popoverProps = usePopover();
@@ -145,7 +145,7 @@ const StakeExchangeForm = ({
       const txReceipt = await buyStake({
         amount: numberOfStakeToExchange,
         stakeId: commonProtocol.STAKE_ID,
-        namespace: stakeData?.Community?.namespace || '',
+        namespace: stakeData?.stake?.Community?.namespace || '',
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
@@ -201,7 +201,7 @@ const StakeExchangeForm = ({
       const txReceipt = await sellStake({
         amount: numberOfStakeToExchange,
         stakeId: commonProtocol.STAKE_ID,
-        namespace: stakeData?.Community?.namespace || '',
+        namespace: stakeData?.stake?.Community?.namespace || '',
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,

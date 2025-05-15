@@ -41,7 +41,7 @@ describe('POST communityStakes Tests', () => {
     await dispose()();
   });
 
-  test('The handler creates and updates community stake', async () => {
+  test('Should create and update community stake', async () => {
     buildUser({
       models: server.models,
       userAttributes: {
@@ -87,7 +87,7 @@ describe('POST communityStakes Tests', () => {
       error = e;
     }
 
-    assert.equal(error.message, 'Community stake already exists');
+    assert.equal(error.message, 'Community stake already configured');
 
     const found = await query(Community.GetCommunityStake(), {
       actor,
