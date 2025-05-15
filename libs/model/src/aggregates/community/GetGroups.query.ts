@@ -22,8 +22,8 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
           },
           include: [
             {
-              model: models.GroupPermission,
-              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+              model: models.GroupGatedAction,
+              attributes: ['group_id', 'topic_id', 'gated_actions'],
             },
           ],
         })
@@ -54,7 +54,7 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
 
       if (include_topics) {
         const topic_ids = groups
-          .map((g) => g.GroupPermissions || [])
+          .map((g) => g.GroupGatedActions || [])
           .flat()
           .map((p) => p.topic_id);
         const topics = await models.Topic.findAll({

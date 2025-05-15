@@ -19,13 +19,13 @@ export function buildTopicPermissionsMap(groups: GroupAttributes[]) {
     if (entry)
       entry.push({
         id: p.topic_id,
-        permissions: p.allowed_actions,
+        permissions: p.gated_actions,
       });
     else
       map.set(p.group_id, [
         {
           id: p.topic_id,
-          permissions: p.allowed_actions,
+          permissions: p.gated_actions,
         },
       ]);
   });
