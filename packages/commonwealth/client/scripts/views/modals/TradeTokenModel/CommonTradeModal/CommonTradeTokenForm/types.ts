@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 
-export type TokenPresetAmounts = number | 'Max';
+export type TokenPresetAmounts = number | 'Max' | string;
 
 export type UseCommonTradeTokenFormProps = {
   tradeConfig: CommonTradingConfig & {

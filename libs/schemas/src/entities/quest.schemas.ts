@@ -1,9 +1,10 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
 
 export const ChannelQuestEvents = {
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  DiscordServerJoined: events.DiscordServerJoined,
   XpChainEventCreated: events.XpChainEventCreated,
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
@@ -101,21 +102,16 @@ export const QuestActionMeta = z
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
       .nullish(),
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().positive().max(100),
-        retweets: z.number().positive().max(100),
-        replies: z.number().positive().max(100),
-      })
-      .optional(),
+    start_link: z.string().url().nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
     // associations
-    QuestTweet: QuestTweet.optional(),
+    QuestTweet: QuestTweet.nullish(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

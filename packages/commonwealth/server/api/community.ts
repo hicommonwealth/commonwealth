@@ -68,6 +68,11 @@ export const trpcRouter = trpc.router({
     },
   }),
   getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community),
+  // Add this to the existing router
+  getCommunitySelectedTagsAndCommunities: trpc.query(
+    Community.GetCommunitySelectedTagsAndCommunities,
+    trpc.Tag.Community,
+  ),
   getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
   getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
   getStakeHistoricalPrice: trpc.query(
@@ -93,6 +98,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  getGroups: trpc.query(Community.GetGroups, trpc.Tag.Community),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
@@ -110,6 +116,10 @@ export const trpcRouter = trpc.router({
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
   getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
+  updateTopicsOrder: trpc.command(
+    Community.UpdateTopicsOrder,
+    trpc.Tag.Community,
+  ),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,
@@ -128,6 +138,10 @@ export const trpcRouter = trpc.router({
       }),
     ]),
   ]),
+  updateTopicChannel: trpc.command(
+    Community.UpdateTopicChannel,
+    trpc.Tag.Community,
+  ),
   toggleArchiveTopic: trpc.command(
     Community.ToggleArchiveTopic,
     trpc.Tag.Community,
@@ -161,4 +175,9 @@ export const trpcRouter = trpc.router({
     Community.UpdateCommunityTags,
     trpc.Tag.Community,
   ),
+  updateCommunityDirectoryTags: trpc.command(
+    Community.UpdateCommunityDirectoryTags,
+    trpc.Tag.Community,
+  ),
+  getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
 });

@@ -1,9 +1,11 @@
+import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export enum TopicWeightedVoting {
   Stake = 'stake',
   ERC20 = 'erc20',
+  ERC1155ID = 'erc1155id',
 }
 
 export const Topic = z.object({
@@ -15,7 +17,7 @@ export const Topic = z.object({
     .max(255)
     .default('General')
     .refine(
-      (v) => !v.match(/["<>%{}|\\/^`]/g),
+      (v) => !v.match(DISALLOWED_TOPIC_NAMES_REGEX),
       'Name must not contain special characters',
     ),
   community_id: z.string().max(255),

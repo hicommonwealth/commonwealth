@@ -150,6 +150,7 @@ export const TreeHierarchy = ({
           isStreamingAIReply={true}
           isRootComment={true}
           threadContext={thread.body}
+          threadTitle={thread.title}
           onStreamingComplete={() => {
             setStreamingReplyIds((prev) =>
               prev.filter((id) => id !== thread.id),

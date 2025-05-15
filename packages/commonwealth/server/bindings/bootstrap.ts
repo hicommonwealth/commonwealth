@@ -1,27 +1,15 @@
-import {
-  RabbitMQAdapter,
-  buildRetryStrategy,
-  createRmqConfig,
-} from '@hicommonwealth/adapters';
+import { RabbitMQAdapter, createRmqConfig } from '@hicommonwealth/adapters';
 import {
   Broker,
+  ConsumerHooks,
+  EventSchemas,
+  EventsHandlerMetadata,
+  RetryStrategyFn,
   broker,
   handleEvent,
   logger,
-  stats,
 } from '@hicommonwealth/core';
-import {
-  ChainEventPolicy,
-  CommunityGoalsPolicy,
-  Contest,
-  ContestWorker,
-  CreateUnverifiedUser,
-  DiscordBotPolicy,
-  FarcasterWorker,
-  TwitterEngagementPolicy,
-  User,
-  models,
-} from '@hicommonwealth/model';
+import { ContestWorker, models } from '@hicommonwealth/model';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -30,17 +18,10 @@ import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-function checkSubscriptionResponse(subRes: boolean, topic: string) {
-  if (!subRes) {
-    log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
-      topic,
-    });
-  }
-}
-
-export async function bootstrapBindings(
-  skipRmqAdapter?: boolean,
-): Promise<void> {
+export async function bootstrapBindings(options?: {
+  skipRmqAdapter?: boolean;
+  worker?: string;
+}): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
@@ -50,10 +31,8 @@ export async function bootstrapBindings(
       }),
     );
     await rmqAdapter.init();
-    if (!skipRmqAdapter) {
-      broker({
-        adapter: rmqAdapter,
-      });
+    if (!options?.skipRmqAdapter) {
+      broker({ adapter: rmqAdapter });
     }
     brokerInstance = rmqAdapter;
   } catch (e) {
@@ -63,59 +42,24 @@ export async function bootstrapBindings(
     throw e;
   }
 
-  const chainEventSubRes = await brokerInstance.subscribe(ChainEventPolicy);
-  checkSubscriptionResponse(chainEventSubRes, ChainEventPolicy.name);
+  for (const item of rascalConsumerMap) {
+    let consumer: () => EventsHandlerMetadata<EventSchemas>;
+    let worker: string | undefined;
+    let retryStrategy: RetryStrategyFn | undefined;
+    let hooks: ConsumerHooks | undefined;
 
-  const contestWorkerSubRes = await brokerInstance.subscribe(
-    ContestWorker,
-    buildRetryStrategy(undefined, 20_000),
-    {
-      beforeHandleEvent: (topic, event, context) => {
-        context.start = Date.now();
-      },
-      afterHandleEvent: (topic, event, context) => {
-        const duration = Date.now() - context.start;
-        const handler = `${topic}.${event.name}`;
-        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
-      },
-    },
-  );
-  checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
+    if (typeof item === 'function') consumer = item;
+    else {
+      consumer = item.consumer;
+      worker = item.worker;
+      retryStrategy = item.retryStrategy;
+      hooks = item.hooks;
+    }
 
-  const contestProjectionsSubRes = await brokerInstance.subscribe(
-    Contest.Contests,
-  );
-  checkSubscriptionResponse(contestProjectionsSubRes, Contest.Contests.name);
-
-  const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
-  checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
-
-  const farcasterWorkerSubRes = await brokerInstance.subscribe(
-    FarcasterWorker,
-    buildRetryStrategy(undefined, 20_000),
-  );
-  checkSubscriptionResponse(farcasterWorkerSubRes, FarcasterWorker.name);
-
-  const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
-  checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
-
-  const createUnverifiedUserSubRes =
-    await brokerInstance.subscribe(CreateUnverifiedUser);
-  checkSubscriptionResponse(
-    createUnverifiedUserSubRes,
-    CreateUnverifiedUser.name,
-  );
-
-  const twitterEngSubRes = await brokerInstance.subscribe(
-    TwitterEngagementPolicy,
-  );
-  checkSubscriptionResponse(twitterEngSubRes, TwitterEngagementPolicy.name);
-  const createCommunityGoalsSubRes =
-    await brokerInstance.subscribe(CommunityGoalsPolicy);
-  checkSubscriptionResponse(
-    createCommunityGoalsSubRes,
-    CommunityGoalsPolicy.name,
-  );
+    // match worker name
+    if ((options?.worker || '') !== (worker || '')) continue;
+    await brokerInstance.subscribe(consumer, retryStrategy, hooks);
+  }
 }
 
 export async function bootstrapRelayer(

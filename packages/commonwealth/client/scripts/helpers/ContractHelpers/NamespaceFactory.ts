@@ -348,10 +348,37 @@ class NamespaceFactory extends ContractBase {
     return txReceipt;
   }
 
+  async configureVerification(
+    namespaceName: string,
+    walletAddress: string,
+    chainId: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .configureNominationNominator(namespaceName)
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
   async configureNominations(
     namespaceName: string,
     creatorOnly: boolean,
     walletAddress: string,
+    judgeId: number,
     maxNominations?: number,
   ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
@@ -365,6 +392,7 @@ class NamespaceFactory extends ContractBase {
           namespaceName,
           maxNominations ?? 0,
           !creatorOnly,
+          judgeId,
         )
         .send({
           from: walletAddress,

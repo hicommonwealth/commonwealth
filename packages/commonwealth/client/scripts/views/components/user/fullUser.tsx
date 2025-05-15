@@ -2,23 +2,26 @@ import { ChainBase, DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useSetUserTierMutation from 'state/api/superAdmin/setUserTier';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import TrustLevelRole from '../TrustLevelRole';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { UserSkeleton } from './UserSkeleton';
 import './user.scss';
@@ -50,6 +53,42 @@ export const FullUser = ({
       id: userCommunityId || '',
       enabled: !!userCommunityId,
     });
+  const { mutateAsync: setUserTier } = useSetUserTierMutation();
+
+  const banUserConfirmationModal = () => {
+    openConfirmation({
+      title: 'Ban User',
+      description:
+        'Are you sure you want to permanently ban this user from ALL communities? ' +
+        'They will no longer be able to sign in but this will not remove their history.',
+      buttons: [
+        {
+          label: 'Ban',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: () => {
+            if (!profile?.userId) return;
+            setUserTier({
+              user_id: profile.userId,
+              tier: UserTierMap.BannedUser,
+            })
+              .then(() => {
+                notifySuccess('User banned');
+              })
+              .catch((e) => {
+                notifyError('Error banning user');
+                console.error(e);
+              });
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
+  };
 
   if (showSkeleton || isLoadingUserCommunity) {
     return (
@@ -81,12 +120,15 @@ export const FullUser = ({
     ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
 
+  const capitalizeRole = roleInCommunity
+    ? roleInCommunity.charAt(0).toUpperCase() +
+      roleInCommunity.slice(1).toLowerCase()
+    : 'Member';
+
   const roleTags = (
     <>
-      {shouldShowRole && roleInCommunity && (
-        <div className="role-tag-container">
-          <CWText className="role-tag-text">{roleInCommunity}</CWText>
-        </div>
+      {shouldShowRole && (
+        <CWTag label={capitalizeRole} type="proposal" classNames="role-tag" />
       )}
     </>
   );
@@ -246,7 +288,8 @@ export const FullUser = ({
                 level={profile?.tier || UserTierMap.IncompleteUser}
               />
             </Link>
-          )}
+          )}{' '}
+          {roleTags}
           {profile?.address && (
             <div className="address-container">
               <div className="user-address">
@@ -278,7 +321,6 @@ export const FullUser = ({
           {friendlyCommunityName && (
             <div className="user-chain">{friendlyCommunityName}</div>
           )}
-          {roleTags}
           {/* If Admin Allow Banning */}
           {loggedInUserIsAdmin && !isSelfSelected && (
             <div className="ban-wrapper">
@@ -290,6 +332,13 @@ export const FullUser = ({
                 buttonType="destructive"
               />
             </div>
+          )}
+          {Permissions.isSiteAdmin() && (
+            <CWButton
+              onClick={banUserConfirmationModal}
+              label="Ban User"
+              buttonType="destructive"
+            />
           )}
         </div>
       )}

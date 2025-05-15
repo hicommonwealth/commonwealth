@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -6,6 +7,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { SharePopover } from 'views/components/SharePopover';
 import { formatAddressShort } from '../../../../../../helpers';
 import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
 import { convertGranularPermissionsToAccumulatedPermissions } from '../../../Groups/common/GroupForm/helpers';
@@ -17,6 +19,7 @@ const ALLOWLIST_MEMBERS_PER_PAGE = 7;
 
 const GroupCard = ({
   isJoined,
+  groupId,
   groupName,
   groupDescription,
   requirements,
@@ -34,8 +37,14 @@ const GroupCard = ({
     ALLOWLIST_MEMBERS_PER_PAGE * (currentAllowlistPage - 1),
     ALLOWLIST_MEMBERS_PER_PAGE * currentAllowlistPage,
   );
+
+  const url = new URL(window.location.href);
+  const search = new URLSearchParams(url.search);
+  search.set(`groupId`, String(groupId));
+  const shareURL = `${url.origin}${url.pathname}?${search.toString()}`;
+
   return (
-    <section className="GroupCard">
+    <section className={clsx('GroupCard', `group-${groupId}`)}>
       {/* Join status */}
       <CWTag
         type={isJoined ? 'passed' : 'referendum'}
@@ -47,12 +56,15 @@ const GroupCard = ({
         <CWText type="h3" className="group-name-text">
           {groupName}
         </CWText>
-        {canEdit && (
-          <button className="group-edit-button" onClick={onEditClick}>
-            <CWIcon iconName="notePencil" iconSize="medium" />
-            <CWText type="caption">Edit</CWText>
-          </button>
-        )}
+        <div className="right">
+          <SharePopover linkToShare={shareURL} buttonLabel="Share" />
+          {canEdit && (
+            <button className="group-edit-button" onClick={onEditClick}>
+              <CWIcon iconName="notePencil" iconSize="medium" />
+              <CWText type="caption">Edit</CWText>
+            </button>
+          )}
+        </div>
       </div>
       {groupDescription && <CWText type="b2">{groupDescription}</CWText>}
 
@@ -65,8 +77,7 @@ const GroupCard = ({
           ? 'All requirements must be satisfied'
           : `At least ${requirementsToFulfill} # of all requirements`}
       </CWText>
-      {/* @ts-expect-error StrictNullChecks*/}
-      {requirements.map((r, index) => (
+      {(requirements || []).map((r, index) => (
         <RequirementCard key={index} {...r} />
       ))}
 

@@ -60,6 +60,9 @@ export default defineConfig(({ mode }) => {
       env.FLAG_TOKENIZED_THREADS,
     ),
     'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
+    'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
+      env.FLAG_PARTNERSHIP_WALLET,
+    ),
   };
 
   const config = {
@@ -108,6 +111,16 @@ export default defineConfig(({ mode }) => {
     'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
       env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
     ),
+    'process.env.LAUNCHPAD_CHAIN_ID':
+      JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
+    'process.env.LAUNCHPAD_CONNECTOR_WEIGHT':
+      JSON.stringify(env.LAUNCHPAD_CONNECTOR_WEIGHT) ||
+      JSON.stringify('830000'),
+    'process.env.LAUNCHPAD_INITIAL_PRICE':
+      JSON.stringify(env.LAUNCHPAD_INITIAL_PRICE) ||
+      JSON.stringify('416700000'),
+    'process.env.ENABLED_TRPC_BATCHING':
+      JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
   };
 
   return {
@@ -164,6 +177,7 @@ export default defineConfig(({ mode }) => {
         'numeral',
         'firebase/app',
         'firebase/messaging',
+        'eventsource-client',
       ],
     },
     build: {

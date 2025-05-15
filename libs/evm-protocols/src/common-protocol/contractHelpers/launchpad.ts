@@ -2,10 +2,7 @@ import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
 import {
   commonProtocol,
   createPrivateEvmClient,
-  decodeParameters,
   EvmEventSignatures,
-  getBlock,
-  getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
@@ -21,21 +18,39 @@ export const launchToken = async (
   connectorWeight: number,
   tokenCommunityManager: string,
   value: number = 4.4400042e14,
+  maxFeePerGas?: bigint,
+  chainId?: string,
 ) => {
-  const txReceipt = await contract.methods
-    .launchTokenWithLiquidity(
-      name,
-      symbol,
-      shares,
-      holders,
-      totalSupply,
-      1,
-      0,
-      '0x0000000000000000000000000000000000000000',
-      tokenCommunityManager,
-      connectorWeight,
-    )
-    .send({ from: walletAddress, value: value });
+  const contractCall = await contract.methods.launchTokenWithLiquidity(
+    name,
+    symbol,
+    shares,
+    holders,
+    totalSupply,
+    1,
+    0,
+    chainId === '8453'
+      ? '0x8e67278d7782dB5e2E07c02206F219A2F495d493'
+      : '0x0000000000000000000000000000000000000000',
+    tokenCommunityManager,
+    connectorWeight,
+  );
+  const gasResult = await contractCall.estimateGas({
+    from: walletAddress,
+    value: value.toFixed(0),
+  });
+
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
+  const txReceipt = contractCall.send({
+    from: walletAddress,
+    value,
+    type: '0x2',
+    gas: gasResult.toString(),
+    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+    maxPriorityFeePerGas,
+  });
   return txReceipt;
 };
 
@@ -45,6 +60,7 @@ export const buyToken = async (
   tokenAddress: string,
   walletAddress: string,
   value: number,
+  maxFeePerGas?: bigint,
 ) => {
   const contractCall = contract.methods.buyToken(tokenAddress, 0);
   const gasResult = await contractCall.estimateGas({
@@ -52,11 +68,16 @@ export const buyToken = async (
     value: value.toFixed(0),
   });
 
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   const txReceipt = await contractCall.send({
     from: walletAddress,
     value: value.toFixed(0),
-    gas: gasResult.toString(),
+    gas: gasResult ? gasResult.toString() : undefined,
     type: '0x2',
+    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+    maxPriorityFeePerGas,
   });
   return txReceipt;
 };
@@ -69,15 +90,27 @@ export const sellToken = async (
   walletAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
+  maxFeePerGas?: bigint,
 ) => {
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
+
   await tokenContract.methods
     .approve(contract.options.address, BigInt(amount))
     .send({
       from: walletAddress,
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+      type: '0x2',
     });
   const txReceipt = await contract.methods
     .sellToken(tokenAddress, BigInt(amount), 0)
-    .send({ from: walletAddress });
+    .send({
+      from: walletAddress,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+    });
   return txReceipt;
 };
 
@@ -100,13 +133,13 @@ export const getAmountIn = async (
   cw: number,
 ) => {
   const data = await Promise.all([
-    contract.methods._getFloatingTokenSupply(tokenAddress),
-    contract.methods.liquidity(tokenAddress),
+    contract.methods._getFloatingTokenSupply(tokenAddress).call(),
+    contract.methods.liquidity(tokenAddress).call(),
   ]);
   const delta =
-    ((BigInt(amountOut) + BigInt(data[0])) / BigInt(data[0])) **
-    (BigInt(1000000) / BigInt(cw));
-  return BigInt(data[1]) * delta - BigInt(data[1]);
+    ((Number(amountOut) + Number(data[0])) / Number(data[0])) **
+    (Number(1000000) / Number(cw));
+  return Number(data[1]) * delta - Number(data[1]);
 };
 
 export const transferLiquidity = async (
@@ -114,18 +147,30 @@ export const transferLiquidity = async (
   contract: any,
   tokenAddress: string,
   walletAddress: string,
+  maxFeePerGas?: bigint,
 ) => {
-  const remainingTokens = await contract.methods._poolLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods
+    ._poolLiquidity(tokenAddress)
+    .call();
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,
-    remainingTokens,
-    500000,
+    Number(remainingTokens),
+    830000,
   );
+
+  // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
+  const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
   const txReceipt = await contract.methods
     .transferLiquidity(tokenAddress, remainingTokens)
-    .send({ value: amountIn, from: walletAddress });
+    .send({
+      value: amountIn,
+      from: walletAddress,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
+      maxPriorityFeePerGas,
+    });
   return txReceipt;
 };
 
@@ -136,79 +181,21 @@ export const getTargetMarketCap = (
   initialReserve: number = 4.167e8,
   initialSupply: number = 1e18,
   currentSupply: number = 4.3e26,
-  connectorWeight: number = 0.83,
+  connectorWeight: number = 830000,
   totalSupply: number = 1e9,
 ) => {
-  const x = initialReserve / (initialSupply * connectorWeight);
-  const y = (currentSupply / initialSupply) ** (1 / connectorWeight - 1);
+  const initialReserveVar = parseInt(
+    process.env.LAUNCHPAD_INITIAL_PRICE || initialReserve.toString(),
+  );
+  const connectorWeightVar =
+    parseInt(
+      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || connectorWeight.toString(),
+    ) / 1000000;
+  const x = initialReserveVar / (initialSupply * connectorWeightVar);
+  const y = (currentSupply / initialSupply) ** (1 / connectorWeightVar - 1);
   const price = x * y;
   return price * totalSupply;
 };
-
-export async function getLaunchpadTradeTransaction({
-  rpc,
-  transactionHash,
-}: {
-  rpc: string;
-  transactionHash: string;
-}) {
-  const { evmClient, txReceipt } = await getTransactionReceipt({
-    rpc,
-    txHash: transactionHash,
-  });
-  if (!txReceipt) {
-    return;
-  }
-
-  const { block } = await getBlock({
-    evmClient: evmClient,
-    rpc,
-    blockHash: txReceipt.blockHash.toString(),
-  });
-
-  const tradeLog = txReceipt.logs.find((l) => {
-    if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
-    }
-    return false;
-  });
-  if (!tradeLog) return;
-
-  const {
-    0: traderAddress,
-    1: tokenAddress,
-    2: isBuy,
-    3: communityTokenAmount,
-    4: ethAmount,
-    5: protocolEthAmount,
-    6: floatingSupply,
-  } = decodeParameters({
-    abiInput: [
-      'address',
-      'address',
-      'bool',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-    ],
-    data: txReceipt.logs[1].data!.toString(),
-  });
-
-  return {
-    txReceipt,
-    block,
-    parsedArgs: {
-      traderAddress: traderAddress as string,
-      tokenAddress: tokenAddress as string,
-      isBuy: isBuy as boolean,
-      communityTokenAmount: communityTokenAmount as bigint,
-      ethAmount: ethAmount as bigint,
-      protocolEthAmount: protocolEthAmount as bigint,
-      floatingSupply: floatingSupply as bigint,
-    },
-  };
-}
 
 export async function getLaunchpadTokenCreatedTransaction({
   rpc,
@@ -290,6 +277,16 @@ export async function getLaunchpadTokenCreatedTransaction({
   };
 }
 
+type LaunchpadTokenOnChainData = {
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+};
+
 export async function getLaunchpadToken({
   rpc,
   lpBondingCurveAddress,
@@ -298,15 +295,7 @@ export async function getLaunchpadToken({
   rpc: string;
   lpBondingCurveAddress: string;
   tokenAddress: string;
-}): Promise<{
-  launchpadLiquidity: bigint;
-  poolLiquidity: bigint;
-  curveId: bigint;
-  scalar: bigint;
-  reserveRation: bigint;
-  LPhook: string;
-  funded: boolean;
-}> {
+}): Promise<LaunchpadTokenOnChainData> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
     LPBondingCurveAbi,
@@ -331,9 +320,22 @@ export async function transferLaunchpadLiquidityToUniswap({
     LPBondingCurveAbi,
     lpBondingCurveAddress,
   );
-  await commonProtocol.transferLiquidity(
+
+  // Estimate gas
+  const latestBlock = await web3.eth.getBlock('latest');
+  let maxFeePerGas: bigint | undefined;
+
+  if (latestBlock.baseFeePerGas) {
+    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
+    maxFeePerGas =
+      latestBlock.baseFeePerGas * BigInt(2) +
+      BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
+  }
+
+  return await commonProtocol.transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
+    maxFeePerGas,
   );
 }

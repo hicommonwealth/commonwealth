@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
@@ -138,8 +139,9 @@ const contestManagerDeployedMapper: EvmMapper<
     namespace: namespace as string,
     contest_address: contest_address as string,
     block_number: Number(event.block.number),
+    transaction_hash: event.rawLog.transactionHash,
+    eth_chain_id: event.eventSource.ethChainId,
   };
-
   if (decoded.args.oneOff) {
     return {
       event_name: 'OneOffContestManagerDeployed',
@@ -274,8 +276,8 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   event: EvmEvent,
 ) => {
   if (
-    !('quest_action_meta_id' in event.meta) ||
-    !event.meta.quest_action_meta_id
+    !('quest_action_meta_ids' in event.meta) ||
+    !event.meta.quest_action_meta_ids
   ) {
     throw new Error('Custom XP chain event is missing quest action meta id');
   }
@@ -284,9 +286,61 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
     event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
-      quest_action_meta_id: event.meta.quest_action_meta_id,
+      quest_action_meta_ids: event.meta.quest_action_meta_ids,
       transaction_hash: event.rawLog.transactionHash,
-      created_at: new Date(Number(event.block.timestamp)),
+      created_at: new Date(Number(event.block.timestamp) * 1_000),
+    },
+  };
+};
+
+const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorSettled',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorSettled',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'JudgeNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'JudgeNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
     },
   };
 };
@@ -308,9 +362,19 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
 
-  // Contests
+  // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
+
+  // Community Nominations
+  [EvmEventSignatures.CommunityNominations.NominatorSettled]:
+    nominatorSettledMapper,
+  [EvmEventSignatures.CommunityNominations.NominatorNominated]:
+    nominatorNominatedMapper,
+  [EvmEventSignatures.CommunityNominations.JudgeNominated]:
+    judgeNominatedMapper,
+
+  // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
     recurringContestStartedMapper,
   [EvmEventSignatures.Contests.SingleContestStarted]:

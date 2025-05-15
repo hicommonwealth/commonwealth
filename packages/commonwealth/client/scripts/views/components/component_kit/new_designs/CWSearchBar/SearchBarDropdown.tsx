@@ -8,18 +8,20 @@ import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
 import { SearchBarThreadPreviewRow } from './SearchBarThreadPreviewRow';
 
-import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import {
+  CommentSearchView,
+  SearchUserProfilesView,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { SearchResults } from '../../../../../hooks/useSearchResults';
 import { SearchChainsResponse } from '../../../../../state/api/chains/searchChains';
-import { SearchCommentsResponse } from '../../../../../state/api/comments/searchComments';
 import { SearchThreadsResponse } from '../../../../../state/api/threads/searchThreads';
 import './SearchBarDropdown.scss';
 
 interface SearchBarPreviewSectionProps {
   searchResults:
     | SearchThreadsResponse['results']
-    | SearchCommentsResponse['results']
+    | z.infer<typeof CommentSearchView>[]
     | SearchChainsResponse['results']
     | z.infer<typeof SearchUserProfilesView>[];
   searchTerm: string;

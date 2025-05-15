@@ -1,5 +1,5 @@
 import { type Command } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { getCommentSearchVector, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { authComment } from '../../middleware';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
@@ -11,17 +11,28 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
       authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
     ],
     body: async ({ actor, payload, context }) => {
-      const { comment } = mustBeAuthorizedComment(actor, context);
+      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
+      let spamToggled = false;
 
       if (payload.spam && !comment.marked_as_spam_at) {
         comment.marked_as_spam_at = new Date();
+        comment.search = null;
         await comment.save();
+        spamToggled = true;
       } else if (!payload.spam && comment.marked_as_spam_at) {
+        // Update search index when unmarking as spam
+        let body = comment.body;
+        if (comment.content_url) {
+          const res = await fetch(comment.content_url);
+          body = await res.text();
+        }
+        comment.search = getCommentSearchVector(body);
         comment.marked_as_spam_at = null;
         await comment.save();
+        spamToggled = true;
       }
 
-      comment.Address = await models.Address.findOne({
+      const address = await models.Address.findOne({
         where: {
           id: comment.address_id,
         },
@@ -32,8 +43,10 @@ export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
           },
         ],
       });
+      const formattedComment = comment.get({ plain: true });
+      if (address) formattedComment.Address = address.get({ plain: true });
 
-      return comment;
+      return { ...formattedComment, community_id, spam_toggled: spamToggled };
     },
   };
 }

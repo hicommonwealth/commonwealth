@@ -4,6 +4,7 @@ export const VALIDATION_MESSAGES = {
     `Minimum ${charLimit} characters required`,
   MAX_CHAR_LIMIT_REACHED: 'Max character limit reached',
   INVALID_INPUT: 'Invalid input',
+  MUST_BE_FORMAT: (format: string | number) => `Must be in ${format} format`,
   MUST_BE_TYPE: (type: string) => `Must be of ${type} type`,
   MUST_BE_GREATER: (value: string | number) => `Must be greater than ${value}`,
   MUST_BE_BETWEEN: (rangeStart: string | number, rangeEnd: string | number) =>
@@ -13,4 +14,6 @@ export const VALIDATION_MESSAGES = {
   MUST_BE_APART: (fieldName: string, differenceValue: string | number) =>
     `Must be atleast ${differenceValue} apart from ${fieldName}`,
   GITHUB_FORMAT: 'Invalid GitHub URL',
+  TWITTER_TWEET_FORMAT: `Invalid Tweet URL`,
+  DISCORD_SERVER_FORMAT: `Invalid Discord Server URL`,
 };

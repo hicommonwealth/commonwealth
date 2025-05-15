@@ -151,6 +151,7 @@ export const UpdateCommunity = {
       featuredTopics: z.array(z.string()).optional(),
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
+      launchpad_weighted_voting: z.boolean().optional(),
     }),
   output: Community,
   context: AuthContext,
@@ -166,6 +167,15 @@ export const GenerateStakeholderGroups = {
       created: z.boolean(),
     })
     .partial(),
+};
+
+export const UpdateTopicsOrder = {
+  input: z.object({
+    community_id: z.string(),
+    ordered_ids: z.array(PG_INT),
+  }),
+  output: z.array(Topic),
+  context: AuthContext,
 };
 
 export const CreateTopic = {
@@ -218,6 +228,15 @@ export const UpdateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  context: TopicContext,
+};
+
+export const UpdateTopicChannel = {
+  input: z.object({
+    topic_id: z.number(),
+    channel_id: z.string().optional(),
+  }),
+  output: Topic,
   context: TopicContext,
 };
 
@@ -359,6 +378,7 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     address: z.string().optional(),
     group_id: PG_INT.optional(),
+    refresh_all: z.boolean().optional(),
   }),
   output: z.object({
     community_id: z.string(),

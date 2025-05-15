@@ -1,7 +1,10 @@
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { z } from 'node_modules/zod';
 import React from 'react';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import TotalQuestXPTag from 'views/pages/QuestDetails/TotalQuestXPTag';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
 import useXPProgress from '../useXPProgress';
 import Quests from './Quests';
@@ -19,7 +22,7 @@ const TaskList = ({ className }: TaskListProps) => {
     isLoadingQuestsList,
     isLoadingXPProgression,
     pendingWeeklyQuests,
-  } = useXPProgress({ includeSystemQuests: false }); // dont show system quests in xp progression bar
+  } = useXPProgress({ includeSystemQuests: true }); // dont show system quests in xp progression bar
 
   if (isLoadingXPProgression) return;
 
@@ -45,7 +48,17 @@ const TaskList = ({ className }: TaskListProps) => {
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
+              xpPointsElement: (
+                <TotalQuestXPTag
+                  questId={quest.id}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
+                  questActions={
+                    (quest.action_metas as z.infer<typeof QuestActionMeta>[]) ||
+                    []
+                  }
+                />
+              ),
             }))}
           />
           <Quests
@@ -59,7 +72,18 @@ const TaskList = ({ className }: TaskListProps) => {
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
+              xpPointsElement: (
+                <TotalQuestXPTag
+                  questId={quest.id}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
+                  questActions={
+                    (quest.action_metas as z.infer<typeof QuestActionMeta>[]) ||
+                    []
+                  }
+                  hideGainedXp
+                />
+              ),
             }))}
           />
         </>

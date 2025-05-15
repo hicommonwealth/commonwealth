@@ -2,13 +2,13 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { doesActionAllowThreadId, doesActionAllowTopicId } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -18,14 +18,12 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
+import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import {
-  QuestAction,
-  QuestActionContentIdScope,
-} from '../CreateQuest/QuestForm/QuestActionSubForm';
-import {
-  buildURLFromContentId,
-  ContentIdType,
+  buildRedirectURLFromContentId,
+  inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
+import { QuestTypes } from '../CreateQuest/QuestForm/types';
 import './UpdateQuest.scss';
 
 const UpdateQuest = ({ id }: { id: number }) => {
@@ -113,6 +111,7 @@ const UpdateQuest = ({ id }: { id: number }) => {
               name: quest.name,
               start_date: quest.start_date,
               max_xp_to_end: `${quest.max_xp_to_end}`,
+              quest_type: quest.quest_type as QuestTypes,
               ...(quest.community_id &&
                 community && {
                   community: {
@@ -134,23 +133,32 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 action: action.event_name as QuestAction,
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
-                rewardAmount: `${action.reward_amount}`,
-                instructionsLink: action.instructions_link,
-                contentIdScope: action.content_id
-                  ? action.content_id.split(':')[0] === 'topic'
-                    ? QuestActionContentIdScope.Topic
-                    : QuestActionContentIdScope.Thread
-                  : doesActionAllowTopicId(action.event_name as QuestAction)
-                    ? QuestActionContentIdScope.Topic
-                    : doesActionAllowThreadId(action.event_name as QuestAction)
-                      ? QuestActionContentIdScope.Thread
-                      : undefined,
-                contentLink: action.content_id
-                  ? buildURLFromContentId(
-                      action.content_id.split(':')[1],
-                      action.content_id.split(':')[0] as ContentIdType,
-                    )
-                  : action.content_id,
+                rewardAmount: `${action.reward_amount || 0}`,
+                instructionsLink: action.instructions_link || '',
+                amountMultipler: `${action.amount_multiplier || 0}`,
+                contentIdScope: inferContentIdTypeFromContentId(
+                  action.event_name as QuestAction,
+                  action.content_id || undefined,
+                ),
+                startLink: action.start_link || '',
+                contentIdentifier: buildRedirectURLFromContentId(
+                  action.content_id || '',
+                ),
+                noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
+                noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
+                noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
+                contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
+                ethChainId: action.ChainEventXpSource?.chain_node_id
+                  ? `${
+                      fetchCachedNodes()?.find(
+                        (x) =>
+                          x.id === action.ChainEventXpSource?.chain_node_id,
+                      )?.ethChainId || ''
+                    }`
+                  : ``,
+                // important to use readable signature instead of event signature here
+                eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
+                transactionHash: `${action.ChainEventXpSource?.transaction_hash || ''}`,
               })),
             }}
           />

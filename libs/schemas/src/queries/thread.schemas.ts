@@ -1,9 +1,11 @@
+import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import {
   Address,
   Comment,
   CommentVersionHistory,
   ContestManager,
+  Link,
   ProfileTags,
   Thread,
   ThreadVersionHistory,
@@ -169,7 +171,7 @@ export const ThreadView = Thread.extend({
   topic: TopicView.optional(),
   topic_id: PG_INT.optional(),
   is_linking_token: z.boolean().optional(),
-  launchpad_token_address: z.string().nullish(),
+  launchpad_token_address: z.string().nullable().optional(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
@@ -333,5 +335,24 @@ export const SearchThreads = {
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
+  }),
+};
+
+export const GetLinks = {
+  input: z.object({
+    thread_id: PG_INT.optional(),
+    link_source: z.nativeEnum(LinkSource).optional(),
+    link_identifier: z.string().optional(),
+  }),
+  output: z.object({
+    links: z.array(Link).optional(),
+    threads: z
+      .array(
+        z.object({
+          id: PG_INT,
+          title: z.string(),
+        }),
+      )
+      .optional(),
   }),
 };

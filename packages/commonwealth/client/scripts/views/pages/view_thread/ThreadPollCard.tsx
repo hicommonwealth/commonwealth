@@ -15,12 +15,16 @@ type ThreadPollCardProps = {
   poll: Poll;
   showDeleteButton?: boolean;
   isTopicMembershipRestricted?: boolean;
+  isCreateThreadPage?: boolean;
+  setLocalPoll?: (params) => void;
 };
 
 export const ThreadPollCard = ({
   poll,
   showDeleteButton,
   isTopicMembershipRestricted = false,
+  isCreateThreadPage = false,
+  setLocalPoll,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -44,9 +48,8 @@ export const ThreadPollCard = ({
   const handleDeletePoll = async () => {
     try {
       await deletePoll({
-        pollId: poll.id,
-        address: user.activeAccount?.address || '',
-        authorCommunity: user.activeAccount?.community?.id || '',
+        thread_id: poll.threadId,
+        poll_id: poll.id,
       });
       notifySuccess('Poll deleted');
     } catch (e) {
@@ -104,31 +107,43 @@ export const ThreadPollCard = ({
     });
   };
 
-  const userVote = poll.getUserVote(
+  const userVote = poll?.getUserVote?.(
     user.activeAccount?.community?.id || '',
     user.activeAccount?.address || '',
   );
+
+  // votes by weighted voting power
+  const totalVoteWeight = poll.votes.reduce(
+    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || 1),
+    0n,
+  );
+  const voteInformation = poll.options.map((option) => ({
+    label: option,
+    value: option,
+    voteCount: poll.votes
+      .filter((v) => v.option === option)
+      .reduce((sum, val) => sum + BigInt(val.calculatedVotingWeight || 1), 0n),
+  }));
 
   return (
     <>
       <PollCard
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={!user.activeAccount || isTopicMembershipRestricted}
+        disableVoteButton={
+          !user.activeAccount ||
+          isTopicMembershipRestricted ||
+          isCreateThreadPage
+        }
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+          poll?.endsAt && poll?.endsAt?.isBefore(moment().utc()),
         )}
-        totalVoteCount={poll.votes?.length}
-        voteInformation={poll.options.map((option) => {
-          return {
-            label: option,
-            value: option,
-            voteCount: poll.votes.filter((v) => v.option === option).length,
-          };
-        })}
+        totalVoteCount={poll.votes.length}
+        totalVoteWeight={totalVoteWeight}
+        voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
         tooltipErrorMessage={getTooltipErrorMessage()}
@@ -144,8 +159,12 @@ export const ThreadPollCard = ({
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
-          //@typescript-eslint/no-misused-promises
-          handleDeletePoll().catch(console.error);
+          if (isCreateThreadPage && setLocalPoll) {
+            setLocalPoll([]);
+          } else {
+            //@typescript-eslint/no-misused-promises
+            handleDeletePoll().catch(console.error);
+          }
         }}
       />
       <CWModal

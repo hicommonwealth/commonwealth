@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { CommunityGoalType } from '@hicommonwealth/shared';
+import { CommunityGoalType, CommunityTierMap } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   CreateGroup,
@@ -44,8 +44,8 @@ describe('community goals lifecycle', () => {
         name: `xp ${type} quest`,
         description: chance.sentence(),
         image_url: chance.url(),
-        start_date: moment().add(2, 'day').toDate(),
-        end_date: moment().add(3, 'day').toDate(),
+        start_date: dayjs().add(2, 'day').toDate(),
+        end_date: dayjs().add(3, 'day').toDate(),
         max_xp_to_end: 100,
         quest_type: 'common',
         community_id,
@@ -69,7 +69,7 @@ describe('community goals lifecycle', () => {
 
     // hack start date to make it active
     await models.Quest.update(
-      { start_date: moment().subtract(3, 'day').toDate() },
+      { start_date: dayjs().subtract(3, 'day').toDate() },
       { where: { id: quest!.id } },
     );
 
@@ -86,6 +86,7 @@ describe('community goals lifecycle', () => {
     superadmin = actors.superadmin;
 
     const [target] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       base: community!.base,
       chain_node_id: community!.chain_node_id!,
       active: true,

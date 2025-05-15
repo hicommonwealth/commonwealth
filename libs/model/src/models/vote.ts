@@ -19,6 +19,10 @@ export default (
       address: { type: Sequelize.STRING, allowNull: false },
       author_community_id: { type: Sequelize.STRING, allowNull: true },
       community_id: { type: Sequelize.STRING, allowNull: false },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },

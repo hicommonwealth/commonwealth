@@ -16,7 +16,6 @@ import {
   useGetCommunityByIdQuery,
   useGetMembersQuery,
 } from 'state/api/communities';
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
@@ -289,10 +288,13 @@ const CommunityMembersPage = () => {
     return clonedFilteredGroups;
   }, [groups, searchFilters, memberships]);
 
-  const totalResults = members?.pages?.[0]?.totalResults || 0;
+  let totalResults = members?.pages?.[0]?.totalResults || 0;
+  if (totalResults < 30) {
+    totalResults = members?.pages?.[0]?.results?.length || 1;
+  }
 
   const updateActiveTab = (activeTab: TabValues) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(window.location.search);
     params.set('tab', activeTab);
     navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
@@ -313,10 +315,8 @@ const CommunityMembersPage = () => {
   };
 
   useEffect(() => {
-    // Invalidate group memberships cache
-    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
     refetch().catch((e) => console.log(e));
-  }, [refetch]);
+  }, [refetch, communityId]);
 
   useEffect(() => {
     // Set the active tab based on URL

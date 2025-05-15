@@ -1,6 +1,7 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
@@ -14,6 +15,8 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
+import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
+import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
 import {
   CWTab,
   CWTabsRow,
@@ -107,7 +110,7 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
-
+  const partnershipWalletEnabled = useFlag('partnershipWallet');
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
@@ -167,11 +170,12 @@ const ModalBase = ({
     wallets.find((wallet) => wallet.name === walletId);
 
   const hasWalletConnect = findWalletById(WalletId.WalletConnect);
+  const isOkxWalletAvailable = findWalletById(WalletId.OKX);
   const evmWallets = filterWalletNames(ChainBase.Ethereum) as EVMWallets[];
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-
+  const suiWallets = filterWalletNames(ChainBase.Sui);
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -186,25 +190,43 @@ const ModalBase = ({
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
-        case ChainBase.Ethereum:
-          return hasWalletConnect ? ['walletconnect'] : [];
+        case ChainBase.Ethereum: {
+          const configEvmWallets: string[] = [];
+          if (isOkxWalletAvailable && partnershipWalletEnabled) {
+            configEvmWallets.push('okx');
+          }
+          if (hasWalletConnect) {
+            configEvmWallets.push('walletconnect');
+          }
+          return configEvmWallets;
+        }
         case ChainBase.CosmosSDK:
           return cosmosWallets;
         case ChainBase.Solana:
           return solanaWallets;
         case ChainBase.Substrate:
           return substrateWallets;
+        case ChainBase.Sui:
+          return suiWallets;
         default:
           return [];
       }
     }
 
     if (!app?.chain?.base) {
+      const configEvmWallets: string[] = [];
+      if (isOkxWalletAvailable && partnershipWalletEnabled) {
+        configEvmWallets.push('okx');
+      }
+      if (hasWalletConnect) {
+        configEvmWallets.push('walletconnect');
+      }
       return [
-        ...(hasWalletConnect ? ['walletconnect'] : []),
+        ...configEvmWallets,
         ...cosmosWallets,
         ...solanaWallets,
         ...substrateWallets,
+        ...suiWallets,
       ];
     }
 
@@ -327,6 +349,8 @@ const ModalBase = ({
 
   return (
     <>
+      <PrivySMSDialog />
+      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />

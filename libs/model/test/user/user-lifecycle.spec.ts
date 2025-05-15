@@ -10,7 +10,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   CreateComment,
@@ -83,8 +83,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -119,7 +119,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -188,6 +188,8 @@ describe('User lifecycle', () => {
       expect(logs.length).to.equal(4);
       expect(logs.map((l) => l.toJSON())).to.deep.equal([
         {
+          id: 1,
+          name: null,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -197,6 +199,8 @@ describe('User lifecycle', () => {
           created_at: logs[0].created_at,
         },
         {
+          id: 2,
+          name: null,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -206,6 +210,8 @@ describe('User lifecycle', () => {
           created_at: logs[1].created_at,
         },
         {
+          id: 3,
+          name: null,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -215,6 +221,8 @@ describe('User lifecycle', () => {
           created_at: logs[2].created_at,
         },
         {
+          id: 4,
+          name: null,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -227,7 +235,7 @@ describe('User lifecycle', () => {
 
       // hack end date to make it inactive
       await models.Quest.update(
-        { end_date: moment().subtract(3, 'day').toDate() },
+        { end_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
     });
@@ -240,8 +248,8 @@ describe('User lifecycle', () => {
           name: 'xp quest 2',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -283,7 +291,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -365,6 +373,10 @@ describe('User lifecycle', () => {
         },
       ]);
 
+      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+        [member.address!]: '100',
+      });
+
       // user signs in a referral link, creating a new user and address
       const new_address = await signIn(
         new SIWESigner({ chainId: 1 }),
@@ -379,6 +391,8 @@ describe('User lifecycle', () => {
           email: '',
         },
       };
+
+      vi.clearAllMocks();
 
       // complete the sign up flow
       await command(UpdateUser(), {
@@ -460,45 +474,55 @@ describe('User lifecycle', () => {
       const last = logs.slice(-5); // last 5 event logs
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
+          id: 5,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
+          name: null,
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
         },
         {
+          id: 6,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
+          name: null,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
         },
         {
+          id: 7,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
+          name: null,
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
         },
         {
+          id: 8,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
+          name: null,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
         },
         {
+          id: 9,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
+          name: null,
           action_meta_id: -1, // this is system quest action
           creator_user_id: member.user.id,
           creator_xp_points: 4,
@@ -508,7 +532,7 @@ describe('User lifecycle', () => {
 
       // hack end date to make it inactive
       await models.Quest.update(
-        { end_date: moment().subtract(3, 'day').toDate() },
+        { end_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
     });
@@ -585,8 +609,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -598,8 +622,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -635,11 +659,11 @@ describe('User lifecycle', () => {
 
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest1!.id } },
       );
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest2!.id } },
       );
 
@@ -678,8 +702,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 20,
           quest_type: 'common',
         },
@@ -707,7 +731,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -780,8 +804,8 @@ describe('User lifecycle', () => {
           name: 'xp quest for memberships',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,
           quest_type: 'common',
         },
@@ -803,7 +827,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -844,8 +868,8 @@ describe('User lifecycle', () => {
           name: 'xp quest for wallet linking',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,
           quest_type: 'common',
         },
@@ -867,7 +891,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -913,14 +937,14 @@ describe('User lifecycle', () => {
         payload: { top: 10 },
       });
       expect(xps1!.length).to.equal(4);
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([147, 50, 37, 11]);
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([161, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { top: 10, quest_id: -1 },
       });
       expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 10]);
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([20, 10]);
     });
   });
 });

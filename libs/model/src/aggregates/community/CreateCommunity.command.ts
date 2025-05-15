@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { config, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   bech32ToHex,
@@ -16,7 +16,6 @@ import {
   mustBeSuperAdmin,
   mustExist,
   tiered,
-  turnstile,
 } from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
@@ -47,6 +46,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
+    case ChainBase.Sui:
+      return ChainNetwork.Sui;
   }
 }
 
@@ -56,7 +57,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
     auth: [
       authVerified(),
       tiered({ creates: true }),
-      turnstile({ widgetName: 'create-community' }),
+      // turnstile({ widgetName: 'create-community' }),
     ],
     body: async ({ actor, payload }) => {
       const {
@@ -154,6 +155,9 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             stages_enabled: true,
             allow_tokenized_threads,
             thread_purchase_token,
+            namespace_verified: false,
+            environment: config.APP_ENV,
+            profile_count: 1,
           },
           { transaction },
         );

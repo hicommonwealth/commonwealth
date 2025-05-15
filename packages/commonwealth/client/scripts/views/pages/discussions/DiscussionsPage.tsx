@@ -25,19 +25,26 @@ import {
   ContentType,
   ZERO_ADDRESS,
   formatDecimalToWei,
-  splitAndDecodeURL,
+  generateTopicIdentifiersFromUrl,
+  generateUrlPartForTopicIdentifiers,
+  sanitizeTopicName,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
+import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
+import { ThreadKind } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import useCreateThreadMutation, {
+  buildCreateThreadInput,
+} from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
@@ -48,6 +55,7 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { serializeDelta } from 'views/components/react_quill_editor/utils';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
@@ -61,7 +69,7 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-type DiscussionsPageProps = {
+export type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
   selectedView?: string;
   topicName?: string;
@@ -77,7 +85,8 @@ const VIEWS = [
   { value: 'overview', label: 'Overview' },
   { value: 'cardview', label: 'Cardview' },
 ];
-const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+
+const DiscussionsPage = () => {
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -87,8 +96,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
-  // @ts-expect-error <StrictNullChecks/>
-  const stageName: string = searchParams.get('stage');
+  const stageName: string = searchParams.get('stage') || '';
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -116,7 +124,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   }, [tabStatus]);
 
-  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicIdentifiersFromURL = generateTopicIdentifiersFromUrl(
+    window.location.href,
+  );
+  const topicObj = topics?.find(
+    ({ name }) =>
+      sanitizeTopicName(name) === topicIdentifiersFromURL?.topicName,
+  );
   const topicId = topicObj?.id;
 
   const user = useUserStore();
@@ -200,16 +214,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
-  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
-  const topicNameFromURL = splitAndDecodeURL(location.pathname);
-
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
     if (
       !isLoadingTopics &&
-      topicNameFromURL &&
-      topicNameFromURL !== 'archived' &&
-      topicNameFromURL !== 'overview' &&
+      topicIdentifiersFromURL &&
+      topicIdentifiersFromURL.topicName !== 'archived' &&
+      topicIdentifiersFromURL.topicName !== 'overview' &&
       tabStatus !== 'overview'
     ) {
       // Don't redirect if we're on a discussion page
@@ -217,19 +228,31 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         return;
       }
 
-      const validTopics = topics?.some(
-        (topic) => topic?.name === topicNameFromURL,
+      const validTopic = topics?.find(
+        (topic) =>
+          sanitizeTopicName(topic?.name) === topicIdentifiersFromURL.topicName,
       );
-      if (!validTopics) {
+      if (!validTopic) {
         navigate('/discussions');
       }
+      if (
+        validTopic &&
+        (!topicIdentifiersFromURL.topicId ||
+          topicIdentifiersFromURL.topicId !== validTopic.id)
+      ) {
+        const identifier = generateUrlPartForTopicIdentifiers(
+          validTopic?.id,
+          validTopic.name,
+        );
+        navigate(`/discussions/${encodeURI(identifier)}`, { replace: true });
+      }
     }
-    if (topicNameFromURL === 'overview') {
+    if (topicIdentifiersFromURL?.topicName === 'overview') {
       setSelectedView(VIEWS[1].value);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, topicNameFromURL, isLoadingTopics]);
+  }, [topics, topicIdentifiersFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
@@ -264,13 +287,80 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     setSelectedView(activeTab);
   };
 
-  // Add sticky editor state
+  const [threadTitle, setThreadTitle] = useState<string>('');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { mutateAsync: createThread } = useCreateThreadMutation({
+    communityId,
+  });
 
   const handleCancel = () => {
+    setThreadTitle('');
     setThreadContentDelta(createDeltaFromText(''));
+  };
+
+  const handleSubmitThread = async (): Promise<number> => {
+    if (isSubmitting) return -1;
+
+    let useTopicObj = topicObj;
+
+    if (!useTopicObj && topics && topics.length > 0) {
+      useTopicObj = topics.find((t) => t.name.toLowerCase() === 'general');
+
+      if (!useTopicObj) {
+        useTopicObj = topics[0];
+      }
+    }
+
+    if (!useTopicObj) {
+      notifyError('No topics available to create a thread');
+      return -1;
+    }
+
+    if (!getTextFromDelta(threadContentDelta).trim()) {
+      notifyError('Please enter content for your thread');
+      return -1;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const title =
+        threadTitle || getTextFromDelta(threadContentDelta).substring(0, 60);
+
+      const communityBase = app?.chain?.base || '';
+
+      const threadInput = await buildCreateThreadInput({
+        communityId,
+        communityBase,
+        address: user.activeAccount?.address || '',
+        title: title,
+        body: serializeDelta(threadContentDelta),
+        kind: ThreadKind.Discussion,
+        stage: '',
+        topic: useTopicObj,
+        url: '',
+      });
+
+      const newThread = await createThread(threadInput);
+
+      setThreadTitle('');
+      setThreadContentDelta(createDeltaFromText(''));
+
+      navigate(`/discussion/${newThread.id}`);
+
+      // Fix for TypeScript error - ensure we return a number
+      return newThread.id ?? -1;
+    } catch (err) {
+      console.error('Error creating thread:', err);
+      notifyError('Failed to create thread');
+      return -1;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -317,8 +407,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         )}
 
         <HeaderWithFilters
-          // @ts-expect-error <StrictNullChecks/>
-          topic={topicName}
+          topic={topicIdentifiersFromURL?.topicName || ''}
           stage={stageName}
           featuredFilter={featuredFilter}
           dateRange={dateRange}
@@ -430,18 +519,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
         <WithDefaultStickyComment>
           {user.isLoggedIn && user.activeAccount && (
-            <StickyEditorContainer
+            <StickyInput
               parentType={ContentType.Thread}
               canComment={true}
-              handleSubmitComment={() => {
-                // This isn't used for creating threads
-                console.error('Not implemented');
-                return Promise.resolve(-1);
-              }}
+              handleSubmitComment={handleSubmitThread}
               errorMsg=""
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              disabled={false}
+              disabled={isSubmitting}
               onCancel={handleCancel}
               author={user.activeAccount}
               editorValue={getTextFromDelta(threadContentDelta)}
