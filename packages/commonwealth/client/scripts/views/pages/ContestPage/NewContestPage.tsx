@@ -15,6 +15,7 @@ import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
 import type { EntriesTabProps } from './tabs/Entries';
 import EntriesTab from './tabs/Entries';
+import JudgesTab from './tabs/Judges';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 import { getCurrentContestIndex, getSortedContests } from './utils';
@@ -72,6 +73,8 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     topicId: contest?.topic_id || undefined,
     isFarcasterContest: !!contest?.is_farcaster_contest,
   };
+
+  const isJudgedContest = !!contest?.namespace_judge_token_id;
 
   return (
     <CWPageLayout>
@@ -139,6 +142,14 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             isActive={selectedMobileTab === MobileTabType.Entries}
             onClick={() => setSelectedMobileTab(MobileTabType.Entries)}
           />
+          {isJudgedContest && (
+            <CWMobileTab
+              label={MobileTabType.Judges}
+              icon="gavel"
+              isActive={selectedMobileTab === MobileTabType.Judges}
+              onClick={() => setSelectedMobileTab(MobileTabType.Judges)}
+            />
+          )}
           {chain && address && (
             <CWMobileTab
               label={MobileTabType.PriceChart}
@@ -161,6 +172,9 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           {selectedMobileTab === MobileTabType.Entries && (
             <EntriesTab {...entriesTabProps} />
           )}
+          {selectedMobileTab === MobileTabType.Judges && isJudgedContest && (
+            <JudgesTab contestAddress={contestAddress} />
+          )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
         </div>
@@ -169,6 +183,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           <CWGrid>
             <div className="thread-list-container">
               <EntriesTab {...entriesTabProps} />
+              {isJudgedContest && <JudgesTab contestAddress={contestAddress} />}
             </div>
             {address ? (
               <div>
