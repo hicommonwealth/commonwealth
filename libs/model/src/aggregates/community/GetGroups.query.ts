@@ -14,24 +14,26 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
       const { community_id, group_id, include_members, include_topics } =
         payload;
 
-      const groups = await models.Group.findAll({
-        where: {
-          ...(community_id && { community_id }),
-          ...(group_id && { id: group_id }),
-        },
-        include: [
-          {
-            model: models.GroupPermission,
-            attributes: ['topic_id', 'allowed_actions'],
+      const groups = (
+        await models.Group.findAll({
+          where: {
+            ...(community_id && { community_id }),
+            ...(group_id && { id: group_id }),
           },
-        ],
-      });
+          include: [
+            {
+              model: models.GroupPermission,
+              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+            },
+          ],
+        })
+      ).map((g) => g.toJSON());
       const ids = groups.map((g) => g.id!);
 
       const output = new Map<number, z.infer<typeof schemas.GroupView>>();
       groups.forEach((g) =>
         output.set(g.id!, {
-          ...g.toJSON(),
+          ...g,
           id: g.id!,
           name: g.metadata.name,
           memberships: [],
@@ -66,7 +68,6 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
         topics.forEach((t) => topics_map.set(t.id!, t.toJSON()));
 
         const topic_permissions = buildTopicPermissionsMap(groups);
-
         output.forEach((g) => {
           const perm = topic_permissions.get(g.id!);
           perm &&

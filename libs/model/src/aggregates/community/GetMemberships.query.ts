@@ -45,17 +45,19 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
       });
       mustExist('Address', addr);
 
-      const groups = await models.Group.findAll({
-        where: { community_id },
-        attributes: ['id'],
-        include: [
-          {
-            model: models.GroupPermission,
-            attributes: ['topic_id', 'allowed_actions'],
-            where: topic_id ? { topic_id } : undefined,
-          },
-        ],
-      });
+      const groups = (
+        await models.Group.findAll({
+          where: { community_id },
+          attributes: ['id'],
+          include: [
+            {
+              model: models.GroupPermission,
+              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+              where: topic_id ? { topic_id } : undefined,
+            },
+          ],
+        })
+      ).map((g) => g.toJSON());
       const ids = groups.map((g) => g.id!);
 
       // TODO: resolve stale community memberships in a separate job

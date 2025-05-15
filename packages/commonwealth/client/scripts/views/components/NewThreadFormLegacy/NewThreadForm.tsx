@@ -233,9 +233,7 @@ export const NewThreadForm = forwardRef<
       topicId: threadTopic?.id,
     });
 
-    const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-      communityId: app.activeChainId() || '',
-    });
+    const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
     const { generateCompletion } = useAiCompletion();
     const [isGenerating, setIsGenerating] = useState(false);
@@ -413,8 +411,7 @@ export const NewThreadForm = forwardRef<
         const thread = await createThread(input);
         if (thread && linkedProposals) {
           addThreadLinks({
-            communityId: app.activeChainId() || '',
-            threadId: thread.id!,
+            thread_id: thread.id!,
             links: [
               {
                 source: linkedProposals.source as LinkSource,

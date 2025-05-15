@@ -1,5 +1,4 @@
 import {
-  LinkSource,
   MAX_COMMUNITY_IMAGE_SIZE_KB,
   MAX_SCHEMA_ETH,
   MAX_SCHEMA_INT,
@@ -31,12 +30,6 @@ export const DiscordMetaSchema = z.object({
   channel_id: z.string(),
   message_id: z.string(),
 });
-
-export const linksSchema = {
-  source: z.nativeEnum(LinkSource),
-  identifier: z.string(),
-  title: z.string().nullable().optional(),
-};
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 

@@ -400,14 +400,7 @@ export const events = {
   }),
 
   LaunchpadTokenGraduated: z.object({
-    token: LaunchpadToken.extend({}),
-    launchpadLiquidity: z.coerce.bigint(),
-    poolLiquidity: z.coerce.bigint(),
-    curveId: z.coerce.bigint(),
-    scalar: z.coerce.bigint(),
-    reserveRation: z.coerce.bigint(),
-    LPhook: z.string(),
-    funded: z.boolean(),
+    token: LaunchpadToken,
   }),
 
   LaunchpadTokenTraded: z.object({
