@@ -145,7 +145,7 @@ const StakeExchangeForm = ({
       const txReceipt = await buyStake({
         amount: numberOfStakeToExchange,
         stakeId: commonProtocol.STAKE_ID,
-        namespace: stakeData?.stake?.Community?.namespace || '',
+        namespace: stakeData!.stake!.Community!.namespace!,
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
@@ -201,7 +201,7 @@ const StakeExchangeForm = ({
       const txReceipt = await sellStake({
         amount: numberOfStakeToExchange,
         stakeId: commonProtocol.STAKE_ID,
-        namespace: stakeData?.stake?.Community?.namespace || '',
+        namespace: stakeData!.stake!.Community!.namespace!,
         chainRpc,
         walletAddress: selectedAddress?.value,
         ethChainId,
