@@ -151,7 +151,7 @@ export async function parseLogs(
       meta: evmEventSource.meta,
     };
     try {
-      events.push((await eventMapper(evmEvent)) as EventPairs);
+      events.push(eventMapper(evmEvent) as EventPairs);
     } catch (e) {
       const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
       logger.error(msg, e, evmEvent);
