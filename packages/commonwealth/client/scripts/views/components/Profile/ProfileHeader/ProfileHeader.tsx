@@ -95,6 +95,22 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
             </CWText>
           </div>
         )}
+        <div className="user-stats">
+          <div className="stats-container">
+            <div className="stat-item">
+              <CWText type="b1" className="stat-value">
+                150
+              </CWText>
+              <CWText type="caption">Token Votes Delegated</CWText>
+            </div>
+            <div className="stat-item">
+              <CWText type="b1" className="stat-value">
+                45
+              </CWText>
+              <CWText type="caption">Karma earned across Common</CWText>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
