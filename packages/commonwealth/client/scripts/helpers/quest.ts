@@ -106,7 +106,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'SSOLinked',
     'DiscordServerJoined',
     'MembershipsRefreshed',
-    'LaunchpadTokenCreated',
+    'LaunchpadTokenRecordCreated',
   ];
   const channelQuest: QuestActionType[] = [
     'TweetEngagement',

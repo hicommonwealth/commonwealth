@@ -399,6 +399,21 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
+  LaunchpadTokenRecordCreated: z.object({
+    name: z.string(),
+    symbol: z.string(),
+    created_at: z.date(),
+    eth_chain_id: z.number(),
+    creator_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
+    namespace: z.string(),
+    curve_id: z.string(),
+    total_supply: z.string(),
+    launchpad_liquidity: z.string(),
+    reserve_ration: z.string(),
+    initial_purchase_eth_amount: z.string(),
+  }),
+
   LaunchpadTokenGraduated: z.object({
     token: LaunchpadToken,
   }),
