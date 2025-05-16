@@ -21,6 +21,7 @@ export enum MobileTabType {
   Entries = 'Entries',
   PriceChart = 'Price Chart',
   TokenSwap = 'Token Swap',
+  Judges = 'Judges',
 }
 
 interface ContestPageProps {

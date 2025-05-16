@@ -1,0 +1,54 @@
+.JudgesTab {
+  margin-top: 16px;
+
+  .loading-container,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .Text.b2.regular {
+    margin-bottom: 8px;
+  }
+
+  .search-section {
+    margin-top: 16px;
+    margin-bottom: 24px;
+
+    .search-container {
+      margin-bottom: 16px;
+    }
+
+    .search-results {
+      margin-top: 8px;
+
+      .data-container {
+        vertical-align: middle;
+      }
+
+      .no-results {
+        padding: 12px;
+        text-align: center;
+        color: #666;
+      }
+
+      .loading-container {
+        padding: 24px;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+}
