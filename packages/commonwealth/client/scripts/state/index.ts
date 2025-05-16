@@ -9,10 +9,10 @@ import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
-import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { fetchNodes } from './api/nodes';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -72,7 +72,7 @@ export async function initAppState(
       axios.get(`${SERVER_URL}/status`),
     ]);
 
-    await fetchNodesQuery();
+    await fetchNodes();
     await fetchCustomDomainQuery();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {

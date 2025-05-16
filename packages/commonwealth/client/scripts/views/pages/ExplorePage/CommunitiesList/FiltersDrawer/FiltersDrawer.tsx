@@ -31,7 +31,7 @@ export const FiltersDrawer = ({
   filters,
   onFiltersChange,
 }: FiltersDrawerProps) => {
-  const { data: tags } = useFetchTagsQuery();
+  const { data: tags } = useFetchTagsQuery({ enabled: true });
   const launchpadEnabled = useFlag('launchpad');
 
   const onStakeFilterChange = () => {

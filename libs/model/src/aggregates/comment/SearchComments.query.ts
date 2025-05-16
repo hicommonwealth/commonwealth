@@ -66,9 +66,9 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       "Threads".community_id as community_id,
       ts_rank_cd("Comments".search, query) as rank
     FROM "Comments"
-    JOIN "Threads" ON "Comments".thread_id = "Threads".id
-    JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
-    websearch_to_tsquery('english', $searchTerm) as query
+      JOIN "Threads" ON "Comments".thread_id = "Threads".id
+      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
+      websearch_to_tsquery('english', $searchTerm) as query
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
@@ -81,9 +81,9 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     SELECT
       COUNT (*) as count
     FROM "Comments"
-    JOIN "Threads" ON "Comments".thread_id = "Threads".id
-    JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
-    websearch_to_tsquery('english', $searchTerm) as query
+      JOIN "Threads" ON "Comments".thread_id = "Threads".id
+      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
+      websearch_to_tsquery('english', $searchTerm) as query
     WHERE
       ${communityWhere}
       "Comments".deleted_at IS NULL AND
