@@ -312,6 +312,19 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/explore?tab=tokens`);
         break;
       }
+      case 'ContestEnded': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest view
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
       default:
         return;
     }

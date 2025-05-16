@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['ContestEnded']: 'Engage on a Contest till completion',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -37,6 +38,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['ContestEnded']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -132,6 +134,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['ContestEnded']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -150,5 +162,6 @@ export const actionCopies = {
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenCreated']: '',
     ['LaunchpadTokenTraded']: '',
+    ['ContestEnded']: '',
   },
 };
