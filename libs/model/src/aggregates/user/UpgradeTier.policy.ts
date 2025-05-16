@@ -9,7 +9,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes, Transaction } from 'sequelize';
-import { models, sequelize } from '../../database';
+import { models } from '../../database';
 import {
   USDC_BASE_MAINNET_ADDRESS,
   USDC_BASE_SEPOLIA_ADDRESS,
@@ -77,17 +77,10 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
         if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-        await sequelize.transaction(async (transaction) => {
-          await upgradeUserTier(
-            nominatedAddress!.User!.id!,
-            UserTierMap.ChainVerified,
-            transaction,
-          );
-          await models.Community.update(
-            { namespace_verified: true },
-            { where: { id: community.id }, transaction },
-          );
-        });
+        await upgradeUserTier(
+          nominatedAddress!.User!.id!,
+          UserTierMap.ChainVerified,
+        );
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;

@@ -17,7 +17,7 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
     inputs,
     body: {
       NominatorSettled: async ({ payload }) => {
-        // on configure verification, update community verification status
+        // on configure verification (ID 3 created), update community verification status
 
         const community = await models.Community.findOne({
           where: {
@@ -52,17 +52,27 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
         }
 
         // append address to community nominations
-        await models.sequelize.query(
-          `UPDATE "Communities"
-          SET "namespace_nominations" = array_append(COALESCE("namespace_nominations", ARRAY[]::text[]), :nominator)
-          WHERE "id" = :community_id`,
-          {
-            replacements: {
-              nominator: payload.parsedArgs.nominator,
-              community_id: community.id,
+        await models.sequelize.transaction(async (transaction) => {
+          await models.sequelize.query(
+            `UPDATE "Communities"
+            SET "namespace_nominations" = CASE
+              WHEN :nominator = ANY(COALESCE("namespace_nominations", ARRAY[]::text[])) THEN "namespace_nominations"
+              ELSE array_append(COALESCE("namespace_nominations", ARRAY[]::text[]), :nominator)
+            END
+            WHERE "id" = :community_id`,
+            {
+              replacements: {
+                nominator: payload.parsedArgs.nominator,
+                community_id: community.id,
+              },
+              transaction,
             },
-          },
-        );
+          );
+          await models.Community.update(
+            { namespace_verified: true },
+            { where: { id: community.id }, transaction },
+          );
+        });
       },
       JudgeNominated: async ({ payload }) => {
         // on contest judge nomination, append judge address to contest manager
@@ -91,7 +101,10 @@ export function NominationsWorker(): Policy<typeof inputs, ZodUndefined> {
         // append new nomination
         await models.sequelize.query(
           `UPDATE "ContestManagers"
-          SET "namespace_judges" = array_append(COALESCE("namespace_judges", ARRAY[]::text[]), :judge_address)
+          SET "namespace_judges" = CASE
+            WHEN :judge_address = ANY(COALESCE("namespace_judges", ARRAY[]::text[])) THEN "namespace_judges"
+            ELSE array_append(COALESCE("namespace_judges", ARRAY[]::text[]), :judge_address)
+          END
           WHERE "contest_address" = :contest_address`,
           {
             replacements: {

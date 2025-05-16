@@ -368,6 +368,7 @@ class NamespaceFactory extends ContractBase {
           maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
         });
     } catch (error) {
+      console.log(error);
       throw new Error('Transaction failed');
     }
     return txReceipt;

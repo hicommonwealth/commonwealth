@@ -149,8 +149,6 @@ describe('Upgrade Tiers lifecycle', () => {
 
       const userAfter = await models.User.findByPk(user.id);
       expect(userAfter!.tier).toBe(UserTierMap.ChainVerified);
-      const communityAfter = await models.Community.findByPk(community.id);
-      expect(communityAfter!.namespace_verified).toBe(true);
     });
 
     test('should upgrade user to ChainVerified tier when contest is funded and there is contest activity', async () => {
