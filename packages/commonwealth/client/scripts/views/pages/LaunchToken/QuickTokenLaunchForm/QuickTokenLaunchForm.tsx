@@ -267,6 +267,8 @@ export const QuickTokenLaunchForm = ({
           community_id: communityId,
           eth_chain_id: baseNode.ethChainId!,
           transaction_hash: txReceipt.transactionHash,
+          description: sanitizedTokenInfo.description,
+          icon_url: sanitizedTokenInfo.imageURL,
         });
 
         // 4. update community to reference the created token
