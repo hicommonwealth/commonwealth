@@ -40,6 +40,7 @@ const featureFlags = {
   trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
   partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
+  newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
