@@ -100,6 +100,17 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: true,
     },
   },
+  binance: {
+    icon: {
+      name: 'binance',
+      isCustom: true,
+    },
+    label: 'Binance Wallet',
+    description: {
+      text: 'Ethereum Communities',
+      hasBackground: false,
+    },
+  },
   polkadot: {
     icon: {
       name: 'polkadot',
