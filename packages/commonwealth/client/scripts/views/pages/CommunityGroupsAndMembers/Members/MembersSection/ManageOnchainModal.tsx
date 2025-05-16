@@ -184,8 +184,6 @@ export const ManageOnchainModal = ({
     }
   };
 
-  console.log({ community });
-
   const mintPermission = async () => {
     try {
       const walletAddress = userData.activeAccount?.address;

@@ -36,6 +36,7 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
   const [selectedAddressInfo, setSelectedAddressInfo] =
     useState<any>(undefined);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [optimisticJudges, setOptimisticJudges] = useState<string[]>(judges);
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 300);
 
   const { getContestByAddress } = useCommunityContests();
@@ -100,8 +101,8 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 
   const { data: members, isLoading } = useGetMembersQuery({
     community_id: communityId,
-    allowedAddresses: judges.join(','),
-    apiEnabled: judges.length > 0 && !!communityId,
+    allowedAddresses: optimisticJudges.join(','),
+    apiEnabled: optimisticJudges.length > 0 && !!communityId,
     memberships: 'allow-specified-addresses',
   });
 
@@ -114,38 +115,40 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         !!communityId && debouncedSearchTerm.length > 2 && isSearchVisible,
     });
 
-  const judgeData = (members?.pages[0]?.results || []).map((member) => {
-    const address = member.addresses[0]?.address || '';
+  const judgeData = (members?.pages[0]?.results || [])
+    .filter((member) => optimisticJudges.includes(member.addresses[0]?.address))
+    .map((member) => {
+      const address = member.addresses[0]?.address || '';
 
-    return {
-      name: {
-        customElement: (
-          <User
-            userAddress={address}
-            userCommunityId={communityId}
-            shouldLinkProfile={true}
-            shouldShowRole={false}
-            avatarSize={24}
-          />
-        ),
-        sortValue: member.profile_name || address,
-      },
-      address: {
-        customElement: (
-          <CWTag
-            label={formatAddressShort(address)}
-            type="address"
-            iconName="ethereum"
-          />
-        ),
-        sortValue: address,
-      },
-    };
-  });
+      return {
+        name: {
+          customElement: (
+            <User
+              userAddress={address}
+              userCommunityId={communityId}
+              shouldLinkProfile={true}
+              shouldShowRole={false}
+              avatarSize={24}
+            />
+          ),
+          sortValue: member.profile_name || address,
+        },
+        address: {
+          customElement: (
+            <CWTag
+              label={formatAddressShort(address)}
+              type="address"
+              iconName="ethereum"
+            />
+          ),
+          sortValue: address,
+        },
+      };
+    });
 
   const filteredSearchResults =
     searchResults?.pages[0]?.results?.filter(
-      (member) => !judges.includes(member.addresses[0].address),
+      (member) => !optimisticJudges.includes(member.addresses[0].address),
     ) || [];
 
   const searchResultsData = filteredSearchResults.map((member) => {
@@ -310,7 +313,16 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
             }}
             Addresses={selectedAddressInfo}
             refetch={() => {
-              console.log('Refetching data');
+              if (selectedAddressInfo && selectedAddressInfo.length > 0) {
+                const newAddresses = selectedAddressInfo
+                  .map((info: any) => info.address)
+                  .filter((addr: string) => !optimisticJudges.includes(addr));
+                if (newAddresses.length > 0) {
+                  setOptimisticJudges((prev) => [...prev, ...newAddresses]);
+                }
+              }
+              setIsRoleModalOpen(false);
+              setSearchTerm('');
             }}
             chainId={communityId}
             forceJudgeTab
@@ -330,5 +342,4 @@ export default JudgesTab;
 
 // make search by address possible
 // make sure it looks good on mobile
-// cleanup scss + delete dialog
-// // Refetch data after changes
+// Refetch data after changes
