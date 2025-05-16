@@ -6,6 +6,7 @@ import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import BackpackWebWalletController from './webWallets/backpack_web_wallet';
+import BinanceWebWalletController from './webWallets/binance_web_wallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
@@ -132,6 +133,7 @@ export default class WebWalletController {
       new BackpackWebWalletController(),
       new SolflareWebWalletController(),
       new SuiWebWalletController(),
+      new BinanceWebWalletController(),
     ];
   }
 }
