@@ -17,7 +17,7 @@ import {
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionToolTips } from 'helpers/threads';
+import { detectURL } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -300,8 +300,7 @@ export const NewThreadForm = forwardRef<
       isWalletBalanceErrorEnabled &&
       parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
-    const disabledThreadActionsTooltips = getThreadActionToolTips({
-      isCommunityMember: !!userSelectedAddress,
+    const threadPermissions = Permissions.getCreateThreadPermission({
       actionGroups,
       bypassGating,
     });
@@ -320,11 +319,7 @@ export const NewThreadForm = forwardRef<
       !userSelectedAddress ||
       walletBalanceError ||
       contestTopicError ||
-      (selectedCommunityId &&
-        !canUserPerformGatedAction(
-          actionGroups,
-          GatedActionEnum.CREATE_THREAD,
-        )) ||
+      (selectedCommunityId && !threadPermissions.allowed) ||
       isLoadingCommunity ||
       (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
       isDisabled ||
@@ -347,7 +342,11 @@ export const NewThreadForm = forwardRef<
       }
 
       if (
-        !canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_THREAD)
+        !canUserPerformGatedAction(
+          actionGroups,
+          GatedActionEnum.CREATE_THREAD,
+          bypassGating,
+        )
       ) {
         notifyError('Topic is gated!');
         return;
@@ -1067,13 +1066,8 @@ export const NewThreadForm = forwardRef<
                     contentDelta={threadContentDelta}
                     setContentDelta={setThreadContentDeltaWithCallback}
                     {...(selectedCommunityId && {
-                      isDisabled:
-                        !canUserPerformGatedAction(
-                          actionGroups,
-                          GatedActionEnum.CREATE_THREAD,
-                        ) || !userSelectedAddress,
-                      tooltipLabel:
-                        disabledThreadActionsTooltips.disabledThreadCreateTooltipText,
+                      isDisabled: !threadPermissions.allowed,
+                      tooltipLabel: threadPermissions.tooltip,
                     })}
                     // eslint-disable-next-line max-len
                     placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
@@ -1167,9 +1161,8 @@ export const NewThreadForm = forwardRef<
                     <div>
                       <CWGatedTopicBanner
                         actions={[GatedActionEnum.CREATE_THREAD]}
-                        groups={groups}
-                        memberships={memberships}
-                        topicId={threadTopic?.id}
+                        actionGroups={actionGroups}
+                        bypassGating={bypassGating}
                         onClose={() => setCanShowGatingBanner(false)}
                       />
                     </div>

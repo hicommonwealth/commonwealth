@@ -1,12 +1,10 @@
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
 import type { Topic } from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -88,16 +86,6 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const disabledThreadActionToolTips = getThreadActionToolTips({
-            isCommunityMember: Permissions.isCommunityMember(
-              thread.communityId,
-            ),
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            actionGroups,
-            bypassGating,
-          });
-
           return (
             <ThreadCard
               key={thread.id}
@@ -110,10 +98,11 @@ export const TopicSummaryRow = ({
               onCommentBtnClick={() =>
                 navigate(`${discussionLinkWithoutChain}?focusComments=true`)
               }
-              disabledThreadActionToolTips={disabledThreadActionToolTips}
               hideReactionButton
               hideUpvotesDrawer
               expandCommentBtnVisible
+              actionGroups={actionGroups}
+              bypassGating={bypassGating}
             />
           );
         })}

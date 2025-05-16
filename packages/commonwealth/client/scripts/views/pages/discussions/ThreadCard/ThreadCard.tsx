@@ -1,7 +1,8 @@
+import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
-import { DisabledThreadActionToolTips, filterLinks } from 'helpers/threads';
+import { filterLinks } from 'helpers/threads';
 import { LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -40,7 +41,6 @@ type CardProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   canUpdateThread?: boolean;
-  disabledThreadActionToolTips: DisabledThreadActionToolTips;
   onCommentBtnClick?: () => any;
   hideRecentComments?: boolean;
   hideReactionButton?: boolean;
@@ -63,6 +63,8 @@ type CardProps = AdminActionsProps & {
   cutoffLines?: number;
   showOnlyThreadActionIcons?: boolean;
   communityHomeLayout?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadCard = ({
@@ -83,7 +85,6 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canUpdateThread = true,
-  disabledThreadActionToolTips,
   onCommentBtnClick = () => null,
   hideRecentComments = false,
   hideReactionButton = false,
@@ -106,6 +107,8 @@ export const ThreadCard = ({
   cutoffLines,
   showOnlyThreadActionIcons = false,
   communityHomeLayout = false,
+  actionGroups,
+  bypassGating,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -132,6 +135,18 @@ export const ThreadCard = ({
     Permissions.isSiteAdmin() ||
     Permissions.isCommunityAdmin(community) ||
     Permissions.isCommunityModerator(community);
+
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_THREAD_REACTION,
+      GatedActionEnum.CREATE_COMMENT,
+      GatedActionEnum.CREATE_COMMENT_REACTION,
+    ],
+    thread,
+    actionGroups,
+    bypassGating,
+  });
+
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
@@ -159,13 +174,9 @@ export const ThreadCard = ({
           <ReactionButton
             thread={thread}
             size="big"
-            disabled={
-              !!disabledThreadActionToolTips.disabledThreadReactionTooltipText
-            }
+            disabled={!permissions.CREATE_THREAD_REACTION.allowed}
             undoUpvoteDisabled={editingDisabled}
-            tooltipText={
-              disabledThreadActionToolTips.disabledThreadReactionTooltipText
-            }
+            tooltipText={permissions.CREATE_THREAD_REACTION.tooltip}
           />
         )}
         <div className="content-wrapper">
@@ -338,7 +349,8 @@ export const ThreadCard = ({
                   showCommentVisible={showCommentVisible}
                   toggleShowComments={toggleShowComments}
                   showOnlyThreadActionIcons={showOnlyThreadActionIcons}
-                  disabledThreadActionTooltips={disabledThreadActionToolTips}
+                  actionGroups={actionGroups}
+                  bypassGating={bypassGating}
                 />
               )}
             </div>
@@ -363,10 +375,8 @@ export const ThreadCard = ({
                 onClick={() => onBodyClick && onBodyClick()}
               >
                 <CommentCard
-                  disabledThreadActionToolTips={disabledThreadActionToolTips}
-                  canReply={
-                    !disabledThreadActionToolTips.disabledCommentTooltipText
-                  }
+                  canReply={!permissions.CREATE_COMMENT.allowed}
+                  permissions={permissions}
                   replyBtnVisible
                   hideReactButton
                   comment={{

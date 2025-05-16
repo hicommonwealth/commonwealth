@@ -64,7 +64,9 @@ export function getMustJoinGroupNames(
 export function canUserPerformGatedAction(
   actionGroups: ActionGroups,
   action: GatedActionEnum,
+  bypassGating: boolean,
 ) {
+  if (bypassGating) return true;
   const groups = actionGroups[action];
   return !groups || !Object.keys(groups).length;
 }

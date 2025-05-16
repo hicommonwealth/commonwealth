@@ -21,13 +21,8 @@ export const EmptyThreadsPlaceholder = ({
             key={i}
             showSkeleton
             thread={{} as any}
-            disabledThreadActionToolTips={{
-              disabledCommentTooltipText: '',
-              disabledPollVoteTooltipText: '',
-              disabledThreadReactionTooltipText: '',
-              disabledThreadCreateTooltipText: '',
-              disabledCommentReactionTooltipText: '',
-            }}
+            actionGroups={{}}
+            bypassGating={false}
           />
         ))}
     </div>

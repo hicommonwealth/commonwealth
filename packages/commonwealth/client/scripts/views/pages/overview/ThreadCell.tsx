@@ -1,13 +1,18 @@
-import { ActionGroups, slugify } from '@hicommonwealth/shared';
+import { ActionGroups, GatedActionEnum, slugify } from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
+import {
+  getScopePrefix,
+  useCommonNavigate,
+} from 'client/scripts/navigation/helpers';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import moment from 'moment';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import threadPlaceholder from '../../../../assets/img/threadplaceholder.png';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { SharePopover } from '../../components/SharePopover';
@@ -19,13 +24,6 @@ import { NewThreadTag } from '../discussions/NewThreadTag';
 import { ReactionButton } from '../discussions/ThreadCard/ThreadOptions/ReactionButton';
 import { ToggleThreadSubscribe } from '../discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { isHot, removeImageFormMarkDown } from '../discussions/helpers';
-
-import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
-import {
-  getScopePrefix,
-  useCommonNavigate,
-} from 'client/scripts/navigation/helpers';
-import { Link } from 'react-router-dom';
 import './ThreadCell.scss';
 
 export type RenderThreadCellProps = {
@@ -40,10 +38,9 @@ const ThreadCell = ({
 }: RenderThreadCellProps) => {
   const user = useUserStore();
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
+  const permissions = Permissions.getGeneralActionPermission({
+    thread,
+    action: GatedActionEnum.CREATE_THREAD_REACTION,
     actionGroups,
     bypassGating,
   });
@@ -71,13 +68,9 @@ const ThreadCell = ({
         <ReactionButton
           thread={thread}
           size="big"
-          disabled={
-            !!disabledThreadActionToolTips.disabledThreadReactionTooltipText
-          }
+          disabled={permissions.allowed}
           undoUpvoteDisabled={false}
-          tooltipText={
-            disabledThreadActionToolTips.disabledThreadReactionTooltipText
-          }
+          tooltipText={permissions.tooltip}
         />
         <img src={image[0] || threadPlaceholder} alt="Thread content" />
         <div className="thread-details">

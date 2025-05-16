@@ -1,4 +1,5 @@
 import {
+  ActionGroups,
   GatedActionEnum,
   PRODUCTION_DOMAIN,
   UserFriendlyActionMap,
@@ -15,31 +16,27 @@ import CWBanner from '../new_designs/CWBanner';
 import { CWTag } from '../new_designs/CWTag';
 import './CWGatedTopicBanner.scss';
 
-interface Group {
-  id: number;
-  name: string;
-  topics: { id: number; permissions: GatedActionEnum[] }[];
-}
-
-interface Memberships {
-  groupId: number;
-  topics: { id: number; permissions: GatedActionEnum[] }[];
-  isAllowed: boolean;
-}
-
 interface CWGatedTopicBannerProps {
-  groups: Group[];
-  memberships: Memberships[];
-  topicId?: number;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
   actions?: GatedActionEnum[];
   onClose: () => any;
 }
 
+function copyKeys<T, K extends keyof T>(source: T, keys: K[]): Pick<T, K> {
+  return keys.reduce(
+    (result, key) => {
+      result[key] = source[key];
+      return result;
+    },
+    {} as Pick<T, K>,
+  );
+}
+
 const CWGatedTopicBanner = ({
+  actionGroups,
+  bypassGating,
   actions = Object.values(GatedActionEnum) as GatedActionEnum[],
-  groups = [],
-  memberships = [],
-  topicId,
   onClose = () => {},
 }: CWGatedTopicBannerProps) => {
   const navigate = useCommonNavigate();
@@ -49,48 +46,22 @@ const CWGatedTopicBanner = ({
       onAction: true,
     });
 
-  if (!topicId) return null;
   if (!actions.length) return null;
+  if (bypassGating) return null;
 
-  // Build a map of groupId -> isMember from memberships
-  const membershipMap = new Map<number, boolean>();
-  memberships?.forEach((m) => {
-    membershipMap.set(m.groupId, m.isAllowed);
-  });
+  const actionGroupsSubset = copyKeys(actionGroups, actions);
+  if (!Object.keys(actionGroupsSubset).length) return null;
 
-  const actionsSet = new Set(actions);
   const topicGroupSet = new Set<number>([]);
-
-  // actionGroups stores groups (by action) that:
-  //  - are relevant to the current topic
-  //  - have a gated actions that match the given actions (e.g. CREATE_THREAD)
-  //  - the user is not a member of
-  // This group info is presented to the user to let them know what groups they need to join
-  // to perform specific actions.
-  // const actionGroups = new Map<GatedActionEnum, Record<number, string>>();
-  const actionGroups: Partial<Record<GatedActionEnum, Record<number, string>>> =
-    {};
-  for (const group of groups) {
-    for (const topic of group.topics) {
-      if (topic.id === topicId) {
-        const topicActions = new Set(topic.permissions);
-        const intersection = actionsSet.intersection(topicActions);
-        if (intersection.size > 0 && !membershipMap.get(group.id)) {
-          topicGroupSet.add(group.id);
-          for (const action of intersection) {
-            if (!actionGroups[action]) {
-              actionGroups[action] = { [group.id]: group.name };
-            }
-            if (!actionGroups[action][group.id])
-              actionGroups[action][group.id] = group.name;
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  if (!Object.keys(actionGroups).length) return null;
+  // only used when there is only 1 group
+  let groupName = '';
+  Object.values(actionGroupsSubset).forEach((groupMap) => {
+    Object.keys(groupMap).forEach((groupId) => {
+      topicGroupSet.add(parseInt(groupId));
+      if (!groupName) groupName = groupMap[groupId];
+    });
+  });
+  if (topicGroupSet.size === 0) return null;
 
   const buttons = [
     {
@@ -113,13 +84,7 @@ const CWGatedTopicBanner = ({
   ];
 
   if (topicGroupSet.size === 1) {
-    const groupId = Array.from(topicGroupSet)[0];
-    const groupName = groups.find((g) => g.id === groupId)?.name;
-    // Collect all actions gated by this group (from actionGroups)
-    const gatedActions: GatedActionEnum[] = Object.entries(actionGroups)
-      .filter(([, groupMap]) => groupMap[groupId])
-      .map(([action]) => action as GatedActionEnum);
-
+    const gatedActions = Object.keys(actionGroupsSubset) as GatedActionEnum[];
     return (
       <div className="GatedTopicBanner">
         <CWBanner
@@ -161,7 +126,7 @@ const CWGatedTopicBanner = ({
             </div>
             <ul>
               {(
-                Object.entries(actionGroups) as [
+                Object.entries(actionGroupsSubset) as [
                   GatedActionEnum,
                   Record<number, string>,
                 ][]

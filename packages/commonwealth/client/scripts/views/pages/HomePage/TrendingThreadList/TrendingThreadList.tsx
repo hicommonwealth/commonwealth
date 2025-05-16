@@ -6,7 +6,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 import { ActivityThread } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
-import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
@@ -21,7 +20,6 @@ import {
 import { useFetchThreadsQuery } from 'client/scripts/state/api/threads';
 import useUserStore from 'client/scripts/state/ui/user';
 import { VirtuosoGrid } from 'react-virtuoso';
-import Permissions from 'utils/Permissions';
 import { EmptyThreadCard } from 'views/components/EmptyThreadCard/EmptyThreadCard';
 import { z } from 'zod';
 import { PageNotFound } from '../../404';
@@ -71,14 +69,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     topicId: thread?.topic?.id || 0,
   });
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    actionGroups,
-    bypassGating,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
@@ -86,7 +76,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
         thread={thread}
         layoutType="community-first"
         showSkeleton
-        disabledThreadActionToolTips={disabledThreadActionToolTips}
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
       />
     );
   }
@@ -104,7 +95,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledThreadActionToolTips={disabledThreadActionToolTips}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -116,6 +106,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hideTrendingTag
       showOnlyThreadActionIcons
       communityHomeLayout
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

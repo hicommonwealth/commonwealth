@@ -9,7 +9,6 @@ import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard
 import { ActivityThread } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
-import { getThreadActionToolTips } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models/Thread';
@@ -22,7 +21,6 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { z } from 'zod';
 import ThreadPreviewModal from '../modals/ThreadPreviewModal';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
@@ -63,14 +61,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     topicId: thread?.topic?.id || 0,
   });
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    actionGroups,
-    bypassGating,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
@@ -78,7 +68,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
         thread={thread}
         layoutType="community-first"
         showSkeleton
-        disabledThreadActionToolTips={disabledThreadActionToolTips}
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
       />
     );
   }
@@ -96,7 +87,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledThreadActionToolTips={disabledThreadActionToolTips}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -104,6 +94,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       onImageClick={onClick}
       maxChars={MIN_CHARS_TO_SHOW_MORE}
       cutoffLines={4}
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

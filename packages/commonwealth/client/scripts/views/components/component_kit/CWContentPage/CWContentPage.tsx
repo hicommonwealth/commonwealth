@@ -1,4 +1,3 @@
-import { getThreadActionToolTips } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
@@ -218,14 +217,6 @@ export const CWContentPage = ({
     </div>
   );
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    actionGroups,
-    bypassGating,
-  });
-
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
@@ -268,7 +259,8 @@ export const CWContentPage = ({
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}
             editingDisabled={editingDisabled}
-            disabledThreadActionTooltips={disabledThreadActionToolTips}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
           />,
         )}
 

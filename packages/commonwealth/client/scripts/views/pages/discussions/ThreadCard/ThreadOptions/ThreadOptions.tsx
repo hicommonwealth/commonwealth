@@ -1,6 +1,8 @@
 import {
+  ActionGroups,
   CanvasSignedData,
   deserializeCanvas,
+  GatedActionEnum,
   verify,
 } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -8,7 +10,6 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
-import { DisabledThreadActionToolTips } from 'helpers/threads';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -31,7 +32,6 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledThreadActionTooltips: DisabledThreadActionToolTips;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
@@ -42,6 +42,8 @@ type OptionsProps = AdminActionsProps & {
   showCommentVisible?: boolean;
   toggleShowComments?: () => void;
   showOnlyThreadActionIcons?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadOptions = ({
@@ -72,7 +74,8 @@ export const ThreadOptions = ({
   showCommentVisible,
   toggleShowComments,
   showOnlyThreadActionIcons = false,
-  disabledThreadActionTooltips,
+  actionGroups,
+  bypassGating,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -80,6 +83,16 @@ export const ThreadOptions = ({
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
+
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_THREAD_REACTION,
+      GatedActionEnum.CREATE_COMMENT,
+    ] as const,
+    thread,
+    actionGroups,
+    bypassGating,
+  });
 
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
@@ -117,13 +130,9 @@ export const ThreadOptions = ({
             <ReactionButton
               thread={thread}
               size="small"
-              disabled={
-                !!disabledThreadActionTooltips.disabledThreadReactionTooltipText
-              }
+              disabled={!permissions.CREATE_THREAD_REACTION.allowed}
               undoUpvoteDisabled={editingDisabled}
-              tooltipText={
-                disabledThreadActionTooltips.disabledThreadReactionTooltipText
-              }
+              tooltipText={permissions.CREATE_THREAD_REACTION.tooltip}
             />
           )}
 
@@ -137,17 +146,13 @@ export const ThreadOptions = ({
                     pluralize(totalComments, 'Comment')
               }
               action="comment"
-              disabled={
-                !!disabledThreadActionTooltips.disabledCommentTooltipText
-              }
+              disabled={!permissions.CREATE_COMMENT.allowed}
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
                 onCommentClick && onCommentClick();
               }}
-              tooltipText={
-                disabledThreadActionTooltips.disabledCommentTooltipText
-              }
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
             />
           )}
 

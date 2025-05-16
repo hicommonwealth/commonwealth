@@ -1,5 +1,4 @@
 import { slugify } from '@hicommonwealth/shared';
-import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
@@ -8,7 +7,6 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchCustomDomainQuery } from 'client/scripts/state/api/configuration';
 import useUserStore from 'client/scripts/state/ui/user';
 import React from 'react';
-import Permissions from '../../../../scripts/utils/Permissions';
 import { ThreadCard } from '../../pages/discussions/ThreadCard';
 
 import './ThreadPreviewModal.scss';
@@ -44,14 +42,6 @@ export const ThreadModal = ({ thread }: ThreadModalProps) => {
     topicId: thread?.topic?.id || 0,
   });
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    actionGroups,
-    bypassGating,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
@@ -59,7 +49,8 @@ export const ThreadModal = ({ thread }: ThreadModalProps) => {
         thread={thread}
         layoutType="community-first"
         showSkeleton
-        disabledThreadActionToolTips={disabledThreadActionToolTips}
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
       />
     );
   }
@@ -77,13 +68,14 @@ export const ThreadModal = ({ thread }: ThreadModalProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledThreadActionToolTips={disabledThreadActionToolTips}
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
       layoutType="author-first"
       showCommentState
       removeImagesFromMarkDown
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

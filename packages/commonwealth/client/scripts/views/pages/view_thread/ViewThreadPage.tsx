@@ -1,5 +1,4 @@
 import {
-  canUserPerformGatedAction,
   ContentType,
   GatedActionEnum,
   getThreadUrl,
@@ -15,7 +14,7 @@ import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
-import { filterLinks, getThreadActionToolTips } from 'helpers/threads';
+import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -481,18 +480,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_COMMENT,
+      GatedActionEnum.CREATE_COMMENT_REACTION,
+    ] as const,
+    thread: thread!,
     actionGroups,
     bypassGating,
   });
-
-  const canComment =
-    !!user.activeAccount &&
-    !canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_COMMENT) &&
-    !disabledThreadActionToolTips.disabledCommentTooltipText;
 
   const handleVersionHistoryChange = (versionId: number) => {
     const foundVersion = (thread?.versionHistory || []).find(
@@ -920,9 +916,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             GatedActionEnum.CREATE_THREAD_REACTION,
                             GatedActionEnum.UPDATE_POLL,
                           ]}
-                          memberships={memberships}
-                          groups={groups}
-                          topicId={thread?.topic?.id}
+                          actionGroups={actionGroups}
+                          bypassGating={bypassGating}
                           onClose={() => setHideGatingBanner(true)}
                         />
                       )}
@@ -1050,21 +1045,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 commentsRef={commentsRef}
                 thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
-                canComment={canComment}
-                canReact={canUserPerformGatedAction(
-                  actionGroups,
-                  GatedActionEnum.CREATE_COMMENT_REACTION,
-                )}
-                canReply={canUserPerformGatedAction(
-                  actionGroups,
-                  GatedActionEnum.CREATE_COMMENT,
-                )}
+                canComment={permissions.CREATE_COMMENT.allowed}
+                canReact={permissions.CREATE_COMMENT_REACTION.allowed}
+                canReply={permissions.CREATE_COMMENT.allowed}
                 fromDiscordBot={fromDiscordBot}
-                disabledThreadActionToolTips={disabledThreadActionToolTips}
                 onThreadCreated={handleGenerateAIComment}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
                 streamingReplyIds={streamingReplyIds}
                 setStreamingReplyIds={setStreamingReplyIds}
+                permissions={permissions}
               />
             </>
           }
@@ -1081,11 +1070,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             user.isLoggedIn && (
               <CreateComment
                 rootThread={thread}
-                canComment={canComment}
+                canComment={permissions.CREATE_COMMENT.allowed}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                tooltipText={
-                  disabledThreadActionToolTips.disabledCommentTooltipText
-                }
+                tooltipText={permissions.CREATE_COMMENT.tooltip}
               />
             )}
         </WithDefaultStickyComment>

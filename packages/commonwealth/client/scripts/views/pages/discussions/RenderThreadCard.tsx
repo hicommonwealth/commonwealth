@@ -4,10 +4,8 @@ import {
   slugify,
 } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
-import { getThreadActionToolTips } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
-import useUserStore from 'client/scripts/state/ui/user';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
@@ -44,20 +42,11 @@ export const RenderThreadCard = ({
   contestsData,
 }: RenderThreadCardProps) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
     `${thread.identifier}-${slugify(thread.title)}`,
   );
-
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    actionGroups,
-    bypassGating,
-  });
 
   const isThreadTopicInContest = checkIsTopicInContest(
     contestsData?.all,
@@ -81,7 +70,6 @@ export const RenderThreadCard = ({
           scrollEle.scrollTop;
       }}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledThreadActionToolTips={disabledThreadActionToolTips}
       hideRecentComments
       editingDisabled={isThreadTopicInContest}
       threadImage={images && isCardView && images.length ? images[0] : null}
@@ -91,6 +79,8 @@ export const RenderThreadCard = ({
       hideSpamTag={hideSpamTag}
       cutoffLines={6}
       maxChars={MIN_CHARS_TO_SHOW_MORE}
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

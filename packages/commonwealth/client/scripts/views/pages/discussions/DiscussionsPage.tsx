@@ -413,9 +413,8 @@ const DiscussionsPage = () => {
         {canShowGatingBanner && (
           <CWGatedTopicBanner
             actions={Object.values(GatedActionEnum)}
-            groups={groups}
-            memberships={memberships}
-            topicId={topicId}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
             onClose={() => setCanShowGatingBanner(false)}
           />
         )}
@@ -538,6 +537,7 @@ const DiscussionsPage = () => {
               canComment={canUserPerformGatedAction(
                 actionGroups,
                 GatedActionEnum.CREATE_COMMENT,
+                bypassGating,
               )}
               handleSubmitComment={handleSubmitThread}
               errorMsg=""

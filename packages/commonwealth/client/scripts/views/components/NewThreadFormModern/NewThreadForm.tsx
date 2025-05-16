@@ -5,7 +5,7 @@ import {
 } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionToolTips } from 'helpers/threads';
+import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import React, { useEffect, useRef, useState } from 'react';
@@ -172,7 +172,11 @@ export const NewThreadForm = () => {
     const body = markdownEditorMethodsRef.current!.getMarkdown();
 
     if (
-      canUserPerformGatedAction(actionGroups, GatedActionEnum.CREATE_THREAD)
+      canUserPerformGatedAction(
+        actionGroups,
+        GatedActionEnum.CREATE_THREAD,
+        bypassGating,
+      )
     ) {
       notifyError('Topic is gated!');
       return;
@@ -232,8 +236,7 @@ export const NewThreadForm = () => {
 
   const showBanner = !user.activeAccount && isBannerVisible;
 
-  const disabledThreadActionToolTips = getThreadActionToolTips({
-    isCommunityMember: !!user.activeAccount,
+  const permissions = Permissions.getCreateThreadPermission({
     actionGroups,
     bypassGating,
   });
@@ -548,15 +551,8 @@ export const NewThreadForm = () => {
                     (markdownEditorMethodsRef.current = methods)
                   }
                   onChange={(markdown) => setEditorText(markdown)}
-                  disabled={
-                    !canUserPerformGatedAction(
-                      actionGroups,
-                      GatedActionEnum.CREATE_THREAD,
-                    ) || !user.activeAccount
-                  }
-                  tooltip={
-                    disabledThreadActionToolTips.disabledThreadCreateTooltipText
-                  }
+                  disabled={!permissions.allowed}
+                  tooltip={permissions.tooltip}
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                   SubmitButton={() => (
                     <MarkdownSubmitButton
@@ -567,6 +563,7 @@ export const NewThreadForm = () => {
                         !canUserPerformGatedAction(
                           actionGroups,
                           GatedActionEnum.CREATE_THREAD,
+                          bypassGating,
                         ) ||
                         walletBalanceError ||
                         contestTopicError
@@ -599,9 +596,8 @@ export const NewThreadForm = () => {
                   <div>
                     <CWGatedTopicBanner
                       actions={[GatedActionEnum.CREATE_THREAD]}
-                      memberships={memberships}
-                      groups={groups}
-                      topicId={threadTopic?.id}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       onClose={() => setCanShowGatingBanner(false)}
                     />
                   </div>
