@@ -90,8 +90,6 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         ? toSignInProvider(privyMobileAuthStatus.userAuth.ssoProvider)
         : undefined;
 
-      // FIXME: the bug is that userAuth , computed in the mobile app, doesn't include the ssoProvider...
-
       if (!ssoProvider) {
         console.warn(
           'Unable to compute the sign in ssoProvider for ' +
@@ -125,7 +123,6 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
     doAsync().catch((err) => {
       console.error('Could not perform authentication: ' + err.message, err);
-      // FIXME enable this again once we have reliable authentication working...
       privyMobileLogout({
         error: err.message ?? undefined,
       }).catch(console.error);
@@ -140,9 +137,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   ]);
 
   if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
-    return (
-      <LoadingIndicatorScreen message="FIXME: Waiting for privy auth... " />
-    );
+    return <LoadingIndicatorScreen />;
   }
 
   return children;
