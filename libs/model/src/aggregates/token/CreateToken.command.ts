@@ -1,8 +1,5 @@
 import { type Command } from '@hicommonwealth/core';
-import {
-  commonProtocol,
-  getLaunchpadTokenDetails,
-} from '@hicommonwealth/evm-protocols';
+import * as protocols from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -41,7 +38,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         curve_id,
         reserve_ration,
         initial_purchase_eth_amount,
-      } = await getLaunchpadTokenDetails({
+      } = await protocols.getLaunchpadTokenDetails({
         rpc: chainNode.private_url! || chainNode.url!,
         transactionHash: transaction_hash,
       });
@@ -57,7 +54,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
             initial_supply: Number(BigInt(total_supply) / BigInt(1e18)),
             liquidity_transferred: false,
             launchpad_liquidity: BigInt(launchpad_liquidity),
-            eth_market_cap_target: commonProtocol.getTargetMarketCap(),
+            eth_market_cap_target: protocols.getTargetMarketCap(),
             description: description ?? null,
             icon_url: icon_url ?? null,
             creator_address,

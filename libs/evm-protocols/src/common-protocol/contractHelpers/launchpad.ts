@@ -351,11 +351,11 @@ export async function getLaunchpadTokenDetails({
   creator_address: string;
   token_address: string;
   namespace: string;
-  curve_id: bigint;
-  total_supply: bigint;
-  launchpad_liquidity: bigint;
-  reserve_ration: bigint;
-  initial_purchase_eth_amount: bigint;
+  curve_id: string;
+  total_supply: string;
+  launchpad_liquidity: string;
+  reserve_ration: string;
+  initial_purchase_eth_amount: string;
 }> {
   const { tx } = await getTransaction({ rpc, txHash: transactionHash });
 
@@ -384,10 +384,11 @@ export async function getLaunchpadTokenDetails({
     creator_address: tx.from,
     token_address: tokenData.parsedArgs.tokenAddress,
     namespace: tokenData.parsedArgs.namespace,
-    curve_id: tokenData.parsedArgs.curveId,
-    total_supply: tokenData.parsedArgs.totalSupply,
-    launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
-    reserve_ration: tokenData.parsedArgs.reserveRation,
-    initial_purchase_eth_amount: tokenData.parsedArgs.initialPurchaseEthAmount,
+    curve_id: tokenData.parsedArgs.curveId.toString(),
+    total_supply: tokenData.parsedArgs.totalSupply.toString(),
+    launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity.toString(),
+    reserve_ration: tokenData.parsedArgs.reserveRation.toString(),
+    initial_purchase_eth_amount:
+      tokenData.parsedArgs.initialPurchaseEthAmount.toString(),
   };
 }
