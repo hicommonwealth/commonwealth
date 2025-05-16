@@ -2,6 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityType,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -16,7 +17,6 @@ import {
   Group,
   Membership,
   MembershipRejectReason,
-  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -102,7 +102,7 @@ export const GetCommunity = {
 
 export const TopicPermissionsView = z.object({
   id: z.number(),
-  permissions: z.array(z.nativeEnum(PermissionEnum)),
+  permissions: z.array(z.nativeEnum(GatedActionEnum)),
 });
 
 export const MembershipView = z.object({
@@ -326,7 +326,7 @@ export const GetTopHolders = {
   }),
 };
 
-export const GroupView = Group.omit({ GroupPermissions: true }).extend({
+export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   id: PG_INT,
   name: z.string(),
   created_at: z.coerce.date().or(z.string()).optional(),
@@ -338,7 +338,7 @@ export const GroupView = Group.omit({ GroupPermissions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
-      permissions: z.array(z.nativeEnum(PermissionEnum)),
+      permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
 });

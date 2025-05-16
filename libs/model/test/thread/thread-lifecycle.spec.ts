@@ -27,6 +27,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CommunityTierMap,
+  GatedActionEnum,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
   UserTierMap,
@@ -129,12 +130,12 @@ describe('Thread lifecycle', () => {
       ],
       topics: [
         {
-          name: 'topic with permissions',
+          name: 'topic with gating',
           group_ids: [threadGroupId, commentGroupId],
           weighted_voting: TopicWeightedVoting.Stake,
         },
         {
-          name: 'topic without thread permissions',
+          name: 'topic without gating',
           group_ids: [emptyGroupId],
         },
         {
@@ -152,24 +153,25 @@ describe('Thread lifecycle', () => {
       ],
       custom_stages: ['one', 'two'],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: threadGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [
-        schemas.PermissionEnum.CREATE_THREAD,
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
-        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      gated_actions: [
+        GatedActionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.UPDATE_POLL,
       ],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: commentGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
+      gated_actions: [GatedActionEnum.CREATE_COMMENT],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: emptyGroupId,
       topic_id: _community?.topics?.[1]?.id || 0,
-      allowed_actions: [],
+      gated_actions: [],
     });
 
     community = _community!;
@@ -339,7 +341,7 @@ describe('Thread lifecycle', () => {
           actor: actors.nonmember,
           payload: await signCreateThread(actors.nonmember.address!, {
             ...payload,
-            topic_id: community!.topics!.at(1)!.id!,
+            topic_id: community!.topics!.at(0)!.id!,
           }),
         }),
       ).rejects.toThrowError(NonMember);

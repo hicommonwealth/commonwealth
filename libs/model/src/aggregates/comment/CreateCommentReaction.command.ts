@@ -1,5 +1,6 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authComment, mustExist, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
@@ -13,7 +14,7 @@ export function CreateCommentReaction(): Command<
     ...schemas.CreateCommentReaction,
     auth: [
       authComment({
-        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+        action: GatedActionEnum.CREATE_COMMENT_REACTION,
       }),
       verifyReactionSignature,
       tiered({ upvotes: true }),

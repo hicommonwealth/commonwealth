@@ -19,11 +19,12 @@ export type Aggregates = Extract<
   | 'CommentSubscription'
   | 'ThreadSubscription'
   | 'Wallets'
-  | 'GroupPermission'
+  | 'GroupGatedAction'
   | 'Tags'
   | 'CommunityTags'
   | 'ContractAbi'
   | 'LaunchpadToken'
+  | 'Group'
 >;
 
 export * from './commands';

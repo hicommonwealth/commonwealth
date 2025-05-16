@@ -28,6 +28,13 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState(CreateVotePollErrors.PollingClosed);
       }
 
+      if (thread.archived_at) {
+        throw new InvalidState('Cannot vote on an archived thread');
+      }
+      if (thread.locked_at) {
+        throw new InvalidState('Cannot vote on a locked thread');
+      }
+
       // TODO: migrate this to be JSONB array of strings in the DB
       const options = JSON.parse(poll.options);
       if (!options.includes(payload.option)) {

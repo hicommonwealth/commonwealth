@@ -80,7 +80,7 @@ export const DiscussionSection = ({
   const { data: memberships = [] } = useGetMembershipsQuery({
     community_id: communityId,
     address: user.activeAccount?.address || '',
-    enabled: !!communityId,
+    enabled: !!communityId && !!user.activeAccount?.address,
   });
   const isTopicGated = (topicId: number) =>
     !!memberships.find((membership) =>

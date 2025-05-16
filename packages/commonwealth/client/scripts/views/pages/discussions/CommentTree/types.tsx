@@ -1,10 +1,16 @@
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
+import Permissions from 'utils/Permissions';
 import Thread from '../../../../models/Thread';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+
+const actionPermissions = [
+  GatedActionEnum.CREATE_COMMENT,
+  GatedActionEnum.CREATE_COMMENT_REACTION,
+] as const;
 
 export type CommentsTreeProps = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -15,11 +21,13 @@ export type CommentsTreeProps = {
   canReact?: boolean;
   canReply?: boolean;
   canComment: boolean;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
   streamingReplyIds: number[];
   setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
+  permissions: ReturnType<
+    typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
+  >;
 };
 
 export type UseCommentsTreeProps = Pick<
@@ -41,7 +49,7 @@ export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
   | 'pageRef'
   | 'thread'
-  | 'disabledActionsTooltipText'
+  | 'permissions'
   | 'streamingReplyIds'
   | 'setStreamingReplyIds'
 > & {

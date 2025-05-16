@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isGatedAction } from '@hicommonwealth/shared';
 import {
   CWImageInput,
   ImageBehavior,
@@ -32,7 +33,6 @@ import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import TopicPermissionToggleGroupSubForm from './TopicPermissionToggleGroupSubForm';
 import { REQUIREMENTS_TO_FULFILL } from './constants';
-import { isPermissionGuard } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
@@ -224,7 +224,7 @@ const GroupForm = ({
             name: label,
           },
           permission: (Array.isArray(permission)
-            ? permission.filter(isPermissionGuard)
+            ? permission.filter(isGatedAction)
             : []) as Permission[],
         }));
       setTopicPermissionsToggleGroupSubForms(updatedInitialValues);
@@ -649,11 +649,18 @@ const GroupForm = ({
                       fontWeight="semiBold"
                       className="header-text"
                     >
-                      Topic Permissions
+                      Topic Gated Actions
                     </CWText>
                     <CWText type="b2">
-                      Select which topics this group can create threads and
-                      within.
+                      Select the actions that members of this group can perform
+                      in each topic. Non-members of this group can perform the
+                      disabled actions unless they are gated by another group.
+                    </CWText>
+                    <CWText type="b2">
+                      For example, if you enable the &apos;Create threads&apos;
+                      option for a topic called &apos;General&apos;, only users
+                      in this group can create threads in &apos;General&apos;,
+                      but all users can comment, upvote, and vote in polls.
                     </CWText>
                   </div>
                   {topicPermissionsToggleGroupSubForms && (
