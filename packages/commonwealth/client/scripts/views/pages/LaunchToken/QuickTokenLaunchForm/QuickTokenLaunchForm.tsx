@@ -264,11 +264,11 @@ export const QuickTokenLaunchForm = ({
         });
 
         const token = await createToken({
-          transaction_hash: txReceipt.transactionHash,
-          chain_node_id: baseNode.id,
           community_id: communityId,
-          icon_url: sanitizedTokenInfo.imageURL,
+          eth_chain_id: baseNode.ethChainId!,
+          transaction_hash: txReceipt.transactionHash,
           description: sanitizedTokenInfo.description,
+          icon_url: sanitizedTokenInfo.imageURL,
         });
 
         // 4. update community to reference the created token
