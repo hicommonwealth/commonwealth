@@ -1,10 +1,8 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import {
-  commonProtocol,
-  createPrivateEvmClient,
-  EvmEventSignatures,
-} from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
+import { EvmEventSignatures } from '../../event-registry/eventSignatures';
+import { createPrivateEvmClient, getTransaction } from '../utils';
+import { getErc20TokenInfo } from './tokens';
 
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -332,7 +330,7 @@ export async function transferLaunchpadLiquidityToUniswap({
       BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
   }
 
-  return await commonProtocol.transferLiquidity(
+  return await transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
@@ -340,19 +338,56 @@ export async function transferLaunchpadLiquidityToUniswap({
   );
 }
 
-// Function to get the transaction sender
-export async function getTransactionSender(
-  rpc: string,
-  transactionHash: string,
-) {
+export async function getLaunchpadTokenDetails({
+  rpc,
+  transactionHash,
+}: {
+  rpc: string;
+  transactionHash: string;
+}): Promise<{
+  name: string;
+  symbol: string;
+  created_at: Date;
+  creator_address: string;
+  token_address: string;
+  namespace: string;
+  curve_id: bigint;
+  total_supply: bigint;
+  launchpad_liquidity: bigint;
+  reserve_ration: bigint;
+  initial_purchase_eth_amount: bigint;
+}> {
+  const { tx } = await getTransaction({ rpc, txHash: transactionHash });
+
+  const tokenData = await getLaunchpadTokenCreatedTransaction({
+    rpc,
+    transactionHash,
+  });
+  if (!tokenData) throw Error('Token data not found');
+
+  let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
   try {
-    const web3 = new Web3(rpc);
-    // Fetch the transaction using transactionHash
-    const transaction = await web3.eth.getTransaction(transactionHash);
-    // The 'from' field contains the sender's address
-    return transaction.from;
-  } catch (error) {
-    console.error('Error fetching transaction:', error);
-    return null;
+    tokenInfo = await getErc20TokenInfo({
+      rpc,
+      tokenAddress: tokenData.parsedArgs.tokenAddress,
+    });
+  } catch (e) {
+    throw Error(
+      `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+    );
   }
+
+  return {
+    name: tokenInfo.name,
+    symbol: tokenInfo.symbol,
+    created_at: new Date(Number(tokenData.block.timestamp) * 1000),
+    creator_address: tx.from,
+    token_address: tokenData.parsedArgs.tokenAddress,
+    namespace: tokenData.parsedArgs.namespace,
+    curve_id: tokenData.parsedArgs.curveId,
+    total_supply: tokenData.parsedArgs.totalSupply,
+    launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+    reserve_ration: tokenData.parsedArgs.reserveRation,
+    initial_purchase_eth_amount: tokenData.parsedArgs.initialPurchaseEthAmount,
+  };
 }

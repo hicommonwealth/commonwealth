@@ -264,19 +264,9 @@ export const QuickTokenLaunchForm = ({
         });
 
         const token = await createToken({
-          transaction_hash: txReceipt.transactionHash,
-          chain_node_id: baseNode.id,
-          eth_chain_id: baseNode.ethChainId!,
           community_id: communityId,
-          icon_url: sanitizedTokenInfo.imageURL,
-          description: sanitizedTokenInfo.description,
-          name: sanitizedTokenInfo.name,
-          symbol: sanitizedTokenInfo.symbol,
-          creator_address: selectedAddress.address,
-          token_address: '', // TODO: set token address from txReceipt
-          namespace: '', // TODO: set namespace from txReceipt
-          total_supply: '0', // TODO: set total supply from txReceipt
-          launchpad_liquidity: '0', // TODO: set launchpad liquidity from txReceipt
+          eth_chain_id: baseNode.ethChainId!,
+          transaction_hash: txReceipt.transactionHash,
         });
 
         // 4. update community to reference the created token

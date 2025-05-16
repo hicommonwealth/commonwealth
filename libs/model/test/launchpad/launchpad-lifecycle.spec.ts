@@ -122,18 +122,8 @@ describe('Launchpad Lifecycle', () => {
       actor,
       payload: {
         transaction_hash: CREATE_TOKEN_TXN_HASH,
-        chain_node_id: node!.id!,
         eth_chain_id: node.eth_chain_id!,
-        description: 'test',
-        icon_url: 'test',
         community_id: community_id!,
-        namespace: 'DogeMoonLanding',
-        symbol: 'DMLND',
-        name: 'DogeMoonLanding',
-        total_supply: '1000',
-        token_address: TOKEN_ADDRESS,
-        creator_address: actor.address as `0x${string}`,
-        launchpad_liquidity: '594115082271506067334',
       },
     });
 

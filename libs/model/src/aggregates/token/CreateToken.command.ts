@@ -1,10 +1,14 @@
 import { type Command } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  getLaunchpadTokenDetails,
+} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
+import { emitEvent } from 'model/src/utils';
 import { z } from 'zod';
 import { models } from '../../database';
-import { authRoles } from '../../middleware';
+import { authRoles, mustExist } from '../../middleware';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
@@ -12,18 +16,34 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const {
-        creator_address,
-        token_address,
-        namespace,
-        launchpad_liquidity,
-        name,
-        symbol,
-        total_supply,
-        eth_chain_id,
         community_id,
+        eth_chain_id,
+        transaction_hash,
         description,
         icon_url,
       } = payload;
+
+      const chainNode = await models.ChainNode.findOne({
+        where: { eth_chain_id },
+      });
+      mustExist('ChainNode', chainNode);
+
+      const {
+        name,
+        symbol,
+        namespace,
+        token_address,
+        creator_address,
+        created_at,
+        total_supply,
+        launchpad_liquidity,
+        curve_id,
+        reserve_ration,
+        initial_purchase_eth_amount,
+      } = await getLaunchpadTokenDetails({
+        rpc: chainNode.private_url! || chainNode.url!,
+        transactionHash: transaction_hash,
+      });
 
       return models.sequelize.transaction(async (transaction) => {
         const [token, created] = await models.LaunchpadToken.findOrCreate({
@@ -90,6 +110,32 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
               },
               transaction,
             },
+          );
+
+        // emit enriched event
+        if (created)
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: 'LaunchpadTokenRecordCreated',
+                event_payload: {
+                  name,
+                  symbol,
+                  namespace,
+                  token_address: token_address as `0x${string}`,
+                  creator_address: creator_address as `0x${string}`,
+                  created_at,
+                  eth_chain_id,
+                  total_supply,
+                  launchpad_liquidity,
+                  curve_id,
+                  reserve_ration,
+                  initial_purchase_eth_amount,
+                },
+              },
+            ],
+            transaction,
           );
 
         return {

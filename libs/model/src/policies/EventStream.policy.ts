@@ -2,9 +2,11 @@ import {
   cache,
   CacheNamespaces,
   config,
+  InvalidState,
   logger,
   Policy,
 } from '@hicommonwealth/core';
+import * as evm from '@hicommonwealth/evm-protocols';
 import {
   Community,
   ContestManager,
@@ -149,10 +151,22 @@ const eventStreamMappers: EventStreamMappers = {
     };
   },
   LaunchpadTokenCreated: async (payload) => {
-    const { token_address } = payload;
-
+    // TODO: can we find the address without having to load all the details again?
+    const { eth_chain_id, transaction_hash } = payload;
+    const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
+      where: { eth_chain_id },
+      attributes: ['eth_chain_id', 'url', 'private_url'],
+    });
+    mustExist('Chain Node', chainNode);
+    const tokenData = await evm.getLaunchpadTokenCreatedTransaction({
+      rpc: chainNode.private_url! || chainNode.url!,
+      transactionHash: transaction_hash,
+    });
+    if (!tokenData) {
+      throw new InvalidState('Transaction not found');
+    }
     const launchpadToken = await models.LaunchpadToken.findOne({
-      where: { token_address },
+      where: { token_address: tokenData.parsedArgs.tokenAddress },
     });
     mustExist('LaunchpadToken', launchpadToken);
     const community = await models.Community.findOne({

@@ -48,22 +48,11 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
     inputs,
     body: {
       LaunchpadTokenCreated: async ({ payload }) => {
-        const chainNode = await models.ChainNode.findOne({
-          where: { eth_chain_id: payload.eth_chain_id },
-        });
         await command(CreateToken(), {
           actor: systemActor({}),
           payload: {
-            creator_address: payload.creator_address,
-            token_address: payload.token_address,
-            namespace: payload.namespace,
-            name: payload.name,
-            symbol: payload.symbol,
-            total_supply: payload.total_supply.toString(),
-            launchpad_liquidity: payload.launchpad_liquidity.toString(),
-            chain_node_id: chainNode!.id!,
+            community_id: '', // community id is not known yet, but system actor has rights
             eth_chain_id: payload.eth_chain_id,
-            community_id: '', // not required for system actors
             transaction_hash: payload.transaction_hash,
           },
         });

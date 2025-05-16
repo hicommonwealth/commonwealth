@@ -397,6 +397,13 @@ export const events = {
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
     eth_chain_id: z.number(),
+  }),
+
+  LaunchpadTokenRecordCreated: z.object({
+    name: z.string(),
+    symbol: z.string(),
+    created_at: z.date(),
+    eth_chain_id: z.number(),
     creator_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,
     namespace: z.string(),
@@ -405,8 +412,6 @@ export const events = {
     launchpad_liquidity: z.coerce.bigint(),
     reserve_ration: z.coerce.bigint(),
     initial_purchase_eth_amount: z.coerce.bigint(),
-    name: z.string(),
-    symbol: z.string(),
   }),
 
   LaunchpadTokenGraduated: z.object({
