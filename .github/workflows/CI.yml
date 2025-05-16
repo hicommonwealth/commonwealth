@@ -377,3 +377,65 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
+
+  setup_review_db:
+    name: Create Review DB
+    outputs:
+      db_url: ${{ steps.create_neon_branch_encode.outputs.db_url }}
+      db_url_with_pooler: ${{ steps.create_neon_branch_encode.outputs.db_url_with_pooler }}
+    needs: [commonwealth-build-type-checks, detect-broken-ts-expect-error]
+    if: |
+      github.event_name == 'pull_request' && (
+      github.event.action == 'synchronize'
+      || github.event.action == 'opened'
+      || github.event.action == 'reopened')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Neon Branch
+        id: create_neon_branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          username: 'commonwealth'
+          database: 'commonwealth'
+          suspend_timeout: 300 # scale to 0 compute after 5 minutes
+          ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
+
+      - name: Migrate DB
+        id: migrate_db
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ steps.create_neon_branch_encode.outputs.db_url }}
+        run: pnpm migrate-db
+
+      # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
+      # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
+      # new comment when a migration changes in one of the commits since last execution
+      - name: Post Schema Diff Comment to PR
+        uses: neondatabase/schema-diff-action@v1
+        if: |
+          github.event_name == 'pull_request' &&
+          (contains(join(github.event.pull_request.changed_files.*.filename, '\n'), 'packages/commonwealth/server/migrations/'))
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          compare_branch: production # TODO: need to ensure this doesn't cause undue stress on main DB (maybe use a read replica?)
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+  delete_review_db:
+    name: Delete Review DB
+    needs: setup_review_db
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+
+
+
