@@ -272,11 +272,11 @@ export const QuickTokenLaunchForm = ({
           description: sanitizedTokenInfo.description,
           name: sanitizedTokenInfo.name,
           symbol: sanitizedTokenInfo.symbol,
-          token_address: selectedAddress.address, // TODO: set token address
-          creator_address: selectedAddress.address, // TODO: set creator address
-          namespace: '', // TODO: set namespace
-          total_supply: '0', // TODO: set total supply
-          launchpad_liquidity: '0', // TODO: set launchpad liquidity
+          creator_address: selectedAddress.address,
+          token_address: '', // TODO: set token address from txReceipt
+          namespace: '', // TODO: set namespace from txReceipt
+          total_supply: '0', // TODO: set total supply from txReceipt
+          launchpad_liquidity: '0', // TODO: set launchpad liquidity from txReceipt
         });
 
         // 4. update community to reference the created token
