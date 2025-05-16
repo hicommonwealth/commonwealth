@@ -908,19 +908,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      {isTopicGated && !hideGatingBanner && (
-                        <CWGatedTopicBanner
-                          actions={[
-                            GatedActionEnum.CREATE_COMMENT,
-                            GatedActionEnum.CREATE_COMMENT_REACTION,
-                            GatedActionEnum.CREATE_THREAD_REACTION,
-                            GatedActionEnum.UPDATE_POLL,
-                          ]}
-                          actionGroups={actionGroups}
-                          bypassGating={bypassGating}
-                          onClose={() => setHideGatingBanner(true)}
-                        />
-                      )}
+                      {isTopicGated &&
+                        !hideGatingBanner &&
+                        !Permissions.isThreadAuthor(thread) && (
+                          <CWGatedTopicBanner
+                            actions={[
+                              GatedActionEnum.CREATE_COMMENT,
+                              GatedActionEnum.CREATE_COMMENT_REACTION,
+                              GatedActionEnum.CREATE_THREAD_REACTION,
+                              GatedActionEnum.UPDATE_POLL,
+                            ]}
+                            actionGroups={actionGroups}
+                            bypassGating={bypassGating}
+                            onClose={() => setHideGatingBanner(true)}
+                          />
+                        )}
                       {showBanner && (
                         <JoinCommunityBanner
                           onClose={handleCloseBanner}

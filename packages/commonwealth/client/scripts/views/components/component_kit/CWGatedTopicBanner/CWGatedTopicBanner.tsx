@@ -48,6 +48,7 @@ const CWGatedTopicBanner = ({
 
   if (!actions.length) return null;
   if (bypassGating) return null;
+  if (!Object.keys(actionGroups).length) return null;
 
   const actionGroupsSubset = copyKeys(actionGroups, actions);
   if (!Object.keys(actionGroupsSubset).length) return null;

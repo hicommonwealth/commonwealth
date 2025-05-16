@@ -124,6 +124,12 @@ async function findReaction(
 async function findPoll(actor: Actor, poll_id: number) {
   const poll = await models.Poll.findOne({
     where: { id: poll_id },
+    include: [
+      {
+        model: models.Thread,
+        required: true,
+      },
+    ],
   });
   if (!poll) {
     throw new InvalidInput('Must provide a valid poll id to authorize');
@@ -277,7 +283,6 @@ async function checkGatedActions(
         topic_id: topic.id,
         action,
       },
-      logging: console.log,
     },
   );
 
@@ -582,6 +587,7 @@ export function authPoll({ action }: AggregateAuthOptions) {
       ctx.actor,
       threadAuth.community_id,
       ['admin', 'moderator', 'member'],
+      poll.Thread!.address_id,
     );
 
     if (threadAuth.thread.archived_at)

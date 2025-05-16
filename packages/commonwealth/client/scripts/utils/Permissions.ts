@@ -5,6 +5,7 @@ import {
   GatedActionEnum,
   getMustJoinGroupNames,
   Role,
+  UserFriendlyActionMap,
 } from '@hicommonwealth/shared';
 import app from 'state';
 import { z } from 'zod';
@@ -89,9 +90,9 @@ function formatGatedTooltip(
 ) {
   const gatingGroupNames = getMustJoinGroupNames(actionGroups, action);
   if (gatingGroupNames.length === 1) {
-    return `Join ${gatingGroupNames[0]} to ${action}`;
+    return `Join ${gatingGroupNames[0]} to ${UserFriendlyActionMap[action]}`;
   } else if (gatingGroupNames.length === 2) {
-    return `Join ${gatingGroupNames[0]} or ${gatingGroupNames[1]} to ${action}`;
+    return `Join ${gatingGroupNames[0]} or ${gatingGroupNames[1]} to ${UserFriendlyActionMap[action]}`;
   } else {
     return `Join a group to unlock gated actions`;
   }
