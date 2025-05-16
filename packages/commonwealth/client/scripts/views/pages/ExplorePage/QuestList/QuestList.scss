@@ -26,6 +26,41 @@
   }
 }
 
+.filters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  height: 0;
+  margin-top: -16px;
+
+  &.hasAppliedFilter {
+    margin-top: initial;
+    height: auto;
+  }
+
+  .Tag {
+    .Text {
+      text-transform: capitalize;
+    }
+  }
+
+  @include extraSmall {
+    gap: 12px;
+  }
+
+  .Divider {
+    height: 40px;
+  }
+
+  .tag-filter {
+    border: 1px solid $black !important;
+    min-width: 180px;
+    max-width: 180px;
+  }
+}
+
 // Special style for when this component is inside a horizontal-scroll-container
 .horizontal-scroll-container .QuestList {
   .empty-placeholder {
