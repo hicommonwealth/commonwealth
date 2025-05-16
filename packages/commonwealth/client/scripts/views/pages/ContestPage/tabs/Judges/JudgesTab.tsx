@@ -3,6 +3,7 @@ import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { useGetMembersQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
+import Permissions from 'utils/Permissions';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,7 +20,9 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { User } from 'views/components/user/user';
 import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/ManageOnchainModal';
+import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import AddJudges from './AddJudges';
 
 import './JudgesTab.scss';
@@ -42,6 +45,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
   const contest = getContestByAddress(contestAddress);
 
   const communityId = contest?.community_id || '';
+
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+  const contestIsActive = contest
+    ? isContestActive({
+        contest: contest as unknown as Contest,
+      })
+    : false;
 
   const columns: CWTableColumnInfo[] = [
     {
@@ -237,13 +247,15 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         <CWText type="h3" fontWeight="semiBold">
           Judges
         </CWText>
-        <CWButton
-          containerClassName="add-judge-button"
-          label="Add judges"
-          iconLeft="plus"
-          onClick={toggleSearch}
-          buttonType="primary"
-        />
+        {isAdmin && contestIsActive && (
+          <CWButton
+            containerClassName="add-judge-button"
+            label="Add judges"
+            iconLeft="plus"
+            onClick={toggleSearch}
+            buttonType="primary"
+          />
+        )}
       </div>
 
       {isSearchVisible && (
@@ -333,7 +345,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 export default JudgesTab;
 
 // todo
-// show add judges only for admin and active contest
 // make search by address possible
 // change add button to "manage" + open modal
 // make sure it looks good on mobile
