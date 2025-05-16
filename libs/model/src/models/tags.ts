@@ -1,16 +1,9 @@
+import { Tags } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type TagsAttributes = {
-  id?: number;
-  name: string;
-  created_at?: Date;
-  updated_at?: Date;
-  deleted_at?: Date;
-};
-
-export type TagsInstance = ModelInstance<TagsAttributes>;
-
+export type TagsInstance = ModelInstance<z.infer<typeof Tags>>;
 export type TagsModelStatic = Sequelize.ModelStatic<TagsInstance>;
 
 export default (sequelize: Sequelize.Sequelize) =>
@@ -27,10 +20,5 @@ export default (sequelize: Sequelize.Sequelize) =>
       tableName: 'Tags',
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      defaultScope: {
-        attributes: {
-          exclude: ['created_at', 'updated_at'],
-        },
-      },
     },
   );
