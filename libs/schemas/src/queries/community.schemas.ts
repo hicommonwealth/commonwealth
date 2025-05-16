@@ -132,7 +132,11 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.optional(),
+  output: z.object({
+    stake: CommunityStake.extend({
+      Community: z.object({ namespace: z.string().nullish() }).optional(),
+    }).nullish(),
+  }),
 };
 
 export const GetCommunityMembers = {
@@ -348,4 +352,39 @@ export const GetGroups = {
     include_topics: z.coerce.boolean().optional(),
   }),
   output: z.array(GroupView),
+};
+
+export const RelatedCommunityView = z.object({
+  id: z.string(),
+  community: z.string(),
+  icon_url: z.string().nullish(),
+  lifetime_thread_count: z.number(),
+  profile_count: z.number(),
+  description: z.string().nullish(),
+  namespace: z.string().nullish(),
+  chain_node_id: z.number(),
+  tag_ids: z.array(z.string()),
+});
+
+export const GetRelatedCommunities = {
+  input: z.object({ chain_node_id: z.number() }),
+  output: z.array(RelatedCommunityView),
+};
+
+export const SearchCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  default_symbol: z.string().nullish(),
+  type: z.string(),
+  icon_url: z.string().nullish(),
+  created_at: z.coerce.date().or(z.string()),
+});
+
+export const SearchCommunities = {
+  input: PaginationParamsSchema.extend({
+    search: z.string(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(SearchCommunityView),
+  }),
 };

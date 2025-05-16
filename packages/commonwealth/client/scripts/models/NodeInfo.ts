@@ -1,3 +1,11 @@
+import * as schemas from '@hicommonwealth/schemas';
+import { z } from 'zod';
+
+export type ChainNode = Omit<
+  z.infer<typeof schemas.ChainNode>,
+  'created_at' | 'updated_at'
+>;
+
 class NodeInfo {
   public readonly id: number;
   public readonly name: string;
@@ -25,19 +33,19 @@ class NodeInfo {
     block_explorer,
     slip44,
     alchemy_metadata,
-  }) {
-    this.id = id;
+  }: ChainNode) {
+    this.id = id!;
     this.name = name;
     this.url = url;
-    this.ethChainId = eth_chain_id;
-    this.cosmosChainId = cosmos_chain_id;
-    this.altWalletUrl = alt_wallet_url;
+    this.ethChainId = eth_chain_id || undefined;
+    this.cosmosChainId = cosmos_chain_id || undefined;
+    this.altWalletUrl = alt_wallet_url || undefined;
     this.balanceType = balance_type;
-    this.bech32 = bech32;
-    this.cosmosGovernanceVersion = cosmos_gov_version;
-    this.block_explorer = block_explorer;
-    this.slip44 = slip44;
-    this.alchemyMetadata = alchemy_metadata;
+    this.bech32 = bech32 || undefined;
+    this.cosmosGovernanceVersion = cosmos_gov_version || undefined;
+    this.block_explorer = block_explorer || undefined;
+    this.slip44 = slip44 || undefined;
+    this.alchemyMetadata = alchemy_metadata || undefined;
   }
 
   public static fromJSON(json) {
