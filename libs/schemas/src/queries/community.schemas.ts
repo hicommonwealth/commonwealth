@@ -155,6 +155,8 @@ export const GetCommunityMembers = {
     order_by: z
       .enum(['last_active', 'name', 'referrals', 'earnings'])
       .optional(),
+    /** If true, search will match both profile name and address. */
+    searchByNameAndAddress: z.boolean().optional().default(false),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),

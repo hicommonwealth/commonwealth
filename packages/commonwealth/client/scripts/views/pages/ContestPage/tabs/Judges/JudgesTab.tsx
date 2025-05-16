@@ -113,6 +113,7 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       limit: 5,
       apiEnabled:
         !!communityId && debouncedSearchTerm.length > 2 && isSearchVisible,
+      searchByNameAndAddress: true,
     });
 
   const judgeData = (members?.pages[0]?.results || [])
@@ -342,4 +343,3 @@ export default JudgesTab;
 
 // make search by address possible
 // make sure it looks good on mobile
-// Refetch data after changes

@@ -14,6 +14,7 @@ export type GetMembersProps = {
   include_stake_balances?: boolean;
   apiEnabled?: boolean;
   allowedAddresses?: string;
+  searchByNameAndAddress?: boolean;
 };
 
 const useGetMembersQuery = ({
@@ -28,6 +29,7 @@ const useGetMembersQuery = ({
   include_stake_balances = false,
   apiEnabled = true,
   allowedAddresses,
+  searchByNameAndAddress = false,
 }: GetMembersProps) => {
   return trpc.community.getMembers.useInfiniteQuery(
     {
@@ -41,6 +43,7 @@ const useGetMembersQuery = ({
       include_group_ids,
       include_stake_balances,
       ...(allowedAddresses && { allowedAddresses }),
+      searchByNameAndAddress,
     },
     {
       initialCursor: 1,
