@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
+import { buildTopicPermissionsMap } from './GetMemberships.query';
 
 export function GetGroups(): Query<typeof schemas.GetGroups> {
   return {
@@ -13,23 +14,26 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
       const { community_id, group_id, include_members, include_topics } =
         payload;
 
-      const groups = await models.Group.findAll({
-        where: {
-          ...(community_id && { community_id }),
-          ...(group_id && { id: group_id }),
-        },
-        include: [
-          {
-            model: models.GroupPermission,
-            attributes: ['topic_id', 'allowed_actions'],
+      const groups = (
+        await models.Group.findAll({
+          where: {
+            ...(community_id && { community_id }),
+            ...(group_id && { id: group_id }),
           },
-        ],
-      });
+          include: [
+            {
+              model: models.GroupPermission,
+              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+            },
+          ],
+        })
+      ).map((g) => g.toJSON());
       const ids = groups.map((g) => g.id!);
-      const map = new Map<number, z.infer<typeof schemas.GroupView>>();
+
+      const output = new Map<number, z.infer<typeof schemas.GroupView>>();
       groups.forEach((g) =>
-        map.set(g.id!, {
-          ...g.toJSON(),
+        output.set(g.id!, {
+          ...g,
           id: g.id!,
           name: g.metadata.name,
           memberships: [],
@@ -43,35 +47,41 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
           include: [{ model: models.Address, as: 'address' }],
         });
         members.forEach((m) => {
-          const group = map.get(m.group_id);
+          const group = output.get(m.group_id);
           group && group.memberships.concat(m);
         });
       }
 
       if (include_topics) {
+        const topic_ids = groups
+          .map((g) => g.GroupPermissions || [])
+          .flat()
+          .map((p) => p.topic_id);
         const topics = await models.Topic.findAll({
           where: {
             ...(community_id && { community_id }),
-            group_ids: { [Op.overlap]: ids },
+            id: topic_ids,
           },
         });
-        groups.forEach((g) => {
-          const group = map.get(g.id!);
-          group &&
-            group.topics.concat(
-              topics
-                .filter((t) => t.group_ids.includes(group.id))
-                .map((t) => ({
-                  ...t.toJSON(),
-                  permissions: (g.GroupPermissions || []).find(
-                    (gtp) => gtp.topic_id === t.id,
-                  )?.allowed_actions as schemas.PermissionEnum[],
-                })),
-            );
+
+        const topics_map = new Map<number, z.infer<typeof schemas.Topic>>();
+        topics.forEach((t) => topics_map.set(t.id!, t.toJSON()));
+
+        const topic_permissions = buildTopicPermissionsMap(groups);
+        output.forEach((g) => {
+          const perm = topic_permissions.get(g.id!);
+          perm &&
+            perm.forEach((p) => {
+              const topic = topics_map.get(p.id);
+              g.topics.push({
+                ...topic!,
+                permissions: p.permissions,
+              });
+            });
         });
       }
 
-      return Array.from(map.values());
+      return Array.from(output.values());
     },
   };
 }

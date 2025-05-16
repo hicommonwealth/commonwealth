@@ -27,6 +27,7 @@ import {
   formatDecimalToWei,
   generateTopicIdentifiersFromUrl,
   generateUrlPartForTopicIdentifiers,
+  sanitizeTopicName,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -127,7 +128,8 @@ const DiscussionsPage = () => {
     window.location.href,
   );
   const topicObj = topics?.find(
-    ({ name }) => name === topicIdentifiersFromURL?.topicName,
+    ({ name }) =>
+      sanitizeTopicName(name) === topicIdentifiersFromURL?.topicName,
   );
   const topicId = topicObj?.id;
 
@@ -227,7 +229,8 @@ const DiscussionsPage = () => {
       }
 
       const validTopic = topics?.find(
-        (topic) => topic?.name === topicIdentifiersFromURL.topicName,
+        (topic) =>
+          sanitizeTopicName(topic?.name) === topicIdentifiersFromURL.topicName,
       );
       if (!validTopic) {
         navigate('/discussions');
