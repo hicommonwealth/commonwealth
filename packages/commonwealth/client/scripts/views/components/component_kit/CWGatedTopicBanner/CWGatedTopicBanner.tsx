@@ -55,11 +55,11 @@ const CWGatedTopicBanner = ({
 
   const topicGroupSet = new Set<number>([]);
   // only used when there is only 1 group
-  let groupName = '';
+  let singleGroupName = '';
   Object.values(actionGroupsSubset).forEach((groupMap) => {
     Object.keys(groupMap).forEach((groupId) => {
       topicGroupSet.add(parseInt(groupId));
-      if (!groupName) groupName = groupMap[groupId];
+      if (!singleGroupName) singleGroupName = groupMap[groupId];
     });
   });
   if (topicGroupSet.size === 0) return null;
@@ -93,7 +93,7 @@ const CWGatedTopicBanner = ({
           body={
             <div>
               <div className="description">
-                Join the <b>{groupName}</b> group to perform the following
+                Join the <b>{singleGroupName}</b> group to perform the following
                 action
                 {gatedActions.length > 1 ? 's' : ''}:
               </div>

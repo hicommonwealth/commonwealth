@@ -20,6 +20,7 @@ export const EmptyThreadsPlaceholder = ({
           <ThreadCard
             key={i}
             showSkeleton
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             thread={{} as any}
             actionGroups={{}}
             bypassGating={false}

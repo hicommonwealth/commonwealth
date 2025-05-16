@@ -130,12 +130,12 @@ describe('Thread lifecycle', () => {
       ],
       topics: [
         {
-          name: 'topic with permissions',
+          name: 'topic with gating',
           group_ids: [threadGroupId, commentGroupId],
           weighted_voting: TopicWeightedVoting.Stake,
         },
         {
-          name: 'topic without thread permissions',
+          name: 'topic without gating',
           group_ids: [emptyGroupId],
         },
         {
@@ -160,6 +160,7 @@ describe('Thread lifecycle', () => {
         GatedActionEnum.CREATE_THREAD,
         GatedActionEnum.CREATE_THREAD_REACTION,
         GatedActionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.UPDATE_POLL,
       ],
     });
     await seed('GroupGatedAction', {
@@ -340,7 +341,7 @@ describe('Thread lifecycle', () => {
           actor: actors.nonmember,
           payload: await signCreateThread(actors.nonmember.address!, {
             ...payload,
-            topic_id: community!.topics!.at(1)!.id!,
+            topic_id: community!.topics!.at(0)!.id!,
           }),
         }),
       ).rejects.toThrowError(NonMember);

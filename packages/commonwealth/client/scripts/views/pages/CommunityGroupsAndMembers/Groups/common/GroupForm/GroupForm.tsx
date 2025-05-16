@@ -657,10 +657,10 @@ const GroupForm = ({
                       disabled actions unless they are gated by another group.
                     </CWText>
                     <CWText type="b2">
-                      For example, if you enable the 'Create threads' option for
-                      a topic called 'General', only users in this group can
-                      create threads in 'General', but all users can comment,
-                      upvote, and vote in polls.
+                      For example, if you enable the &apos;Create threads&apos;
+                      option for a topic called &apos;General&apos;, only users
+                      in this group can create threads in &apos;General&apos;,
+                      but all users can comment, upvote, and vote in polls.
                     </CWText>
                   </div>
                   {topicPermissionsToggleGroupSubForms && (
