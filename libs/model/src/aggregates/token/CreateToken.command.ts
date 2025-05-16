@@ -25,6 +25,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
 
       const chainNode = await models.ChainNode.findOne({
         where: { eth_chain_id },
+        attributes: ['url', 'private_url'],
       });
       mustExist('ChainNode', chainNode);
 
