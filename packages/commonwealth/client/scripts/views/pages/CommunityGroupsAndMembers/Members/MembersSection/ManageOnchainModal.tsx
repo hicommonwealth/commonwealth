@@ -35,11 +35,10 @@ type ManageOnchainModalProps = {
   onClose: () => void;
   Addresses: AddressInfo[] | undefined;
   refetch?: () => void;
-  namespace: string;
-  chainRpc: string;
-  ethChainId: number;
   chainId: string;
-  communityNamespace: boolean;
+  communityNamespace?: boolean;
+  forceJudgeTab?: boolean;
+  contestAddress?: string;
 };
 
 type ContestOption = {
@@ -51,43 +50,26 @@ export const ManageOnchainModal = ({
   onClose,
   Addresses,
   refetch,
-  namespace,
-  chainRpc,
-  ethChainId,
   chainId,
   communityNamespace,
+  forceJudgeTab = false,
+  contestAddress,
 }: ManageOnchainModalProps) => {
   const judgeContestEnabled = useFlag('judgeContest');
 
   const [userRole, setUserRole] = useState(Addresses);
   const [judgeRoles, setJudgeRoles] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('adminId');
-  const [selectedContest, setSelectedContest] = useState<ContestOption | null>(
-    null,
-  );
-  const { mutateAsync: updateRole } = useUpdateRoleMutation();
-  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
-
-  const userData = useUserStore();
-  const mintAdminTokenMutation = useMintAdminTokenMutation();
 
   const { contestsData, isContestDataLoading } = useCommunityContests({
     shouldPolling: false,
     fetchAll: false,
   });
 
-  const { data: community } = useGetCommunityByIdQuery({
-    id: chainId,
-    enabled: !!chainId,
-  });
-
   const contestOptions = useMemo<ContestOption[]>(() => {
     const allOptions: ContestOption[] = [];
-
     if (contestsData?.active && contestsData.active.length > 0) {
       contestsData.active.forEach((contest) => {
-        // Check if the contest is judged
         if (contest.contests && contest.namespace_judge_token_id) {
           contest.contests.forEach(() => {
             allOptions.push({
@@ -98,9 +80,35 @@ export const ManageOnchainModal = ({
         }
       });
     }
-
     return allOptions;
   }, [contestsData]);
+
+  const initialSelectedContest = useMemo(() => {
+    if (contestAddress && contestOptions.length > 0) {
+      const found = contestOptions.find((c) => c.value === contestAddress);
+      if (found) return found;
+    }
+    return null;
+  }, [contestAddress, contestOptions]);
+
+  const initialActiveTab = forceJudgeTab ? 'judgedContest' : 'adminId';
+
+  const [activeTab, setActiveTab] = useState(initialActiveTab);
+  const [selectedContest, setSelectedContest] = useState<ContestOption | null>(
+    initialSelectedContest,
+  );
+
+  const { mutateAsync: updateRole } = useUpdateRoleMutation();
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
+
+  const userData = useUserStore();
+  const mintAdminTokenMutation = useMintAdminTokenMutation();
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: chainId,
+    enabled: !!chainId,
+    includeNodeInfo: true,
+  });
 
   const selectedContestData = useMemo(() => {
     if (!selectedContest?.value || !contestsData?.active) return null;
@@ -176,6 +184,8 @@ export const ManageOnchainModal = ({
     }
   };
 
+  console.log({ community });
+
   const mintPermission = async () => {
     try {
       const walletAddress = userData.activeAccount?.address;
@@ -194,11 +204,11 @@ export const ManageOnchainModal = ({
         await Promise.all(
           adminUpdates.map(async (update) => {
             await mintAdminTokenMutation.mutateAsync({
-              namespace,
+              namespace: community?.namespace || '',
               walletAddress,
               adminAddress: update.address,
-              chainRpc,
-              ethChainId,
+              chainRpc: community?.ChainNode?.url || '',
+              ethChainId: community?.ChainNode?.eth_chain_id || 0,
               chainId,
             });
             notifySuccess(
@@ -263,12 +273,12 @@ export const ManageOnchainModal = ({
       }
 
       await nominateJudges({
-        namespace,
+        namespace: community?.namespace || '',
         judges: selectedJudges,
         judgeId: judgeTokenId,
         walletAddress,
-        ethChainId,
-        chainRpc,
+        ethChainId: community?.ChainNode?.eth_chain_id || 0,
+        chainRpc: community?.ChainNode?.url || '',
       });
 
       notifySuccess('Judges nominated successfully');
@@ -354,6 +364,7 @@ export const ManageOnchainModal = ({
             label="Admin ID"
             isSelected={activeTab === 'adminId'}
             onClick={() => setActiveTab('adminId')}
+            isDisabled={forceJudgeTab}
           />
           {judgeContestEnabled && (
             <CWTab
@@ -390,6 +401,7 @@ export const ManageOnchainModal = ({
                   value={selectedContest}
                   onChange={handleContestSelect}
                   placeholder="Select a contest..."
+                  isDisabled={!!contestAddress}
                 />
 
                 {selectedContest && (

@@ -38,6 +38,10 @@
     }
   }
 
+  .Text.b2.regular {
+    margin-bottom: 8px;
+  }
+
   .add-judge-section {
     display: flex;
     gap: 16px;
@@ -87,6 +91,10 @@
 
     .search-results {
       margin-top: 8px;
+
+      .data-container {
+        vertical-align: middle;
+      }
 
       .no-results {
         padding: 12px;

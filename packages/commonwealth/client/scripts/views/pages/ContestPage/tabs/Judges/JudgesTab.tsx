@@ -8,6 +8,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
 import {
   CWTable,
@@ -17,6 +18,7 @@ import { useCWTableState } from 'views/components/component_kit/new_designs/CWTa
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { User } from 'views/components/user/user';
+import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/ManageOnchainModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import AddJudges from './AddJudges';
 
@@ -28,10 +30,12 @@ interface JudgesTabProps {
 }
 
 const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
-  console.log({ judges });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [selectedAddressInfo, setSelectedAddressInfo] =
+    useState<any>(undefined);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 300);
 
   const { getContestByAddress } = useCommunityContests();
@@ -87,15 +91,12 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
     initialSortDirection: APIOrderDirection.Asc,
   });
 
-  // Query for existing judges
   const { data: members, isLoading } = useGetMembersQuery({
     community_id: communityId,
     allowedAddresses: judges.join(','),
     apiEnabled: judges.length > 0 && !!communityId,
     memberships: 'allow-specified-addresses',
   });
-
-  console.log({ members });
 
   const { data: searchResults, isLoading: isSearchLoading } =
     useGetMembersQuery({
@@ -142,6 +143,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 
   const searchResultsData = filteredSearchResults.map((member) => {
     const address = member.addresses[0]?.address || '';
+    const addressInfo = member.addresses.map((addr) => ({
+      id: addr.id || 0,
+      community_id: communityId,
+      address: addr.address,
+      stake_balance: 0,
+      role: 'member',
+    }));
 
     return {
       name: {
@@ -169,10 +177,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       action: {
         customElement: (
           <CWButton
-            label="Add"
+            label="Add as judge"
             buttonType="secondary"
             buttonHeight="sm"
-            onClick={() => handleAddJudges([address])}
+            onClick={() => {
+              setSelectedAddressInfo(addressInfo);
+              setIsRoleModalOpen(true);
+            }}
           />
         ),
         sortValue: '',
@@ -235,13 +246,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         />
       </div>
 
-      <CWTable
-        columnInfo={tableState.columns}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
-        rowData={judgeData}
-      />
-
       {isSearchVisible && (
         <div className="search-section">
           <div className="search-container">
@@ -279,6 +283,15 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         </div>
       )}
 
+      <CWText type="b2">Active judges</CWText>
+
+      <CWTable
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
+        rowData={judgeData}
+      />
+
       <CWResponsiveDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -290,8 +303,39 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
           currentJudges={judges}
         />
       </CWResponsiveDialog>
+
+      <CWModal
+        size="small"
+        content={
+          <ManageOnchainModal
+            onClose={() => {
+              setIsRoleModalOpen(false);
+            }}
+            Addresses={selectedAddressInfo}
+            refetch={() => {
+              // Refetch data after changes
+              console.log('Refetching data');
+            }}
+            chainId={communityId}
+            forceJudgeTab
+            contestAddress={contestAddress}
+          />
+        }
+        onClose={() => {
+          setIsRoleModalOpen(false);
+        }}
+        open={isRoleModalOpen}
+      />
     </div>
   );
 };
 
 export default JudgesTab;
+
+// todo
+// show add judges only for admin and active contest
+// make search by address possible
+// change add button to "manage" + open modal
+// make sure it looks good on mobile
+// No matching members found - add at least 3 characters
+// cleanup scss + delete dialog
