@@ -2,12 +2,12 @@ import { CommunityAlert } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
-import ScrollContainer from 'views/components/ScrollContainer';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
+import ScrollContainer from 'views/components/ScrollContainer';
 import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
@@ -19,7 +19,7 @@ import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/u
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
-import { PageLoading } from '../loading';
+import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import './index.scss';
 
 type NotificationSection =
@@ -42,7 +42,7 @@ const NotificationSettings = () => {
     useState<NotificationSection>('push-notifications');
 
   if (threadSubscriptions.isLoading) {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   } else if (!user.isLoggedIn) {
     return <PageNotFound />;
   }

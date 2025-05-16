@@ -1,6 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { DebugMobile } from 'views/components/DebugMobile/DebugMobile';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
@@ -145,6 +146,12 @@ const newProposalViewPage = lazy(
 );
 
 const CommonDomainRoutes = () => [
+  <Route
+    key="mobile-app-redirect"
+    path="/_internal/debug-mobile"
+    element={<DebugMobile />}
+  />,
+
   <Route
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"

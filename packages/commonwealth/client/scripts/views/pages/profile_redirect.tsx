@@ -5,8 +5,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from './404';
-import { PageLoading } from './loading';
 
 type ProfileRedirectProps = {
   address: string;
@@ -41,7 +41,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   }, [isError, users]);
 
   if (isLoading) {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   }
 
   if (isError) {

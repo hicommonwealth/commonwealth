@@ -2,7 +2,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 const CommentRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
@@ -32,7 +32,7 @@ const CommentRedirect = ({ identifier }: { identifier: string }) => {
     shouldRun: !!(foundComment || error),
   });
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default CommentRedirect;

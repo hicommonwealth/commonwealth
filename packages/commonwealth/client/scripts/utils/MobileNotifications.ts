@@ -30,7 +30,13 @@ export interface PermissionResponse {
   status: PermissionStatus;
 }
 
+/**
+ * @deprecated Not used any longer.  We should remove.
+ */
 export class MobileNotifications {
+  /**
+   * @deprecated
+   */
   public static async getPermissionsAsync(): Promise<PermissionResponse> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await execWithinMobileApp<any, any>({
@@ -44,6 +50,9 @@ export class MobileNotifications {
     };
   }
 
+  /**
+   * @deprecated
+   */
   public static async requestPermissionsAsync(): Promise<PermissionResponse> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await execWithinMobileApp<any, any>({

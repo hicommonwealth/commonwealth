@@ -2,7 +2,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { PageLoading } from '../loading';
+import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 
 const GroupRedirect = ({ id }: { id: string }) => {
   const navigate = useCommonNavigate();
@@ -26,7 +26,7 @@ const GroupRedirect = ({ id }: { id: string }) => {
     shouldRun: !!(group || error),
   });
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default GroupRedirect;

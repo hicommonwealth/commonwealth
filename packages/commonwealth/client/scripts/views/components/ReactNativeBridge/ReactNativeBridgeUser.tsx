@@ -2,16 +2,7 @@ import useUserStore from 'client/scripts/state/ui/user';
 import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useEffect, useState } from 'react';
 import { useDarkMode } from '../../../state/ui/darkMode/darkMode';
-
-/**
- * Typed message so that the react-native client knows how to handel this message.
- *
- * This is teh standard pattern of how to handle postMessage with multiple uses.
- */
-type TypedData<Data> = {
-  type: string;
-  data: Data;
-};
+import { TypedData } from './types';
 
 /**
  * The actual user info that the client needs.
