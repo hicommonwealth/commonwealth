@@ -216,7 +216,6 @@ export const UpdateTopic = {
       Topic.pick({
         name: true,
         description: true,
-        group_ids: true,
         telegram: true,
         featured_in_sidebar: true,
         featured_in_new_post: true,

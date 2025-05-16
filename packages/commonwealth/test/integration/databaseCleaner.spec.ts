@@ -90,7 +90,6 @@ describe('DatabaseCleaner Tests', async () => {
         description: 'test-123',
         featured_in_sidebar: false,
         featured_in_new_post: false,
-        group_ids: [],
       });
 
       const thread = await models.Thread.create({

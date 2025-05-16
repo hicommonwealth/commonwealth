@@ -53,7 +53,6 @@ describe('Contest Worker Policy Lifecycle', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [

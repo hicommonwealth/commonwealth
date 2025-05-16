@@ -24,7 +24,6 @@ export function mapProfileThread(thread): Thread {
       created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
       allow_tokenized_threads: thread?.topic?.allow_tokenized_threads,

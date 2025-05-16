@@ -130,17 +130,10 @@ describe('Thread lifecycle', () => {
       topics: [
         {
           name: 'topic with permissions',
-          group_ids: [threadGroupId, commentGroupId],
           weighted_voting: TopicWeightedVoting.Stake,
         },
-        {
-          name: 'topic without thread permissions',
-          group_ids: [emptyGroupId],
-        },
-        {
-          name: 'topic without groups',
-          group_ids: [],
-        },
+        { name: 'topic without thread permissions' },
+        { name: 'topic without groups' },
       ],
       CommunityStakes: [
         {
@@ -154,7 +147,7 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupPermission', {
       group_id: threadGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
+      topic_id: _community!.topics![0]!.id,
       allowed_actions: [
         schemas.PermissionEnum.CREATE_THREAD,
         schemas.PermissionEnum.CREATE_THREAD_REACTION,
@@ -163,12 +156,12 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupPermission', {
       group_id: commentGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
+      topic_id: _community!.topics![0]!.id,
       allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
     });
     await seed('GroupPermission', {
       group_id: emptyGroupId,
-      topic_id: _community?.topics?.[1]?.id || 0,
+      topic_id: _community!.topics![1]!.id,
       allowed_actions: [],
     });
 

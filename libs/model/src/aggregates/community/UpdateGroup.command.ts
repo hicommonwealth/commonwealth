@@ -1,7 +1,7 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { models, sequelize } from '../../database';
+import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 import { GroupAttributes } from '../../models';
@@ -51,42 +51,6 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
         await group.update(updates, { transaction });
 
         if (topics.length > 0) {
-          const ids = topics.map(({ id }) => id!);
-          await models.Topic.update(
-            {
-              group_ids: sequelize.fn(
-                'array_append',
-                sequelize.col('group_ids'),
-                group_id,
-              ),
-            },
-            {
-              where: {
-                id: { [Op.in]: ids },
-                [Op.not]: { group_ids: { [Op.contains]: [group_id] } },
-              },
-              transaction,
-            },
-          );
-
-          // remove group from existing group topics
-          await models.Topic.update(
-            {
-              group_ids: sequelize.fn(
-                'array_remove',
-                sequelize.col('group_ids'),
-                group_id,
-              ),
-            },
-            {
-              where: {
-                id: { [Op.notIn]: ids },
-                group_ids: { [Op.contains]: [group_id] },
-              },
-              transaction,
-            },
-          );
-
           // update topic level interaction permissions for current group
           await Promise.all(
             (payload.topics || [])?.map(async (t) => {
@@ -101,7 +65,7 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
                   VALUES (:group_id, :topic_id, ${allowed_actions}, NOW(), NOW())
                   ON CONFLICT(group_id, topic_id) DO UPDATE
                     SET allowed_actions = EXCLUDED.allowed_actions,
-                        updated_at      = NOW();
+                        updated_at = NOW();
                 `,
                   {
                     transaction,

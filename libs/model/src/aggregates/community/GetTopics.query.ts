@@ -80,7 +80,6 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
                                      t.default_offchain_template,
                                      t."order",
                                      t.channel_id,
-                                     t.group_ids,
                                      t.weighted_voting,
                                      t.token_symbol,
                                      t.vote_weight_multiplier,

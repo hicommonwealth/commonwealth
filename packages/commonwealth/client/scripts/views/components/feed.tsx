@@ -150,7 +150,6 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
       // If we expect to do tokenized stuff on the feed, modify this

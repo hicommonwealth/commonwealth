@@ -41,7 +41,6 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
         featured_in_new_post,
         default_offchain_template,
         community_id: community_id!,
-        group_ids: [],
         allow_tokenized_threads: allow_tokenized_threads ?? false,
       };
 

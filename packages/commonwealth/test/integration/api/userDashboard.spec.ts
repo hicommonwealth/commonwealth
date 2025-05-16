@@ -46,10 +46,7 @@ describe('User Dashboard API', () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;
@@ -60,7 +57,6 @@ describe('User Dashboard API', () => {
       community_id: chain2,
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [],
     });
     // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
