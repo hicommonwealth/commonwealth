@@ -116,12 +116,6 @@ const QuestList = ({
           onFiltersChange={(newFilters) => setFilters(newFilters)}
         />
       </div>
-      <FiltersDrawer
-        isOpen={isFilterDrawerOpen}
-        onClose={() => setIsFilterDrawerOpen(false)}
-        filters={filters}
-        onFiltersChange={(newFilters) => setFilters(newFilters)}
-      />
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
