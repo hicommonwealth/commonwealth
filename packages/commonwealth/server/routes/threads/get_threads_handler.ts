@@ -4,7 +4,6 @@ import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,
   TypedRequestQuery,
@@ -57,7 +56,6 @@ export type CountThreadsRequestQuery = {
 export type GetThreadsResponse = any;
 
 export const getThreadsHandler = async (
-  controllers: ServerControllers,
   req: TypedRequestQuery<
     GetThreadsRequestQuery &
       (

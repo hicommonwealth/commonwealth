@@ -3,15 +3,12 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 import * as api from '../api';
-import { createCommunityStakeHandler } from '../routes/communities/create_community_stakes_handler';
-import { getCommunityStakeHandler } from '../routes/communities/get_community_stakes_handler';
 
 import {
   aiTieredMiddleware,
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
-import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
 import domain from '../routes/domain';
@@ -45,18 +42,12 @@ import generateImageHandler from '../routes/generateImage';
 
 import * as controllers from '../controller';
 
-import { ServerCommunitiesController } from '../controllers/server_communities_controller';
-
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
-import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
-import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
-import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
@@ -65,10 +56,6 @@ import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
-export type ServerControllers = {
-  communities: ServerCommunitiesController;
-};
-
 function setupRouter(
   endpoint: string,
   app: Express,
@@ -76,10 +63,6 @@ function setupRouter(
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
-  const serverControllers: ServerControllers = {
-    communities: new ServerCommunitiesController(models),
-  };
-
   const router = express.Router();
   router.use(useragent.express());
 
@@ -114,62 +97,11 @@ function setupRouter(
     getAddressStatus.bind(this, models),
   );
 
-  // communities
-  registerRoute(
-    router,
-    'patch',
-    '/communities/update_id',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunityIdHandler.bind(this, models, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/communities',
-    getCommunitiesHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/nodes',
-    getChainNodesHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/nodes',
-    passport.authenticate('jwt', { session: false }),
-    createChainNodeHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/relatedCommunities',
-    getRelatedCommunitiesHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/communityStakes/:community_id/:stake_id?',
-    getCommunityStakeHandler.bind(this, models, serverControllers),
-  );
-
   registerRoute(
     router,
     'get',
     '/namespaceMetadata/:namespace/:stake_id',
     getNamespaceMetadata.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/communityStakes/:community_id/:stake_id',
-    passport.authenticate('jwt', { session: false }),
-    createCommunityStakeHandler.bind(this, models, serverControllers),
   );
 
   registerRoute(
@@ -186,7 +118,7 @@ function setupRouter(
     'get',
     '/threads',
     databaseValidationService.validateCommunity,
-    getThreadsHandler.bind(this, serverControllers),
+    getThreadsHandler.bind(this),
   );
 
   registerRoute(
@@ -194,7 +126,7 @@ function setupRouter(
     'get',
     '/feed',
     databaseValidationService.validateCommunity,
-    getFeedHandler.bind(this, models, serverControllers),
+    getFeedHandler.bind(this, models),
   );
 
   // reactions
@@ -375,7 +307,7 @@ function setupRouter(
     router,
     'get',
     '/getCanvasClock',
-    getCanvasClockHandler.bind(this, serverControllers),
+    getCanvasClockHandler.bind(this),
   );
 
   registerRoute(router, 'get', '/health', healthHandler.bind(this));

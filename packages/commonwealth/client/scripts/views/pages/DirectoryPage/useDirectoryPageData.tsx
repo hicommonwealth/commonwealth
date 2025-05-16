@@ -60,7 +60,7 @@ const useDirectoryPageData = ({
   const { data: nodes } = useFetchNodesQuery();
   const { data: relatedCommunities = [], isLoading } =
     useFetchRelatedCommunitiesQuery({
-      chainNodeId,
+      chainNodeId: chainNodeId || 0,
     });
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -92,11 +92,11 @@ const useDirectoryPageData = ({
         ChainNode: getNodeById(c.chain_node_id, nodes),
         name: c.community,
         nameLower: c.community.toLowerCase(),
-        namespace: c.namespace,
-        description: c.description,
-        members: c.profile_count,
-        threads: c.lifetime_thread_count,
-        iconUrl: c.icon_url,
+        namespace: c.namespace || '',
+        description: c.description || '',
+        members: c.profile_count.toString(),
+        threads: c.lifetime_thread_count.toString(),
+        iconUrl: c.icon_url || '',
         id: c.id,
         tag_ids: c.tag_ids || [],
       })),
