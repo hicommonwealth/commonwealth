@@ -131,7 +131,7 @@ export const actionCopies = {
           )}
           <li>
             ● No Aura is awarded if your trade amount multiplied by the aura
-            multiplier does not equal at least 1 Aura
+            multiplier does not equal at least 1 Aura.
           </li>
         </ul>
       </div>
