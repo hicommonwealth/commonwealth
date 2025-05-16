@@ -5,10 +5,10 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { emitEvent } from 'model/src/utils';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
+import { emitEvent } from '../../utils/utils';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
