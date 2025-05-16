@@ -10,7 +10,6 @@ import {
   registerRoute,
 } from '../middleware/methodNotAllowed';
 
-import communityStats from '../routes/communityStats';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
@@ -260,14 +259,6 @@ function setupRouter(
 
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/communityStats',
-    databaseValidationService.validateCommunity,
-    communityStats.bind(this, models),
-  );
 
   registerRoute(
     router,

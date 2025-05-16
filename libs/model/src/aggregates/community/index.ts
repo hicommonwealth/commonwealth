@@ -12,6 +12,7 @@ export * from './GetCommunities.query';
 export * from './GetCommunity.query';
 export * from './GetCommunitySelectedTagsAndCommunities.query';
 export * from './GetCommunityStake.query';
+export * from './GetCommunityStats.query';
 export * from './GetGroups.query';
 export * from './GetMembers.query';
 export * from './GetMemberships.query';

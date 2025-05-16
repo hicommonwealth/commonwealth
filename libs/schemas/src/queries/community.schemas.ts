@@ -388,3 +388,28 @@ export const SearchCommunities = {
     results: z.array(SearchCommunityView),
   }),
 };
+
+export const Batchable = z.object({
+  date: z.string(),
+  new_items: z.string(),
+});
+
+export const GetCommunityStats = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    batches: z.object({
+      active_accounts: z.array(Batchable),
+      comments: z.array(Batchable),
+      roles: z.array(Batchable),
+      threads: z.array(Batchable),
+    }),
+    totals: z.object({
+      total_comments: z.number(),
+      total_roles: z.number(),
+      total_threads: z.number(),
+    }),
+  }),
+  context: AuthContext,
+};

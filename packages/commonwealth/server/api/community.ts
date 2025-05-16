@@ -205,4 +205,9 @@ export const trpcRouter = trpc.router({
     Community.SearchCommunities,
     trpc.Tag.Community,
   ),
+  getCommunityStats: trpc.query(
+    Community.GetCommunityStats,
+    trpc.Tag.Community,
+    { ttlSecs: 60 * 60 },
+  ),
 });
