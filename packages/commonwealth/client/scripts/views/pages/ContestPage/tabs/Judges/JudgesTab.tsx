@@ -10,7 +10,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
 import {
   CWTable,
   CWTableColumnInfo,
@@ -23,7 +22,6 @@ import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Member
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
-import AddJudges from './AddJudges';
 
 import './JudgesTab.scss';
 
@@ -33,7 +31,6 @@ interface JudgesTabProps {
 }
 
 const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [selectedAddressInfo, setSelectedAddressInfo] =
@@ -201,11 +198,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
     };
   });
 
-  const handleAddJudges = (newJudges: string[]) => {
-    // This function would typically update the judges list via an API call
-    console.log('Adding judges:', newJudges);
-  };
-
   const toggleSearch = () => {
     setIsSearchVisible(!isSearchVisible);
     // Clear search when hiding
@@ -249,7 +241,8 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         </CWText>
         {isAdmin && contestIsActive && (
           <CWButton
-            containerClassName="add-judge-button"
+            containerClassName="ad
+            n"
             label="Add judges"
             iconLeft="plus"
             onClick={toggleSearch}
@@ -272,9 +265,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
             />
           </div>
 
-          {debouncedSearchTerm.length > 2 && (
-            <div className="search-results">
-              {isSearchLoading ? (
+          <div className="search-results">
+            {searchTerm.length > 0 && searchTerm.length < 3 ? (
+              <div className="no-results">
+                <CWText>Search term must be at least 3 characters</CWText>
+              </div>
+            ) : debouncedSearchTerm.length > 2 ? (
+              isSearchLoading ? (
                 <div className="loading-container">
                   <CWCircleMultiplySpinner />
                 </div>
@@ -289,9 +286,9 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
                 <div className="no-results">
                   <CWText>No matching members found</CWText>
                 </div>
-              )}
-            </div>
-          )}
+              )
+            ) : null}
+          </div>
         </div>
       )}
 
@@ -304,18 +301,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         rowData={judgeData}
       />
 
-      <CWResponsiveDialog
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-      >
-        <AddJudges
-          onClose={() => setIsDialogOpen(false)}
-          onAddJudges={handleAddJudges}
-          communityId={communityId}
-          currentJudges={judges}
-        />
-      </CWResponsiveDialog>
-
       <CWModal
         size="small"
         content={
@@ -325,7 +310,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
             }}
             Addresses={selectedAddressInfo}
             refetch={() => {
-              // Refetch data after changes
               console.log('Refetching data');
             }}
             chainId={communityId}
@@ -344,9 +328,7 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 
 export default JudgesTab;
 
-// todo
 // make search by address possible
-// change add button to "manage" + open modal
 // make sure it looks good on mobile
-// No matching members found - add at least 3 characters
 // cleanup scss + delete dialog
+// // Refetch data after changes

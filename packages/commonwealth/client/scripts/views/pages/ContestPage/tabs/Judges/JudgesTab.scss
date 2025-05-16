@@ -1,16 +1,6 @@
 .JudgesTab {
   margin-top: 16px;
 
-  .CWCard {
-    padding: 24px;
-  }
-
-  .description {
-    margin-top: 8px;
-    margin-bottom: 16px;
-    opacity: 0.7;
-  }
-
   .loading-container,
   .empty-state {
     display: flex;
@@ -22,71 +12,23 @@
     text-align: center;
   }
 
-  .User.linkified:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
   .filter-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-
-    .add-judge-button {
-      width: auto;
-    }
   }
 
   .Text.b2.regular {
     margin-bottom: 8px;
   }
 
-  .add-judge-section {
-    display: flex;
-    gap: 16px;
-    margin-top: 24px;
-    margin-bottom: 24px;
-
-    .add-judge-button,
-    .add-judges-modal-button {
-      width: auto;
-    }
-  }
-
-  .add-judge-dialog {
-    padding: 24px;
-  }
-
-  .judges-list {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .judge-item {
-    padding: 12px 16px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-  }
-
-  // Search section styles
   .search-section {
     margin-top: 16px;
     margin-bottom: 24px;
 
-    .search-title {
-      margin-bottom: 16px;
-    }
-
     .search-container {
       margin-bottom: 16px;
-    }
-
-    .results-title {
-      margin-bottom: 12px;
-      margin-top: 16px;
     }
 
     .search-results {
