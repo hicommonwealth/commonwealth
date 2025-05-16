@@ -123,6 +123,8 @@ describe('Launchpad Lifecycle', () => {
       payload: {
         transaction_hash: CREATE_TOKEN_TXN_HASH,
         eth_chain_id: node.eth_chain_id!,
+        description: 'test',
+        icon_url: 'test',
         community_id: community_id!,
       },
     });
