@@ -12,7 +12,6 @@ import {
 
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
-import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import { status } from '../routes/status';
 import updateEmail from '../routes/updateEmail';
@@ -73,15 +72,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-
-  // Creating and Managing Addresses
-  registerRoute(
-    router,
-    'post',
-    '/getAddressStatus',
-    passport.authenticate('jwt', { session: false }),
-    getAddressStatus.bind(this, models),
-  );
 
   registerRoute(
     router,

@@ -1,6 +1,7 @@
 export * from './CreateApiKey.command';
 export * from './DeleteApiKey.command';
 export * from './DistributeSkale.command';
+export * from './GetAddressStatus.query';
 export * from './GetApiKey.query';
 export * from './GetNewContent.query';
 export * from './GetUser.query';

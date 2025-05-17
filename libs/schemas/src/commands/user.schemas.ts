@@ -122,3 +122,15 @@ export const UpdateSettings = {
   output: z.boolean(),
   context: VerifiedContext,
 };
+
+export const GetAddressStatus = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    exists: z.boolean(),
+    belongs_to_user: z.boolean(),
+  }),
+  context: VerifiedContext,
+};

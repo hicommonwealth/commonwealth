@@ -64,6 +64,7 @@ export const trpcRouter = trpc.router({
   getXps: trpc.query(User.GetXps, trpc.Tag.User),
   getXpsRanked: trpc.query(User.GetXpsRanked, trpc.Tag.User),
   updateSettings: trpc.command(User.UpdateSettings, trpc.Tag.User),
+  getAddressStatus: trpc.query(User.GetAddressStatus, trpc.Tag.User),
   // Not really part of the user, but no better place to put it
   distributeSkale: trpc.command(User.DistributeSkale, trpc.Tag.Token),
 });
