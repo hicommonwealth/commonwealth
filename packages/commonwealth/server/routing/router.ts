@@ -16,7 +16,6 @@ import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
-import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 
@@ -145,16 +144,6 @@ function setupRouter(
     'get',
     '/finishUpdateEmail',
     finishUpdateEmail.bind(this, models),
-  );
-
-  // community banners (update or create)
-  registerRoute(
-    router,
-    'post',
-    '/updateBanner',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateBanner.bind(this, models),
   );
 
   // roles

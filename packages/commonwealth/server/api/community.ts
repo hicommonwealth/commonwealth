@@ -210,4 +210,5 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
     { ttlSecs: 60 * 60 },
   ),
+  updateBanner: trpc.command(Community.UpdateBanner, trpc.Tag.Community),
 });
