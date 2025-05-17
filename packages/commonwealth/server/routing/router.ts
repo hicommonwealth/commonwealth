@@ -19,8 +19,6 @@ import { status } from '../routes/status';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 
-import setDefaultRole from '../routes/setDefaultRole';
-
 import getUploadSignature from '../routes/getUploadSignature';
 
 import logout from '../routes/logout';
@@ -144,15 +142,6 @@ function setupRouter(
     'get',
     '/finishUpdateEmail',
     finishUpdateEmail.bind(this, models),
-  );
-
-  // roles
-  registerRoute(
-    router,
-    'post',
-    '/setDefaultRole',
-    passport.authenticate('jwt', { session: false }),
-    setDefaultRole.bind(this, models),
   );
 
   // uploads

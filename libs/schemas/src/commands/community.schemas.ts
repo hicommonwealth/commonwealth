@@ -467,3 +467,9 @@ export const UpdateBanner = {
   output: z.boolean(),
   context: AuthContext,
 };
+
+export const SetDefaultRole = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
