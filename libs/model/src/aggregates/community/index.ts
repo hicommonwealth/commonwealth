@@ -34,6 +34,7 @@ export * from './SetCommunityStake.command';
 export * from './SetDefaultRole.command';
 export * from './SetReachedGoal.command';
 export * from './ToggleArchiveTopic.command';
+export * from './ToggleCommunityStar.command';
 export * from './UnpinToken.command';
 export * from './UpdateBanner.command';
 export * from './UpdateCommunity.command';

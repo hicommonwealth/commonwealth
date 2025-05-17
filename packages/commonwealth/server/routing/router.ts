@@ -14,7 +14,6 @@ import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
-import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
@@ -93,15 +92,6 @@ function setupRouter(
     'get',
     '/namespaceMetadata/:namespace/:stake_id',
     getNamespaceMetadata.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/starCommunity',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    starCommunity.bind(this, models),
   );
 
   registerRoute(

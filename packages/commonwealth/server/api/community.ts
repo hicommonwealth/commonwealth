@@ -212,4 +212,8 @@ export const trpcRouter = trpc.router({
   ),
   updateBanner: trpc.command(Community.UpdateBanner, trpc.Tag.Community),
   setDefaultRole: trpc.command(Community.SetDefaultRole, trpc.Tag.Community),
+  toggleCommunityStar: trpc.command(
+    Community.ToggleCommunityStar,
+    trpc.Tag.Community,
+  ),
 });
