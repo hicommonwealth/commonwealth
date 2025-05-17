@@ -28,8 +28,6 @@ import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImageHandler from '../routes/generateImage';
 
-import * as controllers from '../controller';
-
 import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
@@ -106,15 +104,6 @@ function setupRouter(
     '/feed',
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models),
-  );
-
-  // roles
-  registerRoute(
-    router,
-    'get',
-    '/roles',
-    databaseValidationService.validateCommunity,
-    controllers.listRoles.bind(this, models),
   );
 
   // user model update

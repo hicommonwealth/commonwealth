@@ -73,10 +73,11 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
           perm &&
             perm.forEach((p) => {
               const topic = topics_map.get(p.id);
-              g.topics.push({
-                ...topic!,
-                permissions: p.permissions,
-              });
+              topic &&
+                g.topics.push({
+                  ...topic!,
+                  permissions: p.permissions,
+                });
             });
         });
       }

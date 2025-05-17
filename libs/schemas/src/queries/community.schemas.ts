@@ -413,3 +413,17 @@ export const GetCommunityStats = {
   }),
   context: AuthContext,
 };
+
+export const GetRoles = {
+  input: z.object({
+    community_id: z.string(),
+    roles: z.string(),
+  }),
+  output: z.array(
+    z.object({
+      address: z.string(),
+      role: z.enum(['moderator', 'admin']),
+    }),
+  ),
+  context: AuthContext,
+};

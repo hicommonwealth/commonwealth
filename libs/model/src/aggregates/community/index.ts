@@ -18,6 +18,7 @@ export * from './GetMembers.query';
 export * from './GetMemberships.query';
 export * from './GetPinnedTokens.query';
 export * from './GetRelatedCommunities.query';
+export * from './GetRoles.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetTopHolders.query';
 export * from './GetTopicById.query';

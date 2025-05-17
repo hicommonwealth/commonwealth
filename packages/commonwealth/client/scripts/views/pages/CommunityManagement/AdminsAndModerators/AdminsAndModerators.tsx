@@ -24,7 +24,7 @@ const AdminsAndModerators = () => {
 
   const communityId = app.activeChainId() || '';
   const {
-    data: { admins: returnedAdmins, mods: returnedMods } = {},
+    data: adminsAndModerators,
     isLoading: isFetchAdminQueryLoading,
     refetch: refetchAdminData,
   } = useFetchAdminQuery({
@@ -49,23 +49,11 @@ const AdminsAndModerators = () => {
   }, [searchResults]);
 
   useEffect(() => {
-    if (!isFetchAdminQueryLoading && returnedAdmins) {
-      setAdmins(
-        returnedAdmins.map(({ address, role }) => ({
-          address,
-          role,
-        })),
-      );
+    if (!isFetchAdminQueryLoading && adminsAndModerators) {
+      setAdmins(adminsAndModerators.filter(({ role }) => role === 'admin'));
+      setMods(adminsAndModerators.filter(({ role }) => role === 'moderator'));
     }
-    if (!isFetchAdminQueryLoading && returnedMods) {
-      setMods(
-        returnedMods.map(({ address, role }) => ({
-          address,
-          role,
-        })),
-      );
-    }
-  }, [returnedAdmins, returnedMods, isFetchAdminQueryLoading]);
+  }, [adminsAndModerators, isFetchAdminQueryLoading]);
 
   const handleRoleUpdate = (oldRole: AddressRole, newRole: AddressRole) => {
     const { adminsAndMods } = app.chain.meta;

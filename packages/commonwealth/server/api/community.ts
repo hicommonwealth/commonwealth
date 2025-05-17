@@ -7,7 +7,6 @@ import {
   refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
-import { SetAddressWallet } from 'node_modules/@hicommonwealth/model/src/aggregates/community';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -217,5 +216,9 @@ export const trpcRouter = trpc.router({
     Community.ToggleCommunityStar,
     trpc.Tag.Community,
   ),
-  setAddressWallet: trpc.command(SetAddressWallet, trpc.Tag.Community),
+  setAddressWallet: trpc.command(
+    Community.SetAddressWallet,
+    trpc.Tag.Community,
+  ),
+  getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
 });
