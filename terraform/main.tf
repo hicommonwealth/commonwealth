@@ -1,13 +1,96 @@
+# Terraform Backend Configuration
+terraform {
+  # Note: The key will be set dynamically in the GitHub Actions workflow
+  # with: terraform init -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+  backend "s3" {
+    bucket = "your-terraform-states-bucket"
+    key = "commonwealth-pr-environments/default/terraform.tfstate" # This will be overridden
+    region = "us-east-1"
+    # TODO: add state locking via DynamoDB?
+  }
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "2.46.0"
+    }
+  }
+}
+
+# DigitalOcean Provider
+provider "digitalocean" {
+  token = var.do_token
+}
+
+# Kubernetes Provider (configured after cluster creation)
+provider "kubernetes" {
+  host  = digitalocean_kubernetes_cluster.main.endpoint
+  token = digitalocean_kubernetes_cluster.main.kube_config[0].token
+  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+}
+
+# Variables
+variable "do_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  sensitive   = true
+}
+
+variable "region" {
+  description = "DigitalOcean region"
+  type        = string
+  default     = "nyc1"
+}
+
+variable "image_tag" {
+  description = "Docker image tag (usually the commit SHA)"
+  type        = string
+  default     = "latest"
+}
+
+# PR-specific variables
+variable "pr_number" {
+  description = "PR number for environment naming"
+  type        = string
+  default     = "dev"  # Default for local development
+}
+
+variable "environment" {
+  description = "Environment name (e.g., pr, dev, staging, prod)"
+  type        = string
+  default     = "pr"
+}
+
+# Local values for naming resources
+locals {
+  name_prefix = "${var.environment}-${var.pr_number}-"
+  worker_images = [
+    "twitter",
+    "message_relayer",
+    "knock",
+    "graphile_worker",
+    "evm_ce",
+    "discord_listener",
+    "consumer"
+  ]
+}
+
+# Create Kubernetes Namespace
+resource "kubernetes_namespace" "cw" {
+  metadata {
+    name = "${local.name_prefix}commonwealth"
+  }
+}
+
 # Create Kubernetes Cluster with two node pools
 resource "digitalocean_kubernetes_cluster" "main" {
-  name    = "cw-ci-cluster"
+  name    = "${local.name_prefix}cluster"
   region  = var.region
   version = "1.29.1-do.0"
 
   # Web node pool - smaller since we only need 1 pod
   node_pool {
-    name       = "web-pool"
-    size       = "s-1vcpu-3gb"  # 1 vCPU, 3GB memory (smallest DO size that meets requirements)
+    name = "${local.name_prefix}web-pool"
+    size = "s-1vcpu-3gb"  # 1 vCPU, 3GB memory (smallest DO size that meets requirements)
     node_count = 1              # For 1 web replica
     labels = {
       "node-type" = "web"
@@ -16,8 +99,8 @@ resource "digitalocean_kubernetes_cluster" "main" {
 
   # Worker node pool - sized for worker requirements
   node_pool {
-    name       = "worker-pool"
-    size       = "s-4vcpu-8gb"  # 4 vCPUs, 8GB memory (good fit for 3-4 worker pods)
+    name = "${local.name_prefix}worker-pool"
+    size = "s-4vcpu-8gb"  # 4 vCPUs, 8GB memory (good fit for 3-4 worker pods)
     node_count = 3              # 3 nodes can fit all 7 workers (with ~2 workers per node)
     labels = {
       "node-type" = "worker"
@@ -37,6 +120,7 @@ resource "kubernetes_deployment" "web" {
     namespace = kubernetes_namespace.cw.metadata[0].name
     labels = {
       app = "web"
+      pr  = var.pr_number
     }
   }
   spec {
@@ -50,6 +134,7 @@ resource "kubernetes_deployment" "web" {
       metadata {
         labels = {
           app = "web"
+          pr  = var.pr_number
         }
       }
       spec {
@@ -61,7 +146,7 @@ resource "kubernetes_deployment" "web" {
                 match_expressions {
                   key      = "node-type"
                   operator = "In"
-                  values   = ["web"]
+                  values = ["web"]
                 }
               }
             }
@@ -75,13 +160,24 @@ resource "kubernetes_deployment" "web" {
           # Resource requests and limits
           resources {
             requests = {
-              cpu    = "800m"   # 0.8 vCPU (leaving some buffer for system processes)
+              cpu = "800m"   # 0.8 vCPU (leaving some buffer for system processes)
               memory = "2.5Gi"  # 2.5GB as specified
             }
             limits = {
-              cpu    = "900m"   # 0.9 vCPU max
+              cpu = "900m"   # 0.9 vCPU max
               memory = "2.5Gi"  # 2.5GB as specified
             }
+          }
+
+          # Add environment variables to identify the environment
+          env {
+            name  = "PR_NUMBER"
+            value = var.pr_number
+          }
+
+          env {
+            name  = "ENVIRONMENT"
+            value = var.environment
           }
 
           ports {
@@ -101,6 +197,7 @@ resource "kubernetes_deployment" "worker" {
     namespace = kubernetes_namespace.cw.metadata[0].name
     labels = {
       app = each.key
+      pr  = var.pr_number
     }
   }
   spec {
@@ -114,6 +211,7 @@ resource "kubernetes_deployment" "worker" {
       metadata {
         labels = {
           app = each.key
+          pr  = var.pr_number
         }
       }
       spec {
@@ -125,7 +223,7 @@ resource "kubernetes_deployment" "worker" {
                 match_expressions {
                   key      = "node-type"
                   operator = "In"
-                  values   = ["worker"]
+                  values = ["worker"]
                 }
               }
             }
@@ -139,7 +237,7 @@ resource "kubernetes_deployment" "worker" {
                   match_expressions {
                     key      = "app"
                     operator = "In"
-                    values   = [each.key]
+                    values = [each.key]
                   }
                 }
                 topology_key = "kubernetes.io/hostname"
@@ -160,14 +258,25 @@ resource "kubernetes_deployment" "worker" {
           name  = each.key
           image = "ghcr.io/hicommonwealth/${each.key}:${var.image_tag}"
 
+          # Add environment variables to identify the environment
+          env {
+            name  = "PR_NUMBER"
+            value = var.pr_number
+          }
+
+          env {
+            name  = "ENVIRONMENT"
+            value = var.environment
+          }
+
           # Resource requests/limits per your specifications
           resources {
             requests = {
-              cpu    = "500m"   # 0.5 vCPU as specified
+              cpu = "500m"   # 0.5 vCPU as specified
               memory = "2.5Gi"  # 2.5GB as specified
             }
             limits = {
-              cpu    = "1000m"  # 1 vCPU max (to prevent a single worker from consuming too much)
+              cpu = "1000m"  # 1 vCPU max (to prevent a single worker from consuming too much)
               memory = "2.5Gi"  # 2.5GB as specified
             }
           }
@@ -175,4 +284,52 @@ resource "kubernetes_deployment" "worker" {
       }
     }
   }
+}
+
+# Web Service configuration
+resource "kubernetes_service" "web" {
+  metadata {
+    name      = "web"
+    namespace = kubernetes_namespace.cw.metadata[0].name
+    labels = {
+      app = "web"
+      pr  = var.pr_number
+    }
+  }
+  spec {
+    selector = {
+      app = "web"
+    }
+    port {
+      port        = 80
+      target_port = 8080
+    }
+    type = "LoadBalancer"
+  }
+}
+
+# Output cluster and load balancer info
+output "kubeconfig" {
+  value       = digitalocean_kubernetes_cluster.main.kube_config[0].raw_config
+  sensitive   = true
+  description = "Kubernetes configuration for connecting to the cluster"
+}
+
+output "web_service_ip" {
+  value       = kubernetes_service.web.status[0].load_balancer[0].ingress[0].ip
+  description = "The external IP of the web service (load balancer)"
+}
+
+output "cluster_name" {
+  value       = digitalocean_kubernetes_cluster.main.name
+  description = "The name of the Kubernetes cluster"
+}
+
+output "environment_info" {
+  value = {
+    pr_number   = var.pr_number
+    environment = var.environment
+    namespace   = kubernetes_namespace.cw.metadata[0].name
+  }
+  description = "Information about the deployed environment"
 }

@@ -434,19 +434,6 @@ jobs:
           compare_branch: production # TODO: need to ensure this doesn't cause undue stress on main DB (maybe use a read replica?)
           api_key: ${{ secrets.NEON_API_KEY }}
 
-  delete_review_db:
-    name: Delete Review DB
-    needs: setup_review_db
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete Neon Branch
-        uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ secrets.NEON_PROJECT_ID }}
-          branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
-          api_key: ${{ secrets.NEON_API_KEY }}
-
   deploy_review_app:
     runs-on: ubuntu-latest
     needs: setup_review_db
@@ -619,6 +606,96 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
           provenance: false
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      # This is for accessing Terraform state in S3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init with PR-specific state
+        id: init
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          terraform init \
+            -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}" -out=tfplan
+        continue-on-error: false
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Export Kubeconfig
+        run: |
+          echo "Exporting kubeconfig to access the cluster..."
+          terraform output -raw kubeconfig > kubeconfig.yaml
+          echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
+
+      - name: Deploy App Configuration
+        run: |
+          echo "Cluster is ready, web service external IP is: $(terraform output -raw web_service_ip)"
+          echo "Adding PR comment with deployment info..."
+
+      - name: Comment PR with Deployment Info
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const output = require('child_process').execSync('terraform output -json').toString();
+            const outputs = JSON.parse(output);
+
+            const webIP = outputs.web_service_ip.value;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Review App Deployed!**
+
+              Your PR environment has been successfully deployed:
+
+              - **Web Application URL**: http://${webIP}
+              - **Environment ID**: pr-${context.issue.number}
+              - **Image Tag**: ${process.env.TF_VAR_image_tag}
+
+              This environment will be automatically deleted when the PR is closed.`
+            });
+
+  delete_review_db:
+    name: Delete Review DB
+    needs: setup_review_db
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+  delete_review_app:
+    name: Delete Review AP
+    needs: deploy_review_app
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Terraform Destroy
+        run: |
+          echo "PR was closed, destroying environment..."
+          terraform destroy -auto-approve -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}"
 
 
 
