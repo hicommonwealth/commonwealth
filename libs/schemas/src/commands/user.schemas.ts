@@ -112,3 +112,13 @@ export const DistributeSkale = {
   }),
   output: z.undefined(),
 };
+
+export const UpdateSettings = {
+  input: z.object({
+    disable_rich_text: z.boolean().optional(),
+    enable_promotional_emails: z.boolean().optional(),
+    email_interval: z.enum(['never', 'weekly']).optional(),
+  }),
+  output: z.boolean(),
+  context: VerifiedContext,
+};

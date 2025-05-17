@@ -21,10 +21,8 @@ import updateSiteAdmin from '../routes/updateSiteAdmin';
 import getUploadSignature from '../routes/getUploadSignature';
 
 import logout from '../routes/logout';
-import writeUserSetting from '../routes/writeUserSetting';
 
 import { type DB } from '@hicommonwealth/model';
-import setAddressWallet from '../routes/setAddressWallet';
 
 import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -141,24 +139,6 @@ function setupRouter(
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
     getUploadSignature.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/setAddressWallet',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    setAddressWallet.bind(this, models),
-  );
-
-  // settings
-  registerRoute(
-    router,
-    'post',
-    '/writeUserSetting',
-    passport.authenticate('jwt', { session: false }),
-    writeUserSetting.bind(this, models),
   );
 
   registerRoute(

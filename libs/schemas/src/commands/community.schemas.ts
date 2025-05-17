@@ -479,3 +479,12 @@ export const ToggleCommunityStar = {
   output: z.boolean(),
   context: AuthContext,
 };
+
+export const SetAddressWallet = {
+  input: z.object({
+    community_id: z.string(),
+    wallet_id: z.nativeEnum(WalletId),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};

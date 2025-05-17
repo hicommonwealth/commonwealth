@@ -12,5 +12,6 @@ export * from './GetXps.query';
 export * from './GetXpsRanked.query';
 export * from './SearchUserProfiles.query';
 export * from './signIn/SignIn.command';
+export * from './UpdateSettings.command';
 export * from './UpdateUser.command';
 export * from './Xp.projection';
