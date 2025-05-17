@@ -458,3 +458,12 @@ export const UpdateCommunityTags = {
   }),
   context: AuthContext,
 };
+
+export const UpdateBanner = {
+  input: z.object({
+    community_id: z.string(),
+    banner_text: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};

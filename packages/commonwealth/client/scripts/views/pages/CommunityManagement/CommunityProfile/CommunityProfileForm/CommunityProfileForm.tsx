@@ -149,8 +149,8 @@ const CommunityProfileForm = () => {
       });
 
       await editBanner({
-        communityId: community.id,
-        bannerText: values.communityBanner ?? '',
+        community_id: community.id,
+        banner_text: values.communityBanner ?? '',
       });
 
       await updateCommunity(
