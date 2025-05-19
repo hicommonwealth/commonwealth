@@ -128,10 +128,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         try {
           return await doLogin();
         } catch (err) {
-          console.error(
-            'Could not perform authentication: ' + err.message,
-            err,
-          );
+          console.error('Could not perform authentication: ' + err.stack, err);
           privyMobileLogout({
             error: err.message ?? undefined,
           }).catch(console.error);
@@ -145,11 +142,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         // NOTE this section reloads the app so we have to break it out of the
         // main try/catch loop or when the page reloads we get weird/unusual
         // behavior.
-        const landingURL = new URL(
-          '/dashboard/for-you',
-          window.location.href,
-        ).toString();
-        document.location.href = landingURL;
+        setTimeout(() => {
+          const landingURL = new URL(
+            '/dashboard/for-you',
+            window.location.href,
+          ).toString();
+          document.location.href = landingURL;
+        }, 1);
       }
     }
 
