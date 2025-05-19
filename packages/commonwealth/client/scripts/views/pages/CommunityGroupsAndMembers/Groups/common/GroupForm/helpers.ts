@@ -57,7 +57,7 @@ export const convertGranularPermissionsToAccumulatedPermissions = (
   } else if (hasUpvote) {
     return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE];
   } else {
-    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE];
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.NONE];
   }
 };
 

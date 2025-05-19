@@ -25,6 +25,21 @@ const SolanaSource = z.object({
   contract_address: z.string().regex(/^[a-zA-Z0-9]{32,44}$/),
 });
 
+const SuiSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiNative]),
+  sui_network: z.string(),
+  object_id: z
+    .string()
+    .regex(/^0x[a-zA-F0-9]+$/)
+    .nullish(),
+});
+
+const SuiTokenSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiToken]),
+  sui_network: z.string(),
+  coin_type: z.string(),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -49,6 +64,8 @@ const ThresholdData = z.object({
     CosmosSource,
     CosmosContractSource,
     SolanaSource,
+    SuiSource,
+    SuiTokenSource,
   ]),
 });
 
@@ -72,6 +89,7 @@ export const GroupMetadata = z.object({
   description: z.string(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: z.number().nullish(), // NOT USED
+  groupImageUrl: z.string().nullish(),
 });
 
 export const Group = z.object({

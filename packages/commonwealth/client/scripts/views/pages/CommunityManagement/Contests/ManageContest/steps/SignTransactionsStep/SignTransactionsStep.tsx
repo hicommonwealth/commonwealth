@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
@@ -80,6 +81,8 @@ const SignTransactionsStep = ({
     useConfigureNominationsMutation();
 
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const { data: judgeStatus } = useGetJudgeStatusQuery(app.activeChainId());
+
   const user = useUserStore();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -105,17 +108,17 @@ const SignTransactionsStep = ({
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration || 0;
 
-    const stakeId = stakeData?.stake_id;
+    const stakeId = stakeData?.stake?.stake_id || 0;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = stakeData?.vote_weight;
+    const weight = stakeData?.stake?.vote_weight || 0;
     const contestInterval = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
-      : stakeData?.stake_token;
+      : stakeData?.stake?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
     const voteToken = contestFormData?.isFarcasterContest
       ? exchangeToken
@@ -133,6 +136,8 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
+    const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
+
     const singleJudged = {
       ethChainId,
       chainRpc,
@@ -142,7 +147,7 @@ const SignTransactionsStep = ({
       voterShare,
       walletAddress,
       exchangeToken,
-      judgeId: 1,
+      judgeId,
     } as DeploySingleJudgedContestOnchainProps;
 
     const recurring = {
@@ -194,6 +199,7 @@ const SignTransactionsStep = ({
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
+        namespace_judge_token_id: judgedContest ? singleJudged.judgeId : null,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -220,6 +226,8 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
+      const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
+
       await configureNominationsMutation({
         namespaceName,
         creatorOnly: true,
@@ -227,8 +235,7 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
-        // TODO: get from backend in https://github.com/hicommonwealth/commonwealth/issues/10993
-        judgeId: 101,
+        judgeId,
       });
 
       setConfigureNominationsData((prevState) => ({

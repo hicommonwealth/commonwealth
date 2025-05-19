@@ -4,6 +4,7 @@ import {
   InvalidState,
   ServerError,
   command,
+  logger,
   type Command,
 } from '@hicommonwealth/core';
 import {
@@ -20,6 +21,8 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { CreateCommunity } from '../community';
+
+const log = logger(import.meta);
 
 export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
   return {
@@ -45,10 +48,12 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         throw new AppError('Token already exists, choose another name');
       }
 
-      const chainNode = await models.ChainNode.findOne({
-        where: { eth_chain_id },
-        attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
-      });
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: { eth_chain_id },
+          attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
+        },
+      );
 
       mustExist('Chain Node', chainNode);
 
@@ -91,6 +96,13 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
           tokenAddress: tokenData.parsedArgs.tokenAddress,
         });
       } catch (e) {
+        log.error(
+          `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+          e instanceof Error ? e : undefined,
+          {
+            e,
+          },
+        );
         throw new Error(
           `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
         );

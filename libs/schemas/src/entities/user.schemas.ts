@@ -35,6 +35,7 @@ export const ProfileTags = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
+  // associations
   Tag: Tags.nullish(),
 });
 

@@ -5,13 +5,18 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import utc from 'dayjs/plugin/utc';
 import {
   CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
 } from './constants';
+
+dayjs.extend(isBetween);
+dayjs.extend(utc);
 
 /**
  * Decamelizes a string
@@ -72,11 +77,18 @@ export const generateTopicIdentifiersFromUrl = (url: string) => {
   return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
 };
 
+export const DISALLOWED_TOPIC_NAMES_REGEX = /["<>%{}|\\/^`?]/g;
+
+export const sanitizeTopicName = (name: string) => {
+  return name.replaceAll(`?`, '');
+};
+
 export const generateUrlPartForTopicIdentifiers = (
   topicId: string | number | undefined,
   topicName: string,
 ) => {
-  return topicId ? `${topicId}-${topicName}` : `${topicName}`;
+  const _topicName = sanitizeTopicName(topicName);
+  return topicId ? `${topicId}-${_topicName}` : `${_topicName}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -391,14 +403,16 @@ export function buildFarcasterContestFrameUrl(contestAddress: string) {
 }
 
 // Date utils
+export type UnitOfTime = 'day' | 'week' | 'month';
 export function isWithinPeriod(
   refDate: Date,
   targetDate: Date,
-  period: moment.unitOfTime.Base,
+  period: UnitOfTime,
 ): boolean {
-  const start = moment(refDate).startOf(period);
-  const end = moment(refDate).endOf(period);
-  return moment(targetDate).isBetween(start, end, null, '[]');
+  const ref = dayjs(refDate);
+  const start = ref.startOf(period);
+  const end = ref.endOf(period);
+  return dayjs(targetDate).isBetween(start, end, null, '[]');
 }
 
 export async function alchemyGetTokenPrices({
@@ -471,6 +485,10 @@ export const buildContestLeaderboardUrl = (
   contestAddress: string,
 ) => {
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};
+
+export const buildCommunityUrl = (baseUrl: string, communityId: string) => {
+  return `${baseUrl}/${communityId}`;
 };
 
 export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
