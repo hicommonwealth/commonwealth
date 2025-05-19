@@ -28,9 +28,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState(CreateVotePollErrors.PollingClosed);
       }
 
-      // TODO: migrate this to be JSONB array of strings in the DB
-      const options = JSON.parse(poll.options);
-      if (!options.includes(payload.option)) {
+      if (!poll.options.includes(payload.option)) {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
 
@@ -44,7 +42,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
       let vote = await models.Vote.findOne({
         where: {
           poll_id: payload.poll_id,
-          user_id: actor.user.id!,
+          address: address.address,
         },
       });
       if (!vote) {

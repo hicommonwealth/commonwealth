@@ -4,6 +4,7 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
+import { SetLocalPolls } from 'utils/polls';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PollCard } from '../../components/Polls';
@@ -13,11 +14,11 @@ import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {
-  poll: z.infer<typeof PollView>;
+  poll: z.infer<typeof PollView> & { thread_id?: number };
   showDeleteButton?: boolean;
   isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
-  setLocalPoll?: (params) => void;
+  setLocalPoll?: SetLocalPolls;
 };
 
 export const ThreadPollCard = ({
@@ -41,15 +42,11 @@ export const ThreadPollCard = ({
 
   const pollVotes = poll.votes || [];
 
-  let userVote = pollVotes.find(
+  const userVote = pollVotes.find(
     (p) =>
       p.address === user.activeAccount?.address &&
       p.community_id === user.activeAccount?.community?.id,
   );
-  if (!userVote) {
-    userVote = (poll.votes || []).find((p) => p.user_id === user.id);
-  }
-  const pollOptions = JSON.parse(poll.options);
 
   const getTooltipErrorMessage = () => {
     if (!user.activeAccount)
@@ -88,29 +85,24 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: async () => {
-            const selectedOption = JSON.parse(votedPoll.options).find(
-              (o) => o === option,
-            );
+          onClick: () => {
+            const selectedOption = votedPoll.options.find((o) => o === option);
 
             if (!selectedOption) {
               notifyError('Invalid voting option');
               return;
             }
 
-            try {
-              await votePoll({
-                thread_id: votedPoll.thread_id,
-                poll_id: votedPoll.id!,
-                option: selectedOption,
-              });
-            } catch (err) {
+            votePoll({
+              thread_id: votedPoll.thread_id,
+              poll_id: votedPoll.id!,
+              option: selectedOption,
+            }).catch((err) => {
               console.error(err);
               notifyError(
                 'Error submitting vote. Check if poll is still active.',
               );
-            }
+            });
           },
         },
         {
@@ -127,7 +119,7 @@ export const ThreadPollCard = ({
     (sum, vote) => sum + BigInt(vote.calculated_voting_weight || 1),
     0n,
   );
-  const voteInformation = pollOptions.map((option) => ({
+  const voteInformation = poll.options.map((option) => ({
     label: option,
     value: option,
     voteCount: pollVotes

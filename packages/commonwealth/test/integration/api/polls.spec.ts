@@ -101,6 +101,7 @@ describe('Polls', () => {
       },
       payload: {
         thread_id: thread!.id!,
+        duration: null,
         ...data,
       },
     });

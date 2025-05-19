@@ -41,12 +41,11 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-import Poll from 'client/scripts/models/Poll';
+import { ExtendedPoll, LocalPoll } from 'utils/polls';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
 import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
-import { ExtendedPoll } from '../NewThreadFormLegacy/NewThreadForm';
 import DetailCard from '../proposals/DetailCard';
 import TimeLineCard from '../proposals/TimeLineCard';
 import VotingResultView from '../proposals/VotingResultView';
@@ -73,7 +72,7 @@ export const NewThreadForm = () => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
 
-  const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+  const [pollsData, setPollData] = useState<LocalPoll[]>();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
@@ -366,15 +365,11 @@ export const NewThreadForm = () => {
             label: 'Polls',
             item: (
               <div className="cards-column">
-                {[
-                  ...new Map(
-                    pollsData?.map((poll) => [poll?.id, poll]),
-                  ).values(),
-                ].map((poll: Poll) => {
+                {(pollsData || []).map((poll) => {
                   return (
                     <ThreadPollCard
-                      poll={poll}
-                      key={poll.id}
+                      poll={poll as unknown as ExtendedPoll}
+                      key={(poll as unknown as ExtendedPoll).id}
                       isTopicMembershipRestricted={isRestrictedMembership}
                       showDeleteButton={true}
                       isCreateThreadPage={true}
