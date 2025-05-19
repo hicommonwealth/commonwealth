@@ -8,11 +8,15 @@ import { NewThreadForm as NewThreadFormModern } from '../NewThreadFormModern';
 export interface NewThreadFormProps {
   contentDelta?: DeltaStatic;
   setContentDelta?: (delta: DeltaStatic) => void;
+  webSearchEnabled?: boolean;
+  setWebSearchEnabled?: (enabled: boolean) => void;
 }
 
 export const NewThreadForm = ({
   contentDelta,
   setContentDelta,
+  webSearchEnabled,
+  setWebSearchEnabled,
 }: NewThreadFormProps = {}) => {
   const newEditor = useFlag('newEditor');
   const user = useUserStore();
@@ -25,6 +29,8 @@ export const NewThreadForm = ({
       key={user.addresses.length}
       contentDelta={contentDelta}
       setContentDelta={setContentDelta}
+      webSearchEnabled={webSearchEnabled}
+      setWebSearchEnabled={setWebSearchEnabled}
     />
   );
 };

@@ -50,6 +50,8 @@ export type CommentEditorProps = {
   parentCommentText?: string;
   triggerImageModalOpen?: boolean;
   placeholder?: string;
+  webSearchEnabled?: boolean;
+  setWebSearchEnabled?: (enabled: boolean) => void;
 };
 
 // eslint-disable-next-line react/display-name
@@ -75,6 +77,8 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       parentCommentText,
       triggerImageModalOpen,
       placeholder,
+      webSearchEnabled,
+      setWebSearchEnabled,
     },
     _ref,
   ) => {
@@ -89,6 +93,13 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
 
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [localWebSearchEnabled, setLocalWebSearchEnabled] = useState(false);
+    const effectiveWebSearchEnabled =
+      typeof webSearchEnabled === 'boolean'
+        ? webSearchEnabled
+        : localWebSearchEnabled;
+    const effectiveSetWebSearchEnabled =
+      setWebSearchEnabled || setLocalWebSearchEnabled;
 
     const { generateCompletion } = useAiCompletion();
 
@@ -350,6 +361,32 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
                 <CWText type="caption" className="toggle-label">
                   AI auto reply
                 </CWText>
+              </div>
+            )}
+            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+              <div className="ai-toggle-wrapper">
+                <CWTooltip
+                  content={`${effectiveWebSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
+                  placement="top"
+                  renderTrigger={() => (
+                    <div className="ai-toggle-wrapper">
+                      <CWToggle
+                        className="ai-toggle"
+                        icon="binoculars"
+                        iconColor="#757575"
+                        checked={effectiveWebSearchEnabled}
+                        onChange={() =>
+                          effectiveSetWebSearchEnabled(
+                            !effectiveWebSearchEnabled,
+                          )
+                        }
+                      />
+                      <CWText type="caption" className="toggle-label">
+                        Web search
+                      </CWText>
+                    </div>
+                  )}
+                />
               </div>
             )}
             <CWButton

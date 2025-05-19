@@ -416,6 +416,8 @@ const StickyInput = (props: StickyInputProps) => {
                 onContentAppended={handleThreadContentAppended}
                 contentDelta={contentDelta}
                 setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
               />
             ) : (
               <CommentEditor
@@ -429,6 +431,8 @@ const StickyInput = (props: StickyInputProps) => {
                 triggerImageModalOpen={openModalOnExpand && mode === 'comment'}
                 contentDelta={contentDelta}
                 setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
               />
             )}
           </div>

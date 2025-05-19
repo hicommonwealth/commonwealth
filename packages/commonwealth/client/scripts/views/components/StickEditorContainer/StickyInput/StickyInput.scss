@@ -317,6 +317,13 @@
 .DesktopStickyInputExpanded {
   padding: 0 !important;
 
+  .PageLayout {
+    padding: 0 !important;
+    .layout-container {
+      padding: 0 !important;
+    }
+  }
+
   .NewThreadForm,
   .CommentEditor {
     width: 100%;
