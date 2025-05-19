@@ -110,14 +110,9 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           },
         };
 
-        console.log(
-          '=== GOING TO AUTHENTICATE with signInOpts: ' +
-            JSON.stringify(signInOpts, null, 2),
-        );
-
         await signIn(session, signInOpts);
 
-        console.log('AUTH WORKED FINE!!!');
+        console.log('Authenticated successfully.');
 
         return true;
       }

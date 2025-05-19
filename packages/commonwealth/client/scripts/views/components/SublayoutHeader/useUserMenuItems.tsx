@@ -119,8 +119,8 @@ const useUserMenuItems = ({
         await logout();
       }
 
-      // it's ok to call this when running outside of the mobile app as nothing
-      // will happen.
+      // when in the mobile, app, logout there too. It's safe to call this
+      // when not in the mobile app.
       privyMobileLogout({}).catch(console.error);
 
       notifySuccess('Signed out');
