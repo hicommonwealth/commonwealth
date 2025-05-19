@@ -64,6 +64,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           return false;
         }
 
+        console.log('Getting privy mobile auth status... ');
+
         const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
         if (!privyMobileAuthStatus.enabled) {
