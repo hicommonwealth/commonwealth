@@ -38,6 +38,13 @@ import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
 
+// Import the event handling utils
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
+
 // New Imports
 import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
 import CWPopover, {
@@ -339,18 +346,34 @@ const StickyInput = (props: StickyInputProps) => {
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
           <>
             <CWTooltip
-              content={'Select AI models to generate replies'}
+              content="Select AI models to generate replies"
               placement="top"
-              renderTrigger={(tooltipInteractionHandler) => (
+              renderTrigger={(tooltipInteractionHandler, isTooltipOpen) => (
                 <button
                   className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
                   onClick={(e) =>
-                    aiModelPopover.handleInteraction(
-                      e as React.MouseEvent<HTMLButtonElement>,
-                    )
+                    handleIconClick({
+                      e,
+                      isMenuOpen: aiModelPopover.open,
+                      isTooltipOpen,
+                      handleInteraction: tooltipInteractionHandler,
+                      onClick: aiModelPopover.handleInteraction,
+                    })
                   }
-                  onMouseEnter={tooltipInteractionHandler}
-                  onMouseLeave={tooltipInteractionHandler}
+                  onMouseEnter={(e) => {
+                    handleMouseEnter({
+                      e,
+                      isMenuOpen: aiModelPopover.open,
+                      handleInteraction: tooltipInteractionHandler,
+                    });
+                  }}
+                  onMouseLeave={(e) => {
+                    handleMouseLeave({
+                      e,
+                      isTooltipOpen,
+                      handleInteraction: tooltipInteractionHandler,
+                    });
+                  }}
                   aria-haspopup="dialog"
                   aria-expanded={aiModelPopover.open}
                   aria-controls={aiModelPopover.id}
