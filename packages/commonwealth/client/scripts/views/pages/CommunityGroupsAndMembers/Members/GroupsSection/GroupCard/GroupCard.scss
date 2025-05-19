@@ -105,8 +105,7 @@
       margin-bottom: 0;
     }
 
-    // Responsive: stack tags under topic name on small screens
-    @media (max-width: 700px) {
+    @include isWindowSmallToMediumInclusive {
       .row,
       .topic-row {
         flex-direction: column;
