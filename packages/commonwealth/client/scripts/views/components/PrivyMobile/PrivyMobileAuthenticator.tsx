@@ -130,9 +130,10 @@ export const PrivyMobileAuthenticator = (props: Props) => {
             'Could not perform authentication: ' + err.message,
             err,
           );
-          privyMobileLogout({
-            error: err.message ?? undefined,
-          }).catch(console.error);
+          // FIXME DO NOT logout for now... unsure where this error is coming from.
+          // privyMobileLogout({
+          //   error: err.message ?? undefined,
+          // }).catch(console.error);
           return false;
         }
       }
