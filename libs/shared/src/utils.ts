@@ -189,11 +189,12 @@ export async function getFileSizeBytes(url: string): Promise<number> {
 
 export const addressSwapper = (options: {
   address: string;
-  currentPrefix: number;
+  currentPrefix: number | undefined | null;
 }): string => {
   if (!options.address) throw new Error('No address provided to swap');
 
-  if (!options.currentPrefix) return options.address;
+  if (options.currentPrefix === undefined || options.currentPrefix === null)
+    return options.address;
 
   if (isU8a(options.address) || isHex(options.address)) {
     throw new Error('address not in SS58 format');
