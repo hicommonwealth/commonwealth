@@ -53,7 +53,8 @@ export const createThreadToken = async ({
     );
   }
 
-  const factoryAddress = commonProtocol.factoryContracts[ethChainId].factory;
+  const factoryAddress =
+    commonProtocol.factoryContracts[ethChainId].postTokenLaunchpad;
   const bondingCurve =
     commonProtocol.factoryContracts[ethChainId].postTokenBondingCurve;
 
@@ -74,7 +75,7 @@ export const createThreadToken = async ({
       chainId.toString(),
       initPurchaseAmount,
       authorAddress,
-      communityTreasuryAddress,
+      (communityTreasuryAddress = '0x0771bf1205506a1d8ad2340dee334c1eb031e48c'),
     );
 
     console.log('Token launch successful:', result);
