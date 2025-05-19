@@ -45,6 +45,9 @@ import {
   handleMouseLeave,
 } from 'views/menus/utils';
 
+// Import ClickAwayListener
+import ClickAwayListener from '@mui/base/ClickAwayListener';
+
 // New Imports
 import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
 import CWPopover, {
@@ -344,72 +347,74 @@ const StickyInput = (props: StickyInputProps) => {
           )}
         />
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-          <>
-            <CWTooltip
-              content="Select AI models to generate replies"
-              placement="top"
-              renderTrigger={(tooltipInteractionHandler, isTooltipOpen) => (
-                <button
-                  className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
-                  onClick={(e) =>
-                    handleIconClick({
-                      e,
-                      isMenuOpen: aiModelPopover.open,
-                      isTooltipOpen,
-                      handleInteraction: tooltipInteractionHandler,
-                      onClick: aiModelPopover.handleInteraction,
-                    })
-                  }
-                  onMouseEnter={(e) => {
-                    handleMouseEnter({
-                      e,
-                      isMenuOpen: aiModelPopover.open,
-                      handleInteraction: tooltipInteractionHandler,
-                    });
-                  }}
-                  onMouseLeave={(e) => {
-                    handleMouseLeave({
-                      e,
-                      isTooltipOpen,
-                      handleInteraction: tooltipInteractionHandler,
-                    });
-                  }}
-                  aria-haspopup="dialog"
-                  aria-expanded={aiModelPopover.open}
-                  aria-controls={aiModelPopover.id}
-                >
-                  <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
-                  {showModelCountBadge && (
-                    <span className="model-count-badge">
-                      {selectedModelValues.length}
-                    </span>
-                  )}
-                </button>
-              )}
-            />
-            <CWPopover
-              {...aiModelPopover}
-              placement="top-end"
-              modifiers={[
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [0, 8],
+          <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
+            <div className="popover-container">
+              <CWTooltip
+                content="Select AI models to generate replies"
+                placement="top"
+                renderTrigger={(tooltipInteractionHandler, isTooltipOpen) => (
+                  <button
+                    className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
+                    onClick={(e) =>
+                      handleIconClick({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                        onClick: aiModelPopover.handleInteraction,
+                      })
+                    }
+                    onMouseEnter={(e) => {
+                      handleMouseEnter({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      handleMouseLeave({
+                        e,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                    aria-haspopup="dialog"
+                    aria-expanded={aiModelPopover.open}
+                    aria-controls={aiModelPopover.id}
+                  >
+                    <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+                    {showModelCountBadge && (
+                      <span className="model-count-badge">
+                        {selectedModelValues.length}
+                      </span>
+                    )}
+                  </button>
+                )}
+              />
+              <CWPopover
+                {...aiModelPopover}
+                placement="top-end"
+                modifiers={[
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
                   },
-                },
-              ]}
-              content={
-                <AIModelSelector
-                  title={AI_SELECTOR_TITLE}
-                  availableModels={availableModels}
-                  selectedModelValues={selectedModelValues}
-                  onSelectionChange={handleModelSelectionChange}
-                  maxSelection={MAX_MODELS_SELECTABLE}
-                  popoverId={aiModelPopover.id}
-                />
-              }
-            />
-          </>
+                ]}
+                content={
+                  <AIModelSelector
+                    title={AI_SELECTOR_TITLE}
+                    availableModels={availableModels}
+                    selectedModelValues={selectedModelValues}
+                    onSelectionChange={handleModelSelectionChange}
+                    maxSelection={MAX_MODELS_SELECTABLE}
+                    popoverId={aiModelPopover.id}
+                  />
+                }
+              />
+            </div>
+          </ClickAwayListener>
         )}
 
         <CWTooltip
