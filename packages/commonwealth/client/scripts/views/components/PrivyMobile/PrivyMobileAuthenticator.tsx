@@ -121,6 +121,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           },
         };
 
+        console.log('Attempting to signIn...');
+
         await signIn(session, signInOpts);
 
         console.log('Authenticated successfully.');
