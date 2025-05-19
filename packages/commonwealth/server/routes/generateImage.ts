@@ -1,5 +1,5 @@
 import { AppError, ServerError, logger } from '@hicommonwealth/core';
-import { DB, generateImage } from '@hicommonwealth/model';
+import { generateImage } from '@hicommonwealth/model';
 import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import { OpenAI } from 'openai';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -49,7 +49,6 @@ type generateImageResp = {
 };
 
 const generateImageHandler = async (
-  models: DB,
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>,
 ) => {

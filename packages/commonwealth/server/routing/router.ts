@@ -117,7 +117,7 @@ function setupRouter(
     'post',
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
-    getUploadSignature.bind(this, models),
+    getUploadSignature.bind(this),
   );
 
   registerRoute(
@@ -130,7 +130,7 @@ function setupRouter(
     }),
     passport.authenticate('jwt', { session: false }),
     aiTieredMiddleware({ images: true }),
-    generateImageHandler.bind(this, models),
+    generateImageHandler.bind(this),
   );
 
   registerRoute(
@@ -185,7 +185,7 @@ function setupRouter(
   );
 
   // logout
-  registerRoute(router, 'get', '/logout', logout.bind(this, models));
+  registerRoute(router, 'get', '/logout', logout.bind(this));
 
   registerRoute(
     router,
