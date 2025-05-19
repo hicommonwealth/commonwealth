@@ -300,7 +300,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
-      case 'LaunchpadTokenCreated': {
+      case 'LaunchpadTokenRecordCreated': {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }

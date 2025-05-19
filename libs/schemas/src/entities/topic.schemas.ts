@@ -8,7 +8,7 @@ export enum TopicWeightedVoting {
   SPL = 'spl',
   SuiNative = 'sui_native',
   SuiToken = 'sui_token',
-  ERC1155ID = 'erc1155id'
+  ERC1155ID = 'erc1155id',
 }
 
 export const Topic = z.object({

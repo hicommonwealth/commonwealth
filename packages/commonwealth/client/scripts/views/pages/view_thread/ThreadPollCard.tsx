@@ -2,7 +2,9 @@ import {
   TopicWeightedVoting,
   Vote as VoteSchema,
 } from '@hicommonwealth/schemas';
+import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type Thread from 'models/Thread';
 import moment from 'moment';
 import React from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
@@ -10,6 +12,7 @@ import useUserStore from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import type Poll from '../../../models/Poll';
+import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
 import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
@@ -17,9 +20,9 @@ import './poll_cards.scss';
 type ActualVoteAttributes = z.infer<typeof VoteSchema>;
 
 type ThreadPollCardProps = {
+  thread?: Thread;
   poll: Poll;
   showDeleteButton?: boolean;
-  isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
   setLocalPoll?: (params) => void;
   tokenDecimals?: number;
@@ -29,18 +32,22 @@ type ThreadPollCardProps = {
     { address: string; name: string; avatarUrl?: string }
   >;
   isLoadingVotes?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadPollCard = ({
+  thread,
   poll,
   showDeleteButton,
-  isTopicMembershipRestricted = false,
   isCreateThreadPage = false,
   setLocalPoll,
   tokenDecimals,
   topicWeight,
   voterProfiles,
   isLoadingVotes,
+  actionGroups,
+  bypassGating,
 }: ThreadPollCardProps) => {
   const user = useUserStore();
 
@@ -52,12 +59,12 @@ export const ThreadPollCard = ({
     threadId: poll.threadId,
   });
 
-  const getTooltipErrorMessage = () => {
-    if (!user.activeAccount)
-      return 'Error: You must join this community to vote.';
-    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
-    return '';
-  };
+  const permissions = Permissions.getGeneralActionPermission({
+    action: GatedActionEnum.UPDATE_POLL,
+    thread: thread!,
+    actionGroups,
+    bypassGating,
+  });
 
   const handleDeletePoll = async () => {
     try {
@@ -164,11 +171,7 @@ export const ThreadPollCard = ({
         isLoadingVotes={isLoadingVotes}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={
-          !user.activeAccount ||
-          isTopicMembershipRestricted ||
-          isCreateThreadPage
-        }
+        disableVoteButton={!permissions.allowed || isCreateThreadPage}
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
@@ -180,7 +183,7 @@ export const ThreadPollCard = ({
         voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={getTooltipErrorMessage()}
+        tooltipErrorMessage={permissions.tooltip}
         onVoteCast={(option, isSelected) => {
           if (option !== undefined) {
             handlePollVote(poll, option, isSelected ?? false);

@@ -357,8 +357,18 @@ describe('community goals lifecycle', () => {
     expect(result).toEqual({
       community_id,
       tags: [
-        { id: tag1!.id!, name: tag1!.name },
-        { id: tag2!.id!, name: tag2!.name },
+        {
+          id: tag1!.id!,
+          name: tag1!.name,
+          created_at: result!.tags[0].created_at,
+          updated_at: result!.tags[0].updated_at,
+        },
+        {
+          id: tag2!.id!,
+          name: tag2!.name,
+          created_at: result!.tags[1].created_at,
+          updated_at: result!.tags[1].updated_at,
+        },
       ],
     });
 

@@ -151,6 +151,7 @@ const eventStreamMappers: EventStreamMappers = {
     };
   },
   LaunchpadTokenCreated: async (payload) => {
+    // TODO: can we find the address without having to load all the details again?
     const { eth_chain_id, transaction_hash } = payload;
     const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
       where: { eth_chain_id },

@@ -1,7 +1,7 @@
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
-import { GroupPermission } from './group-permission.schemas';
+import { GroupGatedAction } from './group-permission.schemas';
 import { Address } from './user.schemas';
 
 const ContractSource = z.object({
@@ -100,7 +100,7 @@ export const Group = z.object({
   is_system_managed: z.boolean().optional(),
 
   // associations
-  GroupPermissions: z.array(GroupPermission).optional(),
+  GroupGatedActions: z.array(GroupGatedAction).optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

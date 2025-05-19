@@ -32,7 +32,7 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
