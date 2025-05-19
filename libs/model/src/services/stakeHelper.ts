@@ -137,57 +137,6 @@ export async function getVotingWeight(
       throw new InvalidState('Insufficient Sui token balance');
     }
     return numTokens;
-  } else if (topic.weighted_voting === TopicWeightedVoting.SPL) {
-    // SPL Token support
-    mustExist('Topic Token Address', topic.token_address);
-    const chainNode = topic.ChainNode || community.ChainNode!;
-    mustExist('Chain Node', chainNode);
-    mustExist('Chain Node Name', chainNode.name);
-
-    const numTokens = await getWeightedSPLTokens(
-      address,
-      topic.token_address,
-      chainNode.name!,
-      topic.vote_weight_multiplier!,
-    );
-    if (numTokens === BigInt(0)) {
-      throw new InvalidState('Insufficient SPL token balance');
-    }
-    return numTokens;
-  } else if (topic.weighted_voting === TopicWeightedVoting.SuiNative) {
-    // Sui Native token support
-    const chainNode = topic.ChainNode || community.ChainNode!;
-    mustExist('Chain Node', chainNode);
-    mustExist('Chain Node Balance Type', chainNode.balance_type);
-    mustExist('Chain Node ID', chainNode.id);
-
-    const numTokens = await getWeightedSuiNativeTokens(
-      address,
-      chainNode.id!,
-      topic.vote_weight_multiplier!,
-    );
-    if (numTokens === BigInt(0)) {
-      throw new InvalidState('Insufficient Sui Native token balance');
-    }
-    return numTokens;
-  } else if (topic.weighted_voting === TopicWeightedVoting.SuiToken) {
-    // Sui Token support
-    const chainNode = topic.ChainNode || community.ChainNode!;
-    mustExist('Chain Node', chainNode);
-    mustExist('Topic Token Address', topic.token_address);
-    mustExist('Chain Node Balance Type', chainNode.balance_type);
-    mustExist('Chain Node ID', chainNode.id);
-
-    const numTokens = await getWeightedSuiTokens(
-      address,
-      topic.token_address!,
-      chainNode.id!,
-      topic.vote_weight_multiplier!,
-    );
-    if (numTokens === BigInt(0)) {
-      throw new InvalidState('Insufficient Sui token balance');
-    }
-    return numTokens;
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC1155ID) {
     // similar to stake voting, but for community nomination token on namespace
     mustExist('Chain Node Eth Chain Id', namespaceChainNode?.eth_chain_id);
