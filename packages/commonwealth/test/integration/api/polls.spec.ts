@@ -107,10 +107,8 @@ describe('Polls', () => {
     });
     expect(res).to.not.be.undefined;
     expect(res?.id).to.not.be.undefined;
-    expect(res).to.contain({
-      prompt: data.prompt,
-      options: data.options,
-    });
+    expect(res?.prompt).to.equal(data.prompt);
+    expect(res?.options).to.deep.equal(data.options);
 
     threadId = thread!.id!;
     pollId = res!.id!;
