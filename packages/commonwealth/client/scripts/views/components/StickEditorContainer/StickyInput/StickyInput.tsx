@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/shared';
+import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -85,20 +85,43 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  const [selectedModelValues, setSelectedModelValues] = useState<string[]>([]);
+  const [selectedModelValues, setSelectedModelValues] = useState<
+    CompletionModel[]
+  >([]);
   const aiModelPopover = usePopover();
 
   const availableModels: ModelOption[] = [
-    { value: 'gpt-4o', label: 'GPT-4o' },
+    { value: 'gpt-4o' as CompletionModel, label: 'GPT-4o' },
+    { value: 'gpt-4o-mini' as CompletionModel, label: 'GPT-4o Mini' },
     {
-      value: 'anthropic/claude-3-7-sonnet',
+      value: 'anthropic/claude-3-7-sonnet' as CompletionModel,
       label: 'Claude 3.7 Sonnet',
     },
-    { value: 'google/gemini-flash-1-5', label: 'Gemini Flash 1.5' },
+    {
+      value: 'anthropic/claude-3-5-sonnet' as CompletionModel,
+      label: 'Claude 3.5 Sonnet',
+    },
+    {
+      value: 'anthropic/claude-3-5-haiku' as CompletionModel,
+      label: 'Claude 3.5 Haiku',
+    },
+    {
+      value: 'anthropic/claude-3-haiku' as CompletionModel,
+      label: 'Claude 3 Haiku',
+    },
+    {
+      value: 'google/gemini-flash-1-5' as CompletionModel,
+      label: 'Gemini Flash 1.5',
+    },
+    {
+      value: 'google/gemini-pro-1-5' as CompletionModel,
+      label: 'Gemini Pro 1.5',
+    },
+    { value: 'google/gemini-pro' as CompletionModel, label: 'Gemini Pro' },
   ];
   const MAX_MODELS_SELECTABLE = 4;
   const AI_SELECTOR_TITLE =
-    'Select up to 4 models to generate a variety of replies';
+    'Select up to 4 models to generate a variety of auto replies';
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -155,8 +178,14 @@ const StickyInput = (props: StickyInputProps) => {
   const handleGenerateAIContent = useCallback(async () => {
     if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
 
+    if (selectedModelValues.length === 0) {
+      notifyError('Please select at least one AI model first');
+      return;
+    }
+
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
+    const modelToUse = selectedModelValues[0];
 
     try {
       if (mode === 'thread') {
@@ -164,12 +193,13 @@ const StickyInput = (props: StickyInputProps) => {
         let lastUpdateTime = Date.now();
 
         await generateCompletion(userPrompt, {
-          model: 'gpt-4o-mini',
+          model: modelToUse,
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
+            notifyError('Failed to generate AI thread content');
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
@@ -192,7 +222,7 @@ const StickyInput = (props: StickyInputProps) => {
         const { systemPrompt, userPrompt } = generateCommentPrompt(context);
 
         await generateCompletion(userPrompt, {
-          model: 'gpt-4o-mini',
+          model: modelToUse,
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
@@ -219,6 +249,7 @@ const StickyInput = (props: StickyInputProps) => {
     parentCommentText,
     setContentDelta,
     webSearchEnabled,
+    selectedModelValues,
   ]);
 
   const getActionPillLabel = () => {
@@ -320,7 +351,7 @@ const StickyInput = (props: StickyInputProps) => {
     setWebSearchEnabled((prev) => !prev);
   };
 
-  const handleModelSelectionChange = (newSelectedValues: string[]) => {
+  const handleModelSelectionChange = (newSelectedValues: CompletionModel[]) => {
     setSelectedModelValues(newSelectedValues);
   };
 

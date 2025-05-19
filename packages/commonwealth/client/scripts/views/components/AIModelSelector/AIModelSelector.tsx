@@ -1,3 +1,4 @@
+import { CompletionModel } from '@hicommonwealth/shared';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
@@ -5,16 +6,15 @@ import './AIModelSelector.scss';
 
 // Define the shape of model options, compatible with CWSelectList
 export interface ModelOption {
-  value: string;
+  value: CompletionModel;
   label: string;
-  // Add other properties if your models have them and CWSelectList needs them
 }
 
 export interface AIModelSelectorProps {
   title: string;
   availableModels: ModelOption[];
-  selectedModelValues: string[];
-  onSelectionChange: (selectedValues: string[]) => void;
+  selectedModelValues: CompletionModel[];
+  onSelectionChange: (selectedValues: CompletionModel[]) => void;
   maxSelection: number;
   popoverId?: string; // For ARIA attributes if needed by the popover trigger
 }
@@ -31,10 +31,10 @@ export const AIModelSelector = ({
     newValue: readonly ModelOption[] | ModelOption | null,
     // actionMeta: ActionMeta<ModelOption> // Available if needed
   ) => {
-    let newSelectedValues: string[] = [];
+    let newSelectedValues: CompletionModel[] = [];
     if (Array.isArray(newValue)) {
       newSelectedValues = newValue.map((option) => option.value);
-    } else if (newValue) {
+    } else if (newValue !== null && 'value' in newValue) {
       // Should be an array if isMulti is true, but handle single object defensively
       newSelectedValues = [newValue.value];
     }
@@ -47,7 +47,7 @@ export const AIModelSelector = ({
     }
   };
 
-  // Convert array of selected string values back to array of ModelOption objects for CWSelectList
+  // Convert array of selected model values back to array of ModelOption objects for CWSelectList
   const currentValueForSelect = availableModels.filter((model) =>
     selectedModelValues.includes(model.value),
   );
@@ -70,6 +70,7 @@ export const AIModelSelector = ({
         onChange={handleChange}
         placeholder="Select models..."
         className="AIModelSelector__selectList"
+        menuPlacement="top"
         closeMenuOnSelect={false} // Keep menu open for easier multi-selection
         hideSelectedOptions={false} // Continue to show selected options in the list
         // components={{ Option: CustomOptionWithCheckbox }} // Future: Add if checkboxes are desired
