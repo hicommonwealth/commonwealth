@@ -427,3 +427,19 @@ export const GetRoles = {
   ),
   context: AuthContext,
 };
+
+export const GetNamespaceMetadata = {
+  input: z.object({
+    namespace: z.string(),
+    stake_id: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  output: z.object({
+    name: z.string(),
+    image: z.string().nullish(),
+  }),
+};
+
+export const GetByDomain = {
+  input: z.object({ custom_domain: z.string() }),
+  output: z.object({ community_id: z.string().optional() }),
+};

@@ -125,3 +125,11 @@ export const UpdateResourceTimestamps = {
 };
 
 export type Type1 = z.infer<typeof TriggerNotificationsWorkflow.input>;
+
+export const UpdateSiteAdmin = {
+  input: z.object({
+    address: z.string(),
+    is_admin: z.boolean(),
+  }),
+  output: z.boolean(),
+};

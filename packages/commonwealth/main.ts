@@ -26,7 +26,6 @@ import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
 import { config } from './server/config';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
@@ -227,12 +226,7 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  // Declare Validation Middleware Service
-  // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(db);
-
-  setupAPI('/api', app, db, dbValidationService, cacheDecorator);
+  setupAPI(app, cacheDecorator);
 
   app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/.well-known/assetlinks.json`);

@@ -123,14 +123,19 @@ export const UpdateSettings = {
   context: VerifiedContext,
 };
 
-export const GetAddressStatus = {
+export const UpdateEmail = {
   input: z.object({
-    community_id: z.string(),
-    address: z.string(),
+    email: z.string().email(),
   }),
-  output: z.object({
-    exists: z.boolean(),
-    belongs_to_user: z.boolean(),
+  output: User.extend({ email: z.string(), update_token: z.string() }),
+  context: VerifiedContext,
+};
+
+export const FinishUpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+    token: z.string(),
   }),
+  output: z.object({ redirect_path: z.string() }),
   context: VerifiedContext,
 };

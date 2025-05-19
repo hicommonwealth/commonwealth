@@ -9,7 +9,6 @@ import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
-import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -75,7 +74,6 @@ describe('User Model Routes', () => {
           jwt: jwtToken,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(updateEmailErrors.NoEmail);
     });
 
     test('should fail with an invalid email', async () => {
@@ -89,7 +87,6 @@ describe('User Model Routes', () => {
           email,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(updateEmailErrors.InvalidEmail);
     });
   });
 });

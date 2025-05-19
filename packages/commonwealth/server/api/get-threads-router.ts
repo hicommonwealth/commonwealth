@@ -2,71 +2,30 @@ import { AppError, query } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
+import { PaginationQueryParams, success } from 'server/types';
+import { formatErrorPretty } from 'server/util/errorFormat';
 import { z } from 'zod';
-import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
-import {
-  PaginationQueryParams,
-  TypedRequestQuery,
-  TypedResponse,
-  success,
-} from '../../types';
-import { formatErrorPretty } from '../../util/errorFormat';
 
 const Errors = {
-  UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
-  InvalidThreadId: 'Invalid thread ID',
-  InvalidCommunityId: 'Invalid community ID',
   NoCommunity: 'No community resolved to execute search',
 };
 
-export type GetThreadsRequestQuery = {
-  community_id: string;
-  bulk?: string;
-  active?: string;
-  search?: string;
-  count?: boolean;
-};
-export type ActiveThreadsRequestQuery = {
+type ActiveThreadsRequestQuery = {
   threads_per_topic: string;
   withXRecentComments?: number;
 };
-export type SearchThreadsRequestQuery = {
+
+type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
   order_by?: 'last_active' | 'rank' | 'created_at' | 'profile_name';
 } & PaginationQueryParams;
-export type BulkThreadsRequestQuery = {
-  topic_id: string;
-  stage?: string;
-  includePinnedThreads?: string;
-  limit?: string;
-  page?: string;
-  orderBy?: string;
-  from_date?: string;
-  to_date?: string;
-  archived?: string;
-  withXRecentComments?: number;
-};
-export type CountThreadsRequestQuery = {
-  limit?: number;
-};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GetThreadsResponse = any;
 
-export const getThreadsHandler = async (
-  req: TypedRequestQuery<
-    GetThreadsRequestQuery &
-      (
-        | ActiveThreadsRequestQuery
-        | SearchThreadsRequestQuery
-        | BulkThreadsRequestQuery
-        | CountThreadsRequestQuery
-      )
-  >,
-  res: TypedResponse<GetThreadsResponse>,
-) => {
+export const get_threads_router = async (req, res) => {
   const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
@@ -82,7 +41,6 @@ export const getThreadsHandler = async (
   if (bulk) {
     const bulkQueryValidationResult =
       schemas.DEPRECATED_GetBulkThreads.safeParse(req.query);
-
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));
     }
@@ -146,10 +104,10 @@ export const getThreadsHandler = async (
     const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
 
-    if (!req.community && community_id !== ALL_COMMUNITIES) {
-      // if no community resolved, ensure that client explicitly requested all communities
-      throw new AppError(Errors.NoCommunity);
-    }
+    // if (!req.community && community_id !== ALL_COMMUNITIES) {
+    //   // if no community resolved, ensure that client explicitly requested all communities
+    //   throw new AppError(Errors.NoCommunity);
+    // }
 
     const searchResults = await query(Thread.SearchThreads(), {
       actor: { user: { email: '' } },
