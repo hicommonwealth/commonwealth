@@ -6,6 +6,7 @@ import {
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireMembersGoalCount,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import {
@@ -22,7 +23,8 @@ export type ContentIdType =
   | 'tweet_url'
   | 'discord_server_id'
   | 'chain'
-  | 'threshold';
+  | 'threshold'
+  | 'goal';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -35,6 +37,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
+    if (doesActionRequireMembersGoalCount(action as QuestAction))
+      return QuestActionContentIdScope.MemberGoalCount;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
     if (doesActionAllowChainId(action as QuestAction))
@@ -54,6 +58,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
+    case 'goal':
+      return QuestActionContentIdScope.MemberGoalCount;
     case 'chain':
       return QuestActionContentIdScope.Chain;
     case 'group':
@@ -76,6 +82,9 @@ export const buildContentIdFromIdentifier = (
     return `${idType}:${identifier}`;
   }
   if (idType === 'threshold') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'goal') {
     return `${idType}:${identifier}`;
   }
 
@@ -149,6 +158,9 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'threshold') {
     return `${idOrURL}`;
   }
+  if (idType === 'goal') {
+    return `${idOrURL}`;
+  }
 
   return '';
 };
@@ -162,6 +174,7 @@ export const doesConfigAllowContentIdField = (
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
+    config?.requires_members_goal_count ||
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
     config?.with_optional_token_trade_threshold

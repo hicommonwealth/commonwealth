@@ -16,6 +16,7 @@ export enum QuestActionContentIdScope {
   Chain = 'chain',
   Group = 'group',
   TokenTradeThreshold = 'threshold',
+  MemberGoalCount = 'goal',
 }
 
 export type QuestActionSubFormErrors = {
@@ -78,6 +79,7 @@ export type QuestActionSubFormConfig = {
   with_optional_comment_id: boolean;
   requires_twitter_tweet_link: boolean;
   requires_discord_server_id: boolean;
+  requires_members_goal_count: boolean;
   requires_chain_event: boolean;
   with_optional_chain_id: boolean;
   requires_group_id: boolean;

@@ -29,6 +29,7 @@ const ContentIdInput = ({
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
       tokenThresholdAmount: '0.00001',
+      membersGoalCount: 'Enter desired member count',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -39,6 +40,7 @@ const ContentIdInput = ({
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
       tokenThresholdAmount: 'Min ETH Trade Amount (optional)',
+      membersGoalCount: 'Members Goal Count',
     },
     instructionalMessages: {
       threadId: '',
@@ -50,6 +52,8 @@ const ContentIdInput = ({
       groupId: '',
       tokenThresholdAmount:
         'Aura is awarded after this amount of token is traded',
+      membersGoalCount:
+        'Aura is awarded to existing members after goal is reached',
     },
   };
 
@@ -96,6 +100,15 @@ const ContentIdInput = ({
         placeholder: inputConfig.placeholders.discordServerId,
         instructionalMessages:
           inputConfig.instructionalMessages.discordServerId,
+      };
+    }
+
+    if (config?.requires_members_goal_count) {
+      return {
+        label: inputConfig.labels.membersGoalCount,
+        placeholder: inputConfig.placeholders.membersGoalCount,
+        instructionalMessages:
+          inputConfig.instructionalMessages.membersGoalCount,
       };
     }
 

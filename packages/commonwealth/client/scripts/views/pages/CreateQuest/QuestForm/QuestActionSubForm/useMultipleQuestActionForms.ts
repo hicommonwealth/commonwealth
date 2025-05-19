@@ -12,6 +12,7 @@ import {
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireMembersGoalCount,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -159,6 +160,8 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerId =
         doesActionRequireDiscordServerId(chosenAction);
+      const requiresMembersGoalCount =
+        doesActionRequireMembersGoalCount(chosenAction);
       const requiresGroupId =
         allowsContentId && doesActionRequireGroupId(chosenAction);
       const allowsTokenTradeThreshold =
@@ -180,6 +183,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_chain_event: doesActionRequireChainEvent(chosenAction),
         requires_discord_server_id: requiresDiscordServerId,
+        requires_members_goal_count: requiresMembersGoalCount,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
@@ -240,6 +244,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.TokenTradeThreshold;
           break;
         }
+        case 'CommunityGoalReached': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.MemberGoalCount;
+          break;
+        }
         default: {
           break;
         }
@@ -262,6 +271,9 @@ const useQuestActionMultiFormsState = ({
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
             !requiresDiscordServerId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.MemberGoalCount &&
+            !requiresMembersGoalCount) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Chain &&
             !allowsChainId) ||

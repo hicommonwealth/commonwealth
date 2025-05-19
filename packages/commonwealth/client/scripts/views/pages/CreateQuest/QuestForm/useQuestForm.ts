@@ -21,6 +21,7 @@ import {
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
+  doesActionRequireMembersGoalCount,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -64,6 +65,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'MembershipsRefreshed',
       'LaunchpadTokenCreated',
       'LaunchpadTokenTraded',
+      'CommunityGoalReached',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
@@ -145,6 +147,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerId(chosenAction),
+                  requires_members_goal_count:
+                    allowsContentId &&
+                    doesActionRequireMembersGoalCount(chosenAction),
                   requires_chain_event:
                     doesActionRequireChainEvent(chosenAction),
                   with_optional_chain_id:
@@ -258,6 +263,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Topic) return 'topic';
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
+        if (scope === QuestActionContentIdScope.MemberGoalCount) return 'goal';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }
@@ -541,6 +547,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             };
           }
           setQuestActionSubForms([...tempForm]);
+          return;
+        }
+        if (error.inclues('community id is required when setting goals')) {
+          notifyError(
+            `Community scope is required for setting a community goal`,
+          );
           return;
         }
         notifyError(`Failed to ${mode} quest!`);
