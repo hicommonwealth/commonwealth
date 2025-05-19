@@ -32,7 +32,9 @@ import {
 import {
   createDeltaFromText,
   ReactQuillEditor,
+  getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { countLinesQuill } from 'views/components/react_quill_editor/utils';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
@@ -55,6 +57,7 @@ const StickyInput = (props: StickyInputProps) => {
     contentDelta,
     thread: originalThread,
     parentCommentText,
+    canComment,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
@@ -251,6 +254,7 @@ const StickyInput = (props: StickyInputProps) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (
       event.key === 'Enter' &&
+      !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
       (!isTurnstileEnabled || turnstileToken)
@@ -272,6 +276,16 @@ const StickyInput = (props: StickyInputProps) => {
       }
     }
   }, [isExpanded, openModalOnExpand, mode]);
+
+  useEffect(() => {
+    if (isExpanded) return;
+
+    const lines = countLinesQuill(contentDelta);
+
+    if (lines >= 5) {
+      setIsExpanded(true);
+    }
+  }, [contentDelta, isExpanded, setIsExpanded]);
 
   // Add toggle handler for the AI auto reply feature
   const handleToggleAiAutoReply = (e: React.MouseEvent) => {
@@ -347,6 +361,7 @@ const StickyInput = (props: StickyInputProps) => {
                 customHandleSubmitComment().catch(console.error);
               }}
               disabled={
+                !canComment ||
                 !contentDelta?.ops?.length ||
                 (isTurnstileEnabled && !turnstileToken)
               }
@@ -434,6 +449,7 @@ const StickyInput = (props: StickyInputProps) => {
                   className="sticky-editor"
                   contentDelta={props.contentDelta}
                   setContentDelta={props.setContentDelta}
+                  isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
                   placeholder={
                     mode === 'thread'
