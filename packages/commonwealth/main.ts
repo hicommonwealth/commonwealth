@@ -112,7 +112,6 @@ export async function main(
     app.use((req, res, next) => {
       const contentLength = parseInt(req.headers['content-length'] || '0', 10);
       if (contentLength > 1024 * 1024) {
-        // 1MB in bytes
         return res.status(413).json({ error: 'Request entity too large' });
       }
       next();
