@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { useReactNativeWebView } from '../useReactNativeWebView';
 
+const ENABLE_TRACE = false;
+
 type EvenSubscribeMessage = {
   $id: string;
   type: string;
@@ -43,7 +45,9 @@ export function useMobileRPCEventReceiver<EventData>(type: string) {
         );
 
         if (eventUpdateMessage?.$id === $id) {
-          console.log('Got event update: ', eventUpdateMessage);
+          if (ENABLE_TRACE) {
+            console.log('Got event update: ', eventUpdateMessage);
+          }
           listener(eventUpdateMessage.data);
         }
       }

@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 
+const ENABLE_TRACE = false;
+
 type ProtoError = {
   message: string;
 };
@@ -52,10 +54,12 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
           );
 
           if (protoResponse?.$id === $id) {
-            console.log(
-              'Got proto response: ',
-              JSON.stringify(protoResponse, null, 2),
-            );
+            if (ENABLE_TRACE) {
+              console.log(
+                'Got proto response: ',
+                JSON.stringify(protoResponse, null, 2),
+              );
+            }
 
             if (protoResponse.error) {
               reject(protoResponse.error);

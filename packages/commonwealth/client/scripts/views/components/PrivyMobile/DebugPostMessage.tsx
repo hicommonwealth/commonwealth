@@ -4,6 +4,10 @@ type Props = {
   children: React.ReactNode;
 };
 
+/**
+ * Debugger which listens to all postMessage traffic which can help us debug
+ * protocol issues between react-native and the browser.
+ */
 export const DebugPostMessage = memo(function DebugPostMessage(props: Props) {
   const { children } = props;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
