@@ -35,6 +35,7 @@ export function useMobileRPCEventReceiver<EventData>(type: string) {
 
       reactNativeWebView.postMessage(JSON.stringify(subscription));
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function handler(message: MessageEvent<any>) {
         const eventUpdateMessage = toEventUpdateMessage<EventData>(
           type,
@@ -55,6 +56,7 @@ export function useMobileRPCEventReceiver<EventData>(type: string) {
 
 function toEventUpdateMessage<EventData>(
   type: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 ): EventUpdateMessage<EventData> | null {
   const obj = messageToObject(data);
@@ -66,6 +68,7 @@ function toEventUpdateMessage<EventData>(
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function messageToObject(message: string | any): any | null {
   if (message === 'string') {
     try {

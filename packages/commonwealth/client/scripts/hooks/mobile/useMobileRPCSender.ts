@@ -83,6 +83,7 @@ export function useMobileRPCSender<Request, Response>(opts: Opts) {
 
 function toProtoResponse<Response>(
   type: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 ): ProtoResponseObject<Response> | null {
   const obj = messageToObject(data);
@@ -94,6 +95,7 @@ function toProtoResponse<Response>(
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function messageToObject(message: string | any): any | null {
   if (message === 'string') {
     try {
