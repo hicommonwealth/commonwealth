@@ -340,19 +340,20 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [isExpanded, openModalOnExpand, mode]);
 
-  // Add toggle handler for the AI auto reply feature
-  const handleToggleAiAutoReply = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+  const handleModelSelectionChange = (newSelectedValues: CompletionModel[]) => {
+    setSelectedModelValues(newSelectedValues);
+
+    // Automatically enable/disable AI comments toggle based on model selection
+    if (newSelectedValues.length > 0 && !aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(true);
+    } else if (newSelectedValues.length === 0 && aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(false);
+    }
   };
 
   const handleToggleWebSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
     setWebSearchEnabled((prev) => !prev);
-  };
-
-  const handleModelSelectionChange = (newSelectedValues: CompletionModel[]) => {
-    setSelectedModelValues(newSelectedValues);
   };
 
   const renderStickyInput = () => {
