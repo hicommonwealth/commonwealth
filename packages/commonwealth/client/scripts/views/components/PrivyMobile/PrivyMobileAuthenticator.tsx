@@ -51,84 +51,107 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
   useEffect(() => {
     async function doAsync() {
-      if (!window.PRIVY_MOBILE_ENABLED) {
-        // only attempt to authenticate when running in the mobile app and
-        // privy is enabled.
-        return;
-      }
+      async function doLogin(): Promise<boolean> {
+        if (!window.PRIVY_MOBILE_ENABLED) {
+          // only attempt to authenticate when running in the mobile app and
+          // privy is enabled.
+          return false;
+        }
 
-      if (user.isLoggedIn) {
-        // we're already authenticated so there's nothing to do...
-        return;
-      }
+        if (user.isLoggedIn) {
+          // we're already authenticated so there's nothing to do...
+          return false;
+        }
 
-      const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
+        const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
-      if (!privyMobileAuthStatus.enabled) {
-        return;
-      }
+        if (!privyMobileAuthStatus.enabled) {
+          return false;
+        }
 
-      if (
-        !privyMobileAuthStatus.authenticated ||
-        !privyMobileAuthStatus.userAuth
-      ) {
-        return;
-      }
+        if (
+          !privyMobileAuthStatus.authenticated ||
+          !privyMobileAuthStatus.userAuth
+        ) {
+          return false;
+        }
 
-      const webWallet = new PrivyEthereumWebWalletController(
-        ethereumProvider,
-        signMessageProvider,
-      );
-
-      await webWallet.enable();
-
-      const session = await getSessionFromWallet(webWallet, {
-        newSession: true,
-      });
-
-      const ssoProvider = privyMobileAuthStatus.userAuth.ssoProvider
-        ? toSignInProvider(privyMobileAuthStatus.userAuth.ssoProvider)
-        : undefined;
-
-      if (!ssoProvider) {
-        console.warn(
-          'Unable to compute the sign in ssoProvider for ' +
-            privyMobileAuthStatus.userAuth.ssoProvider,
+        const webWallet = new PrivyEthereumWebWalletController(
+          ethereumProvider,
+          signMessageProvider,
         );
+
+        await webWallet.enable();
+
+        const session = await getSessionFromWallet(webWallet, {
+          newSession: true,
+        });
+
+        const ssoProvider = privyMobileAuthStatus.userAuth.ssoProvider
+          ? toSignInProvider(privyMobileAuthStatus.userAuth.ssoProvider)
+          : undefined;
+
+        if (!ssoProvider) {
+          console.warn(
+            'Unable to compute the sign in ssoProvider for ' +
+              privyMobileAuthStatus.userAuth.ssoProvider,
+          );
+        }
+
+        const signInOpts = {
+          address: privyMobileAuthStatus.userAuth.address,
+          community_id: ChainBase.Ethereum,
+          wallet_id: WalletId.Privy,
+          privy: {
+            identityToken: privyMobileAuthStatus.userAuth.identityToken,
+            ssoOAuthToken: privyMobileAuthStatus.userAuth.ssoOAuthToken,
+            ssoProvider,
+          },
+        };
+
+        console.log(
+          '=== GOING TO AUTHENTICATE with signInOpts: ' +
+            JSON.stringify(signInOpts, null, 2),
+        );
+
+        await signIn(session, signInOpts);
+
+        return true;
       }
 
-      const signInOpts = {
-        address: privyMobileAuthStatus.userAuth.address,
-        community_id: ChainBase.Ethereum,
-        wallet_id: WalletId.Privy,
-        privy: {
-          identityToken: privyMobileAuthStatus.userAuth.identityToken,
-          ssoOAuthToken: privyMobileAuthStatus.userAuth.ssoOAuthToken,
-          ssoProvider,
-        },
-      };
+      /**
+       * Perform auth with exception handling.
+       */
+      async function login(): Promise<boolean> {
+        try {
+          return await doLogin();
+        } catch (err) {
+          console.error(
+            'Could not perform authentication: ' + err.message,
+            err,
+          );
+          privyMobileLogout({
+            error: err.message ?? undefined,
+          }).catch(console.error);
+          return false;
+        }
+      }
 
-      console.log(
-        '=== GOING TO AUTHENTICATE with signInOpts: ' +
-          JSON.stringify(signInOpts, null, 2),
-      );
-      await signIn(session, signInOpts);
+      const authenticated = await login();
 
-      // FIXME I think THIS is the bug because it has a reload within a catch
-      // block..
-      const landingURL = new URL(
-        '/dashboard/for-you',
-        window.location.href,
-      ).toString();
-      document.location.href = landingURL;
+      if (authenticated) {
+        // NOTE this section reloads the app so we have to break it out of the
+        // main try/catch loop or when the page reloads we get weird/unusual
+        // behavior.
+        const landingURL = new URL(
+          '/dashboard/for-you',
+          window.location.href,
+        ).toString();
+        document.location.href = landingURL;
+      }
     }
 
-    doAsync().catch((err) => {
-      console.error('Could not perform authentication: ' + err.message, err);
-      privyMobileLogout({
-        error: err.message ?? undefined,
-      }).catch(console.error);
-    });
+    doAsync().catch(console.error);
   }, [
     user,
     ethereumProvider,
