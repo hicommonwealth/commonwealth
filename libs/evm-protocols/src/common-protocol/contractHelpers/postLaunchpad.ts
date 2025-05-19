@@ -55,8 +55,8 @@ export const launchPostToken = async (
         totalSupply,
         curveId,
         scalar,
-        0x0000000000000000000000000000000000000000, // No LP hook
-        0x0000000000000000000000000000000000000000, // No TCM
+        '0x0000000000000000000000000000000000000000', // No LP hook
+        '0x0000000000000000000000000000000000000000', // No TCM
         connectorWeight,
         threadId,
         exchangeToken,
