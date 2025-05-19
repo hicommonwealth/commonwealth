@@ -77,6 +77,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           return false;
         }
 
+        console.log('Starting Privy authentication ...');
+
         const webWallet = new PrivyEthereumWebWalletController(
           ethereumProvider,
           signMessageProvider,
