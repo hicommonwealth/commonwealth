@@ -14,6 +14,7 @@ export const DebugMobile = memo(function DebugMobile() {
 
   const [signature, setSignature] = useState<string | undefined>();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [accounts, setAccounts] = useState<any | undefined>();
   const [notificationPermissions, setNotificationPermissions] = useState<
     string | undefined

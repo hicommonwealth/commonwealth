@@ -38,6 +38,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   const walletOn = usePrivyEthereumWalletOn();
   const signMessage = usePrivyMobileSignMessage();
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const ethereumProvider = useCallback(async () => {
     return { request: walletRequest, on: walletOn };
   }, [walletOn, walletRequest]);

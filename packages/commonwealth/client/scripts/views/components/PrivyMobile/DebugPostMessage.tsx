@@ -6,6 +6,7 @@ type Props = {
 
 export const DebugPostMessage = memo(function DebugPostMessage(props: Props) {
   const { children } = props;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handler = useCallback((message: MessageEvent<any>) => {
     console.log('GOT POST MESSAGE' + JSON.stringify(message.data, null, 2));
   }, []);
