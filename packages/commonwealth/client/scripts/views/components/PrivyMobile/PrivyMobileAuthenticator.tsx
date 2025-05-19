@@ -1,7 +1,7 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/privy_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
-import React, { ReactNode, useCallback, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useSignIn } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { LoadingIndicatorScreen } from 'views/components/LoadingIndicatorScreen';
@@ -29,6 +29,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   const { children } = props;
   const getPrivyMobileAuthStatus = usePrivyMobileAuthStatus();
   const privyMobileLogout = usePrivyMobileLogout();
+  const authenticatingRef = useRef(false);
 
   const { signIn } = useSignIn();
 
@@ -79,7 +80,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           return false;
         }
 
+        if (authenticatingRef.current) {
+          console.log('Already authenticating...');
+          return false;
+        }
+
         console.log('Starting Privy authentication ...');
+        authenticatingRef.current = true;
 
         const webWallet = new PrivyEthereumWebWalletController(
           ethereumProvider,
