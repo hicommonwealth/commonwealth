@@ -1,5 +1,6 @@
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
 import React from 'react';
+import { CWText } from '../component_kit/cw_text';
 import './AIModelSelector.scss';
 
 // Define the shape of model options, compatible with CWSelectList
@@ -59,7 +60,9 @@ export const AIModelSelector = ({
       aria-modal="false" // If it doesn't trap focus like a modal
       aria-label={title}
     >
-      <h4 className="AIModelSelector__title">{title}</h4>
+      <CWText className="AIModelSelector__title" type="b2">
+        {title}
+      </CWText>
       <CWSelectList<ModelOption, true> // Explicitly type Option as ModelOption and IsMulti as true
         isMulti
         options={availableModels}

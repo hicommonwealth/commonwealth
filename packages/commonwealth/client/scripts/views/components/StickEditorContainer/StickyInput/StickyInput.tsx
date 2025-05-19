@@ -85,7 +85,6 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  // New State and Definitions
   const [selectedModelValues, setSelectedModelValues] = useState<string[]>([]);
   const aiModelPopover = usePopover();
 
@@ -99,8 +98,7 @@ const StickyInput = (props: StickyInputProps) => {
   ];
   const MAX_MODELS_SELECTABLE = 4;
   const AI_SELECTOR_TITLE =
-    'Select up to 4 models to generate a variety of replies to your post';
-  // End New State and Definitions
+    'Select up to 4 models to generate a variety of replies';
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -378,9 +376,6 @@ const StickyInput = (props: StickyInputProps) => {
                         handleInteraction: tooltipInteractionHandler,
                       });
                     }}
-                    aria-haspopup="dialog"
-                    aria-expanded={aiModelPopover.open}
-                    aria-controls={aiModelPopover.id}
                   >
                     <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
                     {showModelCountBadge && (
@@ -393,7 +388,7 @@ const StickyInput = (props: StickyInputProps) => {
               />
               <CWPopover
                 {...aiModelPopover}
-                placement="top-end"
+                placement="top"
                 modifiers={[
                   {
                     name: 'offset',

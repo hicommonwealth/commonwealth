@@ -1,3 +1,4 @@
+@import '../../../styles/shared';
 .AIModelSelector {
   padding: 12px 16px;
   background-color: $white;
@@ -8,9 +9,9 @@
   max-width: 400px;
 
   &__title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
-    color: $neutral-800;
+    color: $neutral-500;
     margin-top: 0;
     margin-bottom: 12px;
   }
