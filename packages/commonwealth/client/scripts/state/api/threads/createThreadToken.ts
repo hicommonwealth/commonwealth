@@ -7,7 +7,7 @@ export interface CreateThreadTokenProps {
   symbol: string;
   threadId: number;
   initPurchaseAmount: number;
-  chainId: string;
+  chainId: number;
   walletAddress: string;
   authorAddress: string;
   communityTreasuryAddress: string;
@@ -71,7 +71,7 @@ export const createThreadToken = async ({
       walletAddress,
       threadId,
       paymentTokenAddress,
-      chainId,
+      chainId.toString(),
       initPurchaseAmount,
       authorAddress,
       communityTreasuryAddress,

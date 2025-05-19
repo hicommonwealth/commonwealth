@@ -388,13 +388,18 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           return;
         }
 
+        if (!community?.ChainNode?.id) {
+          notifyError('chainId not found');
+          return;
+        }
+
         const data = await createThreadToken({
           name: effectiveTitle,
           symbol: effectiveTitle.substring(0, 4).toUpperCase(),
           threadId: thread.id!,
           ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
           initPurchaseAmount: 1e18,
-          chainId: community.ChainNode?.eth_chain_id?.toString() || '',
+          chainId: community.ChainNode?.id,
           walletAddress: userSelectedAddress,
           authorAddress: userSelectedAddress,
           communityTreasuryAddress:
