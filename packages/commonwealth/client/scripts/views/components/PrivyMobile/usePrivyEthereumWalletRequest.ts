@@ -2,6 +2,7 @@ import { useMobileRPCSender } from 'hooks/mobile/useMobileRPCSender';
 
 type RequestArguments = {
   method: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: Array<any> | undefined;
 };
 
