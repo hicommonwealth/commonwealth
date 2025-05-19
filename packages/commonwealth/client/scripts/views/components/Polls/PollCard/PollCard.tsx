@@ -136,7 +136,7 @@ export const PollCard = ({
       };
     });
 
-    const filename = `${proposalTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_votes.csv`;
+    const filename = `${proposalTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${moment().format('YYYYMMDD_HHmmss')}_votes.csv`;
     downloadCSV(csvData, filename);
   };
 

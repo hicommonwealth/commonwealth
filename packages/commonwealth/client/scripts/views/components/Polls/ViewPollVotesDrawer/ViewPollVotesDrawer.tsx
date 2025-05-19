@@ -12,7 +12,6 @@ import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CW
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { User } from 'views/components/user/user';
 import { z } from 'zod'; // Needed for z.infer
-// import { downloadAsCsv } from 'helpers/csv'; // We'll need a CSV helper
 
 import './ViewPollVotesDrawer.scss';
 
@@ -141,7 +140,7 @@ export const ViewPollVotesDrawer = ({
   const rowData = useMemo(() => {
     if (isLoading || !votes) return [];
     return votes.map(voterRow);
-  }, [votes, pollOptionsSummary, isLoading]); // Use renamed prop in dependency array
+  }, [votes, pollOptionsSummary, isLoading, voterRow]);
 
   // Calculate percentage breakdown for display.
   const percentageBreakdown = useMemo(() => {

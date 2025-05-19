@@ -187,8 +187,8 @@ export const ThreadPollCard = ({
           }
         }}
         onResultsClick={(e) => {
-          if (e && poll.votes.length === 0) {
-          }
+          if (!(e && poll.votes.length === 0)) return;
+          // No-op: No votes to show, so do nothing
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
