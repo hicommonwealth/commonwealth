@@ -114,6 +114,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
       );
       await signIn(session, signInOpts);
 
+      // FIXME I think THIS is the bug because it has a reload within a catch
+      // block..
       const landingURL = new URL(
         '/dashboard/for-you',
         window.location.href,
