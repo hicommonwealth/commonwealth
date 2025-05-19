@@ -1,8 +1,11 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
-import { PrivySignInSSOProvider } from 'views/components/Privy/types';
+import {
+  OAuthProvider,
+  PrivySignInSSOProvider,
+} from 'views/components/Privy/types';
 
 export function toSignInProvider(
-  provider: WalletSsoSource,
+  provider: WalletSsoSource | OAuthProvider,
 ): PrivySignInSSOProvider {
   switch (provider) {
     case 'google':
