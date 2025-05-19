@@ -187,17 +187,17 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           <CWGrid>
             <div className="thread-list-container">
               <EntriesTab {...entriesTabProps} />
-              {isJudgedContest && (
-                <JudgesTab
-                  contestAddress={contestAddress}
-                  judges={judgeAddresses}
-                />
-              )}
             </div>
-            {address ? (
+            {address || isJudgedContest ? (
               <div>
                 <TokenSwapTab />
                 <PriceChartTab />
+                {isJudgedContest && (
+                  <JudgesTab
+                    contestAddress={contestAddress}
+                    judges={judgeAddresses}
+                  />
+                )}
               </div>
             ) : null}
           </CWGrid>

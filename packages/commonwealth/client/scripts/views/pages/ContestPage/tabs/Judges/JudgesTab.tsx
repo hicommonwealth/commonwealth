@@ -1,5 +1,3 @@
-import { formatAddressShort } from 'helpers';
-import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { useGetMembersQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
@@ -10,12 +8,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import {
-  CWTable,
-  CWTableColumnInfo,
-} from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { User } from 'views/components/user/user';
 import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/ManageOnchainModal';
@@ -51,54 +43,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       })
     : false;
 
-  const columns: CWTableColumnInfo[] = [
-    {
-      key: 'name',
-      header: 'Judge',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'address',
-      header: 'Address',
-      numeric: false,
-      sortable: true,
-    },
-  ];
-
-  const searchResultColumns: CWTableColumnInfo[] = [
-    {
-      key: 'name',
-      header: 'Username',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'address',
-      header: 'Address',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'action',
-      header: 'Action',
-      numeric: false,
-      sortable: false,
-    },
-  ];
-
-  const tableState = useCWTableState({
-    columns,
-    initialSortColumn: 'name',
-    initialSortDirection: APIOrderDirection.Asc,
-  });
-
-  const searchTableState = useCWTableState({
-    columns: searchResultColumns,
-    initialSortColumn: 'name',
-    initialSortDirection: APIOrderDirection.Asc,
-  });
-
   const { data: members, isLoading } = useGetMembersQuery({
     community_id: communityId,
     allowedAddresses: optimisticJudges.join(','),
@@ -116,34 +60,22 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       searchByNameAndAddress: true,
     });
 
-  const judgeData = (members?.pages[0]?.results || [])
+  const judgeList = (members?.pages[0]?.results || [])
     .filter((member) => optimisticJudges.includes(member.addresses[0]?.address))
     .map((member) => {
       const address = member.addresses[0]?.address || '';
-
       return {
-        name: {
-          customElement: (
-            <User
-              userAddress={address}
-              userCommunityId={communityId}
-              shouldLinkProfile={true}
-              shouldShowRole={false}
-              avatarSize={24}
-            />
-          ),
-          sortValue: member.profile_name || address,
-        },
-        address: {
-          customElement: (
-            <CWTag
-              label={formatAddressShort(address)}
-              type="address"
-              iconName="ethereum"
-            />
-          ),
-          sortValue: address,
-        },
+        user: (
+          <User
+            shouldShowAddressWithDisplayName={true}
+            userAddress={address}
+            userCommunityId={communityId}
+            shouldLinkProfile={true}
+            shouldShowRole={false}
+            avatarSize={24}
+          />
+        ),
+        key: address,
       };
     });
 
@@ -152,7 +84,7 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       (member) => !optimisticJudges.includes(member.addresses[0].address),
     ) || [];
 
-  const searchResultsData = filteredSearchResults.map((member) => {
+  const searchList = filteredSearchResults.map((member) => {
     const address = member.addresses[0]?.address || '';
     const addressInfo = member.addresses.map((addr) => ({
       id: addr.id || 0,
@@ -161,44 +93,29 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       stake_balance: 0,
       role: 'member',
     }));
-
     return {
-      name: {
-        customElement: (
-          <User
-            userAddress={address}
-            userCommunityId={communityId}
-            shouldLinkProfile={true}
-            shouldShowRole={false}
-            avatarSize={24}
-          />
-        ),
-        sortValue: member.profile_name || address,
-      },
-      address: {
-        customElement: (
-          <CWTag
-            label={formatAddressShort(address)}
-            type="address"
-            iconName="ethereum"
-          />
-        ),
-        sortValue: address,
-      },
-      action: {
-        customElement: (
-          <CWButton
-            label="Add as judge"
-            buttonType="secondary"
-            buttonHeight="sm"
-            onClick={() => {
-              setSelectedAddressInfo(addressInfo);
-              setIsRoleModalOpen(true);
-            }}
-          />
-        ),
-        sortValue: '',
-      },
+      user: (
+        <User
+          shouldShowAddressWithDisplayName={true}
+          userAddress={address}
+          userCommunityId={communityId}
+          shouldLinkProfile={true}
+          shouldShowRole={false}
+          avatarSize={24}
+        />
+      ),
+      action: (
+        <CWButton
+          label="Add as judge"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={() => {
+            setSelectedAddressInfo(addressInfo);
+            setIsRoleModalOpen(true);
+          }}
+        />
+      ),
+      key: address,
     };
   });
 
@@ -245,8 +162,6 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
         </CWText>
         {isAdmin && contestIsActive && (
           <CWButton
-            containerClassName="ad
-            n"
             label="Add judges"
             iconLeft="plus"
             onClick={toggleSearch}
@@ -279,13 +194,15 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
                 <div className="loading-container">
                   <CWCircleMultiplySpinner />
                 </div>
-              ) : filteredSearchResults.length > 0 ? (
-                <CWTable
-                  columnInfo={searchTableState.columns}
-                  sortingState={searchTableState.sorting}
-                  setSortingState={searchTableState.setSorting}
-                  rowData={searchResultsData}
-                />
+              ) : searchList.length > 0 ? (
+                <div className="judge-list">
+                  {searchList.map((item) => (
+                    <div className="judge-list-row" key={item.key}>
+                      <div className="judge-list-user">{item.user}</div>
+                      <div className="judge-list-action">{item.action}</div>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="no-results">
                   <CWText>No matching members found</CWText>
@@ -297,13 +214,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
       )}
 
       <CWText type="b2">Active judges</CWText>
-
-      <CWTable
-        columnInfo={tableState.columns}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
-        rowData={judgeData}
-      />
+      <div className="judge-list">
+        {judgeList.map((item) => (
+          <div className="judge-list-row" key={item.key}>
+            <div className="judge-list-user">{item.user}</div>
+          </div>
+        ))}
+      </div>
 
       <CWModal
         size="small"
@@ -340,6 +257,3 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 };
 
 export default JudgesTab;
-
-// make search by address possible
-// make sure it looks good on mobile

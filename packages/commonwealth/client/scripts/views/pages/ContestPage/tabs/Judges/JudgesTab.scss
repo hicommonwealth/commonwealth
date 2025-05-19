@@ -1,3 +1,5 @@
+@import '../../../../../styles/shared';
+
 .JudgesTab {
   margin-top: 16px;
 
@@ -49,6 +51,38 @@
         display: flex;
         justify-content: center;
       }
+    }
+  }
+
+  .judge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .judge-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 0;
+  }
+
+  .judge-list-user {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .judge-list-action {
+    flex-shrink: 0;
+  }
+
+  @include extraSmall {
+    .judge-list-row {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
     }
   }
 }
