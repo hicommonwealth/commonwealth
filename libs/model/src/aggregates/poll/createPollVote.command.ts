@@ -44,13 +44,14 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
       let vote = await models.Vote.findOne({
         where: {
           poll_id: payload.poll_id,
-          address: address.address,
+          user_id: actor.user.id!,
         },
       });
       if (!vote) {
         vote = await models.Vote.create({
           poll_id: payload.poll_id,
           address: address.address,
+          user_id: actor.user.id!,
           author_community_id: address.community_id,
           community_id: poll.community_id,
           calculated_voting_weight: calculated_voting_weight?.toString(),

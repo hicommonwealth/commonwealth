@@ -36,44 +36,6 @@ class Poll {
   public get votes() {
     return this._votes;
   }
-
-  public getUserVote(chain: string, address: string) {
-    return (this.votes || []).find(
-      (vote) => vote.address === address && vote.authorCommunityId === chain,
-    );
-  }
-
-  public static fromJSON(json) {
-    const {
-      id,
-      thread_id,
-      community_id,
-      prompt,
-      options,
-      ends_at,
-      votes = [],
-      created_at,
-    } = json;
-
-    let pollOptions;
-
-    try {
-      pollOptions = JSON.parse(options);
-    } catch (e) {
-      pollOptions = [];
-    }
-
-    return new Poll({
-      id,
-      thread_id,
-      community_id,
-      prompt,
-      options: pollOptions,
-      ends_at,
-      votes,
-      created_at,
-    });
-  }
 }
 
 export default Poll;

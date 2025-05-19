@@ -8,6 +8,7 @@ const _vote = z.object({
   poll_id: z.number(),
   option: z.string(),
   address: z.string(),
+  user_id: PG_INT.nullish(),
   author_community_id: z.string(),
   community_id: z.string(),
   calculated_voting_weight: z.string().nullish(),

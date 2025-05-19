@@ -1,11 +1,15 @@
+import { Poll } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import type Poll from '../../../models/Poll';
+import { z } from 'zod';
 
-export const getPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
-  if (!poll.endsAt.isValid()) {
+export const getPollTimestamp = (
+  poll: z.infer<typeof Poll>,
+  pollingEnded: boolean,
+) => {
+  if (!poll.ends_at || !moment(poll.ends_at).isValid()) {
     return 'No end date';
   }
   return pollingEnded
-    ? `Ended ${poll.endsAt?.format('lll')}`
-    : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
+    ? `Ended ${moment(poll.ends_at).format('lll')}`
+    : `${moment().from(poll.ends_at).replace(' ago', '')} left`;
 };
