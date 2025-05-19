@@ -18,6 +18,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
+import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
@@ -199,7 +200,9 @@ export const EditTopicModal = ({
           inputValidationFn={(text: string) => {
             let newErrorMsg;
 
-            const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+            const disallowedCharMatches = text.match(
+              DISALLOWED_TOPIC_NAMES_REGEX,
+            );
             if (disallowedCharMatches) {
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,

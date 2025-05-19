@@ -22,11 +22,14 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
+  canUserPerformGatedAction,
   ContentType,
-  ZERO_ADDRESS,
   formatDecimalToWei,
+  GatedActionEnum,
   generateTopicIdentifiersFromUrl,
   generateUrlPartForTopicIdentifiers,
+  sanitizeTopicName,
+  ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -49,6 +52,7 @@ import { StickCommentProvider } from 'views/components/StickEditorContainer/cont
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
+import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
@@ -68,12 +72,6 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-export type DiscussionsPageProps = {
-  tabs?: { value: string; label: string };
-  selectedView?: string;
-  topicName?: string;
-  updateSelectedView?: (tabValue: string) => void;
-};
 export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
@@ -92,6 +90,7 @@ const DiscussionsPage = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -127,16 +126,23 @@ const DiscussionsPage = () => {
     window.location.href,
   );
   const topicObj = topics?.find(
-    ({ name }) => name === topicIdentifiersFromURL?.topicName,
+    ({ name }) =>
+      sanitizeTopicName(name) === topicIdentifiersFromURL?.topicName,
   );
   const topicId = topicObj?.id;
 
   const user = useUserStore();
 
-  const { memberships, topicPermissions } = useTopicGating({
+  const {
+    groups = [],
+    memberships,
+    actionGroups,
+    bypassGating,
+  } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -227,7 +233,8 @@ const DiscussionsPage = () => {
       }
 
       const validTopic = topics?.find(
-        (topic) => topic?.name === topicIdentifiersFromURL.topicName,
+        (topic) =>
+          sanitizeTopicName(topic?.name) === topicIdentifiersFromURL.topicName,
       );
       if (!validTopic) {
         navigate('/discussions');
@@ -403,6 +410,15 @@ const DiscussionsPage = () => {
           />
         )}
 
+        {canShowGatingBanner && (
+          <CWGatedTopicBanner
+            actions={Object.values(GatedActionEnum)}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
+            onClose={() => setCanShowGatingBanner(false)}
+          />
+        )}
+
         <HeaderWithFilters
           topic={topicIdentifiersFromURL?.topicName || ''}
           stage={stageName}
@@ -436,8 +452,8 @@ const DiscussionsPage = () => {
                 <RenderThreadCard
                   thread={thread}
                   communityId={communityId}
-                  memberships={memberships}
-                  topicPermissions={topicPermissions}
+                  actionGroups={actionGroups}
+                  bypassGating={bypassGating}
                   contestsData={contestsData}
                 />
               )}
@@ -502,8 +518,8 @@ const DiscussionsPage = () => {
                 hideTrendingTag={true}
                 hideSpamTag={true}
                 communityId={communityId}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
+                actionGroups={actionGroups}
+                bypassGating={bypassGating}
                 contestsData={contestsData}
               />
             )}
@@ -518,7 +534,11 @@ const DiscussionsPage = () => {
           {user.isLoggedIn && user.activeAccount && (
             <StickyInput
               parentType={ContentType.Thread}
-              canComment={true}
+              canComment={canUserPerformGatedAction(
+                actionGroups,
+                GatedActionEnum.CREATE_COMMENT,
+                bypassGating,
+              )}
               handleSubmitComment={handleSubmitThread}
               errorMsg=""
               contentDelta={threadContentDelta}

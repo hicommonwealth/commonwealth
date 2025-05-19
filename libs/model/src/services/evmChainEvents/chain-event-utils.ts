@@ -142,23 +142,22 @@ const contestManagerDeployedMapper: EvmMapper<
     transaction_hash: event.rawLog.transactionHash,
     eth_chain_id: event.eventSource.ethChainId,
   };
-  if (decoded.args.oneOff) {
-    return {
-      event_name: 'OneOffContestManagerDeployed',
-      event_payload: {
-        ...event_payload,
-        length: Number(interval),
-      },
-    };
-  }
 
-  return {
-    event_name: 'RecurringContestManagerDeployed',
-    event_payload: {
-      ...event_payload,
-      interval: Number(interval),
-    },
-  };
+  return decoded.args.oneOff
+    ? {
+        event_name: 'OneOffContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          length: Number(interval),
+        },
+      }
+    : {
+        event_name: 'RecurringContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          interval: Number(interval),
+        },
+      };
 };
 
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (

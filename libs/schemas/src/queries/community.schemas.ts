@@ -2,6 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityType,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -16,7 +17,6 @@ import {
   Group,
   Membership,
   MembershipRejectReason,
-  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -100,25 +100,25 @@ export const GetCommunity = {
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
+export const TopicPermissionsView = z.object({
+  id: z.number(),
+  permissions: z.array(z.nativeEnum(GatedActionEnum)),
+});
+
+export const MembershipView = z.object({
+  groupId: z.number(),
+  topics: TopicPermissionsView.array(),
+  isAllowed: z.boolean(),
+  rejectReason: MembershipRejectReason,
+});
+
 export const GetMemberships = {
   input: z.object({
     community_id: z.string(),
     address: z.string(),
     topic_id: z.number().optional(),
   }),
-  output: z
-    .object({
-      groupId: z.number(),
-      topics: z
-        .object({
-          id: z.number(),
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
-        })
-        .array(),
-      isAllowed: z.boolean(),
-      rejectReason: MembershipRejectReason,
-    })
-    .array(),
+  output: MembershipView.array(),
 };
 
 export const GetCommunityStake = {
@@ -132,7 +132,11 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.optional(),
+  output: z.object({
+    stake: CommunityStake.extend({
+      Community: z.object({ namespace: z.string().nullish() }).optional(),
+    }).nullish(),
+  }),
 };
 
 export const GetCommunityMembers = {
@@ -322,7 +326,7 @@ export const GetTopHolders = {
   }),
 };
 
-export const GroupView = Group.omit({ GroupPermissions: true }).extend({
+export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   id: PG_INT,
   name: z.string(),
   created_at: z.coerce.date().or(z.string()).optional(),
@@ -334,7 +338,7 @@ export const GroupView = Group.omit({ GroupPermissions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
-      permissions: z.array(z.nativeEnum(PermissionEnum)),
+      permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
 });
@@ -348,4 +352,39 @@ export const GetGroups = {
     include_topics: z.coerce.boolean().optional(),
   }),
   output: z.array(GroupView),
+};
+
+export const RelatedCommunityView = z.object({
+  id: z.string(),
+  community: z.string(),
+  icon_url: z.string().nullish(),
+  lifetime_thread_count: z.number(),
+  profile_count: z.number(),
+  description: z.string().nullish(),
+  namespace: z.string().nullish(),
+  chain_node_id: z.number(),
+  tag_ids: z.array(z.string()),
+});
+
+export const GetRelatedCommunities = {
+  input: z.object({ chain_node_id: z.number() }),
+  output: z.array(RelatedCommunityView),
+};
+
+export const SearchCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  default_symbol: z.string().nullish(),
+  type: z.string(),
+  icon_url: z.string().nullish(),
+  created_at: z.coerce.date().or(z.string()),
+});
+
+export const SearchCommunities = {
+  input: PaginationParamsSchema.extend({
+    search: z.string(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(SearchCommunityView),
+  }),
 };
