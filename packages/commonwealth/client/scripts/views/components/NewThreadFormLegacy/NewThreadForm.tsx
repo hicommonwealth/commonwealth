@@ -1,11 +1,23 @@
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import {
+  canUserPerformGatedAction,
+  DisabledCommunitySpamTier,
+  GatedActionEnum,
+  LinkSource,
+} from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { notifyError } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { detectURL } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -57,14 +69,6 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import { DisabledCommunitySpamTier, LinkSource } from '@hicommonwealth/shared';
-import {
-  SnapshotProposal,
-  SnapshotSpace,
-} from 'client/scripts/helpers/snapshot_utils';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import useForceRerender from 'client/scripts/hooks/useForceRerender';
-
 import { DeltaStatic } from 'quill';
 // eslint-disable-next-line max-len
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
@@ -80,7 +84,6 @@ import { ImageActionCard } from '../ImageActionCard/ImageActionCard';
 import { ImageActionModal } from '../ImageActionModal/ImageActionModal';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
 import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -258,7 +261,7 @@ export const NewThreadForm = forwardRef<
       includeTopics: true,
       enabled: !!selectedCommunityId,
     });
-    const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+    const { memberships, actionGroups, bypassGating } = useTopicGating({
       communityId: selectedCommunityId,
       userAddress: userSelectedAddress || '',
       apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
@@ -284,12 +287,6 @@ export const NewThreadForm = forwardRef<
 
     const isDiscussion = threadKind === ThreadKind.Discussion;
 
-    const gatedGroupNames = groups
-      .filter((group) =>
-        group.topics.find((topic) => topic.id === threadTopic?.id),
-      )
-      .map((group) => group.name);
-
     const bodyAccumulatedRef = useRef('');
 
     const isWalletBalanceErrorEnabled = false;
@@ -299,16 +296,9 @@ export const NewThreadForm = forwardRef<
       isWalletBalanceErrorEnabled &&
       parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
-    const disabledActionsTooltipText = getThreadActionTooltipText({
-      isCommunityMember: !!userSelectedAddress,
-      isThreadTopicGated: isRestrictedMembership,
-      threadTopicInteractionRestrictions:
-        !isAdmin &&
-        !foundTopicPermissions?.permissions?.includes(
-          PermissionEnum.CREATE_THREAD,
-        )
-          ? foundTopicPermissions?.permissions
-          : undefined,
+    const threadPermissions = Permissions.getCreateThreadPermission({
+      actionGroups,
+      bypassGating,
     });
 
     const {
@@ -325,7 +315,7 @@ export const NewThreadForm = forwardRef<
       !userSelectedAddress ||
       walletBalanceError ||
       contestTopicError ||
-      (selectedCommunityId && !!disabledActionsTooltipText) ||
+      (selectedCommunityId && !threadPermissions.allowed) ||
       isLoadingCommunity ||
       (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
       isDisabled ||
@@ -347,7 +337,13 @@ export const NewThreadForm = forwardRef<
         return;
       }
 
-      if (isRestrictedMembership) {
+      if (
+        !canUserPerformGatedAction(
+          actionGroups,
+          GatedActionEnum.CREATE_THREAD,
+          bypassGating,
+        )
+      ) {
         notifyError('Topic is gated!');
         return;
       }
@@ -480,7 +476,6 @@ export const NewThreadForm = forwardRef<
       community,
       createThread,
       isInsideCommunity,
-      isRestrictedMembership,
       isDiscussion,
       threadUrl,
       threadTopic,
@@ -785,7 +780,8 @@ export const NewThreadForm = forwardRef<
                       <ThreadPollCard
                         poll={poll as unknown as ExtendedPoll}
                         key={(poll as unknown as ExtendedPoll).id}
-                        isTopicMembershipRestricted={isRestrictedMembership}
+                        actionGroups={actionGroups}
+                        bypassGating={bypassGating}
                         showDeleteButton={true}
                         isCreateThreadPage={true}
                         setLocalPoll={setPollData}
@@ -1057,14 +1053,8 @@ export const NewThreadForm = forwardRef<
                     contentDelta={threadContentDelta}
                     setContentDelta={setThreadContentDeltaWithCallback}
                     {...(selectedCommunityId && {
-                      isDisabled:
-                        isRestrictedMembership ||
-                        !!disabledActionsTooltipText ||
-                        !userSelectedAddress,
-                      tooltipLabel:
-                        typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('submit')
-                          : disabledActionsTooltipText,
+                      isDisabled: !threadPermissions.allowed,
+                      tooltipLabel: threadPermissions.tooltip,
                     })}
                     // eslint-disable-next-line max-len
                     placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
@@ -1154,28 +1144,16 @@ export const NewThreadForm = forwardRef<
                     />
                   )}
 
-                  {isRestrictedMembership && canShowGatingBanner && (
+                  {canShowGatingBanner && (
                     <div>
                       <CWGatedTopicBanner
-                        groupNames={gatedGroupNames}
+                        actions={[GatedActionEnum.CREATE_THREAD]}
+                        actionGroups={actionGroups}
+                        bypassGating={bypassGating}
                         onClose={() => setCanShowGatingBanner(false)}
                       />
                     </div>
                   )}
-
-                  {canShowTopicPermissionBanner &&
-                    foundTopicPermissions &&
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      PermissionEnum.CREATE_THREAD,
-                    ) && (
-                      <CWGatedTopicPermissionLevelBanner
-                        topicPermissions={
-                          foundTopicPermissions?.permissions as PermissionEnum[]
-                        }
-                        onClose={() => setCanShowTopicPermissionBanner(false)}
-                      />
-                    )}
                 </div>
               </div>
               <>

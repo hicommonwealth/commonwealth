@@ -57,10 +57,11 @@ const OverviewPage = ({
     apiEnabled: !!communityId,
   });
 
-  const { memberships, topicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId: typeof topicId === 'string' ? parseInt(topicId) : topicId,
   });
 
   const filterList = useMemo(() => {
@@ -150,8 +151,8 @@ const OverviewPage = ({
             customElement: (
               <ThreadCell
                 thread={thread}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
+                actionGroups={actionGroups}
+                bypassGating={bypassGating}
               />
             ),
           },

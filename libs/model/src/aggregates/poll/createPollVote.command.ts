@@ -28,6 +28,13 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState(CreateVotePollErrors.PollingClosed);
       }
 
+      if (thread.archived_at) {
+        throw new InvalidState('Cannot vote on an archived thread');
+      }
+      if (thread.locked_at) {
+        throw new InvalidState('Cannot vote on a locked thread');
+      }
+
       if (!poll.options.includes(payload.option)) {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
