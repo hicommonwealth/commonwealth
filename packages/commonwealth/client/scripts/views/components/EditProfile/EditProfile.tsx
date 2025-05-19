@@ -32,6 +32,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 import './EditProfile.scss';
 import ProfileSection from './Section';
+import UserTrustLevel from './UserTrustLevel/UserTrustLevel';
 import { editProfileValidation } from './validation';
 
 export type Image = {
@@ -42,6 +43,8 @@ export type Image = {
 const EditProfile = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
+
+  const trustLevelEnabled = useFlag('trustLevel');
 
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState<string>();
@@ -347,6 +350,20 @@ const EditProfile = () => {
                 canAddLinks={links.length <= 5}
               />
             </ProfileSection>
+            {trustLevelEnabled && (
+              <ProfileSection
+                title="User Verification"
+                description="Verification helps build a trusted
+              ecosystem where members can interact with confidence.
+              As you progress throught verification levels,
+              you'll gain increased capabilities and recognition
+              within the community.
+              "
+              >
+                <UserTrustLevel />
+              </ProfileSection>
+            )}
+
             <ProfileSection
               title="Personalize Your Profile"
               description="Express yourself through imagery."

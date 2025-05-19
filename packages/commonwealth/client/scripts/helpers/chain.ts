@@ -92,6 +92,10 @@ export const loadCommunityChainInfo = async (
           .default;
         return new Ethereum(tempChain, app);
       }
+      case ChainBase.Sui: {
+        const Sui = (await import('../controllers/chain/sui/adapter')).default;
+        return new Sui(tempChain, app);
+      }
       default:
         throw new Error('Invalid Chain');
     }

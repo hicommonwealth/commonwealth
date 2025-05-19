@@ -15,7 +15,7 @@ const MarkdownHitHighlighterPage = lazy(
 );
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/Communities'));
+const ExplorePage = lazy(() => import('views/pages/ExplorePage'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
@@ -268,7 +268,7 @@ const CommonDomainRoutes = () => [
   <Route
     key="/explore"
     path="/explore"
-    element={withLayout(CommunitiesPage, {
+    element={withLayout(ExplorePage, {
       type: 'common',
     })}
   />,

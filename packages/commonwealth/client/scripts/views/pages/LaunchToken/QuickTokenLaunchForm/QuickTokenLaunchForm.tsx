@@ -183,6 +183,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                model: 'runware:100@1',
               });
           }
 
@@ -263,11 +264,11 @@ export const QuickTokenLaunchForm = ({
         });
 
         const token = await createToken({
-          transaction_hash: txReceipt.transactionHash,
-          chain_node_id: baseNode.id,
           community_id: communityId,
-          icon_url: sanitizedTokenInfo.imageURL,
+          eth_chain_id: baseNode.ethChainId!,
+          transaction_hash: txReceipt.transactionHash,
           description: sanitizedTokenInfo.description,
+          icon_url: sanitizedTokenInfo.imageURL,
         });
 
         // 4. update community to reference the created token

@@ -18,6 +18,7 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
@@ -32,7 +33,6 @@ import TokenPerformance from './TokenPerformance/TokenPerformance';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer/StickyEditorContainer';
 
 const CommunityHome = () => {
   const user = useUserStore();
@@ -120,7 +120,7 @@ const CommunityHome = () => {
 
   return (
     <StickCommentProvider mode="thread">
-      <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
+      <CWPageLayout ref={containerRef} className="ExplorePageLayout">
         <div className="CommunityHome">
           <div className="header-section">
             <div className="description">
@@ -161,7 +161,7 @@ const CommunityHome = () => {
         </div>
         <WithDefaultStickyComment>
           {user.isLoggedIn && user.activeAccount && (
-            <StickyEditorContainer
+            <StickyInput
               parentType={ContentType.Thread}
               canComment={true}
               handleSubmitComment={handleCreateThread}

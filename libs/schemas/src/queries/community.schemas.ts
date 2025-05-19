@@ -2,6 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityType,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -13,8 +14,9 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  Group,
+  Membership,
   MembershipRejectReason,
-  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -98,25 +100,25 @@ export const GetCommunity = {
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
+export const TopicPermissionsView = z.object({
+  id: z.number(),
+  permissions: z.array(z.nativeEnum(GatedActionEnum)),
+});
+
+export const MembershipView = z.object({
+  groupId: z.number(),
+  topics: TopicPermissionsView.array(),
+  isAllowed: z.boolean(),
+  rejectReason: MembershipRejectReason,
+});
+
 export const GetMemberships = {
   input: z.object({
     community_id: z.string(),
     address: z.string(),
     topic_id: z.number().optional(),
   }),
-  output: z
-    .object({
-      groupId: z.number(),
-      topics: z
-        .object({
-          id: z.number(),
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
-        })
-        .array(),
-      isAllowed: z.boolean(),
-      rejectReason: MembershipRejectReason,
-    })
-    .array(),
+  output: MembershipView.array(),
 };
 
 export const GetCommunityStake = {
@@ -130,7 +132,11 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.optional(),
+  output: z.object({
+    stake: CommunityStake.extend({
+      Community: z.object({ namespace: z.string().nullish() }).optional(),
+    }).nullish(),
+  }),
 };
 
 export const GetCommunityMembers = {
@@ -212,10 +218,10 @@ export const ConstestManagerView = ContestManager.extend({
 });
 
 export const TopicView = Topic.extend({
-  created_at: z.string().nullish(),
-  updated_at: z.string().nullish(),
-  deleted_at: z.string().nullish(),
-  archived_at: z.string().nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  deleted_at: z.date().or(z.string()).nullish(),
+  archived_at: z.date().or(z.string()).nullish(),
   contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
@@ -295,4 +301,90 @@ export const UpdateCommunityDirectoryTags = {
     community_id: z.string(),
   }),
   context: AuthContext,
+};
+
+export const HolderView = z.object({
+  user_id: z.number(),
+  address: z.string(),
+  name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  tokens: z.number(),
+  role: z.string(),
+  tier: z.number(),
+});
+
+export const GetTopHolders = {
+  input: z.object({
+    community_id: z.string(),
+    limit: z.number().optional(),
+    cursor: z.number().optional(),
+  }),
+  output: z.object({
+    results: z.array(HolderView),
+    limit: z.number(),
+    page: z.number(),
+  }),
+};
+
+export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
+  id: PG_INT,
+  name: z.string(),
+  created_at: z.coerce.date().or(z.string()).optional(),
+  updated_at: z.coerce.date().or(z.string()).optional(),
+  memberships: z.array(
+    Membership.omit({ address: true, group: true }).extend({
+      last_checked: z.coerce.date().or(z.string()),
+    }),
+  ),
+  topics: z.array(
+    TopicView.omit({ total_threads: true }).extend({
+      permissions: z.array(z.nativeEnum(GatedActionEnum)),
+    }),
+  ),
+});
+
+export const GetGroups = {
+  input: z.object({
+    community_id: z.string().optional(),
+    group_id: z.coerce.number().optional(),
+    address_id: z.coerce.number().optional(),
+    include_members: z.coerce.boolean().optional(),
+    include_topics: z.coerce.boolean().optional(),
+  }),
+  output: z.array(GroupView),
+};
+
+export const RelatedCommunityView = z.object({
+  id: z.string(),
+  community: z.string(),
+  icon_url: z.string().nullish(),
+  lifetime_thread_count: z.number(),
+  profile_count: z.number(),
+  description: z.string().nullish(),
+  namespace: z.string().nullish(),
+  chain_node_id: z.number(),
+  tag_ids: z.array(z.string()),
+});
+
+export const GetRelatedCommunities = {
+  input: z.object({ chain_node_id: z.number() }),
+  output: z.array(RelatedCommunityView),
+};
+
+export const SearchCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  default_symbol: z.string().nullish(),
+  type: z.string(),
+  icon_url: z.string().nullish(),
+  created_at: z.coerce.date().or(z.string()),
+});
+
+export const SearchCommunities = {
+  input: PaginationParamsSchema.extend({
+    search: z.string(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(SearchCommunityView),
+  }),
 };

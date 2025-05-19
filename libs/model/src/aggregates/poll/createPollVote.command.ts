@@ -5,6 +5,7 @@ import utc from 'dayjs/plugin/utc';
 import { models } from '../../database';
 import { authPoll } from '../../middleware';
 import { mustBeAuthorizedPoll } from '../../middleware/guards';
+import { getVotingWeight } from '../../services/stakeHelper';
 
 dayjs.extend(utc);
 
@@ -22,9 +23,16 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
       }),
     ],
     body: async ({ actor, payload, context }) => {
-      const { poll, address } = mustBeAuthorizedPoll(actor, context);
+      const { poll, address, thread } = mustBeAuthorizedPoll(actor, context);
       if (!poll.ends_at && dayjs(poll.ends_at).utc().isBefore(dayjs().utc())) {
         throw new InvalidState(CreateVotePollErrors.PollingClosed);
+      }
+
+      if (thread.archived_at) {
+        throw new InvalidState('Cannot vote on an archived thread');
+      }
+      if (thread.locked_at) {
+        throw new InvalidState('Cannot vote on a locked thread');
       }
 
       // TODO: migrate this to be JSONB array of strings in the DB
@@ -32,6 +40,11 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
       if (!options.includes(payload.option)) {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
+
+      const calculated_voting_weight = await getVotingWeight(
+        thread.topic_id,
+        address.address,
+      );
 
       // findOrCreate doesn't work because `poll_id` and `option` not
       // optional in the Vote schema
@@ -47,6 +60,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
           address: address.address,
           author_community_id: address.community_id,
           community_id: poll.community_id,
+          calculated_voting_weight: calculated_voting_weight?.toString(),
           option: payload.option,
         });
       }

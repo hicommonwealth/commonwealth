@@ -50,13 +50,18 @@ export type OpenRouterModel =
 // Union type that includes both OpenAI and OpenRouter models
 export type CompletionModel = OpenAIModel | OpenRouterModel;
 
+// Supported image generation models
+export type ImageGenerationModel = 'gpt-image-1' | 'runware:100@1';
+
 export interface CompletionOptions {
   prompt: string;
+  systemPrompt?: string;
   model?: CompletionModel;
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
   useOpenRouter?: boolean;
+  useWebSearch?: boolean;
 }
 
 export interface CompletionResponse {

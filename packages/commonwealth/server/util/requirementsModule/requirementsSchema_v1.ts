@@ -87,6 +87,38 @@ export default {
       },
       required: ['source_type', 'cosmos_chain_id', 'contract_address'],
     },
+    SuiSource: {
+      type: 'object',
+      properties: {
+        source_type: {
+          type: 'string',
+          enum: ['sui_native'],
+        },
+        sui_network: {
+          type: 'string',
+        },
+        object_id: {
+          type: 'string',
+        },
+      },
+      required: ['source_type', 'sui_network'],
+    },
+    SuiTokenSource: {
+      type: 'object',
+      properties: {
+        source_type: {
+          type: 'string',
+          enum: ['sui_token'],
+        },
+        sui_network: {
+          type: 'string',
+        },
+        coin_type: {
+          type: 'string',
+        },
+      },
+      required: ['source_type', 'sui_network', 'coin_type'],
+    },
     ThresholdData: {
       type: 'object',
       properties: {
@@ -100,6 +132,8 @@ export default {
             { $ref: '#/definitions/NativeSource' },
             { $ref: '#/definitions/CosmosSource' },
             { $ref: '#/definitions/CosmosContractSource' },
+            { $ref: '#/definitions/SuiSource' },
+            { $ref: '#/definitions/SuiTokenSource' },
           ],
         },
       },

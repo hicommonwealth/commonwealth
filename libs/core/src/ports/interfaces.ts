@@ -90,6 +90,7 @@ export enum CacheNamespaces {
   External_Api_Usage_Counter = 'api_key_counter',
   CommunityThreadRanks = 'community_thread_ranks',
   GlobalThreadRanks = 'global_thread_ranks',
+  TokenTopHolders = 'token_top_holders',
 }
 
 /**
@@ -159,6 +160,20 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+
+  lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false>;
+
+  getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    stop?: number,
+  ): Promise<string[]>;
 
   // Hash methods
   /**

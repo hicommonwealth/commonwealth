@@ -1,4 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
+import { command } from '@hicommonwealth/core';
 import {
   Community,
   middleware,
@@ -73,13 +74,29 @@ export const trpcRouter = trpc.router({
     Community.GetCommunitySelectedTagsAndCommunities,
     trpc.Tag.Community,
   ),
-  getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
-  getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
+  getCommunityStake: trpc.query(
+    Community.GetCommunityStake,
+    trpc.Tag.Community,
+  ),
+  setCommunityStake: trpc.command(
+    Community.SetCommunityStake,
+    trpc.Tag.Community,
+    [
+      trpc.fireAndForget(async ({ community_id }, _, { actor }) => {
+        // TODO: this is to reprocude the existing functionality, but it should be part of the command transaction
+        // From legacy: since the stake is already created, generate group in background so this request doesn't fail
+        await command(Community.GenerateStakeholderGroups(), {
+          actor,
+          payload: { id: community_id },
+        });
+      }),
+    ],
+  ),
   getStakeHistoricalPrice: trpc.query(
     Community.GetStakeHistoricalPrice,
     trpc.Tag.Community,
   ),
-  setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
+  getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
     (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([
@@ -98,6 +115,7 @@ export const trpcRouter = trpc.router({
       (output) => ({ community: output.community_id }),
     ]),
   ]),
+  getGroups: trpc.query(Community.GetGroups, trpc.Tag.Community),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
@@ -115,6 +133,10 @@ export const trpcRouter = trpc.router({
   ),
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
   getTopicById: trpc.query(Community.GetTopicById, trpc.Tag.Community),
+  updateTopicsOrder: trpc.command(
+    Community.UpdateTopicsOrder,
+    trpc.Tag.Community,
+  ),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_TOPIC,
@@ -133,6 +155,10 @@ export const trpcRouter = trpc.router({
       }),
     ]),
   ]),
+  updateTopicChannel: trpc.command(
+    Community.UpdateTopicChannel,
+    trpc.Tag.Community,
+  ),
   toggleArchiveTopic: trpc.command(
     Community.ToggleArchiveTopic,
     trpc.Tag.Community,
@@ -168,6 +194,15 @@ export const trpcRouter = trpc.router({
   ),
   updateCommunityDirectoryTags: trpc.command(
     Community.UpdateCommunityDirectoryTags,
+    trpc.Tag.Community,
+  ),
+  getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
+  getRelatedCommunities: trpc.query(
+    Community.GetRelatedCommunities,
+    trpc.Tag.Community,
+  ),
+  searchCommunities: trpc.query(
+    Community.SearchCommunities,
     trpc.Tag.Community,
   ),
 });

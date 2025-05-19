@@ -175,6 +175,7 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
+  const suiWallets = filterWalletNames(ChainBase.Sui);
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -205,6 +206,8 @@ const ModalBase = ({
           return solanaWallets;
         case ChainBase.Substrate:
           return substrateWallets;
+        case ChainBase.Sui:
+          return suiWallets;
         default:
           return [];
       }
@@ -223,6 +226,7 @@ const ModalBase = ({
         ...cosmosWallets,
         ...solanaWallets,
         ...substrateWallets,
+        ...suiWallets,
       ];
     }
 

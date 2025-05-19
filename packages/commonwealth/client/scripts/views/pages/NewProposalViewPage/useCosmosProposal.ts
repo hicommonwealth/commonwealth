@@ -48,14 +48,13 @@ export const useCosmosProposal = ({
     useCosmosProposalMetadataQuery(proposal || null);
 
   const { data: threadsData } = useGetThreadsByLinkQuery({
-    communityId: app.activeChainId() || '',
     link: {
       source: LinkSource.Proposal,
       identifier: proposalId,
     },
     enabled: !!(app.activeChainId() && proposalId),
   });
-  const threads = threadsData || [];
+  const threads = threadsData?.threads || [];
   const { data: poolData } = usePoolParamsQuery();
   const poolValue = poolData ? +poolData : undefined;
 

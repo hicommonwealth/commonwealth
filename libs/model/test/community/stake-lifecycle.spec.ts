@@ -154,7 +154,7 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake_to_set },
     });
-    expect(qr).to.deep.include({ ...payload });
+    expect(qr?.stake).to.deep.include({ ...payload });
 
     const commr = await query(GetCommunities(), {
       actor,
@@ -192,6 +192,6 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake },
     });
-    expect(qr).to.be.undefined;
+    expect(qr?.stake).to.be.undefined;
   });
 });

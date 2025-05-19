@@ -1,0 +1,39 @@
+.WVSuiTokenDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+  padding-bottom: 32px;
+
+  .description {
+    color: var(--neutral-500);
+    margin-top: 8px;
+  }
+
+  .info {
+    color: var(--neutral-500);
+    margin-top: 8px;
+
+    a {
+      margin-left: 4px;
+      color: var(--primary-500);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+  }
+}
