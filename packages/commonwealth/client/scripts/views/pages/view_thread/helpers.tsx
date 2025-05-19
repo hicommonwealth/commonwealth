@@ -12,7 +12,7 @@ export const getPollTimestamp = (
   ) {
     return 'No end date';
   }
-  let end = poll.ends_at ?? poll.custom_duration;
+  const end = poll.ends_at ?? poll.custom_duration;
   return pollingEnded
     ? `Ended ${moment(end).format('lll')}`
     : `${moment().from(end).replace(' ago', '')} left`;

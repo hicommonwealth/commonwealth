@@ -141,7 +141,7 @@ export const PollEditorModal = ({
           {
             options: options,
             prompt: prompt,
-            community_id: user.activeAccount?.community?.id!,
+            community_id: user.activeAccount?.community?.id,
             custom_duration: customDurationEnabled ? customDuration : undefined,
             ends_at: parsedDuration
               ? moment().add(parsedDuration, 'days').toDate()

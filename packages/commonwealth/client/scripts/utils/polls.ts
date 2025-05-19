@@ -9,7 +9,7 @@ export interface ExtendedPoll extends z.infer<typeof PollView> {
 export interface LocalPoll {
   options: Array<string>;
   prompt: string;
-  community_id: string;
+  community_id?: string;
   custom_duration?: string;
   ends_at: Date | undefined;
   votes: [];
