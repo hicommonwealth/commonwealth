@@ -294,10 +294,7 @@
   }
 
   .turnstile-container {
-    margin-top: 8px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
+    padding: 8px 16px 0;
   }
 }
 
@@ -333,5 +330,30 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     margin: 0;
     padding: 16px;
+  }
+}
+
+// Styles for the AI model selection badge on the sparkle button
+.ai-toggle-button {
+  position: relative; // Needed for absolute positioning of the badge
+
+  .model-count-badge {
+    position: absolute;
+    top: -4px; // Adjust as needed for visual alignment
+    right: -4px; // Adjust as needed for visual alignment
+    background-color: var(
+      --color-primary-accent
+    ); // Or your theme's notification/badge color
+    color: var(--button-primary-text-color); // Ensure contrast
+    border-radius: 50%; // Makes it circular
+    width: 16px; // Fixed size for the badge
+    height: 16px;
+    font-size: var(--font-size-xxs); // Smaller font for the number
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    border: 1px solid var(--background-primary); // Optional: adds a bit of separation
+    line-height: 1; // Ensure text is centered vertically
   }
 }

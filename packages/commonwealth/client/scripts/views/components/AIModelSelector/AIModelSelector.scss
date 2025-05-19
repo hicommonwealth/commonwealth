@@ -1,0 +1,32 @@
+.AIModelSelector {
+  padding: 12px 16px;
+  background-color: var(
+    --background-primary
+  ); // Example: Use your theme's background color
+  border: 1px solid var(--border-color-default); // Example: Use your theme's border color
+  border-radius: 8px;
+  box-shadow: var(--shadow-medium); // Example: Use your theme's shadow
+  min-width: 300px;
+  max-width: 400px;
+
+  &__title {
+    font-size: var(--font-size-sm); // Example: Use theme variable
+    font-weight: var(--font-weight-semibold); // Example: Use theme variable
+    color: var(--text-color-primary); // Example: Use theme variable
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  &__selectList {
+    // If CWSelectList needs specific styling in this context, add it here.
+    // For example, to ensure items are clearly checkable if default styling isn't obvious for multi-select.
+  }
+
+  &__maxReachedMessage {
+    font-size: var(--font-size-xs); // Example: Use theme variable
+    color: var(--text-color-secondary); // Example: Use theme variable
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+}

@@ -38,6 +38,13 @@ import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
 
+// New Imports
+import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+// End New Imports
+
 import './StickyInput.scss';
 
 interface StickyInputProps extends CommentEditorProps {
@@ -67,6 +74,23 @@ const StickyInput = (props: StickyInputProps) => {
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
+
+  // New State and Definitions
+  const [selectedModelValues, setSelectedModelValues] = useState<string[]>([]);
+  const aiModelPopover = usePopover();
+
+  const availableModels: ModelOption[] = [
+    { value: 'gpt-4o', label: 'GPT-4o' },
+    {
+      value: 'anthropic/claude-3-7-sonnet',
+      label: 'Claude 3.7 Sonnet',
+    },
+    { value: 'google/gemini-flash-1-5', label: 'Gemini Flash 1.5' },
+  ];
+  const MAX_MODELS_SELECTABLE = 4;
+  const AI_SELECTOR_TITLE =
+    'Select up to 4 models to generate a variety of replies to your post';
+  // End New State and Definitions
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -288,39 +312,81 @@ const StickyInput = (props: StickyInputProps) => {
     setWebSearchEnabled((prev) => !prev);
   };
 
+  const handleModelSelectionChange = (newSelectedValues: string[]) => {
+    setSelectedModelValues(newSelectedValues);
+  };
+
   const renderStickyInput = () => {
+    const isAnyModelSelected = selectedModelValues.length > 0;
+    const showModelCountBadge = selectedModelValues.length > 1;
+
     const buttonGroup = (
       <div className="button-group">
         <CWTooltip
           content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
           placement="top"
-          renderTrigger={(handleInteraction) => (
+          renderTrigger={(tooltipInteractionHandler) => (
             <button
               className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
               onClick={handleToggleWebSearch}
-              onMouseEnter={handleInteraction}
-              onMouseLeave={handleInteraction}
+              onMouseEnter={tooltipInteractionHandler}
+              onMouseLeave={tooltipInteractionHandler}
             >
               <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
             </button>
           )}
         />
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
-          <CWTooltip
-            content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
-        AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
-            placement="top"
-            renderTrigger={(handleInteraction) => (
-              <button
-                className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
-                onClick={handleToggleAiAutoReply}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              >
-                <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
-              </button>
-            )}
-          />
+          <>
+            <CWTooltip
+              content={'Select AI models to generate replies'}
+              placement="top"
+              renderTrigger={(tooltipInteractionHandler) => (
+                <button
+                  className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
+                  onClick={(e) =>
+                    aiModelPopover.handleInteraction(
+                      e as React.MouseEvent<HTMLButtonElement>,
+                    )
+                  }
+                  onMouseEnter={tooltipInteractionHandler}
+                  onMouseLeave={tooltipInteractionHandler}
+                  aria-haspopup="dialog"
+                  aria-expanded={aiModelPopover.open}
+                  aria-controls={aiModelPopover.id}
+                >
+                  <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+                  {showModelCountBadge && (
+                    <span className="model-count-badge">
+                      {selectedModelValues.length}
+                    </span>
+                  )}
+                </button>
+              )}
+            />
+            <CWPopover
+              {...aiModelPopover}
+              placement="top-end"
+              modifiers={[
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, 8],
+                  },
+                },
+              ]}
+              content={
+                <AIModelSelector
+                  title={AI_SELECTOR_TITLE}
+                  availableModels={availableModels}
+                  selectedModelValues={selectedModelValues}
+                  onSelectionChange={handleModelSelectionChange}
+                  maxSelection={MAX_MODELS_SELECTABLE}
+                  popoverId={aiModelPopover.id}
+                />
+              }
+            />
+          </>
         )}
 
         <CWTooltip
@@ -424,7 +490,9 @@ const StickyInput = (props: StickyInputProps) => {
                 {...props}
                 shouldFocus={true}
                 onCancel={handleCancel}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={
+                  aiCommentsToggleEnabled && selectedModelValues.length > 0
+                }
                 handleSubmitComment={customHandleSubmitComment}
                 onAiReply={handleAiReply}
                 streamingReplyIds={streamingReplyIds}
