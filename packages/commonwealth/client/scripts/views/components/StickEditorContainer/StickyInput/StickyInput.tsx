@@ -71,6 +71,7 @@ const StickyInput = (props: StickyInputProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
@@ -134,6 +135,7 @@ const StickyInput = (props: StickyInputProps) => {
           model: 'gpt-4o-mini',
           stream: true,
           systemPrompt,
+          useWebSearch: webSearchEnabled,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
           },
@@ -161,6 +163,7 @@ const StickyInput = (props: StickyInputProps) => {
           model: 'gpt-4o-mini',
           stream: true,
           systemPrompt,
+          useWebSearch: webSearchEnabled,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },
@@ -183,6 +186,7 @@ const StickyInput = (props: StickyInputProps) => {
     originalThread,
     parentCommentText,
     setContentDelta,
+    webSearchEnabled,
   ]);
 
   const getActionPillLabel = () => {
@@ -279,9 +283,28 @@ const StickyInput = (props: StickyInputProps) => {
     setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
   };
 
+  const handleToggleWebSearch = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWebSearchEnabled((prev) => !prev);
+  };
+
   const renderStickyInput = () => {
     const buttonGroup = (
       <div className="button-group">
+        <CWTooltip
+          content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
+              onClick={handleToggleWebSearch}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
+            </button>
+          )}
+        />
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
           <CWTooltip
             content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
