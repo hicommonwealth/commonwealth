@@ -1,0 +1,22 @@
+.GatedTopicBanner {
+  .description {
+    margin-bottom: 10px;
+  }
+  .action-list {
+    margin-right: 8px;
+    color: #1a1a1a;
+  }
+
+  .multi-action-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .action-name {
+    margin-right: 8px;
+  }
+  .group-list {
+    display: inline-block;
+  }
+}

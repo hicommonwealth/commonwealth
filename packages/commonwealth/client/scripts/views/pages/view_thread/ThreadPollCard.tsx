@@ -1,10 +1,13 @@
+import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type Thread from 'models/Thread';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Poll from '../../../models/Poll';
+import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
@@ -12,19 +15,23 @@ import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {
+  thread?: Thread;
   poll: Poll;
   showDeleteButton?: boolean;
-  isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
   setLocalPoll?: (params) => void;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadPollCard = ({
+  thread,
   poll,
   showDeleteButton,
-  isTopicMembershipRestricted = false,
   isCreateThreadPage = false,
   setLocalPoll,
+  actionGroups,
+  bypassGating,
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,12 +45,12 @@ export const ThreadPollCard = ({
     threadId: poll.threadId,
   });
 
-  const getTooltipErrorMessage = () => {
-    if (!user.activeAccount)
-      return 'Error: You must join this community to vote.';
-    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
-    return '';
-  };
+  const permissions = Permissions.getGeneralActionPermission({
+    action: GatedActionEnum.UPDATE_POLL,
+    thread: thread!,
+    actionGroups,
+    bypassGating,
+  });
 
   const handleDeletePoll = async () => {
     try {
@@ -130,11 +137,7 @@ export const ThreadPollCard = ({
       <PollCard
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={
-          !user.activeAccount ||
-          isTopicMembershipRestricted ||
-          isCreateThreadPage
-        }
+        disableVoteButton={!permissions.allowed || isCreateThreadPage}
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
@@ -146,7 +149,7 @@ export const ThreadPollCard = ({
         voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={getTooltipErrorMessage()}
+        tooltipErrorMessage={permissions.tooltip}
         onVoteCast={(option, isSelected) => {
           // @ts-expect-error <StrictNullChecks/>
           handlePollVote(poll, option, isSelected);
