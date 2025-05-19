@@ -1,10 +1,36 @@
 import { command, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { GroupAttributes } from '../../models';
 import { RefreshCommunityMemberships } from './RefreshCommunityMemberships.command';
+
+/**
+ * Builds a map of topic permissions indexed by group id
+ */
+export function buildTopicPermissionsMap(groups: GroupAttributes[]) {
+  const permissions = groups.map((g) => g.GroupPermissions || []).flat();
+  const map = new Map<number, z.infer<typeof schemas.TopicPermissionsView>[]>();
+  permissions.forEach((p) => {
+    const entry = map.get(p.group_id);
+    if (entry)
+      entry.push({
+        id: p.topic_id,
+        permissions: p.allowed_actions,
+      });
+    else
+      map.set(p.group_id, [
+        {
+          id: p.topic_id,
+          permissions: p.allowed_actions,
+        },
+      ]);
+  });
+  return map;
+}
 
 export function GetMemberships(): Query<typeof schemas.GetMemberships> {
   return {
@@ -19,16 +45,20 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
       });
       mustExist('Address', addr);
 
-      const groups = await models.Group.findAll({
-        where: { community_id },
-        include: [
-          {
-            model: models.GroupPermission,
-            attributes: ['topic_id', 'allowed_actions'],
-            where: topic_id ? { topic_id } : undefined,
-          },
-        ],
-      });
+      const groups = (
+        await models.Group.findAll({
+          where: { community_id },
+          attributes: ['id'],
+          include: [
+            {
+              model: models.GroupPermission,
+              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+              where: topic_id ? { topic_id } : undefined,
+            },
+          ],
+        })
+      ).map((g) => g.toJSON());
+      const ids = groups.map((g) => g.id!);
 
       // TODO: resolve stale community memberships in a separate job
       await command(RefreshCommunityMemberships(), {
@@ -37,31 +67,15 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
       });
 
       const memberships = await models.Membership.findAll({
-        where: {
-          group_id: { [Op.in]: groups.map((g) => g.id!) },
-          address_id: addr.id!,
-        },
-        include: [{ model: models.Group, as: 'group' }],
+        where: { group_id: { [Op.in]: ids }, address_id: addr.id! },
       });
 
-      const topics = await models.Topic.findAll({
-        where: { group_ids: { [Op.overlap]: groups.map((g) => g.id!) } },
-        attributes: ['id', 'group_ids'],
-      });
+      const topic_permissions = buildTopicPermissionsMap(groups);
 
       // transform memberships to result shape
       return memberships.map(({ group_id, reject_reason }) => ({
         groupId: group_id,
-        topics: topics
-          .filter((t) => t.group_ids!.includes(group_id))
-          .map((t) => ({
-            id: t.id!,
-            permissions:
-              groups
-                .find((g) => g.id === group_id)
-                ?.GroupPermissions?.find((gtp) => gtp.topic_id === t.id)
-                ?.allowed_actions || [],
-          })),
+        topics: topic_permissions.get(group_id) || [],
         isAllowed: !reject_reason,
         rejectReason: reject_reason || undefined,
       }));
