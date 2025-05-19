@@ -109,7 +109,7 @@ describe('Polls', () => {
     expect(res?.id).to.not.be.undefined;
     expect(res).to.contain({
       prompt: data.prompt,
-      options: JSON.stringify(data.options),
+      options: data.options,
     });
 
     threadId = thread!.id!;

@@ -29,6 +29,17 @@ module.exports = {
       await queryInterface.renameColumn('Polls', 'options_array', 'options', {
         transaction,
       });
+      await queryInterface.changeColumn(
+        'Polls',
+        'options',
+        {
+          type: Sequelize.ARRAY(Sequelize.STRING),
+          allowNull: false,
+        },
+        {
+          transaction,
+        },
+      );
 
       await queryInterface.addColumn(
         'Votes',
@@ -40,6 +51,7 @@ module.exports = {
           transaction,
         },
       );
+
       await queryInterface.sequelize.query(
         `
           UPDATE "Votes" V
