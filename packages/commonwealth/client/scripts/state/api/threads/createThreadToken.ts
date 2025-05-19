@@ -33,9 +33,14 @@ export const createThreadToken = async ({
     name,
     symbol,
     threadId,
+    initPurchaseAmount,
     chainId,
-    chainRpc,
+    walletAddress,
+    authorAddress,
+    communityTreasuryAddress,
     paymentTokenAddress,
+    ethChainId,
+    chainRpc,
   });
 
   if (
@@ -51,14 +56,13 @@ export const createThreadToken = async ({
   const factoryAddress = commonProtocol.factoryContracts[ethChainId].factory;
   const bondingCurve =
     commonProtocol.factoryContracts[ethChainId].postTokenBondingCurve;
+
   const launchpad = new TokenLaunchpad(
     factoryAddress,
     bondingCurve,
     paymentTokenAddress,
     chainRpc,
   );
-
-  console.log('TokenLaunchpad initialized successfully');
 
   try {
     const result = await launchpad.launchTokenWithLiquidity(

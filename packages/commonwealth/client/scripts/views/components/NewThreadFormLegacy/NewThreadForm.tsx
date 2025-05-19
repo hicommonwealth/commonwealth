@@ -1,5 +1,5 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   SessionKeyError,
   getEthChainIdOrBech32Prefix,
@@ -63,6 +63,7 @@ import useForceRerender from 'client/scripts/hooks/useForceRerender';
 
 import Poll from 'client/scripts/models/Poll';
 // eslint-disable-next-line max-len
+import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -92,7 +93,6 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
-import { TokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -306,6 +306,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     topic_id: threadTopic?.id || 0,
   });
 
+  const { data: communityToken } = useGetTokenByCommunityId({
+    community_id: selectedCommunityId,
+    with_stats: true,
+    enabled: !!selectedCommunityId,
+  });
+
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
@@ -377,21 +383,27 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       const thread = await createThread(input);
 
       if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
-        await createThreadToken({
+        if (!communityToken?.token_address) {
+          notifyError('Community token not found');
+          return;
+        }
+
+        const data = await createThreadToken({
           name: effectiveTitle,
           symbol: effectiveTitle.substring(0, 4).toUpperCase(),
           threadId: thread.id!,
           ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
-          initPurchaseAmount: 0.1,
+          initPurchaseAmount: 1e18,
           chainId: community.ChainNode?.eth_chain_id?.toString() || '',
           walletAddress: userSelectedAddress,
           authorAddress: userSelectedAddress,
           communityTreasuryAddress:
             (app.chain?.meta as any)?.communityTreasuryAddress || '',
           chainRpc: community.ChainNode?.url || '',
-          paymentTokenAddress:
-            (app.chain?.meta as any)?.paymentTokenAddress || '',
+          paymentTokenAddress: communityToken.token_address,
         });
+
+        notifySuccess('Thread token created successfully');
       }
 
       if (thread && linkedProposals) {
@@ -498,6 +510,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     pollsData,
     createThreadToken,
     tokenizedThreadsAllowed,
+    communityToken,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -661,11 +674,7 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const sidebarComponent = [
     {
       label: 'Links',
-      item: (
-        <div className="cards-colum">
-          <TokenWidget />
-        </div>
-      ),
+      item: <div className="cards-colum">{/* <TokenWidget /> */}</div>,
     },
     {
       label: 'Links',
