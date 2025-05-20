@@ -164,14 +164,13 @@ async function processViewCounts() {
     CacheNamespaces.CountAggregator,
     CountAggregatorKeys.ThreadViewCount,
   );
-  const threadIds = Object.keys(threadIdHash).join(', ');
 
-  if (threadIds.length === 0) return;
+  if (!Object.keys(threadIdHash).length) return;
 
-  const communityRankUpdates: { newValue: string; whenCaseValue: string }[] =
+  const communityRankUpdates: { newValue: string; whenCaseValue: number }[] =
     [];
-  const globalRankUpdates: { newValue: string; whenCaseValue: string }[] = [];
-  const viewCountUpdates: { newValue: string; whenCaseValue: string }[] = [];
+  const globalRankUpdates: { newValue: string; whenCaseValue: number }[] = [];
+  const viewCountUpdates: { newValue: string; whenCaseValue: number }[] = [];
 
   for (const [threadId, count] of <[string, string][]>(
     Object.entries(threadIdHash)
@@ -181,16 +180,16 @@ async function processViewCounts() {
     if (threadRankIncrease > 0) {
       communityRankUpdates.push({
         newValue: `community_rank + ${threadRankIncrease}`,
-        whenCaseValue: threadId,
+        whenCaseValue: Number(threadId),
       });
       globalRankUpdates.push({
         newValue: `global_rank + ${threadRankIncrease}`,
-        whenCaseValue: threadId,
+        whenCaseValue: Number(threadId),
       });
     }
     viewCountUpdates.push({
       newValue: `view_count + ${count}`,
-      whenCaseValue: threadId,
+      whenCaseValue: Number(threadId),
     });
   }
 
@@ -238,7 +237,10 @@ async function processViewCounts() {
       WHERE TR.thread_id IN (:threadIds)
       GROUP BY T.community_id;
     `,
-    { replacements: { threadIds }, type: QueryTypes.SELECT },
+    {
+      replacements: { threadIds: Object.keys(threadIdHash) },
+      type: QueryTypes.SELECT,
+    },
   );
   await batchedIncrementCachedRank(ranks);
 }

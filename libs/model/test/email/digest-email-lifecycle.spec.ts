@@ -25,7 +25,7 @@ describe('Digest email lifecycle', () => {
     });
 
     [communityOne] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -38,7 +38,7 @@ describe('Digest email lifecycle', () => {
       topics: [{}],
     });
     [communityTwo] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -52,7 +52,7 @@ describe('Digest email lifecycle', () => {
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,

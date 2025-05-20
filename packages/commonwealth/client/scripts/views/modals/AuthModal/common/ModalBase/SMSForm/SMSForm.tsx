@@ -55,7 +55,7 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
                 type="submit"
                 buttonWidth="wide"
                 buttonType="primary"
-                label="Sign in with Magic"
+                label="Sign In"
                 disabled={isLoading || !isPhoneNumberValid}
               />
             </div>

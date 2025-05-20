@@ -6,6 +6,7 @@ import polygonImg from 'assets/img/communitySelector/polygon.svg';
 import skaleImg from 'assets/img/communitySelector/skale.svg';
 import solanaImg from 'assets/img/communitySelector/solana.svg';
 import sonieumImg from 'assets/img/communitySelector/sonieum.png';
+import suiImg from 'assets/img/communitySelector/sui.svg'; // Add Sui image import
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
 export const communityTypeOptions = [
@@ -28,6 +29,17 @@ export const communityTypeOptions = [
     description:
       'Solana is a rapidly growing technology due to its speed and scale. ' +
       'Our integration with Solana allows you to create a community for your project with just a click!',
+  },
+  {
+    type: CommunityType.Sui,
+    img: suiImg,
+    chainBase: ChainBase.Sui,
+    title: 'Sui',
+    isRecommended: false,
+    isHidden: false,
+    description:
+      'Sui is a layer-1 blockchain designed for scalability and low-latency transactions. ' +
+      'Create a community for your Sui project with fast finality and powerful smart contract capabilities.',
   },
   {
     type: CommunityType.Skale,

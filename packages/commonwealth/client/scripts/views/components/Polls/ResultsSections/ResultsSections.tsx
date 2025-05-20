@@ -14,6 +14,7 @@ export type ResultsSectionProps = {
   onResultsClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   tokenSymbol?: string;
   totalVoteCount: number;
+  totalVoteWeight: bigint;
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
   votedFor: string | undefined;
@@ -27,6 +28,7 @@ export const ResultsSections = ({
   resultString,
   tokenSymbol,
   totalVoteCount,
+  totalVoteWeight,
   votedFor,
   voteInformation,
 }: ResultsSectionProps) => {
@@ -67,9 +69,7 @@ export const ResultsSections = ({
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
           >
-            {`${Math.floor(totalVoteCount * 100) / 100} ${
-              tokenSymbol ?? 'votes'
-            }`}
+            {`${totalVoteCount} ${tokenSymbol ?? 'votes'}`}
           </CWText>
         </div>
       )}
@@ -77,7 +77,7 @@ export const ResultsSections = ({
         {voteInformation
           .sort((option1, option2) => {
             if (pollEnded) {
-              return option2.voteCount - option1.voteCount;
+              return Number(option2.voteCount - option1.voteCount);
             } else {
               return 0;
             }
@@ -95,7 +95,8 @@ export const ResultsSections = ({
               <CWProgressBar
                 progress={
                   option.voteCount
-                    ? (option.voteCount / totalVoteCount) * 100
+                    ? Number((option.voteCount * 10000n) / totalVoteWeight) /
+                      100
                     : 0
                 }
                 key={option.value}

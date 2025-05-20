@@ -1,0 +1,130 @@
+@import '../../../styles/shared.scss';
+
+.ImageActionModal.CWResponsiveDialog .CWModal .CWModalBody {
+  overflow-y: auto;
+  max-height: 75vh;
+}
+
+.ImageActionModal {
+  width: 100%;
+
+  .image-input-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+  }
+
+  .reference-images-container {
+    border-bottom: 1px solid $neutral-200;
+    width: 100%;
+    display: block !important;
+  }
+
+  .reference-label {
+    display: block;
+  }
+
+  .reference-subheading {
+    display: block;
+  }
+
+  .reference-grid {
+    padding-block: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .grid-item {
+    position: relative;
+  }
+
+  .empty-reference-uploader {
+    width: 60px;
+    height: 60px;
+    background-color: $neutral-100;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px dashed $neutral-400;
+
+    &:hover {
+      background-color: $neutral-200;
+    }
+
+    .plus-icon {
+      color: $neutral-500;
+      font-size: 24px;
+    }
+  }
+
+  .add-reference-button {
+    margin-top: 16px;
+  }
+
+  .reference-text-container {
+    border-bottom: 1px solid $neutral-200;
+  }
+
+  .reference-text-list {
+    padding-block: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .reference-text-list .Tag.pill {
+    background-color: $neutral-100 !important;
+    border: 1px solid $neutral-300 !important;
+    padding: 4px 8px !important;
+
+    .Text {
+      color: $neutral-700 !important;
+    }
+
+    .close-container {
+      background-color: transparent !important;
+      margin-left: 6px;
+
+      svg {
+        color: $neutral-500 !important;
+      }
+
+      &:hover {
+        svg {
+          background-color: $neutral-200 !important;
+          color: $neutral-700 !important;
+        }
+      }
+    }
+
+    &:hover {
+      background-color: $neutral-200 !important;
+      border-color: $neutral-400 !important;
+
+      .Text {
+        color: $neutral-800 !important;
+      }
+
+      .close-container svg {
+        color: $neutral-700 !important;
+      }
+    }
+  }
+
+  .ImageActionModalFooter {
+    padding: 16px 24px 24px 24px !important;
+  }
+
+  .CWModalBody {
+    max-height: 650px;
+  }
+}
+
+div[class*='CWModal'] div[class*='reference-grid'] > div[class*='grid-item'] {
+  display: inline-block !important;
+  margin-right: 8px !important;
+}

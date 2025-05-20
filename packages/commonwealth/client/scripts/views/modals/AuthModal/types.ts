@@ -24,7 +24,8 @@ export type ModalVariantProps = {
     | ChainBase.Ethereum
     | ChainBase.CosmosSDK
     | ChainBase.Solana
-    | ChainBase.Substrate;
+    | ChainBase.Substrate
+    | ChainBase.Sui;
 
   showAuthOptionFor?: AuthOptions;
   showAuthOptionTypesFor?: AuthOptionTypes[];

@@ -6,6 +6,9 @@ export enum CreateTopicStep {
   WVConsent = 'WVConsent',
   WVNamespaceEnablement = 'WVNamespaceEnablement',
   WVERC20Details = 'WVERC20Details',
+  WVSPLDetails = 'WVSPLDetails',
+  WVSuiNativeDetails = 'WVSuiNativeDetails',
+  WVSuiTokenDetails = 'WVSuiTokenDetails',
   WVStake = 'WVStake',
 }
 
@@ -26,6 +29,9 @@ export const getCreateTopicSteps = (
         createTopicStep === CreateTopicStep.WVConsent ||
         createTopicStep === CreateTopicStep.WVMethodSelection ||
         createTopicStep === CreateTopicStep.WVERC20Details ||
+        createTopicStep === CreateTopicStep.WVSPLDetails ||
+        createTopicStep === CreateTopicStep.WVSuiNativeDetails ||
+        createTopicStep === CreateTopicStep.WVSuiTokenDetails ||
         createTopicStep === CreateTopicStep.WVStake
           ? 'active'
           : 'inactive',

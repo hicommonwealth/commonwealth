@@ -71,6 +71,24 @@ export async function findCompatibleAddress(
       ],
     });
 
+  if (base === ChainBase.Sui)
+    return await models.Address.scope('withPrivateData').findOne({
+      where: {
+        user_id,
+        address: {
+          // Sui addresses are 0x followed by 64 hex characters
+          [Op.regexp]: '0x[a-fA-F0-9]{64}',
+        },
+      },
+      include: [
+        {
+          model: models.Community,
+          where: { base },
+          required: true,
+        },
+      ],
+    });
+
   // Onchain community can be created by Admin only, but we allow Offchain to have any creator
   // if signed in with Keplr or Magic
   if (base === ChainBase.CosmosSDK && type === ChainType.Offchain)

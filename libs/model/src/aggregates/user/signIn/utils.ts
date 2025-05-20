@@ -1,6 +1,10 @@
-import { logger } from '@hicommonwealth/core';
+import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceSourceType,
+  bumpUserTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -8,7 +12,7 @@ import { config } from '../../../config';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
-import { tokenBalanceCache } from '../../../services';
+import * as services from '../../../services';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { emitSignInEvents } from './emitSignInEvents';
 
@@ -27,10 +31,10 @@ export function constructFindAddressBySsoQueryFilter(
     query += ` oauth_username = :oauthUsername`;
   } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
     query += `oauth_email = :oauthEmail`;
-  } else if (['phone_number'].includes(ssoInfo.provider)) {
+  } else if (['SMS'].includes(ssoInfo.provider)) {
     query += `oauth_phone_number = :oauthPhoneNumber`;
   } else {
-    throw new Error(`Unsupported OAuth provider: ${ssoInfo.provider}`);
+    throw new Error(`Unsupported OAuth provider: '${ssoInfo.provider}'`);
   }
 
   return query;
@@ -109,7 +113,7 @@ async function checkNativeWalletBalance(
   const tier = foundUser?.tier || UserTierMap.NewlyVerifiedWallet;
   if (tier < UserTierMap.SocialVerified) {
     const balances = ethChainId
-      ? await tokenBalanceCache.getBalances({
+      ? await services.tokenBalanceCache.getBalances({
           addresses: [address],
           balanceSourceType: BalanceSourceType.ETHNative,
           sourceOptions: { evmChainId: ethChainId },
@@ -163,12 +167,20 @@ export async function findOrCreateUser({
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    if (signedInUser.tier < tier) values.tier = tier;
+    bumpUserTier({
+      oldTier: signedInUser.tier,
+      newTier: tier,
+      targetObject: values,
+    });
     await updateUser(signedInUser.id, values);
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    if (foundUser.tier < tier) values.tier = tier;
+    bumpUserTier({
+      oldTier: foundUser.tier,
+      newTier: tier,
+      targetObject: values,
+    });
     await updateUser(foundUser.id, values);
   }
 
@@ -306,6 +318,20 @@ export async function signInUser({
       signedInUser,
       ethChainId,
     });
+    if (userRes.user.tier === UserTierMap.BannedUser) {
+      throw new InvalidActor(
+        {
+          user: {
+            email: userRes.user.email || '',
+            id: userRes.user.id,
+            emailVerified: userRes.user.emailVerified ?? false,
+            isAdmin: userRes.user.isAdmin ?? false,
+          },
+          address: payload.address,
+        },
+        'User is banned',
+      );
+    }
     foundOrCreatedUser = userRes.user;
     newUser = userRes.newUser;
 

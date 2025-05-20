@@ -15,6 +15,8 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
+import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
+import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
 import {
   CWTab,
   CWTabsRow,
@@ -173,6 +175,7 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
+  const suiWallets = filterWalletNames(ChainBase.Sui);
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -203,6 +206,8 @@ const ModalBase = ({
           return solanaWallets;
         case ChainBase.Substrate:
           return substrateWallets;
+        case ChainBase.Sui:
+          return suiWallets;
         default:
           return [];
       }
@@ -221,6 +226,7 @@ const ModalBase = ({
         ...cosmosWallets,
         ...solanaWallets,
         ...substrateWallets,
+        ...suiWallets,
       ];
     }
 
@@ -343,6 +349,8 @@ const ModalBase = ({
 
   return (
     <>
+      <PrivySMSDialog />
+      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />

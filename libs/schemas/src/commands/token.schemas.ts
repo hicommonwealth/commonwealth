@@ -6,12 +6,15 @@ import { TokenView } from '../queries';
 export const CreateToken = {
   input: z.object({
     community_id: z.string(),
+    eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
-    chain_node_id: z.number(),
     description: z.string().nullish(),
     icon_url: z.string().nullish(),
   }),
-  output: TokenView,
+  output: TokenView.extend({
+    community_id: z.string().nullish(),
+    group_id: z.number().nullish(),
+  }),
   context: AuthContext,
 };
 

@@ -1,0 +1,74 @@
+@import '../../../../styles/shared';
+
+.section-container {
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+      cursor: pointer;
+
+      .link {
+        color: $primary-500;
+
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+
+      .blue-icon {
+        color: $primary-500;
+      }
+    }
+  }
+
+  .horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding-bottom: 10px;
+
+    // Apply to children of QuestList and ExploreContestList
+    & > div {
+      display: flex !important;
+      gap: 15px;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+    }
+
+    // Ensure cards have a fixed width and don't shrink
+    & > div > div {
+      flex: 0 0 auto;
+      min-width: 300px;
+      max-width: 350px;
+    }
+  }
+
+  .users-xp-table {
+    margin-top: 16px;
+    width: 100%;
+    overflow-x: auto;
+
+    .XPEarningsTable {
+      width: 100%;
+      max-width: 100%;
+
+      @include extraSmall {
+        font-size: 14px;
+      }
+    }
+  }
+}

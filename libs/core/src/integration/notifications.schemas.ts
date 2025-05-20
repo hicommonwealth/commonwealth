@@ -236,3 +236,14 @@ export const ReferrerCommunityCreatedNotification = z.object({
   referee_profile_name: z.string(),
   referee_profile_avatar_url: z.string(),
 });
+
+export const TradeEventNotification = z.object({
+  community_id: z.string().describe('The community associated with the token'),
+  symbol: z.string().describe('The token symbol'),
+  is_buy: z.boolean().describe('If the trade was a buy or sell'),
+});
+
+export const CapReachedNotification = z.object({
+  community_id: z.string().describe('The community associated with the token'),
+  symbol: z.string().describe('The token symbol'),
+});

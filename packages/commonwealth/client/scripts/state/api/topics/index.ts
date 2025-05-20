@@ -3,7 +3,6 @@ import useCreateTopicMutation from './createTopic';
 import useEditTopicMutation from './editTopic';
 import useFetchTopicsQuery from './fetchTopics';
 import useGetTopicByIdQuery from './getTopicById';
-import useUpdateFeaturedTopicsOrderMutation from './updateFeaturedTopicsOrder';
 
 export {
   useCreateTopicMutation,
@@ -11,5 +10,4 @@ export {
   useFetchTopicsQuery,
   useGetTopicByIdQuery,
   useToggleArchiveTopicMutation,
-  useUpdateFeaturedTopicsOrderMutation,
 };

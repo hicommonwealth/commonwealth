@@ -16,6 +16,7 @@ type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
   instructionalMessage?: string;
+  containerClassName?: string;
   resizeWithText?: boolean;
   containerClassName?: string;
 };
@@ -29,7 +30,9 @@ type TextAreaFormValidationProps = {
 
 type TextAreaProps = BaseTextInputProps &
   TextAreaStyleProps &
-  TextAreaFormValidationProps;
+  TextAreaFormValidationProps & {
+    customError?: string;
+  };
 
 export const CWTextArea = (props: TextAreaProps) => {
   const validationProps = useTextInputWithValidation();
@@ -102,7 +105,7 @@ export const CWTextArea = (props: TextAreaProps) => {
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
           validationStatus:
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined),
+            (formFieldErrorMessage || customError ? 'failure' : undefined),
           disabled,
           isTyping: validationProps.isTyping,
         })}
@@ -178,7 +181,7 @@ export const CWTextArea = (props: TextAreaProps) => {
           }
           validationStatus={
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined) ||
+            (formFieldErrorMessage || customError ? 'failure' : undefined) ||
             'failure'
           }
         />

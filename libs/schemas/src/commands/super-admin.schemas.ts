@@ -1,5 +1,31 @@
-import { CommunityTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityTierMap,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { Community } from '../entities';
+
+export const CreateChainNode = {
+  input: z.object({
+    url: z.string().url(),
+    name: z.string(),
+    balance_type: z.literal(BalanceType.Ethereum),
+    eth_chain_id: z.number(),
+  }),
+  output: z.object({
+    node_id: z.number(),
+  }),
+};
+
+export const UpdateCommunityId = {
+  input: z.object({
+    community_id: z.string(),
+    new_community_id: z.string(),
+    redirect: z.boolean().optional(),
+  }),
+  output: Community,
+};
 
 export const TriggerNotificationsWorkflow = {
   input: z.object({
@@ -22,6 +48,16 @@ export const SetCommunityTier = {
   input: z.object({
     community_id: z.string(),
     tier: z.nativeEnum(CommunityTierMap),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
+export const SetUserTier = {
+  input: z.object({
+    user_id: z.number(),
+    tier: z.nativeEnum(UserTierMap),
   }),
   output: z.object({
     success: z.boolean(),

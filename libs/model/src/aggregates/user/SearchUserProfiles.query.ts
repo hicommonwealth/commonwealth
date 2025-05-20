@@ -1,6 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
+import { ALL_COMMUNITIES, UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -23,13 +23,13 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
 
       const communityFilter =
         community_id && community_id !== ALL_COMMUNITIES
-          ? `A.community_id = :community_id`
+          ? `AND A.community_id = :community_id`
           : '';
       const nameFilter =
         search.length > 0
           ? exact_match
-            ? `U.profile->>'name' = :searchTerm`
-            : `U.profile->>'name' ILIKE :searchTerm`
+            ? `AND U.profile->>'name' = :searchTerm`
+            : `AND U.profile->>'name' ILIKE :searchTerm`
           : '';
 
       // pagination configuration
@@ -59,8 +59,8 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
                  COUNT(U.id) OVER ()::integer as total
           FROM "Users" U
                    JOIN "Addresses" A ON U.id = A.user_id
-              ${communityFilter || nameFilter ? 'WHERE' : ''} 
-              ${communityFilter} ${communityFilter && nameFilter ? ' AND ' : ''}
+              WHERE U.tier > ${UserTierMap.BannedUser} 
+              ${communityFilter}
               ${nameFilter}
           GROUP BY U.id
           ORDER BY ${order_col} ${direction}

@@ -2,6 +2,7 @@ import {
   CANVAS_TOPIC,
   ChainBase,
   CosmosSignerCW,
+  WalletId,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
   getAddressFromDid,
@@ -66,6 +67,51 @@ export async function getSessionFromWallet(
       );
     }
     return wallet.sessionPayload;
+  }
+
+  // Special handling for Sui Wallet
+  if (wallet.name === WalletId.SuiWallet) {
+    if (newSession) {
+      const address = wallet.accounts[0];
+      if (!address) {
+        throw new Error('No accounts found in Sui Wallet');
+      }
+
+      // Create a simple message to sign
+      const message = `Sign to authenticate with Commonwealth: ${Date.now()}`;
+      const messageBytes = new TextEncoder().encode(message);
+
+      // Use the wallet's signPersonalMessage method to sign
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { signature } = await (wallet as any).signPersonalMessage(
+        messageBytes,
+      );
+
+      // Construct a simple session payload similar to Canvas.js sessions
+      const publicKey = 'sui:' + address; // Use a simple prefix to identify this is a Sui key
+      const did = `did:pkh:sui:${wallet.getChainId()}:${address}`;
+
+      const payload = {
+        type: 'session',
+        did,
+        publicKey,
+        authorizationData: {
+          message,
+          signature: Buffer.from(signature).toString('hex'),
+        },
+        context: {
+          timestamp: Date.now(),
+          duration: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+        },
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (wallet as any).setSession(payload);
+      return payload;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const session = (wallet as any).getSession();
+      return session;
+    }
   }
 
   if (newSession) {

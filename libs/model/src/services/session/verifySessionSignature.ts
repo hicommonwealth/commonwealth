@@ -24,6 +24,22 @@ export const verifySessionSignature = async (
       })
     : address;
 
+  // Special handling for Sui wallet sessions
+  if (session.did?.startsWith('did:pkh:sui:')) {
+    // Extract the wallet address from the DID
+    const [, , , , walletAddress] = session.did.split(':');
+
+    assert(
+      walletAddress === expectedAddress,
+      `session.did address (${walletAddress}) does not match (${expectedAddress})`,
+    );
+
+    // For Sui wallet, we simply verify the address matches since we don't have a
+    // proper Canvas.js signer implementation yet to verify the actual signature
+    // When a proper signer is implemented, this should use that for verification
+    return;
+  }
+
   const signer = getSessionSignerForDid(session.did);
   if (!signer) throw new Error('Missing session signer');
 

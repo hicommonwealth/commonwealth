@@ -6,7 +6,7 @@ import {
   uploadIfLarge,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import {
   authThread,
@@ -35,7 +35,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
     ...schemas.CreateComment,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_COMMENT,
+        action: GatedActionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
       tiered({ creates: true }),

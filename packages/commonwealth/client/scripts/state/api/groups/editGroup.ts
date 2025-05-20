@@ -1,7 +1,6 @@
 import { trpc } from 'utils/trpcClient';
 import { GroupFormTopicSubmitValues } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/index.types';
 import { userStore } from '../../ui/user';
-import { ApiEndpoints, queryClient } from '../config';
 
 interface EditGroupProps {
   groupId: string;
@@ -46,11 +45,10 @@ export const buildUpdateGroupInput = ({
 };
 
 const useEditGroupMutation = ({ communityId }: { communityId: string }) => {
+  const utils = trpc.useUtils();
   return trpc.community.updateGroup.useMutation({
     onSuccess: () => {
-      const key = [ApiEndpoints.FETCH_GROUPS, communityId];
-      queryClient.cancelQueries(key);
-      queryClient.refetchQueries(key);
+      utils.community.getGroups.invalidate({ community_id: communityId });
     },
   });
 };

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { ReactNode, useState } from 'react';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
@@ -8,10 +9,11 @@ type CWResponsiveDialogProps = {
   children: ReactNode;
   onClose: () => void;
   open: boolean;
+  className?: string;
 };
 
 export const CWResponsiveDialog = (props: CWResponsiveDialogProps) => {
-  const { onClose, children, open } = props;
+  const { onClose, children, open, className } = props;
   const [resizing, setResizing] = useState(false);
 
   const { isWindowExtraSmall } = useBrowserWindow({
@@ -24,7 +26,7 @@ export const CWResponsiveDialog = (props: CWResponsiveDialogProps) => {
       <CWDrawer
         size="auto"
         direction="bottom"
-        className="CWResponsiveDialog"
+        className={clsx('CWResponsiveDialog', className)}
         open={open}
         onClose={onClose}
       >
@@ -36,7 +38,7 @@ export const CWResponsiveDialog = (props: CWResponsiveDialogProps) => {
   return (
     <CWModal
       size="small"
-      className="CWResponsiveDialog"
+      className={clsx('CWResponsiveDialog', className)}
       content={<>{children}</>}
       onClose={onClose}
       open={open}

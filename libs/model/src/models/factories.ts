@@ -22,7 +22,7 @@ import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
-import GroupPermission from './groupPermission';
+import GroupGatedAction from './groupGatedAction';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
@@ -76,7 +76,7 @@ export const Factories = {
   EmailUpdateToken,
   EvmEventSource,
   Group,
-  GroupPermission,
+  GroupGatedAction,
   LastProcessedEvmBlock,
   LaunchpadTrade,
   Membership,

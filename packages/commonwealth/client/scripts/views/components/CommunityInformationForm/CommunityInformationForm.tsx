@@ -98,6 +98,12 @@ const CommunityInformationForm = ({
         .map(mappedChainValue);
     }
 
+    if (withChainsConfig?.community?.type === CommunityType.Sui) {
+      return sortedChains
+        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
+        .map(mappedChainValue);
+    }
+
     return sortedChains
       .filter(
         (chainType) =>

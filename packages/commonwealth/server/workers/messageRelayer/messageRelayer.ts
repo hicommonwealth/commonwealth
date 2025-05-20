@@ -1,13 +1,6 @@
-import {
-  createRmqConfig,
-  RabbitMQAdapter,
-  ServiceKey,
-  startHealthCheckLoop,
-} from '@hicommonwealth/adapters';
-import { broker, logger } from '@hicommonwealth/core';
-import { bootstrapRelayer } from 'server/bindings/bootstrap';
-import { rascalConsumerMap } from '../../bindings/rascalConsumerMap';
-import { config } from '../../config';
+import { ServiceKey, startHealthCheckLoop } from '@hicommonwealth/adapters';
+import { logger } from '@hicommonwealth/core';
+import { bootstrapBindings, bootstrapRelayer } from 'server/bindings/bootstrap';
 
 const log = logger(import.meta);
 
@@ -25,14 +18,7 @@ startHealthCheckLoop({
 });
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
-  const rmqAdapter = new RabbitMQAdapter(
-    createRmqConfig({
-      rabbitMqUri: config.BROKER.RABBITMQ_URI,
-      map: rascalConsumerMap,
-    }),
-  );
-  await rmqAdapter.init();
-  broker({ adapter: rmqAdapter });
+  await bootstrapBindings({ worker: 'none' });
   const pgClient = await bootstrapRelayer(maxRelayIterations);
   isServiceHealthy = true;
   return pgClient;

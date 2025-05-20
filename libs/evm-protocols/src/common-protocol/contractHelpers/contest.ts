@@ -32,16 +32,20 @@ export const getTotalContestBalance = async (
   client: PublicClient<HttpTransport, Chain>,
   oneOff?: boolean,
 ): Promise<string> => {
+  // NOTE: only recurring contests have a fee manager
   const contestContract = getContract({
     address: contestAddress as `0x${string}`,
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     client,
   });
 
+  let useFeeManager = false;
   let feeManagerAddressPromise: Promise<`0x${string}`> | undefined;
-  const useFeeManager = await contestContract.read.useFeeManager();
-  if (!oneOff && useFeeManager) {
-    feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
+  if (!oneOff) {
+    useFeeManager = await contestContract.read.useFeeManager();
+    if (useFeeManager) {
+      feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
+    }
   }
 
   const { 0: contestToken, 1: feeManagerAddress } = await Promise.all([
@@ -119,15 +123,7 @@ export const getContestStatus = async (
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
   };
 
-  const [
-    startTime,
-    endTime,
-    currentContentId,
-    contestInterval,
-    prizeShare,
-    voterShare,
-    contestToken,
-  ] = await Promise.all([
+  const promises = [
     client.readContract({
       ...contract,
       functionName: 'startTime',
@@ -146,17 +142,32 @@ export const getContestStatus = async (
     }),
     client.readContract({
       ...contract,
-      functionName: 'prizeShare',
-    }),
-    client.readContract({
-      ...contract,
       functionName: 'voterShare',
     }),
     client.readContract({
       ...contract,
       functionName: 'contestToken',
     }),
-  ]);
+  ];
+
+  if (!oneOff) {
+    promises.push(
+      client.readContract({
+        ...contract,
+        functionName: 'prizeShare',
+      }),
+    );
+  }
+
+  const [
+    startTime,
+    endTime,
+    currentContentId,
+    contestInterval,
+    voterShare,
+    contestToken,
+    prizeShare,
+  ] = await Promise.all(promises);
 
   return {
     startTime: Number(startTime),
@@ -233,14 +244,8 @@ export const getContestScore = async (
     return { contestBalance, scores: [] };
   }
 
-  const contestInstance2 = getContract({
-    address: contest as `0x${string}`,
-    abi: ContestGovernorAbi,
-    client,
-  });
-
   const contentMeta = await Promise.all(
-    winnerIds.map((winnerId) => contestInstance2.read.content([winnerId])),
+    winnerIds.map((winnerId) => contestInstance.read.content([winnerId])),
   );
 
   const scores = winnerIds.map((v, i) => {

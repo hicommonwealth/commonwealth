@@ -165,7 +165,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                     renderTrigger={(handleInteraction) => (
                       <div
                         className="rewards-button-container"
-                        onClick={() => navigate('/rewards', {}, null)}
+                        onClick={() => navigate('/wallet', {}, null)}
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
                       >

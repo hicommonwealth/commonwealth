@@ -24,7 +24,7 @@ describe('Stake Historical Price', () => {
       isAdmin: true,
     });
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,

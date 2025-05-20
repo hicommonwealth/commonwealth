@@ -15,7 +15,9 @@ type WorkflowKey =
   | 'user-mentioned'
   | 'community-stake'
   | 'chain-event-proposals'
-  | 'new-upvote';
+  | 'new-upvote'
+  | 'launchpad-trade-event'
+  | 'launchpad-cap-reached';
 
 const getLinkUrl = (source: { key: WorkflowKey }, data): string => {
   switch (source.key) {
@@ -31,6 +33,10 @@ const getLinkUrl = (source: { key: WorkflowKey }, data): string => {
       return data?.object_url;
     case 'snapshot-proposals':
       return data?.snapshot_proposal_url;
+    case 'launchpad-trade-event':
+      return `/${data?.community_id}`;
+    case 'launchpad-cap-reached':
+      return `/${data?.community_id}`;
     default:
       return `${window.location.origin}/${data?.community_name}`;
   }

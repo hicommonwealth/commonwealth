@@ -18,7 +18,7 @@ describe('New Content lifecycle', () => {
     const [user1] = await seed('User');
     const [user2] = await seed('User');
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 2,

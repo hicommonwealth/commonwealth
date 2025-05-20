@@ -37,7 +37,8 @@ export function debounceRefresh(
     timeouts.set(
       key,
       setTimeout(() => {
-        void fn(args).then(() => {
+        // Spread the args when calling the function instead of passing as a single array
+        void fn(...args).then(() => {
           // clean up after execution
           timeouts.delete(key);
           timestamps.delete(key);
@@ -50,17 +51,17 @@ export function debounceRefresh(
 }
 
 export const refreshProfileCount = debounceRefresh(
-  async (community_id: string) => {
+  async ([community_id]: [string]) => {
     await models.sequelize.query(
       `
-UPDATE "Communities" C
-SET profile_count = (
-    SELECT COUNT(*) 
-    FROM "Addresses" A 
-    WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
-)
-WHERE C.id = :community_id;
-    `,
+        UPDATE "Communities" C
+        SET profile_count = (SELECT COUNT(*)
+                             FROM "Addresses" A
+                             WHERE A.community_id = C.id
+                               AND A.user_id IS NOT NULL
+                               AND A.verified IS NOT NULL)
+        WHERE C.id = :community_id;
+      `,
       { replacements: { community_id } },
     );
   },
@@ -68,11 +69,23 @@ WHERE C.id = :community_id;
 );
 
 export const refreshMemberships = debounceRefresh(
-  async (community_id: string, group_id?: number) => {
-    await command(RefreshCommunityMemberships(), {
-      actor: systemActor({}),
-      payload: { community_id, group_id },
-    });
+  async ([community_id, group_id]: [string, undefined] | [string, number]) => {
+    try {
+      await command(RefreshCommunityMemberships(), {
+        actor: systemActor({}),
+        payload: { community_id, group_id },
+      });
+    } catch (e) {
+      log.error(
+        'Failed to refresh community memberships',
+        e instanceof Error ? e : undefined,
+        {
+          ...(e instanceof Error ? { e } : {}),
+          community_id,
+          group_id,
+        },
+      );
+    }
   },
   10_000,
 );

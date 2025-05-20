@@ -1,3 +1,6 @@
+import * as services from '../../src/services';
+vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({});
+
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
@@ -561,7 +564,7 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have ref.actor join it
         const [community2] = await tester.seed('Community', {
-          tier: CommunityTierMap.CommunityVerified,
+          tier: CommunityTierMap.ChainVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,
@@ -680,7 +683,7 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have 2nd user join it
         const [community2] = await tester.seed('Community', {
-          tier: CommunityTierMap.CommunityVerified,
+          tier: CommunityTierMap.ChainVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,

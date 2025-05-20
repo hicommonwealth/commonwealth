@@ -14,6 +14,7 @@ export * as Reaction from './aggregates/reaction';
 export * as Snapshot from './aggregates/snapshot';
 export * as Subscription from './aggregates/subscription';
 export * as SuperAdmin from './aggregates/super-admin';
+export * as Tag from './aggregates/tag';
 export * as Thread from './aggregates/thread';
 export * as Token from './aggregates/token';
 export * as User from './aggregates/user';

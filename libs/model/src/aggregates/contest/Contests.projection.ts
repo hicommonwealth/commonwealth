@@ -11,6 +11,7 @@ import {
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
+  BalanceSourceType,
   LP_CONTEST_MANAGER_ADDRESS_ANVIL,
   LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
   LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
@@ -128,7 +129,7 @@ async function createInitialContest(
       );
     }
 
-    const [contestManager] = await models.ContestManager.update(
+    const [, [contestManager]] = await models.ContestManager.update(
       {
         interval,
         ticker,
@@ -148,6 +149,42 @@ async function createInitialContest(
       },
       { transaction },
     );
+
+    // if judged contest, create group for contest
+    if (contestManager.namespace_judge_token_id) {
+      const groupName = `Contest [${contestManager.name}] Judge`;
+      await models.Group.findOrCreate({
+        where: {
+          community_id: community.id,
+          metadata: { name: groupName },
+          is_system_managed: true,
+        },
+        defaults: {
+          community_id: community.id,
+          metadata: {
+            name: groupName,
+            description: 'Users who are judges for this contest',
+            required_requirements: 1,
+          },
+          requirements: [
+            {
+              rule: 'threshold',
+              data: {
+                threshold: '0', // must have more than 0 tokens
+                source: {
+                  source_type: BalanceSourceType.ERC1155,
+                  evm_chain_id: community.ChainNode!.eth_chain_id!,
+                  contract_address: community.namespace_address!,
+                  token_id: contestManager.namespace_judge_token_id.toString(),
+                },
+              },
+            },
+          ],
+          is_system_managed: true,
+        },
+        transaction,
+      });
+    }
 
     const childContractName = isOneOff
       ? ChildContractNames.SingleContest

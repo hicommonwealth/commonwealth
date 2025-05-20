@@ -1,4 +1,5 @@
 import { BalanceType } from '@hicommonwealth/shared';
+import useCreateChainNodeMutation from 'client/scripts/state/api/superAdmin/createChainNode';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
@@ -16,7 +17,6 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import './AdminPanel.scss';
-import { createChainNode } from './utils';
 
 const RPCEndpointTask = () => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
@@ -36,6 +36,7 @@ const RPCEndpointTask = () => {
     useState<boolean>(false);
 
   const { data: nodes } = useFetchNodesQuery();
+  const { mutateAsync: createChainNode } = useCreateChainNodeMutation();
 
   const buttonEnabled =
     (communityChainNodeValidated &&
@@ -90,7 +91,7 @@ const RPCEndpointTask = () => {
       await createChainNode({
         url: rpcEndpoint,
         name: rpcName,
-        balance_type: balanceType,
+        balance_type: BalanceType.Ethereum,
         eth_chain_id: ethChainId,
       });
 

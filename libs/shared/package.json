@@ -17,9 +17,7 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
-    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test"
   },
   "dependencies": {
     "@canvas-js/chain-cosmos": "^0.13.14",
@@ -35,8 +33,8 @@
     "@libp2p/crypto": "^5.0.4",
     "@libp2p/peer-id": "^5.0.4",
     "@polkadot/util": "12.6.2",
+    "dayjs": "^1.11.13",
     "libp2p": "^2.1.3",
-    "moment": "^2.23.0",
     "safe-stable-stringify": "^2.4.2"
   }
 }

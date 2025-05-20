@@ -1,4 +1,4 @@
-import GeckoTerminalChart from 'client/scripts/views/components/GekoTerminalChart/GekoTerminalChart';
+import GeckoTerminalChart from 'client/scripts/views/components/GeckoTerminalChart/GeckoTerminalChart';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useTokenData from '../../hooks/useTokenData';
@@ -16,7 +16,7 @@ const PriceChartTab = () => {
       </CWText>
 
       <GeckoTerminalChart
-        className="GekoChartContestPage"
+        className="GeckoChartContestPage"
         chain={chain}
         poolAddress={address}
         info={false}

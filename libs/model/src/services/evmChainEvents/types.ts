@@ -30,7 +30,7 @@ export type Log = {
 type EvmEventMeta = (
   | {
       events_migrated: true;
-      quest_action_meta_id?: number;
+      quest_action_meta_ids?: number[];
     }
   | {
       events_migrated: false;

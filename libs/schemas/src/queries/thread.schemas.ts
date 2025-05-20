@@ -1,9 +1,11 @@
+import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import {
   Address,
   Comment,
   CommentVersionHistory,
   ContestManager,
+  Link,
   ProfileTags,
   Thread,
   ThreadVersionHistory,
@@ -50,7 +52,7 @@ export const ContestActionView = ContestAction.pick({
   Contest: ContestView,
 });
 
-export const ProfileTagsView = ProfileTags.extend({
+export const ProfileTagsView = ProfileTags.omit({ Tag: true }).extend({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
 });
@@ -333,5 +335,24 @@ export const SearchThreads = {
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
+  }),
+};
+
+export const GetLinks = {
+  input: z.object({
+    thread_id: PG_INT.optional(),
+    link_source: z.nativeEnum(LinkSource).optional(),
+    link_identifier: z.string().optional(),
+  }),
+  output: z.object({
+    links: z.array(Link).optional(),
+    threads: z
+      .array(
+        z.object({
+          id: PG_INT,
+          title: z.string(),
+        }),
+      )
+      .optional(),
   }),
 };

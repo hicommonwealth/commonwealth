@@ -1,9 +1,13 @@
-import { dispose } from '@hicommonwealth/core';
-import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
+import { command, dispose } from '@hicommonwealth/core';
+import {
+  SuperAdmin,
+  tester,
+  type DB,
+  type UserInstance,
+} from '@hicommonwealth/model';
 import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
 import { assert, expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('ChainNode Tests', () => {
@@ -18,9 +22,7 @@ describe('ChainNode Tests', () => {
   });
 
   test('Creates new ChainNode when', async () => {
-    // @ts-expect-error StrictNullChecks
-    const controller = new ServerCommunitiesController(models, null);
-    const user: UserInstance = buildUser({
+    buildUser({
       models,
       userAttributes: {
         email: '',
@@ -30,25 +32,25 @@ describe('ChainNode Tests', () => {
         tier: UserTierMap.ManuallyVerified,
       },
     }) as UserInstance;
-    const resp = await controller.createChainNode({
-      user,
-      url: 'wss://',
-      name: 'asd',
-      balanceType: 'ethereum',
-      eth_chain_id: 123,
+    const actor = { user: { id: 1, email: '', isAdmin: true } };
+
+    const resp = await command(SuperAdmin.CreateChainNode(), {
+      actor,
+      payload: {
+        url: 'wss://abc.com',
+        name: 'asd',
+        balance_type: BalanceType.Ethereum,
+        eth_chain_id: 123,
+      },
     });
 
     const createdNode = await models.ChainNode.findOne({
-      where: { id: resp.node_id },
+      where: { id: resp!.node_id },
     });
-    // @ts-expect-error StrictNullChecks
-    assert.equal(createdNode.url, 'wss://');
-    // @ts-expect-error StrictNullChecks
-    assert.equal(createdNode.name, 'asd');
-    // @ts-expect-error StrictNullChecks
-    assert.equal(createdNode.balance_type, 'ethereum');
-    // @ts-expect-error StrictNullChecks
-    assert.equal(createdNode.eth_chain_id, 123);
+    assert.equal(createdNode!.url, 'wss://abc.com');
+    assert.equal(createdNode!.name, 'asd');
+    assert.equal(createdNode!.balance_type, 'ethereum');
+    assert.equal(createdNode!.eth_chain_id, 123);
   });
 
   test('adds eth chain node to db', async () => {

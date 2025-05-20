@@ -30,7 +30,7 @@ describe('Transactions history', () => {
       isAdmin: true,
     });
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       namespace: 'qaa',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,

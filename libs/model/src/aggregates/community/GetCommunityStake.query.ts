@@ -8,18 +8,17 @@ export function GetCommunityStake(): Query<typeof schemas.GetCommunityStake> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      return (
-        await models.CommunityStake.findOne({
-          where: payload,
-          include: [
-            {
-              model: models.Community,
-              required: true,
-              attributes: ['namespace'],
-            },
-          ],
-        })
-      )?.toJSON();
+      const stake = await models.CommunityStake.findOne({
+        where: payload,
+        include: [
+          {
+            model: models.Community,
+            required: true,
+            attributes: ['namespace'],
+          },
+        ],
+      });
+      return { stake: stake?.toJSON() };
     },
   };
 }

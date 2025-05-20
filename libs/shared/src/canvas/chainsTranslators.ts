@@ -14,6 +14,8 @@ export function chainBaseToCaip2(chainBase: ChainBase): string {
     return 'solana';
   } else if (chainBase === ChainBase.Substrate) {
     return 'polkadot';
+  } else if (chainBase === ChainBase.Sui) {
+    return 'sui';
   } else {
     throw new Error(`Unknown chainBase: ${chainBase}`);
   }
@@ -29,6 +31,8 @@ export function caip2ToChainBase(caip2: string): ChainBase {
     return ChainBase.Solana;
   } else if (prefix === 'polkadot') {
     return ChainBase.Substrate;
+  } else if (prefix === 'sui') {
+    return ChainBase.Sui;
   } else {
     throw new Error(`Unknown CAIP-2 chain prefix: ${prefix}`);
   }

@@ -42,7 +42,7 @@ const EmailForm = ({ onSubmit, onCancel, isLoading }: EmailFormProps) => {
               type="submit"
               buttonWidth="wide"
               buttonType="primary"
-              label="Sign in with Magic"
+              label="Sign In"
               disabled={isLoading}
             />
           </div>

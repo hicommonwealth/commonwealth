@@ -1,6 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
@@ -13,7 +14,7 @@ const MarkdownHitHighlighterPage = lazy(
 );
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/Communities'));
+const ExplorePage = lazy(() => import('views/pages/ExplorePage'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
@@ -131,7 +132,7 @@ const CommunityNotFoundPage = lazy(
 );
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
@@ -148,6 +149,12 @@ const CommonDomainRoutes = () => [
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
     element={<MobileAppRedirect />}
+  />,
+
+  <Route
+    key="sign-in"
+    path="/sign-in"
+    element={withLayout(SignIn, { type: 'common' })}
   />,
 
   <Route
@@ -254,14 +261,14 @@ const CommonDomainRoutes = () => [
   <Route
     key="/explore"
     path="/explore"
-    element={withLayout(CommunitiesPage, {
+    element={withLayout(ExplorePage, {
       type: 'common',
     })}
   />,
   <Route
-    key="/rewards"
-    path="/rewards"
-    element={withLayout(RewardsPage, { type: 'common' })}
+    key="/wallet"
+    path="/wallet"
+    element={withLayout(WalletPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -781,6 +788,7 @@ const CommonDomainRoutes = () => [
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
+  <Route key="/rewards" path="/rewards" element={<Navigate to="/wallet" />} />,
   // LEGACY REDIRECTS END
 
   // Community not found page - This should be at the end

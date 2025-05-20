@@ -5,7 +5,7 @@ import type {
   Session,
   Signature,
 } from '@canvas-js/interfaces';
-import { command, dispose } from '@hicommonwealth/core';
+import { command, dispose, query } from '@hicommonwealth/core';
 import { Poll } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -91,30 +91,28 @@ describe('Polls', () => {
       options: ['optionA', 'optionB'],
     };
 
-    const res = await chai.request
-      .agent(server.app)
-      // @ts-expect-error StrictNullChecks
-      .post(`/api/threads/${thread.id}/polls`)
-      .set('Accept', 'application/json')
-      .send({
-        // @ts-expect-error StrictNullChecks
-        author_chain: thread.community_id,
-        // @ts-expect-error StrictNullChecks
-        chain: thread.community_id,
+    const res = await command(Poll.CreatePoll(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
         address: userAddress,
-        jwt: userJWT,
+      },
+      payload: {
+        thread_id: thread!.id!,
         ...data,
-      });
-
-    expect(res.status, JSON.stringify(res)).to.equal(200);
-    expect(res.body.result).to.contain({
+      },
+    });
+    expect(res).to.not.be.undefined;
+    expect(res?.id).to.not.be.undefined;
+    expect(res).to.contain({
       prompt: data.prompt,
       options: JSON.stringify(data.options),
     });
 
-    // @ts-expect-error StrictNullChecks
-    threadId = thread.id;
-    pollId = res.body.result.id;
+    threadId = thread!.id!;
+    pollId = res!.id!;
   });
 
   test('should fail to cast a vote with invalid option', async () => {
@@ -158,64 +156,76 @@ describe('Polls', () => {
   });
 
   test('should get thread polls, response shows poll and vote', async () => {
-    const res = await chai.request
-      .agent(server.app)
-      .get(`/api/threads/${threadId}/polls`)
-      .set('Accept', 'application/json')
-      .query({
-        chain: chain,
-      });
+    const res = await query(Poll.GetPolls(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
+        address: userAddress,
+      },
+      payload: {
+        thread_id: threadId,
+      },
+    });
 
-    expect(res.status).to.equal(200);
-    expect(res.body.result[0]).to.have.property('votes').with.length(1);
-    expect(res.body.result[0].votes).to.have.length(1);
-    expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
-    expect(res.body.result[0].votes[0]).to.have.property(
-      'address',
-      userAddress,
-    );
+    expect(res![0]).to.have.property('votes').with.length(1);
+    expect(res![0].votes).to.have.length(1);
+    expect(res![0].votes![0]).to.have.property('option', 'optionA');
+    expect(res![0].votes![0]).to.have.property('address', userAddress);
   });
 
   test('should get thread poll votes', async () => {
-    const res = await chai.request
-      .agent(server.app)
-      .get(`/api/polls/${pollId}/votes`)
-      .set('Accept', 'application/json')
-      .query({
-        chain: chain,
-      });
+    const res = await query(Poll.GetPollVotes(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
+        address: userAddress,
+      },
+      payload: {
+        poll_id: pollId,
+      },
+    });
 
-    expect(res.status).to.equal(200);
-    expect(res.body.result[0]).to.have.property('option', 'optionA');
-    expect(res.body.result[0]).to.have.property('address', userAddress);
+    expect(res![0]).to.have.property('option', 'optionA');
+    expect(res![0]).to.have.property('address', userAddress);
   });
 
   test('should delete poll', async () => {
-    const res = await chai.request
-      .agent(server.app)
-      .delete(`/api/polls/${pollId}`)
-      .set('Accept', 'application/json')
-      .send({
-        author_chain: chain,
-        chain: chain,
+    const res = await command(Poll.DeletePoll(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
         address: userAddress,
-        jwt: userJWT,
-      });
+      },
+      payload: {
+        thread_id: threadId,
+        poll_id: pollId,
+      },
+    });
 
-    expect(res.status).to.equal(200);
+    expect(res).to.be.true;
   });
 
   test('should get thread polls, response shows no results', async () => {
-    const res = await chai.request
-      .agent(server.app)
-      .get(`/api/threads/${threadId}/polls`)
-      .set('Accept', 'application/json')
-      .query({
-        chain: chain,
-      });
+    const res = await query(Poll.GetPolls(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
+        address: userAddress,
+      },
+      payload: {
+        thread_id: threadId,
+      },
+    });
 
-    expect(res.status).to.equal(200);
-    expect(Array.isArray(res.body.result)).to.be.true;
-    expect(res.body.result).to.have.length(0);
+    expect(Array.isArray(res)).to.be.true;
+    expect(res).to.have.length(0);
   });
 });

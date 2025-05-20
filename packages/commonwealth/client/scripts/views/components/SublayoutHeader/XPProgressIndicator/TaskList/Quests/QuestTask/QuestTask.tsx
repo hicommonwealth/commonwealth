@@ -1,19 +1,18 @@
 import clsx from 'clsx';
 import { calculateQuestTimelineLabel } from 'helpers/quest';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './QuestTask.scss';
 
 export type QuestTaskQuest = {
   id: number;
   communityId?: string;
   imageURL: string;
-  xpPoints: { total: number; gained: number };
   isCompleted: boolean;
   title: string;
   endDate: Date;
+  xpPointsElement: ReactNode;
   startDate: Date;
 };
 
@@ -35,10 +34,7 @@ const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
           {quest.isCompleted && <CWIcon iconName="check" iconSize="small" />}
         </CWText>
         <div className="xp-row">
-          <CWTag
-            label={`${quest.xpPoints.gained > 0 ? `${quest.xpPoints.gained} / ` : ''}${quest.xpPoints.total} Aura`}
-            type="proposal"
-          />
+          {quest.xpPointsElement}
           <CWText
             type="caption"
             className="timeline-label"

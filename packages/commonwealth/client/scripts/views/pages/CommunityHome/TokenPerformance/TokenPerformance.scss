@@ -34,5 +34,37 @@
     gap: 16px;
     align-items: flex-start;
     flex-wrap: wrap;
+
+    &.no-chart {
+      justify-content: space-between;
+
+      > div {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .TopHolders {
+        max-width: 50%;
+      }
+
+      @include mediumSmallInclusive {
+        flex-direction: column;
+
+        > div {
+          min-width: 100%;
+          width: 100%;
+        }
+
+        .TopHolders {
+          max-width: 100%;
+          margin-top: 16px;
+        }
+      }
+    }
+
+    .GeckoChart {
+      flex: 1;
+      min-width: 300px;
+    }
   }
 }

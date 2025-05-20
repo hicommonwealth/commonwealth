@@ -48,6 +48,16 @@
       }
     }
 
+    .mobile-action-card-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      .actions {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
     .action-cards {
       display: flex;
       flex-direction: column;

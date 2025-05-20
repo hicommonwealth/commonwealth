@@ -66,8 +66,8 @@ const useStakeTransaction = ({
       );
 
       await updateCommunityStake({
-        communityId,
-        stakeId: commonProtocol.STAKE_ID,
+        community_id: communityId,
+        stake_id: commonProtocol.STAKE_ID,
       });
 
       setTransactionData({

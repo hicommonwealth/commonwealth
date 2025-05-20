@@ -11,7 +11,6 @@ import { ThreadView } from 'client/scripts/models/Thread';
 import { Feed } from 'feed';
 import moment from 'moment';
 import { z } from 'zod';
-import { ServerControllers } from '../routing/router';
 import { TypedRequestQuery, TypedResponse } from '../types';
 import { formatErrorPretty } from '../util/errorFormat';
 import {
@@ -44,7 +43,6 @@ function computeUpdated(bulkThreads: z.infer<typeof GetThreads.output>) {
 
 export const getFeedHandler = async (
   models: DB,
-  controllers: ServerControllers,
   req: TypedRequestQuery<
     GetThreadsRequestQuery &
       (

@@ -91,7 +91,7 @@ const ThreadResultRow = ({
 
 export type ReplyResult = {
   id: number;
-  proposalid: number;
+  thread_id: number;
   community_id: string;
   title: string;
   body: string;
@@ -111,7 +111,7 @@ const ReplyResultRow = ({
   searchTerm,
   setRoute,
 }: ReplyResultRowProps) => {
-  const proposalId = comment.proposalid;
+  const threadId = comment.thread_id;
   const communityId = comment.community_id;
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -121,11 +121,7 @@ const ReplyResultRow = ({
   }, [comment.title]);
 
   const handleClick = () => {
-    setRoute(
-      `/discussion/${proposalId}?comment=${comment.id}`,
-      {},
-      communityId,
-    );
+    setRoute(`/discussion/${threadId}?comment=${comment.id}`, {}, communityId);
   };
 
   if (domain?.isCustomDomain && domain?.customDomainId !== communityId) {

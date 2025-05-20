@@ -18,9 +18,7 @@
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "echo No tests to run",
-    "start": "tsx src/server.ts",
-    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+    "start": "tsx src/server.ts"
   },
   "author": "",
   "license": "ISC",
@@ -30,7 +28,6 @@
     "axios": "^1.3.4",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "moment": "^2.23.0",
     "morgan": "^1.10.0",
     "pino-http": "^9.0.0",
     "web3": "^4.7.0",

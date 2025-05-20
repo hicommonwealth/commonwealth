@@ -2,6 +2,7 @@ import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import {
   doesActionAllowChainId,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
   doesActionRequireGroupId,
@@ -20,7 +21,8 @@ export type ContentIdType =
   | 'group'
   | 'tweet_url'
   | 'discord_server_id'
-  | 'chain';
+  | 'chain'
+  | 'threshold';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -39,6 +41,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Chain;
     if (doesActionRequireGroupId(action as QuestAction))
       return QuestActionContentIdScope.Group;
+    if (doesActionAllowTokenTradeThreshold(action as QuestAction))
+      return QuestActionContentIdScope.TokenTradeThreshold;
     return undefined;
   }
 
@@ -54,6 +58,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Chain;
     case 'group':
       return QuestActionContentIdScope.Group;
+    case 'threshold':
+      return QuestActionContentIdScope.TokenTradeThreshold;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -67,6 +73,9 @@ export const buildContentIdFromIdentifier = (
     return `${idType}:${identifier}`;
   }
   if (idType === 'chain') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'threshold') {
     return `${idType}:${identifier}`;
   }
 
@@ -137,6 +146,9 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'group') {
     return `${origin}/group/${idOrURL}${params}`;
   }
+  if (idType === 'threshold') {
+    return `${idOrURL}`;
+  }
 
   return '';
 };
@@ -151,6 +163,7 @@ export const doesConfigAllowContentIdField = (
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
     config?.with_optional_chain_id ||
-    config?.requires_group_id
+    config?.requires_group_id ||
+    config?.with_optional_token_trade_threshold
   );
 };

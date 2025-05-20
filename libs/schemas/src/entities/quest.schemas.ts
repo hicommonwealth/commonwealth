@@ -1,6 +1,7 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
 
 export const ChannelQuestEvents = {
   DiscordServerJoined: events.DiscordServerJoined,
@@ -43,7 +44,7 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
@@ -174,6 +175,7 @@ const sharedQuestActionMeta = z.object({
 
   // associations
   QuestTweet: QuestTweet.nullish(),
+  ChainEventXpSource: ChainEventXpSource.nullish(),
 });
 
 export const KyoFinanceSwapQuestAction = sharedQuestActionMeta.extend({

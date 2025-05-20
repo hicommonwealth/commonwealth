@@ -1,0 +1,269 @@
+@import '../../../styles/shared';
+
+.BreadcrumbsComponent {
+  z-index: 0 !important;
+}
+
+.ExplorePageLayout {
+  padding-top: 0;
+  height: 100%;
+  overflow-y: auto;
+
+  .layout-container {
+    height: 100%;
+    margin-top: 10px;
+  }
+}
+
+.ExplorePage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: $white;
+
+    .btn-border {
+      margin: 0 !important;
+      padding: 0 !important;
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+    }
+
+    .description {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .communities-count {
+          color: $neutral-500;
+          height: fit-content;
+          margin-right: 12px;
+        }
+
+        .CreateCommunityButton {
+          padding: 0;
+        }
+      }
+    }
+
+    .explore-tabs-row {
+      margin: 8px 0 16px;
+      width: 100%;
+      border-bottom: 1px solid $neutral-200;
+      overflow-x: auto;
+
+      @include extraSmall {
+        padding-bottom: 4px;
+      }
+    }
+  }
+
+  .tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 4px 0;
+
+    .coming-soon-badge {
+      background-color: $primary-100;
+      color: $primary-700;
+      border-radius: 4px;
+      padding: 4px 8px;
+
+      .Text {
+        color: $primary-700;
+      }
+    }
+  }
+
+  .placeholder-content {
+    background-color: $neutral-50;
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    margin: 24px 0;
+    color: $neutral-600;
+  }
+
+  // Common styles for tab content
+  .threads-tab,
+  .transactions-tab,
+  .users-tab {
+    margin-top: 16px;
+    padding: 0 8px;
+  }
+
+  // Specific styles for the Threads tab
+  .threads-tab {
+    width: 100%;
+
+    .Feed {
+      width: 100%;
+      min-height: 400px;
+
+      .no-feed-message {
+        text-align: center;
+        padding: 32px;
+        font-size: 16px;
+        color: $neutral-600;
+      }
+    }
+  }
+
+  // Specific styles for the Users tab
+  .users-tab {
+    .users-xp-table {
+      margin-top: 16px;
+      width: 100%;
+      overflow-x: auto;
+
+      .XPEarningsTable {
+        width: 100%;
+        max-width: 100%;
+
+        @include extraSmall {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .communities-list {
+    width: 100%;
+    min-height: 500px;
+
+    > div {
+      div[data-testid='virtuoso-item-list'] {
+        > div {
+          display: grid !important;
+          grid-gap: 28px;
+          grid-template-columns: 1fr 1fr;
+          justify-content: center;
+          padding-top: 24px;
+
+          @include mediumSmall {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          @include extraSmall {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+
+  .my-16 {
+    margin: 16px 0;
+  }
+
+  .empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    justify-content: center;
+    align-items: center;
+
+    .h2 {
+      display: inline;
+      text-align: center;
+
+      a {
+        color: $primary-500;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: $primary-500;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.section-container {
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+      cursor: pointer;
+
+      .link {
+        color: $primary-500;
+
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+
+      .blue-icon {
+        color: $primary-500;
+      }
+    }
+  }
+
+  .horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding-bottom: 10px;
+
+    // Apply to children of QuestList and ExploreContestList
+    & > div {
+      display: flex !important;
+      gap: 15px;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+    }
+
+    // Ensure cards have a fixed width and don't shrink
+    & > div > div {
+      flex: 0 0 auto;
+      min-width: 300px;
+      max-width: 350px;
+    }
+  }
+}

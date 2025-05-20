@@ -4,7 +4,6 @@ import { notifyError } from '../../controllers/app/notifications';
 import { getAddedAndDeleted } from '../../helpers/threads';
 import type Thread from '../../models/Thread';
 import { LinkSource } from '../../models/Thread';
-import app from '../../state';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
@@ -33,16 +32,8 @@ export const LinkedThreadModal = ({
   const [tempLinkedThreads, setTempLinkedThreads] =
     useState<Array<Thread>>(initialLinkedThreads);
 
-  const communityId = app.activeChainId() || '';
-  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId,
-    threadId: thread.id,
-  });
-
-  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId,
-    threadId: thread.id,
-  });
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation();
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
@@ -53,26 +44,24 @@ export const LinkedThreadModal = ({
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          communityId,
-          threadId: thread.id,
+          thread_id: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
             identifier: String(el.id),
             title: el.title,
           })),
         });
-        links = updatedThread.links;
+        links = updatedThread.links || [];
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          communityId,
-          threadId: thread.id,
+          thread_id: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,
             identifier: String(el.id),
           })),
         });
-        links = updatedThread.links;
+        links = updatedThread.links || [];
       }
       onModalClose();
       // @ts-expect-error <StrictNullChecks/>

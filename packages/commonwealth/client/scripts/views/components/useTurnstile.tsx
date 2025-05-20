@@ -125,7 +125,6 @@ export const useTurnstile = (
   ]);
 
   if (!siteKey) {
-    console.warn('Turnstile site key not provided');
     return {
       turnstileToken: null,
       setTurnstileToken: () => {},

@@ -60,6 +60,10 @@ export function CreateContestManagerMetadata(): Command<
               image_url: rest.image_url || getDefaultContestImage(),
               environment: config.APP_ENV,
               farcaster_author_cast_hash: undefined,
+              // if judged contest, add creator as judge
+              namespace_judges: payload.namespace_judge_token_id
+                ? [actor.address!]
+                : [],
             },
             { transaction },
           );

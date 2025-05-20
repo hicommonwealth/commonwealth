@@ -1,27 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError, logger } from '@hicommonwealth/core';
+import { logger, ServerError } from '@hicommonwealth/core';
 import {
   AddressAttributes,
   AddressInstance,
   CommunityInstance,
   DB,
-  UserAttributes,
-  UserInstance,
-  VerifiedUserInfo,
   emitEvent,
   getVerifiedUserInfo,
   sequelize,
+  UserInstance,
+  VerifiedUserInfo,
 } from '@hicommonwealth/model';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
+  bumpUserTier,
   CANVAS_TOPIC,
   ChainBase,
+  deserializeCanvas,
+  getSessionSignerForDid,
   UserTierMap,
   WalletId,
   WalletSsoSource,
-  deserializeCanvas,
-  getSessionSignerForDid,
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
@@ -128,6 +128,20 @@ async function updateAddressesOauth(
   }
 }
 
+async function bumpTier(
+  user: UserInstance,
+  verifiedInfo: OauthInfo,
+  transaction?: Transaction,
+) {
+  if (
+    !verifiedInfo.oauth_email ||
+    (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified)
+  ) {
+    bumpUserTier({ newTier: UserTierMap.SocialVerified, targetObject: user });
+    await user.save({ transaction });
+  }
+}
+
 // Creates a trusted address in a community
 async function createMagicAddressInstances(
   models: DB,
@@ -143,7 +157,7 @@ async function createMagicAddressInstances(
     oauthInfo,
   }: {
     generatedAddresses: Array<{ address: string; community_id: string }>;
-    user: UserAttributes;
+    user: UserInstance;
     isNewUser: boolean;
     decodedMagicToken: MagicUser;
     magicUserMetadata: MagicUserMetadata;
@@ -166,6 +180,7 @@ async function createMagicAddressInstances(
     oauth_phone_number,
     oauth_email_verified,
   } = verifiedInfo;
+  await bumpTier(user, verifiedInfo, transaction);
 
   for (const { community_id, address } of generatedAddresses) {
     log.trace(`CREATING OR LOCATING ADDRESS ${address} IN ${community_id}`);
@@ -437,6 +452,8 @@ async function loginExistingMagicUser({
         walletSsoSource,
         accessToken,
       );
+
+      await bumpTier(existingUserInstance, verifiedInfo, transaction);
       await updateAddressesOauth(
         models,
         verifiedInfo,
@@ -797,6 +814,16 @@ async function magicLoginRoute(
     },
     referrer_address: body.referrer_address,
   };
+
+  if (loggedInUser && loggedInUser.tier === UserTierMap.BannedUser) {
+    return cb('User is banned');
+  } else if (
+    existingUserInstance &&
+    existingUserInstance.tier === UserTierMap.BannedUser
+  ) {
+    return cb('User is banned');
+  }
+
   try {
     if (loggedInUser && existingUserInstance) {
       // user is already logged in + has already linked the provided magic address.
@@ -819,6 +846,10 @@ async function magicLoginRoute(
   } catch (e) {
     log.error(`Failed to sign in user ${JSON.stringify(e, null, 2)}`);
     return cb(e);
+  }
+
+  if (finalUser.tier === UserTierMap.BannedUser) {
+    return cb('User is banned');
   }
 
   log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);

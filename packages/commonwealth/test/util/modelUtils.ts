@@ -27,7 +27,6 @@ import {
   serializeCanvas,
   toCanvasSignedDataApiArgs,
   type Link,
-  type LinkSource,
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
@@ -90,15 +89,9 @@ export interface ThreadArgs {
 }
 
 type createDeleteLinkArgs = {
+  address: string;
   thread_id: number;
   links: Link[];
-  jwt: any;
-};
-
-type getLinksArgs = {
-  thread_id?: number;
-  linkType?: LinkSource[];
-  link?: Link;
   jwt: any;
 };
 
@@ -218,7 +211,6 @@ export type ModelSeeder = {
   ) => Promise<{ status: string; result?: ThreadAttributes; error?: Error }>;
   createLink: (args: createDeleteLinkArgs) => Promise<any>;
   deleteLink: (args: createDeleteLinkArgs) => Promise<any>;
-  getLinks: (args: getLinksArgs) => Promise<any>;
   createComment: (args: CommentArgs) => Promise<any>;
   editComment: (args: EditCommentArgs) => Promise<any>;
   createReaction: (args: CreateReactionArgs) => Promise<any>;
@@ -385,8 +377,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .post('/api/linking/addThreadLinks')
+      .post('/api/v1/addLinks')
       .set('Accept', 'application/json')
+      .set('address', args.address)
       .send(args);
     return res.body;
   },
@@ -394,17 +387,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   deleteLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .delete('/api/linking/deleteLinks')
+      .post('/api/v1/deleteLinks')
       .set('Accept', 'application/json')
-      .send(args);
-    return res.body;
-  },
-
-  getLinks: async (args: getLinksArgs) => {
-    const res = await chai.request
-      .agent(app)
-      .post('/api/linking/getLinks')
-      .set('Accept', 'application/json')
+      .set('address', args.address)
       .send(args);
     return res.body;
   },

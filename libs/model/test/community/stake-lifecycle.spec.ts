@@ -62,7 +62,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake_to_set] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
@@ -78,7 +78,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,
@@ -154,7 +154,7 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake_to_set },
     });
-    expect(qr).to.deep.include({ ...payload });
+    expect(qr?.stake).to.deep.include({ ...payload });
 
     const commr = await query(GetCommunities(), {
       actor,
@@ -192,6 +192,6 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake },
     });
-    expect(qr).to.be.undefined;
+    expect(qr?.stake).to.be.undefined;
   });
 });

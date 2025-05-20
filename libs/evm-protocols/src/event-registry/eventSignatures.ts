@@ -1,18 +1,3 @@
-// TODO: remove when we remove Contest mappers
-export const ChainEventSigs = {
-  NewContest:
-    'address contest, address namespace, uint256 interval, bool oneOff' as const,
-  NewRecurringContestStarted:
-    'uint256 indexed contestId, uint256 startTime, uint256 endTime' as const,
-  NewSingleContestStarted: 'uint256 startTime, uint256 endTime' as const,
-  ContentAdded:
-    'uint256 indexed contentId, address indexed creator, string url' as const,
-  VoterVotedRecurring:
-    'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
-  VoterVotedOneOff:
-    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
-};
-
 export const EvmEventSignatures = {
   NamespaceFactory: {
     NamespaceDeployed:
@@ -65,6 +50,14 @@ export const EvmEventSignatures = {
       '0x6d7f8a6578e88ed61f656e059018728da0fba2a3f4cab0c4adaca21ace3cbf24',
     TokenMerged:
       '0xe7eeebf74838dceecbee54a09b6a6f12b27cab64859c8f8a9fe2e492d226afad',
+  },
+  CommunityNominations: {
+    NominatorSettled:
+      '0x03618668aeac06c0bfc54fabb38080c1f51cd34f257c3773bf66044d2bb8b427',
+    NominatorNominated:
+      '0x7f484f73afbbbc0b24b4cca807c76ab1f6e9eec1cb84afc111f3fd37edd38c97',
+    JudgeNominated:
+      '0xd3381a18ee091ebc453476f9f0f9167642972862d5946a730a557ef658113ac1',
   },
 } as const;
 

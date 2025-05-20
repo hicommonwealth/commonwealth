@@ -172,7 +172,10 @@ const Discord = () => {
     topicId: string,
   ) => {
     try {
-      await setForumChannelConnection({ topicId, channelId });
+      await setForumChannelConnection({
+        topic_id: +topicId,
+        channel_id: channelId,
+      });
       await refetchTopics();
       const topicName = topics.find(
         (topic) => topic.id === Number(topicId),

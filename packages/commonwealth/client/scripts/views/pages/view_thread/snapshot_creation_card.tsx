@@ -30,6 +30,7 @@ export const SnapshotCreationCard = ({
     <>
       <CWContentPageCard
         header="Create Snapshot"
+        showCollapsedIcon={true}
         content={
           <div className="SnapshotCreationCard">
             <CWText type="b2" className="no-threads-text">

@@ -67,6 +67,8 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'reward_amount', QAS.reward_amount,
                 'instructions_link', QAS.instructions_link,
                 'creator_reward_weight', QAS.creator_reward_weight,
+                'amount_multiplier', QAS.amount_multiplier,
+                'content_id', QAS.content_id,
                 'participation_limit', QAS.participation_limit,
                 'participation_period', QAS.participation_period,
                 'participation_times_per_period', QAS.participation_times_per_period,

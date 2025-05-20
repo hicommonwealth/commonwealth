@@ -54,6 +54,7 @@ export const outboxEvents: Events[] = [
   'NamespaceDeployedWithReferral',
   'LaunchpadTokenCreated',
   'LaunchpadTokenTraded',
+  'LaunchpadTokenGraduated',
   'ReferralFeeDistributed',
   'WalletLinked',
   'SSOLinked',
@@ -70,6 +71,9 @@ export const outboxEvents: Events[] = [
   'TweetEngagementCapReached',
   'CommunityTagsUpdated',
   'MembershipsRefreshed',
+  'NominatorSettled',
+  'NominatorNominated',
+  'JudgeNominated',
   'CommunityDirectoryTagsUpdated',
 ] as const;
 

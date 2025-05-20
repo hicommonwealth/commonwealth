@@ -28,8 +28,18 @@ export function DeleteContestManagerMetadata(): Command<
         throw new InvalidState(Errors.ContestNotCancelledOrEnded);
       }
 
-      contestManager.deleted_at = new Date();
-      await contestManager.save();
+      await models.sequelize.transaction(async (transaction) => {
+        // cleanup evm event sources
+        await models.EvmEventSource.destroy({
+          where: {
+            contract_address: contestManager.contest_address,
+          },
+          transaction,
+        });
+
+        contestManager.deleted_at = new Date();
+        await contestManager.save({ transaction });
+      });
       return {
         contest_managers: [contestManager.get({ plain: true })],
       };

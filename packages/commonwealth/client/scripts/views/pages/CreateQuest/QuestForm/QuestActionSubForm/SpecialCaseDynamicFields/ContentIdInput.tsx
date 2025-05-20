@@ -28,6 +28,7 @@ const ContentIdInput = ({
       discordServerId: `0xxxxxxxxxxxxxxxx0`,
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
+      tokenThresholdAmount: '0.00001',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -37,6 +38,18 @@ const ContentIdInput = ({
       chainId: 'Chain Id (optional)',
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
+      tokenThresholdAmount: 'Min ETH Trade Amount (optional)',
+    },
+    instructionalMessages: {
+      threadId: '',
+      commentId: '',
+      topicId: '',
+      twitterTweetUrl: '',
+      chainId: '',
+      discordServerId: '',
+      groupId: '',
+      tokenThresholdAmount:
+        'Aura is awarded after this amount of token is traded',
     },
   };
 
@@ -46,12 +59,14 @@ const ContentIdInput = ({
         return {
           label: inputConfig.labels.threadId,
           placeholder: inputConfig.placeholders.sampleThreadLink,
+          instructionalMessages: inputConfig.instructionalMessages.threadId,
         };
       }
       if (config?.with_optional_comment_id) {
         return {
           label: inputConfig.labels.commentId,
           placeholder: inputConfig.placeholders.sampleCommentLink,
+          instructionalMessages: inputConfig.instructionalMessages.commentId,
         };
       }
     }
@@ -62,6 +77,7 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.topicId,
         placeholder: inputConfig.placeholders.sampleTopicLink,
+        instructionalMessages: inputConfig.instructionalMessages.topicId,
       };
     }
 
@@ -69,6 +85,8 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.twitterTweetUrl,
         placeholder: inputConfig.placeholders.twitterTweetUrl,
+        instructionalMessages:
+          inputConfig.instructionalMessages.twitterTweetUrl,
       };
     }
 
@@ -76,6 +94,8 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.discordServerId,
         placeholder: inputConfig.placeholders.discordServerId,
+        instructionalMessages:
+          inputConfig.instructionalMessages.discordServerId,
       };
     }
 
@@ -83,6 +103,7 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.chainId,
         placeholder: inputConfig.placeholders.chainId,
+        instructionalMessages: inputConfig.instructionalMessages.chainId,
       };
     }
 
@@ -90,10 +111,24 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.groupId,
         placeholder: inputConfig.placeholders.groupId,
+        instructionalMessages: inputConfig.instructionalMessages.groupId,
       };
     }
 
-    return { label: 'Content Id', placeholder: 'Content Id' };
+    if (config?.with_optional_token_trade_threshold) {
+      return {
+        label: inputConfig.labels.tokenThresholdAmount,
+        placeholder: inputConfig.placeholders.tokenThresholdAmount,
+        instructionalMessages:
+          inputConfig.instructionalMessages.tokenThresholdAmount,
+      };
+    }
+
+    return {
+      label: 'Content Id',
+      placeholder: 'Content Id',
+      instructionalMessages: '',
+    };
   };
 
   const communityChainNodeSelectInputOptions = fetchCachedNodes()
@@ -147,6 +182,7 @@ const ContentIdInput = ({
         onChange?.({ contentIdentifier: e?.target?.value?.trim() })
       }
       customError={errors?.contentIdentifier}
+      instructionalMessage={getContentIdInputConfig().instructionalMessages}
     />
   );
 };

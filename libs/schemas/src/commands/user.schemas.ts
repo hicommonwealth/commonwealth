@@ -28,6 +28,9 @@ export const SignIn = {
             z.literal('discord_oauth'),
             z.literal('apple_oauth'),
             z.literal('twitter_oauth'),
+            z.literal('phone'),
+            z.literal('farcaster'),
+            z.literal('email'),
           ])
           .optional(),
       })

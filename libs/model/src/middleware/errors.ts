@@ -1,5 +1,5 @@
 import { Actor, INVALID_ACTOR_ERROR, InvalidActor } from '@hicommonwealth/core';
-import { GroupPermissionAction } from '@hicommonwealth/schemas';
+import { GroupGatedActionKey } from '@hicommonwealth/shared';
 
 export class BannedActor extends InvalidActor {
   constructor(public actor: Actor) {
@@ -12,7 +12,7 @@ export class NonMember extends InvalidActor {
   constructor(
     public actor: Actor,
     public topic: string,
-    public action: GroupPermissionAction,
+    public action: GroupGatedActionKey,
   ) {
     super(
       actor,

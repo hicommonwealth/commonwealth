@@ -80,6 +80,7 @@ const system_prompt: ChatCompletionMessage = {
       isUSDC: true
     }
     `,
+  refusal: null,
 };
 
 const tools: ChatCompletionTool[] = [

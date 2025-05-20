@@ -1,7 +1,12 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import {
+  cache,
+  CacheNamespaces,
+  logger,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import type { Requirement } from '@hicommonwealth/shared';
-import moment from 'moment';
+import { BalanceSourceType, type Requirement } from '@hicommonwealth/shared';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
@@ -21,17 +26,16 @@ import {
 
 const log = logger(import.meta);
 
-type Membership = z.infer<typeof schemas.Membership>;
+type Membership = z.infer<typeof schemas.Membership> & { balance?: bigint };
 
 function computeMembership(
   address: AddressAttributes,
   group: GroupAttributes,
   balances: OptionsWithBalances[],
 ): Membership {
-  const { requirements } = group;
-  const { isValid, messages } = validateGroupMembership(
+  const { isValid, messages, balance } = validateGroupMembership(
     address.address,
-    requirements as Requirement[],
+    group.requirements as Requirement[],
     balances,
     group.metadata.required_requirements!,
   );
@@ -40,6 +44,7 @@ function computeMembership(
     address_id: address.id!,
     reject_reason: isValid ? undefined : (messages ?? undefined),
     last_checked: new Date(),
+    balance,
   };
 }
 
@@ -60,16 +65,30 @@ async function processMemberships(
     created: boolean;
     rejected: boolean;
   }>;
+  let tokenHolderGroupId: number | undefined;
+
   for (const group of groups) {
+    // determine if this is a token holder group
+    const singleRequirement =
+      group.requirements?.length === 1 ? group.requirements?.[0] : undefined;
+    tokenHolderGroupId =
+      singleRequirement &&
+      singleRequirement.rule === 'threshold' &&
+      singleRequirement.data.source.source_type === BalanceSourceType.ERC20 &&
+      // TODO: compare to launchpad contract address
+      singleRequirement.data.source.contract_address
+        ? group.id
+        : tokenHolderGroupId;
+
     for (const address of addresses) {
       const memberships = address.Memberships ?? [];
       const found = memberships.find(({ group_id }) => group_id === group.id);
       if (found) {
-        const expiresAt = moment(found.last_checked).add(
+        const expiresAt = dayjs(found.last_checked).add(
           config.MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
-        if (moment().isAfter(expiresAt) || force_refresh) {
+        if (dayjs().isAfter(expiresAt) || force_refresh) {
           const updated = computeMembership(address, group, balances);
           toUpdate.push(updated);
           // make sure we only emit actual changes to membership, not just refreshed dates
@@ -96,7 +115,37 @@ async function processMemberships(
       }
     }
   }
+
   if (toCreate.length === 0 && toUpdate.length === 0) return [0, 0, 0];
+
+  // cache token balances for token holders group
+  if (tokenHolderGroupId) {
+    const toCache = [
+      ...toCreate
+        .filter(
+          (m) => m.group_id === tokenHolderGroupId && (m.balance || 0) > 0,
+        )
+        .map((m) => ({
+          value: m.address_id.toString(),
+          score: Number(m.balance) / 1e18,
+        })),
+      ...toUpdate
+        .filter(
+          (m) => m.group_id === tokenHolderGroupId && (m.balance || 0) > 0,
+        )
+        .map((m) => ({
+          value: m.address_id.toString(),
+          score: Number(m.balance) / 1e18,
+        })),
+    ];
+    if (toCache.length > 0) {
+      await cache()
+        .addToSortedSet(CacheNamespaces.TokenTopHolders, community_id, toCache)
+        .catch((err) => {
+          log.error(`Failed to cache token holders for ${community_id}`, err);
+        });
+    }
+  }
 
   await models.sequelize.transaction(async (transaction) => {
     await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
@@ -119,6 +168,7 @@ async function processMemberships(
         transaction,
       );
   });
+
   return [toCreate.length, toUpdate.length, toEmit.length];
 }
 
@@ -167,7 +217,7 @@ export function RefreshCommunityMemberships(): Command<
     ...schemas.RefreshCommunityMemberships,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { community_id, address, group_id } = payload;
+      const { community_id, address, group_id, refresh_all } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },
@@ -207,7 +257,7 @@ export function RefreshCommunityMemberships(): Command<
             try {
               result = await tokenBalanceCache.getBalances({
                 ...options,
-                cacheRefresh: false, // get cached balances
+                cacheRefresh: refresh_all || false,
               });
             } catch (err) {
               console.error(err);

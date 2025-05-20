@@ -31,12 +31,6 @@
         }
       }
     }
-
-    .attribution-right-content {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-    }
   }
 
   .callout-text.Text {
@@ -66,6 +60,18 @@
       width: 100%;
       align-items: center;
       flex-wrap: wrap;
+
+      .ThreadAction {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .attribution-right-content {
+        display: flex;
+        align-items: center;
+      }
 
       @include smallInclusive {
         flex-wrap: wrap;

@@ -66,6 +66,8 @@ describe('CacheDecorator', () => {
       addToSortedSet: vi.fn(),
       sortedSetPopMin: vi.fn(),
       delSortedSetItemsByValue: vi.fn(),
+      lpushAndTrim: vi.fn(),
+      getList: vi.fn(),
     };
     cache({
       key: 'mocked.cache.key',
