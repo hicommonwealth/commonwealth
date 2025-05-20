@@ -53,7 +53,8 @@ export function UpdateEmail(): Command<typeof schemas.UpdateEmail> {
           { transaction },
         );
 
-        await notifyUpdateEmail({ email, update_token: eut.token });
+        if (config.SENDGRID.API_KEY)
+          await notifyUpdateEmail({ email, update_token: eut.token });
 
         user.email = email;
         user.emailVerified = false;

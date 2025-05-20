@@ -4,9 +4,9 @@ import { cache, dispose } from '@hicommonwealth/core';
 import { tester, type E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
+import { main } from './main';
 import { config } from './server/config';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
-const { main } = await import('./main');
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -37,12 +37,13 @@ export const testServer = async (): Promise<TestServer> => {
   });
   await tester.seedDb();
   const app = express();
+  const seeder = modelSeeder(app);
+  const e2eTestEntities = await tester.e2eTestEntities();
+
   const { server, cacheDecorator } = await main(app, {
     port: 8081,
     withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });
-  const seeder = modelSeeder(app);
-  const e2eTestEntities = await tester.e2eTestEntities();
 
   // auto dispose server
   dispose(async () => {
