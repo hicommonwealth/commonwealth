@@ -18,7 +18,6 @@ export interface LocalPoll {
 export type SetLocalPolls = (params: LocalPoll[]) => void;
 
 export function parseCustomDuration(customDuration?: string): number | null {
-  console.log('Custom Duration Parsing:', customDuration);
   if (customDuration) {
     if (customDuration === 'Infinite') return null;
     return parseInt(customDuration, 10);
