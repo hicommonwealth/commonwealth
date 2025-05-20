@@ -33,12 +33,14 @@ export const ThreadPollEditorCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pollData, setPollData] = useState<string>();
 
-  const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(false);
+  const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(true);
 
   const { generateCompletion } = useAiCompletion();
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
   const handleGeneratePoll = () => {
+    setIsAIresponseCompleted(false);
+    setPollData('');
     let effectiveTitle;
     let effectiveBody;
 
@@ -101,7 +103,8 @@ export const ThreadPollEditorCard = ({
               onClick={(e) => {
                 e.preventDefault();
                 setIsModalOpen(true);
-                handleGeneratePoll();
+                setIsAIresponseCompleted(true);
+                setPollData('');
               }}
             />
           </div>
@@ -114,17 +117,18 @@ export const ThreadPollEditorCard = ({
             thread={thread}
             onModalClose={() => {
               setIsModalOpen(false);
-              setIsAIresponseCompleted(false);
+              setIsAIresponseCompleted(true);
               setPollData('');
             }}
             pollData={pollData}
             isAIresponseCompleted={isAIresponseCompleted}
+            onGeneratePoll={handleGeneratePoll}
             setLocalPoll={setLocalPoll}
           />
         }
         onClose={() => {
           setIsModalOpen(false);
-          setIsAIresponseCompleted(false);
+          setIsAIresponseCompleted(true);
           setPollData('');
         }}
         open={isModalOpen}

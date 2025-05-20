@@ -14,6 +14,7 @@ import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWThreadAction } from '../components/component_kit/new_designs/cw_thread_action';
 import {
   CWModalBody,
   CWModalFooter,
@@ -52,6 +53,7 @@ type PollEditorModalProps = {
   thread?: Thread;
   pollData?: string;
   isAIresponseCompleted: boolean;
+  onGeneratePoll: () => void;
   setLocalPoll?: (params) => void;
 };
 
@@ -60,6 +62,7 @@ export const PollEditorModal = ({
   thread,
   pollData,
   isAIresponseCompleted,
+  onGeneratePoll,
   setLocalPoll,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
@@ -228,6 +231,11 @@ export const PollEditorModal = ({
               buttonType="secondary"
               buttonHeight="sm"
               onClick={onModalClose}
+            />
+            <CWThreadAction
+              action="ai-reply"
+              label="Generate poll"
+              onClick={onGeneratePoll}
             />
             <CWButton
               label="Save changes"
