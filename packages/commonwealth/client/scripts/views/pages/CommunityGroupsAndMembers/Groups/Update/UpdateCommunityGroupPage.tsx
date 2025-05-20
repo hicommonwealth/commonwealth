@@ -3,7 +3,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
@@ -55,12 +55,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   );
 
   const { isAddedToHomeScreen } = useAppStatus();
-
-  useEffect(() => {
-    if (initialAllowlist) {
-      setAllowedAddresses(initialAllowlist);
-    }
-  }, [initialAllowlist]);
 
   useBrowserAnalyticsTrack({
     payload: {
