@@ -112,3 +112,25 @@ export const DistributeSkale = {
   }),
   output: z.undefined(),
 };
+
+export const UpdateSettings = {
+  input: z.object({
+    disable_rich_text: z.boolean().optional(),
+    enable_promotional_emails: z.boolean().optional(),
+    email_interval: z.enum(['never', 'weekly']).optional(),
+  }),
+  output: z.boolean(),
+  context: VerifiedContext,
+};
+
+export const GetAddressStatus = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    exists: z.boolean(),
+    belongs_to_user: z.boolean(),
+  }),
+  context: VerifiedContext,
+};
