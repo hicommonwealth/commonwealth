@@ -93,7 +93,7 @@ const EditProfile = () => {
   });
 
   const handleImageProcessingChange = useCallback(
-    ({ isGenerating, isUploading }: ImageProcessingProps) => {
+    ({ isGenerating, isUploading }) => {
       setIsUploadingCoverImage(isGenerating || isUploading);
     },
     [],
