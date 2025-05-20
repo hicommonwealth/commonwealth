@@ -65,13 +65,17 @@ export default class WebWalletController {
     }
     // do nothing on failure
     try {
-      await axios.post(`${SERVER_URL}/setAddressWallet`, {
-        address: account.address,
-        author_community_id: account.community.id,
-        wallet_id: wallet,
-        wallet_sso_source: null,
-        jwt: userStore.getState().jwt,
-      });
+      await axios.post(
+        `${SERVER_URL}/internal/SetAddressWallet`,
+        {
+          community_id: account.community.id,
+          wallet_id: wallet,
+          jwt: userStore.getState().jwt,
+        },
+        {
+          headers: { address: account.address },
+        },
+      );
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
     }

@@ -6,12 +6,12 @@ import {
   CanvasSignedData,
   DEFAULT_NAME,
   deserializeCanvas,
+  GatedActionEnum,
   UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -39,14 +39,19 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { z } from 'zod';
+import Permissions from '../../../../utils/Permissions';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
 
 export type CommentViewParams = z.infer<typeof CommentsView>;
 
+const actionPermissions = [
+  GatedActionEnum.CREATE_COMMENT,
+  GatedActionEnum.CREATE_COMMENT_REACTION,
+] as const;
+
 type CommentCardProps = {
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -90,10 +95,12 @@ type CommentCardProps = {
   isRootComment?: boolean;
   threadContext?: string;
   threadTitle?: string;
+  permissions: ReturnType<
+    typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
+  >;
 };
 
 export const CommentCard = ({
-  disabledActionsTooltipText = '',
   // edit
   editDraft,
   canEdit,
@@ -134,6 +141,7 @@ export const CommentCard = ({
   isRootComment,
   threadContext,
   threadTitle,
+  permissions,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -465,11 +473,7 @@ Community Description: ${communityDescription}`;
                   <CommentReactionButton
                     comment={comment}
                     disabled={!canReact}
-                    tooltipText={
-                      typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('upvote')
-                        : disabledActionsTooltipText
-                    }
+                    tooltipText={permissions.CREATE_COMMENT_REACTION.tooltip}
                     onReaction={handleReaction}
                     weightType={weightType}
                     tokenNumDecimals={tokenNumDecimals}
@@ -509,9 +513,7 @@ Community Description: ${communityDescription}`;
                       label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
                       disabled={maxReplyLimitReached || !canReply}
                       tooltipText={
-                        (typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('reply')
-                          : disabledActionsTooltipText) ||
+                        permissions.CREATE_COMMENT.tooltip ||
                         (canReply && maxReplyLimitReached
                           ? 'Further replies not allowed'
                           : '')
@@ -529,9 +531,7 @@ Community Description: ${communityDescription}`;
                           label="AI Reply"
                           disabled={maxReplyLimitReached || !canReply}
                           tooltipText={
-                            (typeof disabledActionsTooltipText === 'function'
-                              ? disabledActionsTooltipText?.('reply')
-                              : disabledActionsTooltipText) ||
+                            permissions.CREATE_COMMENT.tooltip ||
                             (canReply && maxReplyLimitReached
                               ? 'Further replies not allowed'
                               : '')

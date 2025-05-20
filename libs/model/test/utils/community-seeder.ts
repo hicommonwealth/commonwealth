@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
@@ -20,7 +21,7 @@ export type CommunitySeedOptions = {
   ss58_prefix?: number;
   groups?: {
     id: number;
-    permissions: schemas.PermissionEnum[];
+    permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
   namespace_address?: string;
@@ -115,10 +116,10 @@ export async function seedCommunity({
 
   await Promise.all(
     groups.map((g) =>
-      seed('GroupPermission', {
+      seed('GroupGatedAction', {
         group_id: g.id,
         topic_id: community?.topics?.[0]?.id || 0,
-        allowed_actions: g.permissions,
+        gated_actions: g.permissions,
       }),
     ),
   );

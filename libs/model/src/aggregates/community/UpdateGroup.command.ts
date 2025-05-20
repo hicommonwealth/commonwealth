@@ -56,16 +56,16 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
             (payload.topics || [])?.map(async (t) => {
               const permissions = t.permissions;
               if (group.id) {
-                const allowed_actions = `ARRAY[${permissions
+                const gatedActions = `ARRAY[${permissions
                   .map((p) => `'${p}'`)
-                  .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`;
+                  .join(', ')}]::"enum_GroupGatedActions_gated_actions"[]`;
                 await models.sequelize.query(
                   `
-                  INSERT INTO "GroupPermissions" (group_id, topic_id, allowed_actions, created_at, updated_at)
-                  VALUES (:group_id, :topic_id, ${allowed_actions}, NOW(), NOW())
+                  INSERT INTO "GroupGatedActions" (group_id, topic_id, gated_actions, created_at, updated_at)
+                  VALUES (:group_id, :topic_id, ${gatedActions}, NOW(), NOW())
                   ON CONFLICT(group_id, topic_id) DO UPDATE
-                    SET allowed_actions = EXCLUDED.allowed_actions,
-                        updated_at = NOW();
+                    SET gated_actions = EXCLUDED.gated_actions,
+                        updated_at      = NOW();
                 `,
                   {
                     transaction,

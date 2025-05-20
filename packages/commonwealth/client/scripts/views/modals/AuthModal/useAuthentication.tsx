@@ -660,27 +660,28 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (user.isLoggedIn) {
       try {
-        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: address,
-                  currentPrefix: parseInt(
-                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
-                    10,
-                  ),
-                })
-              : address,
-          community_id: app.activeChainId() ?? wallet.chain,
-          jwt: user.jwt,
-        });
+        const cid = app.activeChainId() ?? wallet.chain;
+        const adr =
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address,
+                currentPrefix: parseInt(
+                  `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+                  10,
+                ),
+              })
+            : address;
+        const { data } = await axios.get(
+          `${SERVER_URL}/internal/GetAddressStatus?community_id=${cid}&address=${adr}`,
+          { headers: { address: user.activeAccount?.address, jwt: user.jwt } },
+        );
 
-        if (res.data.result.exists && res.data.result.belongsToUser) {
+        if (data.exists && data.belongs_to_user) {
           notifyInfo('This address is already linked to your current account.');
           return;
         }
 
-        if (res.data.result.exists) {
+        if (data.exists) {
           openConfirmation({
             title: 'Wallet Transfer Confirmation',
             description: `

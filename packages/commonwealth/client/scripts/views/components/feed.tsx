@@ -6,10 +6,9 @@ import './feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
+import { ActivityThread } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models/Thread';
@@ -22,7 +21,6 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { z } from 'zod';
 import ThreadPreviewModal from '../modals/ThreadPreviewModal';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
@@ -56,50 +54,29 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: thread.communityId,
     userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
     topicId: thread?.topic?.id || 0,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin({
-      id: community?.id || '',
-      adminsAndMods: community?.adminsAndMods || [],
-    });
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledCommentActionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
-      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+      <ThreadCard
+        thread={thread}
+        layoutType="community-first"
+        showSkeleton
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
+      />
     );
   }
 
   return (
     <ThreadCard
       thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -110,11 +87,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentActionTooltipText
-          ? disabledCommentActionTooltipText
-          : disabledActionsTooltipText
-      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -122,6 +94,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       onImageClick={onClick}
       maxChars={MIN_CHARS_TO_SHOW_MORE}
       cutoffLines={4}
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

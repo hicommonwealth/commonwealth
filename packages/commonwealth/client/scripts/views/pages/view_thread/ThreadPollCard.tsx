@@ -1,33 +1,54 @@
+import {
+  TopicWeightedVoting,
+  Vote as VoteSchema,
+} from '@hicommonwealth/schemas';
+import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type Thread from 'models/Thread';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { z } from 'zod';
 import type Poll from '../../../models/Poll';
+import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
+type ActualVoteAttributes = z.infer<typeof VoteSchema>;
+
 type ThreadPollCardProps = {
+  thread?: Thread;
   poll: Poll;
   showDeleteButton?: boolean;
-  isTopicMembershipRestricted?: boolean;
   isCreateThreadPage?: boolean;
   setLocalPoll?: (params) => void;
+  tokenDecimals?: number;
+  topicWeight?: TopicWeightedVoting | null;
+  voterProfiles?: Record<
+    string,
+    { address: string; name: string; avatarUrl?: string }
+  >;
+  isLoadingVotes?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadPollCard = ({
+  thread,
   poll,
   showDeleteButton,
-  isTopicMembershipRestricted = false,
   isCreateThreadPage = false,
   setLocalPoll,
+  tokenDecimals,
+  topicWeight,
+  voterProfiles,
+  isLoadingVotes,
+  actionGroups,
+  bypassGating,
 }: ThreadPollCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const user = useUserStore();
 
   const { mutateAsync: deletePoll } = useDeletePollMutation({
@@ -38,12 +59,12 @@ export const ThreadPollCard = ({
     threadId: poll.threadId,
   });
 
-  const getTooltipErrorMessage = () => {
-    if (!user.activeAccount)
-      return 'Error: You must join this community to vote.';
-    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
-    return '';
-  };
+  const permissions = Permissions.getGeneralActionPermission({
+    action: GatedActionEnum.UPDATE_POLL,
+    thread: thread!,
+    actionGroups,
+    bypassGating,
+  });
 
   const handleDeletePoll = async () => {
     try {
@@ -75,7 +96,6 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick: async () => {
             const selectedOption = votedPoll.options.find((o) => o === option);
 
@@ -112,9 +132,8 @@ export const ThreadPollCard = ({
     user.activeAccount?.address || '',
   );
 
-  // votes by weighted voting power
   const totalVoteWeight = poll.votes.reduce(
-    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || 1),
+    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || '0'),
     0n,
   );
   const voteInformation = poll.options.map((option) => ({
@@ -122,19 +141,37 @@ export const ThreadPollCard = ({
     value: option,
     voteCount: poll.votes
       .filter((v) => v.option === option)
-      .reduce((sum, val) => sum + BigInt(val.calculatedVotingWeight || 1), 0n),
+      .reduce(
+        (sum, val) => sum + BigInt(val.calculatedVotingWeight || '0'),
+        0n,
+      ),
   }));
+
+  const individualVotesData: ActualVoteAttributes[] = poll.votes.map(
+    (vote) => ({
+      id: vote.id,
+      poll_id: vote.pollId,
+      community_id: vote.communityId,
+      author_community_id: vote.authorCommunityId,
+      address: vote.address,
+      option: vote.option,
+      created_at: vote.createdAt.toDate(),
+      calculated_voting_weight: vote.calculatedVotingWeight,
+    }),
+  );
 
   return (
     <>
       <PollCard
+        communityId={poll.communityId}
+        individualVotesData={individualVotesData}
+        voterProfiles={voterProfiles}
+        tokenDecimals={tokenDecimals}
+        topicWeight={topicWeight}
+        isLoadingVotes={isLoadingVotes}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={!!userVote}
-        disableVoteButton={
-          !user.activeAccount ||
-          isTopicMembershipRestricted ||
-          isCreateThreadPage
-        }
+        disableVoteButton={!permissions.allowed || isCreateThreadPage}
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
@@ -146,37 +183,24 @@ export const ThreadPollCard = ({
         voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={getTooltipErrorMessage()}
+        tooltipErrorMessage={permissions.tooltip}
         onVoteCast={(option, isSelected) => {
-          // @ts-expect-error <StrictNullChecks/>
-          handlePollVote(poll, option, isSelected);
+          if (option !== undefined) {
+            handlePollVote(poll, option, isSelected ?? false);
+          }
         }}
         onResultsClick={(e) => {
-          e.preventDefault();
-          if (poll.votes.length > 0) {
-            setIsModalOpen(true);
-          }
+          if (!(e && poll.votes.length === 0)) return;
+          // No-op: No votes to show, so do nothing
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
           if (isCreateThreadPage && setLocalPoll) {
             setLocalPoll([]);
           } else {
-            //@typescript-eslint/no-misused-promises
             handleDeletePoll().catch(console.error);
           }
         }}
-      />
-      <CWModal
-        size="small"
-        content={
-          <OffchainVotingModal
-            votes={poll.votes}
-            onModalClose={() => setIsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
       />
     </>
   );

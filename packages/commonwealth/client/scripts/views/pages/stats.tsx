@@ -1,54 +1,38 @@
-import axios from 'axios';
+import * as schemas from '@hicommonwealth/schemas';
+import { useFetchCommunityStatsQuery } from 'client/scripts/state/api/communities/fetchCommunityStats';
 import Permissions from 'client/scripts/utils/Permissions';
-import React, { useEffect, useState } from 'react';
-import app from 'state';
-import { SERVER_URL } from 'state/api/config';
-import useUserStore, { userStore } from 'state/ui/user';
+import React from 'react';
+import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+import z from 'zod';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageNotFound } from './404';
 import './stats.scss';
 
-type Batchable = {
-  date: string;
-  new_items: string;
-};
-
-type Batchables = {
-  activeAccounts: Array<Batchable>;
-  comments: Array<Batchable>;
-  roles: Array<Batchable>;
-  threads: Array<Batchable>;
-};
-
-type TotalDataType = {
-  totalComments: number;
-  totalRoles: number;
-  totalThreads: number;
-};
-
-type Batched = {
+type Batch = {
   day: number;
   month: number;
   twoWeek: number;
   week: number;
 };
 
-type BatchedDataType = {
-  batchedActiveAccounts: Batched;
-  batchedComments: Batched;
-  batchedRoles: Batched;
-  batchedThreads: Batched;
+type Batches = {
+  batchedRoles: Batch;
+  batchedComments: Batch;
+  batchedThreads: Batch;
+  batchedActiveAccounts: Batch;
 };
 
-const getBatched = ({
-  activeAccounts,
+const toBatches = ({
+  active_accounts,
   comments,
   roles,
   threads,
-}: Batchables) => {
+}: z.infer<
+  (typeof schemas.GetCommunityStats)['output']
+>['batches']): Batches => {
   const batchedComments = {};
   const batchedRoles = {};
   const batchedThreads = {};
@@ -56,7 +40,7 @@ const getBatched = ({
   const c = comments.map((a) => Number(a.new_items));
   const r = roles.map((a) => Number(a.new_items));
   const t = threads.map((a) => Number(a.new_items));
-  const aa = activeAccounts.map((a) => Number(a.new_items));
+  const aa = active_accounts.map((a) => Number(a.new_items));
 
   // Comments
   batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);
@@ -87,65 +71,14 @@ const getBatched = ({
     batchedComments,
     batchedThreads,
     batchedActiveAccounts,
-  } as BatchedDataType;
+  } as Batches;
 };
 
 const StatsPage = () => {
-  const [batchedData, setBatchedData] = useState<BatchedDataType>();
-  const [totalData, setTotalData] = useState<TotalDataType>();
-  const [error, setError] = useState('');
-
   const user = useUserStore();
-
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/communityStats`, {
-          params: {
-            chain: app.activeChainId(),
-            jwt: userStore.getState().jwt,
-          },
-        });
-
-        const {
-          comments,
-          roles,
-          threads,
-          activeAccounts,
-          totalComments,
-          totalRoles,
-          totalThreads,
-        } = response.data.result;
-
-        setTotalData({
-          totalComments: +totalComments[0].new_items,
-          totalRoles: +totalRoles[0].new_items,
-          totalThreads: +totalThreads[0].new_items,
-        });
-
-        setBatchedData(
-          getBatched({
-            comments,
-            roles,
-            threads,
-            activeAccounts,
-          }),
-        );
-      } catch (err) {
-        if (err.response.data.error || err.responseJSON?.error) {
-          setError(err.response.data.error);
-        } else if (err.response.data.error || err.responseText) {
-          setError(err.response.data.error || err.responseText);
-        } else {
-          setError('Error loading analytics');
-        }
-      }
-    };
-
-    if (app.activeChainId()) {
-      fetch();
-    }
-  }, []);
+  const { data, isLoading, error } = useFetchCommunityStatsQuery(
+    user?.activeCommunity?.id,
+  );
 
   if (
     !user.isLoggedIn ||
@@ -154,74 +87,65 @@ const StatsPage = () => {
     return <PageNotFound />;
   }
 
-  if (!batchedData) {
+  if (isLoading) {
     return <PageLoading message="Loading analytics" />;
   } else if (error) {
-    return <ErrorPage message={error} />;
+    return <ErrorPage message={error.message} />;
+  } else if (data) {
+    const batches = toBatches(data.batches);
+    return (
+      <CWPageLayout>
+        <div className="StatsPage">
+          <div className="header">
+            <CWText type="h2" fontWeight="medium">
+              Analytics
+            </CWText>
+          </div>
+          <div className="stat-row dark top">
+            <CWText fontWeight="medium">Duration</CWText>
+            <CWText fontWeight="medium">New Addresses</CWText>
+            <CWText fontWeight="medium">New Comments</CWText>
+            <CWText fontWeight="medium">New Threads</CWText>
+            <CWText fontWeight="medium">Active Addresses</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>24 hours</CWText>
+            <CWText>{batches.batchedRoles['day']}</CWText>
+            <CWText>{batches.batchedComments['day']}</CWText>
+            <CWText>{batches.batchedThreads['day']}</CWText>
+            <CWText>{batches.batchedActiveAccounts['day']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>1 week</CWText>
+            <CWText>{batches.batchedRoles['week']}</CWText>
+            <CWText>{batches.batchedComments['week']}</CWText>
+            <CWText>{batches.batchedThreads['week']}</CWText>
+            <CWText>{batches.batchedActiveAccounts['week']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>2 weeks</CWText>
+            <CWText>{batches.batchedRoles['twoWeek']}</CWText>
+            <CWText>{batches.batchedComments['twoWeek']}</CWText>
+            <CWText>{batches.batchedThreads['twoWeek']}</CWText>
+            <CWText>{batches.batchedActiveAccounts['twoWeek']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>1 month</CWText>
+            <CWText>{batches.batchedRoles['month']}</CWText>
+            <CWText>{batches.batchedComments['month']}</CWText>
+            <CWText>{batches.batchedThreads['month']}</CWText>
+            <CWText>{batches.batchedActiveAccounts['month']}</CWText>
+          </div>
+          <div className="stat-row dark bottom">
+            <CWText fontWeight="medium">Total &#40;all time&#41;</CWText>
+            <CWText fontWeight="medium">{data.totals.total_roles}</CWText>
+            <CWText fontWeight="medium">{data.totals.total_comments}</CWText>
+            <CWText fontWeight="medium">{data.totals.total_threads}</CWText>
+          </div>
+        </div>
+      </CWPageLayout>
+    );
   }
-
-  const {
-    batchedRoles,
-    batchedComments,
-    batchedThreads,
-    batchedActiveAccounts,
-  } = batchedData;
-
-  return (
-    <CWPageLayout>
-      <div className="StatsPage">
-        <div className="header">
-          <CWText type="h2" fontWeight="medium">
-            Analytics
-          </CWText>
-        </div>
-        <div className="stat-row dark top">
-          <CWText fontWeight="medium">Duration</CWText>
-          <CWText fontWeight="medium">New Addresses</CWText>
-          <CWText fontWeight="medium">New Comments</CWText>
-          <CWText fontWeight="medium">New Threads</CWText>
-          <CWText fontWeight="medium">Active Addresses</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>24 hours</CWText>
-          <CWText>{batchedRoles['day']}</CWText>
-          <CWText>{batchedComments['day']}</CWText>
-          <CWText>{batchedThreads['day']}</CWText>
-          <CWText>{batchedActiveAccounts['day']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>1 week</CWText>
-          <CWText>{batchedRoles['week']}</CWText>
-          <CWText>{batchedComments['week']}</CWText>
-          <CWText>{batchedThreads['week']}</CWText>
-          <CWText>{batchedActiveAccounts['week']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>2 weeks</CWText>
-          <CWText>{batchedRoles['twoWeek']}</CWText>
-          <CWText>{batchedComments['twoWeek']}</CWText>
-          <CWText>{batchedThreads['twoWeek']}</CWText>
-          <CWText>{batchedActiveAccounts['twoWeek']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>1 month</CWText>
-          <CWText>{batchedRoles['month']}</CWText>
-          <CWText>{batchedComments['month']}</CWText>
-          <CWText>{batchedThreads['month']}</CWText>
-          <CWText>{batchedActiveAccounts['month']}</CWText>
-        </div>
-        <div className="stat-row dark bottom">
-          <CWText fontWeight="medium">Total &#40;all time&#41;</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
-          <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
-          <CWText fontWeight="medium">{totalData.totalComments}</CWText>
-          {/* @ts-expect-error StrictNullChecks*/}
-          <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
-        </div>
-      </div>
-    </CWPageLayout>
-  );
 };
 
 export default StatsPage;

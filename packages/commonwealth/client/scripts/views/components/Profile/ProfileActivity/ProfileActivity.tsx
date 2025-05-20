@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 
 import './ProfileActivity.scss';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
 import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
+import useUserStore from 'state/ui/user';
 import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
 import ProfileActivityContent, {
   ProfileActivityType,
@@ -22,9 +24,12 @@ type ProfileActivityProps = {
 };
 
 const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
+  const newProfilePageEnabled = useFlag('newProfilePage');
+
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
   );
+  const user = useUserStore();
 
   return (
     <div className="ProfileActivity">
@@ -56,6 +61,20 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
+          {newProfilePageEnabled && (
+            <CWTab
+              label={
+                <div className="tab-header">
+                  Communities
+                  <div className="count">{user.communities.length}</div>
+                </div>
+              }
+              onClick={() => {
+                setSelectedActivity(ProfileActivityType.Communities);
+              }}
+              isSelected={selectedActivity === ProfileActivityType.Communities}
+            />
+          )}
         </CWTabsRow>
       </div>
       <div
@@ -64,6 +83,9 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
           selectedActivity === ProfileActivityType.Comments ||
             selectedActivity === ProfileActivityType.Threads
             ? 'removePadding'
+            : '',
+          selectedActivity === ProfileActivityType.Communities
+            ? 'communityPadding'
             : '',
         )}
       >
