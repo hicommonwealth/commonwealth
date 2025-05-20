@@ -69,10 +69,7 @@ describe('createReaction Integration Tests', () => {
     userSession = { session: res.session, sign: res.sign };
 
     const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: communityId,
-        group_ids: [],
-      },
+      where: { community_id: communityId },
     });
 
     const { result: thread } = await server.seeder.createThread({

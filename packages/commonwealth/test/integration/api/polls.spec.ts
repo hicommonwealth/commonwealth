@@ -39,10 +39,7 @@ describe('Polls', () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;
@@ -101,15 +98,14 @@ describe('Polls', () => {
       },
       payload: {
         thread_id: thread!.id!,
+        duration: null,
         ...data,
       },
     });
     expect(res).to.not.be.undefined;
     expect(res?.id).to.not.be.undefined;
-    expect(res).to.contain({
-      prompt: data.prompt,
-      options: JSON.stringify(data.options),
-    });
+    expect(res?.prompt).to.equal(data.prompt);
+    expect(res?.options).to.deep.equal(data.options);
 
     threadId = thread!.id!;
     pollId = res!.id!;

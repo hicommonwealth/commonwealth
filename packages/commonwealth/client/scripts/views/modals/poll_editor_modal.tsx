@@ -20,6 +20,8 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
+import { DEFAULT_POLL_DURATION } from '@hicommonwealth/shared';
+import { parseCustomDuration, SetLocalPolls } from 'utils/polls';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './poll_editor_modal.scss';
 
@@ -53,7 +55,7 @@ type PollEditorModalProps = {
   pollData?: string;
   isAIresponseCompleted: boolean;
   onGeneratePoll: () => void;
-  setLocalPoll?: (params) => void;
+  setLocalPoll?: SetLocalPolls;
 };
 
 export const PollEditorModal = ({
@@ -64,7 +66,9 @@ export const PollEditorModal = ({
   onGeneratePoll,
   setLocalPoll,
 }: PollEditorModalProps) => {
-  const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
+  const [customDuration, setCustomDuration] = useState(
+    `${DEFAULT_POLL_DURATION}`,
+  );
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
@@ -125,24 +129,25 @@ export const PollEditorModal = ({
           thread_id: thread?.id,
           prompt,
           options,
-          custom_duration: customDurationEnabled
+          duration: customDurationEnabled
             ? customDuration === 'Infinite'
               ? null
               : parseInt(customDuration)
-            : 5,
+            : DEFAULT_POLL_DURATION,
         }).catch(console.error);
 
         notifySuccess('Poll creation succeeded');
       } else if (setLocalPoll) {
+        const parsedDuration = parseCustomDuration(customDuration);
         setLocalPoll([
           {
             options: options,
             prompt: prompt,
-            communityId: user.activeAccount?.community?.id,
-            customDuration: customDurationEnabled ? customDuration : undefined,
-            address: user.activeAccount?.address || '',
-            createdAt: moment(),
-            endsAt: moment('2025-04-20T19:04:53.661Z'),
+            community_id: user.activeAccount?.community?.id,
+            custom_duration: customDurationEnabled ? customDuration : undefined,
+            ends_at: parsedDuration
+              ? moment().add(parsedDuration, 'days').toDate()
+              : undefined,
             votes: [],
           },
         ]);

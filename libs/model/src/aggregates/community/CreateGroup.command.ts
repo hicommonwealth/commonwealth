@@ -56,20 +56,6 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
           );
           if (topics.length > 0) {
             // add group to all specified topics
-            await models.Topic.update(
-              {
-                group_ids: sequelize.fn(
-                  'array_append',
-                  sequelize.col('group_ids'),
-                  group.id,
-                ),
-              },
-              {
-                where: { id: { [Op.in]: topics.map(({ id }) => id!) } },
-                transaction,
-              },
-            );
-
             if (group.id) {
               // add topic level interaction permissions for current group
               const groupGatedActions = (payload.topics || []).map((t) => ({
