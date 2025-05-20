@@ -39,10 +39,7 @@ describe('Polls', () => {
     server = await testServer();
 
     const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;
