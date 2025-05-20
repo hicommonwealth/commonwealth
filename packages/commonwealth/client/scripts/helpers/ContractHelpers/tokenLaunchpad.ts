@@ -70,8 +70,8 @@ class TokenLaunchpad extends ContractBase {
         threadId,
         exchangeToken,
         initPurchaseAmount,
-        this.paymentTokenContract,
         this.contract.options.address as string,
+        this.paymentTokenContract,
       );
     } catch (error) {
       console.error('Error launching token with liquidity:', error);
