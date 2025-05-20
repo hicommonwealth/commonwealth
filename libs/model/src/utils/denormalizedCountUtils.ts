@@ -54,14 +54,14 @@ export const refreshProfileCount = debounceRefresh(
   async ([community_id]: [string]) => {
     await models.sequelize.query(
       `
-UPDATE "Communities" C
-SET profile_count = (
-    SELECT COUNT(*) 
-    FROM "Addresses" A 
-    WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
-)
-WHERE C.id = :community_id;
-    `,
+        UPDATE "Communities" C
+        SET profile_count = (SELECT COUNT(*)
+                             FROM "Addresses" A
+                             WHERE A.community_id = C.id
+                               AND A.user_id IS NOT NULL
+                               AND A.verified IS NOT NULL)
+        WHERE C.id = :community_id;
+      `,
       { replacements: { community_id } },
     );
   },
@@ -70,10 +70,22 @@ WHERE C.id = :community_id;
 
 export const refreshMemberships = debounceRefresh(
   async ([community_id, group_id]: [string, undefined] | [string, number]) => {
-    await command(RefreshCommunityMemberships(), {
-      actor: systemActor({}),
-      payload: { community_id, group_id },
-    });
+    try {
+      await command(RefreshCommunityMemberships(), {
+        actor: systemActor({}),
+        payload: { community_id, group_id },
+      });
+    } catch (e) {
+      log.error(
+        'Failed to refresh community memberships',
+        e instanceof Error ? e : undefined,
+        {
+          ...(e instanceof Error ? { e } : {}),
+          community_id,
+          group_id,
+        },
+      );
+    }
   },
   10_000,
 );

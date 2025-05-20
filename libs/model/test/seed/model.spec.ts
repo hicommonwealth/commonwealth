@@ -16,7 +16,7 @@ const generateSchemas = async () => {
   // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(models.sequelize, {
     ignore_columns: {
-      GroupPermissions: ['allowed_actions'],
+      GroupGatedActions: ['gated_actions'],
     },
     ignore_constraints: {
       // Removed in migration
@@ -32,7 +32,7 @@ const generateSchemas = async () => {
       // Missing in model - migrations with backups
       Comments: ['root_id'],
       Topics: ['default_offchain_template_backup'],
-      GroupPermissions: ['allowed_actions'],
+      GroupGatedActions: ['gated_actions'],
     },
     ignore_constraints: {
       // Can't define index in model since it uses NULLS NOT DISTINCT
