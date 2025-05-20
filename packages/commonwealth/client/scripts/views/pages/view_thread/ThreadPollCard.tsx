@@ -1,8 +1,4 @@
-import {
-  PollView,
-  TopicWeightedVoting,
-  Vote as VoteSchema,
-} from '@hicommonwealth/schemas';
+import { PollView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Thread from 'models/Thread';
@@ -17,8 +13,6 @@ import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
 import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
-
-type ActualVoteAttributes = z.infer<typeof VoteSchema>;
 
 type ThreadPollCardProps = {
   thread?: Thread;
@@ -150,22 +144,11 @@ export const ThreadPollCard = ({
       ),
   }));
 
-  const individualVotesData: ActualVoteAttributes[] = pollVotes.map((vote) => ({
-    id: vote.id,
-    poll_id: vote.poll_id,
-    community_id: vote.community_id,
-    author_community_id: vote.author_community_id,
-    address: vote.address,
-    option: vote.option,
-    created_at: vote.created_at!.toDate(),
-    calculated_voting_weight: vote.calculated_voting_weight,
-  }));
-
   return (
     <>
       <PollCard
         communityId={poll.community_id}
-        individualVotesData={individualVotesData}
+        individualVotesData={pollVotes}
         voterProfiles={voterProfiles}
         tokenDecimals={tokenDecimals}
         topicWeight={topicWeight}

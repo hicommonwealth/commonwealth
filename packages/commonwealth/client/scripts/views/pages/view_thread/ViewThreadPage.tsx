@@ -383,7 +383,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useEffect(() => {
     if (pollsData && pollsData.length > 0) {
       const allAddresses = pollsData.flatMap((poll) =>
-        poll.votes.map((vote) => vote.address),
+        (poll.votes || []).map((vote) => vote.address),
       );
       setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
     }

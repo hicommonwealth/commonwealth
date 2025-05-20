@@ -1,7 +1,4 @@
-import {
-  TopicWeightedVoting,
-  Vote as VoteSchema,
-} from '@hicommonwealth/schemas';
+import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import React, { useState } from 'react';
 import {
@@ -28,8 +25,6 @@ import {
 
 import './PollCard.scss';
 
-type ActualVoteAttributes = z.infer<typeof VoteSchema>;
-
 interface VoterProfileData {
   name: string;
   avatarUrl?: string;
@@ -45,7 +40,7 @@ export type PollCardProps = PollOptionProps &
     showDeleteButton?: boolean;
     onDeleteClick?: () => void;
     communityId: string;
-    individualVotesData?: ActualVoteAttributes[];
+    individualVotesData?: z.infer<typeof VoteView>[];
     voterProfiles?: Record<string, VoterProfileData>;
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
