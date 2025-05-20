@@ -1,6 +1,7 @@
 export * from './CreateApiKey.command';
 export * from './DeleteApiKey.command';
 export * from './DistributeSkale.command';
+export * from './GetAddressStatus.query';
 export * from './GetApiKey.query';
 export * from './GetNewContent.query';
 export * from './GetUser.query';
@@ -12,5 +13,6 @@ export * from './GetXps.query';
 export * from './GetXpsRanked.query';
 export * from './SearchUserProfiles.query';
 export * from './signIn/SignIn.command';
+export * from './UpdateSettings.command';
 export * from './UpdateUser.command';
 export * from './Xp.projection';

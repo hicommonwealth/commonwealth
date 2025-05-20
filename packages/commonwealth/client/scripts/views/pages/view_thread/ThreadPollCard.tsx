@@ -1,9 +1,13 @@
-import { PollView } from '@hicommonwealth/schemas';
+import {
+  PollView,
+  TopicWeightedVoting,
+  Vote as VoteSchema,
+} from '@hicommonwealth/schemas';
 import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Thread from 'models/Thread';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import { SetLocalPolls } from 'utils/polls';
@@ -11,10 +15,10 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
+
+type ActualVoteAttributes = z.infer<typeof VoteSchema>;
 
 type ThreadPollCardProps = {
   thread?: Thread;
@@ -22,6 +26,13 @@ type ThreadPollCardProps = {
   showDeleteButton?: boolean;
   isCreateThreadPage?: boolean;
   setLocalPoll?: SetLocalPolls;
+  tokenDecimals?: number;
+  topicWeight?: TopicWeightedVoting | null;
+  voterProfiles?: Record<
+    string,
+    { address: string; name: string; avatarUrl?: string }
+  >;
+  isLoadingVotes?: boolean;
   actionGroups: ActionGroups;
   bypassGating: boolean;
 };
@@ -32,11 +43,13 @@ export const ThreadPollCard = ({
   showDeleteButton,
   isCreateThreadPage = false,
   setLocalPoll,
+  tokenDecimals,
+  topicWeight,
+  voterProfiles,
+  isLoadingVotes,
   actionGroups,
   bypassGating,
 }: ThreadPollCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const user = useUserStore();
 
   const { mutateAsync: deletePoll } = useDeletePollMutation({
@@ -123,7 +136,7 @@ export const ThreadPollCard = ({
 
   // votes by weighted voting power
   const totalVoteWeight = pollVotes.reduce(
-    (sum, vote) => sum + BigInt(vote.calculated_voting_weight || 1),
+    (sum, vote) => sum + BigInt(vote.calculated_voting_weight || '0'),
     0n,
   );
   const voteInformation = poll.options.map((option) => ({
@@ -132,14 +145,31 @@ export const ThreadPollCard = ({
     voteCount: pollVotes
       .filter((v) => v.option === option)
       .reduce(
-        (sum, val) => sum + BigInt(val.calculated_voting_weight || 1),
+        (sum, val) => sum + BigInt(val.calculated_voting_weight || '0'),
         0n,
       ),
+  }));
+
+  const individualVotesData: ActualVoteAttributes[] = pollVotes.map((vote) => ({
+    id: vote.id,
+    poll_id: vote.poll_id,
+    community_id: vote.community_id,
+    author_community_id: vote.author_community_id,
+    address: vote.address,
+    option: vote.option,
+    created_at: vote.created_at!.toDate(),
+    calculated_voting_weight: vote.calculated_voting_weight,
   }));
 
   return (
     <>
       <PollCard
+        communityId={poll.community_id}
+        individualVotesData={individualVotesData}
+        voterProfiles={voterProfiles}
+        tokenDecimals={tokenDecimals}
+        topicWeight={topicWeight}
+        isLoadingVotes={isLoadingVotes}
         pollEnded={
           !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc())
         }
@@ -158,35 +188,22 @@ export const ThreadPollCard = ({
         isPreview={false}
         tooltipErrorMessage={permissions.tooltip}
         onVoteCast={(option, isSelected) => {
-          // @ts-expect-error <StrictNullChecks/>
-          handlePollVote(poll, option, isSelected);
+          if (option !== undefined) {
+            handlePollVote(poll, option, isSelected ?? false);
+          }
         }}
         onResultsClick={(e) => {
-          e.preventDefault();
-          if (pollVotes.length > 0) {
-            setIsModalOpen(true);
-          }
+          if (!(e && pollVotes.length === 0)) return;
+          // No-op: No votes to show, so do nothing
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
           if (isCreateThreadPage && setLocalPoll) {
             setLocalPoll([]);
           } else {
-            //@typescript-eslint/no-misused-promises
             handleDeletePoll().catch(console.error);
           }
         }}
-      />
-      <CWModal
-        size="small"
-        content={
-          <OffchainVotingModal
-            votes={pollVotes}
-            onModalClose={() => setIsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
       />
     </>
   );

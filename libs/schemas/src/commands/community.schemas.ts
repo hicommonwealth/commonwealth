@@ -458,3 +458,33 @@ export const UpdateCommunityTags = {
   }),
   context: AuthContext,
 };
+
+export const UpdateBanner = {
+  input: z.object({
+    community_id: z.string(),
+    banner_text: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetDefaultRole = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const ToggleCommunityStar = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetAddressWallet = {
+  input: z.object({
+    community_id: z.string(),
+    wallet_id: z.nativeEnum(WalletId),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
