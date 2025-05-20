@@ -60,8 +60,7 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 };
-//allows for FS.identify to be used
-declare const window: any;
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -112,16 +111,6 @@ export async function initAppState(
           true,
         ),
       });
-    }
-
-    if (userResponse) {
-      try {
-        window.FS('setIdentity', {
-          uid: userResponse.id,
-        });
-      } catch (e) {
-        console.error('FullStory not found.');
-      }
     }
   } catch (err) {
     errorStore

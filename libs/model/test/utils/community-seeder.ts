@@ -109,12 +109,7 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: [
-      {
-        group_ids: groups.map(({ id }) => id),
-        weighted_voting,
-      },
-    ],
+    topics: [{ weighted_voting }],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });
