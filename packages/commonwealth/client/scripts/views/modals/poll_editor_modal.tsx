@@ -14,7 +14,6 @@ import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
-import { CWThreadAction } from '../components/component_kit/new_designs/cw_thread_action';
 import {
   CWModalBody,
   CWModalFooter,
@@ -232,9 +231,11 @@ export const PollEditorModal = ({
               buttonHeight="sm"
               onClick={onModalClose}
             />
-            <CWThreadAction
-              action="ai-reply"
+            <CWButton
+              iconLeft="sparkle"
               label="Generate poll"
+              buttonType="secondary"
+              buttonHeight="sm"
               onClick={onGeneratePoll}
             />
             <CWButton
