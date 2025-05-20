@@ -32,9 +32,7 @@ import {
 import {
   createDeltaFromText,
   ReactQuillEditor,
-  getTextFromDelta,
 } from 'views/components/react_quill_editor';
-import { countLinesQuill } from 'views/components/react_quill_editor/utils';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
@@ -277,16 +275,6 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [isExpanded, openModalOnExpand, mode]);
 
-  useEffect(() => {
-    if (isExpanded) return;
-
-    const lines = countLinesQuill(contentDelta);
-
-    if (lines >= 5) {
-      setIsExpanded(true);
-    }
-  }, [contentDelta, isExpanded, setIsExpanded]);
-
   // Add toggle handler for the AI auto reply feature
   const handleToggleAiAutoReply = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -381,7 +369,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
-        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'}`}
+        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
