@@ -8,6 +8,7 @@ import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  SENDGRID_API_KEY,
   DATABASE_URL,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
@@ -97,6 +98,9 @@ const DEFAULTS = {
 export const config = configure(
   [target],
   {
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -269,6 +273,15 @@ export const config = configure(
     },
   },
   z.object({
+    SENDGRID: z.object({
+      API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SENDGRID_API_KEY is required in production',
+        ),
+    }),
     DB: z.object({
       URI: z
         .string()

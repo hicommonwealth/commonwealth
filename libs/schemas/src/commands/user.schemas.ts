@@ -127,7 +127,7 @@ export const UpdateEmail = {
   input: z.object({
     email: z.string().email(),
   }),
-  output: User.extend({ email: z.string(), update_token: z.string() }),
+  output: User.extend({ email: z.string() }),
   context: VerifiedContext,
 };
 

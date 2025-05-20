@@ -18,6 +18,7 @@ import {
 } from '@hicommonwealth/core';
 import { R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import express from 'express';
+import { main } from './main';
 import { config } from './server/config';
 
 // handle exceptions thrown in express routes
@@ -68,12 +69,9 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
-  const { models } = await import('@hicommonwealth/model');
   config.APP_ENV === 'local' && console.log(config);
 
-  const { main } = await import('./main');
-
-  await main(app, models, {
+  await main(app, {
     port: config.PORT,
     withLoggingMiddleware: true,
     withPrerender:

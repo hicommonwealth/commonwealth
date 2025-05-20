@@ -38,7 +38,7 @@ export const testServer = async (): Promise<TestServer> => {
   });
   const db = await tester.seedDb();
   const app = express();
-  const { server, cacheDecorator } = await main(app, db, {
+  const { server, cacheDecorator } = await main(app, {
     port: 8081,
     withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });

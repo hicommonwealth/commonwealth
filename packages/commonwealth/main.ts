@@ -1,8 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -42,7 +41,6 @@ const latencyInfo: Record<string, { invocationCount: number; total: number }> =
  */
 export async function main(
   app: express.Express,
-  db: DB,
   {
     port,
     withLoggingMiddleware = false,
@@ -60,15 +58,12 @@ export async function main(
     )} GB`,
   );
 
-  // @ts-expect-error StrictNullChecks
-  sgMail.setApiKey(config.SENDGRID.API_KEY);
-
   const cacheDecorator = new CacheDecorator();
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
 
   const sessionStore = new SequelizeStore({
-    db: db.sequelize,
+    db: sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
     expiration: config.AUTH.SESSION_EXPIRY_MILLIS,
@@ -224,7 +219,7 @@ export async function main(
   };
 
   setupMiddleware();
-  setupPassport(db);
+  setupPassport();
 
   setupAPI(app, cacheDecorator);
 

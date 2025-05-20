@@ -24,21 +24,22 @@ export const get_status_handler = async (req, res) => {
       return success(res, { evmTestEnv: config.TEST_EVM.ETH_RPC });
     } else {
       // user is logged in
-      const user = await query(User.GetStatus(), {
+      const status = await query(User.GetStatus(), {
         actor: { user: { id: reqUser.id, email: '' } },
         payload: {},
       });
-      const jwtToken = jwt.sign({ id: user!.id }, config.AUTH.JWT_SECRET, {
+      const jwtToken = jwt.sign({ id: status!.id }, config.AUTH.JWT_SECRET, {
         expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
       });
-      const knockJwtToken = await computeKnockJwtToken(user!.id);
+      const knockJwtToken = await computeKnockJwtToken(status!.id);
 
+      const user = {
+        ...status,
+        jwt: jwtToken,
+        knockJwtToken: knockJwtToken!,
+      };
       return success(res, {
-        user: {
-          ...user,
-          jwt: jwtToken,
-          knockJwtToken: knockJwtToken!,
-        },
+        user,
         communityWithRedirects: (user!.communities || []).filter(
           (c) => c.redirect,
         ),

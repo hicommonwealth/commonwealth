@@ -11,7 +11,9 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
     auth: [],
     secure: false, // TODO: this should be secure
     body: async ({ actor }) => {
-      const user = await models.User.findByPk(actor.user.id);
+      const user = await models.User.scope('withPrivateData').findOne({
+        where: { id: actor.user.id },
+      });
       mustExist('User', user);
 
       const addresses = await models.Address.findAll({
