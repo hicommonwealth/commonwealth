@@ -134,6 +134,7 @@ describe('Thread lifecycle', () => {
           weighted_voting: TopicWeightedVoting.Stake,
         },
         { name: 'topic without gating' },
+        { name: 'topic without groups' },
       ],
       CommunityStakes: [
         {
@@ -147,7 +148,7 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupGatedAction', {
       group_id: threadGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
+      topic_id: _community!.topics![0]!.id,
       gated_actions: [
         GatedActionEnum.CREATE_THREAD,
         GatedActionEnum.CREATE_THREAD_REACTION,
@@ -157,12 +158,12 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupGatedAction', {
       group_id: commentGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
+      topic_id: _community!.topics![0]!.id,
       gated_actions: [GatedActionEnum.CREATE_COMMENT],
     });
     await seed('GroupGatedAction', {
       group_id: emptyGroupId,
-      topic_id: _community?.topics?.[1]?.id || 0,
+      topic_id: _community!.topics![1]!.id,
       gated_actions: [],
     });
 
