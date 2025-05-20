@@ -18,7 +18,6 @@ type TextAreaStyleProps = {
   instructionalMessage?: string;
   containerClassName?: string;
   resizeWithText?: boolean;
-  containerClassName?: string;
 };
 
 type TextAreaFormValidationProps = {

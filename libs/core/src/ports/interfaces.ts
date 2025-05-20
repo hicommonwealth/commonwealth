@@ -440,7 +440,7 @@ export type ConsumerHooks = {
 
 export type Consumer =
   | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      consumer: () => EventsHandlerMetadata<EventSchemas, ZodSchema>;
       worker?: string;
       retryStrategy?: RetryStrategyFn;
       hooks?: ConsumerHooks;
