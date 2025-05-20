@@ -6,7 +6,7 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { command, dispose, query } from '@hicommonwealth/core';
-import { Poll } from '@hicommonwealth/model';
+import { Poll, models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -38,7 +38,7 @@ describe('Polls', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    const topic = await server.models.Topic.findOne({
+    const topic = await models.Topic.findOne({
       where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks

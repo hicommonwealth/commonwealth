@@ -23,20 +23,20 @@ export function GetCommunityMembersStats(): Query<
         SELECT
           a.id, 
           a.address, 
-          u.profile->>'name' AS profile_name 
+          COALESCE(u.profile->>'name', '') AS profile_name 
         FROM 
           "Addresses" a
           LEFT JOIN "Users" u ON a.user_id = u.id
         WHERE 
-          a.community_id = :communit_id
+          a.community_id = :community_id
       ),
       T AS (SELECT id, address_id from "Threads" where community_id = :community_id)
       SELECT 
         A.address, 
         A.profile_name, 
-        COUNT(DISTINCT T.id) AS thread_count,
-        COUNT(DISTINCT c.id) AS comment_count,
-        COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
+        COUNT(DISTINCT T.id)::int AS thread_count,
+        COUNT(DISTINCT c.id)::int AS comment_count,
+        COUNT(DISTINCT tr.id)::int + COUNT(DISTINCT cr.id)::int AS reaction_count
       FROM 
         A
         LEFT JOIN T ON A.id = T.address_id

@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
+import { tester, type E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
 import { config } from './server/config';
@@ -22,7 +22,6 @@ const { main } = await import('./main');
 export type TestServer = {
   app: express.Express;
   cacheDecorator: CacheDecorator;
-  models: DB;
   seeder: ModelSeeder;
   e2eTestEntities: E2E_TestEntities;
 };
@@ -36,14 +35,14 @@ export const testServer = async (): Promise<TestServer> => {
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
   });
-  const db = await tester.seedDb();
+  await tester.seedDb();
   const app = express();
   const { server, cacheDecorator } = await main(app, {
     port: 8081,
     withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });
-  const seeder = modelSeeder(app, db);
-  const e2eTestEntities = await tester.e2eTestEntities(db);
+  const seeder = modelSeeder(app);
+  const e2eTestEntities = await tester.e2eTestEntities();
 
   // auto dispose server
   dispose(async () => {
@@ -53,7 +52,6 @@ export const testServer = async (): Promise<TestServer> => {
   return {
     app,
     cacheDecorator,
-    models: db,
     seeder,
     e2eTestEntities,
   };

@@ -55,21 +55,24 @@ describe('User Model Routes', () => {
       const email = `test@${PRODUCTION_DOMAIN}`;
       const res = await chai
         .request(server.app)
-        .post('/api/updateEmail')
+        .post('/api/internal/UpdateEmail')
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({
           jwt: jwtToken,
           email,
         });
-      expect(res.body.status).to.be.equal('Success');
+      console.log({ userAddress, jwtToken, body: res.body });
+      expect(res).to.be.json;
       expect(res.body.result.email).to.be.equal(email);
     });
 
     test('should fail to update without email', async () => {
       const res = await chai
         .request(server.app)
-        .post('/api/updateEmail')
+        .post('/api/internal/UpdateEmail')
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({
           jwt: jwtToken,
         });
@@ -80,8 +83,9 @@ describe('User Model Routes', () => {
       const email = 'testatcommonwealthdotim';
       const res = await chai
         .request(server.app)
-        .post('/api/updateEmail')
+        .post('/api/internal/UpdateEmail')
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({
           jwt: jwtToken,
           email,
