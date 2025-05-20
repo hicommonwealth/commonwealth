@@ -34,6 +34,7 @@ export const launchPostToken = async (
   threadId: number,
   exchangeToken: string,
   initPurchaseAmount: number,
+  bondingCurveAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
   curveId: number = 1,
@@ -42,7 +43,7 @@ export const launchPostToken = async (
   try {
     await approveTokenTransfer(
       tokenContract,
-      contract.options.address,
+      bondingCurveAddress,
       initPurchaseAmount.toString(),
       walletAddress,
     );
