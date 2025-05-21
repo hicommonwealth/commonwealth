@@ -2,6 +2,7 @@ import { createWalletClient, http, publicActions } from 'viem';
 import { mainnet } from 'viem/chains';
 import { AbiFragment, Contract } from 'web3';
 import erc_721_abi from '../utils/abi/erc721';
+import { localRpc } from '../utils/chainUtil';
 import { erc_721 } from '../utils/contracts';
 import { SdkBase } from './sdkBase';
 export class ERC721 extends SdkBase {
@@ -27,7 +28,7 @@ export class ERC721 extends SdkBase {
     const accounts = await this.getAccounts();
     const client = createWalletClient({
       account: accounts[0] as `0x${string}`,
-      transport: http('http://localhost:8545'),
+      transport: http(localRpc),
       chain: mainnet,
     }).extend(publicActions);
     const { request } = await client.simulateContract({
