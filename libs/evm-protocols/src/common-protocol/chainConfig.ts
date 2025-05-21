@@ -98,9 +98,9 @@ export const factoryContracts = {
   [ValidChains.Base]: {
     factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
-    launchpad: '0x0c1786961cfdac88edeb5728e52f73a0dbbe7813',
+    launchpad: '0x0c1786961CfDac88EdEb5728E52F73A0DbBe7813',
     lpBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
-    tokenCommunityManager: '0x84a0cfb53a77202777fdbc845e7a5bb214311e88',
+    tokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
     referralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
     chainId: 8453,
   },
