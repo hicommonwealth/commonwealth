@@ -41,7 +41,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         z.infer<typeof schemas.UserStatusCommunityView>
       >(
         `
-      SELECT
+      SELECT DISTINCT
         c.id, c.name, c.icon_url,
         CASE
           WHEN sc.community_id IS NOT NULL THEN TRUE
