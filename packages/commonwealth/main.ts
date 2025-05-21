@@ -33,8 +33,6 @@ import setupServer from './server/scripts/setupServer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const parseJson = json({ limit: '1mb' });
-
 const latencyInfo: Record<string, { invocationCount: number; total: number }> =
   {};
 
@@ -110,6 +108,21 @@ export async function main(
         301,
       ),
     );
+
+    app.use((req, res, next) => {
+      const contentLength = parseInt(req.headers['content-length'] || '0', 10);
+      if (contentLength > 1024 * 1024) {
+        return res.status(413).json({ error: 'Request entity too large' });
+      }
+      next();
+    });
+
+    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
+    const parseJson = json({ limit: '1mb' });
+    app.use((req, res, next) => {
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
+      else parseJson(req, res, next);
+    });
 
     // dynamic compression settings used
     app.use(compression());
@@ -201,12 +214,6 @@ export async function main(
         }),
       );
 
-    app.use((req, res, next) => {
-      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
-      else parseJson(req, res, next);
-    });
-
-    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
