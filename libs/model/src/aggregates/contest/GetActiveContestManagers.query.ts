@@ -28,6 +28,7 @@ export function GetActiveContestManagers(): Query<
         environment: z.infer<typeof schemas.ContestManagerEnvironmentsSchema>;
         namespace_judge_token_id: number | null;
         namespace_judges: string[] | null;
+        funding_token_address: string | null;
       }>(
         `
             SELECT cn.eth_chain_id,
@@ -41,7 +42,8 @@ export function GetActiveContestManagers(): Query<
                    COALESCE(JSON_AGG(ca) FILTER (WHERE ca.action IS NOT NULL), '[]'::json) as actions,
                    cm.environment,
                    cm.namespace_judge_token_id,
-                   cm.namespace_judges
+                   cm.namespace_judges,
+                   cm.funding_token_address
             FROM "Communities" c
                      JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                      JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -68,7 +70,7 @@ export function GetActiveContestManagers(): Query<
                 )
             GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address,
                 co.max_contest_id, co.end_time, cm.interval, cm.ending, cm.environment,
-                cm.namespace_judge_token_id, cm.namespace_judges
+                cm.namespace_judge_token_id, cm.namespace_judges, cm.funding_token_address
         `,
         {
           type: QueryTypes.SELECT,
@@ -91,6 +93,7 @@ export function GetActiveContestManagers(): Query<
         environment: r.environment,
         namespace_judge_token_id: r.namespace_judge_token_id,
         namespace_judges: r.namespace_judges,
+        funding_token_address: r.funding_token_address,
       }));
     },
   };
