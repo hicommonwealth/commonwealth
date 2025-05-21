@@ -85,7 +85,8 @@ export async function getEventSources(): Promise<EvmSources> {
   let ethChainIds: string[] | number[] = Object.keys(EventRegistry);
   if (
     Array.isArray(config.EVM_CE.ETH_CHAIN_ID_OVERRIDE) &&
-    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0
+    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0 &&
+    config.NODE_ENV !== 'test'
   ) {
     ethChainIds = config.EVM_CE.ETH_CHAIN_ID_OVERRIDE;
     if (logWarning) {
