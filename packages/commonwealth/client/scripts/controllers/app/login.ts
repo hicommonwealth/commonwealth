@@ -23,7 +23,6 @@ import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
 import axios from 'axios';
-import { updateEmail } from 'client/scripts/state/api/user/updateEmail';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -569,13 +568,7 @@ export async function handleSocialLoginCallback({
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
     }
 
-    const { Profiles: profiles, email: ssoEmail } = response.data.result;
-
-    // if email is not set, set the SSO email as the default email
-    // only if its a standalone account (no account linking)
-    // TODO: @timolegros - can we make this update directly in the signIn command? Do we have access to the ssoEmail?
-    if (!userStore.getState().email && ssoEmail && profiles?.length === 1)
-      await updateEmail({ email: ssoEmail as string });
+    const { Profiles: profiles } = response.data.result;
 
     // if account is newly created and user has not completed onboarding flow
     // then open the welcome modal.
