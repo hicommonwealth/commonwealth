@@ -68,12 +68,10 @@ module.exports = {
                                        poll_id,
                                        address,
                                        ROW_NUMBER() OVER (PARTITION BY poll_id, address ORDER BY id) as rn
-                                FROM "Votes"
-                                WHERE user_id IS NOT NULL)
+                                FROM "Votes")
           DELETE
           FROM "Votes"
-          WHERE user_id IS NOT NULL
-            AND id IN (SELECT id
+          WHERE id IN (SELECT id
                        FROM ranked_votes
                        WHERE rn > 1);
         `,
