@@ -22,9 +22,6 @@ type SearchThreadsRequestQuery = {
   order_by?: 'last_active' | 'rank' | 'created_at' | 'profile_name';
 } & PaginationQueryParams;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type GetThreadsResponse = any;
-
 export const get_threads_router = async (req, res) => {
   const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
@@ -103,11 +100,6 @@ export const get_threads_router = async (req, res) => {
   if (search) {
     const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
-
-    // if (!req.community && community_id !== ALL_COMMUNITIES) {
-    //   // if no community resolved, ensure that client explicitly requested all communities
-    //   throw new AppError(Errors.NoCommunity);
-    // }
 
     const searchResults = await query(Thread.SearchThreads(), {
       actor: { user: { email: '' } },

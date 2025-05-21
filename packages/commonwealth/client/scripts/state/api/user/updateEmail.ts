@@ -1,6 +1,8 @@
+import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { trpc } from 'utils/trpcClient';
 import { userStore } from '../../ui/user';
+import { SERVER_URL } from '../config';
 
 const useUpdateUserEmailMutation = ({
   shouldNotifyFailure = true,
@@ -14,3 +16,18 @@ const useUpdateUserEmailMutation = ({
 };
 
 export default useUpdateUserEmailMutation;
+
+export const updateEmail = ({ email }: { email: string }) =>
+  axios
+    .post(
+      `${SERVER_URL}/internal/UpdateEmail`,
+      { email, jwt: userStore.getState().jwt },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          address: userStore.getState().activeAccount?.address,
+        },
+      },
+    )
+    .then(() => userStore.getState().setData({ email }))
+    .catch(() => {});
