@@ -1,4 +1,3 @@
-import Poll from 'client/scripts/models/Poll';
 import { trpc } from 'utils/trpcClient';
 
 const POLLS_STALE_TIME = 60 * 1000; // 1 minute
@@ -17,7 +16,6 @@ const useGetThreadPollsQuery = ({
     {
       enabled: apiCallEnabled,
       staleTime: POLLS_STALE_TIME,
-      select: (data) => data.map((poll) => new Poll(poll)),
     },
   );
 };

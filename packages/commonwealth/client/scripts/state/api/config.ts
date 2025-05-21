@@ -12,13 +12,11 @@ export const queryClient = new QueryClient({
 export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
-  FETCH_ADMIN: '/roles',
   FETCH_THREADS: '/threads',
   FETCH_DOMAIN: '/domain',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   UPDATE_USER_EMAIL: '/updateEmail',
-  UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   GENERATE_IMAGE: '/generateImage',
