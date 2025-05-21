@@ -1,4 +1,5 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { Actor, InvalidState, type Command } from '@hicommonwealth/core';
+import { Contest } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authThread, mustExist, tiered } from '../../middleware';
@@ -8,6 +9,7 @@ import { getVotingWeight } from '../../services/stakeHelper';
 
 export const CreateThreadReactionErrors = {
   ThreadArchived: 'Thread is archived',
+  MustBeJudge: 'Must be judge to vote',
 };
 
 export function CreateThreadReaction(): Command<
@@ -27,6 +29,30 @@ export function CreateThreadReaction(): Command<
 
       if (thread.archived_at)
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
+
+      // check if thread is part of contest
+      const contestManagers = await Contest.GetActiveContestManagers().body({
+        actor: {} as Actor,
+        payload: {
+          community_id: thread.community_id!,
+          topic_id: thread.topic_id!,
+        },
+      });
+      // if all contests are judged, then user must be allowed on all judged contests
+      const judgedContestManagers = (contestManagers ?? []).filter(
+        (cm) => cm.namespace_judge_token_id !== null,
+      );
+      if (judgedContestManagers.length === (contestManagers ?? []).length) {
+        for (const judgedContestManager of judgedContestManagers) {
+          if (
+            !judgedContestManager.namespace_judges
+              ?.map((addr) => addr.toLowerCase())
+              .includes(address.address.toLowerCase())
+          ) {
+            throw new InvalidState(CreateThreadReactionErrors.MustBeJudge);
+          }
+        }
+      }
 
       const calculated_voting_weight = await getVotingWeight(
         thread.topic_id!,

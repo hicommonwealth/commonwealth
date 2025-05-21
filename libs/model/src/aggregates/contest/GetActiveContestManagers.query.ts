@@ -26,6 +26,8 @@ export function GetActiveContestManagers(): Query<
         max_contest_id: number;
         actions: Array<z.infer<typeof schemas.ContestAction>>;
         environment: z.infer<typeof schemas.ContestManagerEnvironmentsSchema>;
+        namespace_judge_token_id: number | null;
+        namespace_judges: string[] | null;
       }>(
         `
             SELECT cn.eth_chain_id,
@@ -37,7 +39,9 @@ export function GetActiveContestManagers(): Query<
                    co.max_contest_id,
                    co.end_time,
                    COALESCE(JSON_AGG(ca) FILTER (WHERE ca.action IS NOT NULL), '[]'::json) as actions,
-                   cm.environment
+                   cm.environment,
+                   cm.namespace_judge_token_id,
+                   cm.namespace_judges
             FROM "Communities" c
                      JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                      JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -63,7 +67,8 @@ export function GetActiveContestManagers(): Query<
                 cm.interval > 0
                 )
             GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address,
-                co.max_contest_id, co.end_time, cm.interval, cm.ending, cm.environment
+                co.max_contest_id, co.end_time, cm.interval, cm.ending, cm.environment,
+                cm.namespace_judge_token_id, cm.namespace_judges
         `,
         {
           type: QueryTypes.SELECT,
@@ -84,6 +89,8 @@ export function GetActiveContestManagers(): Query<
         max_contest_id: r.max_contest_id,
         actions: r.actions,
         environment: r.environment,
+        namespace_judge_token_id: r.namespace_judge_token_id,
+        namespace_judges: r.namespace_judges,
       }));
     },
   };
