@@ -1,10 +1,11 @@
 import {
   BalanceType,
+  CommunityGoalTypes,
   CommunityTierMap,
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community } from '../entities';
+import { Community, CommunityGoalMeta } from '../entities';
 
 export const CreateChainNode = {
   input: z.object({
@@ -125,3 +126,13 @@ export const UpdateResourceTimestamps = {
 };
 
 export type Type1 = z.infer<typeof TriggerNotificationsWorkflow.input>;
+
+export const CreateCommunityGoalMeta = {
+  input: z.object({
+    name: z.string(),
+    description: z.string(),
+    type: z.enum(CommunityGoalTypes),
+    target: z.number(),
+  }),
+  output: CommunityGoalMeta,
+};
