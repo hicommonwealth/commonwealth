@@ -1,4 +1,5 @@
 export * from './CreateChainNode.command';
+export * from './CreateCommunityGoalMeta.command';
 export * from './EnableDigestEmail';
 export * from './GetChainNodes.query';
 export * from './GetCommunityMembersStats.query';

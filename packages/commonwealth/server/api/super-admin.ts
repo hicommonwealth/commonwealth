@@ -38,4 +38,8 @@ export const trpcRouter = trpc.router({
     SuperAdmin.GetCommunityMembersStats,
     trpc.Tag.SuperAdmin,
   ),
+  createCommunityGoalMeta: trpc.command(
+    SuperAdmin.CreateCommunityGoalMeta,
+    trpc.Tag.SuperAdmin,
+  ),
 });
