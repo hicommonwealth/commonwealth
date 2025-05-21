@@ -24,6 +24,8 @@ export type Contest = {
   payout_structure?: number[];
   prize_percentage?: number;
   ticker?: string;
+  namespace_judges?: string[];
+  namespace_judge_token_id?: number;
   contests?: {
     contest_id?: number;
     score?: {
