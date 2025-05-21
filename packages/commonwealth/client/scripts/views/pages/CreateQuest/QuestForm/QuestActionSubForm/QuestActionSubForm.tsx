@@ -17,6 +17,7 @@ import BasicPointsInput from './SpecialCaseDynamicFields/BasicPointsInput';
 import ChainEventFields from './SpecialCaseDynamicFields/ChainEventFields';
 import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
 import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
+import KYOFinanceFields from './SpecialCaseDynamicFields/KYOFinanceFields';
 import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
 import TwitterFields from './SpecialCaseDynamicFields/TwitterFields';
 import { QuestAction, QuestActionSubFormProps } from './types';
@@ -119,12 +120,9 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
         })}
         customError={errors?.action}
         instructionalMessage={
-          ((defaultValues?.action === 'TweetEngagement' ||
-            defaultValues?.action === 'DiscordServerJoined') &&
-            actionCopies.pre_reqs[defaultValues?.action as QuestAction](
-              'admin',
-            )) ||
-          ''
+          actionCopies?.pre_reqs?.[defaultValues?.action as QuestAction]?.(
+            'admin',
+          ) || ''
         }
       />
 
@@ -159,6 +157,12 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
             config={config}
           />
           <ChainEventFields
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <KYOFinanceFields
             defaultValues={defaultValues}
             errors={errors}
             onChange={onChange}

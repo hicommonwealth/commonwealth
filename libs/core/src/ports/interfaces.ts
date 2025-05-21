@@ -1,6 +1,6 @@
 import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
-import { z } from 'zod';
+import { z, ZodSchema } from 'zod';
 import {
   EventContext,
   EventSchemas,
@@ -447,7 +447,7 @@ export type ConsumerHooks = {
 
 export type Consumer =
   | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      consumer: () => EventsHandlerMetadata<EventSchemas, ZodSchema>;
       worker?: string;
       retryStrategy?: RetryStrategyFn;
       hooks?: ConsumerHooks;
@@ -469,7 +469,7 @@ export interface Broker extends Disposable {
   publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    consumer: () => EventsHandlerMetadata<Inputs>,
+    consumer: () => EventsHandlerMetadata<Inputs, ZodSchema>,
     retryStrategy?: RetryStrategyFn,
     hooks?: ConsumerHooks,
   ): Promise<boolean>;

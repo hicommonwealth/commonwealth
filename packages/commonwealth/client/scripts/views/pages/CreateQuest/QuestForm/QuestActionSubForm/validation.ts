@@ -29,6 +29,7 @@ const questSubFormValidationSchema = z.object({
   // internal state validation, that is handled by a custom function
   participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
+  metadata: z.null(),
 });
 
 export const buildQuestSubFormValidationSchema = (
@@ -51,6 +52,9 @@ export const buildQuestSubFormValidationSchema = (
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
   const allowsTokenThresholdAmountAsContentId =
     config?.with_optional_token_trade_threshold;
+  const requiresKYOFinanceMetadata =
+    config?.requires_kyo_finance_swap_metadata ||
+    config?.requires_kyo_finance_lp_metadata;
 
   const needsExtension =
     requiresCreatorPoints ||
@@ -62,6 +66,7 @@ export const buildQuestSubFormValidationSchema = (
     allowsChainIdAsContentId ||
     allowsTokenThresholdAmountAsContentId ||
     requiresChainEvent;
+  requiresKYOFinanceMetadata;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -249,6 +254,138 @@ export const buildQuestSubFormValidationSchema = (
           ),
         }),
     }) as unknown as typeof baseSchema;
+  }
+  if (requiresKYOFinanceMetadata) {
+    const KYOFinanceChainIdVaidationSchema = z.union(
+      [
+        z
+          .literal(1868, {
+            invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          })
+          .describe('Soneium Mainnet'),
+        z
+          .literal(1946, {
+            invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          })
+          .describe('Soneium Testnet'),
+      ],
+      { invalid_type_error: VALIDATION_MESSAGES.NO_INPUT },
+    );
+    if (config.requires_kyo_finance_swap_metadata) {
+      baseSchema = baseSchema.extend({
+        metadata: z.object({
+          chainId: KYOFinanceChainIdVaidationSchema,
+          // TODO: malik - format?
+          minTimestamp: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - address validation
+          outputToken: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - address validation
+          inputToken: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - amount unit? + validation
+          minOutputAmount: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          // TODO: malik - unit/ranges?  + validation
+          minVolumeUSD: z
+            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+        }),
+      }) as unknown as typeof baseSchema;
+    }
+    if (config.requires_kyo_finance_lp_metadata) {
+      baseSchema = baseSchema.extend({
+        metadata: z
+          .object({
+            chainId: KYOFinanceChainIdVaidationSchema,
+            poolAddresses: z
+              .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+              .refine(
+                (val) => {
+                  if (!val) return false;
+                  const addresses = val
+                    .split(',')
+                    .map((addr) => addr.trim())
+                    .filter(Boolean);
+                  return addresses.length >= 1 && addresses.length <= 20;
+                },
+                {
+                  message: 'Must provide between 1 and 20 pool addresses',
+                },
+              )
+              .refine(
+                (val) => {
+                  const addresses = val
+                    .split(',')
+                    .map((addr) => addr.trim())
+                    .filter(Boolean);
+                  return addresses.every((addr) =>
+                    /^0x[a-fA-F0-9]{40}$/.test(addr),
+                  );
+                },
+                {
+                  message:
+                    'All pool addresses must be valid Ethereum addresses',
+                },
+              ),
+            minUSDValues: z
+              .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+              .refine(
+                (val) => {
+                  if (!val) return false;
+                  const values = val
+                    .split(',')
+                    .map((v) => v.trim())
+                    .filter(Boolean);
+                  return values.length >= 1 && values.length <= 20;
+                },
+                {
+                  message: 'Must provide between 1 and 20 minimum USD values',
+                },
+              )
+              .refine(
+                (val) => {
+                  const values = val
+                    .split(',')
+                    .map((v) => v.trim())
+                    .filter(Boolean);
+                  return values.every(
+                    (v) => !isNaN(Number(v)) && Number(v) >= 0,
+                  );
+                },
+                {
+                  message:
+                    'All minimum USD values must be valid numbers greater than or equal to 0',
+                },
+              )
+              .optional(),
+          })
+          .refine(
+            (data) => {
+              if (!data.minUSDValues) return true;
+              const addresses = data.poolAddresses
+                .split(',')
+                .map((addr) => addr.trim())
+                .filter(Boolean);
+              const values = data.minUSDValues
+                .split(',')
+                .map((v) => v.trim())
+                .filter(Boolean);
+              return addresses.length === values.length;
+            },
+            {
+              message:
+                'Number of pool addresses must match number of minimum USD values',
+              path: ['minUSDValues'],
+            },
+          ),
+      }) as unknown as typeof baseSchema;
+    }
   }
 
   return baseSchema;

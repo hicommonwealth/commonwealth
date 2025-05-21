@@ -1,9 +1,11 @@
 import {
   ChannelBatchActions,
+  KyoFinanceChainIds,
   QuestActionNames,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 export type QuestAction =
   | (typeof QuestActionNames)[number]
@@ -17,6 +19,8 @@ export enum QuestActionContentIdScope {
   Group = 'group',
   TokenTradeThreshold = 'threshold',
 }
+
+export type KyoFinanceChainIdsType = z.infer<typeof KyoFinanceChainIds>;
 
 export type QuestActionSubFormErrors = {
   action?: string;
@@ -39,6 +43,20 @@ export type QuestActionSubFormErrors = {
   ethChainId?: string;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: string;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
+  };
 };
 
 export type QuestActionSubFormFields = {
@@ -67,6 +85,20 @@ export type QuestActionSubFormFields = {
   ethChainId?: string | number;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: KyoFinanceChainIdsType;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
+  } | null;
 };
 
 export type QuestActionSubFormConfig = {
@@ -84,6 +116,8 @@ export type QuestActionSubFormConfig = {
   requires_start_link: boolean;
   requires_amount_multipler: boolean;
   with_optional_token_trade_threshold: boolean;
+  requires_kyo_finance_swap_metadata: boolean;
+  requires_kyo_finance_lp_metadata: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {
