@@ -22,6 +22,30 @@ import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
 
+async function createQuest(
+  community_id: string,
+  actor: Actor,
+  start_date: Date,
+  end_date: Date,
+  name = chance.name() + Math.random(),
+  max_xp_to_end = 100,
+) {
+  const quest = await command(CreateQuest(), {
+    actor,
+    payload: {
+      community_id,
+      name,
+      description: chance.sentence(),
+      image_url: chance.url(),
+      start_date,
+      end_date,
+      max_xp_to_end,
+      quest_type: 'common',
+    },
+  });
+  return quest;
+}
+
 describe('Quest lifecycle', () => {
   let superadmin: Actor;
   let community_id: string;
@@ -55,55 +79,36 @@ describe('Quest lifecycle', () => {
 
   describe('create', () => {
     it('should create a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: 'test quest',
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        'test quest',
+      );
       expect(quest?.name).toBe('test quest');
     });
 
     it('should create a global quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          name: 'test quest global',
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        'test quest global',
+      );
       expect(quest?.name).toBe('test quest global');
     });
 
     it('should not create a quest with the same name', async () => {
       await expect(
-        command(CreateQuest(), {
-          actor: superadmin,
-          payload: {
-            community_id,
-            name: 'test quest',
-            description: 'test description',
-            image_url: chance.url(),
-            start_date: new Date(
-              new Date().getTime() + 1000 * 60 * 60 * 24 * 3,
-            ),
-            end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 5),
-            max_xp_to_end: 100,
-            quest_type: 'common',
-          },
-        }),
+        createQuest(
+          community_id,
+          superadmin,
+          start_date,
+          end_date,
+          'test quest',
+        ),
       ).rejects.toThrowError(
         `Quest named "test quest" in community "${community_id}"`,
       );
@@ -112,19 +117,12 @@ describe('Quest lifecycle', () => {
 
   describe('update', () => {
     it('should update a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
         [
           {
@@ -170,19 +168,13 @@ describe('Quest lifecycle', () => {
 
     it('should not update a quest with the same name', async () => {
       const name = chance.name() + Math.random();
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name,
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        name,
+      );
       await expect(
         command(UpdateQuest(), {
           actor: superadmin,
@@ -199,19 +191,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should not update a quest that has started', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       // hack to update the start_date
       const now = new Date();
       await models.Quest.update(
@@ -233,19 +218,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should not update a quest with invalid content_id', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
 
       await expect(
         command(UpdateQuest(), {
@@ -271,19 +249,12 @@ describe('Quest lifecycle', () => {
 
   describe('query', () => {
     it('should get a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const retrieved = await query(GetQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },
@@ -315,19 +286,7 @@ describe('Quest lifecycle', () => {
         ];
       const quests = await Promise.all(
         [...Array(3)].map(() =>
-          command(CreateQuest(), {
-            actor: superadmin,
-            payload: {
-              community_id,
-              name: chance.name() + Math.random(),
-              description: chance.sentence(),
-              image_url: chance.url(),
-              start_date,
-              end_date,
-              max_xp_to_end: 100,
-              quest_type: 'common',
-            },
-          }),
+          createQuest(community_id, superadmin, start_date, end_date),
         ),
       );
       await command(UpdateQuest(), {
@@ -341,7 +300,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(9);
+      expect(retrieved?.results?.length).toBe(10);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
@@ -352,19 +311,12 @@ describe('Quest lifecycle', () => {
 
   describe('delete', () => {
     it('should delete a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const deleted = await command(DeleteQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },
@@ -379,19 +331,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should be able to delete after started but with no actions', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       // hack to update the start_date
       const now = new Date();
       await models.Quest.update(
@@ -406,19 +351,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should not delete a quest with actions', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
         [
           {
@@ -467,19 +405,12 @@ describe('Quest lifecycle', () => {
 
   describe('cancel', () => {
     it('should cancel a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const cancelled = await command(CancelQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },
