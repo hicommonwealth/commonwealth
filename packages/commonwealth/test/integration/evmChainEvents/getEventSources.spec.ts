@@ -9,8 +9,8 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { createContestEventSources } from '../../util/util';
 
-const singleContestAddress = '0x123';
-const recurringContestAddress = '0x321';
+const singleContestAddress = '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE';
+const recurringContestAddress = '0x3cE1F5d4f84B583Ab320cAc0948AddE52a131FBC';
 
 describe('getEventSources', () => {
   beforeAll(async () => {
