@@ -125,7 +125,7 @@ export async function main(
         const start = Date.now();
         res.on('finish', () => {
           const latency = Date.now() - start;
-          stats().distribution(`cw.path.latency`, latency, 0.3, {
+          stats().distribution(`cw.path.metrics`, latency, 0.3, {
             path: routePattern,
             statusCode: `${res.statusCode}`,
           });
