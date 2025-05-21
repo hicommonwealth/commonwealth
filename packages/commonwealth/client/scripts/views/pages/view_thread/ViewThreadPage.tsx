@@ -34,6 +34,7 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
+import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -54,7 +55,6 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -97,6 +97,14 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
+
+// Define the VoterProfileData type
+type VoterProfileData = {
+  address: string;
+  name: string; // Make name non-optional by providing a fallback
+  avatarUrl?: string;
+};
+
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
   const [searchParams] = useSearchParams();
@@ -116,6 +124,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [voterProfiles, setVoterProfiles] = useState<
+    Record<string, VoterProfileData>
+  >({});
+  const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
+    [],
+  );
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -365,6 +379,41 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
+  // Effect to gather unique voter addresses from all polls
+  useEffect(() => {
+    if (pollsData && pollsData.length > 0) {
+      const allAddresses = pollsData.flatMap((poll) =>
+        (poll.votes || []).map((vote) => vote.address),
+      );
+      setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
+    }
+  }, [pollsData]);
+
+  const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
+    useFetchProfilesByAddressesQuery({
+      currentChainId: communityId,
+      profileChainIds: [communityId],
+      profileAddresses: uniqueVoterAddresses,
+      apiCallEnabled: !!communityId && uniqueVoterAddresses.length > 0,
+    });
+
+  // Effect to transform fetched profiles into the voterProfiles map
+  useEffect(() => {
+    if (fetchedProfiles && fetchedProfiles.length > 0) {
+      const profilesMap: Record<string, VoterProfileData> = {};
+      fetchedProfiles.forEach((profile) => {
+        if (profile.address) {
+          profilesMap[profile.address] = {
+            address: profile.address,
+            name: profile.name || '', // Provide fallback for name
+            avatarUrl: profile.avatarUrl,
+          };
+        }
+      });
+      setVoterProfiles(profilesMap);
+    }
+  }, [fetchedProfiles]);
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -608,7 +657,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ...new Map(
                     pollsData?.map((poll) => [poll.id, poll]),
                   ).values(),
-                ].map((poll: Poll) => {
+                ].map((poll) => {
                   return (
                     <ThreadPollCard
                       thread={thread}
@@ -617,6 +666,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       actionGroups={actionGroups}
                       bypassGating={bypassGating}
                       showDeleteButton={isAuthor || isAdmin}
+                      tokenDecimals={thread?.topic?.token_decimals ?? undefined}
+                      topicWeight={thread?.topic?.weighted_voting}
+                      voterProfiles={voterProfiles}
+                      isLoadingVotes={isLoadingProfiles}
                     />
                   );
                 })}

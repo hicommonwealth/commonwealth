@@ -155,7 +155,7 @@ const PersonalInformationStep = ({
     }
     // enable/disable promotional emails flag for user
     await updateEmailSettings({
-      promotionalEmailsEnabled: values.enableProductUpdates,
+      enable_promotional_emails: values.enableProductUpdates,
     });
 
     // refetch profile data

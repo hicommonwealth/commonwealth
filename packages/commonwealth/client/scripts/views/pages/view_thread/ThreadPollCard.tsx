@@ -1,25 +1,32 @@
+import { PollView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Thread from 'models/Thread';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
+import { SetLocalPolls } from 'utils/polls';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import type Poll from '../../../models/Poll';
+import { z } from 'zod';
 import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {
   thread?: Thread;
-  poll: Poll;
+  poll: z.infer<typeof PollView> & { thread_id?: number };
   showDeleteButton?: boolean;
   isCreateThreadPage?: boolean;
-  setLocalPoll?: (params) => void;
+  setLocalPoll?: SetLocalPolls;
+  tokenDecimals?: number;
+  topicWeight?: TopicWeightedVoting | null;
+  voterProfiles?: Record<
+    string,
+    { address: string; name: string; avatarUrl?: string }
+  >;
+  isLoadingVotes?: boolean;
   actionGroups: ActionGroups;
   bypassGating: boolean;
 };
@@ -30,20 +37,30 @@ export const ThreadPollCard = ({
   showDeleteButton,
   isCreateThreadPage = false,
   setLocalPoll,
+  tokenDecimals,
+  topicWeight,
+  voterProfiles,
+  isLoadingVotes,
   actionGroups,
   bypassGating,
 }: ThreadPollCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const user = useUserStore();
 
   const { mutateAsync: deletePoll } = useDeletePollMutation({
-    threadId: poll.threadId,
+    threadId: poll.thread_id,
   });
 
   const { mutateAsync: votePoll } = useVotePollMutation({
-    threadId: poll.threadId,
+    threadId: poll.thread_id,
   });
+
+  const pollVotes = poll.votes || [];
+
+  const userVote = pollVotes.find(
+    (p) =>
+      p.address === user.activeAccount?.address &&
+      p.community_id === user.activeAccount?.community?.id,
+  );
 
   const permissions = Permissions.getGeneralActionPermission({
     action: GatedActionEnum.UPDATE_POLL,
@@ -55,8 +72,8 @@ export const ThreadPollCard = ({
   const handleDeletePoll = async () => {
     try {
       await deletePoll({
-        thread_id: poll.threadId,
-        poll_id: poll.id,
+        thread_id: poll.thread_id,
+        poll_id: poll.id!,
       });
       notifySuccess('Poll deleted');
     } catch (e) {
@@ -66,7 +83,7 @@ export const ThreadPollCard = ({
   };
 
   const handlePollVote = (
-    votedPoll: Poll,
+    votedPoll: z.infer<typeof PollView>,
     option: string,
     isSelected: boolean,
   ) => {
@@ -82,8 +99,7 @@ export const ThreadPollCard = ({
           label: 'Submit',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: async () => {
+          onClick: () => {
             const selectedOption = votedPoll.options.find((o) => o === option);
 
             if (!selectedOption) {
@@ -91,18 +107,16 @@ export const ThreadPollCard = ({
               return;
             }
 
-            try {
-              await votePoll({
-                thread_id: votedPoll.threadId,
-                poll_id: votedPoll.id,
-                option: selectedOption,
-              });
-            } catch (err) {
+            votePoll({
+              thread_id: votedPoll.thread_id,
+              poll_id: votedPoll.id!,
+              option: selectedOption,
+            }).catch((err) => {
               console.error(err);
               notifyError(
                 'Error submitting vote. Check if poll is still active.',
               );
-            }
+            });
           },
         },
         {
@@ -114,72 +128,65 @@ export const ThreadPollCard = ({
     });
   };
 
-  const userVote = poll?.getUserVote?.(
-    user.activeAccount?.community?.id || '',
-    user.activeAccount?.address || '',
-  );
-
   // votes by weighted voting power
-  const totalVoteWeight = poll.votes.reduce(
-    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || 1),
+  const totalVoteWeight = pollVotes.reduce(
+    (sum, vote) => sum + BigInt(vote.calculated_voting_weight || '0'),
     0n,
   );
   const voteInformation = poll.options.map((option) => ({
     label: option,
     value: option,
-    voteCount: poll.votes
+    voteCount: pollVotes
       .filter((v) => v.option === option)
-      .reduce((sum, val) => sum + BigInt(val.calculatedVotingWeight || 1), 0n),
+      .reduce(
+        (sum, val) => sum + BigInt(val.calculated_voting_weight || '0'),
+        0n,
+      ),
   }));
 
   return (
     <>
       <PollCard
-        pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
+        communityId={poll.community_id}
+        individualVotesData={pollVotes}
+        voterProfiles={voterProfiles}
+        tokenDecimals={tokenDecimals}
+        topicWeight={topicWeight}
+        isLoadingVotes={isLoadingVotes}
+        pollEnded={
+          !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc())
+        }
         hasVoted={!!userVote}
         disableVoteButton={!permissions.allowed || isCreateThreadPage}
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll?.endsAt && poll?.endsAt?.isBefore(moment().utc()),
+          !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc()),
         )}
-        totalVoteCount={poll.votes.length}
+        totalVoteCount={pollVotes.length}
         totalVoteWeight={totalVoteWeight}
         voteInformation={voteInformation}
         incrementalVoteCast={1}
         isPreview={false}
         tooltipErrorMessage={permissions.tooltip}
         onVoteCast={(option, isSelected) => {
-          // @ts-expect-error <StrictNullChecks/>
-          handlePollVote(poll, option, isSelected);
+          if (option !== undefined) {
+            handlePollVote(poll, option, isSelected ?? false);
+          }
         }}
         onResultsClick={(e) => {
-          e.preventDefault();
-          if (poll.votes.length > 0) {
-            setIsModalOpen(true);
-          }
+          if (!(e && pollVotes.length === 0)) return;
+          // No-op: No votes to show, so do nothing
         }}
         showDeleteButton={showDeleteButton}
         onDeleteClick={() => {
           if (isCreateThreadPage && setLocalPoll) {
             setLocalPoll([]);
           } else {
-            //@typescript-eslint/no-misused-promises
             handleDeletePoll().catch(console.error);
           }
         }}
-      />
-      <CWModal
-        size="small"
-        content={
-          <OffchainVotingModal
-            votes={poll.votes}
-            onModalClose={() => setIsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
       />
     </>
   );

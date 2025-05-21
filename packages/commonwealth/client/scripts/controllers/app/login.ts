@@ -56,20 +56,15 @@ function storeActiveAccount(account: Account) {
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
-  const community = app.activeChainId();
   try {
-    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
-      address: account.address,
-      author_community_id: account.community.id,
-      community_id: community,
-      jwt: userStore.getState().jwt,
-      auth: true,
-    });
-
-    if (response.data.status !== 'Success') {
-      throw Error(`Unsuccessful status: ${response.status}`);
-    }
-
+    await axios.post(
+      `${SERVER_URL}/internal/SetDefaultRole`,
+      {
+        community_id: account.community.id,
+        jwt: userStore.getState().jwt,
+      },
+      { headers: { address: account.address } },
+    );
     storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.
