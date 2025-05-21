@@ -1,5 +1,5 @@
 import { command } from '@hicommonwealth/core';
-import { models, SuperAdmin, UserInstance } from '@hicommonwealth/model';
+import { SuperAdmin, UserInstance } from '@hicommonwealth/model';
 import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
 import { assert } from 'chai';
 import { describe, test } from 'vitest';
@@ -8,7 +8,6 @@ import { buildUser } from '../../unit/unitHelpers';
 describe('create chain tests', () => {
   test('fails when no eth_chain_id is provided when chain is ethereum', async () => {
     buildUser({
-      models,
       userAttributes: {
         email: '',
         id: 1,
@@ -36,7 +35,6 @@ describe('create chain tests', () => {
 
   test('fails when eth_chain_id is not a number', async () => {
     buildUser({
-      models,
       userAttributes: {
         email: '',
         id: 1,

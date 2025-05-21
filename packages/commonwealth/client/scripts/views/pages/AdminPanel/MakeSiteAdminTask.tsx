@@ -1,5 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
+import useUpdateSiteAdminMutation from 'state/api/superAdmin/updateSiteAdmin';
 import { isAddress } from 'web3-utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -7,11 +8,11 @@ import { ValidationStatus } from '../../components/component_kit/cw_validation_t
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import './AdminPanel.scss';
-import { updateSiteAdmin } from './utils';
 
 const MakeSiteAdminTask = () => {
   const [address, setAddress] = useState<string>('');
   const [addressValidated, setAddressValidated] = useState<boolean>(false);
+  const { mutateAsync: updateSiteAdmin } = useUpdateSiteAdminMutation();
 
   const onInput = (e) => {
     setAddress(e.target.value);
@@ -33,13 +34,12 @@ const MakeSiteAdminTask = () => {
             try {
               await updateSiteAdmin({
                 address: address,
-                siteAdmin: true,
+                is_admin: true,
               });
               setAddress('');
               notifySuccess('Address promoted');
             } catch (e) {
               notifyError('Error promoting address');
-
               console.error(e);
             }
           },

@@ -1,5 +1,5 @@
 import { stats } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { UserTierMap } from '@hicommonwealth/shared';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
@@ -12,7 +12,7 @@ import { initMagicAuth } from './magic';
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function initDefaultUserAuth(models: DB) {
+function initDefaultUserAuth() {
   passport.use(
     new JWTStrategy(
       {
@@ -48,9 +48,9 @@ function initDefaultUserAuth(models: DB) {
   );
 }
 
-export function setupPassport(models: DB) {
-  initDefaultUserAuth(models);
-  initMagicAuth(models);
+export function setupPassport() {
+  initDefaultUserAuth();
+  initMagicAuth();
   // initTokenAuth();
 
   passport.serializeUser<any>((user, done) => {
