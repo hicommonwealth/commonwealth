@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
@@ -91,6 +91,13 @@ const EditProfile = () => {
   } = useFetchProfileByIdQuery({
     apiCallEnabled: user.isLoggedIn,
   });
+
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsUploadingCoverImage(isGenerating || isUploading);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isLoadingProfile) return;
@@ -375,9 +382,7 @@ const EditProfile = () => {
                 hookToForm
                 withAIImageGeneration
                 imageBehavior={imageBehavior}
-                onImageProcessingChange={({ isGenerating, isUploading }) =>
-                  setIsUploadingCoverImage(isGenerating || isUploading)
-                }
+                onImageProcessingChange={handleImageProcessingChange}
                 onImageUploaded={console.log}
                 onImageBehaviorChange={setImageBehavior}
                 allowedImageBehaviours={['Fill', 'Tiled']}
