@@ -24,6 +24,7 @@ import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupGatedAction from './groupGatedAction';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
+import LastProcessedSolanaSlot from './lastProcessedSolanaSlot';
 import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
 import Outbox from './outbox';
@@ -78,6 +79,7 @@ export const Factories = {
   Group,
   GroupGatedAction,
   LastProcessedEvmBlock,
+  LastProcessedSolanaSlot,
   LaunchpadTrade,
   Membership,
   Outbox,
