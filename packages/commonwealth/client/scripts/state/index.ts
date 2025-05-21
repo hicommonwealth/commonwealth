@@ -67,9 +67,7 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }] = await Promise.all([
-      axios.get(`${SERVER_URL}/status`),
-    ]);
+    const { data: statusRes } = await axios.get(`${SERVER_URL}/status`);
 
     await fetchNodes();
     await fetchCustomDomainQuery();
@@ -105,11 +103,11 @@ export async function initAppState(
 
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
+    if (updateSelectedCommunity && userResponse?.selected_community_id) {
       userStore.getState().setData({
         // TODO: api should be updated to get relevant data
         activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
-          userResponse?.selectedCommunity.id,
+          userResponse.selected_community_id,
           true,
         ),
       });

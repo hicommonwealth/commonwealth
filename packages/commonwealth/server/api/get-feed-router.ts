@@ -1,5 +1,5 @@
 import { AppError, query } from '@hicommonwealth/core';
-import { Thread, type DB } from '@hicommonwealth/model';
+import { Community, Thread } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   GetThreads,
@@ -7,25 +7,21 @@ import {
   GetThreadsStatus,
 } from '@hicommonwealth/schemas';
 import { getDecodedString, slugify } from '@hicommonwealth/shared';
-import { ThreadView } from 'client/scripts/models/Thread';
 import { Feed } from 'feed';
 import moment from 'moment';
 import { z } from 'zod';
-import { TypedRequestQuery, TypedResponse } from '../types';
 import { formatErrorPretty } from '../util/errorFormat';
-import {
-  ActiveThreadsRequestQuery,
-  BulkThreadsRequestQuery,
-  GetThreadsRequestQuery,
-  GetThreadsResponse,
-  SearchThreadsRequestQuery,
-} from './threads/get_threads_handler';
 
-function toDate(t: ThreadView): Date {
+type SortByDate = {
+  last_edited?: string | Date | null;
+  created_at?: string | Date | null;
+};
+
+function toDate(t: SortByDate): Date {
   return moment(t.last_edited ?? t.created_at!).toDate();
 }
 
-function sortByDateDesc(a: ThreadView, b: ThreadView) {
+function sortByDateDesc(a: SortByDate, b: SortByDate) {
   return toDate(b).getTime() - toDate(a).getTime();
 }
 
@@ -41,18 +37,7 @@ function computeUpdated(bulkThreads: z.infer<typeof GetThreads.output>) {
   return toDate(sortedByDateDesc[0]);
 }
 
-export const getFeedHandler = async (
-  models: DB,
-  req: TypedRequestQuery<
-    GetThreadsRequestQuery &
-      (
-        | ActiveThreadsRequestQuery
-        | SearchThreadsRequestQuery
-        | BulkThreadsRequestQuery
-      )
-  >,
-  res: TypedResponse<GetThreadsResponse>,
-) => {
+export const get_feed_router = async (req, res) => {
   const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
@@ -91,6 +76,12 @@ export const getFeedHandler = async (
       status,
     } = bulkQueryValidationResult.data;
 
+    const community = await query(Community.GetCommunity(), {
+      actor: { user: { email: '' } },
+      payload: { id: community_id },
+    });
+    if (!community) throw new AppError('Community not found');
+
     const bulkThreads = await query(Thread.GetThreads(), {
       actor: { user: { email: '' } },
       payload: {
@@ -109,23 +100,15 @@ export const getFeedHandler = async (
       },
     });
 
-    const community = await models.Community.findOne({
-      where: {
-        id: community_id,
-      },
-    });
     const updated = computeUpdated(bulkThreads!);
     // const self = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
     const feed = new Feed({
-      // @ts-expect-error StrictNullChecks
       title: community.name,
-      // @ts-expect-error StrictNullChecks
-      description: community.description,
+      description: community.description!,
       id: `https://common.xyz/${community_id}/discussions`,
       link: `https://common.xyz/${community_id}/discussions`,
-      // @ts-expect-error StrictNullChecks
-      image: community.icon_url,
+      image: community.icon_url!,
       copyright: 'All rights Reserved 2024, common.xyz',
       updated,
       generator: 'common.xyz',
@@ -139,17 +122,11 @@ export const getFeedHandler = async (
       const slug = slugify(title);
       feed.addItem({
         title: title,
-        // @ts-expect-error StrictNullChecks
-        id: thread.url,
+        id: thread.url!,
         link: `https://common.xyz/${community_id}/discussions/${thread.id}-${slug}`,
         date: toDate(thread),
         content: thread.body || '',
-        author: [
-          {
-            // @ts-expect-error StrictNullChecks
-            name: thread.profile_name,
-          },
-        ],
+        author: [{ name: thread.profile_name! }],
       });
     });
 
