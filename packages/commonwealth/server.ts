@@ -18,7 +18,6 @@ import {
 } from '@hicommonwealth/core';
 import { R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import express from 'express';
-import { main } from './main';
 import { config } from './server/config';
 
 // handle exceptions thrown in express routes
@@ -69,6 +68,9 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
+  // importing here to avoid conflicts with notifications provider port
+  const { main } = await import('./main');
+
   config.APP_ENV === 'local' && console.log(config);
 
   await main(app, {
