@@ -6,16 +6,24 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 
-const DEFAULT_ICON = '🚫';
+const DEFAULT_ICON = 'stopSymbol';
+type ComponentIcon =
+  | 'stopSymbol'
+  | 'socialVerified'
+  | 'sandClock'
+  | 'globe'
+  | 'pins'
+  | 'whiteCheck'
+  | 'starGolden';
 
 interface TrustLevelResult {
-  icon: string;
+  icon: ComponentIcon;
 }
 
 const hasCommunityClientInfo = (
   tier: (typeof COMMUNITY_TIERS)[keyof typeof COMMUNITY_TIERS],
 ): tier is (typeof COMMUNITY_TIERS)[keyof typeof COMMUNITY_TIERS] & {
-  clientInfo: { trustLevel: number; icon: string };
+  clientInfo: { trustLevel: number; componentIcon: ComponentIcon };
 } => {
   return 'clientInfo' in tier && tier.clientInfo !== undefined;
 };
@@ -32,7 +40,7 @@ export const getUserTrustLevel = (level: number): TrustLevelResult => {
   }
 
   const userTier = USER_TIERS[userTierKey];
-  return { icon: userTier.clientInfo?.icon || DEFAULT_ICON };
+  return { icon: userTier.clientInfo?.componentIcon || DEFAULT_ICON };
 };
 
 export const getCommunityTrustLevel = (level: number): TrustLevelResult => {
@@ -47,5 +55,5 @@ export const getCommunityTrustLevel = (level: number): TrustLevelResult => {
     return { icon: DEFAULT_ICON };
   }
 
-  return { icon: communityTier.clientInfo.icon };
+  return { icon: communityTier.clientInfo.componentIcon };
 };

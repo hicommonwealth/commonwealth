@@ -9,9 +9,10 @@ import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
-import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
+import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { fetchNodes } from './api/nodes';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -28,6 +29,7 @@ export interface IApp {
     | NearAccount
     | SolanaAccount
     | SubstrateAccount
+    | SuiAccount
   >;
 
   // XXX: replace this with some app.chain helper
@@ -58,19 +60,16 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 };
-//allows for FS.identify to be used
-declare const window: any;
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
-    const [{ data: statusRes }] = await Promise.all([
-      axios.get(`${SERVER_URL}/status`),
-    ]);
+    const { data: statusRes } = await axios.get(`${SERVER_URL}/status`);
 
-    await fetchNodesQuery();
+    await fetchNodes();
     await fetchCustomDomainQuery();
 
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
@@ -104,24 +103,14 @@ export async function initAppState(
 
     // update the selectedCommunity, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
+    if (updateSelectedCommunity && userResponse?.selected_community_id) {
       userStore.getState().setData({
         // TODO: api should be updated to get relevant data
         activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
-          userResponse?.selectedCommunity.id,
+          userResponse.selected_community_id,
           true,
         ),
       });
-    }
-
-    if (userResponse) {
-      try {
-        window.FS('setIdentity', {
-          uid: userResponse.id,
-        });
-      } catch (e) {
-        console.error('FullStory not found.');
-      }
     }
   } catch (err) {
     errorStore

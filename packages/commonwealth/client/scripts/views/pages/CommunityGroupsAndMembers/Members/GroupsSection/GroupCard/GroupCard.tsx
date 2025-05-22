@@ -1,3 +1,4 @@
+import { UserFriendlyActionMap } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
@@ -10,7 +11,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { SharePopover } from 'views/components/SharePopover';
 import { formatAddressShort } from '../../../../../../helpers';
 import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
-import { convertGranularPermissionsToAccumulatedPermissions } from '../../../Groups/common/GroupForm/helpers';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 import { GroupCardProps } from './types';
@@ -77,8 +77,7 @@ const GroupCard = ({
           ? 'All requirements must be satisfied'
           : `At least ${requirementsToFulfill} # of all requirements`}
       </CWText>
-      {/* @ts-expect-error StrictNullChecks*/}
-      {requirements.map((r, index) => (
+      {(requirements || []).map((r, index) => (
         <RequirementCard key={index} {...r} />
       ))}
 
@@ -156,22 +155,31 @@ const GroupCard = ({
         <>
           <CWText type="h5">Gated Topics</CWText>
           <div className="gating-topics">
-            <div className="row">
-              <CWText type="b2">Topic</CWText>
-              <CWText type="b2">Permission</CWText>
+            <div className="row header-row">
+              <CWText type="b2" className="topic-name-header">
+                Topic
+              </CWText>
+              <CWText type="b2" className="actions-header">
+                Gated Actions
+              </CWText>
             </div>
             {topics.map((t, index) => (
               <div key={index}>
                 <CWDivider className="divider-spacing" />
-                <div className="row">
-                  <CWText type="b2">{t.name}</CWText>
-
-                  <CWTag
-                    label={convertGranularPermissionsToAccumulatedPermissions(
-                      t.permissions || [],
-                    )}
-                    type="referendum"
-                  />
+                <div className="row topic-row">
+                  <CWText type="b2" className="topic-name">
+                    {t.name}
+                  </CWText>
+                  <div className="actions-container">
+                    {(t.permissions || ['None']).map((p, idx) => (
+                      <span key={idx} className="action-tag">
+                        <CWTag
+                          label={UserFriendlyActionMap[p]}
+                          type="referendum"
+                        />
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <CWDivider className="divider-spacing" />
               </div>

@@ -32,7 +32,6 @@ export const TreeHierarchy = ({
   isThreadArchived,
   isReplyingToCommentId,
   isReplyButtonVisible,
-  disabledActionsTooltipText,
   canReply,
   canReact,
   canComment,
@@ -47,6 +46,7 @@ export const TreeHierarchy = ({
   commentEdits,
   streamingReplyIds,
   setStreamingReplyIds,
+  permissions,
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
@@ -150,6 +150,7 @@ export const TreeHierarchy = ({
           isStreamingAIReply={true}
           isRootComment={true}
           threadContext={thread.body}
+          threadTitle={thread.title}
           onStreamingComplete={() => {
             setStreamingReplyIds((prev) =>
               prev.filter((id) => id !== thread.id),
@@ -163,6 +164,7 @@ export const TreeHierarchy = ({
           shareURL=""
           maxReplyLimitReached={false}
           isThreadArchived={false}
+          permissions={permissions}
         />
       </div>
     );
@@ -198,7 +200,6 @@ export const TreeHierarchy = ({
                 <div className={`Comment comment-${comment.id}`}>
                   <CommentCard
                     key={`${comment.id}-${comment.body}`}
-                    disabledActionsTooltipText={disabledActionsTooltipText}
                     isThreadArchived={isThreadArchived}
                     canReply={canReply}
                     maxReplyLimitReached={
@@ -244,6 +245,7 @@ export const TreeHierarchy = ({
                     weightType={thread.topic?.weighted_voting}
                     tokenNumDecimals={thread.topic?.token_decimals || undefined}
                     threadContext={thread.body}
+                    permissions={permissions}
                   />
                 </div>
                 {comment.reply_count > 0 && (
@@ -264,19 +266,19 @@ export const TreeHierarchy = ({
                     commentEdits={commentEdits}
                     canComment={canComment}
                     thread={thread}
-                    disabledActionsTooltipText={disabledActionsTooltipText}
                     canReact={canReact}
                     canReply={canReply}
                     parentCommentId={comment.id}
                     streamingReplyIds={streamingReplyIds}
                     setStreamingReplyIds={setStreamingReplyIds}
+                    permissions={permissions}
                   />
                 )}
                 {streamingReplyIds.includes(comment.id) && (
                   <div className="replies-container">
                     <CommentCard
                       key={`streaming-${comment.id}`}
-                      disabledActionsTooltipText={disabledActionsTooltipText}
+                      permissions={permissions}
                       isThreadArchived={isThreadArchived}
                       maxReplyLimitReached={true}
                       replyBtnVisible={false}
@@ -334,12 +336,7 @@ export const TreeHierarchy = ({
                           triggerStreamingForNewComment(newCommentId);
                         }
                       }}
-                      tooltipText={
-                        !canComment &&
-                        typeof disabledActionsTooltipText === 'string'
-                          ? disabledActionsTooltipText
-                          : ''
-                      }
+                      tooltipText={permissions.CREATE_COMMENT.tooltip}
                     />
                   </WithActiveStickyComment>
                 )}

@@ -16,7 +16,6 @@ import {
   mustBeSuperAdmin,
   mustExist,
   tiered,
-  turnstile,
 } from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
@@ -47,6 +46,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
+    case ChainBase.Sui:
+      return ChainNetwork.Sui;
   }
 }
 
@@ -56,7 +57,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
     auth: [
       authVerified(),
       tiered({ creates: true }),
-      turnstile({ widgetName: 'create-community' }),
+      // turnstile({ widgetName: 'create-community' }),
     ],
     body: async ({ actor, payload }) => {
       const {
@@ -156,6 +157,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             thread_purchase_token,
             namespace_verified: false,
             environment: config.APP_ENV,
+            profile_count: 1,
           },
           { transaction },
         );
@@ -167,7 +169,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             description: 'General discussions',
             featured_in_sidebar: true,
             featured_in_new_post: false,
-            group_ids: [],
             allow_tokenized_threads: false,
           },
           { transaction },

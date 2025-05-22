@@ -40,8 +40,8 @@ import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
-import QuestCard from '../Communities/QuestList/QuestCard';
 import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import QuestCard from '../ExplorePage/QuestList/QuestCard';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 import TotalQuestXPTag from './TotalQuestXPTag';
@@ -300,7 +300,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
-      case 'LaunchpadTokenCreated': {
+      case 'LaunchpadTokenRecordCreated': {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }

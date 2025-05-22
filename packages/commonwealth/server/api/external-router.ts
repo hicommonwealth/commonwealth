@@ -42,6 +42,7 @@ const {
   joinCommunity,
   banAddress,
   updateRole,
+  setDefaultRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -49,6 +50,8 @@ const {
   createThreadReaction,
   deleteReaction,
   deleteThread,
+  addLinks,
+  deleteLinks,
 } = thread.trpcRouter;
 const {
   createComment,
@@ -94,7 +97,13 @@ const api = {
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
+  getLinks: trpc.query(Thread.GetLinks, trpc.Tag.Thread, {
+    forceSecure: true,
+  }),
   getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Contest, {
+    forceSecure: true,
+  }),
+  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
     forceSecure: true,
   }),
   createContestMetadata,
@@ -111,6 +120,8 @@ const api = {
   createThread,
   updateThread,
   deleteThread,
+  addLinks,
+  deleteLinks,
   createComment,
   updateComment,
   deleteComment,
@@ -120,13 +131,11 @@ const api = {
   joinCommunity,
   banAddress,
   updateRole,
+  setDefaultRole,
   toggleCommentSpam,
   createToken,
   createTrade,
   getTokenInfoAlchemy,
-  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
-    forceSecure: true,
-  }),
   getLaunchpadTrades,
   launchTokenBot,
 };

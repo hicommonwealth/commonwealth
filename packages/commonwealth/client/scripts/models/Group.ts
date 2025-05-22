@@ -1,35 +1,5 @@
-interface APIResponseFormat {
-  id: number;
-  community_id: string;
-  metadata: {
-    name: string;
-    description?: string;
-    groupImageUrl?: string;
-    required_requirements?: number;
-  };
-  requirements: {
-    rule: 'threshold';
-    source: {
-      source_type:
-        | 'erc20'
-        | 'erc721'
-        | 'erc1155'
-        | 'eth_native'
-        | 'cosmos_native'
-        | 'cw20'
-        | 'cw721';
-      evm_chain_id?: number;
-      cosmos_chain_id?: number;
-      contract_address?: string;
-      token_symbol?: string;
-      token_id?: string;
-    };
-  }[];
-  topics: any[];
-  memberships: any[];
-  updated_at: string;
-  created_at: string;
-}
+import * as schemas from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 class Group {
   public id: number;
@@ -38,7 +8,7 @@ class Group {
   public updatedAt: string; // ISO string
   public name: string;
   public description?: string;
-  public groupImageUrl?: string;
+  public groupImageUrl?: string | null;
   public requirements: any[];
   public topics: any[];
   public members: any[];
@@ -53,11 +23,11 @@ class Group {
     requirements,
     topics,
     memberships,
-  }: APIResponseFormat) {
+  }: z.infer<typeof schemas.GroupView>) {
     this.id = id;
     this.communityId = community_id;
-    this.createdAt = created_at;
-    this.updatedAt = updated_at;
+    this.createdAt = created_at!.toString();
+    this.updatedAt = updated_at!.toString();
     this.name = metadata.name;
     this.description = metadata.description;
     this.groupImageUrl = metadata.groupImageUrl;

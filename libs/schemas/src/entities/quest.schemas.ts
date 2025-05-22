@@ -32,7 +32,7 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
@@ -111,7 +111,7 @@ export const QuestActionMeta = z
 
     // associations
     QuestTweet: QuestTweet.nullish(),
-    ChainEventXpSource: ChainEventXpSource.optional(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

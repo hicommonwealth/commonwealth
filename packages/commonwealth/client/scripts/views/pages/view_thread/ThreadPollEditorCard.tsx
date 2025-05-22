@@ -2,6 +2,7 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
 import React, { useState } from 'react';
+import { SetLocalPolls } from 'utils/polls';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -14,7 +15,7 @@ import './poll_cards.scss';
 type ThreadPollEditorCardProps = {
   thread?: Thread;
   threadAlreadyHasPolling: boolean;
-  setLocalPoll?: (params) => void;
+  setLocalPoll?: SetLocalPolls;
   isCreateThreadPage?: boolean;
   aiInteractionsToggleEnabled?: boolean;
   threadContentDelta?: string;
@@ -57,15 +58,16 @@ export const ThreadPollEditorCard = ({
     let text = '';
     const context = `
     Thread: ${thread?.title || effectiveTitle || ''}
-    ${`body ${thread?.body || effectiveBody || ''}`}
+    body ${thread?.body || effectiveBody || ''}
     `;
 
     setPollData(text);
-    const prompt = generatePollPrompt(context);
+    const { systemPrompt, userPrompt } = generatePollPrompt(context);
 
-    generateCompletion(prompt, {
+    generateCompletion(userPrompt, {
       model: 'gpt-4o-mini',
       stream: true,
+      systemPrompt,
       onError: (error) => {
         console.error('Error generating Poll:', error);
         notifyError('Failed to generate  Poll');

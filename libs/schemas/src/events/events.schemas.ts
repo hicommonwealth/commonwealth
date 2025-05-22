@@ -9,6 +9,7 @@ import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -398,6 +399,25 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
+  LaunchpadTokenRecordCreated: z.object({
+    name: z.string(),
+    symbol: z.string(),
+    created_at: z.date(),
+    eth_chain_id: z.number(),
+    creator_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
+    namespace: z.string(),
+    curve_id: z.string(),
+    total_supply: z.string(),
+    launchpad_liquidity: z.string(),
+    reserve_ration: z.string(),
+    initial_purchase_eth_amount: z.string(),
+  }),
+
+  LaunchpadTokenGraduated: z.object({
+    token: LaunchpadToken,
+  }),
+
   LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
@@ -449,7 +469,7 @@ export const events = {
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),

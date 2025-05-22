@@ -95,7 +95,7 @@ const StakeIntegration = ({
         <CWText type="h2">Stake</CWText>
         <Status
           communityName={app.chain.meta.name || ''}
-          isEnabled={stakeEnabled}
+          isEnabled={stakeEnabled || false}
         />
         <CWDivider />
         {stakeEnabled ? (
