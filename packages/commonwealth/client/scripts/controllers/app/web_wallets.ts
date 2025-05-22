@@ -1,7 +1,7 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -66,7 +66,7 @@ export default class WebWalletController {
     // do nothing on failure
     try {
       await axios.post(
-        `${SERVER_URL}/internal/SetAddressWallet`,
+        `${BASE_API_PATH}/community.setAddressWallet`,
         {
           community_id: account.community.id,
           wallet_id: wallet,
