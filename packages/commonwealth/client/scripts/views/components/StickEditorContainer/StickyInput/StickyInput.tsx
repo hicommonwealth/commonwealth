@@ -20,7 +20,7 @@ import {
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
-import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
+import { AIModelSelector } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -48,6 +48,12 @@ import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
 import { useDynamicPlaceholder } from './useDynamicPlaceholder';
+import {
+  AI_SELECTOR_TITLE,
+  availableModels,
+  getCompletionModelValue,
+  MAX_MODELS_SELECTABLE,
+} from './utils';
 
 import './StickyInput.scss';
 
@@ -83,31 +89,6 @@ const StickyInput = (props: StickyInputProps) => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const aiModelPopover = usePopover();
-
-  const availableModels: ModelOption[] = [
-    { value: 'gpt-4o' as CompletionModel, label: 'GPT-4o' },
-    { value: 'gpt-4o-mini' as CompletionModel, label: 'GPT-4o Mini' },
-    {
-      value: 'anthropic/claude-3-7-sonnet' as CompletionModel,
-      label: 'Claude 3.7 Sonnet',
-    },
-    {
-      value: 'anthropic/claude-3-5-haiku' as CompletionModel,
-      label: 'Claude 3.5 Haiku',
-    },
-    {
-      value: 'google/gemini-flash-1.5' as CompletionModel,
-      label: 'Gemini Flash 1.5',
-    },
-    {
-      value: 'google/gemini-pro-1.5' as CompletionModel,
-      label: 'Gemini Pro 1.5',
-    },
-  ];
-
-  const MAX_MODELS_SELECTABLE = 4;
-  const AI_SELECTOR_TITLE =
-    'Select up to 4 models to generate a variety of auto replies';
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -174,8 +155,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
-    const modelToUse =
-      (selectedModels[0]?.value as CompletionModel) || 'gpt-4o';
+    const modelToUse = getCompletionModelValue(selectedModels[0]);
 
     try {
       if (mode === 'thread') {
@@ -433,8 +413,8 @@ const StickyInput = (props: StickyInputProps) => {
                   <AIModelSelector
                     title={AI_SELECTOR_TITLE}
                     availableModels={availableModels}
-                    selectedModelValues={selectedModels.map(
-                      (m) => m.value as CompletionModel,
+                    selectedModelValues={selectedModels.map((m) =>
+                      getCompletionModelValue(m),
                     )}
                     onSelectionChange={handleModelSelectionChange}
                     maxSelection={MAX_MODELS_SELECTABLE}
