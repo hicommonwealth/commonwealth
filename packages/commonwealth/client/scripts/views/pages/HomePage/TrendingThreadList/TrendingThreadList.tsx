@@ -120,7 +120,6 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       address: thread.user_address,
       community_id: thread.community_id,
       ghost_address: false,
-      is_user_default: false,
       is_banned: false,
       role: 'member',
     },

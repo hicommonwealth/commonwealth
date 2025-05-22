@@ -188,7 +188,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               admin_address.verification_token_expires,
             verified: admin_address.verified,
             wallet_id: admin_address.wallet_id,
-            is_user_default: true,
             role: 'admin',
             last_active: new Date(),
             ghost_address: false,
