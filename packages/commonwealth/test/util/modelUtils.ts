@@ -11,10 +11,10 @@ import type {
 } from '@canvas-js/interfaces';
 import { Action, Session } from '@canvas-js/interfaces';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
-import type {
+import {
   CommunityAttributes,
-  DB,
   ThreadAttributes,
+  models,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -234,7 +234,7 @@ export type ModelSeeder = {
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
-export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
+export const modelSeeder = (app: Application): ModelSeeder => ({
   getTopicId: async ({ chain }: { chain: string }) => {
     const res = await chai.request
       .agent(app)
@@ -652,15 +652,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     try {
       await chai.request
         .agent(app)
-        .post('/api/setDefaultRole')
+        .post('/api/v1/SetDefaultRole')
         .set('Accept', 'application/json')
-        .send({
-          address,
-          author_chain: chain,
-          chain,
-          jwt,
-          auth: 'true',
-        });
+        .set('address', address)
+        .send({ community_id: chain, jwt });
     } catch (e) {
       console.error('Failed to set default role');
       console.error(e);
