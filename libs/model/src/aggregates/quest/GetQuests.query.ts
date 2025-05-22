@@ -73,13 +73,21 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'participation_period', QAS.participation_period,
                 'participation_times_per_period', QAS.participation_times_per_period,
                 'created_at', QAS.created_at,
-                'updated_at', QAS.updated_at
+                'updated_at', QAS.updated_at,
+                'CommunityGoalMeta', json_build_object(
+                  'id', CGM.id,
+                  'name', CGM.name,
+                  'description', CGM.description,
+                  'type', CGM.type,
+                  'target', CGM.target
+                )
             )))
           ELSE '[]'::json
           END AS "action_metas"
         FROM 
           "Quests" as Q
-        LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+          LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+          LEFT JOIN "CommunityGoalMetas" CGM on QAS.community_goal_meta_id = CGM.id
         ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
