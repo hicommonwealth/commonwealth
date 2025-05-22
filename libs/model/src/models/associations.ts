@@ -48,7 +48,8 @@ export const buildAssociations = (db: DB) => {
 
   db.CommunityGoalMeta.withMany(db.QuestActionMeta, {
     foreignKey: 'community_goal_meta_id',
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
   });
 
   db.Address.withMany(db.Thread, {
