@@ -1,5 +1,5 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import {
   SessionKeyError,
   getEthChainIdOrBech32Prefix,
@@ -29,9 +29,7 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
 import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
-import useGetTokenizedThreadsAllowedQuery from 'state/api/tokens/getTokenizedThreadsAllowed';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
@@ -62,8 +60,6 @@ import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 
 import Poll from 'client/scripts/models/Poll';
-// eslint-disable-next-line max-len
-import { useGetTokenByCommunityId } from 'state/api/tokens';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
@@ -116,7 +112,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const [pollsData, setPollData] = useState<ExtendedPoll[]>();
 
   const { mutateAsync: createPoll } = useCreateThreadPollMutation();
-  const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
 
   const user = useUserStore();
   const { data: userProfile } = useFetchProfileByIdQuery({
@@ -302,17 +297,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
 
-  const { data: tokenizedThreadsAllowed } = useGetTokenizedThreadsAllowedQuery({
-    community_id: selectedCommunityId,
-    topic_id: threadTopic?.id || 0,
-  });
-
-  const { data: communityToken } = useGetTokenByCommunityId({
-    community_id: selectedCommunityId,
-    with_stats: true,
-    enabled: !!selectedCommunityId,
-  });
-
   const handleNewThreadCreation = useCallback(async () => {
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
@@ -382,36 +366,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
       });
 
       const thread = await createThread(input);
-
-      if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
-        if (!communityToken?.token_address) {
-          notifyError('Community token not found');
-          return;
-        }
-
-        if (!community?.ChainNode?.id) {
-          notifyError('chainId not found');
-          return;
-        }
-
-        await createThreadToken({
-          name: community.id,
-          symbol: communityToken.symbol,
-          threadId: thread.id!,
-          ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
-          initPurchaseAmount: 1e18,
-          chainId: community.ChainNode?.id,
-          walletAddress: userSelectedAddress,
-          authorAddress: userSelectedAddress,
-          communityTreasuryAddress:
-            (app.chain?.meta as any)?.communityTreasuryAddress || '',
-          chainRpc: community.ChainNode?.url || '',
-          paymentTokenAddress: communityToken.token_address,
-        });
-
-        notifySuccess('Thread token created successfully');
-      }
-
       if (thread && linkedProposals) {
         addThreadLinks({
           communityId: app.activeChainId() || '',
@@ -514,9 +468,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     linkedProposals,
     createPoll,
     pollsData,
-    createThreadToken,
-    tokenizedThreadsAllowed,
-    communityToken,
   ]);
 
   const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -678,15 +629,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
     setVotingModalOpen(false);
   };
   const sidebarComponent = [
-    {
-      label: 'Links',
-      item: (
-        <div className="cards-colum">
-          {/* Note : Hiding this as the CommonTrade Modal is Broken for base sepollia. */}
-          {/* <TokenWidget /> */}
-        </div>
-      ),
-    },
     {
       label: 'Links',
       item: (
@@ -928,23 +870,6 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
                       }
                     }}
                   />
-                )}
-
-                {tokenizedThreadsAllowed && (
-                  <div className="tokenized-status">
-                    <CWText
-                      type="caption"
-                      className={
-                        tokenizedThreadsAllowed.tokenized_threads_enabled
-                          ? 'tokenized-enabled'
-                          : 'tokenized-disabled'
-                      }
-                    >
-                      {tokenizedThreadsAllowed.tokenized_threads_enabled
-                        ? 'This topic allows tokenized threads'
-                        : 'This topic does not allow tokenized threads'}
-                    </CWText>
-                  </div>
                 )}
 
                 {!!contestTopicAffordanceVisible && (
