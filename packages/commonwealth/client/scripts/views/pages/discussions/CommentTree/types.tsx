@@ -43,9 +43,6 @@ export type UseCommentsTreeProps = Pick<
 export type CommentFilters = {
   includeSpam: boolean;
   sortType: CommentsFeaturedFilterTypes;
-  permissions: any;
-  aiCommentsToggleEnabled?: boolean;
-  onThreadCreated?: (threadId: number) => Promise<void>;
 };
 
 export type CommentFiltersProps = Pick<CommentsTreeProps, 'commentsRef'> & {

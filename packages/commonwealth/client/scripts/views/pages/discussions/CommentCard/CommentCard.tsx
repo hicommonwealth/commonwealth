@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommentsView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
+  CompletionModel,
   DEFAULT_NAME,
   deserializeCanvas,
   GatedActionEnum,
@@ -287,7 +288,7 @@ Community Description: ${communityDescription}`;
 
         await generateCompletion(userPrompt, {
           systemPrompt: systemPrompt,
-          model: streamingModelId as any,
+          model: streamingModelId as CompletionModel,
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
