@@ -132,19 +132,26 @@ export const ThreadPollCard = ({
     user.activeAccount?.address || '',
   );
 
-  const totalVoteWeight = poll.votes.reduce(
-    (sum, vote) => sum + BigInt(vote.calculatedVotingWeight || '0'),
-    0n,
-  );
+  const totalVoteWeight = poll.votes.reduce((sum, vote) => {
+    const weight =
+      vote.calculatedVotingWeight && BigInt(vote.calculatedVotingWeight) > 0n
+        ? BigInt(vote.calculatedVotingWeight)
+        : 1n;
+    return sum + weight;
+  }, 0n);
+
   const voteInformation = poll.options.map((option) => ({
     label: option,
     value: option,
     voteCount: poll.votes
       .filter((v) => v.option === option)
-      .reduce(
-        (sum, val) => sum + BigInt(val.calculatedVotingWeight || '0'),
-        0n,
-      ),
+      .reduce((sum, val) => {
+        const weight =
+          val.calculatedVotingWeight && BigInt(val.calculatedVotingWeight) > 0n
+            ? BigInt(val.calculatedVotingWeight)
+            : 1n;
+        return sum + weight;
+      }, 0n),
   }));
 
   const individualVotesData: ActualVoteAttributes[] = poll.votes.map(
