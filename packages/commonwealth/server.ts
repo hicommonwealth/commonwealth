@@ -68,12 +68,12 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
-  const { models } = await import('@hicommonwealth/model');
-  config.APP_ENV === 'local' && console.log(config);
-
+  // importing here to avoid conflicts with notifications provider port
   const { main } = await import('./main');
 
-  await main(app, models, {
+  config.APP_ENV === 'local' && console.log(config);
+
+  await main(app, {
     port: config.PORT,
     withLoggingMiddleware: true,
     withPrerender:

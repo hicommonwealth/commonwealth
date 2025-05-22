@@ -1,4 +1,4 @@
-import { TopicWeightedVoting, Vote } from '@hicommonwealth/schemas'; // Corrected import for Vote schema
+import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import { prettyVoteWeight } from 'shared/adapters/currency';
@@ -11,25 +11,20 @@ import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { User } from 'views/components/user/user';
-import { z } from 'zod'; // Needed for z.infer
+import { z } from 'zod';
 
 import './ViewPollVotesDrawer.scss';
-
-// Define the actual VoteAttributes type from the schema
-type ActualVoteAttributes = z.infer<typeof Vote>;
 
 // TODO: Define this more accurately based on how profile info is fetched for voters
 // This might involve looking up profiles based on vote.address and vote.author_community_id
 type VoterProfile = {
   name: string;
-  avatarUrl?: string; // Made avatarUrl optional to match usage in PollCard
+  avatarUrl?: string;
   address: string;
-  // Any other relevant fields from Account/AddressInfo/MinimumProfile
 };
 
-export type VoterWithProfile = ActualVoteAttributes & {
+export type VoterWithProfile = z.infer<typeof VoteView> & {
   profile?: VoterProfile; // Voter's profile
-  // calculated_voting_weight is already part of ActualVoteAttributes if schema matches
 };
 
 // Renamed from PollOptionInfo to PollOptionSummary for consistency with PollCard

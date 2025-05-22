@@ -23,7 +23,6 @@ describe('ChainNode Tests', () => {
 
   test('Creates new ChainNode when', async () => {
     buildUser({
-      models,
       userAttributes: {
         email: '',
         id: 1,

@@ -55,7 +55,6 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -384,7 +383,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useEffect(() => {
     if (pollsData && pollsData.length > 0) {
       const allAddresses = pollsData.flatMap((poll) =>
-        poll.votes.map((vote) => vote.address),
+        (poll.votes || []).map((vote) => vote.address),
       );
       setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
     }
@@ -658,7 +657,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ...new Map(
                     pollsData?.map((poll) => [poll.id, poll]),
                   ).values(),
-                ].map((poll: Poll) => {
+                ].map((poll) => {
                   return (
                     <ThreadPollCard
                       thread={thread}

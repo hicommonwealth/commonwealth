@@ -112,3 +112,30 @@ export const DistributeSkale = {
   }),
   output: z.undefined(),
 };
+
+export const UpdateSettings = {
+  input: z.object({
+    disable_rich_text: z.boolean().optional(),
+    enable_promotional_emails: z.boolean().optional(),
+    email_interval: z.enum(['never', 'weekly']).optional(),
+  }),
+  output: z.boolean(),
+  context: VerifiedContext,
+};
+
+export const UpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+  }),
+  output: User.extend({ email: z.string() }),
+  context: VerifiedContext,
+};
+
+export const FinishUpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+    token: z.string(),
+  }),
+  output: z.object({ redirect_path: z.string() }),
+  context: VerifiedContext,
+};
