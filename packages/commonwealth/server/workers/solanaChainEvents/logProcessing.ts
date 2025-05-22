@@ -1,8 +1,5 @@
-import * as anchor from '@coral-xyz/anchor';
-import { BorshCoder } from '@coral-xyz/anchor';
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import {
-  findIdlByProgramId,
   getAllProgramIds,
   SolanaNetworks,
 } from '@hicommonwealth/evm-protocols';
@@ -181,16 +178,19 @@ async function getSlotDetails(
 }
 
 /**
- * Decodes events from a Solana transaction using Anchor
+ * Gets transaction details for decoding by Anchor later
+ * This function replaces decodeEventsFromTransaction to separate
+ * fetching transaction data from decoding events
  */
-async function decodeEventsFromTransaction(
+async function getTransactionDetails(
   connection: Connection,
   signature: string,
   programIds: string[],
 ): Promise<{
-  events: Array<{ name: string; data: any; programId: string }>;
+  programIdsInTransaction: string[];
   slot?: number;
   blockTime?: number;
+  transaction: any;
 }> {
   try {
     // Get the full transaction details
@@ -199,170 +199,25 @@ async function decodeEventsFromTransaction(
     });
 
     if (!transaction || !transaction.meta) {
-      return { events: [] };
+      return { programIdsInTransaction: [], transaction: null };
     }
 
-    const events: Array<{ name: string; data: any; programId: string }> = [];
-
-    // For each program ID, try to decode events
-    for (const programId of programIds) {
-      // Get the IDL for this program
-      const idlWithAddress = findIdlByProgramId(programId);
-      if (!idlWithAddress) continue;
-
-      // Create an Anchor coder from the IDL
-      const coder = new BorshCoder(idlWithAddress.idl);
-
-      // Skip the account key check as it's complex to handle all transaction versions
-      // Instead, let's rely on the logs to determine if the program was called
-      const programWasCalled =
-        transaction.meta.logMessages?.some((log) =>
-          log.includes(`Program ${programId}`),
-        ) || false;
-
-      if (!programWasCalled) continue;
-
-      // Look for logs that might contain events
-      const programLogs =
-        transaction.meta.logMessages?.filter(
-          (log) =>
-            log.includes(`Program ${programId}`) ||
-            log.includes('Program log:'),
-        ) || [];
-
-      // Extract events based on the log pattern
-      for (let i = 0; i < programLogs.length; i++) {
-        const log = programLogs[i];
-
-        // Skip logs that don't have program output
-        if (!log.includes('Program log:')) continue;
-
-        // Look for specific event patterns in the log
-        // Format: "Program log: Event [EventName]"
-        const eventMatch = log.match(/Program log: Event ([A-Za-z]+)/);
-        if (eventMatch && eventMatch[1]) {
-          const eventName = eventMatch[1];
-
-          // Get the next log which might contain the data
-          if (
-            i + 1 < programLogs.length &&
-            programLogs[i + 1].includes('Program log: ')
-          ) {
-            const dataLog = programLogs[i + 1];
-            // Try to extract and decode data
-            try {
-              // For Anchor events, the data is often Base58 encoded
-              const dataMatch = dataLog.match(/Program log: (.*)/);
-              if (dataMatch && dataMatch[1]) {
-                const rawData = dataMatch[1];
-
-                // Find the event definition in the IDL
-                const eventDef = idlWithAddress.idl.events?.find(
-                  (e) => e.name === eventName,
-                );
-                if (eventDef) {
-                  // Try to decode using Anchor
-                  try {
-                    const decodedData = anchor.utils.bytes.bs58.decode(rawData);
-                    const eventData = coder.events.decode(
-                      anchor.utils.bytes.base64.encode(decodedData.subarray(8)),
-                    );
-
-                    if (eventData) {
-                      events.push({
-                        name: eventName,
-                        data: eventData.data,
-                        programId,
-                      });
-                    }
-                  } catch (decodeErr) {
-                    logger.debug(`Error decoding event data: ${decodeErr}`);
-                    // Try alternative decoding approach for raw data
-                  }
-                }
-              }
-            } catch (err) {
-              logger.debug(`Error parsing event data: ${err}`);
-            }
-          }
-        }
-
-        // Alternative: Look for direct data patterns
-        // Format: "Program log: data: [Base64 or other encoded data]"
-        const directDataMatch = log.match(/Program log: data: (.*)/);
-        if (directDataMatch && directDataMatch[1]) {
-          try {
-            const base64Data = directDataMatch[1];
-            // Try to decode using Anchor's event decoder
-            const eventData = coder.events.decode(base64Data);
-            if (eventData) {
-              events.push({
-                name: eventData.name,
-                data: eventData.data,
-                programId,
-              });
-            }
-          } catch (err) {
-            logger.debug(`Error decoding direct data: ${err}`);
-          }
-        }
-      }
-
-      // If we couldn't find any events via logs, try to extract from inner instructions
-      if (events.length === 0 && transaction.meta.innerInstructions) {
-        for (const innerIx of transaction.meta.innerInstructions) {
-          for (const ix of innerIx.instructions) {
-            // Use the actual programId string for comparison instead of index
-            const ixProgramId =
-              transaction.transaction.message.staticAccountKeys?.[
-                ix.programIdIndex
-              ]?.toString();
-            if (ixProgramId === programId && ix.data) {
-              try {
-                // For Anchor events, we need to decode the data
-                const rawData = anchor.utils.bytes.bs58.decode(ix.data);
-
-                // Check if this might be an event (events typically have a specific format)
-                // This is a heuristic approach as we don't have direct event markers
-                if (rawData.length > 8) {
-                  try {
-                    // Skip the first 8 bytes (discriminator) and encode the rest as base64
-                    const base64Data = anchor.utils.bytes.base64.encode(
-                      rawData.subarray(8),
-                    );
-                    const eventData = coder.events.decode(base64Data);
-
-                    if (eventData) {
-                      events.push({
-                        name: eventData.name,
-                        data: eventData.data,
-                        programId,
-                      });
-                    }
-                  } catch (decodeErr) {
-                    // This instruction wasn't an event or couldn't be decoded
-                    logger.debug(
-                      `Failed to decode potential event: ${decodeErr}`,
-                    );
-                  }
-                }
-              } catch (err) {
-                logger.debug(`Error processing inner instruction: ${err}`);
-              }
-            }
-          }
-        }
-      }
-    }
+    // Find which of our program IDs were called in this transaction
+    const programIdsInTransaction = programIds.filter((programId) =>
+      transaction.meta?.logMessages?.some((log) =>
+        log.includes(`Program ${programId}`),
+      ),
+    );
 
     return {
-      events,
+      programIdsInTransaction,
       slot: transaction.slot,
       blockTime: transaction.blockTime || undefined,
+      transaction,
     };
   } catch (error) {
-    logger.error(`Error decoding events from transaction ${signature}:`, error);
-    return { events: [] };
+    logger.error(`Error getting transaction details for ${signature}:`, error);
+    return { programIdsInTransaction: [], transaction: null };
   }
 }
 
@@ -392,14 +247,21 @@ async function extractEvents(
         const signature = sigInfo.signature;
 
         try {
-          // Decode events from the transaction
-          const decodedEventData = await decodeEventsFromTransaction(
+          // Get transaction details but don't decode events
+          const txDetails = await getTransactionDetails(
             connection,
             signature,
             programIds,
           );
 
-          const slot = decodedEventData.slot || sigInfo.slot;
+          if (
+            !txDetails.transaction ||
+            txDetails.programIdsInTransaction.length === 0
+          ) {
+            return; // Skip if no transaction data or no relevant programs called
+          }
+
+          const slot = txDetails.slot || sigInfo.slot;
           if (!slot) return; // Skip if no slot info available
 
           // Record the slot as processed
@@ -418,54 +280,41 @@ async function extractEvents(
             slot: slot,
             blockhash: '',
             parentSlot: 0,
-            timestamp:
-              decodedEventData.blockTime || Math.floor(Date.now() / 1000),
+            timestamp: txDetails.blockTime || Math.floor(Date.now() / 1000),
           };
 
           // Create transaction info
           const transactionInfo: SolanaTransactionInfo = {
             signature,
             slot,
-            blockTime: decodedEventData.blockTime || slotDetails.timestamp,
+            blockTime: txDetails.blockTime || slotDetails.timestamp,
           };
 
-          // Process each decoded event
-          for (const decodedEvent of decodedEventData.events) {
-            // Map the event name to our internal event type
+          // Determine the network from the connection's RPC URL
+          const network = connection.rpcEndpoint.includes('devnet')
+            ? SolanaNetworks.Devnet
+            : SolanaNetworks.Mainnet;
 
-            if (!decodedEvent.name) {
-              logger.debug(`Unknown event type for event: ${decodedEvent}`);
-              continue;
-            }
-
-            // Determine the network from the connection's RPC URL
-            const network = connection.rpcEndpoint.includes('devnet')
-              ? SolanaNetworks.Devnet
-              : SolanaNetworks.Mainnet;
-
-            // Get transaction logs
-            const transaction = await connection.getTransaction(signature, {
-              maxSupportedTransactionVersion: 0,
-            });
-
-            // Create log info
+          // For each program ID in this transaction
+          for (const programId of txDetails.programIdsInTransaction) {
+            // Create log info with all available data for proper decoding later
             const logInfo: SolanaLogInfo = {
               signature,
               slot,
-              blockTime: decodedEventData.blockTime || slotDetails.timestamp,
-              programId: decodedEvent.programId,
-              logs: transaction?.meta?.logMessages || [],
-              data: transaction?.meta?.loadedAddresses
-                ? JSON.stringify(transaction.meta.loadedAddresses)
+              blockTime: txDetails.blockTime || slotDetails.timestamp,
+              programId,
+              logs: txDetails.transaction?.meta?.logMessages || [],
+              data: txDetails.transaction?.meta?.loadedAddresses
+                ? JSON.stringify(txDetails.transaction.meta.loadedAddresses)
                 : undefined,
             };
 
-            // Add the event to our list
+            // Create one generic event entry for this program
+            // Let chain-event-utils handle all the event decoding
             events.push({
               eventSource: {
                 chainId: network,
-                programId: decodedEvent.programId,
-                eventType: decodedEvent.name,
+                programId,
               },
               transaction: transactionInfo,
               slot: slotDetails,
@@ -473,12 +322,12 @@ async function extractEvents(
               meta: {
                 events_migrated: false,
                 created_at_slot: slot,
-                event_name: undefined, // We don't map to a specific schema event name here
+                event_name: undefined,
               },
             });
 
             logger.debug(
-              `Extracted Solana event: (${decodedEvent.name}) from transaction ${signature}`,
+              `Extracted Solana transaction data for program ${programId} from transaction ${signature}`,
             );
           }
         } catch (error) {
@@ -490,6 +339,8 @@ async function extractEvents(
 
   return { events, slots: processedSlots };
 }
+
+// Event name extraction has been moved to the decodeAnchorEvent function in chain-event-utils.ts
 
 /**
  * Main function to process Solana events within a specified slot range

@@ -1,3 +1,4 @@
+import { Event } from '@coral-xyz/anchor';
 import { EventPair, Events } from '@hicommonwealth/schemas';
 
 export type SolanaSlotDetails = {
@@ -37,7 +38,6 @@ export type SolanaEvent = {
   eventSource: {
     chainId: string; // Solana uses string chain IDs (mainnet, devnet, testnet)
     programId: string;
-    eventType: string;
   };
   transaction: SolanaTransactionInfo;
   slot: SolanaSlotDetails;
@@ -46,5 +46,5 @@ export type SolanaEvent = {
 };
 
 export type SolanaMapper<E extends Events> = (
-  solanaEvent: SolanaEvent,
+  solanaEvent: Event,
 ) => EventPair<E>;

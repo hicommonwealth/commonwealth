@@ -1,5 +1,5 @@
 import * as anchor from '@coral-xyz/anchor';
-import { BorshCoder } from '@coral-xyz/anchor';
+import { BorshCoder, Event } from '@coral-xyz/anchor';
 import { findIdlByProgramId } from '@hicommonwealth/evm-protocols';
 import { EventPairs, Events } from '@hicommonwealth/schemas';
 import { SolanaEvent, SolanaMapper } from './types';
@@ -7,10 +7,9 @@ import { SolanaEvent, SolanaMapper } from './types';
 /**
  * Decodes an event from Anchor-based transaction data.
  * This uses the Anchor IDL to decode the event data.
+ * Exported so it can be used by other modules.
  */
-function decodeAnchorEvent(
-  event: SolanaEvent,
-): { name: string; data: any } | null {
+export function decodeAnchorEvent(event: SolanaEvent): Event | null {
   try {
     // Find the IDL corresponding to this program ID
     const idlWithAddress = findIdlByProgramId(event.eventSource.programId);
@@ -91,10 +90,7 @@ function decodeAnchorEvent(
       return null;
     }
 
-    return {
-      name: decodedEvent.name,
-      data: decodedEvent.data,
-    };
+    return decodedEvent;
   } catch (error) {
     console.error('Error decoding Anchor event:', error);
     return null;
@@ -107,22 +103,16 @@ function decodeAnchorEvent(
  * Uses Anchor for event decoding.
  */
 const singleContestStartedMapper: SolanaMapper<'ContestStarted'> = (
-  event: SolanaEvent,
+  event: Event,
 ) => {
-  // Decode the event using Anchor
-  const decodedEvent = decodeAnchorEvent(event);
-
-  // Directly extract and use data from the decoded event
-  const data = decodedEvent!.data;
-
   return {
     event_name: 'ContestStarted',
     event_payload: {
-      contest_address: data.contest.toString(),
+      contest_address: event.data.contest.toString(),
       contest_id: 0,
-      start_time: new Date(data.start_time * 1000),
-      end_time: new Date(data.end_time * 1000),
-      is_one_off: data.one_off,
+      start_time: new Date(Number(event.data.start_time) * 1000),
+      end_time: new Date(Number(event.data.end_time) * 1000),
+      is_one_off: true,
     },
   };
 };
@@ -133,19 +123,15 @@ const singleContestStartedMapper: SolanaMapper<'ContestStarted'> = (
  * Uses Anchor for event decoding.
  */
 const contestContentAddedMapper: SolanaMapper<'ContestContentAdded'> = (
-  event: SolanaEvent,
+  event: Event,
 ) => {
-  // Decode the event using Anchor
-  const decodedEvent = decodeAnchorEvent(event);
-  const data = decodedEvent!.data;
-
   return {
     event_name: 'ContestContentAdded',
     event_payload: {
-      contest_address: data.contest.toString(),
-      content_id: Number(data.content_id),
-      creator_address: data.creator.toString(),
-      content_url: data.url,
+      contest_address: event.data.contest.toString(),
+      content_id: Number(event.data.content_id),
+      creator_address: event.data.creator.toString(),
+      content_url: event.data.url as string,
     },
   };
 };
@@ -156,20 +142,16 @@ const contestContentAddedMapper: SolanaMapper<'ContestContentAdded'> = (
  * Uses Anchor for event decoding.
  */
 const singleContestVoteMapper: SolanaMapper<'ContestContentUpvoted'> = (
-  event: SolanaEvent,
+  event: Event,
 ) => {
-  // Decode the event using Anchor
-  const decodedEvent = decodeAnchorEvent(event);
-  const data = decodedEvent!.data;
-
   return {
     event_name: 'ContestContentUpvoted',
     event_payload: {
-      contest_address: data.contest.toString(),
+      contest_address: event.data.contest.toString(),
       contest_id: 0,
-      content_id: Number(data.content_id),
-      voter_address: data.voter.toString(),
-      voting_power: data.voting_power.toString(),
+      content_id: Number(event.data.content_id),
+      voter_address: event.data.voter.toString(),
+      voting_power: Number(event.data.voting_power).toString(),
     },
   };
 };
@@ -185,16 +167,25 @@ export const solanaEventMappers: Record<string, SolanaMapper<Events>> = {
 
 /**
  * Processes Solana events through the appropriate mappers based on event type.
+ * If event type is 'unknown' or 'pending', it will attempt to decode the event first.
  */
 export function processSolanaEvents(events: SolanaEvent[]): EventPairs[] {
   return events
-    .map((event) => {
-      const mapper = solanaEventMappers[event.eventSource.eventType];
-      if (!mapper) {
-        return null;
-      }
+    .flatMap((event) => {
       try {
-        return mapper(event);
+        const decodedEvent = decodeAnchorEvent(event);
+        if (decodedEvent) {
+          // Find the mapper for this decoded event type
+          const mapper = solanaEventMappers[decodedEvent.name];
+          if (mapper) {
+            return mapper(decodedEvent);
+          } else {
+            console.warn(
+              `No mapper found for decoded event type: ${decodedEvent.name}`,
+            );
+          }
+        }
+        return null;
       } catch (error) {
         console.error(`Failed to process Solana event: ${error}`);
         return null;
