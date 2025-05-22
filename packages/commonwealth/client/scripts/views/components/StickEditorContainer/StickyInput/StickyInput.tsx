@@ -37,6 +37,7 @@ import { useTurnstile } from 'views/components/useTurnstile';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
+import { useDynamicPlaceholder } from './useDynamicPlaceholder';
 
 // Import the event handling utils
 import {
@@ -72,6 +73,7 @@ const StickyInput = (props: StickyInputProps) => {
     contentDelta,
     thread: originalThread,
     parentCommentText,
+    handleIsReplying,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
@@ -126,6 +128,14 @@ const StickyInput = (props: StickyInputProps) => {
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+
+  // Use our dynamic placeholder hook with the DOM selector approach
+  const placeholderText = useDynamicPlaceholder({
+    mode,
+    isReplying: !!isReplying,
+    replyingToAuthor,
+    isMobile,
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
@@ -365,20 +375,22 @@ const StickyInput = (props: StickyInputProps) => {
 
     const buttonGroup = (
       <div className="button-group">
-        <CWTooltip
-          content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
-          placement="top"
-          renderTrigger={(tooltipInteractionHandler) => (
-            <button
-              className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
-              onClick={handleToggleWebSearch}
-              onMouseEnter={tooltipInteractionHandler}
-              onMouseLeave={tooltipInteractionHandler}
-            >
-              <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
-            </button>
-          )}
-        />
+        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+          <CWTooltip
+            content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
+            placement="top"
+            renderTrigger={(tooltipInteractionHandler) => (
+              <button
+                className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
+                onClick={handleToggleWebSearch}
+                onMouseEnter={tooltipInteractionHandler}
+                onMouseLeave={tooltipInteractionHandler}
+              >
+                <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
+              </button>
+            )}
+          />
+        )}
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
           <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
             <div className="popover-container">
@@ -591,20 +603,23 @@ const StickyInput = (props: StickyInputProps) => {
                   contentDelta={props.contentDelta}
                   setContentDelta={props.setContentDelta}
                   onKeyDown={handleKeyDown}
-                  placeholder={
-                    mode === 'thread'
-                      ? 'Create a thread...'
-                      : isReplying
-                        ? `Reply to ${replyingToAuthor}...`
-                        : isMobile
-                          ? 'Comment on thread...'
-                          : 'Write a comment...'
-                  }
+                  placeholder={placeholderText}
                 />
               </div>
+
               {!isMobile && buttonGroup}
             </div>
-
+            {isReplying && (
+              <div
+                className="cancel-reply-button"
+                onClick={() => {
+                  handleIsReplying?.(false);
+                }}
+              >
+                <CWIcon iconName="close" iconSize="small" weight="bold" />
+                <CWText type="caption">Cancel reply</CWText>
+              </div>
+            )}
             {isTurnstileEnabled && (
               <div className="turnstile-container">
                 <TurnstileWidget />

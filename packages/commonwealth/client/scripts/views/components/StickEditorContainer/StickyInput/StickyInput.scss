@@ -318,6 +318,17 @@
   .turnstile-container {
     padding: 8px 16px 0;
   }
+
+  .cancel-reply-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    background-color: $neutral-100;
+    width: fit-content;
+    padding: 2px 4px;
+    border-radius: 6px;
+  }
 }
 
 /* Desktop container styles */

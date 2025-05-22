@@ -31,6 +31,7 @@ export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
   handleSubmitComment: (turnstileToken?: string | null) => Promise<number>;
+  handleIsReplying?: (isReplying: boolean) => void;
   errorMsg: string;
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
