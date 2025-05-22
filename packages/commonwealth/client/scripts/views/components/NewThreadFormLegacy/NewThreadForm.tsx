@@ -393,9 +393,9 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
           return;
         }
 
-        const data = await createThreadToken({
-          name: effectiveTitle,
-          symbol: effectiveTitle.substring(0, 4).toUpperCase(),
+        await createThreadToken({
+          name: community.id,
+          symbol: communityToken.symbol,
           threadId: thread.id!,
           ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
           initPurchaseAmount: 1e18,
