@@ -10,6 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
@@ -24,7 +25,6 @@ import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { PageNotFound } from '../404';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
-import { PageLoading } from '../loading';
 import { JSONDisplay } from '../view_proposal/JSONDisplay';
 import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
@@ -136,7 +136,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   }, [snapshotProposal, proposal, queryType]);
 
   if (isLoading || isSnapshotLoading) {
-    return <PageLoading message="Loading..." />;
+    return <LoadingIndicator message="Loading..." />;
   }
 
   if (cosmosError) {

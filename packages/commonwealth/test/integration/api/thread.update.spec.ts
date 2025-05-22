@@ -6,6 +6,7 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Express } from 'express';
@@ -86,11 +87,8 @@ describe('Thread Patch Update', () => {
       expect(userJWT).to.not.be.null;
     }
 
-    const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+    const topic = await models.Topic.findOne({
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;

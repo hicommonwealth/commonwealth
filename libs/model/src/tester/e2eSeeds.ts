@@ -13,12 +13,12 @@ import type {
   CollaborationAttributes,
   CommentInstance,
   CommunityInstance,
-  DB,
   ReactionAttributes,
   ThreadInstance,
   TopicAttributes,
   UserInstance,
 } from '../../src';
+import { models } from '../database';
 import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {
@@ -33,9 +33,7 @@ export type E2E_TestEntities = {
   testTopics: TopicAttributes[];
 };
 
-export const e2eTestEntities = async function (
-  testDb: DB,
-): Promise<E2E_TestEntities> {
+export const e2eTestEntities = async function (): Promise<E2E_TestEntities> {
   const testThreads: ThreadInstance[] = [];
   const testComments: CommentInstance[] = [];
   const testUsers: UserInstance[] = [];
@@ -52,7 +50,7 @@ export const e2eTestEntities = async function (
         [...Array(4).keys()].map(
           async (i) =>
             (
-              await testDb.User.findOrCreate({
+              await models.User.findOrCreate({
                 where: {
                   id: -i - 1,
                   email: `test${i - 1}@gmail.com`,
@@ -74,7 +72,7 @@ export const e2eTestEntities = async function (
     testChainNodes.push(
       ...(await Promise.all([
         (
-          await testDb.ChainNode.findOrCreate({
+          await models.ChainNode.findOrCreate({
             where: {
               id: 9999,
               eth_chain_id: 9999,
@@ -85,7 +83,7 @@ export const e2eTestEntities = async function (
           })
         )[0],
         (
-          await testDb.ChainNode.findOrCreate({
+          await models.ChainNode.findOrCreate({
             where: {
               id: 99999,
               eth_chain_id: 99999,
@@ -99,7 +97,7 @@ export const e2eTestEntities = async function (
     );
 
     testChains.push(
-      ...(await testDb.Community.bulkCreate(
+      ...(await models.Community.bulkCreate(
         [
           {
             id: 'cmntest',
@@ -152,7 +150,7 @@ export const e2eTestEntities = async function (
     testTopics.push(
       ...(await Promise.all([
         (
-          await testDb.Topic.findOrCreate({
+          await models.Topic.findOrCreate({
             where: {
               id: -1,
               name: 'testTopic',
@@ -161,7 +159,7 @@ export const e2eTestEntities = async function (
           })
         )[0],
         (
-          await testDb.Topic.findOrCreate({
+          await models.Topic.findOrCreate({
             where: {
               id: -2,
               name: 'testTopic2',
@@ -184,7 +182,7 @@ export const e2eTestEntities = async function (
         [...Array(4).keys()].map(
           async (i) =>
             (
-              await testDb.Address.findOrCreate({
+              await models.Address.findOrCreate({
                 where: {
                   id: -i - 1,
                   user_id: i < 2 ? -1 : -2,
@@ -204,7 +202,7 @@ export const e2eTestEntities = async function (
         [...Array(2).keys()].map(
           async (i) =>
             (
-              await testDb.Thread.findOrCreate({
+              await models.Thread.findOrCreate({
                 where: {
                   id: -i - 1,
                 },
@@ -236,7 +234,7 @@ export const e2eTestEntities = async function (
         [...Array(3).keys()].map(
           async (i) =>
             (
-              await testDb.Thread.findOrCreate({
+              await models.Thread.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
                 },
@@ -268,7 +266,7 @@ export const e2eTestEntities = async function (
         [...Array(2).keys()].map(
           async (i) =>
             (
-              await testDb.Collaboration.findOrCreate({
+              await models.Collaboration.findOrCreate({
                 where: {
                   thread_id: -1,
                   address_id: -i - 1,
@@ -284,7 +282,7 @@ export const e2eTestEntities = async function (
         [...Array(2).keys()].map(
           async (i) =>
             (
-              await testDb.Comment.findOrCreate({
+              await models.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
                 },
@@ -309,7 +307,7 @@ export const e2eTestEntities = async function (
         [...Array(3).keys()].map(
           async (i) =>
             (
-              await testDb.Comment.findOrCreate({
+              await models.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
                 },
@@ -334,7 +332,7 @@ export const e2eTestEntities = async function (
         [...Array(2).keys()].map(
           async (i) =>
             (
-              await testDb.Reaction.findOrCreate({
+              await models.Reaction.findOrCreate({
                 where: {
                   id: -i - 1,
                   reaction: 'like',
@@ -352,7 +350,7 @@ export const e2eTestEntities = async function (
         [...Array(3).keys()].map(
           async (i) =>
             (
-              await testDb.Reaction.findOrCreate({
+              await models.Reaction.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
                   reaction: 'like',

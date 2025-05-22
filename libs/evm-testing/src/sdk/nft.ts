@@ -1,7 +1,10 @@
+import { createWalletClient, http, publicActions } from 'viem';
+import { mainnet } from 'viem/chains';
 import { AbiFragment, Contract } from 'web3';
+import erc_721_abi from '../utils/abi/erc721';
+import { localRpc } from '../utils/chainUtil';
 import { erc_721 } from '../utils/contracts';
 import { SdkBase } from './sdkBase';
-
 export class ERC721 extends SdkBase {
   public address: string;
   public contract: Contract<AbiFragment[]>;
@@ -23,12 +26,21 @@ export class ERC721 extends SdkBase {
    */
   public async mint(tokenId: string, to: number) {
     const accounts = await this.getAccounts();
-    const txReceipt = await this.contract.methods
-      .safeMint(accounts[to], tokenId)
-      .send({
-        from: accounts[0],
-        gas: '500000',
-      });
+    const client = createWalletClient({
+      account: accounts[0] as `0x${string}`,
+      transport: http(localRpc),
+      chain: mainnet,
+    }).extend(publicActions);
+    const { request } = await client.simulateContract({
+      account: accounts[0] as `0x${string}`,
+      address: this.address as `0x${string}`,
+      abi: erc_721_abi,
+      functionName: 'safeMint',
+      args: [accounts[to], tokenId],
+    });
+    const txReceipt = await client.waitForTransactionReceipt({
+      hash: await client.writeContract(request),
+    });
     return { block: Number(txReceipt.blockNumber) };
   }
 
