@@ -249,7 +249,7 @@ export function updateActiveUser(
         id: c.id || '',
         iconUrl: c.icon_url || '',
         name: c.name || '',
-        isStarred: c.is_starred || false,
+        isStarred: !!c.starred_at,
       })),
       isLoggedIn: true,
       xpPoints: data.xp_points || undefined,
