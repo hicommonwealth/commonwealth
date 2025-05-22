@@ -177,14 +177,10 @@ const StickyInput = (props: StickyInputProps) => {
   const handleGenerateAIContent = useCallback(async () => {
     if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
 
-    if (selectedModels.length === 0) {
-      notifyError('Please select at least one AI model first');
-      return;
-    }
-
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
-    const modelToUse = selectedModels[0].value as CompletionModel;
+    const modelToUse =
+      (selectedModels[0]?.value as CompletionModel) || 'gpt-4o';
 
     try {
       if (mode === 'thread') {
@@ -501,6 +497,7 @@ const StickyInput = (props: StickyInputProps) => {
               }}
               disabled={
                 !contentDelta?.ops?.length ||
+                isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
               }
               onMouseEnter={handleInteraction}

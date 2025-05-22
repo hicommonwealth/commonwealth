@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CommentFilters } from './CommentFilters';
 import './CommentTree.scss';
-import { StreamingReplyInstance, TreeHierarchy } from './TreeHierarchy';
+import { TreeHierarchy } from './TreeHierarchy';
 import { CommentsTreeProps } from './types';
 import { useCommentTree } from './useCommentTree';
 
@@ -17,13 +17,12 @@ export const CommentTree = ({
   canComment,
   onThreadCreated,
   aiCommentsToggleEnabled,
+  streamingInstances,
+  setStreamingInstances,
   permissions,
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
-  const [streamingInstances, setStreamingInstances] = useState<
-    StreamingReplyInstance[]
-  >([]);
 
   const {
     commentFilters,

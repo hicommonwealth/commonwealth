@@ -373,11 +373,9 @@ export const TreeHierarchy = ({
                           reaction_count: 0,
                           reply_count: 0,
                           user_id: user.id,
+                          // Use fallbacks for profile_name
                           profile_name:
-                            user.profile_name ||
-                            user.displayName ||
-                            user.activeAccount?.address ||
-                            'AI Assistant',
+                            user.activeAccount?.address || 'AI Assistant',
                         }}
                         isStreamingAIReply={true}
                         streamingModelId={instance.modelId}
