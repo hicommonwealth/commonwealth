@@ -149,7 +149,9 @@ async function getSlotDetails(
 ): Promise<SolanaSlotDetails | null> {
   try {
     // Get block info for the slot
-    const block = await connection.getBlock(slot);
+    const block = await connection.getBlock(slot, {
+      maxSupportedTransactionVersion: 0,
+    });
 
     if (!block) {
       logger.debug(`No block found for slot ${slot}`);

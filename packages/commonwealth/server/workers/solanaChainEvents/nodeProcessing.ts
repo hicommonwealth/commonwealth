@@ -67,7 +67,7 @@ export async function processChainNode(
 
     // Limit the number of slots to process at once to avoid timeouts
     const maxSlotRange = config.SOLANA_CE.MAX_SLOT_RANGE || 100;
-    const endSlot = Math.min(currentSlot - 1, startSlot + maxSlotRange);
+    const endSlot = currentSlot - 1;
 
     const allEvents: Array<EventPairs> = [];
 

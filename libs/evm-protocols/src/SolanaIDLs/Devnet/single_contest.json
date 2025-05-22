@@ -532,6 +532,10 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "contest",
+            "type": "pubkey"
+          },
+          {
             "name": "content_id",
             "type": "u64"
           },
@@ -707,6 +711,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "contest",
+            "type": "pubkey"
+          },
           {
             "name": "voter",
             "type": "pubkey"
