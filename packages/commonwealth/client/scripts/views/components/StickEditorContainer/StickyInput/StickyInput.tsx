@@ -80,14 +80,13 @@ const StickyInput = (props: StickyInputProps) => {
     aiCommentsToggleEnabled,
     aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
+    selectedModels,
+    setSelectedModels,
   } = useLocalAISettingsStore();
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
-  const [selectedModelValues, setSelectedModelValues] = useState<
-    CompletionModel[]
-  >([]);
   const aiModelPopover = usePopover();
 
   const availableModels: ModelOption[] = [
@@ -178,14 +177,14 @@ const StickyInput = (props: StickyInputProps) => {
   const handleGenerateAIContent = useCallback(async () => {
     if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
 
-    if (selectedModelValues.length === 0) {
+    if (selectedModels.length === 0) {
       notifyError('Please select at least one AI model first');
       return;
     }
 
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
-    const modelToUse = selectedModelValues[0];
+    const modelToUse = selectedModels[0].value as CompletionModel;
 
     try {
       if (mode === 'thread') {
@@ -249,7 +248,7 @@ const StickyInput = (props: StickyInputProps) => {
     parentCommentText,
     setContentDelta,
     webSearchEnabled,
-    selectedModelValues,
+    selectedModels,
   ]);
 
   const getActionPillLabel = () => {
@@ -340,13 +339,21 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [isExpanded, openModalOnExpand, mode]);
 
-  const handleModelSelectionChange = (newSelectedValues: CompletionModel[]) => {
-    setSelectedModelValues(newSelectedValues);
+  const handleModelSelectionChange = (
+    newSelectedModelValues: CompletionModel[],
+  ) => {
+    const newAiModelOptions = newSelectedModelValues.map((value) => {
+      const modelDetails = availableModels.find((m) => m.value === value);
+      return {
+        value: value,
+        label: modelDetails ? modelDetails.label : value,
+      };
+    });
+    setSelectedModels(newAiModelOptions);
 
-    // Automatically enable/disable AI comments toggle based on model selection
-    if (newSelectedValues.length > 0 && !aiCommentsToggleEnabled) {
+    if (newAiModelOptions.length > 0 && !aiCommentsToggleEnabled) {
       setAICommentsToggleEnabled(true);
-    } else if (newSelectedValues.length === 0 && aiCommentsToggleEnabled) {
+    } else if (newAiModelOptions.length === 0 && aiCommentsToggleEnabled) {
       setAICommentsToggleEnabled(false);
     }
   };
@@ -357,8 +364,8 @@ const StickyInput = (props: StickyInputProps) => {
   };
 
   const renderStickyInput = () => {
-    const isAnyModelSelected = selectedModelValues.length > 0;
-    const showModelCountBadge = selectedModelValues.length > 1;
+    const isAnyModelSelected = selectedModels.length > 0;
+    const showModelCountBadge = selectedModels.length > 1;
 
     const buttonGroup = (
       <div className="button-group">
@@ -412,7 +419,7 @@ const StickyInput = (props: StickyInputProps) => {
                     <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
                     {showModelCountBadge && (
                       <span className="model-count-badge">
-                        {selectedModelValues.length}
+                        {selectedModels.length}
                       </span>
                     )}
                   </button>
@@ -433,7 +440,9 @@ const StickyInput = (props: StickyInputProps) => {
                   <AIModelSelector
                     title={AI_SELECTOR_TITLE}
                     availableModels={availableModels}
-                    selectedModelValues={selectedModelValues}
+                    selectedModelValues={selectedModels.map(
+                      (m) => m.value as CompletionModel,
+                    )}
                     onSelectionChange={handleModelSelectionChange}
                     maxSelection={MAX_MODELS_SELECTABLE}
                     popoverId={aiModelPopover.id}
@@ -546,7 +555,7 @@ const StickyInput = (props: StickyInputProps) => {
                 shouldFocus={true}
                 onCancel={handleCancel}
                 aiCommentsToggleEnabled={
-                  aiCommentsToggleEnabled && selectedModelValues.length > 0
+                  aiCommentsToggleEnabled && selectedModels.length > 0
                 }
                 handleSubmitComment={customHandleSubmitComment}
                 onAiReply={handleAiReply}

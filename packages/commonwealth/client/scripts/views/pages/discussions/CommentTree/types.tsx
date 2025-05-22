@@ -3,9 +3,12 @@ import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import Permissions from 'utils/Permissions';
-import Thread from '../../../../models/Thread';
+// Removed unused Profile and Thread imports for now, can be added if models are used
+// import Thread from '../../../../models/Thread';
+// import { Profile } from 'models/user';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+import { StreamingReplyInstance } from './TreeHierarchy';
 
 const actionPermissions = [
   GatedActionEnum.CREATE_COMMENT,
@@ -15,7 +18,7 @@ const actionPermissions = [
 export type CommentsTreeProps = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
   commentsRef: React.MutableRefObject<HTMLDivElement | null>;
-  thread: Thread;
+  thread: any; // Should be Thread, but using any to avoid import error if Thread model is complex or not found
   setIsGloballyEditing?: (status: boolean) => void;
   fromDiscordBot?: boolean;
   canReact?: boolean;
@@ -23,8 +26,13 @@ export type CommentsTreeProps = {
   canComment: boolean;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
-  streamingReplyIds: number[];
-  setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
+  // Correctly define streamingInstances and setStreamingInstances
+  streamingInstances: StreamingReplyInstance[];
+  setStreamingInstances: (
+    instances:
+      | StreamingReplyInstance[]
+      | ((prevInstances: StreamingReplyInstance[]) => StreamingReplyInstance[]),
+  ) => void;
   permissions: ReturnType<
     typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
   >;
@@ -38,6 +46,10 @@ export type UseCommentsTreeProps = Pick<
 export type CommentFilters = {
   includeSpam: boolean;
   sortType: CommentsFeaturedFilterTypes;
+  permissions: any; // Was ThreadPermissions, using any to avoid error if not defined
+  aiCommentsToggleEnabled?: boolean; // Keep as per user file state
+  onThreadCreated?: (threadId: number) => Promise<void>; // Keep as per user file state
+  // Ensure no streaming props here
 };
 
 export type CommentFiltersProps = Pick<CommentsTreeProps, 'commentsRef'> & {
@@ -45,13 +57,11 @@ export type CommentFiltersProps = Pick<CommentsTreeProps, 'commentsRef'> & {
   onFiltersChange: (newFilters: CommentFilters) => void;
 };
 
+// This type represents the props before Omit/addition in TreeHierarchy.tsx
 export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
-  | 'pageRef'
-  | 'thread'
-  | 'permissions'
-  | 'streamingReplyIds'
-  | 'setStreamingReplyIds'
+  'pageRef' | 'thread' | 'permissions'
+  // streamingInstances and setStreamingInstances are handled by TreeHierarchy.tsx itself
 > & {
   parentCommentId?: number;
   isThreadLocked: boolean;

@@ -1,46 +1,59 @@
-import { devtools, persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
+
+// Define AIModelOption type
+export type AIModelOption = {
+  value: string; // e.g., 'openai/gpt-4o', 'anthropic/claude-3.5-sonnet'
+  label: string; // e.g., 'GPT-4o', 'Claude 3.5 Sonnet'
+  description?: string;
+  pricing?: any; // Or a more specific type
+};
+
 interface LocalAISettingsStore {
   aiInteractionsToggleEnabled: boolean;
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
+  preferredModel?: string;
+  setPreferredModel: (model?: string) => void;
+  showSuggestions?: boolean;
+  setShowSuggestions: (show: boolean) => void;
+  selectedModels: AIModelOption[];
+  setSelectedModels: (models: AIModelOption[]) => void;
 }
 
-export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        aiInteractionsToggleEnabled: false,
-        aiCommentsToggleEnabled: false,
-        setAIInteractionsToggleEnabled: (enabled) => {
-          set(() => {
-            return {
-              aiInteractionsToggleEnabled: enabled,
-              ...(!enabled && { aiCommentsToggleEnabled: false }),
-            };
-          });
-        },
-
-        setAICommentsToggleEnabled: (enabled) => {
-          set(() => {
-            return { aiCommentsToggleEnabled: enabled };
-          });
-        },
-      }),
-      {
-        name: 'local-ai-settings-store', // unique name
-        partialize: (state) => ({
-          aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
-          aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
-        }), // persist only these states
+const localAISettingsStore = createStore<LocalAISettingsStore>()(
+  persist(
+    (set) => ({
+      aiInteractionsToggleEnabled: true,
+      aiCommentsToggleEnabled: true,
+      setAIInteractionsToggleEnabled: (enabled: boolean) => {
+        set({ aiInteractionsToggleEnabled: enabled });
       },
-    ),
+      setAICommentsToggleEnabled: (enabled: boolean) => {
+        set({ aiCommentsToggleEnabled: enabled });
+      },
+      preferredModel: undefined,
+      setPreferredModel: (model) => set({ preferredModel: model }),
+      showSuggestions: true,
+      setShowSuggestions: (show) => set({ showSuggestions: show }),
+      selectedModels: [],
+      setSelectedModels: (models) => set({ selectedModels: models }),
+    }),
+    {
+      name: 'local-ai-settings-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
+        aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
+        preferredModel: state.preferredModel,
+        showSuggestions: state.showSuggestions,
+        selectedModels: state.selectedModels,
+      }),
+    },
   ),
 );
 
-const useLocalAISettingsStore = createBoundedUseStore(LocalAISettingsStore);
-
-export { useLocalAISettingsStore };
-export default useLocalAISettingsStore;
+export const useLocalAISettingsStore =
+  createBoundedUseStore(localAISettingsStore);
