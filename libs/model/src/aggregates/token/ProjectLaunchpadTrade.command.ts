@@ -86,7 +86,6 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
                   address: trader_address,
                   user_id: address.user_id,
                   role: 'member',
-                  is_user_default: false,
                   ghost_address: false,
                   is_banned: false,
                 },

@@ -9,6 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -39,7 +40,6 @@ import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
@@ -672,7 +672,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
               })
             : address;
         const { data } = await axios.get(
-          `${SERVER_URL}/internal/GetAddressStatus?community_id=${cid}&address=${adr}`,
+          `${BASE_API_PATH}/user.getAddressStatus?community_id=${cid}&address=${adr}`,
           { headers: { address: user.activeAccount?.address, jwt: user.jwt } },
         );
 

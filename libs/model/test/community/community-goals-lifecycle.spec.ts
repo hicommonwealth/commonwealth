@@ -11,6 +11,7 @@ import {
   UpdateRole,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { CreateCommunityGoalMeta } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import { Xp } from '../../src/aggregates/user';
 import { models } from '../../src/database';
@@ -31,11 +32,14 @@ describe('community goals lifecycle', () => {
     target: number,
     reward_amount: number,
   ) {
-    const meta = await models.CommunityGoalMeta.create({
-      name: type as string,
-      description: `reach ${target} ${type}`,
-      type,
-      target,
+    const meta = await command(CreateCommunityGoalMeta(), {
+      actor: superadmin,
+      payload: {
+        name: type as string,
+        description: `reach ${target} ${type}`,
+        type,
+        target,
+      },
     });
 
     const quest = await command(CreateQuest(), {
@@ -61,7 +65,7 @@ describe('community goals lifecycle', () => {
             event_name: 'CommunityGoalReached',
             reward_amount,
             creator_reward_weight: 0,
-            content_id: `goal:${meta.id}`,
+            content_id: `goal:${meta!.id}`,
           },
         ],
       },
@@ -73,7 +77,7 @@ describe('community goals lifecycle', () => {
       { where: { id: quest!.id } },
     );
 
-    return meta;
+    return meta!;
   }
 
   beforeAll(async () => {

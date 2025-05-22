@@ -43,3 +43,20 @@ export const GetTopUsers = {
   input: z.object({}),
   output: z.array(z.any()),
 };
+
+export const MembersStatsView = z.object({
+  address: z.string(),
+  profile_name: z.string(),
+  thread_count: z.number(),
+  comment_count: z.number(),
+  reaction_count: z.number(),
+});
+
+export const GetCommunityMembersStats = {
+  input: z.object({
+    community_id: z.string().optional(),
+  }),
+  output: z.object({
+    members: z.array(MembersStatsView),
+  }),
+};

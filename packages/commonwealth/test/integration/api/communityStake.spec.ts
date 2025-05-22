@@ -2,6 +2,7 @@ import { command, dispose, query } from '@hicommonwealth/core';
 import {
   commonProtocol,
   Community,
+  models,
   type UserInstance,
 } from '@hicommonwealth/model';
 import { UserTierMap } from '@hicommonwealth/shared';
@@ -43,7 +44,6 @@ describe('POST communityStakes Tests', () => {
 
   test('Should create and update community stake', async () => {
     buildUser({
-      models: server.models,
       userAttributes: {
         email: '',
         id: 1,
@@ -105,7 +105,7 @@ describe('POST communityStakes Tests', () => {
   });
 
   test('The integration with protocol works', async () => {
-    const community = await server.models.Community.findOne({
+    const community = await models.Community.findOne({
       where: {
         id: 'common-protocol',
       },
