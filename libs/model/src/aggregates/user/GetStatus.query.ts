@@ -41,19 +41,19 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         z.infer<typeof schemas.UserStatusCommunityView>
       >(
         `
-      SELECT
-        c.id, c.name, c.icon_url,
-        CASE
-          WHEN sc.community_id IS NOT NULL THEN TRUE
-          ELSE FALSE
-        END AS is_starred,
-        c.redirect
+      SELECT DISTINCT
+        c.id, c.name, c.icon_url, c.redirect,
+        c.created_at, c.updated_at,
+        sc.updated_at as starred_at
       FROM
         "Communities" c
-        JOIN "Addresses" a ON c.id = a.community_id and a.user_id = :user_id
+        JOIN "Addresses" a ON c.id = a.community_id and a.user_id = :user_id AND a.verified IS NOT NULL
         LEFT JOIN "StarredCommunities" sc ON c.id = sc.community_id AND sc.user_id = :user_id
       WHERE
-        c.active = true;
+        c.active = true
+      ORDER BY
+        sc.updated_at DESC NULLS LAST,
+        c.created_at DESC;
       `,
         {
           replacements: { user_id: user.id },

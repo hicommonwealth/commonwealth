@@ -337,7 +337,6 @@ describe('Community lifecycle', () => {
         user_id: superAdminActor.user.id,
         address: superAdminActor.address!,
         community_id: community.id,
-        is_user_default: true,
         role: 'admin',
         last_active: new Date(),
         ghost_address: false,

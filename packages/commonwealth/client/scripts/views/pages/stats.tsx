@@ -4,8 +4,8 @@ import Permissions from 'client/scripts/utils/Permissions';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import ErrorPage from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 import z from 'zod';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageNotFound } from './404';
@@ -88,7 +88,7 @@ const StatsPage = () => {
   }
 
   if (isLoading) {
-    return <PageLoading message="Loading analytics" />;
+    return <LoadingIndicator message="Loading analytics" />;
   } else if (error) {
     return <ErrorPage message={error.message} />;
   } else if (data) {
