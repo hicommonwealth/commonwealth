@@ -128,15 +128,11 @@ export const ThreadPollCard = ({
     });
   };
 
-  const userVote = poll?.getUserVote?.(
-    user.activeAccount?.community?.id || '',
-    user.activeAccount?.address || '',
-  );
-
-  const totalVoteWeight = poll.votes.reduce((sum, vote) => {
+  const totalVoteWeight = pollVotes.reduce((sum, vote) => {
     const weight =
-      vote.calculatedVotingWeight && BigInt(vote.calculatedVotingWeight) > 0n
-        ? BigInt(vote.calculatedVotingWeight)
+      vote.calculated_voting_weight &&
+      BigInt(vote.calculated_voting_weight) > 0n
+        ? BigInt(vote.calculated_voting_weight)
         : 1n;
     return sum + weight;
   }, 0n);
@@ -148,8 +144,9 @@ export const ThreadPollCard = ({
       .filter((v) => v.option === option)
       .reduce((sum, val) => {
         const weight =
-          val.calculatedVotingWeight && BigInt(val.calculatedVotingWeight) > 0n
-            ? BigInt(val.calculatedVotingWeight)
+          val.calculated_voting_weight &&
+          BigInt(val.calculated_voting_weight) > 0n
+            ? BigInt(val.calculated_voting_weight)
             : 1n;
         return sum + weight;
       }, 0n),
