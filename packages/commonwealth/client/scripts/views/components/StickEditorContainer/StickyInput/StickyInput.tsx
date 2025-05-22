@@ -18,7 +18,7 @@ import {
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import { useLocalAISettingsStore } from 'state/ui/user';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -75,7 +75,6 @@ const StickyInput = (props: StickyInputProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
   const bodyAccumulatedRef = useRef('');
-  const user = useUserStore();
 
   const {
     turnstileToken,
@@ -387,7 +386,7 @@ const StickyInput = (props: StickyInputProps) => {
               </div>
             )}
 
-            {mode === 'thread' && user.isLoggedIn ? (
+            {mode === 'thread' ? (
               <NewThreadForm
                 ref={newThreadFormRef}
                 onCancel={handleCancel}
