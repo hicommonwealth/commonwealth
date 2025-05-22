@@ -29,20 +29,6 @@ export const createThreadToken = async ({
   ethChainId,
   chainRpc,
 }: CreateThreadTokenProps) => {
-  console.log('createThreadToken called with:', {
-    name,
-    symbol,
-    threadId,
-    initPurchaseAmount,
-    chainId,
-    walletAddress,
-    authorAddress,
-    communityTreasuryAddress,
-    paymentTokenAddress,
-    ethChainId,
-    chainRpc,
-  });
-
   if (
     !commonProtocol.factoryContracts ||
     !commonProtocol.factoryContracts[ethChainId] ||
@@ -66,7 +52,7 @@ export const createThreadToken = async ({
   );
 
   try {
-    const result = await launchpad.launchTokenWithLiquidity(
+    return await launchpad.launchTokenWithLiquidity(
       name,
       symbol,
       walletAddress,
@@ -77,9 +63,6 @@ export const createThreadToken = async ({
       authorAddress,
       (communityTreasuryAddress = '0x0771bf1205506a1d8ad2340dee334c1eb031e48c'),
     );
-
-    console.log('Token launch successful:', result);
-    return result;
   } catch (error) {
     console.error('Error in createThreadToken:', {
       error,
