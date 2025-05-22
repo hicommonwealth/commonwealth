@@ -61,8 +61,16 @@ const {
   toggleCommentSpam,
 } = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
-const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
-  contest.trpcRouter;
+const {
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
+  deleteContestMetadata,
+  getContestLog,
+  getFarcasterCasts,
+  farcasterWebhook,
+  getJudgeStatus,
+} = contest.trpcRouter;
 const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
@@ -109,6 +117,11 @@ const api = {
   createContestMetadata,
   updateContestMetadata,
   cancelContestMetadata,
+  deleteContestMetadata,
+  getContestLog,
+  getFarcasterCasts,
+  farcasterWebhook,
+  getJudgeStatus,
   createCommunity,
   updateCommunity,
   createTopic,
