@@ -23,53 +23,56 @@ export function decodeAnchorEvent(event: SolanaEvent): Event | null {
     // Create an Anchor coder from the IDL
     const coder = new BorshCoder(idl);
 
-    // Find the inner instruction that contains our event data
-    const eventLog = event.log.logs.find(
-      (log) =>
-        log.includes('Program log: ') &&
-        (log.includes(event.meta.event_name || '') ||
-          log.includes('Program log: data:')),
-    );
-
-    if (!eventLog) {
-      console.warn(
-        `No event log found in transaction ${event.transaction.signature}`,
-      );
-      return null;
-    }
-
     // Extract the base64-encoded event data
     let eventData: string | null = null;
 
-    if (eventLog.includes('Program log: data: ')) {
-      // Extract data directly if it's in the expected format
-      eventData = eventLog.split('Program log: data: ')[1];
+    // First look for "Program data:" line which contains base64 encoded event data
+    const dataLog = event.log.logs.find((log) =>
+      log.startsWith('Program data:'),
+    );
+    if (dataLog) {
+      // Extract the base64 data part
+      eventData = dataLog.substring('Program data:'.length).trim();
     } else {
-      // Try to find the inner instruction that contains our event
-      const innerIxIndex = event.log.logs.findIndex((log) =>
-        log.includes(`Program log: ${event.meta.event_name || ''}`),
+      // Try the previous methods if no "Program data:" line exists
+      const eventLog = event.log.logs.find(
+        (log) =>
+          log.includes('Program log: ') &&
+          (log.includes(event.meta.event_name || '') ||
+            log.includes('Program log: data:')),
       );
-      if (innerIxIndex >= 0 && event.log.data) {
-        // If we find a matching event, try to decode using the raw data
-        // This follows the structure described in the Anchor approach
-        try {
-          const parsedData = JSON.parse(event.log.data);
-          if (
-            parsedData.innerInstructions &&
-            parsedData.innerInstructions.length > 0
-          ) {
-            for (const ix of parsedData.innerInstructions) {
-              if (ix.data) {
-                const rawData = anchor.utils.bytes.bs58.decode(ix.data);
-                eventData = anchor.utils.bytes.base64.encode(
-                  rawData.subarray(8),
-                );
-                break;
+
+      if (eventLog) {
+        if (eventLog.includes('Program log: data: ')) {
+          // Extract data directly if it's in the expected format
+          eventData = eventLog.split('Program log: data: ')[1];
+        } else {
+          // Try to find the inner instruction that contains our event
+          const innerIxIndex = event.log.logs.findIndex((log) =>
+            log.includes(`Program log: ${event.meta.event_name || ''}`),
+          );
+          if (innerIxIndex >= 0 && event.log.data) {
+            // If we find a matching event, try to decode using the raw data
+            try {
+              const parsedData = JSON.parse(event.log.data);
+              if (
+                parsedData.innerInstructions &&
+                parsedData.innerInstructions.length > 0
+              ) {
+                for (const ix of parsedData.innerInstructions) {
+                  if (ix.data) {
+                    const rawData = anchor.utils.bytes.bs58.decode(ix.data);
+                    eventData = anchor.utils.bytes.base64.encode(
+                      rawData.subarray(8),
+                    );
+                    break;
+                  }
+                }
               }
+            } catch (err) {
+              console.warn('Error parsing inner instruction data:', err);
             }
           }
-        } catch (err) {
-          console.warn('Error parsing inner instruction data:', err);
         }
       }
     }
@@ -110,8 +113,8 @@ const singleContestStartedMapper: SolanaMapper<'ContestStarted'> = (
     event_payload: {
       contest_address: event.data.contest.toString(),
       contest_id: 0,
-      start_time: new Date(Number(event.data.start_time) * 1000),
-      end_time: new Date(Number(event.data.end_time) * 1000),
+      start_time: new Date(Number(event.data.start_time)),
+      end_time: new Date(Number(event.data.end_time)),
       is_one_off: true,
     },
   };
