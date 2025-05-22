@@ -1,4 +1,5 @@
 import { CompletionModel, ContentType } from '@hicommonwealth/shared';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -19,10 +20,14 @@ import {
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
+import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
@@ -34,27 +39,15 @@ import {
   ReactQuillEditor,
 } from 'views/components/react_quill_editor';
 import { useTurnstile } from 'views/components/useTurnstile';
-import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
-import { StickCommentContext } from '../context/StickCommentProvider';
-import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
-import { useDynamicPlaceholder } from './useDynamicPlaceholder';
-
-// Import the event handling utils
 import {
   handleIconClick,
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-
-// Import ClickAwayListener
-import ClickAwayListener from '@mui/base/ClickAwayListener';
-
-// New Imports
-import { AIModelSelector, ModelOption } from 'views/components/AIModelSelector';
-import CWPopover, {
-  usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-// End New Imports
+import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { StickCommentContext } from '../context/StickCommentProvider';
+import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
+import { useDynamicPlaceholder } from './useDynamicPlaceholder';
 
 import './StickyInput.scss';
 
@@ -120,6 +113,7 @@ const StickyInput = (props: StickyInputProps) => {
     },
     { value: 'google/gemini-pro' as CompletionModel, label: 'Gemini Pro' },
   ];
+
   const MAX_MODELS_SELECTABLE = 4;
   const AI_SELECTOR_TITLE =
     'Select up to 4 models to generate a variety of auto replies';

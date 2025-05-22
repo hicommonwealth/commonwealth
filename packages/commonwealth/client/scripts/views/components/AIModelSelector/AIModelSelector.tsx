@@ -4,7 +4,6 @@ import React from 'react';
 import { CWText } from '../component_kit/cw_text';
 import './AIModelSelector.scss';
 
-// Define the shape of model options, compatible with CWSelectList
 export interface ModelOption {
   value: CompletionModel;
   label: string;
@@ -16,7 +15,7 @@ export interface AIModelSelectorProps {
   selectedModelValues: CompletionModel[];
   onSelectionChange: (selectedValues: CompletionModel[]) => void;
   maxSelection: number;
-  popoverId?: string; // For ARIA attributes if needed by the popover trigger
+  popoverId?: string;
 }
 
 export const AIModelSelector = ({
@@ -29,18 +28,15 @@ export const AIModelSelector = ({
 }: AIModelSelectorProps) => {
   const handleChange = (
     newValue: readonly ModelOption[] | ModelOption | null,
-    // actionMeta: ActionMeta<ModelOption> // Available if needed
   ) => {
     let newSelectedValues: CompletionModel[] = [];
     if (Array.isArray(newValue)) {
       newSelectedValues = newValue.map((option) => option.value);
     } else if (newValue !== null && 'value' in newValue) {
-      // Should be an array if isMulti is true, but handle single object defensively
       newSelectedValues = [newValue.value];
     }
 
     if (newSelectedValues.length > maxSelection) {
-      // Silently cap the selection at maxSelection
       onSelectionChange(newSelectedValues.slice(0, maxSelection));
     } else {
       onSelectionChange(newSelectedValues);
@@ -53,17 +49,11 @@ export const AIModelSelector = ({
   );
 
   return (
-    <div
-      className="AIModelSelector"
-      id={popoverId}
-      role="dialog" // Assuming this component acts as a dialog within a popover
-      aria-modal="false" // If it doesn't trap focus like a modal
-      aria-label={title}
-    >
+    <div className="AIModelSelector" id={popoverId}>
       <CWText className="AIModelSelector__title" type="b2">
         {title}
       </CWText>
-      <CWSelectList<ModelOption, true> // Explicitly type Option as ModelOption and IsMulti as true
+      <CWSelectList<ModelOption, true>
         isMulti
         options={availableModels}
         value={currentValueForSelect}
@@ -71,9 +61,8 @@ export const AIModelSelector = ({
         placeholder="Select models..."
         className="AIModelSelector__selectList"
         menuPlacement="top"
-        closeMenuOnSelect={false} // Keep menu open for easier multi-selection
-        hideSelectedOptions={false} // Continue to show selected options in the list
-        // components={{ Option: CustomOptionWithCheckbox }} // Future: Add if checkboxes are desired
+        closeMenuOnSelect={false}
+        hideSelectedOptions={false}
       />
       {selectedModelValues.length >= maxSelection && (
         <p className="AIModelSelector__maxReachedMessage">
