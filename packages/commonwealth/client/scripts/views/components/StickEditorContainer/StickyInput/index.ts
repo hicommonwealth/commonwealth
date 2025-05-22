@@ -1,2 +1,3 @@
-export { default } from './StickyInput';
-export * from './useDynamicPlaceholder';
+import StickyInput from './StickyInput';
+
+export { StickyInput };
