@@ -672,7 +672,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
               })
             : address;
         const { data } = await axios.get(
-          `${BASE_API_PATH}/user.GetAddressStatus?community_id=${cid}&address=${adr}`,
+          `${BASE_API_PATH}/user.getAddressStatus?community_id=${cid}&address=${adr}`,
           { headers: { address: user.activeAccount?.address, jwt: user.jwt } },
         );
 

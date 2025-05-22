@@ -66,7 +66,7 @@ export default class WebWalletController {
     // do nothing on failure
     try {
       await axios.post(
-        `${BASE_API_PATH}/community.SetAddressWallet`,
+        `${BASE_API_PATH}/community.setAddressWallet`,
         {
           community_id: account.community.id,
           wallet_id: wallet,
