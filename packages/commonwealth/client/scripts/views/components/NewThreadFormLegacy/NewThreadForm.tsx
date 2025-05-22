@@ -679,7 +679,12 @@ export const NewThreadForm = ({ onCancel }: NewThreadFormProps) => {
   const sidebarComponent = [
     {
       label: 'Links',
-      item: <div className="cards-colum">{/* <TokenWidget /> */}</div>,
+      item: (
+        <div className="cards-colum">
+          {/* Note : Hiding this as the CommonTrade Modal is Broken for base sepollia. */}
+          {/* <TokenWidget /> */}
+        </div>
+      ),
     },
     {
       label: 'Links',
