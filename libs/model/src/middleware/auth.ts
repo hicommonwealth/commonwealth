@@ -253,12 +253,8 @@ async function checkGatedActions(
   if (!topic_id)
     throw new InvalidInput('Must provide a valid topic id to authorize');
 
-  // TODO: we can probably cache this
   const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
-
-  // If no groups/actions, allow all actions
-  if (topic.group_ids?.length === 0) return;
 
   // Get the groups and gated actions
   // TODO: we can probably cache this

@@ -1,4 +1,4 @@
-import { config } from '@hicommonwealth/model';
+import { config, models } from '@hicommonwealth/model';
 import { test } from '@playwright/test';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 
@@ -34,7 +34,7 @@ test.describe('New Discussion Page Tests', () => {
     const match = page.url().match(/\/(\d+)-/);
     // @ts-expect-error StrictNullChecks
     const threadId = match[1];
-    await seeder.testDb.sequelize.query(
+    await models.sequelize.query(
       `DELETE from "Threads" where id = ${threadId}`,
     );
   });

@@ -205,4 +205,20 @@ export const trpcRouter = trpc.router({
     Community.SearchCommunities,
     trpc.Tag.Community,
   ),
+  getCommunityStats: trpc.query(
+    Community.GetCommunityStats,
+    trpc.Tag.Community,
+    { ttlSecs: 60 * 60 },
+  ),
+  updateBanner: trpc.command(Community.UpdateBanner, trpc.Tag.Community),
+  setDefaultRole: trpc.command(Community.SetDefaultRole, trpc.Tag.Community),
+  toggleCommunityStar: trpc.command(
+    Community.ToggleCommunityStar,
+    trpc.Tag.Community,
+  ),
+  setAddressWallet: trpc.command(
+    Community.SetAddressWallet,
+    trpc.Tag.Community,
+  ),
+  getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
 });

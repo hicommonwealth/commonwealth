@@ -69,9 +69,9 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import Poll from 'client/scripts/models/Poll';
 import { DeltaStatic } from 'quill';
 // eslint-disable-next-line max-len
+import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -120,10 +120,6 @@ export interface NewThreadFormHandles {
   appendContent: (markdown: string) => void;
 }
 
-export interface ExtendedPoll extends Poll {
-  customDuration?: string;
-}
-
 // eslint-disable-next-line react/display-name
 export const NewThreadForm = forwardRef<
   NewThreadFormHandles,
@@ -149,7 +145,7 @@ export const NewThreadForm = forwardRef<
     const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
     const [linkedProposals, setLinkedProposals] =
       useState<ProposalState | null>();
-    const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+    const [pollsData, setPollData] = useState<LocalPoll[]>();
 
     // --- State for Image Modal Context ---
     const [imageModalContext, setImageModalContext] = useState<{
@@ -419,16 +415,11 @@ export const NewThreadForm = forwardRef<
         }
 
         if (thread && pollsData && pollsData?.length) {
-          const custom_duration = pollsData[0]?.customDuration
-            ? pollsData[0]?.customDuration === 'Infinite'
-              ? null
-              : parseInt(pollsData[0]?.customDuration)
-            : 5;
           await createPoll({
             thread_id: thread.id!,
             prompt: pollsData[0]?.prompt,
             options: pollsData[0]?.options,
-            custom_duration,
+            duration: parseCustomDuration(pollsData[0]?.custom_duration),
           });
         }
 
@@ -784,15 +775,11 @@ export const NewThreadForm = forwardRef<
               label: 'Polls',
               item: (
                 <div className="cards-column">
-                  {[
-                    ...new Map(
-                      pollsData?.map((poll) => [poll?.id, poll]),
-                    ).values(),
-                  ].map((poll: Poll) => {
+                  {(pollsData || []).map((poll) => {
                     return (
                       <ThreadPollCard
-                        poll={poll}
-                        key={poll.id}
+                        poll={poll as unknown as ExtendedPoll}
+                        key={(poll as unknown as ExtendedPoll).id}
                         actionGroups={actionGroups}
                         bypassGating={bypassGating}
                         showDeleteButton={true}

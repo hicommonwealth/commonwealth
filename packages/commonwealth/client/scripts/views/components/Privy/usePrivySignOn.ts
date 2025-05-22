@@ -4,6 +4,7 @@ import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/pri
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback } from 'react';
 import { useSignIn } from 'state/api/user';
+import { PrivySignInSSOProvider } from 'views/components/Privy/types';
 import { useIdentityTokenRef } from 'views/components/Privy/useIdentityTokenRef';
 import { useSignMessageMemo } from 'views/components/Privy/useSignMessageMemo';
 
@@ -12,7 +13,7 @@ type UsePrivySignOnProps = {
   onError: (err: Error) => void;
   wallet: ConnectedWallet;
   ssoOAuthToken: string | undefined;
-  ssoProvider: 'google_oauth' | 'phone' | 'email';
+  ssoProvider: PrivySignInSSOProvider;
 };
 
 export function usePrivySignOn() {

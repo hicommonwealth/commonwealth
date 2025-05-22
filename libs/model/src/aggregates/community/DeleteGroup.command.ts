@@ -1,7 +1,6 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op } from 'sequelize';
-import { models, sequelize } from '../../database';
+import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 
@@ -26,19 +25,6 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
         throw new InvalidInput(DeleteGroupErrors.SystemManaged);
 
       await models.sequelize.transaction(async (transaction) => {
-        await models.Topic.update(
-          {
-            group_ids: sequelize.fn(
-              'array_remove',
-              sequelize.col('group_ids'),
-              group_id,
-            ),
-          },
-          {
-            where: { community_id, group_ids: { [Op.contains]: [group_id] } },
-            transaction,
-          },
-        );
         await models.Membership.destroy({
           where: { group_id },
           transaction,

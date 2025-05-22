@@ -1,8 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
@@ -26,7 +25,6 @@ import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
 import { config } from './server/config';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
@@ -35,15 +33,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
 
-const latencyInfo: Record<string, { invocationCount: number; total: number }> =
-  {};
-
 /**
  * Bootstraps express app
  */
 export async function main(
   app: express.Express,
-  db: DB,
   {
     port,
     withLoggingMiddleware = false,
@@ -61,15 +55,12 @@ export async function main(
     )} GB`,
   );
 
-  // @ts-expect-error StrictNullChecks
-  sgMail.setApiKey(config.SENDGRID.API_KEY);
-
   const cacheDecorator = new CacheDecorator();
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
 
   const sessionStore = new SequelizeStore({
-    db: db.sequelize,
+    db: sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
     expiration: config.AUTH.SESSION_EXPIRY_MILLIS,
@@ -125,29 +116,13 @@ export async function main(
     app.use((req, res, next) => {
       try {
         const routePattern = `${req.method.toUpperCase()} ${req.path}`;
-        stats().increment('cw.path.called', {
-          path: routePattern,
-        });
         const start = Date.now();
-        if (!latencyInfo[routePattern])
-          latencyInfo[routePattern] = { invocationCount: 0, total: 0 };
-
         res.on('finish', () => {
           const latency = Date.now() - start;
-          latencyInfo[routePattern].invocationCount += 1;
-          latencyInfo[routePattern].total += latency;
-          if (latencyInfo[routePattern].invocationCount >= 3) {
-            stats().histogram(
-              `cw.path.latency`,
-              Math.round(latencyInfo[routePattern].total / 3),
-              {
-                path: routePattern,
-                statusCode: `${res.statusCode}`,
-              },
-            );
-            latencyInfo[routePattern].invocationCount = 0;
-            latencyInfo[routePattern].total = 0;
-          }
+          stats().distribution(`cw.path.metrics`, latency, 0.3, {
+            path: routePattern,
+            statusCode: `${res.statusCode}`,
+          });
         });
       } catch (e) {
         log.error('Failed to record stats', e, {
@@ -225,14 +200,9 @@ export async function main(
   };
 
   setupMiddleware();
-  setupPassport(db);
+  setupPassport();
 
-  // Declare Validation Middleware Service
-  // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(db);
-
-  setupAPI('/api', app, db, dbValidationService, cacheDecorator);
+  setupAPI(app, cacheDecorator);
 
   app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/.well-known/assetlinks.json`);

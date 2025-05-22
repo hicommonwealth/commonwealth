@@ -1,5 +1,4 @@
 import { AppError, blobStorage } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,7 +9,6 @@ export const Errors = {
 };
 
 const getUploadSignature = async (
-  models: DB,
   req: Request,
   res: Response,
   next: NextFunction,

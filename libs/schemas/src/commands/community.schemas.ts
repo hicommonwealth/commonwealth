@@ -216,7 +216,6 @@ export const UpdateTopic = {
       Topic.pick({
         name: true,
         description: true,
-        group_ids: true,
         telegram: true,
         featured_in_sidebar: true,
         featured_in_new_post: true,
@@ -456,5 +455,35 @@ export const UpdateCommunityTags = {
     community_id: z.string(),
     tags: z.array(Tags),
   }),
+  context: AuthContext,
+};
+
+export const UpdateBanner = {
+  input: z.object({
+    community_id: z.string(),
+    banner_text: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetDefaultRole = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const ToggleCommunityStar = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetAddressWallet = {
+  input: z.object({
+    community_id: z.string(),
+    wallet_id: z.nativeEnum(WalletId),
+  }),
+  output: z.boolean(),
   context: AuthContext,
 };

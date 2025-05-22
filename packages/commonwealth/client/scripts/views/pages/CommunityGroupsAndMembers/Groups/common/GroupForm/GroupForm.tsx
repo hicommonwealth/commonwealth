@@ -7,7 +7,7 @@ import {
 import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -181,6 +181,13 @@ const GroupForm = ({
   ] = useState<TopicPermissionToggleGroupSubFormsState[]>([]);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsProcessingProfileImage(isGenerating || isUploading);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -501,9 +508,7 @@ const GroupForm = ({
 
               <CWImageInput
                 label="Group Image (Accepts JPG and PNG files)"
-                onImageProcessingChange={({ isGenerating, isUploading }) => {
-                  setIsProcessingProfileImage(isGenerating || isUploading);
-                }}
+                onImageProcessingChange={handleImageProcessingChange}
                 name="groupImageUrl"
                 hookToForm
                 imageBehavior={ImageBehavior.Circle}

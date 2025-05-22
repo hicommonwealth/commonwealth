@@ -388,3 +388,58 @@ export const SearchCommunities = {
     results: z.array(SearchCommunityView),
   }),
 };
+
+export const Batchable = z.object({
+  date: z.string(),
+  new_items: z.string(),
+});
+
+export const GetCommunityStats = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    batches: z.object({
+      active_accounts: z.array(Batchable),
+      comments: z.array(Batchable),
+      roles: z.array(Batchable),
+      threads: z.array(Batchable),
+    }),
+    totals: z.object({
+      total_comments: z.number(),
+      total_roles: z.number(),
+      total_threads: z.number(),
+    }),
+  }),
+  context: AuthContext,
+};
+
+export const GetRoles = {
+  input: z.object({
+    community_id: z.string(),
+    roles: z.string(),
+  }),
+  output: z.array(
+    z.object({
+      address: z.string(),
+      role: z.enum(['moderator', 'admin']),
+    }),
+  ),
+  context: AuthContext,
+};
+
+export const GetNamespaceMetadata = {
+  input: z.object({
+    namespace: z.string(),
+    stake_id: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  output: z.object({
+    name: z.string(),
+    image: z.string().nullish(),
+  }),
+};
+
+export const GetByDomain = {
+  input: z.object({ custom_domain: z.string() }),
+  output: z.object({ community_id: z.string().optional() }),
+};
