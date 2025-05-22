@@ -95,7 +95,6 @@ const StickyInput = (props: StickyInputProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
 
-  // Use our dynamic placeholder hook with the DOM selector approach
   const placeholderText = useDynamicPlaceholder({
     mode,
     isReplying: !!isReplying,

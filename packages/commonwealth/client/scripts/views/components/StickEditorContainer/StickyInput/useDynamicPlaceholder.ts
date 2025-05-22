@@ -10,9 +10,6 @@ interface UseDynamicPlaceholderProps {
 
 /**
  * Custom hook to handle dynamic placeholder text for Quill editor
- *
- * @param props - Configuration object containing mode, isReplying, replyingToAuthor, and isMobile
- * @returns The placeholder text string
  */
 export const useDynamicPlaceholder = (props: UseDynamicPlaceholderProps) => {
   const {
@@ -20,10 +17,9 @@ export const useDynamicPlaceholder = (props: UseDynamicPlaceholderProps) => {
     isReplying,
     replyingToAuthor,
     isMobile,
-    selector = '.quill.sticky-editor .ql-editor', // Default selector for the Quill editor
+    selector = '.quill.sticky-editor .ql-editor',
   } = props;
 
-  // Calculate the placeholder text based on current state
   const getPlaceholderText = () => {
     if (mode === 'thread') {
       return 'Create a thread...';
@@ -34,15 +30,11 @@ export const useDynamicPlaceholder = (props: UseDynamicPlaceholderProps) => {
     }
   };
 
-  // Current placeholder text
   const placeholderText = getPlaceholderText();
 
-  // Update the placeholder whenever relevant props change
   useEffect(() => {
-    // Find the editor element using the selector
     const editorElement = document.querySelector(selector);
 
-    // Only update if we found the element
     if (editorElement) {
       editorElement.setAttribute('data-placeholder', placeholderText);
     }
