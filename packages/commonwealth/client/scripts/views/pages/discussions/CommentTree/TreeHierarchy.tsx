@@ -47,6 +47,11 @@ type ExtendedCommentViewParams = CommentViewParams & {
   aiEnabled?: boolean;
 };
 
+const DEFAULT_MODEL: AIModelOption = {
+  value: 'gpt-4o',
+  label: 'GPT-4o',
+};
+
 export const TreeHierarchy = ({
   pageRef,
   thread,
@@ -98,7 +103,10 @@ export const TreeHierarchy = ({
   ) as ExtendedCommentViewParams[];
 
   const handleGenerateAIReply = useCallback(
-    (targetCommentIdToReplyTo: number): Promise<void> => {
+    (
+      targetCommentIdToReplyTo: number,
+      useDefaultModelOnly = false,
+    ): Promise<void> => {
       const commentBeingRepliedTo =
         allComments.find((c) => c.id === targetCommentIdToReplyTo) ||
         (targetCommentIdToReplyTo === thread.id ? thread : undefined);
@@ -110,7 +118,12 @@ export const TreeHierarchy = ({
         return Promise.resolve();
       }
 
-      const newInstances = selectedModels.map((model: AIModelOption) => ({
+      // If useDefaultModelOnly is true, only use the first selected model
+      const modelsToUse = useDefaultModelOnly
+        ? [DEFAULT_MODEL]
+        : selectedModels;
+
+      const newInstances = modelsToUse.map((model: AIModelOption) => ({
         targetCommentId: targetCommentIdToReplyTo,
         modelId: model.value,
         modelName: model.label,
@@ -156,8 +169,14 @@ export const TreeHierarchy = ({
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const triggerStreamingForNewComment = useCallback(
-    (commentId: number) => {
-      const newInstances = selectedModels.map((model: AIModelOption) => ({
+    (commentId: number, useDefaultModelOnly = false) => {
+      // If useDefaultModelOnly is true, only use the first selected model
+
+      const modelsToUse = useDefaultModelOnly
+        ? [DEFAULT_MODEL]
+        : selectedModels;
+
+      const newInstances = modelsToUse.map((model: AIModelOption) => ({
         targetCommentId: commentId,
         modelId: model.value,
         modelName: model.label,
@@ -306,7 +325,7 @@ export const TreeHierarchy = ({
                       onCommentReplyStart(comment.id, index);
                     }}
                     onAIReply={() => {
-                      return handleGenerateAIReply(comment.id);
+                      return handleGenerateAIReply(comment.id, true);
                     }}
                     onDelete={() => onDelete(comment)}
                     isSpam={!!comment.marked_as_spam_at}
@@ -423,7 +442,7 @@ export const TreeHierarchy = ({
                         hasAI: boolean,
                       ) => {
                         if (hasAI) {
-                          triggerStreamingForNewComment(newCommentId);
+                          triggerStreamingForNewComment(newCommentId, true);
                         }
                       }}
                       tooltipText={permissions.CREATE_COMMENT.tooltip}
