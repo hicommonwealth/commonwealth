@@ -181,20 +181,6 @@ async function getSlotDetails(
 }
 
 /**
- * Maps a Solana event name to our internal event type
- */
-function mapSolanaEventType(eventName: string): string | undefined {
-  // Map from Anchor event names to our internal event types
-  const eventTypeMap: Record<string, string> = {
-    NewContest: 'contest:started',
-    ContentAdded: 'contest:contentAdded',
-    VoterVoted: 'contest:vote',
-  };
-
-  return eventTypeMap[eventName];
-}
-
-/**
  * Decodes events from a Solana transaction using Anchor
  */
 async function decodeEventsFromTransaction(

@@ -113,7 +113,6 @@ export async function processChainNode(
  * Schedules processing for all Solana chain nodes with the specified interval.
  */
 export async function scheduleSolanaNodeProcessing(
-  interval: number,
   processorFunc: typeof processChainNode,
 ): Promise<void> {
   // Loop through all available Solana networks defined in the enum

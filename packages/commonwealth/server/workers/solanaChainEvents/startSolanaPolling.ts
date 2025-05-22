@@ -25,13 +25,8 @@ export async function startSolanaPolling(
   log.info(
     `All Solana chains will be polled for events every ${interval / 1000} seconds`,
   );
-  await scheduleSolanaNodeProcessing(interval, processChainNode);
-  return setInterval(
-    scheduleSolanaNodeProcessing,
-    interval,
-    interval,
-    processChainNode,
-  );
+  await scheduleSolanaNodeProcessing(processChainNode);
+  return setInterval(scheduleSolanaNodeProcessing, interval, processChainNode);
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
