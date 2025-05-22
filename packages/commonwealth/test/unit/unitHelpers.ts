@@ -1,4 +1,4 @@
-import type { DB, UserAttributes } from '@hicommonwealth/model';
+import { UserAttributes, models } from '@hicommonwealth/model';
 import type {
   TypedRequestBody,
   TypedRequestQuery,
@@ -28,13 +28,13 @@ export function postReq<
   return resp;
 }
 
-type UserBuilder = { models: DB; userAttributes: UserAttributes };
+type UserBuilder = { userAttributes: UserAttributes };
 
 export function buildUser(userBuilder: UserBuilder): Express.User {
   return {
     ...userBuilder.userAttributes,
     getAddresses: () =>
-      userBuilder.models.Address.findAll({
+      models.Address.findAll({
         where: { user_id: userBuilder.userAttributes.id },
       }),
   } as Express.User;

@@ -53,6 +53,13 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 export interface Stats extends Disposable {
   histogram(key: string, value: number, tags?: Record<string, string>): void;
 
+  distribution(
+    key: string,
+    value: number,
+    sampleRate?: number,
+    tags?: Record<string, string>,
+  ): void;
+
   // counters
   set(key: string, value: number): void;
 

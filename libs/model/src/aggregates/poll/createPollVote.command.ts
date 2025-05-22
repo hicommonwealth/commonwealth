@@ -35,9 +35,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         throw new InvalidState('Cannot vote on a locked thread');
       }
 
-      // TODO: migrate this to be JSONB array of strings in the DB
-      const options = JSON.parse(poll.options);
-      if (!options.includes(payload.option)) {
+      if (!poll.options.includes(payload.option)) {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
 
@@ -58,6 +56,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         vote = await models.Vote.create({
           poll_id: payload.poll_id,
           address: address.address,
+          user_id: actor.user.id!,
           author_community_id: address.community_id,
           community_id: poll.community_id,
           calculated_voting_weight: calculated_voting_weight?.toString(),
