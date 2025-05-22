@@ -106,7 +106,7 @@ type VoterProfileData = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const threadId = identifier.split('-')[0];
+  const threadId = parseInt(`${identifier.split('-')?.[0] || 0}`);
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -142,7 +142,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const communityId = app.activeChainId() || '';
-  const { data: groups = [] } = useFetchGroupsQuery({
+  useFetchGroupsQuery({
     communityId,
     includeTopics: true,
     enabled: !!communityId,
@@ -309,13 +309,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
-  const { actionGroups, bypassGating, memberships, isTopicGated } =
-    useTopicGating({
-      communityId,
-      apiEnabled: !!user?.activeAccount?.address && !!communityId,
-      userAddress: user?.activeAccount?.address || '',
-      topicId: thread?.topic?.id || 0,
-    });
+  const { actionGroups, bypassGating, isTopicGated } = useTopicGating({
+    communityId,
+    apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
+  });
 
   const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
@@ -414,7 +413,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [fetchedProfiles]);
 
-  if (typeof identifier !== 'string') {
+  if (
+    typeof identifier !== 'string' ||
+    !(threadId && isLoading) ||
+    fetchThreadError
+  ) {
     return <PageNotFound />;
   }
 

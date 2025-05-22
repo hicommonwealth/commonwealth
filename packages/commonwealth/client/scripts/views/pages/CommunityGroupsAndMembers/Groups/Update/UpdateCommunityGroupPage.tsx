@@ -65,7 +65,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
 
   if (
     !user.isLoggedIn ||
-    !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
+    !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin()) ||
+    (!foundGroup && !isLoading)
   ) {
     return <PageNotFound />;
   }
