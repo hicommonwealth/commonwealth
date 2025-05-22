@@ -115,7 +115,7 @@ export async function main(
     // Report stats for all routes
     app.use((req, res, next) => {
       try {
-        if (!req.path.startsWith('/api')) next();
+        if (!req.path.startsWith('/api')) return next();
         const routePattern = `${req.method.toUpperCase()} ${req.path}`;
         const start = Date.now();
         res.on('finish', () => {
