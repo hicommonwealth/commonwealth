@@ -649,19 +649,6 @@ export const modelSeeder = (app: Application): ModelSeeder => ({
       return false;
     }
 
-    try {
-      await chai.request
-        .agent(app)
-        .post('/api/v1/SetDefaultRole')
-        .set('Accept', 'application/json')
-        .set('address', address)
-        .send({ community_id: chain, jwt });
-    } catch (e) {
-      console.error('Failed to set default role');
-      console.error(e);
-      return false;
-    }
-
     return true;
   },
 

@@ -39,8 +39,8 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
       console.warn('No provider.');
       return;
     }
-
-    privyAuthEffect(toSignInProvider(providerRef.current), oAuthAccessToken);
+    const ssoProvider = toSignInProvider(providerRef.current);
+    privyAuthEffect(ssoProvider, oAuthAccessToken);
   }, [oAuthAccessToken, privyAuthEffect]);
 
   const onInitOAuth = useCallback(

@@ -422,7 +422,6 @@ export const seedDb = async () => {
         verification_token_expires: undefined,
         verified: new Date(),
         role: 'admin' as Role,
-        is_user_default: false,
         ghost_address: false,
         is_banned: false,
       })),
