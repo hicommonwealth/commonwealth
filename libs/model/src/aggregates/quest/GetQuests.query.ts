@@ -74,13 +74,17 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'participation_times_per_period', QAS.participation_times_per_period,
                 'created_at', QAS.created_at,
                 'updated_at', QAS.updated_at,
-                'CommunityGoalMeta', json_build_object(
-                  'id', CGM.id,
-                  'name', CGM.name,
-                  'description', CGM.description,
-                  'type', CGM.type,
-                  'target', CGM.target
-                )
+                'CommunityGoalMeta', 
+                  CASE 
+                    WHEN CGM.id IS NOT NULL THEN json_build_object(
+                      'id', CGM.id,
+                      'name', CGM.name,
+                      'description', CGM.description,
+                      'type', CGM.type,
+                      'target', CGM.target
+                    )
+                    ELSE NULL
+                  END
             )))
           ELSE '[]'::json
           END AS "action_metas"

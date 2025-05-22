@@ -83,8 +83,8 @@ export const QuestTweet = z
 
 export const QuestActionMeta = z
   .object({
-    id: PG_INT.nullish(),
-    quest_id: PG_INT,
+    id: z.number().nullish(), // to allow negative system quests
+    quest_id: z.number(), // to allow negative system quests
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum([
       ...(Object.keys(QuestEvents) as [
